@@ -1,0 +1,153 @@
+/* Shared sizing for desktop, tablet and phone layouts. */
+:root {
+  --bottom-nav-height: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+html { scroll-padding-top: 88px; }
+body { min-width: 0; padding-bottom: 0; }
+.app-shell { padding-bottom: 0; }
+.page-container, .graph-page { padding-bottom: 110px; }
+.top-actions > *, .button > svg { flex-shrink: 0; }
+.field, .form-section-content, .support-course > div,
+.home-dashboard > *, .home-columns > *, .support-layout > *,
+.module-grid > *, .organization-grid > *, .partner-grid > *,
+.alumni-grid > *, .alumni-card > *, .community-layout > *,
+.form-grid > *, .choice-grid > *, .profile-grid > * { min-width: 0; }
+.field input, .field select, .field textarea { min-width: 0; max-width: 100%; }
+.support-course .button { flex: 0 0 auto; }
+.support-compose { scroll-margin-top: 92px; }
+.academic-compose-link { display: none; }
+.support-ai .filter-row { flex-wrap: wrap; overflow: visible; margin-right: 0; padding-right: 0; }
+.support-ai .filter-row button { white-space: normal; text-align: left; line-height: 1.5; padding: 10px 14px; }
+.support-question .button { flex: 0 0 auto; min-height: 46px; }
+.post-card h2, .module-card h2, .organization-card h2,
+.alumni-card, .support-course h3 { overflow-wrap: anywhere; }
+.modal { max-height: calc(100dvh - 36px); }
+.modal-header { position: sticky; top: 0; z-index: 1; background: var(--paper); }
+.modal-footer { position: sticky; bottom: 0; background: var(--paper); flex-wrap: wrap; }
+
+@media (min-width: 1001px) {
+  .support-compose { position: sticky; top: 96px; }
+  .desktop-ai-entry { bottom: max(22px, env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (min-width: 1001px) and (max-width: 1180px) {
+  .topbar-inner { gap: 16px; width: calc(100% - 32px); }
+  .desktop-nav { margin-left: 0; gap: 0; }
+  .desktop-nav a { padding: 10px 9px; font-size: 13px; white-space: nowrap; }
+  .top-actions { gap: 6px; }
+  .create-button { padding: 0 12px; font-size: 12px; }
+  .sports-card { grid-template-columns: 115px minmax(0, 1fr); }
+  .sports-bars { grid-column: 1 / -1; }
+  .sports-card .progress-ring { width: 110px; }
+}
+
+/* Tablet layouts retain two-column collections and give forms a full row. */
+@media (max-width: 1000px) {
+  body { padding-bottom: 0; }
+  html { scroll-padding-bottom: calc(var(--bottom-nav-height) + 24px); }
+  .page-container, .graph-page { padding-bottom: calc(var(--bottom-nav-height) + 40px); }
+  .mobile-nav { height: var(--bottom-nav-height); padding: 5px max(8px, env(safe-area-inset-right, 0px)) calc(5px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+  .mobile-nav a { min-width: 0; font-size: 11px; }
+  .mobile-nav .nav-ai .nav-icon { width: 46px; height: 38px; }
+  .toast { bottom: calc(var(--bottom-nav-height) + 16px); }
+  .support-layout, .create-layout, .community-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .support-compose, .create-summary, .community-aside { position: static; }
+  .academic-compose-link { display: inline-flex; margin-top: 8px; }
+  .community-aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .checkin-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .checkin-total-card { grid-column: 1 / -1; }
+  .checkin-history-row { grid-template-columns: 100px minmax(0, 1fr) 100px 75px auto; gap: 10px; }
+  .alumni-grid { grid-template-columns: minmax(0, 1fr); }
+  .alumni-card { grid-template-columns: 180px minmax(0, 1fr); }
+  .organization-home { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 720px) {
+  html { scroll-padding-top: 76px; }
+  .topbar-inner { gap: 8px; }
+  .top-actions { gap: 4px; }
+  .top-actions .icon-button, .create-button, .avatar-button { width: 44px; height: 44px; min-height: 44px; }
+  .page-container, .graph-page { width: calc(100% - 32px); padding-top: 24px; }
+  .page-hero { padding: 18px 0 24px; }
+  .page-hero h1 { font-size: clamp(32px, 8.6vw, 42px); line-height: 1.12; overflow-wrap: anywhere; }
+  .home-intro h1 { font-size: clamp(30px, 8vw, 42px); }
+  .home-intro { padding-top: 12px; }
+  .section-heading { flex-wrap: wrap; gap: 12px; }
+  .section-heading h2 { font-size: 24px; }
+  .content-section { margin-top: 36px; }
+  .panel, .post-card, .partner-card, .sports-card, .journey-preview { padding: 20px; border-radius: 18px; }
+  .home-dashboard { gap: 16px; }
+  .sports-card { gap: 18px; }
+  .sports-copy h2 { font-size: 26px; }
+  .sports-copy .teaching-context-link { min-height: 32px; }
+  .module-grid { gap: 12px; margin-top: 18px; }
+  .module-card { min-height: 0; padding: 22px; }
+  .module-icon { width: 42px; height: 42px; margin-bottom: 18px; }
+  .module-card h2 { font-size: 23px; }
+  .module-card .text-link { padding-top: 8px; }
+  .campus-feature > div:last-child { padding: 26px; }
+  .campus-feature > div:last-child h2 { font-size: 28px; }
+  .support-layout { gap: 18px; }
+  .support-course { flex-wrap: wrap; padding: 20px 0; gap: 12px; }
+  .support-course > div { flex: 1 1 145px; }
+  .support-compose { scroll-margin-top: 80px; }
+  .support-ai { margin-bottom: 0; }
+  .support-ai .filter-row { gap: 8px; }
+  .support-messages article { padding: 16px; }
+  .support-question { gap: 8px; }
+  .support-question .button { padding: 0 14px; }
+  .field input, .field select, .field textarea, .search-field input, .discover-search input { font-size: 16px; }
+  .filter-row { margin-right: 0; padding: 2px 0 8px; }
+  .filter-row button { flex: 0 0 auto; }
+  .filter-row button, .time-filter button, .post-actions button { min-height: 44px; }
+  .community-aside, .checkin-summary-grid { grid-template-columns: minmax(0, 1fr); }
+  .checkin-total-card { grid-column: auto; }
+  .checkin-history-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .checkin-hero { min-height: 320px; padding: 112px 22px 24px; }
+  .checkin-hero h1 { font-size: clamp(30px, 8vw, 42px); }
+  .checkin-today-panel { padding: 20px; }
+  .form-section { padding: 22px; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .form-section-number { width: 28px; height: 28px; }
+  .form-grid, .choice-grid { grid-template-columns: minmax(0, 1fr); }
+  .cover-marketing > strong { font-size: clamp(26px, 7.5vw, 34px); overflow-wrap: anywhere; }
+  .alumni-card { grid-template-columns: 100px minmax(0, 1fr); }
+  .alumni-card > div:last-child { padding: 20px; }
+  .event-detail-page { width: 100%; padding-bottom: calc(var(--bottom-nav-height) + 110px); }
+  .mobile-rsvp-bar { bottom: var(--bottom-nav-height); }
+  .mobile-rsvp-bar .button { flex-shrink: 0; }
+  .modal-backdrop { padding: max(12px, env(safe-area-inset-top, 0px)) 12px max(12px, env(safe-area-inset-bottom, 0px)); }
+  .modal { max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+  .modal-body { padding: 16px; }
+  .modal-header h2 { min-width: 0; overflow-wrap: anywhere; }
+  .modal-header .icon-button { flex-shrink: 0; }
+}
+
+@media (max-width: 480px) {
+  /* Settings remain accessible from the profile menu. */
+  .top-actions > .language-button { display: none; }
+  .topbar-inner { width: calc(100% - 24px); }
+  .brand { gap: 7px; }
+  .brand-copy strong { font-size: 11px; }
+  .alumni-card { grid-template-columns: minmax(0, 1fr); }
+  .alumni-portrait { min-height: 0; height: 155px; }
+  .checkin-total-body { grid-template-columns: minmax(0, 1fr); }
+  .checkin-total-card, .checkin-summary-card { padding: 20px; }
+  .checkin-completed-card { flex-wrap: wrap; }
+  .post-actions { flex-wrap: wrap; }
+  .upcoming-list > a { grid-template-columns: 40px minmax(0, 1fr); }
+  .upcoming-list .status-pill { grid-column: 2; justify-self: start; }
+  .coffee-cup-art { width: 160px; }
+}
+
+@media (max-width: 360px) {
+  .brand-copy { display: none; }
+  .topbar-inner { gap: 4px; }
+  .top-actions { gap: 3px; }
+  .support-question { flex-wrap: wrap; }
+  .support-question .field { flex-basis: 100%; }
+  .support-question .button { width: 100%; }
+  .partner-top { grid-template-columns: auto minmax(0, 1fr); }
+  .partner-top .activity-pill { grid-column: 2; justify-self: start; }
+  .coffee-hero { padding: 24px; }
+}
