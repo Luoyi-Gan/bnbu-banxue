@@ -32,7 +32,7 @@ const buildEvent = (
   ...event,
 })
 
-export const events: Event[] = [
+const seededEvents: Event[] = [
   buildEvent({
     id: 'ai-agent-workshop',
     title: 'AI Agent Workshop',
@@ -86,6 +86,35 @@ export const events: Event[] = [
   buildEvent({ id: 'makers-market', title: 'Student Makers Market', subtitle: 'Ideas you can hold', cover: 'cover-makers', category: '创业', dateLabel: 'OCT 29', timeLabel: '1:00 PM', location: 'Central Lawn', hostId: 'innovation-center', attendeeCount: 96, capacity: null, temporal: 'Next Week' }),
   buildEvent({ id: 'language-exchange', title: 'Language Exchange Picnic', subtitle: 'Bring a phrase, leave with a friend', cover: 'cover-language', category: '英语', dateLabel: 'OCT 30', timeLabel: '3:30 PM', location: 'Lake Lawn', hostId: 'english-club', attendeeCount: 47, temporal: 'Next Week' }),
 ]
+
+// Seed activities stay close to the day the demo is opened. The original
+// display dates and startAt values disagreed, which broke date filtering.
+const demoSchedule: Record<string, [number, number, number, number]> = {
+  'ai-agent-workshop': [2, 19, 30, 90], 'campus-night-run': [0, 19, 0, 75],
+  'english-corner': [-2, 20, 0, 90], 'badminton-night': [1, 19, 0, 90],
+  'board-game-night': [0, 20, 30, 120], 'startup-meetup': [2, 18, 30, 90],
+  'marketing-case-night': [3, 19, 0, 90], 'alumni-founder-talk': [4, 16, 0, 90],
+  'music-night': [4, 19, 30, 120], 'photography-walk': [5, 17, 0, 90],
+  'sustainability-lab': [6, 14, 0, 120], 'product-design-jam': [7, 10, 0, 120],
+  'basketball-open': [7, 16, 30, 90], 'debate-night': [8, 19, 0, 90],
+  'volunteer-day': [9, 9, 0, 180], 'career-stories': [10, 18, 0, 90],
+  'makers-market': [11, 13, 0, 180], 'language-exchange': [12, 15, 30, 90],
+}
+
+export const events: Event[] = seededEvents.map((event) => {
+  const [dayOffset, hour, minute, duration] = demoSchedule[event.id]
+  const start = new Date()
+  start.setHours(0, 0, 0, 0)
+  start.setDate(start.getDate() + dayOffset)
+  start.setHours(hour, minute, 0, 0)
+  return {
+    ...event,
+    startAt: start.toISOString(),
+    endAt: new Date(start.getTime() + duration * 60_000).toISOString(),
+    dateLabel: new Intl.DateTimeFormat('zh-CN', { month: 'numeric', day: 'numeric' }).format(start),
+    timeLabel: new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(start),
+  }
+})
 
 export const hosts: Host[] = [
   { id: 'ai-club', name: 'BNBU AI Club', shortName: 'AI', type: 'organization', verified: true, description: 'A student community for building useful, responsible AI together.', followers: 1284, tags: ['AI', 'Workshops', 'Builders'], color: '#155eef', members: ['Ming Li', 'Jia Wang', 'Yuqing Chen', 'Sophie Lau'] },

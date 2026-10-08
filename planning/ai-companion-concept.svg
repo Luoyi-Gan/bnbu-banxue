@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title desc">
+  <title id="title">小伴：校园 AI 助手</title>
+  <desc id="desc">一只蓝色聊天气泡造型的小助手，有星光、眼睛和微笑。</desc>
+  <defs>
+    <linearGradient id="body" x1="18" y1="16" x2="100" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1054DA"/>
+      <stop offset="0.58" stop-color="#2879F6"/>
+      <stop offset="1" stop-color="#62B5FF"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="31" y1="23" x2="73" y2="82" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow" x="4" y="8" width="112" height="112" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#1749A5" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <path d="M59 17c-23 0-41 17-41 39 0 14 8 27 21 34l-3 15 18-11c2 .3 4 .4 5 .4 23 0 42-17 42-39S82 17 59 17Z" fill="url(#body)" stroke="#0F4CC9" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M59 23c-18 0-33 10-37 25 9-7 23-12 38-12 13 0 26 3 35 9-5-13-19-22-36-22Z" fill="url(#shine)"/>
+    <ellipse cx="45" cy="56" rx="8" ry="10" fill="#FFFFFF"/>
+    <ellipse cx="73" cy="56" rx="8" ry="10" fill="#FFFFFF"/>
+    <circle cx="47" cy="57" r="3.2" fill="#15366E"/>
+    <circle cx="71" cy="57" r="3.2" fill="#15366E"/>
+    <path d="M48 73c6 6 16 6 22 0" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="34" cy="69" rx="5" ry="2.6" fill="#F6A8C6" fill-opacity="0.7"/>
+    <ellipse cx="84" cy="69" rx="5" ry="2.6" fill="#F6A8C6" fill-opacity="0.7"/>
+  </g>
+  <path d="M95 7l2.8 7.2L105 17l-7.2 2.8L95 27l-2.8-7.2L85 17l7.2-2.8L95 7Z" fill="#FFC85A" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round"/>
+  <circle cx="110" cy="36" r="2.6" fill="#85C8FF"/>
+  <circle cx="18" cy="22" r="2.2" fill="#85C8FF"/>
+</svg>

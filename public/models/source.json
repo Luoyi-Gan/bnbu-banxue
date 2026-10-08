@@ -1,0 +1,11 @@
+{
+  "project": "BNBU 3D Model",
+  "version": "S1.214",
+  "sourceFile": "exports/campus-lod1.glb",
+  "file": "bnbu-campus.glb",
+  "sha256": "9ef76a7349602f01aa206ce553f01ca9cf4706dd4bfa208245938405507d83d7",
+  "bytes": 2130548,
+  "copiedAt": "2026-10-08",
+  "locationPrecision": "building",
+  "limitations": "Model contains estimated geometry. Generic activity locations without a confirmed building ID remain unmarked. Indoor rooms and precise meeting points are not modeled."
+}
