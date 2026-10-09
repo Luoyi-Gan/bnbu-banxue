@@ -2,23 +2,34 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { initialV2State, v2StorageKey, type V2State } from './model'
 import { V2Context } from './context'
 import { hideRetiredContent } from './retiredContent'
+import { resolvePortalRole } from './portalAccess'
+
+const portalSessionKey = 'bnbu-campus-v2:portal-role'
+
+function sessionRole(legacy?: unknown) {
+  try {
+    const role = resolvePortalRole(window.sessionStorage.getItem(portalSessionKey), legacy)
+    window.sessionStorage.setItem(portalSessionKey, role)
+    return role
+  } catch { return resolvePortalRole(null, legacy) }
+}
 
 function readState(): V2State {
   try {
     const value = JSON.parse(window.localStorage.getItem(v2StorageKey) ?? 'null') as Partial<V2State> | null
-    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
+    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, role: sessionRole(value.role), participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
   } catch { /* use seed */ }
-  return initialV2State
+  return { ...initialV2State, role: sessionRole() }
 }
 
 export function V2Provider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<V2State>(readState)
   useEffect(() => {
-    const sync = (event: StorageEvent) => { if (event.key === v2StorageKey) setState(readState()) }
+    const sync = (event: StorageEvent) => { if (event.key === v2StorageKey) setState(current => ({ ...readState(), role: current.role })) }
     window.addEventListener('storage', sync)
     return () => window.removeEventListener('storage', sync)
   }, [])
-  useEffect(() => { try { window.localStorage.setItem(v2StorageKey, JSON.stringify(state)) } catch { /* ephemeral demo */ } }, [state])
-  return <V2Context.Provider value={{ state, setState, reset: () => setState(initialV2State) }}>{children}</V2Context.Provider>
+  useEffect(() => { try { window.localStorage.setItem(v2StorageKey, JSON.stringify({ ...state, role: undefined })) } catch { /* ephemeral demo */ } }, [state])
+  return <V2Context.Provider value={{ state, setState, reset: () => setState(current => ({ ...initialV2State, role: current.role })) }}>{children}</V2Context.Provider>
 }
 

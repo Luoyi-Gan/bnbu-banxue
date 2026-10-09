@@ -56,6 +56,7 @@ const seededActivities: ActivityItem[] = events.map((event) => ({ id: event.id, 
 
 export function V2Activities() {
   const { state, setState } = useV2()
+  const activityBase = state.role === 'teacher' ? '/v2/teacher/activities' : '/v2/activities'
   const { id } = useParams()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -90,7 +91,7 @@ export function V2Activities() {
     const data = new FormData(form.currentTarget)
     try {
       const next = createActivity(state, { title: String(data.get('title') ?? ''), description: String(data.get('description') ?? ''), startAt: String(data.get('date') ?? ''), location: String(data.get('location') ?? ''), capacity: Number(data.get('capacity')) })
-      setState(next); setCreateOpen(false); setPublishError(''); navigate('/v2/activities/' + next.localEvents[0].id)
+      setState(next); setCreateOpen(false); setPublishError(''); navigate(activityBase + '/' + next.localEvents[0].id)
     } catch (error) { setPublishError(error instanceof Error ? error.message : '活动发布失败') }
   }
   const changeVisibility = (eventId: string) => {
@@ -98,7 +99,7 @@ export function V2Activities() {
     catch (error) { setPublishError(error instanceof Error ? error.message : '操作失败') }
   }
   return <div className="v2-page v2-activities"><PageHeading eyebrow="DISCOVER CAMPUS" title="发现活动" description="认识新的人，参与正在发生的校园生活。" action={permitted && <button className="v2-button v2-button-primary" type="button" onClick={() => { setPublishError(''); setCreateOpen(true) }}><Plus size={17}/> 发起活动</button>}/>
-    {featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map((event) => ({ src: event.image!, alt: event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}` }))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={(index) => navigate(`/v2/activities/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`/v2/activities/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
+    {featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map((event) => ({ src: event.image!, alt: event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}` }))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={(index) => navigate(`${activityBase}/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`${activityBase}/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
     <section className="v2-panel v2-list-panel">
       <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`} />
       <div className="v2-toolbar v2-activity-toolbar">
@@ -118,8 +119,8 @@ export function V2Activities() {
       </div>
       <div className="v2-filter-pills">{categories.map((item) => <button type="button" key={item} className={category === item ? 'is-active' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
       {activeFilters.length > 0 && <div className="v2-active-filters" aria-label="已应用的筛选条件">{activeFilters.map((item) => <button type="button" key={item.label} aria-label={`清除${item.label}`} onClick={item.clear}>{item.label}<X size={13}/></button>)}<button type="button" className="v2-active-filters-reset" onClick={resetFilters}>清除全部</button></div>}
-      {filtered.length ? <div key={`${query}|${category}|${period}|${hostFilter}|${statusFilter}|${sort}`} className="v2-activity-grid v2-filtered-list">{filtered.map((event, index) => <Link className="v2-activity-card" to={`/v2/activities/${event.id}`} key={event.id} style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}><div className="v2-activity-art" style={event.image ? { backgroundImage: `url(${event.image})` } : undefined}><span>{event.category}</span></div><div className="v2-activity-info"><small>{formatWhen(event.startAt)}</small><h3>{event.title}</h3><p>{event.subtitle}</p><span><MapPin size={14}/>{event.location}</span></div></Link>)}</div> : <div className="v2-filter-empty"><Empty icon={Search} title="没有匹配的活动" description="试试其他分类或清除搜索条件。"/><button type="button" className="v2-button v2-button-secondary" onClick={resetFilters}>清除筛选</button></div>}</section>
-    {active && <Drawer title={active.title} eyebrow={`${active.category} · ${active.host}`} onClose={() => navigate('/v2/activities')} wide>
+      {filtered.length ? <div key={`${query}|${category}|${period}|${hostFilter}|${statusFilter}|${sort}`} className="v2-activity-grid v2-filtered-list">{filtered.map((event, index) => <Link className="v2-activity-card" to={`${activityBase}/${event.id}`} key={event.id} style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}><div className="v2-activity-art" style={event.image ? { backgroundImage: `url(${event.image})` } : undefined}><span>{event.category}</span></div><div className="v2-activity-info"><small>{formatWhen(event.startAt)}</small><h3>{event.title}</h3><p>{event.subtitle}</p><span><MapPin size={14}/>{event.location}</span></div></Link>)}</div> : <div className="v2-filter-empty"><Empty icon={Search} title="没有匹配的活动" description="试试其他分类或清除搜索条件。"/><button type="button" className="v2-button v2-button-secondary" onClick={resetFilters}>清除筛选</button></div>}</section>
+    {active && <Drawer title={active.title} eyebrow={`${active.category} · ${active.host}`} onClose={() => navigate(activityBase)} wide>
       <div className="v2-detail-art" style={active.image ? { backgroundImage: `url(${active.image})` } : undefined}/>
       <p className="v2-detail-lead">{active.subtitle}</p>
       <section className="v2-event-detail-section"><h3>活动介绍</h3><p>{active.description}</p></section>
