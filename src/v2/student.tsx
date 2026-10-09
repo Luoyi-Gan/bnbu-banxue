@@ -72,7 +72,7 @@ export function V2Activities() {
   const [publishError, setPublishError] = useState('')
   const permitted = canPublishActivity(state)
   const [featured, setFeatured] = useState(0)
-  const all = useMemo(() => [...state.localEvents.map((event): ActivityItem => ({ id: event.id, title: event.title, subtitle: '校园成员发起的活动', description: event.description, category: '校园成员活动', startAt: event.startAt, location: event.location, capacity: event.capacity, host: event.host ?? studentName, local: event })), ...seededActivities], [state.localEvents])
+  const all = useMemo(() => [...state.localEvents.map((event): ActivityItem => ({ id: event.id, title: event.title, subtitle: event.mailSourceId ? '来自学校邮件' : '校园成员发起的活动', description: event.description, category: event.mailSourceId ? '学校邮件活动' : '校园成员活动', image: event.image, endAt: event.endAt, startAt: event.startAt, location: event.location, capacity: event.capacity, host: event.host ?? studentName, local: event })), ...seededActivities], [state.localEvents])
   const categories = ['全部', ...new Set(all.map((event) => event.category))]
   const hostsList = ['全部主办方', ...new Set(all.filter((event) => event.local?.status !== 'draft').map((event) => event.host))]
   const filtered = filterActivityItems(all, { query, category, period, host: hostFilter, status: statusFilter, sort }, activityActor(state).id)
@@ -125,11 +125,11 @@ export function V2Activities() {
     {active && <Drawer title={active.title} eyebrow={`${active.category} · ${active.host}`} onClose={() => navigate(activityBase)} wide>
       <div className="v2-detail-art" style={active.image ? { backgroundImage: `url(${active.image})` } : undefined}/>
       <p className="v2-detail-lead">{active.subtitle}</p>
-      <section className="v2-event-detail-section"><h3>活动介绍</h3><p>{active.description}</p></section>
+      <section className="v2-event-detail-section"><h3>活动介绍</h3><p>{active.description}</p>{active.local?.conditions && <p>参与条件：{active.local.conditions}</p>}{active.local?.mailSourceId && <p>来源：学校邮件{active.image ? ' · 封面来自邮件附件' : ''}</p>}</section>
       <section className="v2-event-detail-section"><h3>活动信息</h3><div className="v2-event-facts">
-        <div><CalendarDays size={20}/><span><small>时间</small><strong>{formatWhen(active.startAt)}</strong></span></div>
+        <div><CalendarDays size={20}/><span><small>时间</small><strong>{formatWhen(active.startAt)}{active.local?.endAt && <> 至 {formatWhen(active.local.endAt)}</>}</strong></span></div>
         <div><MapPin size={20}/><span><small>地点</small><strong>{active.location}</strong></span></div>
-        <div><UsersRound size={20}/><span><small>人数上限</small><strong>{active.capacity ? `${active.capacity} 人` : '未限定'}</strong></span></div>
+        <div><UsersRound size={20}/><span><small>人数上限</small><strong>{active.capacity ? `${active.capacity} 人` : active.local?.mailSourceId ? '未提供' : '未限定'}</strong></span></div>
         <div><Megaphone size={20}/><span><small>主办方</small><strong>{active.host}</strong></span></div>
       </div></section>
       {state.role === 'student' && <div className="v2-detail-actions"><button type="button" className={`v2-button ${state.participatingActivities.includes(active.id) ? 'v2-button-secondary' : 'v2-button-primary'}`} aria-pressed={state.participatingActivities.includes(active.id)} disabled={!state.participatingActivities.includes(active.id) && (active.local?.status === 'draft' || Date.parse(active.endAt ?? active.startAt) <= Date.now())} onClick={() => setState(value => setActivityParticipation(value, active.id, !value.participatingActivities.includes(active.id)))}>{state.participatingActivities.includes(active.id) ? '取消参与标记' : '标记参与'}</button><span className="v2-form-note">{state.participatingActivities.includes(active.id) ? '已标记参与，将显示在首页近期校园安排中。' : '标记后加入个人安排，不占用活动名额。'}</span></div>}

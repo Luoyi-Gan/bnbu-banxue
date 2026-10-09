@@ -1,3 +1,4 @@
+import type { MailActivityRecord } from './mailActivityPolicy'
 import type { TeacherAccount, TeacherCoffeeData } from './teacherCoffee'
 import type { RelationshipHistory } from './relationshipAdapter'
 import { alumniSeed, alumniSeedPosts, type AlumniData } from './alumniModel'
@@ -15,8 +16,9 @@ export interface Post { alumniId?: string; id: string; title: string; body: stri
 export interface Room { id: string; type: RoomType; title: string; body: string; time: string; place: string; buildingId?: string; capacity: number; members: string[]; owner: string; status: 'open' | 'finished'; requests: string[] }
 export interface Conversation { id: string; title: string; messages: { id: string; from: string; body: string; time: string }[]; unread: number }
 export interface Verification { id: string; name: string; kind: 'student' | 'club' | 'official'; organization: string; note: string; status: ReviewStatus; reviewNote: string; date: string }
-export interface LocalEvent { ownerId?: string; host?: string; id: string; title: string; description: string; startAt: string; location: string; capacity: number; status: 'published' | 'draft'; registrations: number }
+export interface LocalEvent { endAt?: string; image?: string; conditions?: string; mailSourceId?: string; ownerId?: string; host?: string; id: string; title: string; description: string; startAt: string; location: string; capacity: number | null; status: 'published' | 'draft'; registrations: number }
 export interface V2State {
+  mailActivities?: MailActivityRecord[]
   teacherAccount?: TeacherAccount
   teacherCoffee?: TeacherCoffeeData
   relationshipHistory?: Record<string, RelationshipHistory>

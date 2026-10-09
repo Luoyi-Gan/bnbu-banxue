@@ -12,7 +12,7 @@ export function setActivityParticipation(state: V2State, id: string, participati
   const marked = state.participatingActivities.filter(value => value !== id)
   if (!participating) return { ...state, participatingActivities: marked }
   const event = availableActivities(state).find(item => item.id === id)
-  if (!event || Date.parse('endAt' in event ? event.endAt : event.startAt) <= now) return state
+  if (!event || Date.parse(event.endAt ?? event.startAt) <= now) return state
   return { ...state, participatingActivities: [...marked, id] }
 }
 
@@ -21,7 +21,7 @@ export type StudentScheduleItem = { id: string; kind: 'activity' | 'room' | 'cof
 export function studentSchedule(state: V2State, now = Date.now()): StudentScheduleItem[] {
   const items: StudentScheduleItem[] = []
   for (const event of availableActivities(state)) {
-    if (!state.participatingActivities.includes(event.id) || Date.parse('endAt' in event ? event.endAt : event.startAt) <= now) continue
+    if (!state.participatingActivities.includes(event.id) || Date.parse(event.endAt ?? event.startAt) <= now) continue
     items.push({ id: `activity:${event.id}`, kind: 'activity', title: event.title, time: '', startAt: event.startAt, location: event.location, path: `/v2/activities/${event.id}`, label: '已标记参与' })
   }
   for (const room of state.rooms) {

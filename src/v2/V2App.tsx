@@ -1,4 +1,5 @@
-import { CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { AdminMailActivities } from './AdminMailActivities'
+import { Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -35,6 +36,7 @@ const studentMore = [
 ]
 const adminNav = [
   { path: '/v2/admin', label: '运营总览', icon: LayoutDashboard, end: true },
+  { path: '/v2/admin/mail-activities', label: '邮件转活动', icon: Mail },
   { path: '/v2/admin/verifications', label: '认证审核', icon: ShieldCheck },
   { path: '/v2/admin/moderation', label: '内容审核', icon: Newspaper },
 ]
@@ -122,6 +124,7 @@ function V2Routes() {
     <Route path="/v2/settings" element={<V2Settings/>}/>
     <Route path="/v2/admin" element={<AdminDashboard/>}/>
     <Route path="/v2/admin/verifications" element={<AdminVerifications/>}/>
+    <Route path="/v2/admin/mail-activities" element={<AdminMailActivities/>}/>
     <Route path="/v2/admin/moderation" element={<AdminModeration/>}/>
     <Route path="*" element={<Navigate to={portalHome[state.role]} replace/>}/>
   </Routes></V2Shell>

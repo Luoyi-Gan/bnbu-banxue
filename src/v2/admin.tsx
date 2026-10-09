@@ -16,6 +16,7 @@ export function AdminDashboard() {
   const pendingComments = state.posts.flatMap((post) => post.comments.filter((comment) => comment.status === 'pending').map((comment) => ({ ...comment, postTitle: post.title })))
   const pendingVerifications = state.verifications.filter((item) => item.status === 'pending')
   const metrics = [
+    { label: '邮件转活动', value: (state.mailActivities ?? []).filter(m => m.status === 'pending').length, detail: '待核实邮件 · 自动发布与事后修正', path: '/v2/admin/mail-activities', icon: Newspaper },
     { label: '内容待审', value: pendingPosts.length + pendingComments.length, detail: `帖子 ${pendingPosts.length} · 评论 ${pendingComments.length}`, path: '/v2/admin/moderation', icon: FileCheck2 },
     { label: '认证待审', value: pendingVerifications.length + alumniData(state).profiles.filter(p => p.status === 'pending').length, detail: '学生 / 社团成员 / 官方 / 校友', path: '/v2/admin/verifications', icon: ShieldCheck },
     { label: '校园社区', value: state.posts.filter((post) => post.status === 'visible').length, detail: '当前可见帖子', path: '/v2/admin/moderation', icon: Newspaper },
