@@ -81,7 +81,7 @@ function V2Shell({ children }: { children: ReactNode }) {
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
     <div className="v2-workspace">
       <header className="v2-topbar">
-        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button><div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
+        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button><div>{(admin || teacher) && <span className="v2-breadcrumb">BNBU / {admin ? '管理' : '教师'}</span>}<strong>{title}</strong></div></div>
         <div className="v2-top-actions">
           {!admin && !teacher && <div className="v2-quick-nav" ref={quickNavRef}>
             <button type="button" className={`v2-quick-nav-trigger${quickNavOpen ? ' is-open' : ''}`} aria-expanded={quickNavOpen} aria-controls="v2-quick-nav-panel" aria-label="快捷入口" onClick={() => setQuickNavOpen((value) => !value)}><LayoutGrid size={17}/><span>快捷入口</span><ChevronDown size={14}/></button>
