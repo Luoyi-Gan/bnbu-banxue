@@ -30,7 +30,7 @@ function readTeacherAccount() {
 function readState(): V2State {
   try {
     const value = JSON.parse(window.localStorage.getItem(v2StorageKey) ?? 'null') as Partial<V2State> | null
-    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, posts: value.alumni ? value.posts : [...value.posts, ...alumniSeedPosts.filter(seed => !value.posts!.some(post => post.id === seed.id))], role: sessionRole(value.role), teacherAccount: readTeacherAccount(), participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
+    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, posts: value.alumni ? value.posts : [...value.posts, ...alumniSeedPosts.filter(seed => !value.posts!.some(post => post.id === seed.id))], roomReviews: Array.isArray(value.roomReviews) ? value.roomReviews : [], role: sessionRole(value.role), teacherAccount: readTeacherAccount(), participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
   } catch { /* use seed */ }
   return { ...initialV2State, role: sessionRole(), teacherAccount: readTeacherAccount() }
 }
@@ -51,4 +51,3 @@ export function V2Provider({ children }: { children: ReactNode }) {
   useEffect(() => { if (synced.current === state) return; try { window.localStorage.setItem(v2StorageKey, JSON.stringify({ ...state, role: undefined, teacherAccount: undefined })); setPersistenceError(false) } catch { setPersistenceError(true) } }, [state])
   return <V2Context.Provider value={{ state, setState: updateState, persistenceError, reset: () => setState(current => ({ ...initialV2State, role: current.role, teacherAccount: current.teacherAccount })) }}>{children}</V2Context.Provider>
 }
-
