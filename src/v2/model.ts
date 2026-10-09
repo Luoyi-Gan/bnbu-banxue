@@ -10,8 +10,9 @@ export type AnnouncementCategory = 'platform' | 'academic' | 'service' | 'club'
 export type RoomType = 'carpool' | 'entertainment' | 'study'
 export interface Announcement { id: string; title: string; body: string; category: AnnouncementCategory; author: string; date: string; pinned: boolean }
 export interface Comment { id: string; author: string; body: string; date: string; status: 'visible' | 'pending' | 'hidden' }
-export interface Post { id: string; title: string; body: string; board: string; author: string; date: string; likes: number; status: 'visible' | 'pending' | 'hidden'; comments: Comment[] }
+export interface Post { id: string; title: string; body: string; board: string; author: string; date: string; likes: number; status: 'visible' | 'pending' | 'hidden'; comments: Comment[]; images?: string[] }
 export interface Room { id: string; type: RoomType; title: string; body: string; time: string; place: string; buildingId?: string; capacity: number; members: string[]; owner: string; status: 'open' | 'finished'; requests: string[] }
+export interface RoomReview { id: string; roomId: string; from: string; to: string; stars: number; tags: string[]; comment: string; date: string }
 export interface Conversation { id: string; title: string; messages: { id: string; from: string; body: string; time: string }[]; unread: number }
 export interface Verification { id: string; name: string; kind: 'student' | 'club' | 'official'; organization: string; note: string; status: ReviewStatus; reviewNote: string; date: string }
 export interface LocalEvent { id: string; title: string; description: string; startAt: string; location: string; capacity: number; status: 'published' | 'draft'; registrations: number }
@@ -20,6 +21,7 @@ export interface V2State {
   announcements: Announcement[]
   posts: Post[]
   rooms: Room[]
+  roomReviews: RoomReview[]
   conversations: Conversation[]
   verifications: Verification[]
   savedPosts: string[]
@@ -56,6 +58,7 @@ export const initialV2State: V2State = {
     { id: 'room-ball', type: 'entertainment', title: '周末羽毛球双打', body: '轻松打球，水平不限，记得带球拍。', time: '周六 19:00', place: '体育馆 3 号场', capacity: 4, members: ['王嘉', '林同学', studentName], owner: '王嘉', status: 'open', requests: [] },
     { id: 'room-ai', type: 'study', title: 'AI Agent Workshop 复盘小组', body: '交流 Workshop 笔记和项目想法，一起做出下一个原型。', time: '周日 15:00', place: '资源中心', capacity: 6, members: [studentName, '许宁'], owner: studentName, status: 'open', requests: ['李明'] },
   ],
+  roomReviews: [],
   conversations: [
     { id: 'chat-ball', title: '周末羽毛球双打', messages: [{ id: 'm1', from: '王嘉', body: '周末见！场地已经预约好了。', time: '18:42' }], unread: 1 },
     { id: 'chat-ai', title: 'AI Agent Workshop 复盘小组', messages: [{ id: 'm2', from: '许宁', body: '我会带上活动笔记。', time: '17:16' }], unread: 1 },
