@@ -1,3 +1,4 @@
+import type { RelationshipHistory } from './relationshipAdapter'
 import { alumniSeed, alumniSeedPosts, type AlumniData } from './alumniModel'
 export const studentName = '陈雨晴'
 export const v2StorageKey = 'bnbu-campus-v2-demo:v1'
@@ -15,6 +16,7 @@ export interface Conversation { id: string; title: string; messages: { id: strin
 export interface Verification { id: string; name: string; kind: 'student' | 'club' | 'official'; organization: string; note: string; status: ReviewStatus; reviewNote: string; date: string }
 export interface LocalEvent { ownerId?: string; host?: string; id: string; title: string; description: string; startAt: string; location: string; capacity: number; status: 'published' | 'draft'; registrations: number }
 export interface V2State {
+  relationshipHistory?: Record<string, RelationshipHistory>
   alumni?: AlumniData
   profile?: { nickname: string; avatar: string }
   role: Role
