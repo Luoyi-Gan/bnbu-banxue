@@ -11,7 +11,7 @@ export type RoomType = 'carpool' | 'entertainment' | 'study'
 export interface Announcement { id: string; title: string; body: string; category: AnnouncementCategory; author: string; date: string; pinned: boolean }
 export interface Comment { id: string; author: string; body: string; date: string; status: 'visible' | 'pending' | 'hidden' }
 export interface Post { id: string; title: string; body: string; board: string; author: string; date: string; likes: number; status: 'visible' | 'pending' | 'hidden'; comments: Comment[] }
-export interface Room { id: string; type: RoomType; title: string; body: string; time: string; place: string; capacity: number; members: string[]; owner: string; status: 'open' | 'finished'; requests: string[] }
+export interface Room { id: string; type: RoomType; title: string; body: string; time: string; place: string; buildingId?: string; capacity: number; members: string[]; owner: string; status: 'open' | 'finished'; requests: string[] }
 export interface Conversation { id: string; title: string; messages: { id: string; from: string; body: string; time: string }[]; unread: number }
 export interface Verification { id: string; name: string; kind: 'student' | 'club' | 'official'; organization: string; note: string; status: ReviewStatus; reviewNote: string; date: string }
 export interface LocalEvent { id: string; title: string; description: string; startAt: string; location: string; capacity: number; status: 'published' | 'draft'; registrations: number }

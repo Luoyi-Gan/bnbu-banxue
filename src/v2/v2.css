@@ -182,3 +182,47 @@
 .v2-coffee-schedule>.v2-form-note{margin:0}
 @media(max-width:720px){.v2-drawer .v2-teacher-grid .v2-teacher-card{height:120px;min-height:120px;max-height:120px}.v2-drawer .v2-teacher-grid .v2-teacher-card>img{width:30%;min-width:100px}.v2-coffee-teacher-detail{grid-template-columns:120px minmax(0,1fr);min-height:160px}.v2-coffee-teacher-detail>img{min-height:160px}.v2-coffee-teacher-detail>div{padding:12px 10px 12px 0}.v2-coffee-teacher-detail h3{font-size:18px}.v2-coffee-teacher-detail p{font-size:10px}.v2-coffee-slot-list{grid-template-columns:1fr}}
 @media(max-width:420px){.v2-drawer .v2-teacher-grid .v2-teacher-card{height:112px;min-height:112px;max-height:112px}.v2-drawer .v2-teacher-grid .v2-teacher-card>img{width:29%;min-width:90px}.v2-coffee-teacher-detail{grid-template-columns:90px minmax(0,1fr);min-height:180px}.v2-coffee-teacher-detail>img{min-height:180px}.v2-coffee-teacher-detail p{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:3}.v2-coffee-teacher-detail small{font-size:10px}.v2-coffee-booking-panel>.v2-button{width:100%;margin:5px 0 0}}
+
+/* The connector uses each milestone row as its origin, so the line follows its dot at every width. */
+.v2-announcement-milestones::before{content:none}
+.v2-announcement-milestones button::before{left:2px;top:17px;z-index:1;width:11px;height:11px}
+.v2-announcement-milestones button:not(:last-child)::after{content:"";position:absolute;left:6.5px;top:22px;bottom:-22px;width:2px;background:linear-gradient(#83b9ff,rgba(131,185,255,.38));pointer-events:none}
+
+.v2-pulse-heart{display:inline-flex;align-items:center;gap:5px;min-height:25px;padding:3px 0;border:0;background:transparent;color:#8290a8;font:inherit;font-size:11px;cursor:pointer;transition:color .18s}
+.v2-post-actions .v2-pulse-heart:hover,.v2-post-actions .v2-pulse-heart.is-active,.v2-detail-actions .v2-pulse-heart:hover,.v2-detail-actions .v2-pulse-heart.is-active{color:#ed4b73}
+.v2-pulse-heart-icon{position:relative;display:grid;place-items:center;width:18px;height:18px;transform-origin:center}
+.v2-pulse-heart-icon::after{content:"";position:absolute;inset:-5px;border:1px solid currentColor;border-radius:50%;opacity:0;pointer-events:none}
+.v2-pulse-heart-icon svg{display:block}
+.v2-pulse-heart.is-active .v2-pulse-heart-icon{animation:v2-heart-pulse .54s cubic-bezier(.25,.9,.3,1) both}
+.v2-pulse-heart.is-active .v2-pulse-heart-icon::after{animation:v2-heart-halo .58s ease-out both}
+.v2-pulse-heart-count{display:inline-block;min-width:1ch;animation:v2-heart-count .34s ease-out both}
+.v2-detail-actions .v2-pulse-heart{min-height:36px;padding:0 12px;border:1px solid var(--v2-line);border-radius:8px;background:#fff;font-size:12px;font-weight:700}
+@keyframes v2-heart-pulse{0%{transform:scale(1)}28%{transform:scale(.34) rotate(-8deg)}48%{transform:scale(1.28) rotate(6deg)}72%{transform:scale(.88)}100%{transform:scale(1)}}
+@keyframes v2-heart-halo{0%,20%{transform:scale(.3);opacity:0}43%{opacity:.55}100%{transform:scale(1.35);opacity:0}}
+@keyframes v2-heart-count{0%{transform:translateY(5px);opacity:.35}100%{transform:translateY(0);opacity:1}}
+
+.v2-quick-nav{position:relative}
+.v2-quick-nav-trigger{display:flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 11px;border:1px solid var(--v2-line);border-radius:10px;background:#fff;color:#26436c;font-size:11px;font-weight:800;white-space:nowrap;transition:background .2s,border-color .2s,box-shadow .2s}
+.v2-quick-nav-trigger:hover,.v2-quick-nav-trigger.is-open{border-color:#b4c8f4;background:#f2f6ff;box-shadow:0 6px 16px rgba(16,53,124,.07)}
+.v2-quick-nav-trigger>svg:last-child{transition:transform .22s}
+.v2-quick-nav-trigger.is-open>svg:last-child{transform:rotate(180deg)}
+.v2-quick-nav-panel{position:absolute;top:calc(100% + 14px);right:0;z-index:60;width:min(440px,calc(100vw - 30px));padding:18px;border:1px solid #d8e3f8;border-radius:18px;background:rgba(255,255,255,.98);box-shadow:0 24px 65px rgba(13,37,85,.18);opacity:0;visibility:hidden;transform:translateY(-9px) scale(.97);transform-origin:top right;pointer-events:none;transition:opacity .25s,transform .34s cubic-bezier(.2,.8,.2,1),visibility .25s}
+.v2-quick-nav-panel.is-open{opacity:1;visibility:visible;transform:translateY(0) scale(1);pointer-events:auto}
+.v2-quick-nav-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.v2-quick-nav-heading span{color:var(--v2-blue);font-size:10px;font-weight:900;letter-spacing:.15em}
+.v2-quick-nav-heading strong{color:#7b8da8;font-size:11px}
+.v2-quick-nav-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.v2-quick-nav-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:157px;padding:16px;border:1px solid transparent;border-radius:13px;color:#fff;opacity:0;transform:translateY(11px);transition:transform .25s,box-shadow .25s,opacity .28s}
+.v2-quick-nav-panel.is-open .v2-quick-nav-card{opacity:1;transform:translateY(0);transition-delay:.08s}
+.v2-quick-nav-panel.is-open .v2-quick-nav-card:nth-child(2){transition-delay:.14s}
+.v2-quick-nav-card:hover{transform:translateY(-4px)!important;box-shadow:0 13px 20px rgba(12,45,105,.17)}
+.v2-quick-nav-card.is-partners{background:linear-gradient(135deg,#0b2d72,#1553dd)}
+.v2-quick-nav-card.is-community{background:linear-gradient(135deg,#1c4aa3,#6b62df)}
+.v2-quick-nav-card-icon{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(255,255,255,.32);border-radius:9px;background:rgba(255,255,255,.13)}
+.v2-quick-nav-card>span:nth-child(2){display:grid;gap:5px;margin-top:auto}
+.v2-quick-nav-card strong{font-size:17px}
+.v2-quick-nav-card small{color:#d7e4ff;font-size:10px}
+.v2-quick-nav-card>svg:last-child{position:absolute;top:18px;right:17px;color:#dce8ff}
+@media(max-width:720px){.v2-quick-nav-trigger{width:38px;padding:0}.v2-quick-nav-trigger span,.v2-quick-nav-trigger>svg:last-child{display:none}.v2-quick-nav-panel{position:fixed;top:68px;right:14px;width:min(420px,calc(100vw - 28px))}}
+@media(max-width:420px){.v2-quick-nav-cards{grid-template-columns:1fr}.v2-quick-nav-card{min-height:103px;gap:5px}.v2-quick-nav-card>span:nth-child(2){margin-top:0}.v2-quick-nav-card-icon{width:30px;height:30px}}
+@media(prefers-reduced-motion:reduce){.v2-pulse-heart-icon,.v2-pulse-heart-icon::after,.v2-pulse-heart-count{animation:none!important}.v2-quick-nav-panel,.v2-quick-nav-card,.v2-quick-nav-trigger>svg:last-child{transition:none!important}}
