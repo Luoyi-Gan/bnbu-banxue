@@ -1,3 +1,4 @@
+import { alumniSeedPosts } from './alumniModel'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { initialV2State, v2StorageKey, type V2State } from './model'
 import { V2Context } from './context'
@@ -17,7 +18,7 @@ function sessionRole(legacy?: unknown) {
 function readState(): V2State {
   try {
     const value = JSON.parse(window.localStorage.getItem(v2StorageKey) ?? 'null') as Partial<V2State> | null
-    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, role: sessionRole(value.role), participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
+    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, posts: value.alumni ? value.posts : [...value.posts, ...alumniSeedPosts.filter(seed => !value.posts!.some(post => post.id === seed.id))], role: sessionRole(value.role), participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
   } catch { /* use seed */ }
   return { ...initialV2State, role: sessionRole() }
 }

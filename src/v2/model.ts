@@ -1,3 +1,4 @@
+import { alumniSeed, alumniSeedPosts, type AlumniData } from './alumniModel'
 export const studentName = '陈雨晴'
 export const v2StorageKey = 'bnbu-campus-v2-demo:v1'
 export const makeId = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -8,12 +9,13 @@ export type Role = 'student' | 'admin' | 'teacher'
 export type ReviewStatus = 'pending' | 'approved' | 'rejected'
 export type RoomType = 'carpool' | 'entertainment' | 'study'
 export interface Comment { id: string; author: string; body: string; date: string; status: 'visible' | 'pending' | 'hidden' }
-export interface Post { id: string; title: string; body: string; board: string; author: string; date: string; likes: number; status: 'visible' | 'pending' | 'hidden'; comments: Comment[] }
+export interface Post { alumniId?: string; id: string; title: string; body: string; board: string; author: string; date: string; likes: number; status: 'visible' | 'pending' | 'hidden'; comments: Comment[] }
 export interface Room { id: string; type: RoomType; title: string; body: string; time: string; place: string; buildingId?: string; capacity: number; members: string[]; owner: string; status: 'open' | 'finished'; requests: string[] }
 export interface Conversation { id: string; title: string; messages: { id: string; from: string; body: string; time: string }[]; unread: number }
 export interface Verification { id: string; name: string; kind: 'student' | 'club' | 'official'; organization: string; note: string; status: ReviewStatus; reviewNote: string; date: string }
 export interface LocalEvent { ownerId?: string; host?: string; id: string; title: string; description: string; startAt: string; location: string; capacity: number; status: 'published' | 'draft'; registrations: number }
 export interface V2State {
+  alumni?: AlumniData
   profile?: { nickname: string; avatar: string }
   role: Role
   announcements: unknown[] // Legacy history only.
@@ -40,8 +42,10 @@ export interface V2State {
 
 export const initialV2State: V2State = {
   role: 'student',
+  alumni: alumniSeed,
   announcements: [],
   posts: [
+    ...alumniSeedPosts,
     { id: 'post-study', title: '你最喜欢哪处学习空间？', body: '想找一个适合小组讨论的地方，欢迎分享你的推荐。', board: '校园', author: '林同学', date: '10月8日', likes: 12, status: 'visible', comments: [{ id: 'comment-seed', author: '李明', body: '资源中心靠窗的位置很舒服。', date: '10月8日', status: 'visible' }] },
     { id: 'post-english', title: '周末英语口语练习', body: '计划周六下午练习一小时，话题可以一起商量。', board: '学习', author: '王嘉', date: '10月7日', likes: 7, status: 'visible', comments: [] },
     { id: 'post-run', title: '推荐的校园夜跑路线？', body: '想从体育场出发跑 3 公里，欢迎分享路线。', board: '生活', author: '周然', date: '10月6日', likes: 5, status: 'visible', comments: [] },

@@ -1,3 +1,4 @@
+import { alumniData } from './alumniPolicy'
 import { coffeeSlots, events, teachers } from '../data/mockData'
 import { studentName, type V2State } from './model'
 
@@ -31,6 +32,14 @@ export function studentSchedule(state: V2State, now = Date.now()): StudentSchedu
     if (!state.coffeeBookings.includes(slot.id) || Date.parse(slot.endAt) <= now) continue
     const teacher = teachers.find(item => item.id === slot.teacherId)
     items.push({ id: `coffee:${slot.id}`, kind: 'coffee', title: `与${teacher?.name ?? '老师'}的 Coffee Chat`, time: '', startAt: slot.startAt, location: teacher?.location ?? '地点待确认', path: '/v2/me?tab=events', label: 'Coffee Chat' })
+  }
+  const alumni = alumniData(state)
+  for (const booking of alumni.bookings) {
+    if (booking.status !== 'confirmed') continue
+    const slot = alumni.slots.find(s => s.id === booking.slotId)
+    const person = alumni.profiles.find(p => p.id === slot?.alumniId)
+    if (!slot || !person || (booking.student !== studentName && person.owner !== studentName) || Date.parse(slot.endAt) <= now) continue
+    items.push({ id: `alumni:${booking.id}`, kind: 'coffee', title: `与${person.owner === studentName ? booking.student : person.name}的 Coffee Chat`, time: '', startAt: slot.startAt, location: slot.location, path: '/v2/alumni?view=bookings', label: '校友 Coffee Chat' })
   }
   return items.sort((a, b) => (a.startAt ? Date.parse(a.startAt) : Infinity) - (b.startAt ? Date.parse(b.startAt) : Infinity))
 }

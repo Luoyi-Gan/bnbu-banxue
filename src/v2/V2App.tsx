@@ -13,6 +13,7 @@ import { AdminDashboard, AdminModeration, AdminVerifications } from './admin'
 import { V2Activities, V2Community, V2Home, V2Messages, V2Partners, V2Teams } from './student'
 import { V2AI, V2Campus, V2Me, V2Settings } from './services'
 import { DraggableAI } from './DraggableAI'
+import { V2Alumni } from './V2Alumni'
 import { V2Sports } from './V2Sports'
 import { V2CampusExplore } from './V2CampusExplorer'
 import './v2.css'
@@ -25,6 +26,7 @@ const studentNav = [
   { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const studentMore = [
+  { path: '/v2/alumni', label: '校友同行', icon: UsersRound },
   { path: '/v2/sports', label: '体育运动', icon: GraduationCap },
   { path: '/v2/campus', label: '校园服务', icon: GraduationCap },
   { path: '/v2/ai', label: '校园 AI', icon: Sparkles },
@@ -51,7 +53,7 @@ function V2Shell({ children }: { children: ReactNode }) {
   const unread = state.conversations.reduce((sum, item) => sum + item.unread, 0)
   const unreadNotices = state.notifications.filter((item) => !item.read).length
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
-  useEffect(() => { setMobileMenu(false); setRoleMenu(false); setQuickNavOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname])
+  useEffect(() => { setMobileMenu(false); setRoleMenu(false); setQuickNavOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname, location.search])
   useEffect(() => {
     if (!roleMenu) return
     const closeOutside = (event: PointerEvent) => { if (!roleMenuRef.current?.contains(event.target as Node)) setRoleMenu(false) }
@@ -92,7 +94,7 @@ function V2Shell({ children }: { children: ReactNode }) {
             </div>
           </div>}
           {!admin && !teacher && <StudentSearch/>}
-          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? activityActor(state).name + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu"><span>{admin ? '管理员账号' : teacher ? '教师账号' : '学生账号'}</span>{!admin && !teacher && <><Link to="/v2/me">个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
+          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? activityActor(state).name + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
         </div>
       </header>
       <main className="v2-main">{children}</main>
@@ -108,6 +110,7 @@ function V2Routes() {
   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>
   return <V2Shell><Routes>
     <Route path="/v2" element={<V2Home/>}/>
+    <Route path="/v2/alumni" element={<V2Alumni/>}/>
     <Route path="/v2/sports" element={<V2Sports/>}/>
     <Route path="/v2/teacher" element={<Navigate to={portalHome.teacher} replace/>}/>
     <Route path="/v2/teacher/activities" element={<V2Activities/>}/>
