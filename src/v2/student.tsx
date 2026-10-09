@@ -34,7 +34,7 @@ export function V2Home() {
   const pending = state.applications.filter((item) => item.status === 'pending').length + state.rooms.reduce((count, room) => count + (room.owner === studentName ? room.requests.length : 0), 0)
   return <div className="v2-page v2-home">
     <section className="v2-home-hero" style={{ backgroundImage: `linear-gradient(95deg,rgba(4,22,54,.94),rgba(4,39,87,.72) 55%,rgba(4,24,54,.1)),url(${campusPhoto})` }}>
-      <span className="v2-eyebrow">2026 秋季学期 · BNBU CAMPUS</span><h1>你好，陈雨晴</h1><p>今天在校园里，先从你关心的事情开始。</p>
+      <span className="v2-eyebrow">2026 秋季学期 · BNBU CAMPUS</span><h1>你好，{state.profile?.nickname ?? studentName}</h1><p>今天在校园里，先从你关心的事情开始。</p>
       <div className="v2-home-hero-actions"><Link className="v2-button v2-button-light" to="/v2/activities">发现活动 <ArrowRight size={16}/></Link><Link className="v2-button v2-button-outline-light" to="/v2/partners">找搭子 <ArrowRight size={16}/></Link></div>
     </section>
     <div className="v2-home-stats">

@@ -92,7 +92,7 @@ function V2Shell({ children }: { children: ReactNode }) {
             </div>
           </div>}
           {!admin && !teacher && <StudentSearch/>}
-          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : '晴'}</span><strong>{admin ? '管理员演示' : teacher ? activityActor(state).name + ' · 演示' : '陈雨晴'}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu"><span>{admin ? '管理员账号' : teacher ? '教师账号' : '学生账号'}</span>{!admin && !teacher && <><Link to="/v2/me">个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
+          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? activityActor(state).name + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu"><span>{admin ? '管理员账号' : teacher ? '教师账号' : '学生账号'}</span>{!admin && !teacher && <><Link to="/v2/me">个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
         </div>
       </header>
       <main className="v2-main">{children}</main>
