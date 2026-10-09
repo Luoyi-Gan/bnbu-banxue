@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
+import { runInNewContext } from 'node:vm'
 import { sportsStudentHref } from '../src/v2/sportsEntry'
 import manifest from '../docs/SPORTS_STUDENT_SOURCE.json'
 
@@ -12,9 +13,20 @@ describe('Sports student migration', () => {
     }
   })
   it('only requests the existing local preview on loopback hosts', () => {
-    expect(sportsStudentHref('127.0.0.1')).toBe('/student/index.html?entry=checkin&preview=student')
+    expect(sportsStudentHref('127.0.0.1')).toBe('/student/index.html?preview=student')
     expect(sportsStudentHref('localhost')).toContain('preview=student')
-    expect(sportsStudentHref('example.com')).toBe('/student/index.html?entry=checkin')
+    expect(sportsStudentHref('example.com')).toBe('/student/index.html')
     expect(sportsStudentHref('127.0.0.1.example.com')).not.toContain('preview=')
+  })
+  it('does not switch screens after startup, even for previously shared checkin links', () => {
+    const script = readFileSync(new URL('../public/runtime-config.js', import.meta.url), 'utf8')
+    const listeners: unknown[] = []
+    const context = {
+      location: { hostname: '127.0.0.1', pathname: '/student/index.html', search: '?entry=checkin&preview=student' },
+      URLSearchParams,
+      addEventListener: (...args: unknown[]) => listeners.push(args),
+    }
+    runInNewContext(script, context)
+    expect(listeners).toEqual([])
   })
 })
