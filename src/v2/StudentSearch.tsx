@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, Megaphone, MessageCircle, Search, UsersRound, X } from 'lucide-react'
+import { ArrowRight, CalendarDays, MessageCircle, Search, UsersRound, X } from 'lucide-react'
 import { gsap } from 'gsap'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -6,9 +6,9 @@ import { events, hosts } from '../data/mockData'
 import { recommendationPhoto } from '../data/recommendationPhoto'
 import { useV2 } from './useV2'
 
-type SearchResult = { id: string; title: string; meta: string; path: string; keywords?: string; image?: string; kind: 'event' | 'notice' | 'post' | 'room' }
+type SearchResult = { id: string; title: string; meta: string; path: string; keywords?: string; image?: string; kind: 'event' | 'post' | 'room' }
 
-const resultIcons = { event: CalendarDays, notice: Megaphone, post: MessageCircle, room: UsersRound }
+const resultIcons = { event: CalendarDays, post: MessageCircle, room: UsersRound }
 
 export function StudentSearch() {
   const { state } = useV2()
@@ -25,14 +25,13 @@ export function StudentSearch() {
   const allResults = useMemo<SearchResult[]>(() => [
     ...state.localEvents.filter((event) => event.status === 'published').map((event) => ({ id: event.id, title: event.title, meta: `活动 · ${event.location}`, keywords: event.description, path: `/v2/activities/${event.id}`, kind: 'event' as const })),
     ...events.map((event) => ({ id: event.id, title: event.title, meta: `${event.category} · ${event.location} · ${hosts.find((host) => host.id === event.hostId)?.name ?? 'BNBU'}`, keywords: `${event.subtitle} ${event.description} ${event.tags.join(' ')}`, path: `/v2/activities/${event.id}`, image: recommendationPhoto(event), kind: 'event' as const })),
-    ...state.announcements.map((item) => ({ id: item.id, title: item.title, meta: `公告 · ${item.author}`, keywords: item.body, path: `/v2/announcements?item=${encodeURIComponent(item.id)}`, kind: 'notice' as const })),
     ...state.posts.filter((item) => item.status === 'visible' || item.status === 'pending' && item.author === '陈雨晴').map((item) => ({ id: item.id, title: item.title, meta: `社区 · ${item.board} · ${item.author}`, keywords: item.body, path: `/v2/community?item=${encodeURIComponent(item.id)}`, kind: 'post' as const })),
     ...state.rooms.filter((item) => item.status === 'open').map((item) => ({ id: item.id, title: item.title, meta: `找搭子 · ${item.place} · ${item.owner}`, keywords: item.body, path: `/v2/partners?item=${encodeURIComponent(item.id)}`, kind: 'room' as const })),
-  ], [state.announcements, state.localEvents, state.posts, state.rooms])
+  ], [state.localEvents, state.posts, state.rooms])
 
   const normalized = query.trim().toLocaleLowerCase()
   const matched = normalized ? allResults.filter((item) => `${item.title} ${item.meta} ${item.keywords ?? ''}`.toLocaleLowerCase().includes(normalized)) : []
-  const firstByKind = (['event', 'notice', 'post', 'room'] as const).flatMap((kind) => matched.filter((item) => item.kind === kind).slice(0, 2))
+  const firstByKind = (['event', 'post', 'room'] as const).flatMap((kind) => matched.filter((item) => item.kind === kind).slice(0, 2))
   const results = normalized
     ? [...firstByKind, ...matched.filter((item) => !firstByKind.includes(item))].slice(0, 7)
     : allResults.filter((item) => item.kind === 'event').slice(0, 3)
@@ -79,7 +78,7 @@ export function StudentSearch() {
     <button ref={triggerRef} type="button" className="v2-icon-button v2-student-search-trigger" aria-label="搜索校园" aria-expanded={open} aria-keyshortcuts="/ Meta+K Control+K" onClick={() => setOpen(true)}><Search size={19}/></button>
     <div className="v2-student-search-field" aria-hidden={!open}>
       <Search size={18} aria-hidden="true"/>
-      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder="搜索活动、公告、社区与搭子" aria-label="搜索校园内容" tabIndex={open ? 0 : -1}/>
+      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder="搜索活动、社区与搭子" aria-label="搜索校园内容" tabIndex={open ? 0 : -1}/>
       {query && <button type="button" className="v2-student-search-clear" aria-label="清除搜索词" onClick={() => { setQuery(''); inputRef.current?.focus() }}><X size={15}/></button>}
       <button type="button" className="v2-student-search-close" aria-label="关闭搜索" onClick={closeToTrigger}><X size={18}/></button>
     </div>

@@ -1,4 +1,4 @@
-import { Activity, ArrowRight, Bell, BookOpen, Bookmark, CalendarDays, CarFront, Check, ChevronRight, Clapperboard, Clock3, Heart, MapPin, Megaphone, MessageCircle, Plus, Search, Send, SlidersHorizontal, Ticket, UsersRound, X } from 'lucide-react'
+import { Activity, ArrowRight, Bell, BookOpen, Bookmark, CalendarDays, CarFront, ChevronRight, Clapperboard, Clock3, Heart, MapPin, Megaphone, MessageCircle, Plus, Search, Send, SlidersHorizontal, UsersRound, X } from 'lucide-react'
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import FlexCarousel from '../components/reactbits/FlexCarousel/FlexCarousel'
@@ -8,12 +8,12 @@ import campusPhoto from '../assets/campus/home-background.jpg'
 import { CampusMap } from './CampusMap'
 import { CampusBuildingPicker } from './V2CampusExplorer'
 import type { CampusBuilding } from './campusLocations'
-import { categoryName, makeId, roomTypeName, studentName, timeLabel, todayLabel, type AnnouncementCategory, type LocalEvent, type Room, type RoomType } from './model'
+import { makeId, roomTypeName, studentName, timeLabel, todayLabel, type Room, type RoomType } from './model'
 import { useV2 } from './useV2'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { AnimatedSearchField } from './AnimatedSearchField'
 import { filterActivityItems, type ActivityItem, type ActivityPeriod, type ActivitySort, type ActivityStatus } from './activityFilters'
-import { V2Ticket } from './V2Ticket'
+import { activityActor, canPublishActivity, changeActivityVisibility, createActivity, ownsActivity } from './activityPolicy'
 
 const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
 
@@ -27,11 +27,10 @@ function PulseHeart({ liked, count, onClick, label }: { liked: boolean; count: n
 
 export function V2Home() {
   const { state } = useV2()
-  const upcoming = events.filter((event) => Boolean(state.eventRegistrations[event.id]) && new Date(event.endAt).getTime() > Date.now()).sort((a, b) => Date.parse(a.startAt) - Date.parse(b.startAt)).slice(0, 3)
+  const upcoming = events.filter((event) => new Date(event.endAt).getTime() > Date.now()).sort((a, b) => Date.parse(a.startAt) - Date.parse(b.startAt)).slice(0, 3)
   const upcomingRooms = state.rooms.filter((room) => room.members.includes(studentName) && room.status === 'open').slice(0, 1)
   const upcomingCoffee = state.coffeeBookings.map((id) => coffeeSlots.find((slot) => slot.id === id)).filter((slot) => slot && Date.parse(slot.endAt) > Date.now()).slice(0, 2)
   const pending = state.applications.filter((item) => item.status === 'pending').length + state.rooms.reduce((count, room) => count + (room.owner === studentName ? room.requests.length : 0), 0)
-  const pinned = state.announcements.filter((item) => item.pinned).slice(0, 2)
   return <div className="v2-page v2-home">
     <section className="v2-home-hero" style={{ backgroundImage: `linear-gradient(95deg,rgba(4,22,54,.94),rgba(4,39,87,.72) 55%,rgba(4,24,54,.1)),url(${campusPhoto})` }}>
       <span className="v2-eyebrow">2026 秋季学期 · BNBU CAMPUS</span><h1>你好，陈雨晴</h1><p>今天在校园里，先从你关心的事情开始。</p>
@@ -46,16 +45,16 @@ export function V2Home() {
         <div className="v2-sport-progress" role="progressbar" aria-label="运动目标完成进度" aria-valuenow={16} aria-valuemin={0} aria-valuemax={20}><span/></div>
       </div>
     </div>
-    <div className="v2-home-grid"><section className="v2-panel v2-home-timeline"><SectionHeading title="我的接下来" detail="活动、组队与校园安排" action={<Link to="/v2/activities">查看活动 <ArrowRight size={15}/></Link>}/>
-      <div className="v2-timeline">{upcoming.map((event, index) => <Link to={`/v2/activities/${event.id}`} className="v2-timeline-item" style={{ animationDelay: `${index * 85}ms` }} key={event.id}><span className="v2-timeline-dot"/><span><small>{formatWhen(event.startAt)}</small><strong>{event.title}</strong><em><MapPin size={13}/>{event.location}</em></span><b>{state.eventRegistrations[event.id] === 'pending' ? '待审批' : state.eventRegistrations[event.id] === 'waitlist' ? '候补中' : '已报名'}</b></Link>)}
+    <div className="v2-home-grid v2-home-grid-single"><section className="v2-panel v2-home-timeline"><SectionHeading title="近期校园安排" detail="活动、组队与校园安排" action={<Link to="/v2/activities">查看活动 <ArrowRight size={15}/></Link>}/>
+      <div className="v2-timeline">{upcoming.map((event, index) => <Link to={`/v2/activities/${event.id}`} className="v2-timeline-item" style={{ animationDelay: `${index * 85}ms` }} key={event.id}><span className="v2-timeline-dot"/><span><small>{formatWhen(event.startAt)}</small><strong>{event.title}</strong><em><MapPin size={13}/>{event.location}</em></span><b>校园活动</b></Link>)}
       {upcomingCoffee.map((slot) => { const teacher = teachers.find((person) => person.id === slot!.teacherId); return <Link to="/v2/me?tab=events" className="v2-timeline-item" key={slot!.id}><span className="v2-timeline-dot"/><span><small>{slot!.dateLabel} · {slot!.timeLabel}</small><strong>与{teacher?.name ?? '老师'}的 Coffee Chat</strong><em>一对一交流</em></span><b>已预约</b></Link> })}
       {upcomingRooms.map((room) => <Link to="/v2/partners/teams" className="v2-timeline-item" key={room.id}><span className="v2-timeline-dot"/><span><small>{room.time}</small><strong>{room.title}</strong><em><MapPin size={13}/>{room.place}</em></span><b>我的组队</b></Link>)}
-      {!upcoming.length && !upcomingRooms.length && !upcomingCoffee.length && <div className="v2-timeline-empty"><span className="v2-timeline-dot"/><div><strong>安排从这里开始</strong><p>报名活动后，时间和状态会出现在这里。</p><Link to="/v2/activities">探索校园活动 <ArrowRight size={14}/></Link></div></div>}</div>
-    </section><section className="v2-panel v2-home-notices"><SectionHeading title="重要公告" detail="与你有关的校园信息" action={<Link to="/v2/announcements">全部公告 <ArrowRight size={15}/></Link>}/>{pinned.map((item) => <Link to={`/v2/announcements?item=${encodeURIComponent(item.id)}`} className="v2-notice-mini" key={item.id}><span>{categoryName[item.category]}</span><strong>{item.title}</strong><small>{item.date} · {item.author}</small><ChevronRight size={16}/></Link>)}<div className="v2-home-quick"><Link to="/v2/community">去社区看看 <ArrowRight size={14}/></Link><Link to="/v2/partners">发现搭子 <ArrowRight size={14}/></Link></div></section></div>
+      {!upcoming.length && !upcomingRooms.length && !upcomingCoffee.length && <div className="v2-timeline-empty"><span className="v2-timeline-dot"/><div><strong>安排从这里开始</strong><p>校园活动、组队和老师预约会出现在这里。</p><Link to="/v2/activities">探索校园活动 <ArrowRight size={14}/></Link></div></div>}</div>
+    </section></div>
   </div>
 }
 
-const seededActivities: ActivityItem[] = events.map((event) => ({ id: event.id, title: event.title, subtitle: event.subtitle, description: event.description, category: event.category, startAt: event.startAt, endAt: event.endAt, location: event.location, capacity: event.capacity, attendeeCount: event.attendeeCount, registrationMode: event.registrationMode, host: hosts.find((host) => host.id === event.hostId)?.name ?? 'BNBU', image: recommendationPhoto(event) }))
+const seededActivities: ActivityItem[] = events.map((event) => ({ id: event.id, title: event.title, subtitle: event.subtitle, description: event.description, category: event.category, startAt: event.startAt, endAt: event.endAt, location: event.location, capacity: event.capacity, host: hosts.find((host) => host.id === event.hostId)?.name ?? 'BNBU', image: recommendationPhoto(event) }))
 
 export function V2Activities() {
   const { state, setState } = useV2()
@@ -69,12 +68,13 @@ export function V2Activities() {
   const [sort, setSort] = useState<ActivitySort>('推荐顺序')
   const [filterOpen, setFilterOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
-  const [ticketOpen, setTicketOpen] = useState(false)
+  const [publishError, setPublishError] = useState('')
+  const permitted = canPublishActivity(state)
   const [featured, setFeatured] = useState(0)
-  const all = useMemo(() => [...state.localEvents.map((event): ActivityItem => ({ id: event.id, title: event.title, subtitle: '由你发起的活动', description: event.description, category: '我的活动', startAt: event.startAt, location: event.location, capacity: event.capacity, attendeeCount: event.registrations, registrationMode: 'open', host: studentName, local: event })), ...seededActivities], [state.localEvents])
+  const all = useMemo(() => [...state.localEvents.map((event): ActivityItem => ({ id: event.id, title: event.title, subtitle: '校园成员发起的活动', description: event.description, category: '校园成员活动', startAt: event.startAt, location: event.location, capacity: event.capacity, host: event.host ?? studentName, local: event })), ...seededActivities], [state.localEvents])
   const categories = ['全部', ...new Set(all.map((event) => event.category))]
   const hostsList = ['全部主办方', ...new Set(all.filter((event) => event.local?.status !== 'draft').map((event) => event.host))]
-  const filtered = filterActivityItems(all, { query, category, period, host: hostFilter, status: statusFilter, sort }, state.eventRegistrations)
+  const filtered = filterActivityItems(all, { query, category, period, host: hostFilter, status: statusFilter, sort }, activityActor(state).id)
   const activeFilters = [
     ...(query.trim() ? [{ label: `搜索：${query.trim()}`, clear: () => setQuery('') }] : []),
     ...(category !== '全部' ? [{ label: `分类：${category}`, clear: () => setCategory('全部') }] : []),
@@ -84,18 +84,25 @@ export function V2Activities() {
     ...(sort !== '推荐顺序' ? [{ label: `排序：${sort}`, clear: () => setSort('推荐顺序') }] : []),
   ]
   const resetFilters = () => { setQuery(''); setCategory('全部'); setPeriod('全部时间'); setHostFilter('全部主办方'); setStatusFilter('全部状态'); setSort('推荐顺序') }
-  const active = all.find((item) => item.id === id)
+  const active = all.find((item) => item.id === id && (!item.local || item.local.status === 'published' || ownsActivity(state, item.local)))
   const featuredItems = seededActivities.filter((event) => new Date(event.startAt).getTime() > Date.now()).slice(0, 7)
   const selectedFeatured = featuredItems[featured] ?? featuredItems[0]
-  const register = (event: ActivityItem) => {
-    const status = event.registrationMode === 'approval' ? 'pending' : event.capacity !== null && event.attendeeCount >= event.capacity ? 'waitlist' : 'going'
-    setState((value) => ({ ...value, eventRegistrations: { ...value.eventRegistrations, [event.id]: status }, notifications: [{ id: makeId(), title: status === 'going' ? '活动报名成功' : status === 'pending' ? '报名申请已提交' : '已加入候补', body: event.title, path: `/v2/activities/${event.id}`, date: '刚刚', read: false }, ...value.notifications] }))
+  const create = (form: FormEvent<HTMLFormElement>) => {
+    form.preventDefault()
+    const data = new FormData(form.currentTarget)
+    try {
+      const next = createActivity(state, { title: String(data.get('title') ?? ''), description: String(data.get('description') ?? ''), startAt: String(data.get('date') ?? ''), location: String(data.get('location') ?? ''), capacity: Number(data.get('capacity')) })
+      setState(next); setCreateOpen(false); setPublishError(''); navigate('/v2/activities/' + next.localEvents[0].id)
+    } catch (error) { setPublishError(error instanceof Error ? error.message : '活动发布失败') }
   }
-  const create = (form: FormEvent<HTMLFormElement>) => { form.preventDefault(); const data = new FormData(form.currentTarget); const title = String(data.get('title') ?? '').trim(); const location = String(data.get('location') ?? '').trim(); const rawDate = String(data.get('date') ?? ''); if (!title || !location || !rawDate) return; const event: LocalEvent = { id: makeId(), title, description: String(data.get('description') ?? '').trim(), startAt: new Date(rawDate).toISOString(), location, capacity: Math.max(1, Number(data.get('capacity')) || 20), status: 'published', registrations: 0 }; setState((value) => ({ ...value, localEvents: [event, ...value.localEvents] })); setCreateOpen(false); navigate(`/v2/activities/${event.id}`) }
-  return <div className="v2-page v2-activities"><PageHeading eyebrow="DISCOVER CAMPUS" title="发现活动" description="认识新的人，参与正在发生的校园生活。" action={<button className="v2-button v2-button-primary" type="button" onClick={() => setCreateOpen(true)}><Plus size={17}/> 发起活动</button>}/>
+  const changeVisibility = (eventId: string) => {
+    try { setState(changeActivityVisibility(state, eventId)); setPublishError('') }
+    catch (error) { setPublishError(error instanceof Error ? error.message : '操作失败') }
+  }
+  return <div className="v2-page v2-activities"><PageHeading eyebrow="DISCOVER CAMPUS" title="发现活动" description="认识新的人，参与正在发生的校园生活。" action={permitted && <button className="v2-button v2-button-primary" type="button" onClick={() => { setPublishError(''); setCreateOpen(true) }}><Plus size={17}/> 发起活动</button>}/>
     {featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map((event) => ({ src: event.image!, alt: event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}` }))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={(index) => navigate(`/v2/activities/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`/v2/activities/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
     <section className="v2-panel v2-list-panel">
-      <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`} action={<Link to="/v2/me?tab=events">我的活动 <ArrowRight size={15}/></Link>}/>
+      <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`} />
       <div className="v2-toolbar v2-activity-toolbar">
         <AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索活动、地点或主办方"/>
         <button type="button" className={`v2-activity-filter-toggle${filterOpen ? ' is-open' : ''}`} aria-expanded={filterOpen} aria-controls="v2-activity-filter-panel" onClick={() => setFilterOpen((value) => !value)}><SlidersHorizontal size={17}/> 筛选{activeFilters.length > 0 && <b>{activeFilters.length}</b>}</button>
@@ -104,9 +111,9 @@ export function V2Activities() {
         <div className="v2-activity-filter-inner">
           <div className="v2-activity-filter-grid">
             <fieldset><legend>活动时间</legend><div className="v2-activity-filter-options">{(['全部时间', '今天', '本周', '下周'] as ActivityPeriod[]).map((item) => <button type="button" key={item} className={period === item ? 'is-active' : ''} onClick={() => setPeriod(item)}>{item}</button>)}</div></fieldset>
-            <fieldset><legend>参与状态</legend><div className="v2-activity-filter-options">{(['全部状态', '可参与', '已报名', '我主办'] as ActivityStatus[]).map((item) => <button type="button" key={item} className={statusFilter === item ? 'is-active' : ''} onClick={() => setStatusFilter(item)}>{item}</button>)}</div></fieldset>
+            <fieldset><legend>活动状态</legend><div className="v2-activity-filter-options">{(['全部状态', '未结束', '我主办'] as ActivityStatus[]).map((item) => <button type="button" key={item} className={statusFilter === item ? 'is-active' : ''} onClick={() => setStatusFilter(item)}>{item}</button>)}</div></fieldset>
             <label>主办方<select value={hostFilter} onChange={(event) => setHostFilter(event.target.value)}>{hostsList.map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label>排序<select value={sort} onChange={(event) => setSort(event.target.value as ActivitySort)}>{(['推荐顺序', '时间最近', '热度最高'] as ActivitySort[]).map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label>排序<select value={sort} onChange={(event) => setSort(event.target.value as ActivitySort)}>{(['推荐顺序', '时间最近'] as ActivitySort[]).map((item) => <option key={item}>{item}</option>)}</select></label>
           </div>
           <div className="v2-activity-filter-footer"><span>可组合多个条件，结果会立即更新</span><button type="button" onClick={resetFilters}>重置全部</button></div>
         </div>
@@ -121,31 +128,14 @@ export function V2Activities() {
       <section className="v2-event-detail-section"><h3>活动信息</h3><div className="v2-event-facts">
         <div><CalendarDays size={20}/><span><small>时间</small><strong>{formatWhen(active.startAt)}</strong></span></div>
         <div><MapPin size={20}/><span><small>地点</small><strong>{active.location}</strong></span></div>
-        <div><UsersRound size={20}/><span><small>参与人数</small><strong>{active.attendeeCount} 人{active.capacity ? ` / ${active.capacity} 人` : ''}</strong></span></div>
+        <div><UsersRound size={20}/><span><small>人数上限</small><strong>{active.capacity ? `${active.capacity} 人` : '未限定'}</strong></span></div>
         <div><Megaphone size={20}/><span><small>主办方</small><strong>{active.host}</strong></span></div>
       </div></section>
       <section className="v2-event-detail-section"><h3>校园位置</h3><CampusMap key={active.id} location={active.location}/></section>
-      {active.local ? <div className="v2-detail-actions"><span className="v2-status-chip">{active.local.status === 'published' ? '我主办的活动' : '已结束展示'}</span><button type="button" className="v2-button v2-button-secondary" onClick={() => setState((value) => ({ ...value, localEvents: value.localEvents.map((event) => event.id === active.id ? { ...event, status: event.status === 'published' ? 'draft' : 'published' } : event) }))}>{active.local.status === 'published' ? '结束展示' : '重新展示'}</button></div> : <div className="v2-detail-actions">{state.eventRegistrations[active.id] ? <><span className="v2-status-chip is-success"><Check size={15}/>{state.eventRegistrations[active.id] === 'going' ? '已报名' : state.eventRegistrations[active.id] === 'pending' ? '待审批' : '候补中'}</span>{state.eventRegistrations[active.id] === 'going' && <button type="button" className="v2-button v2-button-primary" onClick={() => setTicketOpen(true)}><Ticket size={17}/> 查看电子凭证</button>}<button type="button" className="v2-button v2-button-secondary" onClick={() => { setTicketOpen(false); setState((value) => { const next = { ...value.eventRegistrations }; delete next[active.id]; return { ...value, eventRegistrations: next } }) }}>取消报名</button></> : <button type="button" className="v2-button v2-button-primary" disabled={Date.parse(active.endAt ?? active.startAt) < Date.now()} onClick={() => register(active)}>{Date.parse(active.endAt ?? active.startAt) < Date.now() ? '活动已结束' : active.registrationMode === 'approval' ? '申请报名' : '立即报名'} <ArrowRight size={16}/></button>}</div>}
+      {active.local && ownsActivity(state, active.local) && <div className="v2-detail-actions"><span className="v2-status-chip">我主办的活动</span><button type="button" className="v2-button v2-button-secondary" disabled={active.local.status === 'draft' && !permitted} onClick={() => changeVisibility(active.id)}>{active.local.status === 'published' ? '结束展示' : '重新展示'}</button></div>}
+      {publishError && <p role="alert">{publishError}</p>}
     </Drawer>}
-    {active && ticketOpen && state.eventRegistrations[active.id] === 'going' && <V2Ticket event={active} onClose={() => setTicketOpen(false)}/>}
-    {createOpen && <Modal title="发起校园活动" onClose={() => setCreateOpen(false)}><form className="v2-form" onSubmit={create}><label>活动名称<input name="title" required maxLength={80} placeholder="例如：周末摄影漫步"/></label><label>活动介绍<textarea name="description" rows={3} placeholder="告诉大家会发生什么"/></label><div className="v2-form-two"><label>开始时间<input name="date" type="datetime-local" required/></label><label>人数上限<input name="capacity" type="number" min={1} defaultValue={20}/></label></div><label>地点<input name="location" required placeholder="校园内的集合地点"/></label><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setCreateOpen(false)}>取消</button><button type="submit" className="v2-button v2-button-primary">发布活动</button></div></form></Modal>}
-  </div>
-}
-
-export function V2AnnouncementPage() {
-  const { state } = useV2()
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [filter, setFilter] = useState<'all' | AnnouncementCategory>('all')
-  const [query, setQuery] = useState('')
-  const [selected, setSelected] = useState<string | null>(null)
-  const sorted = [...state.announcements].sort((a, b) => Number(b.pinned) - Number(a.pinned))
-  const items = sorted.filter((item) => (filter === 'all' || item.category === filter) && `${item.title} ${item.body}`.toLowerCase().includes(query.toLowerCase()))
-  const current = state.announcements.find((item) => item.id === (selected ?? new URLSearchParams(location.search).get('item')))
-  return <div className="v2-page"><PageHeading eyebrow="CAMPUS UPDATES" title="校园公告" description="重要时间节点、教务通知与校园服务，都在这里。"/>
-    <section className="v2-announcement-hero" style={{ backgroundImage: `linear-gradient(95deg,rgba(3,19,52,.92),rgba(5,47,103,.52)),url(${campusPhoto})` }}><div><span className="v2-eyebrow">CAMPUS TODAY</span><h2>知道校园正在发生什么</h2><p>来自平台、教务与校园组织的最新消息。</p></div><div className="v2-announcement-milestones"><strong>本学期关键节点</strong>{sorted.filter((item) => item.pinned).slice(0, 3).map((item) => <button type="button" onClick={() => setSelected(item.id)} key={item.id}><span>{item.date}</span><b>{item.title}</b></button>)}</div></section>
-    <section className="v2-panel v2-list-panel"><SectionHeading title="最新通知" detail={`${items.length} 条公告`}/><div className="v2-toolbar"><AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索公告"/></div><div className="v2-filter-pills">{([['all', '全部'], ['platform', '平台'], ['academic', '教务'], ['service', '服务'], ['club', '社团']] as const).map(([key, label]) => <button type="button" key={key} className={filter === key ? 'is-active' : ''} onClick={() => setFilter(key)}>{label}</button>)}</div>{items.length ? <div key={`${query}|${filter}`} className="v2-row-list v2-filtered-list">{items.map((item) => <button className="v2-announcement-row" type="button" key={item.id} onClick={() => setSelected(item.id)}><span className="v2-notice-icon"><Megaphone size={20}/></span><span className="v2-row-main"><small>{categoryName[item.category]} · {item.author}</small><strong>{item.title}</strong><span>{item.body}</span></span><span className="v2-row-end">{item.pinned && <b>置顶</b>}<small>{item.date}</small><ChevronRight size={17}/></span></button>)}</div> : <div className="v2-filter-empty"><Empty icon={Megaphone} title="当前条件下暂无公告" description="可以切换分类或清除搜索词。"/><button type="button" className="v2-button v2-button-secondary" onClick={() => { setQuery(''); setFilter('all') }}>清除筛选</button></div>}</section>
-    {current && <Drawer title={current.title} eyebrow={`${categoryName[current.category]} · ${current.author}`} onClose={() => { setSelected(null); if (location.search) navigate('/v2/announcements', { replace: true }) }}><p className="v2-detail-date">{current.date} {current.pinned && '· 关键公告'}</p><p className="v2-detail-lead">{current.body}</p><div className="v2-info-box">此为本地演示公告。正式信息请以学校官方渠道为准。</div></Drawer>}
+    {createOpen && <Modal title="发起校园活动" onClose={() => setCreateOpen(false)}><form className="v2-form" onSubmit={create}><label>活动名称<input name="title" required maxLength={80} placeholder="例如：周末摄影漫步"/></label><label>活动介绍<textarea name="description" required rows={3} placeholder="告诉大家会发生什么"/></label><div className="v2-form-two"><label>开始时间<input name="date" type="datetime-local" required/></label><label>人数上限<input name="capacity" type="number" min={1} defaultValue={20}/></label></div><label>地点<input name="location" required placeholder="校园内的集合地点"/></label><p className="v2-form-note">仅已认证的学生社团成员或老师可以发起活动。</p>{publishError && <p role="alert">{publishError}</p>}<div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setCreateOpen(false)}>取消</button><button type="submit" disabled={!permitted} className="v2-button v2-button-primary">发布活动</button></div></form></Modal>}
   </div>
 }
 

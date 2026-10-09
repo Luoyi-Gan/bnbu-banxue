@@ -1,11 +1,12 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { initialV2State, v2StorageKey, type V2State } from './model'
 import { V2Context } from './context'
+import { hideRetiredContent } from './retiredContent'
 
 function readState(): V2State {
   try {
     const value = JSON.parse(window.localStorage.getItem(v2StorageKey) ?? 'null') as Partial<V2State> | null
-    if (value && Array.isArray(value.announcements) && Array.isArray(value.posts) && Array.isArray(value.rooms)) return { ...initialV2State, ...value, preferences: { ...initialV2State.preferences, ...value.preferences } }
+    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, preferences: { ...initialV2State.preferences, ...value.preferences } })
   } catch { /* use seed */ }
   return initialV2State
 }

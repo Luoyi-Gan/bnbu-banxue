@@ -1,4 +1,4 @@
-import type { LocalEvent, V2State } from './model'
+import type { LocalEvent } from './model'
 
 export type ActivityItem = {
   id: string
@@ -10,16 +10,14 @@ export type ActivityItem = {
   endAt?: string
   location: string
   capacity: number | null
-  attendeeCount: number
-  registrationMode: 'open' | 'approval'
   host: string
   image?: string
   local?: LocalEvent
 }
 
 export type ActivityPeriod = '全部时间' | '今天' | '本周' | '下周'
-export type ActivityStatus = '全部状态' | '可参与' | '已报名' | '我主办'
-export type ActivitySort = '推荐顺序' | '时间最近' | '热度最高'
+export type ActivityStatus = '全部状态' | '未结束' | '我主办'
+export type ActivitySort = '推荐顺序' | '时间最近'
 
 export type ActivityFilters = {
   query: string
@@ -30,7 +28,7 @@ export type ActivityFilters = {
   sort: ActivitySort
 }
 
-export function filterActivityItems(items: ActivityItem[], filters: ActivityFilters, registrations: V2State['eventRegistrations'], now = new Date()): ActivityItem[] {
+export function filterActivityItems(items: ActivityItem[], filters: ActivityFilters, actorId: string, now = new Date()): ActivityItem[] {
   const needle = filters.query.trim().toLocaleLowerCase()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const weekStart = new Date(today)
@@ -49,13 +47,11 @@ export function filterActivityItems(items: ActivityItem[], filters: ActivityFilt
     if (filters.period === '今天' && start.toDateString() !== today.toDateString()) return false
     if (filters.period === '本周' && (start < weekStart || start >= nextWeekStart)) return false
     if (filters.period === '下周' && (start < nextWeekStart || start >= weekAfterNext)) return false
-    if (filters.status === '可参与' && (item.local || registrations[item.id] || Date.parse(item.endAt ?? item.startAt) <= now.getTime())) return false
-    if (filters.status === '已报名' && !registrations[item.id]) return false
-    if (filters.status === '我主办' && !item.local) return false
+    if (filters.status === '未结束' && Date.parse(item.endAt ?? item.startAt) <= now.getTime()) return false
+    if (filters.status === '我主办' && (!item.local || (item.local.ownerId ?? 'student-demo') !== actorId)) return false
     return true
   })
 
-  if (filters.sort === '热度最高') return filtered.sort((a, b) => b.attendeeCount - a.attendeeCount)
   if (filters.sort === '时间最近') return filtered.sort((a, b) => {
     const aUpcoming = Date.parse(a.endAt ?? a.startAt) >= now.getTime()
     const bUpcoming = Date.parse(b.endAt ?? b.startAt) >= now.getTime()
