@@ -1,3 +1,5 @@
+import { hasAlumniConflict } from './alumniPolicy'
+import { studentName } from './model'
 import { ArrowLeft, ArrowRight, CalendarDays, Check, ChevronRight, Clock3, Coffee, MapPin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { coffeeSlots, teachers } from '../data/mockData'
@@ -48,6 +50,7 @@ export function V2CoffeeChat() {
   }
   const updateBooking = () => {
     if (!teacher || !slot || (slot.status !== 'available' && !isBooked)) return
+    if (!isBooked && hasAlumniConflict(state, studentName, slot)) { setFeedback('该时段与已确认的校友交流冲突，请选择其他时间。'); return }
     const cancelling = isBooked
     setState((value) => ({
       ...value,

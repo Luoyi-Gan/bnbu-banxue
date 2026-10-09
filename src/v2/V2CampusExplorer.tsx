@@ -23,7 +23,7 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
   const selectedId = selected?.id
   const scheduled = [
     ...events.filter((event) => resolveCampusLocation(event.location) === selectedId && Date.parse(event.endAt) >= Date.now()).map((event) => ({ id: event.id, title: event.title, when: event.dateLabel, place: event.location, kind: '校园活动', path: `/v2/activities/${event.id}` })),
-    ...state.localEvents.filter((event) => event.status === 'published' && resolveCampusLocation(event.location) === selectedId && Date.parse(event.startAt) >= Date.now()).map((event) => ({ id: event.id, title: event.title, when: new Date(event.startAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }), place: event.location, kind: '学生发起', path: `/v2/activities/${event.id}` })),
+    ...state.localEvents.filter((event) => event.status === 'published' && resolveCampusLocation(event.location) === selectedId && Date.parse(event.startAt) >= Date.now()).map((event) => ({ id: event.id, title: event.title, when: new Date(event.startAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }), place: event.location, kind: '成员发起', path: `/v2/activities/${event.id}` })),
     ...state.rooms.filter((room) => room.status === 'open' && (room.buildingId ?? resolveCampusLocation(room.place)) === selectedId).map((room) => ({ id: room.id, title: room.title, when: room.time, place: room.place, kind: '正在组队', path: `/v2/partners?item=${encodeURIComponent(room.id)}` })),
   ]
 
