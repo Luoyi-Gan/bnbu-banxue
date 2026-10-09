@@ -21,13 +21,13 @@ const studentNav = [
   { path: '/v2/activities', label: '活动', icon: Compass },
   { path: '/v2/community', label: '社区', icon: Newspaper },
   { path: '/v2/partners', label: '找搭子', icon: UsersRound },
-  { path: '/v2/messages', label: '消息', icon: MessageCircle },
+  { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const studentMore = [
   { path: '/v2/sports', label: '体育运动', icon: GraduationCap },
   { path: '/v2/campus', label: '校园服务', icon: GraduationCap },
   { path: '/v2/ai', label: '校园 AI', icon: Sparkles },
-  { path: '/v2/me', label: '我的', icon: UserRound },
+  { path: '/v2/messages', label: '消息', icon: MessageCircle },
 ]
 const adminNav = [
   { path: '/v2/admin', label: '运营总览', icon: LayoutDashboard, end: true },
@@ -72,7 +72,7 @@ function V2Shell({ children }: { children: ReactNode }) {
       <Link to={portalHome[state.role]} className="v2-brand"><img src={brandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
       <div className="v2-nav-label">{admin ? 'MANAGEMENT' : 'CAMPUS LIFE'}</div>
       <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav>
-      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">MORE TO EXPLORE</div><nav className="v2-side-nav">{studentMore.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span></NavLink>)}</nav></>}
+      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">MORE TO EXPLORE</div><nav className="v2-side-nav">{studentMore.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav></>}
       <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>前端演示模式</span></div></div>
     </aside>
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
