@@ -123,7 +123,7 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
     const box = new THREE.Box3().setFromObject(model)
     box.getCenter(overviewTarget)
     const size = box.getSize(new THREE.Vector3()).length()
-    overviewPosition.copy(overviewTarget).add(new THREE.Vector3(size * 0.35, size * 0.7, size * 0.65))
+    overviewPosition.copy(overviewTarget).add(new THREE.Vector3(size * 0.75, size * 1.5, size * 1.3))
     camera.position.copy(overviewPosition)
     controls.target.copy(overviewTarget)
     paint()

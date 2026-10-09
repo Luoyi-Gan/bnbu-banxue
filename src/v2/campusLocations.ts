@@ -6,6 +6,14 @@ const teaching: Record<string, string> = {
   T7: 'way/664093260', T8: 'way/664093261', T29: 'way/664093294',
 }
 
+export const fallbackCampusBuildings: CampusBuilding[] = [
+  ...Object.entries(teaching).map(([code, id]) => ({ id, name: `${code} 教学楼` })),
+  { id: 'way/664082915', name: '体育馆' },
+  { id: 'way/1215983507', name: '学习资源中心' },
+  { id: 'way/664082913', name: '大学会堂' },
+  { id: 'way/664082911', name: '演艺厅' },
+]
+
 // Match only identifiable buildings. Generic outdoor names have no verified pin.
 export function resolveCampusLocation(location: string): string | null {
   const code = location.toUpperCase().match(/\bT(29|[1-8])(?=$|[-\s\u4e00-\u9fff])/)
