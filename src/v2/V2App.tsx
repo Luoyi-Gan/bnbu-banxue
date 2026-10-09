@@ -12,6 +12,7 @@ import { StudentSearch } from './StudentSearch'
 import { AdminDashboard, AdminModeration, AdminVerifications } from './admin'
 import { V2Activities, V2Community, V2Home, V2Messages, V2Partners, V2Teams } from './student'
 import { V2AI, V2Campus, V2Me, V2Settings } from './services'
+import { V2Sports } from './V2Sports'
 import { V2CampusExplore } from './V2CampusExplorer'
 import './v2.css'
 
@@ -23,6 +24,7 @@ const studentNav = [
   { path: '/v2/messages', label: '消息', icon: MessageCircle },
 ]
 const studentMore = [
+  { path: '/v2/sports', label: '体育运动', icon: GraduationCap },
   { path: '/v2/campus', label: '校园服务', icon: GraduationCap },
   { path: '/v2/ai', label: '校园 AI', icon: Sparkles },
   { path: '/v2/me', label: '我的', icon: UserRound },
@@ -46,6 +48,7 @@ function V2Shell({ children }: { children: ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const admin = location.pathname.startsWith('/v2/admin')
   const teacher = state.role === 'teacher'
+  const sports = location.pathname === '/v2/sports'
   const nav = admin ? adminNav : teacher ? studentNav.filter((item) => item.path === '/v2/activities') : studentNav
   const unread = state.conversations.reduce((sum, item) => sum + item.unread, 0)
   const unreadNotices = state.notifications.filter((item) => !item.read).length
@@ -77,7 +80,7 @@ function V2Shell({ children }: { children: ReactNode }) {
     ...state.posts.filter((item) => `${item.title} ${item.body}`.toLowerCase().includes(search.trim().toLowerCase())).map((item) => ({ id: item.id, label: item.title, path: '/v2/community' })),
     ...state.rooms.filter((item) => `${item.title} ${item.body}`.toLowerCase().includes(search.trim().toLowerCase())).map((item) => ({ id: item.id, label: item.title, path: '/v2/partners' })),
   ].slice(0, 6) : []
-  return <div className="v2-app">
+  return <div className={`v2-app${sports ? ' v2-app-sports' : ''}`}>
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
       <Link to="/v2" className="v2-brand"><img src={brandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
       <div className="v2-nav-label">{admin ? 'MANAGEMENT' : 'CAMPUS LIFE'}</div>
@@ -106,7 +109,7 @@ function V2Shell({ children }: { children: ReactNode }) {
       </header>
       <main className="v2-main">{children}</main>
     </div>
-    {!admin && !teacher && <><nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.slice(0, 5).map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav><Link to="/v2/ai" className="v2-ai-float" aria-label="打开校园 AI"><img src={state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon} alt=""/></Link></>}
+    {!admin && !teacher && !sports && <><nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.slice(0, 5).map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav><Link to="/v2/ai" className="v2-ai-float" aria-label="打开校园 AI"><img src={state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon} alt=""/></Link></>}
     {admin && <nav className="v2-mobile-nav" aria-label="手机管理导航">{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
   </div>
 }
@@ -122,6 +125,7 @@ function V2Routes() {
   if (state.role === 'teacher' && !location.pathname.startsWith('/v2/activities')) return <Navigate to="/v2/activities" replace/>
   return <V2Shell><Routes>
     <Route path="/v2" element={<V2Home/>}/>
+    <Route path="/v2/sports" element={<V2Sports/>}/>
     <Route path="/v2/activities" element={<V2Activities/>}/>
     <Route path="/v2/activities/:id" element={<V2Activities/>}/>
     <Route path="/v2/community" element={<V2Community/>}/>

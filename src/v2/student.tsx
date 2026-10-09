@@ -13,7 +13,6 @@ import { useV2 } from './useV2'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { AnimatedSearchField } from './AnimatedSearchField'
 import { filterActivityItems, type ActivityItem, type ActivityPeriod, type ActivitySort, type ActivityStatus } from './activityFilters'
-import { sportsStudentHref } from './sportsEntry'
 import { activityActor, canPublishActivity, changeActivityVisibility, createActivity, ownsActivity } from './activityPolicy'
 
 const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
@@ -40,11 +39,11 @@ export function V2Home() {
     <div className="v2-home-stats">
       <Link to="/v2/activities"><CalendarDays size={22}/><span><strong>{upcoming.length}</strong><small>接下来的活动</small></span><ArrowRight size={16}/></Link>
       <Link to="/v2/partners/teams"><UsersRound size={22}/><span><strong>{pending}</strong><small>组队待处理</small></span><ArrowRight size={16}/></Link>
-      <a href={sportsStudentHref(window.location.hostname)} className="v2-sport-stat" aria-label="运动进度，已完成 16 小时，目标 20 小时，进入运动打卡">
+      <Link to="/v2/sports" className="v2-sport-stat" aria-label="运动进度，已完成 16 小时，目标 20 小时，进入体育运动平台">
         <div className="v2-sport-stat-head"><span className="v2-sport-stat-icon"><Activity size={20}/></span><span className="v2-sport-stat-title"><strong>运动进度</strong><small>只读演示数据</small></span><span className="v2-sport-stat-percent">80%</span></div>
         <div className="v2-sport-stat-summary"><span className="v2-sport-stat-value"><strong>16</strong><em> / 20 小时</em></span><small>距离目标还差 <b>4 小时</b></small></div>
         <div className="v2-sport-progress" role="progressbar" aria-label="运动目标完成进度" aria-valuenow={16} aria-valuemin={0} aria-valuemax={20}><span/></div>
-      </a>
+      </Link>
     </div>
     <div className="v2-home-grid v2-home-grid-single"><section className="v2-panel v2-home-timeline"><SectionHeading title="近期校园安排" detail="活动、组队与校园安排" action={<Link to="/v2/activities">查看活动 <ArrowRight size={15}/></Link>}/>
       <div className="v2-timeline">{upcoming.map((event, index) => <Link to={`/v2/activities/${event.id}`} className="v2-timeline-item" style={{ animationDelay: `${index * 85}ms` }} key={event.id}><span className="v2-timeline-dot"/><span><small>{formatWhen(event.startAt)}</small><strong>{event.title}</strong><em><MapPin size={13}/>{event.location}</em></span><b>校园活动</b></Link>)}
