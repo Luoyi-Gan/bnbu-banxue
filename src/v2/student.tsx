@@ -2,7 +2,7 @@ import { Activity, ArrowRight, Bell, BookOpen, Bookmark, CalendarDays, CarFront,
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import FlexCarousel from '../components/reactbits/FlexCarousel/FlexCarousel'
-import { coffeeSlots, events, hosts, teachers } from '../data/mockData'
+import { events, hosts } from '../data/mockData'
 import { recommendationPhoto } from '../data/recommendationPhoto'
 import campusPhoto from '../assets/campus/home-background.jpg'
 import { CampusMap } from './CampusMap'
@@ -13,6 +13,7 @@ import { useV2 } from './useV2'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { AnimatedSearchField } from './AnimatedSearchField'
 import { filterActivityItems, type ActivityItem, type ActivityPeriod, type ActivitySort, type ActivityStatus } from './activityFilters'
+import { studentSchedule, setActivityParticipation } from './studentSchedule'
 import { activityActor, canPublishActivity, changeActivityVisibility, createActivity, ownsActivity } from './activityPolicy'
 
 const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
@@ -27,9 +28,8 @@ function PulseHeart({ liked, count, onClick, label }: { liked: boolean; count: n
 
 export function V2Home() {
   const { state } = useV2()
-  const upcoming = events.filter((event) => new Date(event.endAt).getTime() > Date.now()).sort((a, b) => Date.parse(a.startAt) - Date.parse(b.startAt)).slice(0, 3)
-  const upcomingRooms = state.rooms.filter((room) => room.members.includes(studentName) && room.status === 'open').slice(0, 1)
-  const upcomingCoffee = state.coffeeBookings.map((id) => coffeeSlots.find((slot) => slot.id === id)).filter((slot) => slot && Date.parse(slot.endAt) > Date.now()).slice(0, 2)
+  const schedule = studentSchedule(state)
+  const upcoming = schedule.filter(item => item.kind === 'activity')
   const pending = state.applications.filter((item) => item.status === 'pending').length + state.rooms.reduce((count, room) => count + (room.owner === studentName ? room.requests.length : 0), 0)
   return <div className="v2-page v2-home">
     <section className="v2-home-hero" style={{ backgroundImage: `linear-gradient(95deg,rgba(4,22,54,.94),rgba(4,39,87,.72) 55%,rgba(4,24,54,.1)),url(${campusPhoto})` }}>
@@ -45,11 +45,9 @@ export function V2Home() {
         <div className="v2-sport-progress" role="progressbar" aria-label="运动目标完成进度" aria-valuenow={16} aria-valuemin={0} aria-valuemax={20}><span/></div>
       </Link>
     </div>
-    <div className="v2-home-grid v2-home-grid-single"><section className="v2-panel v2-home-timeline"><SectionHeading title="近期校园安排" detail="活动、组队与校园安排" action={<Link to="/v2/activities">查看活动 <ArrowRight size={15}/></Link>}/>
-      <div className="v2-timeline">{upcoming.map((event, index) => <Link to={`/v2/activities/${event.id}`} className="v2-timeline-item" style={{ animationDelay: `${index * 85}ms` }} key={event.id}><span className="v2-timeline-dot"/><span><small>{formatWhen(event.startAt)}</small><strong>{event.title}</strong><em><MapPin size={13}/>{event.location}</em></span><b>校园活动</b></Link>)}
-      {upcomingCoffee.map((slot) => { const teacher = teachers.find((person) => person.id === slot!.teacherId); return <Link to="/v2/me?tab=events" className="v2-timeline-item" key={slot!.id}><span className="v2-timeline-dot"/><span><small>{slot!.dateLabel} · {slot!.timeLabel}</small><strong>与{teacher?.name ?? '老师'}的 Coffee Chat</strong><em>一对一交流</em></span><b>已预约</b></Link> })}
-      {upcomingRooms.map((room) => <Link to="/v2/partners/teams" className="v2-timeline-item" key={room.id}><span className="v2-timeline-dot"/><span><small>{room.time}</small><strong>{room.title}</strong><em><MapPin size={13}/>{room.place}</em></span><b>我的组队</b></Link>)}
-      {!upcoming.length && !upcomingRooms.length && !upcomingCoffee.length && <div className="v2-timeline-empty"><span className="v2-timeline-dot"/><div><strong>安排从这里开始</strong><p>校园活动、组队和老师预约会出现在这里。</p><Link to="/v2/activities">探索校园活动 <ArrowRight size={14}/></Link></div></div>}</div>
+    <div className="v2-home-grid v2-home-grid-single"><section className="v2-panel v2-home-timeline"><SectionHeading title="近期校园安排" detail="已标记的活动、已加入的搭子与 Coffee Chat" action={<Link to="/v2/activities">查看活动 <ArrowRight size={15}/></Link>}/>
+      <div className="v2-timeline">{schedule.map((item, index) => <Link to={item.path} className="v2-timeline-item" style={{ animationDelay: `${index * 45}ms` }} key={item.id}><span className="v2-timeline-dot"/><span><small>{item.startAt ? formatWhen(item.startAt) : item.time}</small><strong>{item.title}</strong><em><MapPin size={13}/>{item.location}</em></span><b>{item.label}</b></Link>)}
+      {!schedule.length && <div className="v2-timeline-empty"><span className="v2-timeline-dot"/><div><strong>暂无近期安排</strong><p>标记参与活动、加入搭子或预约 Coffee Chat 后，会显示在这里。</p><Link to="/v2/activities">探索校园活动 <ArrowRight size={14}/></Link></div></div>}</div>
     </section></div>
   </div>
 }
@@ -131,6 +129,7 @@ export function V2Activities() {
         <div><UsersRound size={20}/><span><small>人数上限</small><strong>{active.capacity ? `${active.capacity} 人` : '未限定'}</strong></span></div>
         <div><Megaphone size={20}/><span><small>主办方</small><strong>{active.host}</strong></span></div>
       </div></section>
+      {state.role === 'student' && <div className="v2-detail-actions"><button type="button" className={`v2-button ${state.participatingActivities.includes(active.id) ? 'v2-button-secondary' : 'v2-button-primary'}`} aria-pressed={state.participatingActivities.includes(active.id)} disabled={!state.participatingActivities.includes(active.id) && (active.local?.status === 'draft' || Date.parse(active.endAt ?? active.startAt) <= Date.now())} onClick={() => setState(value => setActivityParticipation(value, active.id, !value.participatingActivities.includes(active.id)))}>{state.participatingActivities.includes(active.id) ? '取消参与标记' : '标记参与'}</button><span className="v2-form-note">{state.participatingActivities.includes(active.id) ? '已标记参与，将显示在首页近期校园安排中。' : '标记后加入个人安排，不占用活动名额。'}</span></div>}
       <section className="v2-event-detail-section"><h3>校园位置</h3><CampusMap key={active.id} location={active.location}/></section>
       {active.local && ownsActivity(state, active.local) && <div className="v2-detail-actions"><span className="v2-status-chip">我主办的活动</span><button type="button" className="v2-button v2-button-secondary" disabled={active.local.status === 'draft' && !permitted} onClick={() => changeVisibility(active.id)}>{active.local.status === 'published' ? '结束展示' : '重新展示'}</button></div>}
       {publishError && <p role="alert">{publishError}</p>}

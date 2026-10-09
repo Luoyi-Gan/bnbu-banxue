@@ -6,7 +6,7 @@ import { hideRetiredContent } from './retiredContent'
 function readState(): V2State {
   try {
     const value = JSON.parse(window.localStorage.getItem(v2StorageKey) ?? 'null') as Partial<V2State> | null
-    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, preferences: { ...initialV2State.preferences, ...value.preferences } })
+    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
   } catch { /* use seed */ }
   return initialV2State
 }

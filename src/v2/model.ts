@@ -25,6 +25,7 @@ export interface V2State {
   likedPosts: string[]
   applications: { roomId: string; status: ReviewStatus }[]
   eventRegistrations: Record<string, 'going' | 'pending' | 'waitlist'>
+  participatingActivities: string[]
   localEvents: LocalEvent[]
   coffeeBookings: string[]
   joinedOrganizations: string[]
@@ -54,7 +55,7 @@ export const initialV2State: V2State = {
     { id: 'chat-ai', title: 'AI Agent Workshop 复盘小组', messages: [{ id: 'm2', from: '许宁', body: '我会带上活动笔记。', time: '17:16' }], unread: 1 },
   ],
   verifications: [{ id: 'verify-club', name: '校园摄影社', kind: 'club', organization: '校园摄影社', note: '申请社团认证，用于核实社团成员身份。', status: 'pending', reviewNote: '', date: '10月8日' }],
-  savedPosts: [], savedRooms: [], likedPosts: [], applications: [], eventRegistrations: {}, localEvents: [], coffeeBookings: [], joinedOrganizations: [],
+  savedPosts: [], savedRooms: [], likedPosts: [], applications: [], eventRegistrations: {}, participatingActivities: [], localEvents: [], coffeeBookings: [], joinedOrganizations: [],
   notifications: [{ id: 'n1', title: '新的组队申请', body: '李明申请加入你的 AI Agent 复盘小组', path: '/v2/partners/teams', read: false, date: '今天' }],
   preferences: { messages: true, teams: true, searchable: true, profilePreview: true },
   aiMessages: [{ id: 'ai-hello', from: 'assistant', body: '你好，我是奶蛙。可以帮你查找活动、校园服务和自己的安排。当前内容为本地演示数据。' }],
