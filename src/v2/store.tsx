@@ -6,11 +6,13 @@ import { V2Context } from './context'
 import { hideRetiredContent } from './retiredContent'
 import { resolvePortalRole } from './portalAccess'
 
-const portalSessionKey = 'bnbu-campus-v2:portal-role'
+const portalSessionKey = import.meta.env.DEV ? 'bnbu-campus-v2:dev-portal-role' : 'bnbu-campus-v2:portal-role'
 
 function sessionRole(legacy?: unknown) {
   try {
-    const role = resolvePortalRole(window.sessionStorage.getItem(portalSessionKey), legacy)
+    const preview = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('previewRole') : null
+    const requested = preview === 'student' || preview === 'teacher' || preview === 'admin' ? preview : null
+    const role = resolvePortalRole(requested ?? window.sessionStorage.getItem(portalSessionKey), legacy)
     window.sessionStorage.setItem(portalSessionKey, role)
     return role
   } catch { return resolvePortalRole(null, legacy) }
