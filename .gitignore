@@ -2,3 +2,7 @@ node_modules/
 dist/
 *.local
 *.log
+
+integrations/**/.wrangler/
+integrations/**/.next/
+integrations/**/*.tsbuildinfo

@@ -1,0 +1,537 @@
+{
+  "files": [
+    {
+      "path": "app/admin-accounts-cache.ts",
+      "sha256": "23FF73CF5A79DE632E0F5B0B4FA07C797F639C3508CF5630C73A7590FB3AAE61"
+    },
+    {
+      "path": "app/admin-audit.tsx",
+      "sha256": "5E084B209DD43F8E8B8045329DA4180A36F12089C261415ACCB2449B5CD04C9F"
+    },
+    {
+      "path": "app/admin-checkins.tsx",
+      "sha256": "5378EEB4C67098BFCB0B9DA6C16882D369130BBA35E60CC083B179EDD5FB3222"
+    },
+    {
+      "path": "app/admin-class-records.tsx",
+      "sha256": "EB48617322525EC1C628927A17AED1AAC5A953D7905C159287888011852E03D1"
+    },
+    {
+      "path": "app/admin-components.tsx",
+      "sha256": "425686835DFCECD7C12D12FB1AB9178FACF182D02D0A7A30DECE19B7A8AEE027"
+    },
+    {
+      "path": "app/admin-course-directory-api.ts",
+      "sha256": "683F9F919F4440D7BC7EDABE7F7402CDE69D9CA16CC167B7F8C5DB08E3376907"
+    },
+    {
+      "path": "app/admin-courses.tsx",
+      "sha256": "5010A9BBA764D04C0066A3432FC698C82C057F0C1F46190457C3E9565EE8DA52"
+    },
+    {
+      "path": "app/admin-domain.ts",
+      "sha256": "3D871A0B3039859E1EECECE9D069AE9D9ED9D1BCE7E7EC5FFCD6A59014DA4E92"
+    },
+    {
+      "path": "app/admin-help.tsx",
+      "sha256": "3F217C93B25793546EB6DCC08427E296DFBB70EFC07DAC614E85E4C0316430C6"
+    },
+    {
+      "path": "app/admin-i18n.ts",
+      "sha256": "61BE497A1E44320AA4F1AC8BBCFCA2F4B962C74B8F621CC52F4617EF329C831C"
+    },
+    {
+      "path": "app/admin-insights.tsx",
+      "sha256": "B6B2277A1A1F847D04DEF583677FBD138F3910813179D2A7B5377D9B3F767E75"
+    },
+    {
+      "path": "app/admin-mock-data.ts",
+      "sha256": "5240DABA7C24CD9FE2548B67ABA3D593D0A4C03723A6238F4905D388C6E2E05C"
+    },
+    {
+      "path": "app/admin-outbox.tsx",
+      "sha256": "A01DCFEC857A2EAC0893E8C564100E087DFA82FA0B8C4D44145218278A23C6CF"
+    },
+    {
+      "path": "app/admin-overview.tsx",
+      "sha256": "192B80786CDFD5ADB7D9A576A378A8ED2F1EDED3BD7E9FE5D722BAAC1ACFE1CB"
+    },
+    {
+      "path": "app/admin-review-services.tsx",
+      "sha256": "69B1B93DA904272CAE203AD089F3F81674B9FD352B54ABC3578BDA44E23F8A9C"
+    },
+    {
+      "path": "app/admin-rules.tsx",
+      "sha256": "CE8FF05ABD0CDBBCBC2DA2BDFCEC761340FDD04D9C998902B81664FAA62282E8"
+    },
+    {
+      "path": "app/admin-semesters.tsx",
+      "sha256": "2EF360FA0189F956858B27227AE3F75669260122D7E977BDF82626B4B610D995"
+    },
+    {
+      "path": "app/admin-service.ts",
+      "sha256": "0E0225C6795ED82442BB6A70177EA0606A6C600717BFB6CF7171F9BF02D3D5A9"
+    },
+    {
+      "path": "app/admin-store.tsx",
+      "sha256": "370C0419BCCBF6C38A1BFDC36BA47595AB4495D6BF162ED13E826390F2EBBF1E"
+    },
+    {
+      "path": "app/admin-student-bulk-deletion.tsx",
+      "sha256": "CDD3658CC2D960287BF1835186BB09F7F7B6729E57BD4B664A25111263092E9C"
+    },
+    {
+      "path": "app/admin-student-bulk-update.tsx",
+      "sha256": "22C2FE1DA6E3B29121A2E3DB9D5DCAC65DCCC9ABD3139A487921178CE14D8016"
+    },
+    {
+      "path": "app/admin-student-deletion.tsx",
+      "sha256": "A8A6A5A91753A8846DA0F70F860F553FB8668BCBDB60C17C5A3B47622F659CE8"
+    },
+    {
+      "path": "app/admin-subadmins.tsx",
+      "sha256": "3DA58972FB9126BC5CCC03075A57489189F1978DFE365BE264D39851C104431F"
+    },
+    {
+      "path": "app/admin-support-search.ts",
+      "sha256": "26954CAF467A7C4D0F7B4E28C09B18A22582FEDB89459B8665521213EBDE3EDE"
+    },
+    {
+      "path": "app/admin-support.tsx",
+      "sha256": "528B3CE1BD3CABEB00805CCEBFBC0733C254F922B4A31302C7CAE88BA67AFBE9"
+    },
+    {
+      "path": "app/admin-system.tsx",
+      "sha256": "BBFFBF75147B0518D9906C6DD533C91B6A3C54E092EEEBE6142941EC82516D6D"
+    },
+    {
+      "path": "app/admin-teacher-details.tsx",
+      "sha256": "061480FD6FD9B6DB5558207750270CC0399ED8E6CA9DDDE66CB0F02DC0A8043F"
+    },
+    {
+      "path": "app/admin-types.ts",
+      "sha256": "2F26535B6D23029B013F01E036014FCFB2B928040A234E02F730CBB44D711AA9"
+    },
+    {
+      "path": "app/admin-users.tsx",
+      "sha256": "33BA3D563E65BD53613C852E0E47E3288F24F53A3932655EC5211019E8507D50"
+    },
+    {
+      "path": "app/admin-workspace.css",
+      "sha256": "D1A8226DE8B8378A515104334B342A4F71EE39DD8AAD031135C083F3208DB91E"
+    },
+    {
+      "path": "app/admin-workspace.tsx",
+      "sha256": "32708C5EBC49A7D44BD7A5BE95B5C0F414D8675193A41B475FAC14ECB1CBE797"
+    },
+    {
+      "path": "app/ai-review.tsx",
+      "sha256": "43088AA509DDDD75FAD7463BD530DE2BC11C0C84AC11F86FBF62B182BD03210D"
+    },
+    {
+      "path": "app/api-client.ts",
+      "sha256": "684CCDF1A23C96A485120C12F431559129601906EC4362FFB879DA251BF4EA64"
+    },
+    {
+      "path": "app/app-select.css",
+      "sha256": "A8083FCF7455F50BBADD41A8263BAC0F326BF3B62BFDAA31993BCD7450A02D9F"
+    },
+    {
+      "path": "app/app-select.tsx",
+      "sha256": "4F37AF5C65CCD343F8002CEEADAC893A680C27B29322DC50BD61BD4045CC8BA1"
+    },
+    {
+      "path": "app/business-time.ts",
+      "sha256": "9C395BEAB9AC20FDD82DDCD7737FD7E52F787674910BB9E7AEAAA891C2D3E3B4"
+    },
+    {
+      "path": "app/checkin-audit.ts",
+      "sha256": "0DA3CD3A565F2BF27B9A667CFB629BD07199224C9EB4AD8FCDCF3F0106BB957D"
+    },
+    {
+      "path": "app/course-closure.tsx",
+      "sha256": "249E7D780DBA1516B8C90F5FBAD72888878D709B673AA6B764F5294B368B381F"
+    },
+    {
+      "path": "app/course-history-settings.tsx",
+      "sha256": "BBBD9FBEDF5C61945585D2CDBB968BAAE107CB5E91F6366B1BA64B328C86A65F"
+    },
+    {
+      "path": "app/course-invite.ts",
+      "sha256": "AC04C9C8FF64E267750649CB5B61F46F8B0C815EA8F1E382C4CBD0E8FF6E5FDE"
+    },
+    {
+      "path": "app/course-name-settings.tsx",
+      "sha256": "8235FF02B6268C3A885587402ABCD2328A4F5A9F4735C7AFF090B61D6A962A0A"
+    },
+    {
+      "path": "app/course-operations.css",
+      "sha256": "D54016DBADE9CD5EE9E2695B0AEC14B6F93CE5DD0D0FDA610E618BEDC2B11084"
+    },
+    {
+      "path": "app/course-rules-api.ts",
+      "sha256": "F5141726CB1B540E53F805E20D2391281CDF1390E064320B9869AA64FCBCDF0E"
+    },
+    {
+      "path": "app/course-settlement.tsx",
+      "sha256": "1129107984541F940D42796CD95F96433569A31B2E8020734225E48808D2F40B"
+    },
+    {
+      "path": "app/deferred-component.tsx",
+      "sha256": "B6DD2083DD95A94580A274CF33260568569CBCA3197B8B2A59201C5B110D627D"
+    },
+    {
+      "path": "app/endurance-api.ts",
+      "sha256": "8F0DDB6B291ECD6DADB69C4C0F13B3B01506C461AAD25898260AE82179BF734A"
+    },
+    {
+      "path": "app/error-panel.tsx",
+      "sha256": "A5756C1636435D51C84A092981E453C0A6DDE83E7E2A0FA92A7CB7F99C6A4B3F"
+    },
+    {
+      "path": "app/feedback-api.ts",
+      "sha256": "7C52DD0D9AAD0720E9AE41C0B1CF056248C5F8D4DBA7287B4458222EEFC6422F"
+    },
+    {
+      "path": "app/feedback-attachments.tsx",
+      "sha256": "DBB1BF5F71F37C2AF4FE512BD15CD1C3B8237D7EF92B74AB454A0E10CB6BA9A9"
+    },
+    {
+      "path": "app/final-grade-intents.ts",
+      "sha256": "0F72A817489D07524A60E2A1A9C9F2611C3DD72F69A3587CBCF413E722CE8187"
+    },
+    {
+      "path": "app/form-field.tsx",
+      "sha256": "EE18532216D44997AD906B3AE25E0F6ED68EB599BCAB1753EF3D65B1AE844C44"
+    },
+    {
+      "path": "app/globals.css",
+      "sha256": "BD71D53845EB369CFF4BC60C7E1BBFBEFCFCDB061C050514325F2EB3C753A5C7"
+    },
+    {
+      "path": "app/help-api.ts",
+      "sha256": "EF2BAFD8E8E47C7E2B5E81B00B45B9451850052B02E5C5F9B7E8920349582E7F"
+    },
+    {
+      "path": "app/help-content.tsx",
+      "sha256": "9FB588F27688FA64F193C2B6450F907C4764A82997B0C3B87E1292EC799632A3"
+    },
+    {
+      "path": "app/invite-qr.tsx",
+      "sha256": "A6EA35B41B3268E8D886436F676F19011B41556180B927C1675024A0E95F075B"
+    },
+    {
+      "path": "app/language.tsx",
+      "sha256": "ADDA04C421E139BE3764ED5F0C9630D1AF42E4B0CEB5A25934BEDCB6851AEB5B"
+    },
+    {
+      "path": "app/layout.tsx",
+      "sha256": "B231C50EF0F8E5FD177B6C49EF3594833C8DFC29C04170DC1B59D2B963A7128B"
+    },
+    {
+      "path": "app/makeup-window-form.tsx",
+      "sha256": "2E75F2831ADF9590138AD603A44C9DE60C3B62AD243A8025D5B71EE12D705B65"
+    },
+    {
+      "path": "app/missing-enrollment.ts",
+      "sha256": "64F161875B1D71ECF534A24BE7EE7859FF4F5F1E3EE84AE5E46AB2EB7341DA82"
+    },
+    {
+      "path": "app/mobile-workspace.css",
+      "sha256": "A493A7362979B1B117CBFB0E8F69AA45847040926ACD9D67EE88B7D156EB669A"
+    },
+    {
+      "path": "app/ocr-import-panel.tsx",
+      "sha256": "F944C07BCA25E9DA7E00DFA03BB3F66BB7BFB96256D74CE244C43742FA992114"
+    },
+    {
+      "path": "app/openapi.generated.ts",
+      "sha256": "00949DB14E417CB3F086D2B2AF5634BEE14D11CF0B6C90ED719D17E80F13D87B"
+    },
+    {
+      "path": "app/own-password-panel.tsx",
+      "sha256": "10012F24BFAF67BC6E1E50D168814A5EB4CB403928B5FE00755E6C0494D6714F"
+    },
+    {
+      "path": "app/page.tsx",
+      "sha256": "EA6671AD0C4A0D9D4A01AFEEB9079313137E4D00749014969324C43B2E752A16"
+    },
+    {
+      "path": "app/parallel-map.ts",
+      "sha256": "8067F595AB088B00273107906319BF0D718698A8CE2A37383DE4891E167B57EE"
+    },
+    {
+      "path": "app/phase5b-contract-fixtures.ts",
+      "sha256": "AD4379125F2F6F2E8160474D27877DB78961FEF68D3491DB23F08FC4AF733AFD"
+    },
+    {
+      "path": "app/phase5b-contract-mock.module.css",
+      "sha256": "FC704F28AD30F41A9507C4120B1AA307DB1FC627656F9A865DBB29721AF4E904"
+    },
+    {
+      "path": "app/phase5b-contract-mock.tsx",
+      "sha256": "D2C71A0501498A848739AE43F1DDE417F541EFF99317F7C58AB1B6271847445C"
+    },
+    {
+      "path": "app/phase5b-contract-revalidation-fixtures.ts",
+      "sha256": "D2768C758E367C43FCABA6864FF796BD1FFE3BF71912F7433D63D02A46117C13"
+    },
+    {
+      "path": "app/phase5b-contract.generated.ts",
+      "sha256": "5CD91037CABE198FFF7D7208D1645D2357399D15D45C6802F0D03EEC271B8A4D"
+    },
+    {
+      "path": "app/phase5gb-contract-fixtures.ts",
+      "sha256": "74F48677B6E8591EB8DA29EAA0C3BAEA7C20008B6740DA576A2508574CC633E2"
+    },
+    {
+      "path": "app/physical-import-panel.css",
+      "sha256": "687FF3F3F105722C83AC60CD35C5947486E2D2D20DEB483C43F3423AFEA51E27"
+    },
+    {
+      "path": "app/physical-import-panel.tsx",
+      "sha256": "E350AD2C421826017C9D1B8AD21022007D4020AB32D38816261A25C347BA6549"
+    },
+    {
+      "path": "app/physical-result-form.tsx",
+      "sha256": "B52047DFD134F70C4E1C1CD0D294D145146162B4CC1BDF1DC324C4AFE7E4593A"
+    },
+    {
+      "path": "app/portal-app.tsx",
+      "sha256": "947E62D385674A955489184135E0727A3E30B5F271D8C2433A62398224D7909A"
+    },
+    {
+      "path": "app/portal-notifications.tsx",
+      "sha256": "494540C68137CDD2843FFA1B38780A4A4DE78287BD4DCD7ECCEE20E93A4CBC07"
+    },
+    {
+      "path": "app/review-public-reasons.ts",
+      "sha256": "A32BB1D56774E6C0A305B81AA73516E98E726027868D005F5B420ED801AD02FE"
+    },
+    {
+      "path": "app/roster-import.ts",
+      "sha256": "DA1ECC06D0EC77AA89A761D390B34E23A0302C488187AD8BC759D3887DE9D93A"
+    },
+    {
+      "path": "app/roster-reconciliation-api-service.ts",
+      "sha256": "F74EBA9F7ED3BC6E44776F951AA87BE72D9922F08B62BB45190A673DC69D22B8"
+    },
+    {
+      "path": "app/roster-reconciliation-mock-data.ts",
+      "sha256": "5DD42CCAF294D0D1F30FD63F02EB4258983E0BA8E5166317C0E635210A0FF3B1"
+    },
+    {
+      "path": "app/roster-reconciliation-mock-service.ts",
+      "sha256": "C3252F250C8645C4D3A0E8E74333AE8D79CA1BBE748E2DDDC2453FD5C88FA226"
+    },
+    {
+      "path": "app/roster-reconciliation-projection.ts",
+      "sha256": "5D5F7D6AABBED5494229FF8D0CD434FAD2D5C634DBCB09755D836ADC0AC9CB49"
+    },
+    {
+      "path": "app/roster-reconciliation-types.ts",
+      "sha256": "D5756014F88221FD1AD1A2C4CD5115563BF8DFB7EBD79A1A0665F643A2198276"
+    },
+    {
+      "path": "app/roster-reconciliation.tsx",
+      "sha256": "91FA8200CB59D0412129DD5074F5AE2ED430FA6E664BB6F6D04ABA55907AA4F7"
+    },
+    {
+      "path": "app/runtime-archive-intent.ts",
+      "sha256": "94BE3F1A6A37B35EAB4FCF1437FDAB5CD42C5E73BE1F8CD961D192A48E775462"
+    },
+    {
+      "path": "app/scrollbar-manager.tsx",
+      "sha256": "F04364EB964BC19D21FAC3FCFEAB0A0D9A6FBC20ECE8ED1E79E939D7E6CFFD0D"
+    },
+    {
+      "path": "app/semester-api.ts",
+      "sha256": "5C750E46A6157D1BBE57EFFC119159B99813014683CE2F79751105ECE66FF26E"
+    },
+    {
+      "path": "app/semester-presentation.ts",
+      "sha256": "A4EF2320C15CD034E543B8BAF5BDE6C20DBB0B2C6B169711B3645072E30C89B3"
+    },
+    {
+      "path": "app/student-deletion-batch.ts",
+      "sha256": "46A922E4EE4428150B86A96E9318BD6D3C13C0880D265D2C603E1492C5E63952"
+    },
+    {
+      "path": "app/student-major-correction.tsx",
+      "sha256": "7D7BE0B8178CFF70576DF65EDB9177E34348AFD5237C4DDB04AE7330D494C401"
+    },
+    {
+      "path": "app/student-profile.tsx",
+      "sha256": "4FCB20A9D253D7CEB8624F413AD9F27C74281F75FCC1D35218ED7F157D10EC31"
+    },
+    {
+      "path": "app/student-region.ts",
+      "sha256": "7A14C8106D4422A375F1ABAB26C92EDEA931C807B1445FF7C8C2DF4418ABDEFC"
+    },
+    {
+      "path": "app/student-second-class.tsx",
+      "sha256": "A5B6AC9B0AE30C8212117209FB44935FA54D219D69FC44FDD8ABB3D633EA0123"
+    },
+    {
+      "path": "app/student-update-batch.ts",
+      "sha256": "51E15FD328C17B631DA643CAD63CD0CB1564C51E122A425D519053158966ABFF"
+    },
+    {
+      "path": "app/subadmin-api.ts",
+      "sha256": "AD5175E738D593EAC7CC2F894B915B54D3068790D1C7BD9218DBF807D77E3774"
+    },
+    {
+      "path": "app/system-mode-service.ts",
+      "sha256": "E537CE08145DE85EFAC2123187D29786E125A392EEFC91863C73BAF3DD75A1BA"
+    },
+    {
+      "path": "app/teacher-api-types.ts",
+      "sha256": "5BE9B9DA3AA8785A749D41BAA9056EEABB68AE3D68446D4473A488C4F377F52D"
+    },
+    {
+      "path": "app/teacher-data.ts",
+      "sha256": "4A5D8B86AC2A088819D273954B57E563CC26334160B7E0EB15F61C14F8784E0D"
+    },
+    {
+      "path": "app/teacher-feedback.tsx",
+      "sha256": "0A6286DDBA41466063CCE70BCD4D6B846602CA627AAC1D4CCC51978E0B2DD273"
+    },
+    {
+      "path": "app/teacher-import-api.ts",
+      "sha256": "F547C315CF2E4D30FC9A6F48BBAE0CEFE0BB3D4C0B3A6CE6A400552BBBD1764D"
+    },
+    {
+      "path": "app/teacher-media-access.ts",
+      "sha256": "D748C7229C81B3F6B88A4B06178DF358AA3D540FB235244DB8E222659424210C"
+    },
+    {
+      "path": "app/teacher-media-preview.tsx",
+      "sha256": "D0B5BE346627DE2DBDE43C2BB32B9273A8493E45204E968E4F777F3B65A9A6F0"
+    },
+    {
+      "path": "app/teacher-media-thumbnail.tsx",
+      "sha256": "109F23866E29136D6A5E3C33AE677F52E18B232B593FBF8DB066B27FBC0BF1F3"
+    },
+    {
+      "path": "app/teacher-preview-notifications.css",
+      "sha256": "C26E0E84D41E4F9784636F7139014FE76ECA17159FF088D7397B7A9AD14E2397"
+    },
+    {
+      "path": "app/teacher-tab-page-transition.tsx",
+      "sha256": "2007BBAA36F73A393D57C6543655465B58ED180372C56DD2E58A5B4174977017"
+    },
+    {
+      "path": "app/teacher-ui.tsx",
+      "sha256": "9118749969055DB7294A9D43D0EBF18C371C17EAAA22E1B3DDADD4CD232D21DA"
+    },
+    {
+      "path": "app/teacher-workspace.css",
+      "sha256": "0483BD629CBCBA1034AE27E7606EF131480552D9E65F4ABCE48F9F1C3D255129"
+    },
+    {
+      "path": "app/teacher-workspace.tsx",
+      "sha256": "E85D577CBBDEE630480193E975B8C2EC2F08CCC22379C18AD8B75CF7D3F83B29"
+    },
+    {
+      "path": "app/typography.css",
+      "sha256": "8F3B2057C4D711D6360ADB5467ABAB460F83FCD625A4F4F4A352F3FFFFCFE18B"
+    },
+    {
+      "path": "app/ui-refinement.css",
+      "sha256": "8511F6A91BC137E177E7481C8C3B96F2FC6062BC014D1D4BC0077B42C685B199"
+    },
+    {
+      "path": "app/use-resizable-sidebar.ts",
+      "sha256": "730AAE1FC2D6BF7F5377FCE50C6151A1E34F7661E94B0C9E9314E10CE252B1F1"
+    },
+    {
+      "path": "app/use-student-profile.ts",
+      "sha256": "EED9EF7E0D14646C25A9922DE8399246BA4BA478324626854B4BB57EFFF8D38B"
+    },
+    {
+      "path": "app/v81-data.ts",
+      "sha256": "16758606D141AFEC3651C7988E9A911ABDA6F60E7CE3FE5CFCFD4823DEA0DCAB"
+    },
+    {
+      "path": "app/phase5b-contract-mock/page.tsx",
+      "sha256": "58C1525A2E4DA30C56A5A898D21EA330BE2D27CF3F505F822B3FC68FA6422E6D"
+    },
+    {
+      "path": "public/bnbu-emblem.svg",
+      "sha256": "DE978CB12B86A80A17499703A1CBD0FD3CD2694FDC3964BDEC066EDEBCAE31ED"
+    },
+    {
+      "path": "public/bnbu-sports-icon.svg",
+      "sha256": "49A400D7C5BEC25E697347923377578DA8FC8D3991C25D146A50F05B2768F6B2"
+    },
+    {
+      "path": "public/checkin-evidence-preview.svg",
+      "sha256": "58596B837E2EA01EB5AA410ABC5C988B94C5C4292C701BDCFA25680C08F17178"
+    },
+    {
+      "path": "public/og.png",
+      "sha256": "D7EC95B61DE99A4EC66568E91750D044D7EB533A1A876A25411D2EB5CE6CF0C4"
+    },
+    {
+      "path": "public/brand/verity-ai-logo.svg",
+      "sha256": "FCDB41BDFE71352863E6E55577726ADF281A32DBDFE6DA320499E3AF5E668E16"
+    },
+    {
+      "path": "public/branding/sports-logo.png",
+      "sha256": "377BA9C5E34FF40835B821E65729C16AD5F621848BCD46A6F56C3EAD546FB17E"
+    },
+    {
+      "path": "build/sites-vite-plugin.ts",
+      "sha256": "3A62672C1AB7AACD1B17670DE5B519B07134E6B57BBBB1F1FD76127F77441FF8"
+    },
+    {
+      "path": "worker/cloudflare-env.d.ts",
+      "sha256": "83116E3CC16B11FBED83ECB69541206738402A80CAB625A4396D9A0DBAA3321C"
+    },
+    {
+      "path": "worker/index.ts",
+      "sha256": "83567FE41310ACE9C155F9D15C0B71A8EA54867E32426B91CF374F5294BB4711"
+    },
+    {
+      "path": "openapi/contract.json",
+      "sha256": "042855B82A1583FEDF48315C560794E4EE3A99B0C9ACA109DF834127C5B0F5AB"
+    },
+    {
+      "path": "openapi/openapi.snapshot.yaml",
+      "sha256": "BABA5B43B23046D97D1B403430B0D819328ABDAB420FD40B790C5977EBBC74DE"
+    },
+    {
+      "path": ".openai/hosting.json",
+      "sha256": "64861CC7AA4EFC47960347EF1BBD2813FBD6412BEBB14EDD717B31D3AC55100B"
+    },
+    {
+      "path": "next.config.ts",
+      "sha256": "A972C4F0FFA6DD714E7909B02D1AC19D2F2FE3D01F191EFD2C5054BD6F142EC1"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "FA7DDCB43424D40A7EF8594E3CF57F35D1FA1485220ED6FA2436E7F4F7CC8C67"
+    },
+    {
+      "path": "package.json",
+      "sha256": "FA86F5CD05D05030DB010C05CB2361D98F3FFD657316ECBF84384B56B5B50FB6"
+    },
+    {
+      "path": "postcss.config.mjs",
+      "sha256": "7B299D3D3B16699DDDA397C0B2373B3AF4F25F8FC9CCC9B3D9E64EF083BC1C21"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "0633EC9ACC9E114989755D48C781EA553AC3E954408AAE75775FAF1428894060"
+    },
+    {
+      "path": "tsconfig.worker.json",
+      "sha256": "E705442D08D0F93B6F2CACE779363041A69F69638D2264C97CE500A0D3F339FC"
+    },
+    {
+      "path": "vite.config.ts",
+      "sha256": "8651DF19DA40870064AD24DEA9A75269E5CBF3F618E013D4FCD6F35BDB0A0E91"
+    }
+  ],
+  "source": "C:/Users/23328/Desktop/new_version/BNBU-Sports-Web-new/portal-teacher-admin"
+}

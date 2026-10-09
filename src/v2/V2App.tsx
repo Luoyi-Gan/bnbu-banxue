@@ -1,4 +1,4 @@
-import { ChevronDown, Compass, GraduationCap, LayoutDashboard, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -6,7 +6,8 @@ import yellowIcon from '../assets/companion-yellow.png'
 import kittyIcon from '../assets/companion-kitty.png'
 import { V2Provider } from './store'
 import { useV2 } from './useV2'
-import { activityActor } from './activityPolicy'
+import { canUseTeacherSports, managedTeachers, teacherAccount } from './teacherCoffee'
+import { TeacherCoffee, TeacherProfile, TeacherSchedule, TeacherMessages, TeacherSports } from './TeacherPortal'
 import { canAccessPortal, portalHome } from './portalAccess'
 import { StudentSearch } from './StudentSearch'
 import { AdminDashboard, AdminModeration, AdminVerifications } from './admin'
@@ -46,8 +47,15 @@ function V2Shell({ children }: { children: ReactNode }) {
   const roleMenuRef = useRef<HTMLDivElement>(null)
   const admin = state.role === 'admin'
   const teacher = state.role === 'teacher'
-  const sports = location.pathname === '/v2/sports'
-  const nav = admin ? adminNav : teacher ? [{ path: '/v2/teacher/activities', label: '我的活动', icon: Compass }] : studentNav
+  const sports = location.pathname === '/v2/sports' || location.pathname === '/v2/teacher/sports'
+  const teacherNav = [
+    { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
+    { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
+    { path: '/v2/teacher/messages', label: '消息与通知', icon: MessageCircle },
+    { path: '/v2/teacher/profile', label: '个人资料', icon: UserRound },
+    ...(canUseTeacherSports(state) ? [{ path: '/v2/teacher/sports', label: '体育管理', icon: GraduationCap }] : []),
+  ]
+  const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = state.conversations.reduce((sum, item) => sum + item.unread, 0)
   const unreadNotices = state.notifications.filter((item) => !item.read).length
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
@@ -74,12 +82,13 @@ function V2Shell({ children }: { children: ReactNode }) {
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button><div>{(admin || teacher) && <span className="v2-breadcrumb">BNBU / {admin ? '管理' : '教师'}</span>}<strong>{title}</strong></div></div>
         <div className="v2-top-actions">
           {!admin && !teacher && <StudentSearch/>}
-          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? activityActor(state).name + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
+          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? (managedTeachers(state).find(t => t.id === teacherAccount(state).id)?.name ?? '老师') + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
         </div>
       </header>
       <main className="v2-main">{children}</main>
     </div>
     {!admin && !teacher && !sports && <><nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.slice(0, 5).map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>{location.pathname !== '/v2/ai' && <DraggableAI src={state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon}/>}</>}
+    {teacher && !sports && <nav className="v2-mobile-nav" aria-label="手机教师导航">{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label="手机管理导航">{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
   </div>
 }
@@ -93,8 +102,13 @@ function V2Routes() {
     <Route path="/v2/alumni" element={<V2Alumni/>}/>
     <Route path="/v2/sports" element={<V2Sports/>}/>
     <Route path="/v2/teacher" element={<Navigate to={portalHome.teacher} replace/>}/>
-    <Route path="/v2/teacher/activities" element={<V2Activities/>}/>
-    <Route path="/v2/teacher/activities/:id" element={<V2Activities/>}/>
+    <Route path="/v2/teacher/activities" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
+    <Route path="/v2/teacher/activities/:id" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
+    <Route path="/v2/teacher/coffee" element={<TeacherCoffee/>}/>
+    <Route path="/v2/teacher/profile" element={<TeacherProfile/>}/>
+    <Route path="/v2/teacher/schedule" element={<TeacherSchedule/>}/>
+    <Route path="/v2/teacher/messages" element={<TeacherMessages/>}/>
+    <Route path="/v2/teacher/sports" element={<TeacherSports/>}/>
     <Route path="/v2/activities" element={<V2Activities/>}/>
     <Route path="/v2/activities/:id" element={<V2Activities/>}/>
     <Route path="/v2/community" element={<V2Community/>}/>

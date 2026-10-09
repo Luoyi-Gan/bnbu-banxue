@@ -9,7 +9,8 @@
     "build": "tsc --noEmit -p tsconfig.app.json && vite build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --pretty false",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:sports-teacher": "npm --prefix integrations/sports-teacher run dev -- --port 4186"
   },
   "dependencies": {
     "cytoscape": "^3.34.3",

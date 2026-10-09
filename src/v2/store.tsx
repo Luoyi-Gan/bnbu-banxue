@@ -18,12 +18,21 @@ function sessionRole(legacy?: unknown) {
   } catch { return resolvePortalRole(null, legacy) }
 }
 
+function readTeacherAccount() {
+  const key = 'bnbu-campus-v2:dev-teacher-account'
+  try {
+    if (!import.meta.env.DEV) return { id: 'prof-zhang', sportsQualified: false }
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('previewRole') === 'teacher') window.sessionStorage.setItem(key, params.get('sportsTeacher') === '1' ? 'sports' : 'regular')
+    return window.sessionStorage.getItem(key) === 'sports' ? { id: 'prof-zhao', sportsQualified: true } : { id: 'prof-zhang', sportsQualified: false }
+  } catch { return { id: 'prof-zhang', sportsQualified: false } }
+}
 function readState(): V2State {
   try {
     const value = JSON.parse(window.localStorage.getItem(v2StorageKey) ?? 'null') as Partial<V2State> | null
-    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, posts: value.alumni ? value.posts : [...value.posts, ...alumniSeedPosts.filter(seed => !value.posts!.some(post => post.id === seed.id))], role: sessionRole(value.role), participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
+    if (value && Array.isArray(value.posts) && Array.isArray(value.rooms)) return hideRetiredContent({ ...initialV2State, ...value, posts: value.alumni ? value.posts : [...value.posts, ...alumniSeedPosts.filter(seed => !value.posts!.some(post => post.id === seed.id))], role: sessionRole(value.role), teacherAccount: readTeacherAccount(), participatingActivities: Array.isArray(value.participatingActivities) ? [...new Set(value.participatingActivities.filter((id): id is string => typeof id === "string"))] : [], preferences: { ...initialV2State.preferences, ...value.preferences } })
   } catch { /* use seed */ }
-  return { ...initialV2State, role: sessionRole() }
+  return { ...initialV2State, role: sessionRole(), teacherAccount: readTeacherAccount() }
 }
 
 export function V2Provider({ children }: { children: ReactNode }) {
@@ -35,11 +44,11 @@ export function V2Provider({ children }: { children: ReactNode }) {
   }), [])
   const synced = useRef<V2State | null>(null)
   useEffect(() => {
-    const sync = (event: StorageEvent) => { if (event.key === v2StorageKey) setState(current => { const next = { ...readState(), role: current.role }; synced.current = next; return next }) }
+    const sync = (event: StorageEvent) => { if (event.key === v2StorageKey) setState(current => { const next = { ...readState(), role: current.role, teacherAccount: current.teacherAccount }; synced.current = next; return next }) }
     window.addEventListener('storage', sync)
     return () => window.removeEventListener('storage', sync)
   }, [])
-  useEffect(() => { if (synced.current === state) return; try { window.localStorage.setItem(v2StorageKey, JSON.stringify({ ...state, role: undefined })); setPersistenceError(false) } catch { setPersistenceError(true) } }, [state])
-  return <V2Context.Provider value={{ state, setState: updateState, persistenceError, reset: () => setState(current => ({ ...initialV2State, role: current.role })) }}>{children}</V2Context.Provider>
+  useEffect(() => { if (synced.current === state) return; try { window.localStorage.setItem(v2StorageKey, JSON.stringify({ ...state, role: undefined, teacherAccount: undefined })); setPersistenceError(false) } catch { setPersistenceError(true) } }, [state])
+  return <V2Context.Provider value={{ state, setState: updateState, persistenceError, reset: () => setState(current => ({ ...initialV2State, role: current.role, teacherAccount: current.teacherAccount })) }}>{children}</V2Context.Provider>
 }
 
