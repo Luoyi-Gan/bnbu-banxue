@@ -40,7 +40,7 @@ export function V2Home() {
       <Link to="/v2/activities"><CalendarDays size={22}/><span><strong>{upcoming.length}</strong><small>接下来的活动</small></span><ArrowRight size={16}/></Link>
       <Link to="/v2/partners/teams"><UsersRound size={22}/><span><strong>{pending}</strong><small>组队待处理</small></span><ArrowRight size={16}/></Link>
       <Link to="/v2/sports" className="v2-sport-stat" aria-label="运动进度，已完成 16 小时，目标 20 小时，进入体育运动平台">
-        <div className="v2-sport-stat-head"><span className="v2-sport-stat-icon"><Activity size={20}/></span><span className="v2-sport-stat-title"><strong>运动进度</strong><small>只读演示数据</small></span><span className="v2-sport-stat-percent">80%</span></div>
+        <div className="v2-sport-stat-head"><span className="v2-sport-stat-icon"><Activity size={20}/></span><span className="v2-sport-stat-title"><strong>运动进度</strong></span><span className="v2-sport-stat-percent">80%</span></div>
         <div className="v2-sport-stat-summary"><span className="v2-sport-stat-value"><strong>16</strong><em> / 20 小时</em></span><small>距离目标还差 <b>4 小时</b></small></div>
         <div className="v2-sport-progress" role="progressbar" aria-label="运动目标完成进度" aria-valuenow={16} aria-valuemin={0} aria-valuemax={20}><span/></div>
       </Link>
