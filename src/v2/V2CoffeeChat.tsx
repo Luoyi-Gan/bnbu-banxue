@@ -1,14 +1,14 @@
-import { hasAlumniConflict } from './alumniPolicy'
-import { studentName } from './model'
+import { managedSlots, managedTeachers, occupied, bookCoffee, cancelCoffee, coffeeData } from './teacherCoffee'
+
 import { ArrowLeft, ArrowRight, CalendarDays, Check, ChevronRight, Clock3, Coffee, MapPin } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { coffeeSlots, teachers } from '../data/mockData'
+import { useEffect, useMemo, useRef, useState } from 'react'
+
 import campusServicesPhoto from '../assets/campus/campus-services.jpg'
 import campusHomePhoto from '../assets/campus/home-background.jpg'
 import campusEveningPhoto from '../assets/campus/evening-campus.jpg'
 import campusNightPhoto from '../assets/campus/night-walkway.jpg'
 import { AnimatedSearchField } from './AnimatedSearchField'
-import { makeId } from './model'
+
 import { Empty } from './ui'
 import { useV2 } from './useV2'
 
@@ -20,6 +20,9 @@ const slotEnd = (value: string) => new Intl.DateTimeFormat('zh-CN', { hour: '2-d
 
 export function V2CoffeeChat() {
   const { state, setState } = useV2()
+  const teachers = useMemo(() => managedTeachers(state), [state])
+  const coffeeSlots = managedSlots(state)
+  const [topic, setTopic] = useState('')
   const [teacherId, setTeacherId] = useState<string | null>(null)
   const [slotId, setSlotId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
@@ -49,15 +52,12 @@ export function V2CoffeeChat() {
     setFeedback('')
   }
   const updateBooking = () => {
-    if (!teacher || !slot || (slot.status !== 'available' && !isBooked)) return
-    if (!isBooked && hasAlumniConflict(state, studentName, slot)) { setFeedback('该时段与已确认的校友交流冲突，请选择其他时间。'); return }
-    const cancelling = isBooked
-    setState((value) => ({
-      ...value,
-      coffeeBookings: cancelling ? value.coffeeBookings.filter((id) => id !== slot.id) : value.coffeeBookings.includes(slot.id) ? value.coffeeBookings : [...value.coffeeBookings, slot.id],
-      notifications: [{ id: makeId(), title: cancelling ? 'Coffee Chat 预约已取消' : 'Coffee Chat 预约成功', body: `${teacher.name} · ${slotDate(slot.startAt)} ${slot.timeLabel}`, path: '/v2/me?tab=events', read: false, date: '刚刚' }, ...value.notifications],
-    }))
-    setFeedback(cancelling ? '预约已取消，你可以重新选择时间。' : '预约成功，已加入“我的接下来”。')
+    if (!slot) return
+    try {
+      const booking = coffeeData(state).bookings.find(b => b.slotId === slot.id && b.status === 'confirmed')
+      setState(isBooked && booking ? cancelCoffee(state, booking.id, '') : bookCoffee(state, slot.id, topic))
+      setFeedback(isBooked ? '预约已取消。' : '预约成功，老师已收到通知。')
+    } catch (error) { setFeedback((error as Error).message) }
   }
 
   if (teacher) {
@@ -68,17 +68,17 @@ export function V2CoffeeChat() {
         <img src={photo} alt="校园场景"/>
         <div><span className="v2-eyebrow">COFFEE CHAT · {facultyOf(teacher.department)}</span><h3 ref={headingRef} tabIndex={-1}>{teacher.name}</h3><small>{teacher.englishName} · {teacher.department}</small><p>{teacher.bio}</p><div className="v2-coffee-topics">{teacher.topics.map((topic) => <span key={topic}>{topic}</span>)}</div></div>
       </div>
-      <div className="v2-coffee-schedule-heading"><div><span className="v2-eyebrow">AVAILABLE TIMES</span><h3>选择预约时间</h3><p>每次交流 30 分钟；选择时段后确认预约。</p></div><CalendarDays size={22}/></div>
+      <div className="v2-coffee-schedule-heading"><div><span className="v2-eyebrow">AVAILABLE TIMES</span><h3>选择预约时间</h3><p>按老师开放的起止时间交流；预约符合条件即成立。</p></div><CalendarDays size={22}/></div>
       {slots.length ? <div className="v2-coffee-slot-list">{slots.map((item) => {
         const mine = state.coffeeBookings.includes(item.id)
-        const full = item.status !== 'available' && !mine
+        const full = !mine && (item.closed || Date.parse(item.startAt) <= Date.now() || occupied(state, item.id) >= item.capacity)
         return <button type="button" key={item.id} className={`v2-coffee-slot${slotId === item.id ? ' is-selected' : ''}${mine ? ' is-booked' : ''}`} aria-pressed={slotId === item.id} disabled={full} onClick={() => { setSlotId(item.id); setFeedback('') }}>
           <span className="v2-coffee-slot-date"><CalendarDays size={16}/>{slotDate(item.startAt)}</span>
           <strong><Clock3 size={16}/>{item.timeLabel} – {slotEnd(item.endAt)}</strong>
           <span className="v2-coffee-slot-status">{mine ? <><Check size={13}/> 已预约</> : full ? '已约满' : '可预约'}</span>
         </button>
       })}</div> : <Empty icon={Coffee} title="暂时没有可查看的时段" description="稍后再来看看。"/>}
-      <div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{teacher.location}</span><small>{slot ? `${slotDate(slot.startAt)} · ${slot.timeLabel}` : '请先选择一个时段'}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} disabled={!slot || (slot.status !== 'available' && !isBooked)} onClick={updateBooking}>{isBooked ? '取消预约' : '确认预约'} <ArrowRight size={15}/></button></div>
+      {!isBooked && <label className="v2-form">想交流的问题<textarea maxLength={500} value={topic} onChange={event => setTopic(event.target.value)} placeholder="请填写交流主题或问题"/></label>}<div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{slot?.location ?? teacher.location}</span><small>{slot ? `${slotDate(slot.startAt)} · ${slot.timeLabel}` : '请先选择一个时段'}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} disabled={!slot || (!isBooked && (slot.closed || Date.parse(slot.startAt) <= Date.now() || occupied(state, slot.id) >= slot.capacity))} onClick={updateBooking}>{isBooked ? '取消预约' : '确认预约'} <ArrowRight size={15}/></button></div>
       {feedback && <p className="v2-coffee-feedback" role="status">{feedback}</p>}
       <p className="v2-form-note">此处为本地演示，预约状态保存在当前浏览器。</p>
     </div>

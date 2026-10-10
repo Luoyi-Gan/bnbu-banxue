@@ -1,4 +1,5 @@
-import { coffeeSlots, events, organizations, teachers } from '../data/mockData'
+import { managedSlots, managedTeachers } from './teacherCoffee'
+import { events, organizations } from '../data/mockData'
 import { studentName, type V2State } from './model'
 import { ownsActivity } from './activityPolicy'
 
@@ -49,8 +50,8 @@ export function relationshipSnapshot(state: V2State): RelationshipEntity[] {
     if (org) put({ ...base, id: `organization:${id}`, sourceId: id, title: org.name, kind: 'organization', relation: 'followed', status: '关注关系 · 正式入会未核验', path: '/v2/campus', memberAccess: '组织入会和授权成员接口未接入；关注不代表正式加入。' })
   }
   for (const id of new Set(state.coffeeBookings)) {
-    const slot = coffeeSlots.find(s => s.id === id)
-    if (slot) put({ ...base, id: `coffee:${id}`, sourceId: id, title: `与${teachers.find(t => t.id === slot.teacherId)?.name ?? '老师'}交流`, kind: 'coffee', relation: 'booked', status: '预约已确认 · 未核实到场', path: '/v2/me?tab=events', memberAccess: '预约不公开其他预约人的身份。' })
+    const slot = managedSlots(state).find(s => s.id === id)
+    if (slot) put({ ...base, id: `coffee:${id}`, sourceId: id, title: `与${managedTeachers(state).find(t => t.id === slot.teacherId)?.name ?? '老师'}交流`, kind: 'coffee', relation: 'booked', status: '预约已确认 · 未核实到场', path: '/v2/me?tab=events', memberAccess: '预约不公开其他预约人的身份。' })
   }
   for (const booking of state.alumni?.bookings ?? []) {
     if (booking.status !== 'confirmed' || booking.student !== studentName) continue

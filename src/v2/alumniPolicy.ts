@@ -1,4 +1,4 @@
-import { coffeeSlots } from '../data/mockData'
+import { coffeeData, managedSlots } from './teacherCoffee'
 import { makeId, studentName, todayLabel, type Role, type V2State } from './model'
 import { alumniSeed, type AlumniData, type AlumniProfile, type AlumniSlot, type AlumniBookingStatus } from './alumniModel'
 
@@ -98,7 +98,7 @@ export function hasAlumniConflict(state: V2State, personId: string, slot: Pick<A
 
 function hasConflict(state: V2State, student: string, slot: AlumniSlot, except?: string) {
   const data = alumniData(state)
-  return (student === studentName && coffeeSlots.some(s => state.coffeeBookings.includes(s.id) && overlap(s, slot))) || data.bookings.some(b => b.id !== except && b.status === 'confirmed' && b.student === student && data.slots.some(s => s.id === b.slotId && overlap(s, slot)))
+  return (student === studentName && managedSlots(state).some(s => (state.coffeeBookings.includes(s.id) || coffeeData(state).bookings.some(b => b.student === studentName && b.status === 'confirmed' && b.proposedSlotId === s.id)) && overlap(s, slot))) || data.bookings.some(b => b.id !== except && b.status === 'confirmed' && b.student === student && data.slots.some(s => s.id === b.slotId && overlap(s, slot)))
 }
 
 export function requestAlumniChat(state: V2State, actor: AlumniActor, slotId: string, question: string, now = Date.now()): V2State {

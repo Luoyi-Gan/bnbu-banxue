@@ -1,4 +1,5 @@
-import { ArrowUpRight, ChevronDown, Compass, GraduationCap, LayoutDashboard, LayoutGrid, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, SquarePen, UserRound, UsersRound } from 'lucide-react'
+import { AdminMailActivities } from './AdminMailActivities'
+import { Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -6,7 +7,8 @@ import yellowIcon from '../assets/companion-yellow.png'
 import kittyIcon from '../assets/companion-kitty.png'
 import { V2Provider } from './store'
 import { useV2 } from './useV2'
-import { activityActor } from './activityPolicy'
+import { canUseTeacherSports, managedTeachers, teacherAccount } from './teacherCoffee'
+import { TeacherCoffee, TeacherProfile, TeacherSchedule, TeacherMessages, TeacherSports } from './TeacherPortal'
 import { canAccessPortal, portalHome } from './portalAccess'
 import { StudentSearch } from './StudentSearch'
 import { AdminDashboard, AdminModeration, AdminVerifications } from './admin'
@@ -34,6 +36,7 @@ const studentMore = [
 ]
 const adminNav = [
   { path: '/v2/admin', label: '运营总览', icon: LayoutDashboard, end: true },
+  { path: '/v2/admin/mail-activities', label: '邮件转活动', icon: Mail },
   { path: '/v2/admin/verifications', label: '认证审核', icon: ShieldCheck },
   { path: '/v2/admin/moderation', label: '内容审核', icon: Newspaper },
 ]
@@ -44,16 +47,21 @@ function V2Shell({ children }: { children: ReactNode }) {
   const [mobileMenu, setMobileMenu] = useState(false)
   const [roleMenu, setRoleMenu] = useState(false)
   const roleMenuRef = useRef<HTMLDivElement>(null)
-  const [quickNavOpen, setQuickNavOpen] = useState(false)
-  const quickNavRef = useRef<HTMLDivElement>(null)
   const admin = state.role === 'admin'
   const teacher = state.role === 'teacher'
-  const sports = location.pathname === '/v2/sports'
-  const nav = admin ? adminNav : teacher ? [{ path: '/v2/teacher/activities', label: '我的活动', icon: Compass }] : studentNav
+  const sports = location.pathname === '/v2/sports' || location.pathname === '/v2/teacher/sports'
+  const teacherNav = [
+    { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
+    { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
+    { path: '/v2/teacher/messages', label: '消息与通知', icon: MessageCircle },
+    { path: '/v2/teacher/profile', label: '个人资料', icon: UserRound },
+    ...(canUseTeacherSports(state) ? [{ path: '/v2/teacher/sports', label: '体育管理', icon: GraduationCap }] : []),
+  ]
+  const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = state.conversations.reduce((sum, item) => sum + item.unread, 0)
   const unreadNotices = state.notifications.filter((item) => !item.read).length
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
-  useEffect(() => { setMobileMenu(false); setRoleMenu(false); setQuickNavOpen(false); window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname, location.search])
+  useEffect(() => { setMobileMenu(false); setRoleMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname, location.search])
   useEffect(() => {
     if (!roleMenu) return
     const closeOutside = (event: PointerEvent) => { if (!roleMenuRef.current?.contains(event.target as Node)) setRoleMenu(false) }
@@ -62,14 +70,6 @@ function V2Shell({ children }: { children: ReactNode }) {
     document.addEventListener('keydown', closeEscape)
     return () => { document.removeEventListener('pointerdown', closeOutside); document.removeEventListener('keydown', closeEscape) }
   }, [roleMenu])
-  useEffect(() => {
-    if (!quickNavOpen) return
-    const closeOutside = (event: PointerEvent) => { if (!quickNavRef.current?.contains(event.target as Node)) setQuickNavOpen(false) }
-    const closeEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setQuickNavOpen(false) }
-    document.addEventListener('pointerdown', closeOutside)
-    document.addEventListener('keydown', closeEscape)
-    return () => { document.removeEventListener('pointerdown', closeOutside); document.removeEventListener('keydown', closeEscape) }
-  }, [quickNavOpen])
   return <div className={`v2-app${sports ? ' v2-app-sports' : ''}`}>
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
       <Link to={portalHome[state.role]} className="v2-brand"><img src={brandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
@@ -83,23 +83,14 @@ function V2Shell({ children }: { children: ReactNode }) {
       <header className="v2-topbar">
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button><div>{(admin || teacher) && <span className="v2-breadcrumb">BNBU / {admin ? '管理' : '教师'}</span>}<strong>{title}</strong></div></div>
         <div className="v2-top-actions">
-          {!admin && !teacher && <div className="v2-quick-nav" ref={quickNavRef}>
-            <button type="button" className={`v2-quick-nav-trigger${quickNavOpen ? ' is-open' : ''}`} aria-expanded={quickNavOpen} aria-controls="v2-quick-nav-panel" aria-label="快捷入口" onClick={() => setQuickNavOpen((value) => !value)}><LayoutGrid size={17}/><span>快捷入口</span><ChevronDown size={14}/></button>
-            <div id="v2-quick-nav-panel" className={`v2-quick-nav-panel${quickNavOpen ? ' is-open' : ''}`} inert={!quickNavOpen} aria-hidden={!quickNavOpen}>
-              <div className="v2-quick-nav-heading"><span>QUICK ACCESS</span><strong>从这里开始</strong></div>
-              <div className="v2-quick-nav-cards">
-                <Link className="v2-quick-nav-card is-partners" to="/v2/partners" onClick={() => setQuickNavOpen(false)}><span className="v2-quick-nav-card-icon"><UsersRound size={21}/></span><span><strong>找搭子</strong><small>一起出发、体验或学习</small></span><ArrowUpRight size={18}/></Link>
-                <Link className="v2-quick-nav-card is-community" to="/v2/community?compose=1" onClick={() => setQuickNavOpen(false)}><span className="v2-quick-nav-card-icon"><SquarePen size={21}/></span><span><strong>发帖子</strong><small>把想法分享给校园</small></span><ArrowUpRight size={18}/></Link>
-              </div>
-            </div>
-          </div>}
           {!admin && !teacher && <StudentSearch/>}
-          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? activityActor(state).name + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
+          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? (managedTeachers(state).find(t => t.id === teacherAccount(state).id)?.name ?? '老师') + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
         </div>
       </header>
       <main className="v2-main">{children}</main>
     </div>
     {!admin && !teacher && !sports && <><nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.slice(0, 5).map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>{location.pathname !== '/v2/ai' && <DraggableAI src={state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon}/>}</>}
+    {teacher && !sports && <nav className="v2-mobile-nav" aria-label="手机教师导航">{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label="手机管理导航">{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
   </div>
 }
@@ -113,8 +104,13 @@ function V2Routes() {
     <Route path="/v2/alumni" element={<V2Alumni/>}/>
     <Route path="/v2/sports" element={<V2Sports/>}/>
     <Route path="/v2/teacher" element={<Navigate to={portalHome.teacher} replace/>}/>
-    <Route path="/v2/teacher/activities" element={<V2Activities/>}/>
-    <Route path="/v2/teacher/activities/:id" element={<V2Activities/>}/>
+    <Route path="/v2/teacher/activities" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
+    <Route path="/v2/teacher/activities/:id" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
+    <Route path="/v2/teacher/coffee" element={<TeacherCoffee/>}/>
+    <Route path="/v2/teacher/profile" element={<TeacherProfile/>}/>
+    <Route path="/v2/teacher/schedule" element={<TeacherSchedule/>}/>
+    <Route path="/v2/teacher/messages" element={<TeacherMessages/>}/>
+    <Route path="/v2/teacher/sports" element={<TeacherSports/>}/>
     <Route path="/v2/activities" element={<V2Activities/>}/>
     <Route path="/v2/activities/:id" element={<V2Activities/>}/>
     <Route path="/v2/community" element={<V2Community/>}/>
@@ -128,6 +124,7 @@ function V2Routes() {
     <Route path="/v2/settings" element={<V2Settings/>}/>
     <Route path="/v2/admin" element={<AdminDashboard/>}/>
     <Route path="/v2/admin/verifications" element={<AdminVerifications/>}/>
+    <Route path="/v2/admin/mail-activities" element={<AdminMailActivities/>}/>
     <Route path="/v2/admin/moderation" element={<AdminModeration/>}/>
     <Route path="*" element={<Navigate to={portalHome[state.role]} replace/>}/>
   </Routes></V2Shell>

@@ -29,9 +29,9 @@ describe('activity publishing eligibility and ownership', () => {
     expect(next.localEvents[0]).toMatchObject({ ownerId: 'student-demo', host: studentName, status: 'published' })
     expect(value.localEvents).toEqual([])
   })
-  it('publishes for a teacher but not an administrator', () => {
+  it('rejects teachers and administrators', () => {
     const value = state(); value.role = 'teacher'
-    expect(createActivity(value, input).localEvents[0]).toMatchObject({ ownerId: 'prof-zhang', host: '张老师' })
+    expect(() => createActivity(value, input)).toThrow()
     value.role = 'admin'; value.verifications = [certification('approved')]
     expect(() => createActivity(value, input)).toThrow()
   })
@@ -45,20 +45,19 @@ describe('activity publishing eligibility and ownership', () => {
     expect(() => changeActivityVisibility(value, id)).toThrow('资格')
   })
   it('prevents another identity managing events and retains legacy student ownership', () => {
-    let value = state(); value.role = 'teacher'; value = createActivity(value, input)
+    const value = state(); value.localEvents = [{ ...input, id: 'legacy-teacher', ownerId: 'prof-zhang', host: '张老师', status: 'published', registrations: 0 }]
     value.role = 'student'
     expect(ownsActivity(value, value.localEvents[0])).toBe(false)
     expect(() => changeActivityVisibility(value, value.localEvents[0].id)).toThrow('本人')
     expect(ownsActivity(value, { ...value.localEvents[0], ownerId: undefined })).toBe(true)
   })
   it('validates activity fields before writing', () => {
-    const value = state(); value.role = 'teacher'
+    const value = state(); value.verifications = [certification('approved')]
     expect(() => createActivity(value, { ...input, startAt: '2000-01-01' })).toThrow()
     expect(() => createActivity(value, { ...input, description: '', capacity: 0 })).toThrow()
   })
   it('filters hosted events by owner rather than assuming all local events are mine', () => {
-    const value = state(); value.role = 'teacher'
-    const event = createActivity(value, input).localEvents[0]
+    const event = { ...input, id: 'legacy-teacher', ownerId: 'prof-zhang', host: '张老师', status: 'published' as const, registrations: 0 }
     const item: ActivityItem = { ...event, subtitle: '', category: '', host: event.host!, local: event }
     const filters = { query: '', category: '全部', period: '全部时间', host: '全部主办方', status: '我主办', sort: '推荐顺序' } as const
     expect(filterActivityItems([item], filters, 'student-demo')).toEqual([])

@@ -1,0 +1,244 @@
+"use client";
+
+import { useCallback, useEffect, useRef } from "react";
+import { ADMIN_PERMISSIONS, ADMIN_ROUTE_PERMISSION } from "./admin-domain";
+import { adminCopy } from "./admin-i18n";
+
+
+
+
+
+
+
+
+import { AdminStoreProvider, useAdminStore } from "./admin-store";
+
+
+
+
+import { AdminLoadError, AdminLoading } from "./admin-components";
+import {
+  getCurrentSemesterProjection,
+  getSystemModeProjection,
+} from "./admin-service";
+import {
+  TabPageTransition,
+  type TabTransitionDirection,
+} from "./teacher-tab-page-transition";
+import { semesterDisplayName } from "./semester-presentation";
+import type { AdminLocale, AdminRoute, AdminState } from "./admin-types";
+import type { WorkspaceMode } from "./portal-app";
+
+import type { NotificationTarget } from "./portal-notifications";
+import type { SemesterRow } from "./semester-api";
+
+import { deferredComponent } from "./deferred-component";
+
+const AdminInsights = deferredComponent(() => import('./admin-insights').then(module => module.AdminInsights));
+const AdminCheckins = deferredComponent(() => import('./admin-checkins').then(module => module.AdminCheckins));
+const AdminAudit = deferredComponent(() => import('./admin-audit').then(module => module.AdminAudit));
+const AdminCourses = deferredComponent(() => import('./admin-courses').then(module => module.AdminCourses));
+const AdminHelp = deferredComponent(() => import('./admin-help').then(module => module.AdminHelp));
+const AdminOverview = deferredComponent(() => import('./admin-overview').then(module => module.AdminOverview));
+const AdminRules = deferredComponent(() => import('./admin-rules').then(module => module.AdminRules));
+const AdminSemesters = deferredComponent(() => import('./admin-semesters').then(module => module.AdminSemesters));
+const AdminSupport = deferredComponent(() => import('./admin-support').then(module => module.AdminSupport));
+const AdminSystem = deferredComponent(() => import('./admin-system').then(module => module.AdminSystem));
+const AdminSubadmins = deferredComponent(() => import('./admin-subadmins').then(module => module.AdminSubadmins));
+const AdminUsers = deferredComponent(() => import('./admin-users').then(module => module.AdminUsers));
+
+const adminRoutes: AdminRoute[] = [
+  "insights",
+  "checkins",
+  "overview",
+  "courses",
+  "semesters",
+  "accounts",
+  "support",
+  "rules",
+  "system",
+  "help",
+  "audit",
+  "subadmins",
+];
+
+function AdminPage({
+  onSemestersLoaded,
+  notificationTarget,
+  active,
+  locale,
+  mode,
+  onNavigate,
+}: {
+  onSemestersLoaded: (rows: SemesterRow[]) => void;
+  notificationTarget?:NotificationTarget|null;
+  active: AdminRoute;
+  locale: AdminLocale;
+  mode: WorkspaceMode;
+  onNavigate: (route: AdminRoute) => void;
+}) {
+  const { state, loading, loadError, refresh } = useAdminStore();
+  // Recovery must remain reachable when ordinary business reads are paused.
+  if (active === "system" && mode === "real") return <AdminSystem locale={locale} />;
+  if (loading) return <AdminLoading locale={locale} />;
+  if (loadError)
+    return (
+      <AdminLoadError
+        locale={locale}
+        message={loadError}
+        retry={() => void refresh()}
+      />
+    );
+  if (!state)
+    return (
+      <AdminLoadError
+        locale={locale}
+        message={adminCopy(locale, "load_error")}
+        retry={() => void refresh()}
+      />
+    );
+  if (!ADMIN_PERMISSIONS.has(ADMIN_ROUTE_PERMISSION[active])) {
+    return (
+      <div className="admin-empty-state is-error" role="alert">
+        <span>!</span>
+        <h2>{adminCopy(locale, "permission_denied")}</h2>
+      </div>
+    );
+  }
+  if (active === "insights") return mode === "real" ? <AdminInsights/> : <p>数据看板需要连接正式账号读取真实统计数据。</p>;
+  if (active === "checkins") return <AdminCheckins locale={locale} />;
+  if (active === "courses") return <AdminCourses locale={locale} mode={mode} notificationTarget={notificationTarget} />;
+  if (active === "semesters") return <AdminSemesters locale={locale} onSemestersLoaded={onSemestersLoaded} />;
+  if (active === "accounts") return <AdminUsers locale={locale} />;
+  if (active === "support")
+    return <AdminSupport locale={locale} notificationTarget={notificationTarget} />;
+  if (active === "rules")
+    return <AdminRules locale={locale} />;
+  if (active === "system") return <AdminSystem locale={locale} />;
+  if (active === "help")
+    return <AdminHelp locale={locale} />;
+  if (active === "audit") return <AdminAudit locale={locale} />;
+  if (active === "subadmins") return <AdminSubadmins locale={locale} mode={mode} />;
+  return (
+    <AdminOverview
+      locale={locale}
+      mode={mode}
+      onNavigate={onNavigate}
+    />
+  );
+}
+
+export function AdminWorkspace({
+  notificationTarget,
+  active,
+  direction,
+  locale,
+  mode,
+  showToast,
+  onNavigate,
+  onContextChange,
+}: {
+  notificationTarget?:NotificationTarget|null;
+  active: string;
+  direction: TabTransitionDirection;
+  locale: AdminLocale;
+  mode: WorkspaceMode;
+  showToast: (message: string) => void;
+  onNavigate: (route: AdminRoute) => void;
+  onContextChange?: (context: {
+    semesterName: string;
+    notificationCount: number;
+    systemMode: AdminState["systemMode"]["mode"];
+  }) => void;
+}) {
+  const route = adminRoutes.includes(active as AdminRoute)
+    ? (active as AdminRoute)
+    : "overview";
+  const backendContextRef = useRef<{
+    semesterName?: string;
+    systemMode?: AdminState["systemMode"]["mode"];
+  }>({});
+  const latestNotificationCountRef = useRef(0);
+  const semesterRevisionRef = useRef(0);
+
+  const publishBackendContext = useCallback(() => {
+    onContextChange?.({
+      semesterName:
+        backendContextRef.current.semesterName ??
+        adminCopy(locale, "no_current_semester"),
+      notificationCount: latestNotificationCountRef.current,
+      systemMode: backendContextRef.current.systemMode ?? "NORMAL",
+    });
+  }, [locale, onContextChange]);
+
+  const handleSemestersLoaded = useCallback((rows: SemesterRow[]) => {
+    semesterRevisionRef.current += 1;
+    backendContextRef.current.semesterName = semesterDisplayName(
+      rows.find((semester) => semester.status === "CURRENT"),
+      adminCopy(locale, "no_current_semester"),
+    );
+    publishBackendContext();
+  }, [locale, publishBackendContext]);
+
+  useEffect(() => {
+    if (mode === "demo") return;
+    let cancelled = false;
+    const semesterRevision = semesterRevisionRef.current;
+    void Promise.allSettled([
+      getCurrentSemesterProjection(),
+      getSystemModeProjection(),
+    ]).then(([semester, systemMode]) => {
+      if (cancelled) return;
+      if (semester.status === "fulfilled" && semesterRevision === semesterRevisionRef.current)
+        backendContextRef.current.semesterName = semesterDisplayName(semester.value);
+      if (systemMode.status === "fulfilled")
+        backendContextRef.current.systemMode = systemMode.value.mode;
+      publishBackendContext();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, publishBackendContext]);
+
+  const handleStateChange = useCallback(
+    (state: AdminState) => {
+      latestNotificationCountRef.current = state.notifications.length;
+      if (mode === "demo") {
+        backendContextRef.current.semesterName = semesterDisplayName(
+          state.semesters.find((semester) => semester.status === "current"),
+          adminCopy(locale, "no_current_semester"),
+        );
+        backendContextRef.current.systemMode = state.systemMode.mode;
+      }
+      publishBackendContext();
+    },
+    [locale, mode, publishBackendContext],
+  );
+  return (
+    <div className="admin-i18n-boundary">
+      <AdminStoreProvider
+        mode={mode}
+        locale={locale}
+        showToast={showToast}
+        onStateChange={handleStateChange}
+      >
+        <TabPageTransition
+          activeKey={route}
+          direction={direction}
+          renderPage={(pageKey) => (
+            <div className="teacher-page-layout admin-page-layout admin-business-page">
+              <AdminPage
+                onSemestersLoaded={handleSemestersLoaded}
+                notificationTarget={notificationTarget}
+                active={pageKey as AdminRoute}
+                locale={locale}
+                mode={mode}
+                onNavigate={onNavigate}
+              />
+            </div>
+          )}
+        />
+      </AdminStoreProvider>
+    </div>
+  );
+}

@@ -7,7 +7,7 @@ export function resolvePortalRole(session: unknown, legacy: unknown): Role {
 
 export const portalHome: Record<Role, string> = {
   student: '/v2',
-  teacher: '/v2/teacher/activities',
+  teacher: '/v2/teacher/coffee',
   admin: '/v2/admin',
 }
 
