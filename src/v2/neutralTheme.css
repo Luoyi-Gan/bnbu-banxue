@@ -1,0 +1,96 @@
+/* Student palette. Portaled controls inherit the same tokens as the page. */
+body:has(.v2-app-student),
+.v2-app-student,
+body:has(.v2-app-student) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-picker-layer) {
+  --v2-canvas: #FAFAFA;
+  --v2-surface: #FFFFFF;
+  --v2-ink: #242424;
+  --v2-muted: #858585;
+  --v2-blue: #242424;
+  --v2-soft: #FAFAFA;
+  --v2-line: rgb(133 133 133 / 22%);
+  --v2-shadow: 0 12px 32px rgb(36 36 36 / 7%);
+  accent-color: var(--v2-ink);
+}
+body:has(.v2-app-student),
+.v2-app-student { background: var(--v2-canvas); color: var(--v2-ink); }
+
+/* Text hierarchy, including older feature components. */
+.v2-app-student :is(.v2-page-heading p,.v2-profile-header p,.v2-profile-header>div>span,
+.v2-room-open p,.v2-room-facts,.v2-room-footer,.v2-partner-stats span,
+.v2-saved-row small,.v2-detail-date,.v2-chat-list small,.v2-chat-main>header small,
+.v2-bubble small,.v2-service-card small,.v2-alumni-card p,.v2-alumni-card small,
+.v2-network-heading p,.v2-network-help,.v2-network-loading,.v2-network-empty,
+.v2-network-privacy,.v2-network-detail dt,.v2-network-detail>small,.v2-network-detail details,
+.v2-network-stats>span,.v2-network-legend,.v2-network-pagination,.v2-network-list,.v2-network-source,
+.v2-network-toolbar span,.v2-timetable-footnote,.v2-timetable-day header>span,
+.v2-course-time small,.v2-weekdays button,.v2-recognition p,.v2-recognition li,
+.v2-empty,.v2-form-note,.discovery-text-cover small,.discovery-text-cover>span) { color: var(--v2-muted); }
+.v2-app-student :is(.v2-profile-header strong,.v2-profile-header>a,.v2-profile-overview>a,
+.v2-profile-overview>a strong,.v2-profile-overview>a svg,.v2-room-open h3,
+.v2-room-facts svg,.v2-room-footer button,.v2-saved-row,.v2-chat-list strong,
+.v2-empty strong,.v2-course-body>strong,.v2-course-time strong,.v2-timetable-day h3,
+.v2-alumni-card h3,.discovery-title,.discovery-text-cover strong) { color: var(--v2-ink); }
+.v2-app-student :is(.v2-profile-overview>a,.v2-room-card,.v2-chat-shell,.v2-chat-main,
+.v2-coffee-card,.v2-coffee-slot,.v2-service-card,.v2-alumni-card,.v2-saved-row,
+.v2-network-toolbar,.v2-network-help,.v2-course-card) { border-color: var(--v2-line); }
+.v2-app-student :is(.v2-profile-overview>a:hover,.v2-room-card:hover,.v2-service-card:hover,
+.v2-chat-list>button:hover,.v2-chat-list>button.is-active,.v2-icon-options button.is-active) {
+  background-color: var(--v2-soft); border-color: var(--v2-muted); box-shadow: none;
+}
+.v2-app-student :is(.v2-profile-header,.v2-chat-list,.v2-chat-main>header,.v2-chat-composer,
+.v2-comments,.v2-comment,.v2-network-stats,.v2-network-pagination) { border-color: var(--v2-line); }
+.v2-app-student :is(.v2-chat-avatar,.v2-avatar,.v2-bubble:not(.is-mine) p,
+.v2-network-help,.v2-recognition ol,.v2-coffee-topics span,.v2-alumni-topic,
+.v2-profile-header>div>span) { background: var(--v2-soft); color: var(--v2-ink); }
+.v2-app-student .v2-bubble.is-mine p { background: var(--v2-ink); color: var(--v2-surface); }
+.v2-app-student :is(.v2-chat-composer input,.v2-comment-form input) {
+  background: var(--v2-surface); border-color: var(--v2-line); color: var(--v2-ink);
+}
+.v2-app-student :is(.v2-timetable-import>p,.v2-timetable-upload,.v2-form>label) { color: var(--v2-muted); }
+.v2-app-student :is(.v2-network-toolbar button:hover,.v2-activity-filter-inner) { background: var(--v2-soft); }
+
+/* Selection uses contrast and the existing filled icon / label, rather than hue. */
+.v2-app-student :is(.v2-filter-pills button,.v2-tabs button,.v2-activity-filter-options button).is-active {
+  background: var(--v2-ink); border-color: var(--v2-ink); color: var(--v2-surface);
+}
+.v2-app-student .v2-activities .v2-activity-discovery-panel .v2-filter-pills button.is-active {
+  background: var(--v2-ink); border-color: var(--v2-ink); color: var(--v2-surface);
+}
+.v2-app-student :is(.discovery-meta button.is-liked,.activity-discovery-reactions button.is-liked,
+.activity-discovery-reactions button.is-saved,.activity-discovery-participating) { color: var(--v2-ink); }
+.v2-app-student .v2-timetable-shortcut { color: var(--v2-ink); background: var(--v2-surface); }
+.v2-app-student .v2-timetable-shortcut[aria-current="page"] { background: var(--v2-ink); color: var(--v2-surface); }
+.v2-app-student .v2-weekdays button.is-active { background: var(--v2-ink); color: var(--v2-surface); }
+.v2-app-student .v2-mobile-nav a.is-active,.v2-app-student .v2-side-link.is-active { color: var(--v2-ink); }
+.v2-app-student :is(.v2-profile-overview>a>svg:last-child,.v2-network-filters>label,
+.v2-room-card-top button,.v2-room-facts span,.v2-room-footer span,.v2-animated-search-field button) { color: var(--v2-muted); }
+.v2-app-student :is(.v2-partner-overview p,.v2-service-lead p,.v2-service-lead .v2-eyebrow) { color: var(--v2-surface); }
+.v2-app-student .v2-partner-overview .v2-eyebrow { color: var(--v2-surface); }
+.v2-app-student .v2-network-legend i.self { background: var(--v2-ink); }
+.v2-app-student .v2-network-legend i.person { background: var(--v2-surface); border-color: var(--v2-muted); }
+.v2-app-student .v2-network-legend i.entity { background: var(--v2-soft); border-color: var(--v2-muted); }
+.v2-app-student .v2-network-legend b { border-color: var(--v2-muted); }
+.v2-app-student .v2-network-legend b.confirmed { border-color: var(--v2-ink); }
+
+/* Student dialogs render outside the app root. */
+body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) { background: var(--v2-surface); color: var(--v2-ink); }
+body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-detail-lead,.v2-detail-date,
+.v2-form-note,.v2-form>label,.v2-timetable-import>p,.v2-recognition p,.v2-event-facts small,
+.v2-detail-actions small,.activity-detail-reactions small,.v2-comments small) { color: var(--v2-muted); }
+body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-timetable-upload,.v2-recognition ol,
+.v2-event-facts>div,.v2-avatar,.v2-upload-add) { background: var(--v2-soft); color: var(--v2-ink); border-color: var(--v2-line); }
+body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-modal-close,.v2-pulse-heart,
+.activity-detail-reactions button,.activity-detail-reactions button.is-liked,.v2-recognition li.is-active,
+.v2-recognition-spinner,.v2-course-time strong,.v2-course-body>strong) { color: var(--v2-ink); }
+body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-comment-form input,.activity-detail-reactions button) {
+  background: var(--v2-surface); border-color: var(--v2-line); color: var(--v2-ink);
+}
+body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(button,input,textarea,select):focus-visible,
+.v2-app-student :is(button,a,input,textarea,select):focus-visible { outline-color: var(--v2-muted); }
+body:has(.v2-app-student) .v2-a-community-compose .v2-community-compose-circle { background: var(--v2-ink); color: var(--v2-surface); }
+body:has(.v2-app-student) :is(.v2-modal-scrim,.v2-drawer-scrim) { background: rgb(36 36 36 / 42%); }
+body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-timetable-message,.v2-icon-button) {
+  background: var(--v2-soft); color: var(--v2-ink); border-color: var(--v2-line);
+}
+.v2-app-student .v2-ai-float { filter: drop-shadow(0 5px 14px rgb(36 36 36 / 12%)); }

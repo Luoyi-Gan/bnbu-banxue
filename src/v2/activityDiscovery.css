@@ -9,41 +9,41 @@
 .v2-app-student .v2-activities .v2-activity-discovery-panel .v2-filter-pills button {
   border-color: transparent;
   border-radius: 99px;
-  background: #edf0ef;
+  background: var(--v2-soft);
   padding-inline: 14px;
 }
 .v2-app-student .v2-activities .v2-activity-discovery-panel .v2-filter-pills button.is-active {
-  color: #305d70;
-  background: #dfeaed;
+  color: var(--v2-ink);
+  background: var(--v2-soft);
   border-color: transparent;
 }
-.activity-discovery-note { margin: 0 0 16px; color: #7b858b; font-size: 11px; line-height: 1.6; }
-.activity-discovery-cover { background: #e9edeb; color: inherit; }
+.activity-discovery-note { margin: 0 0 16px; color: var(--v2-muted); font-size: 11px; line-height: 1.6; }
+.activity-discovery-cover { background: var(--v2-soft); color: inherit; }
 .activity-discovery-cover img { position: absolute; inset: 0; }
 .activity-discovery-cover.is-loading img { opacity: 0; }
 .activity-discovery-category {
   position: absolute; bottom: 9px; left: 9px; max-width: calc(100% - 18px);
-  padding: 4px 8px; border-radius: 5px; background: #fffffff0; color: #426373;
+  padding: 4px 8px; border-radius: 5px; background: rgb(255 255 255 / 94%); color: var(--v2-ink);
   font-size: 10px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .activity-discovery-save { position: absolute; top: 8px; right: 8px; }
 .activity-discovery-save button {
   display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
-  border: 0; background: #ffffffee; color: #506a76; cursor: pointer;
+  border: 0; background: rgb(255 255 255 / 93%); color: var(--v2-muted); cursor: pointer;
 }
-.activity-discovery-when { margin: 0 2px 4px; color: #567786; font-size: 11px; line-height: 1.5; }
-.activity-discovery-location { margin: 0 2px 5px; color: #838e92; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.activity-discovery-when { margin: 0 2px 4px; color: var(--v2-muted); font-size: 11px; line-height: 1.5; }
+.activity-discovery-location { margin: 0 2px 5px; color: var(--v2-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .activity-discovery-reactions { flex: none; }
 .activity-discovery-reactions button { min-height: 32px; min-width: 32px; justify-content: center; }
-.activity-discovery-reactions button.is-liked,.activity-detail-reactions button.is-liked { color: #b3576c; }
-.activity-discovery-reactions button.is-saved { color: #315c6d; }
+.activity-discovery-reactions button.is-liked,.activity-detail-reactions button.is-liked { color: var(--v2-muted); }
+.activity-discovery-reactions button.is-saved { color: var(--v2-ink); }
 .activity-detail-reactions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-.activity-detail-reactions button { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid #dce4e5; border-radius: 8px; background: #fff; color: #416675; cursor: pointer; }
+.activity-detail-reactions button { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid var(--v2-line); border-radius: 8px; background: var(--v2-surface); color: var(--v2-ink); cursor: pointer; }
 .activity-detail-reactions button:disabled { opacity: .5; cursor: not-allowed; }
-.activity-detail-reactions small { color: #7b858b; font-size: 11px; }
-.activity-discovery-participating { display: inline-block; margin-top: 5px; color: #527663; font-size: 10px; }
-.activity-discovery-card .discovery-title { color: #24343d; text-decoration: none; }
-.activity-discovery-card a:focus-visible { outline: 2px solid #447d99; outline-offset: 3px; }
+.activity-detail-reactions small { color: var(--v2-muted); font-size: 11px; }
+.activity-discovery-participating { display: inline-block; margin-top: 5px; color: var(--v2-muted); font-size: 10px; }
+.activity-discovery-card .discovery-title { color: var(--v2-ink); text-decoration: none; }
+.activity-discovery-card a:focus-visible { outline: 2px solid var(--v2-muted); outline-offset: 3px; }
 @media (max-width: 600px) {
   .v2-app-student .v2-activities .v2-activity-discovery-panel { padding: 4px 0 0; }
   .activity-discovery-note { font-size: 10px; margin-bottom: 12px; }
