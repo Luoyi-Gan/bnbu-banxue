@@ -1,5 +1,5 @@
 import { AdminMailActivities } from './AdminMailActivities'
-import { Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { Mail, BookOpen, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -22,6 +22,7 @@ import { V2CampusExplore } from './V2CampusExplorer'
 import './v2.css'
 import './aRedesign.css'
 import './aControls.css'
+import './timetableShortcut.css'
 
 const studentNav = [
   { path: '/v2', label: '首页', icon: LayoutDashboard, end: true },
@@ -94,6 +95,7 @@ function V2Shell({ children }: { children: ReactNode }) {
       </header>
       <main className="v2-main">{children}</main>
     </div>
+    {!admin && !teacher && !sports && !mobileMenu && <Link className="v2-timetable-shortcut" to="/v2/me?tab=timetable" aria-label="打开我的课表" aria-current={location.pathname === '/v2/me' && new URLSearchParams(location.search).get('tab') === 'timetable' ? 'page' : undefined}><BookOpen size={19}/><span>我的课表</span></Link>}
     {!admin && !teacher && !sports && <><nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.slice(0, 5).map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>{location.pathname !== '/v2/ai' && <DraggableAI src={state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon}/>}</>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label="手机教师导航">{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label="手机管理导航">{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
