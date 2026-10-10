@@ -15,6 +15,7 @@ import { AnimatedSearchField } from './AnimatedSearchField'
 import { filterActivityItems, type ActivityPeriod, type ActivitySort, type ActivityStatus } from './activityFilters'
 import { studentSchedule, setActivityParticipation } from './studentSchedule'
 import { activityActor, canPublishActivity, changeActivityVisibility, createActivity, ownsActivity } from './activityPolicy'
+import { SportsProgressCard } from './SportsProgressCard'
 
 const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
 
@@ -33,8 +34,9 @@ export function V2Home() {
       <section className="v2-panel v2-a-next-card"><span className="v2-eyebrow">下一步 · {next ? next.label : '从这里开始'}</span>{next ? <><strong className="v2-a-next-time">{next.startAt ? formatWhen(next.startAt) : next.time}</strong><h2>{next.title}</h2><p><MapPin size={15}/>{next.location}</p><div className="v2-a-next-actions"><Link className="v2-button v2-button-primary" to={next.path}>查看详情 <ArrowRight size={16}/></Link><Link className="v2-button v2-button-secondary" to="/v2/activities">发现活动</Link></div></> : <><h2>发现你的下一件校园事</h2><p>标记感兴趣的活动，或加入搭子队伍，安排会自动显示在这里。</p><div className="v2-a-next-actions"><Link className="v2-button v2-button-primary" to="/v2/activities">发现活动 <ArrowRight size={16}/></Link><Link className="v2-button v2-button-secondary" to="/v2/partners">找搭子</Link></div></>}</section>
       <section className="v2-panel v2-a-task-card"><SectionHeading title="待处理" detail="与你有关的新进展" action={<Link to="/v2/messages">全部消息 <ArrowRight size={14}/></Link>}/><div className="v2-a-task-list"><Link to="/v2/partners/teams"><span className="v2-a-task-count">{roomRequests}</span><span><strong>{roomRequests ? '组队申请等待答复' : '组队申请'}</strong><small>{roomRequests ? '前往我的队伍处理' : '目前无需答复'}</small></span><ArrowRight size={15}/></Link><Link to="/v2/messages"><span className="v2-a-task-count">{unreadMessages + unreadNotices}</span><span><strong>未读消息与通知</strong><small>聊天 {unreadMessages} 条 · 通知 {unreadNotices} 条</small></span><ArrowRight size={15}/></Link></div></section>
     </div>
+    <SportsProgressCard/>
     <div className="v2-a-home-secondary"><section className="v2-panel v2-a-schedule-card"><SectionHeading title="近期安排" detail="已标记的活动、已加入的搭子与 Coffee Chat" action={<Link to="/v2/me?tab=events">查看全部 <ArrowRight size={14}/></Link>}/><div className="v2-a-schedule-list">{schedule.slice(0, 4).map((item, index) => <Link to={item.path} key={item.id} style={{ animationDelay: `${index * 45}ms` }}><time>{item.startAt ? formatWhen(item.startAt) : item.time}</time><span><strong>{item.title}</strong><small>{item.location}</small></span><em>{item.label}</em></Link>)}{schedule.length === 0 && <div className="v2-a-schedule-empty">暂无近期安排。<Link to="/v2/activities">去看看校园活动 <ArrowRight size={14}/></Link></div>}</div></section>
-      <section className="v2-panel v2-a-campus-card"><SectionHeading title="校园里正在发生" detail="从校园探索新的活动" action={<Link to="/v2/campus/explore">探索校园 <ArrowRight size={14}/></Link>}/><Link to="/v2/campus/explore" className="v2-a-campus-photo"><img src={campusPhoto} alt="校园建筑与树木"/></Link><h3>从地图上查看楼栋与活动</h3><p>找到地点，再决定今天要去哪里。</p><Link to="/v2/sports" className="v2-a-sport-mini"><span>运动进度 · 本地演示数据</span><strong>16 / 20 小时</strong><span className="v2-a-sport-track"><i/></span></Link></section></div>
+      <section className="v2-panel v2-a-campus-card"><SectionHeading title="校园里正在发生" detail="从校园探索新的活动" action={<Link to="/v2/campus/explore">探索校园 <ArrowRight size={14}/></Link>}/><Link to="/v2/campus/explore" className="v2-a-campus-photo"><img src={campusPhoto} alt="校园建筑与树木"/></Link><h3>从地图上查看楼栋与活动</h3><p>找到地点，再决定今天要去哪里。</p></section></div>
   </div>
 }
 

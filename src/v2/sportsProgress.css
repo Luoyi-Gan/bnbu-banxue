@@ -1,0 +1,29 @@
+.v2-app-student .v2-sports-progress-card{position:relative;margin:0 0 17px;background:var(--v2-surface);border:1px solid var(--v2-line);border-radius:20px;min-height:258px;overflow:hidden}
+.v2-sports-progress-link{display:block;padding:22px 24px;color:var(--v2-ink);text-decoration:none;border-radius:inherit}
+.v2-sports-progress-link:focus-visible{outline:3px solid var(--v2-blue);outline-offset:-3px}
+.v2-sports-progress-heading{display:flex;align-items:center;gap:11px}
+.v2-sports-progress-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:var(--v2-accent-soft);color:var(--v2-action);flex:none}
+.v2-sports-progress-heading h2{margin:0 0 4px;font-size:17px;letter-spacing:-.02em}
+.v2-sports-progress-heading div>span{font-size:11px;color:var(--v2-muted)}
+.v2-sports-progress-arrow{margin-left:auto;color:var(--v2-muted);flex:none}
+.v2-sports-progress-content{display:flex;align-items:center;gap:22px;margin:20px 0}
+.v2-sports-progress-ring{position:relative;width:104px;height:104px;flex:none;display:grid;place-items:center}
+.v2-sports-progress-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.v2-sports-progress-ring circle{fill:none;stroke:var(--v2-accent-soft);stroke-width:6}
+.v2-sports-progress-ring .v2-sports-progress-fill{stroke:var(--v2-blue);stroke-linecap:round}
+.v2-sports-progress-ring strong{font-size:30px;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.v2-sports-progress-ring strong small{font-size:13px;margin-left:2px}
+.v2-sports-progress-status{font-size:11px;font-weight:650;color:var(--v2-action)}
+.v2-sports-progress-values p{margin:5px 0 3px;font-variant-numeric:tabular-nums}
+.v2-sports-progress-values p strong{font-size:28px;letter-spacing:-.6px;font-weight:650}
+.v2-sports-progress-values p span,.v2-sports-progress-values>small{font-size:12px;color:var(--v2-muted)}
+.v2-sports-progress-values p.v2-sports-progress-placeholder{font-size:17px;font-weight:600;margin-top:9px}
+.v2-sports-progress-footer{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;padding-top:14px;border-top:1px solid var(--v2-line);font-size:11px;color:var(--v2-muted);line-height:1.6}
+.v2-sports-progress-footer small{display:block;font-size:11px;margin-bottom:2px}
+.v2-sports-progress-cta{display:inline-flex;gap:4px;align-items:center;white-space:nowrap;color:var(--v2-action);font-weight:650;flex:none}
+.v2-sports-progress-retry{position:relative;display:flex;align-items:center;gap:6px;margin:-6px 24px 18px;min-height:36px;border:1px solid var(--v2-line);background:var(--v2-soft);color:var(--v2-action);border-radius:10px;padding:5px 11px;cursor:pointer;font:inherit;font-size:12px}
+.v2-sports-progress-card.is-loading .v2-sports-progress-ring{opacity:.5}
+.v2-sports-progress-retry:disabled{opacity:.65;cursor:wait}
+@media(hover:hover){.v2-sports-progress-link:hover{background:var(--v2-soft)}}
+@media(min-width:1100px){.v2-sports-progress-link{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}.v2-sports-progress-content{grid-column:2;grid-row:1 / 3;margin:0;border-left:1px solid var(--v2-line);padding-left:32px}.v2-sports-progress-footer{grid-column:1;margin-top:18px}.v2-app-student .v2-sports-progress-card{min-height:184px}}
+@media(max-width:720px){.v2-app-student .v2-sports-progress-card{margin-bottom:12px;border-radius:18px}.v2-sports-progress-link{padding:18px 19px}.v2-sports-progress-content{gap:18px;margin:16px 0}.v2-sports-progress-ring{width:94px;height:94px}.v2-sports-progress-values p strong{font-size:26px}.v2-sports-progress-footer{gap:9px}.v2-sports-progress-heading h2{font-size:16px}.v2-sports-progress-heading div>span{font-size:10px}}

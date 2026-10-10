@@ -18,6 +18,7 @@ import { V2AI, V2Campus, V2Me, V2Settings } from './services'
 import { DraggableAI } from './DraggableAI'
 import { V2Alumni } from './V2Alumni'
 import { V2Sports } from './V2Sports'
+import { useSportsHomeScroll } from './useSportsHomeScroll'
 import { V2CampusExplore } from './V2CampusExplorer'
 import './v2.css'
 import './aRedesign.css'
@@ -50,6 +51,7 @@ const adminNav = [
 function V2Shell({ children }: { children: ReactNode }) {
   const { state } = useV2()
   const location = useLocation()
+  useSportsHomeScroll()
   const [mobileMenu, setMobileMenu] = useState(false)
   const [roleMenu, setRoleMenu] = useState(false)
   const roleMenuRef = useRef<HTMLDivElement>(null)
@@ -68,7 +70,7 @@ function V2Shell({ children }: { children: ReactNode }) {
   const unread = state.conversations.reduce((sum, item) => sum + item.unread, 0)
   const unreadNotices = state.notifications.filter((item) => !item.read).length
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
-  useEffect(() => { setMobileMenu(false); setRoleMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname, location.search])
+  useEffect(() => { setMobileMenu(false); setRoleMenu(false) }, [location.pathname, location.search])
   useEffect(() => {
     if (!roleMenu) return
     const closeOutside = (event: PointerEvent) => { if (!roleMenuRef.current?.contains(event.target as Node)) setRoleMenu(false) }
