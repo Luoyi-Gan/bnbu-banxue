@@ -34,6 +34,8 @@ export interface V2State {
   roomReviews: RoomReview[]
   conversations: Conversation[]
   verifications: Verification[]
+  likedActivities?: string[]
+  savedActivities?: string[]
   savedPosts: string[]
   savedRooms: string[]
   likedPosts: string[]
