@@ -1,6 +1,6 @@
-import { ArrowRight, Bell, BookOpen, Bookmark, CalendarDays, CarFront, ChevronRight, Clapperboard, Clock3, MapPin, Megaphone, MessageCircle, Plus, Search, Send, SlidersHorizontal, UsersRound, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Bookmark, CalendarDays, CarFront, ChevronRight, Clapperboard, Clock3, MapPin, Megaphone, Plus, Search, SlidersHorizontal, UsersRound, X } from 'lucide-react'
 import { useMemo, useState, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import FlexCarousel from '../components/reactbits/FlexCarousel/FlexCarousel'
 import campusPhoto from '../assets/campus/home-background.jpg'
 import { ActivityDiscovery, ActivityReactions } from './ActivityDiscovery'
@@ -8,7 +8,7 @@ import { activityCatalog, seededActivities } from './activityCatalog'
 import { CampusMap } from './CampusMap'
 import { CampusBuildingPicker } from './V2CampusExplorer'
 import type { CampusBuilding } from './campusLocations'
-import { makeId, roomTypeName, studentName, timeLabel, type Room, type RoomType } from './model'
+import { makeId, roomTypeName, studentName, type Room, type RoomType } from './model'
 import { useV2 } from './useV2'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { AnimatedSearchField } from './AnimatedSearchField'
@@ -214,18 +214,4 @@ export function V2Partners() {
 
 export { V2Teams } from './V2Teams'
 
-export function V2Messages() {
-  const { state, setState } = useV2()
-  const [params, setParams] = useSearchParams()
-  const view = params.get('view') === 'notifications' ? 'notifications' : 'conversations'
-  const [selected, setSelected] = useState(state.conversations[0]?.id ?? '')
-  const [text, setText] = useState('')
-  const active = state.conversations.find((item) => item.id === selected)
-  const unreadNotices = state.notifications.filter((item) => !item.read).length
-  const open = (id: string) => { setSelected(id); setState((value) => ({ ...value, conversations: value.conversations.map((item) => item.id === id ? { ...item, unread: 0 } : item) })) }
-  const send = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); if (!active || !text.trim()) return; const body = text.trim(); setState((value) => ({ ...value, conversations: value.conversations.map((item) => item.id === active.id ? { ...item, messages: [...item.messages, { id: makeId(), from: studentName, body, time: timeLabel() }] } : item) })); setText('') }
-  return <div className="v2-page v2-messages-page"><PageHeading eyebrow="MESSAGES" title="消息" description="私聊、组队会话与校园通知集中在这里。"/>
-    <div className="v2-tabs v2-message-tabs"><button type="button" className={view === 'conversations' ? 'is-active' : ''} onClick={() => setParams({})}><MessageCircle size={16}/> 会话 {state.conversations.reduce((sum, item) => sum + item.unread, 0) > 0 && <b>{state.conversations.reduce((sum, item) => sum + item.unread, 0)}</b>}</button><button type="button" className={view === 'notifications' ? 'is-active' : ''} onClick={() => setParams({ view: 'notifications' })}><Bell size={16}/> 通知 {unreadNotices > 0 && <b>{unreadNotices}</b>}</button></div>
-    {view === 'notifications' ? <section className="v2-panel v2-list-panel v2-notification-panel"><SectionHeading title="校园通知" detail={`${state.notifications.length} 条通知`} action={<button type="button" className="v2-text-button" onClick={() => setState((value) => ({ ...value, notifications: value.notifications.map((item) => ({ ...item, read: true })) }))}>全部标为已读</button>}/>{state.notifications.map((item) => <Link className={`v2-saved-row${item.read ? '' : ' is-unread'}`} to={item.path} key={item.id} onClick={() => setState((value) => ({ ...value, notifications: value.notifications.map((notice) => notice.id === item.id ? { ...notice, read: true } : notice) }))}><Bell size={20}/><span><strong>{item.title}</strong><small>{item.body} · {item.date}</small></span>{!item.read && <i className="v2-notification-unread"/>}<ChevronRight size={16}/></Link>)}{!state.notifications.length && <Empty icon={Bell} title="暂无通知"/>}</section> : <div className="v2-chat-shell"><aside className="v2-chat-list"><div className="v2-chat-list-heading"><strong>会话</strong><small>{state.conversations.length} 条</small></div>{state.conversations.map((conversation) => <button type="button" className={selected === conversation.id ? 'is-active' : ''} key={conversation.id} onClick={() => open(conversation.id)}><span className="v2-chat-avatar"><MessageCircle size={20}/></span><span><strong>{conversation.title}</strong><small>{conversation.messages.at(-1)?.body ?? '开始一段新对话'}</small></span>{conversation.unread > 0 && <b>{conversation.unread}</b>}</button>)}</aside><section className="v2-chat-main">{active ? <><header><span className="v2-chat-avatar"><UsersRound size={20}/></span><div><strong>{active.title}</strong><small>演示对话 · 仅保存在当前浏览器</small></div></header><div className="v2-chat-messages">{active.messages.map((message) => <div className={`v2-bubble${message.from === studentName ? ' is-mine' : ''}`} key={message.id}><small>{message.from} · {message.time}</small><p>{message.body}</p></div>)}</div><form className="v2-chat-composer" onSubmit={send}><input value={text} onChange={(event) => setText(event.target.value)} placeholder="输入消息…" aria-label="消息内容" maxLength={500}/><button type="submit" className="v2-button v2-button-primary" disabled={!text.trim()}><Send size={17}/></button></form></> : <Empty icon={MessageCircle} title="选择一个会话" description="加入队伍后可在这里继续交流。"/>}</section></div>}
-  </div>
-}
+export { V2Messages } from './V2Messages'
