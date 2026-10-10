@@ -1,3 +1,4 @@
+import type { StudentTimetable } from './timetableModel'
 import type { MailActivityRecord } from './mailActivityPolicy'
 import type { TeacherAccount, TeacherCoffeeData } from './teacherCoffee'
 import type { RelationshipHistory } from './relationshipAdapter'
@@ -19,6 +20,7 @@ export interface Conversation { id: string; title: string; messages: { id: strin
 export interface Verification { id: string; name: string; kind: 'student' | 'club' | 'official'; organization: string; note: string; status: ReviewStatus; reviewNote: string; date: string }
 export interface LocalEvent { endAt?: string; image?: string; conditions?: string; mailSourceId?: string; ownerId?: string; host?: string; id: string; title: string; description: string; startAt: string; location: string; capacity: number | null; status: 'published' | 'draft'; registrations: number }
 export interface V2State {
+  timetable?: StudentTimetable
   mailActivities?: MailActivityRecord[]
   teacherAccount?: TeacherAccount
   teacherCoffee?: TeacherCoffeeData
