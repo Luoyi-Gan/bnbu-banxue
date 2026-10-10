@@ -3,16 +3,16 @@ import fcose from 'cytoscape-fcose'
 import type { GraphNode, GraphEdge } from './relationshipAdapter'
 cytoscape.use(fcose)
 export const relationshipStyles: StylesheetStyle[] = [
-  { selector: 'node', style: { width: 180, height: 68, shape: 'round-rectangle', 'background-color': '#FAFAFA', 'border-color': '#858585', 'border-width': 2, label: 'data(label)', color: '#242424', 'font-size': 18, 'font-family': 'Inter, "PingFang SC", "Microsoft YaHei", sans-serif', 'text-valign': 'center', 'text-halign': 'center', 'text-wrap': 'ellipsis', 'text-max-width': '158px', 'min-zoomed-font-size': 8, 'overlay-opacity': 0 } },
-  { selector: 'node[kind = "self"]', style: { shape: 'ellipse', width: 92, height: 92, 'background-color': '#242424', 'border-color': '#242424', 'font-size': 27, 'font-weight': 'bold', color: '#fff' } },
-  { selector: 'node[kind = "person"]', style: { shape: 'ellipse', width: 76, height: 76, 'background-color': '#FFFFFF', 'border-color': '#858585', color: '#242424', 'font-size': 17, 'text-max-width': '62px' } },
-  { selector: 'edge', style: { width: 2, 'line-color': '#858585', 'curve-style': 'bezier', 'target-arrow-shape': 'none', 'line-style': 'solid', 'overlay-opacity': 0 } },
-  { selector: 'edge[relation = "marked"], edge[relation = "followed"]', style: { 'line-style': 'dashed', 'line-color': '#858585', 'line-dash-pattern': [6, 5] } },
-  { selector: 'edge[relation = "booked"], edge[relation = "confirmed"]', style: { 'line-color': '#242424', width: 3 } },
-  { selector: 'edge[relation = "shared"]', style: { 'line-style': 'dashed', 'line-color': '#858585', 'line-dash-pattern': [5, 5] } },
-  { selector: 'edge[?history]', style: { 'line-style': 'dotted', 'line-color': '#858585', opacity: .7 } },
+  { selector: 'node', style: { width: 180, height: 68, shape: 'round-rectangle', 'background-color': '#E8F2FF', 'border-color': '#007AFF', 'border-width': 2, label: 'data(label)', color: '#003E7D', 'font-size': 18, 'font-family': 'Inter, "PingFang SC", "Microsoft YaHei", sans-serif', 'text-valign': 'center', 'text-halign': 'center', 'text-wrap': 'ellipsis', 'text-max-width': '158px', 'min-zoomed-font-size': 8, 'overlay-opacity': 0 } },
+  { selector: 'node[kind = "self"]', style: { shape: 'ellipse', width: 92, height: 92, 'background-color': '#007AFF', 'border-color': '#007AFF', 'font-size': 27, 'font-weight': 'bold', color: '#fff' } },
+  { selector: 'node[kind = "person"]', style: { shape: 'ellipse', width: 76, height: 76, 'background-color': '#E6F6E9', 'border-color': '#248A3D', color: '#0E4B1D', 'font-size': 17, 'text-max-width': '62px' } },
+  { selector: 'edge', style: { width: 2, 'line-color': '#8E8E93', 'curve-style': 'bezier', 'target-arrow-shape': 'none', 'line-style': 'solid', 'overlay-opacity': 0 } },
+  { selector: 'edge[relation = "marked"], edge[relation = "followed"]', style: { 'line-style': 'dashed', 'line-color': '#8E8E93', 'line-dash-pattern': [6, 5] } },
+  { selector: 'edge[relation = "booked"], edge[relation = "confirmed"]', style: { 'line-color': '#0865D1', width: 3 } },
+  { selector: 'edge[relation = "shared"]', style: { 'line-style': 'dashed', 'line-color': '#248A3D', 'line-dash-pattern': [5, 5] } },
+  { selector: 'edge[?history]', style: { 'line-style': 'dotted', 'line-color': '#8E8E93', opacity: .7 } },
   { selector: '.muted', style: { opacity: .18 } },
-  { selector: 'node.highlight', style: { 'border-width': 4, 'border-color': '#242424' } },
+  { selector: 'node.highlight', style: { 'border-width': 4, 'border-color': '#0865D1' } },
   { selector: 'edge.highlight', style: { width: 4 } },
 ]
 export function graphElements(graph: { nodes: GraphNode[]; edges: GraphEdge[] }): ElementDefinition[] {

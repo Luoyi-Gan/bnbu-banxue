@@ -23,7 +23,7 @@ import './v2.css'
 import './aRedesign.css'
 import './aControls.css'
 import './timetableShortcut.css'
-import './neutralTheme.css'
+import './studentTheme.css'
 
 const studentNav = [
   { path: '/v2', label: '首页', icon: LayoutDashboard, end: true },
