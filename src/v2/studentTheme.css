@@ -133,3 +133,7 @@ body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-recognition-spinner,
 .v2-pulse-heart.is-active,.activity-detail-reactions button.is-liked,.activity-detail-reactions button.is-saved) { color: var(--v2-blue); }
 body:has(.v2-app-student) :is(.v2-modal,.v2-drawer) :is(button,input,textarea,select):focus-visible,
 .v2-app-student :is(button,a,input,textarea,select):focus-visible { outline-color: var(--v2-blue); }
+
+.v2-app-student .v2-header-messages { position:relative; flex:none; text-decoration:none; }
+.v2-app-student .v2-header-messages.is-active { color:var(--v2-action); background:var(--v2-accent-soft); border-color:transparent; }
+.v2-header-message-count { position:absolute; top:-4px; right:-2px; display:grid; place-items:center; min-width:18px; height:18px; padding:0 4px; border:2px solid var(--v2-surface); border-radius:12px; background:#f04438; color:#fff; font-size:10px; font-weight:650; line-height:1; font-variant-numeric:tabular-nums; pointer-events:none; }
