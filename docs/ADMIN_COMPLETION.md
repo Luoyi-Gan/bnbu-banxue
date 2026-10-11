@@ -527,3 +527,9 @@ sports.grade.save(enrollmentId,version,score)仅原课程责任教师，version�
 workspace仅责任教师取得gradeDrafts/gradePublications，学生和管理员均为空。教师课程卡中填写/修改、确认发布及查看历次内部版本；学生页面没有成绩入口。关闭课程仍可处理已有学生成绩；已结算或归档的分支明确要求历史报告更正入口，目前该分支尚未接通，不以拒绝覆盖代替完整历史更正交付。
 
 33文件230项测试、双端类型、Lint、构建通过。验证120和-5可发布、顺序及前驱保留、学生/管理员隔离、无学生分数通知、不改进度、备注/非整数/超INT/权限/版本/结算拒绝。新增网页点击与真实学校正式成绩渠道未验收。原始用时/OCR、免测/认证、正式名单、结算报告、账号治理及其他完整范围继续。
+
+## 2026-10-13 最新 Docker 项目验证
+
+已使用当前 PowerShell 代理重新执行 docker compose build，项目镜像构建成功，包含业务提交8699738；镜像ID为sha256:da5a7d26e0340cf2b27f250b519065115802663ea753ebcb24552d04b00e8d3d。独立临时容器启动成功，health为healthy，经容器内部4174访问/workspace及/api/health均为200。未发布临时容器端口，Windows验收服务保持4174/4175运行。
+
+Linux容器挂载只读测试fixtures和integrations后，33文件230项测试全部通过。该结果验证当前项目容器与自动测试，不代表新增页面完成浏览器点击验收或真实学校服务接通。临时验证容器用后删除，保留镜像和数据卷。教师正式域名确认为bnbu.edu.cn，Windows Acceptance仍显式使用example.test。
