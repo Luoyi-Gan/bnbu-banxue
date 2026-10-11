@@ -26,6 +26,7 @@ import { sportsIncidentCommand } from "./sports/incidents";
 import { sportsSwimCommand } from "./sports/swimming";
 import { sportsPasswordCommand } from "./sports/password";
 import { sportsTeacherAccountCommand } from "./sports/teacher-accounts";
+import { sportsFeedbackCommand } from "./sports/feedback";
 import {
   sportsAccountGate,
   requiresPasswordChange,
@@ -144,6 +145,7 @@ export function execute(
       result =
         sportsPasswordCommand(repo, actor, token, action, input) ??
         sportsTeacherAccountCommand(repo, actor, action, input) ??
+        sportsFeedbackCommand(repo, actor, action, input) ??
         communityCommand(repo, actor, action, input) ??
         coffeeCommand(repo, actor, action, input) ??
         governanceCommand(repo, actor, action, input) ??

@@ -491,3 +491,11 @@ sports.teachers.preview(csv)要求ACCOUNTS权限，支持粘贴UTF-8 CSV及引�
 配置BNBU_SCHOOL_EMAIL_DOMAINS为逗号分隔的已确认学校域名，未配置拒绝建号。正式域名已向用户询问，尚未确认；Start-Local.ps1 -Acceptance在未指定域名时仅设example.test，用于用户已授权的独立本地测试，不证明学校身份。实际运行环境当前也仅配置此测试域名。
 
 33文件221项测试、双端类型、Lint、构建通过；验证带引号CSV、整批成功、首次改密门禁、密码无明文持久化、未配置域名拒绝、密码列拒绝、重复行、预览后冲突整批不建。新增网页点击、正式学校域名/实际教师身份未验收。教师账号删除与历史主体处理、分管理员治理、学生注册及其他完整范围继续进行。
+
+## 2026-10-13 体育学生反馈
+
+sports.feedback.submit(type,description)仅体育学生本人；类型BUG/SUGGESTION/ACCESSIBILITY/PRIVACY/OTHER，服务器生成编号、时间和NEW状态，忽略客户端指定处理状态/处理人。sports.feedback.reply(id,version,status,reply)要求FEEDBACK权限，每次必须填写公开回复，状态只能PROCESSING/TECHNICAL/RESOLVED/CLOSED；允许关闭后重新跟进，不能回NEW。追加不可覆盖的sportsFeedbackReply，含处理人姓名、顺序、时间、前后状态及公开内容，通知原学生。反馈不改写任何教学事实。
+
+workspace提供feedback、feedbackReplies、canManageFeedback；学生仅本人、授权管理员全部，教师无访问权。管理员读取当前姓名/邮箱和已知学号（缺少时不编造）；学生不取得管理端身份补充字段。网页具备数量概况、编号/身份/描述搜索、分类和状态筛选、清除筛选、六条分页、公开历史及回复入口。
+
+33文件223项全量测试通过，随后补强不同学生隔离和同时间回复顺序，课程/账号/反馈20项复测通过；双端类型、Lint、构建通过。新增网页点击未验收；历史主体注销后的身份清理须随注销流程补齐，不宣称已完成注销隐私验收。学校域名仍待确认，账号治理、名单/OCR、认证免测、成绩与结算等完整范围继续。

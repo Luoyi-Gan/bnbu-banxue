@@ -17,6 +17,7 @@ import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { teacherAccountWorkspace } from "./sports/teacher-accounts";
+import { feedbackWorkspace } from "./sports/feedback";
 import {
   requiresPasswordChange,
   sportsAccountGate,
@@ -275,6 +276,7 @@ export function createApiServer(
           ...system,
           ...sportsWorkspace(repo, actor),
           ...teacherAccountWorkspace(repo, actor),
+          ...feedbackWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),
           ...calendarWorkspace(repo, actor),

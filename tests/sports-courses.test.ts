@@ -750,3 +750,82 @@ it("教师CSV错误和预览后冲突整批拒绝，未知学校域名及密码�
   ).toBeUndefined();
   expect(f.repo.get(batch.id).data.status).toBe("PREVIEW");
 });
+
+it("学生反馈仅本人和授权管理员可见，回复关闭后可追加跟进且历史不覆盖", async () => {
+  const f = setup();
+  const { feedbackWorkspace } = await import("../server/sports/feedback");
+  const feedback = f.run(f.student, "sports.feedback.submit", {
+    type: "ACCESSIBILITY",
+    description: "键盘无法操作某按钮",
+    status: "CLOSED",
+    assignedTo: f.teacher.account.id,
+  });
+  expect(feedback.data.status).toBe("NEW");
+  expect(feedback.data.assignedTo).toBeUndefined();
+  expect(feedbackWorkspace(f.repo, f.teacher.account).feedback).toEqual([]);
+  f.repo.create("sportsIdentity",f.ordinary.account.id,{role:"student",status:"verified"});
+  expect(feedbackWorkspace(f.repo,f.ordinary.account).feedback).toEqual([]);
+  expect(() =>
+    f.run(f.teacher, "sports.feedback.reply", {
+      id: feedback.id,
+      version: feedback.version,
+      status: "RESOLVED",
+      reply: "越权",
+    }),
+  ).toThrow("管理权限");
+  const closed = f.run(f.admin, "sports.feedback.reply", {
+    id: feedback.id,
+    version: feedback.version,
+    status: "CLOSED",
+    reply: "已修复，请重新检查",
+  });
+  f.run(f.admin, "sports.feedback.reply", {
+    id: closed.id,
+    version: closed.version,
+    status: "TECHNICAL",
+    reply: "收到复现说明，继续排查",
+  });
+  const studentView = feedbackWorkspace(f.repo, f.student.account);
+  expect(studentView.feedback[0].data.status).toBe("TECHNICAL");
+  expect(studentView.feedbackReplies).toHaveLength(2);
+  expect(studentView.feedback[0].data.email).toBeUndefined();
+  expect(f.repo.all("sportsRecord")).toHaveLength(0);
+  expect(f.repo.all("sportsEnrollment")).toHaveLength(0);
+  expect(() =>
+    f.run(f.admin, "sports.feedback.reply", {
+      id: closed.id,
+      version: closed.version,
+      status: "PROCESSING",
+      reply: "旧请求",
+    }),
+  ).toThrow("已变化");
+});
+it("反馈状态必须伴随公开回复，不能回待受理，撤销反馈权限立即拒绝", () => {
+  const f = setup();
+  const feedback = f.run(f.student, "sports.feedback.submit", {
+    type: "BUG",
+    description: "测试问题",
+  });
+  const input = {
+    id: feedback.id,
+    version: feedback.version,
+    status: "PROCESSING",
+    reply: " ",
+  };
+  expect(() => f.run(f.admin, "sports.feedback.reply", input)).toThrow("reply");
+  expect(() =>
+    f.run(f.admin, "sports.feedback.reply", {
+      ...input,
+      status: "NEW",
+      reply: "回退",
+    }),
+  ).toThrow("status");
+  f.db
+    .prepare("UPDATE accounts SET roles='[]' WHERE id=?")
+    .run(f.admin.account.id);
+  expect(() =>
+    f.run(f.admin, "sports.feedback.reply", { ...input, reply: "无权限" }),
+  ).toThrow("管理权限");
+  expect(f.repo.get(feedback.id).data.status).toBe("NEW");
+  expect(f.repo.all("sportsFeedbackReply")).toHaveLength(0);
+});

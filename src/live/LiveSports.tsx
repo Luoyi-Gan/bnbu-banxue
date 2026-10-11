@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsFeedback } from "./SportsFeedback";
 import { SportsTeacherAccounts } from "./SportsTeacherAccounts";
 import { SportsCourseManagement } from "./SportsCourseManagement";
 
@@ -20,6 +21,9 @@ interface SportsData
   identity: LiveEntity;
   firstLoginOnly?: boolean;
   teacherImports?: LiveEntity[];
+  feedback?: LiveEntity[];
+  feedbackReplies?: LiveEntity[];
+  canManageFeedback?: boolean;
   administratorAccess?: { superAdmin: boolean; permissions: string[] };
   semesters: LiveEntity[];
   templates: LiveEntity[];
@@ -212,6 +216,14 @@ export function LiveSports({
       </section>
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
+      <SportsFeedback
+        items={data.feedback ?? []}
+        replies={data.feedbackReplies ?? []}
+        manage={data.canManageFeedback === true}
+        student={role === "student"}
+        open={open}
+        busy={busy}
+      />
       {data.administratorAccess?.permissions.includes("ACCOUNTS") && (
         <SportsTeacherAccounts
           imports={data.teacherImports ?? []}
