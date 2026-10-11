@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "dev:local": "node scripts/local.mjs",
+    "typecheck:server": "tsc --noEmit -p tsconfig.server.json",
     "dev": "vite --host 127.0.0.1 --strictPort",
     "dev:v2": "vite --host 127.0.0.1 --strictPort",
     "build": "tsc --noEmit -p tsconfig.app.json && vite build",

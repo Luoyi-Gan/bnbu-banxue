@@ -2,6 +2,9 @@ node_modules/
 dist/
 *.local
 *.log
+data/
+.runtime/
+artifacts/local-accounts.json
 
 integrations/**/.wrangler/
 integrations/**/.next/

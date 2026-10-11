@@ -5,5 +5,9 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
-  server: { host: '127.0.0.1', port: 4174, strictPort: true },
+  server: { host: '127.0.0.1', port: 4174, strictPort: true, proxy: {
+    ...(process.env.BNBU_SPORTS_ORIGIN ? { '/api/v1': { target: process.env.BNBU_SPORTS_ORIGIN, changeOrigin: false } } : {}),
+    ...(process.env.BNBU_SPORTS_OBJECT_ORIGIN ? { '/minio': { target: process.env.BNBU_SPORTS_OBJECT_ORIGIN, rewrite: (path: string) => path.replace(/^\/minio/, '') } } : {}),
+    '/api': { target: 'http://127.0.0.1:4175' },
+  } },
 })

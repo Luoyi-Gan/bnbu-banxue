@@ -1,0 +1,339 @@
+import { afterEach, describe, expect, it } from "vitest";
+import { randomUUID } from "node:crypto";
+import { mkdtempSync, unlinkSync, rmdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { openDatabase, type Database } from "../server/database";
+import { createAccount, login } from "../server/auth";
+import { createApiServer } from "../server/main";
+import { execute, snapshot } from "../server/commands";
+import { Repository } from "../server/repository";
+
+const resources: (() => Promise<void> | void)[] = [];
+afterEach(async () => {
+  for (const close of resources.splice(0).reverse()) await close();
+});
+function setup(db: Database = openDatabase(":memory:")) {
+  resources.push(() => db.close());
+  const repo = new Repository(db);
+  const make = (name: string, roles: string[]) => {
+    const id = createAccount(db, {
+      email: `${name}@example.test`,
+      name,
+      password: "Acceptance-123",
+      roles,
+    });
+    return { ...login(db, `${name}@example.test`, "Acceptance-123"), id };
+  };
+  const a = make("student-a", ["student"]),
+    b = make("student-b", ["student"]),
+    c = make("student-c", ["student"]),
+    teacher = make("teacher", ["teacher"]),
+    admin = make("admin", ["superadmin"]),
+    reviewer = make("reviewer", ["reviewer"]),
+    operator = make("operator", ["operator"]);
+  const run = (
+    who: typeof a,
+    action: string,
+    input: Record<string, unknown>,
+    key = randomUUID(),
+  ) => execute(db, who.token, action, input, key) as { id: string };
+  return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
+}
+describe("API、持久化和跨角色联动", () => {
+  it("实际 HTTP 登录 cookie、来源校验、错误响应和私有接口认证", async () => {
+    const { db, a } = setup(),
+      server = createApiServer(db, { localOutbox: true });
+    await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+    resources.push(
+      () =>
+        new Promise<void>((done) => {
+          server.closeAllConnections();
+          server.close(() => done());
+        }),
+    );
+    const address = server.address() as { port: number },
+      base = `http://127.0.0.1:${address.port}`;
+    expect((await fetch(`${base}/api/workspace`)).status).toBe(401);
+    const loggedIn = await fetch(`${base}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: a.account.email,
+        password: "Acceptance-123",
+      }),
+    });
+    expect(loggedIn.status).toBe(200);
+    const cookie = loggedIn.headers.get("set-cookie")!;
+    expect(cookie).toContain("HttpOnly");
+    expect(cookie).toContain("SameSite=Strict");
+    const response = await fetch(`${base}/api/workspace`, {
+      headers: { Cookie: cookie },
+    });
+    expect((await response.json()).account.id).toBe(a.id);
+    const rejected = await fetch(`${base}/api/commands`, {
+      method: "POST",
+      headers: {
+        Cookie: cookie,
+        Origin: "https://example.org",
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
+    expect(rejected.status).toBe(403);
+    expect(
+      (await fetch(`${base}/api/v1/me`, { headers: { Cookie: cookie } }))
+        .status,
+    ).toBe(503);
+  });
+  it("命令幂等与参数冲突，事务外客户端不能伪造作者或审核状态", () => {
+    const { a, b, run, repo } = setup(),
+      key = randomUUID();
+    const input = {
+      title: "真实帖子",
+      body: "内容",
+      board: "校园",
+      ownerId: b.id,
+      status: "visible",
+    };
+    const first = run(a, "post.create", input, key),
+      duplicate = run(a, "post.create", input, key);
+    expect(duplicate).toEqual(first);
+    expect(repo.all("post")).toHaveLength(1);
+    expect(repo.get(first.id).ownerId).toBe(a.id);
+    expect(repo.get(first.id).data.status).toBe("pending");
+    expect(() =>
+      run(a, "post.create", { ...input, title: "替换" }, key),
+    ).toThrow("不同操作");
+  });
+  it("审核员不能管理账号；唯一超级管理员受保护；封禁与禁言即时执行", () => {
+    const { a, reviewer, admin, run, repo } = setup();
+    expect(() =>
+      run(reviewer, "account.update", {
+        id: a.id,
+        status: "banned",
+        roles: ["student"],
+        reason: "测试",
+      }),
+    ).toThrow("超级管理员");
+    expect(() =>
+      run(admin, "account.update", {
+        id: admin.id,
+        status: "active",
+        roles: ["student"],
+        reason: "降级",
+      }),
+    ).toThrow("唯一有效");
+    run(admin, "account.update", {
+      id: a.id,
+      status: "muted",
+      roles: ["student"],
+      reason: "违规",
+    });
+    expect(() =>
+      run(a, "post.create", { title: "a", body: "a", board: "a" }),
+    ).toThrow("不能发帖");
+    run(admin, "account.update", {
+      id: a.id,
+      status: "banned",
+      roles: ["student"],
+      reason: "严重违规",
+    });
+    expect(() =>
+      run(a, "profile.save", { nickname: "new", avatar: "" }),
+    ).toThrow("封禁");
+    expect(repo.person(a.id).status).toBe("banned");
+  });
+  it("待审、隐藏、邮件原文、私人会话和通知按账号过滤", () => {
+    const { db, repo, a, b, admin, run } = setup();
+    const post = run(a, "post.create", {
+      title: "私有待审",
+      body: "秘密草稿",
+      board: "校园",
+    });
+    expect(snapshot(db, b.account).entities.some((e) => e.id === post.id)).toBe(
+      false,
+    );
+    run(admin, "content.review", {
+      id: post.id,
+      status: "visible",
+      reason: "通过",
+    });
+    run(b, "relation.set", { id: post.id, kind: "save", enabled: true });
+    run(admin, "content.review", {
+      id: post.id,
+      status: "hidden",
+      reason: "下架",
+    });
+    expect(snapshot(db, b.account).entities.some((e) => e.id === post.id)).toBe(
+      false,
+    );
+    const room = run(a, "room.create", {
+      title: "小组",
+      body: "讨论",
+      time: "周日",
+      place: "学校",
+      type: "study",
+      capacity: 3,
+    });
+    run(a, "message.send", { roomId: room.id, body: "仅成员可见" });
+    expect(
+      snapshot(db, admin.account).entities.filter((e) => e.kind === "message"),
+    ).toEqual([]);
+    repo.notify([a.id], null, "private", "通知");
+    const notification = snapshot(db, a.account).notifications[0];
+    expect(() => run(b, "notification.read", { id: notification.id })).toThrow(
+      "通知不存在",
+    );
+    expect(snapshot(db, b.account).notifications).toEqual([]);
+  });
+  it("社团认证撤销阻止发起和恢复，旧活动保留归属", () => {
+    const { a, admin, run, repo } = setup();
+    const certification = run(a, "certification.apply", {
+      kind: "club",
+      organization: "摄影社",
+      note: "成员",
+    });
+    expect(() => run(a, "activity.create", { title: "活动" })).toThrow(
+      "已认证",
+    );
+    run(admin, "certification.review", { id: certification.id, approve: true });
+    const event = run(a, "activity.create", {
+      title: "摄影",
+      description: "拍照交流",
+      startAt: new Date(Date.now() + 86400000).toISOString(),
+      location: "学校",
+      capacity: 10,
+    });
+    run(admin, "certification.review", {
+      id: certification.id,
+      approve: false,
+      reason: "成员资格结束",
+    });
+    run(a, "activity.visibility", { id: event.id, publish: false });
+    expect(() =>
+      run(a, "activity.visibility", { id: event.id, publish: true }),
+    ).toThrow("恢复活动");
+    expect(repo.get(event.id).ownerId).toBe(a.id);
+  });
+  it("校友竞争确认、跨教师交流冲突及撤销认证联动", () => {
+    const { a, b, c, teacher, admin, db, run } = setup();
+    run(a, "alumni.apply", {
+      major: "计算机",
+      graduationYear: 2024,
+      city: "珠海",
+      direction: "就业",
+      experience: "工作",
+      topics: "实习",
+      bio: "",
+      evidence: "本地验收说明",
+    });
+    const profile = snapshot(db, admin.account).alumni.profiles[0];
+    run(admin, "alumni.review", { id: profile.id, approve: true });
+    const period = {
+      startAt: new Date(Date.now() + 86400000).toISOString(),
+      endAt: new Date(Date.now() + 90000000).toISOString(),
+      location: "图书馆",
+    };
+    run(a, "alumni.slot.create", period);
+    const slot = snapshot(db, a.account).alumni.slots[0];
+    run(b, "alumni.request", { slotId: slot.id, question: "就业问题" });
+    run(c, "alumni.request", { slotId: slot.id, question: "升学问题" });
+    const first = snapshot(db, b.account).alumni.bookings[0];
+    expect(() =>
+      run(admin, "alumni.decide", { id: first.id, accept: true }),
+    ).toThrow("学生身份");
+    run(a, "alumni.decide", { id: first.id, accept: true });
+    expect(snapshot(db, c.account).alumni.bookings[0].status).toBe(
+      "unavailable",
+    );
+    const teacherSlot = run(teacher, "coffee.slot.create", {
+      ...period,
+      capacity: 2,
+    });
+    expect(() =>
+      run(b, "coffee.book", { slotId: teacherSlot.id, topic: "问题" }),
+    ).toThrow("冲突");
+    run(admin, "alumni.review", {
+      id: profile.id,
+      approve: false,
+      reason: "核验失效",
+    });
+    expect(snapshot(db, b.account).alumni.bookings[0].status).toBe("cancelled");
+  });
+  it("举报处置、社团入驻、知识反馈共享原记录并定向通知", () => {
+    const { a, b, admin, operator, run, repo, db } = setup();
+    const club = run(a, "organization.apply", {
+      name: "新社团",
+      description: "介绍",
+      category: "艺术",
+      contact: "club@example.test",
+    });
+    run(admin, "organization.review", { id: club.id, approve: true });
+    run(b, "relation.set", { id: club.id, kind: "follow", enabled: true });
+    expect(repo.related(b.id, club.id, "follow")).toBe(true);
+    const post = run(a, "post.create", {
+      title: "帖子",
+      body: "正文",
+      board: "校园",
+    });
+    run(admin, "content.review", {
+      id: post.id,
+      status: "visible",
+      reason: "通过",
+    });
+    const report = run(b, "report.create", { id: post.id, reason: "有问题" });
+    run(admin, "report.decide", {
+      id: report.id,
+      upheld: true,
+      reason: "确认问题",
+    });
+    expect(repo.get(post.id).data.status).toBe("hidden");
+    run(operator, "knowledge.save", {
+      title: "图书馆",
+      body: "以官网时间为准",
+      keywords: "图书馆",
+      source: "学校官网",
+      status: "published",
+    });
+    const answer = run(b, "knowledge.ask", { question: "图书馆几点开？" });
+    const feedback = run(b, "feedback.create", {
+      answerId: answer.id,
+      reason: "希望补充链接",
+    });
+    run(operator, "feedback.resolve", {
+      id: feedback.id,
+      reason: "已记录并核对",
+    });
+    expect(repo.get(feedback.id).data.status).toBe("resolved");
+    expect(snapshot(db, b.account).notifications.length).toBeGreaterThan(0);
+  });
+  it("关闭和重新打开数据库后，账号及业务记录仍存在", () => {
+    const directory = mkdtempSync(join(tmpdir(), "bnbu-acceptance-")),
+      path = join(directory, "test.sqlite");
+    let db = openDatabase(path);
+    createAccount(db, {
+      email: "persist@example.test",
+      password: "Acceptance-123",
+      name: "持久账号",
+      roles: ["student"],
+    });
+    const session = login(db, "persist@example.test", "Acceptance-123");
+    const post = execute(
+      db,
+      session.token,
+      "post.create",
+      { title: "持久帖子", body: "重启后保留", board: "校园" },
+      randomUUID(),
+    ) as { id: string };
+    db.close();
+    db = openDatabase(path);
+    expect(new Repository(db).get(post.id).data.body).toBe("重启后保留");
+    expect(
+      login(db, "persist@example.test", "Acceptance-123").account.name,
+    ).toBe("持久账号");
+    db.close();
+    unlinkSync(path);
+    rmdirSync(directory);
+  });
+});

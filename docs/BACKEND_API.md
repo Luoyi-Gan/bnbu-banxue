@@ -1,0 +1,110 @@
+# 伴学本地后端协议
+
+日期：2026-10-11。业务依据为根目录 `BUSINESS_RULES.md`。本协议描述新增 `/workspace` 持久化业务入口；旧 `/v2` 演示数据不导入后端。
+
+## 运行与身份
+
+Node.js 24（使用 `node:sqlite`），SQLite WAL，单进程 HTTP 服务。网页在 `127.0.0.1:4174`，后端在 `127.0.0.1:4175`，浏览器仅访问同源 `/api`。默认数据库 `data/bnbu.sqlite`，可由 `BNBU_DATABASE` 指定。
+
+邮箱注册只证明账号流程完成，不授予学校身份或业务职责。业务请求从 HttpOnly、SameSite=Strict Cookie 查找有效会话，再读取当前账号角色和状态；请求中的作者、角色、学时或审核状态不能覆盖服务端决定。密码使用独立盐和 scrypt；数据库不保存明文密码。登录会话有效期 12 小时，退出删除该会话。封禁账号保留读取和历史但不能业务写入，禁言阻止发帖、评论、聊天。
+
+角色：`student`、`teacher`、`reviewer`、`operator`、`superadmin`。体育资格不能通过此角色接口创建，继续由原体育系统确认。超级管理员不能停用或降级唯一有效超级管理员。
+
+## HTTP 接口
+
+| 方法与路径 | 输入或结果 |
+| --- | --- |
+| GET `/api/health` | `{ok, storage, schemaVersion}` |
+| POST `/api/auth/verification-codes` | `{email}`；成功 `{sent:true,delivery,message}`。十分钟有效，每邮箱六十秒间隔、最多五次核验 |
+| POST `/api/auth/register` | `{email,code,password}`；成功 `{registered:true}`，不自动登录或授予角色 |
+| POST `/api/auth/login` | `{email,password}`；成功 `{authenticated:true,account}`，设置 Cookie |
+| POST `/api/auth/logout` | `{}`；删除当前会话 |
+| GET `/api/auth/me` | 当前账号，未经授权返回 401 |
+| GET `/api/workspace` | 本人可见实体、账号、展示人员、校友、通知、本人关系；有权人员额外获得审核/运营记录 |
+| POST `/api/commands` | 下述命令信封；成功 `{data:{id}}` |
+| POST `/api/timetable/recognize` | 登录学生的 multipart `image`，最多 10MB JPG/PNG/WebP。有效响应 `{lessons:[...]}`，识别自身不保存课表 |
+
+JSON 写请求必须发送 `Content-Type: application/json`，上限 12MB。浏览器写入检查 Origin 和 Sec-Fetch-Site。错误为 `{code,message}`；400 业务校验失败，401 会话无效，403 无权限，404 对象/接口不存在，409 重复或状态冲突，413 过大，429 频率限制，502/503 外部依赖失败或未配置，500 内部持久化失败。
+
+```json
+{
+  "requestId": "客户端生成的唯一请求标识",
+  "action": "coffee.book",
+  "input": {"slotId": "服务端时段ID", "topic": "交流问题"}
+}
+```
+
+同一账号同一 `requestId`、相同内容返回原结果；不同内容返回 409。所有业务命令在 `BEGIN IMMEDIATE` 内复核权限、状态、容量及冲突，同时提交业务、站内通知、审计和请求回执。失败回滚。客户端遇到响应不确定时保留同一幂等键重试，收到明确结果后才更新页面。
+
+## 命令目录
+
+未列出的客户端字段不能授予资格。所有 `id`、`slotId` 等来自服务端，不用姓名判断归属。日期使用带时区的 ISO 时间，邮件显式字段沿用现有北京时间格式。
+
+| 命令 | 必填输入及可选输入 | 权限与主要约束 |
+| --- | --- | --- |
+| `post.create` | title, body, board；images[] | 学生；80/1000 字、最多九图，待审 |
+| `comment.create` | postId, body | 学生；公开帖子、最多300字，待审 |
+| `content.review` | id, status=visible/hidden, reason | 审核职责；原因、通知和审计 |
+| `room.create` | type=study/entertainment/carpool,title,body,time,place,capacity | 学生；队长计入容量 |
+| `room.apply` | id | 开放公开且有名额，无重复待申请 |
+| `room.decide` | id=申请ID, accept | 队长；批准时再次核对容量与申请人状态 |
+| `room.finish` | id | 所属队长；保留成员与历史，停止消息 |
+| `room.moderate` | id,decision=hide/restore/finish/remove,reason；memberId | 审核职责；不能移除队长，通知受影响成员 |
+| `room.review` | id,targetId,stars；comment,tags[] | 已结束队伍成员互评、不能自评或重复 |
+| `message.send` | roomId,body | 当前公开开放队伍成员；禁言/封禁不能发 |
+| `report.create` | id,reason | 学生；保存对象快照、同对象待处理举报去重 |
+| `report.decide` | id,upheld,reason | 审核职责；成立下架原对象、分别通知 |
+| `certification.apply` | kind=student/club/official,organization,note | 学生；相同待审申请去重 |
+| `certification.review` | id,approve；reason | 审核职责；驳回和撤销须原因；不授予管理/体育资格 |
+| `activity.create` | title,description,startAt,location,capacity | 已认证社团成员；保存唯一账号归属 |
+| `activity.visibility` | id,publish | 本人；恢复重新核验资格 |
+| `relation.set` | id,kind,enabled | 本人关系幂等；activity: like/save/participate，post: like/save，room: save，organization: follow |
+| `coffee.profile` | nickname,bio,topics,location,enabled；teacherId | 教师本人或运营；有有效预约不能停用 |
+| `coffee.slot.create` | startAt,endAt,location,capacity；teacherId | 教师本人或运营；未来、同教师不重叠 |
+| `coffee.slot.update` | id,startAt,endAt,location,capacity,closed | 有占用不能改时间或关闭；容量不得低于占用 |
+| `coffee.book` | slotId,topic | 学生；条件满足即成立，无教师再次审批 |
+| `coffee.cancel` | id；reason | 当事学生、所属教师或运营；教师/运营须原因 |
+| `coffee.move` | id,slotId,reason | 所属教师或运营；原占用保留、新名额预留 |
+| `coffee.answer` | id,accept | 仅预约学生；再次复核时段，释放对应占用 |
+| `alumni.apply` | major,graduationYear,city,direction,experience,topics,bio,evidence | 学生；复用原首版说明核验，不代表学校正式核验 |
+| `alumni.profile` | city,direction,experience,topics,bio,accepting | 本人已通过资格；不改原毕业身份 |
+| `alumni.review` | id,approve；reason | 审核职责；撤销关闭时段、取消未来有效申请并通知 |
+| `alumni.follow` | id | 学生，不能自己关注自己；切换本人关注状态 |
+| `alumni.post` | title,body,direction | 认证校友；使用同一社区待审记录 |
+| `alumni.slot.create` | startAt,endAt,location | 本人认证校友；未来不重叠 |
+| `alumni.slot.close` | id | 无有效申请或预约才可关闭 |
+| `alumni.request` | slotId,question | 学生；最多500字，待确认不占正式预约 |
+| `alumni.decide` | id,accept；reason | 仅校友本人；拒绝须原因，确认后竞争申请结束 |
+| `alumni.cancel` | id；reason | 当事人；已确认取消须原因，待申请可撤回 |
+| `organization.apply` | name,description,category,contact | 学生代表；同名待审/已入驻去重 |
+| `organization.review` | id,approve；reason | 审核职责；通过形成同一入驻对象 |
+| `organization.update` | id,description,contact,visibility,reason | 运营；公开状态不撤销入驻资格 |
+| `knowledge.save` | title,body,keywords,source,status；id | 运营；修改原记录或新建 |
+| `knowledge.ask` | question | 学生；只用已发布知识，返回依据，无匹配不编造 |
+| `feedback.create` | answerId,reason | 本人回答；待反馈去重、保留快照 |
+| `feedback.resolve` | id,reason | 运营；通知原反馈人 |
+| `profile.save` | nickname,avatar | 本人；1–20字、头像最多5MB，不改学校身份 |
+| `timetable.save` | lessons[]；fileName | 学生本人；复用原有效结果校验，无效不替换 |
+| `timetable.correct` | lessonId,name,weekday,startTime,endTime,period,location,teacher,weeks,note | 本人已有课程，复用原修正规则 |
+| `notification.read` | id | 仅接收人，重复已读不增加计数 |
+| `notification.send` | recipients[],body | 运营，逐人通知；按实际通知数计算已读率 |
+| `account.update` | id,status,roles[],reason | 超级管理员；禁止停用/降级唯一超级管理员 |
+| `mail.import` | messageId,subject,sender,body；cover,coverName | 运营导入来源，复用原显式字段识别；不是声称接入真实学校邮箱/AI |
+| `mail.correct` | id,title,description,startAt,endAt,location,host,conditions,reason | 运营；保留原值新值、原因和依据；隐藏不会自动恢复 |
+| `mail.cover` | id,cover,coverName,reason | 运营补充/替换活动相关附件，保留历史 |
+| `mail.visibility` | id,publish,reason | 运营下架/恢复，恢复重新校验 |
+
+## 数据模型与访问范围
+
+`schema_migrations` 管理版本；`accounts`、`sessions`、`email_challenges` 管理身份；`entities` 保存类型、所有人、JSON业务属性、版本和时间；`relations` 以账号、对象、类型为联合主键；`notifications` 保存独立接收及阅读状态；`audit` 追加处理记录；`command_receipts` 防止重试重复执行；`mail_outbox` 区分生成通知与实际邮件发送回执。账号与对象引用设外键；多步操作统一事务。
+
+私聊不因管理员身份开放；队伍聊天只有当前成员可读写。学生不能读取其他人的认证说明、课表、个人通知或预约问题。作者能核对自己的待审内容；收藏引用不使下架正文继续公开。学校邮件原文和发件人只出现在运营可见的 `mail` 实体中，不在公开活动投影中。
+
+## 外部服务适配
+
+- `BNBU_EMAIL_DELIVERY_URL`：服务端 POST JSON `{to,subject,text,idempotencyKey}`，可配置 `BNBU_EMAIL_DELIVERY_TOKEN` Bearer token。仅收到成功 HTTP 和 `{sent:true}` 才对网页报告真实邮件已发送。
+- `BNBU_LOCAL_OUTBOX=1`：显式启用开发收件箱。验证码只在本地数据库，网页明确提示没有发送真实邮件。可用 `node scripts/acceptance.mjs outbox <email>` 读取指定邮箱的最近三封开发邮件。
+- `BNBU_TIMETABLE_UPSTREAM`：服务端 multipart `image`，可配置 `BNBU_TIMETABLE_TOKEN`；响应 `{lessons:[...]}`，复用原课表校验。超时/无效响应不保存原照片或替换课表。没有配置时前端不上传。
+- `BNBU_SPORTS_ORIGIN`：Vite 将原 `/api/v1` 转发到原体育后端；`BNBU_SPORTS_OBJECT_ORIGIN` 可提供原对象服务 `/minio` 转发。未配置返回503，不生成替代体育数据。
+
+正式邮箱接收、AI识别/封面生成、原体育账号统一与真实跨端审核尚需实际服务配置和联调。不得以本地夹具或适配器契约测试宣称这些外部服务已通过验收。

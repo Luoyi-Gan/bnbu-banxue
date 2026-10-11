@@ -1,15 +1,21 @@
 # BNBU 伴学
 
-校园综合平台本地演示，提供学生和管理员视图。
+校园综合平台。`/workspace` 为新增的 SQLite 持久化业务入口，`/v2` 保留原浏览器本地演示。当前交付属于本地验收，不代表学校身份核验、真实邮件投递或原体育系统已经接通。
 
-## 启动预览
+## 启动本地完整服务
 
 ```bash
 npm ci
-npm run dev
+npm run dev:local
 ```
 
-访问 http://127.0.0.1:4174/ ，自动进入 `/v2`。`npm run dev:v2` 也是同一入口。
+要求 Node.js 24。访问 http://127.0.0.1:4174/workspace ，未登录时进入统一登录页。默认数据库 `data/bnbu.sqlite`，不会自动生成学校身份。
+
+Windows 独立验收：运行 `./Start-Local.ps1 -Acceptance`。首次会创建单独的 `data/browser-acceptance.sqlite` 和随机密码账号文件 `data/browser-acceptance-accounts.json`；重复运行保留已有数据。六个账号仅用于本地验收，不能证明学校身份。普通启动可用 `./Start-Local.ps1`。
+
+`npm run dev` / `npm run dev:v2` 只运行前端；原视觉演示请明确访问 `/v2`。接通版的状态不会写入旧演示 localStorage。
+
+详见 [本地交接与验收](docs/LOCAL_BACKEND_HANDOFF.md)、[API 协议](docs/BACKEND_API.md) 和 [业务规则](BUSINESS_RULES.md)。
 
 ## 功能
 
@@ -17,17 +23,18 @@ npm run dev
 
 ## 数据
 
-演示数据保存在浏览器本地。设置页可恢复默认演示数据。活动、组织、老师及图片使用项目内的演示素材。当前没有连接真实学校系统或后端。
+接通版业务保存在服务端 SQLite，账号、会话、通知和业务归属按 ID 隔离。旧 `/v2` 演示仍保存在浏览器本地，素材和默认人物仅用于演示。二者不自动迁移。
 
 ## 检查与构建
 
 ```bash
 npm run lint
 npm run test
+npm run typecheck:server
 npm run build
 ```
 
-构建结果输出到 `dist`，静态托管需支持 SPA 路由回退。
+构建结果输出到 `dist`，仅静态托管不能提供后端业务；本轮交付启动方式是 `dev:local`。没有执行云部署。
 
 ## 三维校园导览
 

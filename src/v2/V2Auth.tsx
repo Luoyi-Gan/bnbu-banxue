@@ -37,9 +37,9 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
     if (!emailValid) { setError('请先填写有效的邮箱地址。'); return }
     setCodeBusy(true)
     try {
-      await authApi.sendCode(normalizedEmail)
+      const deliveryMessage = await authApi.sendCode(normalizedEmail)
       setCountdown(60)
-      setMessage('验证码已发送，请查看邮箱。')
+      setMessage(deliveryMessage ?? '验证码已发送，请查看邮箱。')
     } catch (cause) { setError(cause instanceof AuthServiceError ? cause.message : '发送失败，请稍后重试。') }
     finally { setCodeBusy(false) }
   }
@@ -58,7 +58,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
     try {
       if (mode === 'login') {
         await authApi.login(normalizedEmail, password)
-        navigate('/v2', { replace: true })
+        navigate('/workspace', { replace: true })
       } else {
         await authApi.register(normalizedEmail, code.trim(), password)
         navigate('/v2/login', { replace: true, state: { registered: true } })
@@ -89,7 +89,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
           <button className="v2-auth-submit" type="submit" disabled={busy}>{busy ? '请稍候…' : mode === 'login' ? '登录' : step === 1 ? '下一步' : '完成注册'}{!busy && <ArrowRight size={18}/>}</button>
         </form>
         <p className="v2-auth-switch">{mode === 'login' ? '还没有账号？' : '已有账号？'} <Link to={mode === 'login' ? '/v2/register' : '/v2/login'}>{mode === 'login' ? '立即注册' : '去登录'} <ArrowRight size={14}/></Link></p>
-        <div className="v2-auth-demo"><span>当前为本地预览。账号服务尚未接入，不能发送真实验证码或完成登录。</span><Link to="/v2">继续浏览演示 <ArrowRight size={14}/></Link></div>
+        <div className="v2-auth-demo"><span>本地账号与业务数据由后端保存。开发验证码使用本地收件箱，不代表真实邮箱或学校身份核验。</span><Link to="/v2">浏览旧版演示 <ArrowRight size={14}/></Link></div>
       </section>
     </main>
     <footer className="v2-auth-footer"><span>BNBU CAMPUS · 伴学</span><span>清晰连接校园生活</span></footer>

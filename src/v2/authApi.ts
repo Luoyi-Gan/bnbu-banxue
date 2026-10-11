@@ -4,7 +4,7 @@ export class AuthServiceError extends Error {
   constructor(message: string) { super(message); this.name = 'AuthServiceError' }
 }
 
-async function postAuth(path: string, payload: AuthPayload, successKey: 'authenticated' | 'sent' | 'registered'): Promise<void> {
+async function postAuth(path: string, payload: AuthPayload, successKey: 'authenticated' | 'sent' | 'registered'): Promise<string | undefined> {
   let response: Response
   try {
     response = await fetch(`/api/auth/${path}`, {
@@ -27,6 +27,7 @@ async function postAuth(path: string, payload: AuthPayload, successKey: 'authent
   if (!data || typeof data !== 'object' || (data as Record<string, unknown>)[successKey] !== true) {
     throw new AuthServiceError('账号服务未返回有效确认，请稍后重试。')
   }
+  return 'message' in data && typeof data.message === 'string' ? data.message : undefined
 }
 
 export const authApi = {
