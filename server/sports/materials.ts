@@ -274,6 +274,9 @@ export function materialWorkspace(repo: Repository, actor: Account) {
   const records = visibleRecords(repo, actor),
     ids = new Set(records.map((r) => r.id));
   return {
+    deadlineAdjustments: repo
+      .all("sportsDeadlineAdjustment")
+      .filter((a) => ids.has(String(a.data.recordId))),
     records: records.map((r) => ({
       ...r,
       data: {

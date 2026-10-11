@@ -21,6 +21,7 @@ import { reviewWorkspace } from "./sports/review";
 import { processSportsReview } from "./sports/review-worker";
 import { systemWorkspace } from "./sports/system";
 import { calendarWorkspace } from "./sports/calendar";
+import { incidentWorkspace } from "./sports/incidents";
 import {
   materialWorkspace,
   readMaterial,
@@ -257,6 +258,7 @@ export function createApiServer(
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),
           ...calendarWorkspace(repo, actor),
+          ...incidentWorkspace(repo, actor),
           serverNow,
           sessions: repo
             .all("sportsSession")

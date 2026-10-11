@@ -138,3 +138,9 @@ AI适配配置 `BNBU_SPORTS_AI_URL`、可选 `BNBU_SPORTS_AI_TOKEN` 与 `BNBU_SP
 - sports.calendar.publish：name/source/daysText/confirmed=true；daysText每行为YYYY-MM-DD,WORKDAY或YYYY-MM-DD,REST，须覆盖连续日期且包含休息日。仅总管理员，发布新不可变版本。
 - sports.calendar.bind：id（未结束审核轮次）、version、calendarId、reason；明确迁移，写入sportsCalendarBinding历史，不能改写已结束轮次或原入队时间。
 - workspace新增system公告/权限/历史/本人暂停摘要；维护时正常业务集合为空。正常时提供calendars/calendarRounds/slaReminders（总管理员范围），责任教师reviewRounds包含clock。无日历或覆盖不足返回明确calculationStatus及空截止，不猜测普通周一至周五。
+
+## 平台事故与P-04技术恢复
+
+- sports.incident.confirm：reference、evidenceRef、reason、startAt/endAt（已发生实际区间）、recordIdsText（每行或逗号分隔记录编号）。仅总管理员；事故引用唯一。写入sportsIncident、逐记录sportsPause和sportsDeadlineAdjustment，不自动改判。
+- sports.incident.restore：id/version、incidentId、terminalEventId、roundId/roundVersion、reason。仅当前系统错误补证逾期、未结算归档且原剩余时间为正才恢复；错误锁定区间追加去重，原终局和已用次数不删除。写入sportsCorrection及公开事件/通知/进度版本，同事务提交。
+- workspace新增总管理员范围incidents/corrections/expiryCandidates；本人及责任教师的材料投影含deadlineAdjustments。技术证据不投影给学生或教师。维护期间恢复入口关闭，须先明确恢复正常模式。

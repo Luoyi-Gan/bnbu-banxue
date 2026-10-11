@@ -7,11 +7,12 @@ import { openDatabase } from "../server/database";
 import { createAccount, login } from "../server/auth";
 import { Repository, type Fields } from "../server/repository";
 import { execute } from "../server/commands";
-import { uploadMaterial } from "../server/sports/materials";
+import { uploadMaterial, materialWorkspace } from "../server/sports/materials";
 import { processSportsReview } from "../server/sports/review-worker";
 import { createApiServer } from "../server/main";
 import { systemWorkspace } from "../server/sports/system";
 import { reviewClock } from "../server/sports/calendar";
+import { incidentWorkspace } from "../server/sports/incidents";
 const closes: (() => void | Promise<void>)[] = [];
 const calendarInput = () => ({
   name: "隔离测试日历",
@@ -35,6 +36,196 @@ const maintenanceInput = () => ({
 afterEach(async () => {
   vi.restoreAllMocks();
   for (const close of closes.splice(0).reverse()) await close();
+});
+
+it("晚确认事故纠正错误逾期，排除错误锁定且只恢复原剩余时间，原终局永久保留", async () => {
+  const f = await fixture();
+  f.manual();
+  const original = f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+    publicExplanation: "请补原材料",
+  });
+  const start = Number(original.data.supplementStartedAt),
+    hour = 3600000;
+  const timer = vi.spyOn(Date, "now").mockReturnValue(start + 24 * hour);
+  await processSportsReview(f.db, {});
+  const terminal = f.repo
+    .all("sportsReviewEvent")
+    .find((e) => e.data.action === "SUPPLEMENT_EXPIRED")!;
+  timer.mockReturnValue(start + 30 * hour);
+  const admin = login(f.db, "admin@example.test", "Review-test-123");
+  const incident = f.run(admin, "sports.incident.confirm", {
+    reference: "TEST-FAULT-1",
+    evidenceRef: "隔离故障测试证据",
+    reason: "平台不可用测试",
+    recordIdsText: original.id,
+    startAt: new Date(start + 20 * hour).toISOString(),
+    endAt: new Date(start + 23 * hour).toISOString(),
+  });
+  expect(f.repo.get(original.id).data.status).toBe("INVALID");
+  const candidate = incidentWorkspace(f.repo, admin.account)
+      .expiryCandidates[0],
+    key = randomUUID();
+  const input = {
+    ...candidate,
+    incidentId: incident.id,
+    reason: "排除事故及错误锁定恢复原机会",
+  };
+  const restored = f.run(admin, "sports.incident.restore", input, key);
+  f.run(admin, "sports.incident.restore", input, key);
+  expect(restored.data).toMatchObject({
+    status: "SUPPLEMENT_REQUIRED",
+    supplementUsed: true,
+    supplementStartedAt: start,
+    supplementWindowMilliseconds: 24 * hour,
+    publicExplanation: "请补原材料",
+  });
+  expect(supplementClock(f.repo, restored)).toMatchObject({
+    remaining: 3 * hour,
+    deadline: start + 33 * hour,
+  });
+  expect(f.repo.get(terminal.id)).toEqual(terminal);
+  expect(f.repo.all("sportsCorrection")).toHaveLength(1);
+  expect(f.repo.all("sportsReviewRound")).toHaveLength(1);
+  expect(() =>
+    f.run(admin, "sports.incident.restore", {
+      ...input,
+      version: restored.version,
+    }),
+  ).toThrow(/合法后继/);
+  timer.mockReturnValue(start + 32 * hour);
+  const student = login(f.db, "student@example.test", "Review-test-123"),
+    material = f.repo.all("sportsMaterial")[0];
+  const draft = f.run(student, "sports.supplement.prepare", {
+    id: restored.id,
+    version: restored.version,
+    reuseIds: [material.id],
+    files: [],
+  });
+  f.run(student, "sports.supplement.submit", {
+    id: draft.id,
+    version: draft.version,
+  });
+  expect(f.repo.get(original.id).data.status).toBe("TEACHER_PENDING");
+});
+
+it("事故补偿仍采用并集，重复事故引用拒绝，真实逾期不能恢复", async () => {
+  const f = await fixture();
+  f.manual();
+  const record = f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
+  const start = Number(record.data.supplementStartedAt),
+    hour = 3600000;
+  vi.spyOn(Date, "now").mockReturnValue(start + 30 * hour);
+  await processSportsReview(f.db, {});
+  const admin = login(f.db, "admin@example.test", "Review-test-123");
+  const input = {
+    reference: "TEST-FAULT-2",
+    evidenceRef: "隔离测试",
+    reason: "实际影响不足以恢复",
+    recordIdsText: record.id,
+    startAt: new Date(start + hour).toISOString(),
+    endAt: new Date(start + 3 * hour).toISOString(),
+  };
+  const incident = f.run(admin, "sports.incident.confirm", input);
+  expect(() => f.run(admin, "sports.incident.confirm", input)).toThrow(
+    /事故引用已确认/,
+  );
+  f.run(admin, "sports.incident.confirm", {
+    ...input,
+    reference: "TEST-FAULT-3",
+    startAt: new Date(start + 2 * hour).toISOString(),
+    endAt: new Date(start + 4 * hour).toISOString(),
+  });
+  const candidate = incidentWorkspace(f.repo, admin.account)
+    .expiryCandidates[0];
+  expect(() =>
+    f.run(admin, "sports.incident.restore", {
+      ...candidate,
+      incidentId: incident.id,
+      reason: "不应恢复",
+    }),
+  ).toThrow(/真实逾期/);
+  expect(f.repo.all("sportsCorrection")).toHaveLength(0);
+  expect(f.repo.get(record.id).data.status).toBe("INVALID");
+  expect(supplementClock(f.repo, f.repo.get(record.id)).deadline).toBe(
+    start + 27 * hour,
+  );
+});
+
+it("平台故障证据仅总管理员可治理，学生只读取本人公开期限调整", async () => {
+  const f=await fixture();f.manual();const record=f.decide("RETURN",{reason:"UNCLEAR",hours:24,canSupplementOriginal:true});
+  const start=Number(record.data.supplementStartedAt);
+  vi.spyOn(Date,"now").mockReturnValue(start+3600000);
+  const input={reference:"PRIVATE-TECH-REF",evidenceRef:"只供治理核对的技术依据",reason:"公开平台影响说明",recordIdsText:record.id,startAt:new Date(start).toISOString(),endAt:new Date(start+1800000).toISOString()};
+  expect(()=>f.run(f.student,"sports.incident.confirm",input)).toThrow(/体育身份/);
+  expect(()=>f.run(f.teacher,"sports.incident.confirm",input)).toThrow(/体育身份/);
+  expect(()=>f.run(f.admin,"sports.incident.confirm",{...input,endAt:new Date(start+7200000).toISOString()})).toThrow(/未来时间/);
+  f.run(f.admin,"sports.incident.confirm",input);
+  expect(incidentWorkspace(f.repo,f.student.account).incidents).toEqual([]);
+  const view=materialWorkspace(f.repo,f.student.account);
+  expect(view.deadlineAdjustments).toHaveLength(1);
+  expect(JSON.stringify(view)).not.toContain("只供治理核对");
+  expect(view.deadlineAdjustments[0].data.reason).toBe("公开平台影响说明");
+  expect(materialWorkspace(f.repo,f.other.account).deadlineAdjustments).toEqual([]);
+});
+
+it("P04核对原轮次、当前记录及结算后继版本，冲突不产生部分修复", async () => {
+  const f = await fixture();
+  f.manual();
+  const record = f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
+  const start = Number(record.data.supplementStartedAt),
+    hour = 3600000;
+  vi.spyOn(Date, "now").mockReturnValue(start + 24 * hour);
+  await processSportsReview(f.db, {});
+  const admin = login(f.db, "admin@example.test", "Review-test-123");
+  const incident = f.run(admin, "sports.incident.confirm", {
+    reference: "TEST-CONFLICT",
+    evidenceRef: "隔离测试",
+    reason: "版本冲突测试",
+    recordIdsText: record.id,
+    startAt: new Date(start + hour).toISOString(),
+    endAt: new Date(start + 3 * hour).toISOString(),
+  });
+  const candidate = incidentWorkspace(f.repo, admin.account)
+      .expiryCandidates[0],
+    input = { ...candidate, incidentId: incident.id, reason: "恢复" };
+  expect(() =>
+    f.run(admin, "sports.incident.restore", {
+      ...input,
+      roundVersion: candidate.roundVersion + 1,
+    }),
+  ).toThrow(/轮次版本/);
+  f.repo.save(f.repo.get(f.course.id), { settlementStatus: "SETTLED" });
+  expect(() => f.run(admin, "sports.incident.restore", input)).toThrow(/结算/);
+  f.repo.save(f.repo.get(f.course.id), { settlementStatus: null });
+  const changed = f.repo.save(f.repo.get(record.id), {
+    publicExplanation: "已存在后继处理",
+  });
+  expect(() => f.run(admin, "sports.incident.restore", input)).toThrow(
+    /记录已变化/,
+  );
+  expect(() =>
+    f.run(admin, "sports.incident.restore", {
+      ...input,
+      version: changed.version,
+    }),
+  ).toThrow(/合法后继/);
+  expect(f.repo.all("sportsCorrection")).toHaveLength(0);
+  expect(
+    f.repo
+      .all("sportsPause")
+      .filter((p) => p.data.source === "WRONG_TERMINAL_LOCK"),
+  ).toHaveLength(0);
 });
 
 it("日历发布严格校验且只用于新轮次，已有轮次显式迁移保留原起点及历史", async () => {

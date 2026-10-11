@@ -193,6 +193,7 @@ export function expireSupplements(repo: Repository) {
     .filter((r) => r.data.status === "SUPPLEMENT_REQUIRED")) {
     const clock = supplementClock(repo, record);
     if (clock.paused || clock.remaining > 0) continue;
+    const now = Date.now();
     const reason = {
       code: "SUPPLEMENT_EXPIRED",
       zh: "补证逾期",
@@ -202,15 +203,19 @@ export function expireSupplements(repo: Repository) {
       status: "INVALID",
       publicReason: reason,
       publicExplanation: "",
-      lastDecisionAt: Date.now(),
+      lastDecisionAt: now,
       supplementFinalDeadline: clock.deadline,
     });
     repo.create("sportsReviewEvent", null, {
       recordId: record.id,
       action: "SUPPLEMENT_EXPIRED",
-      at: Date.now(),
+      at: now,
       reason,
       deadline: clock.deadline,
+      previousPublicReason: record.data.publicReason ?? null,
+      previousPublicExplanation: record.data.publicExplanation ?? "",
+      previousRecordVersion: record.version,
+      resultRecordVersion: saved.version,
     });
     recalculateProgress(repo, saved, "SUPPLEMENT_EXPIRED");
     repo.notify(

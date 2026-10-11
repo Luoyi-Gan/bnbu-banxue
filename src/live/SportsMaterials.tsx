@@ -6,6 +6,7 @@ export interface MaterialData {
   records: LiveEntity[];
   materialBatches: LiveEntity[];
   materials: LiveEntity[];
+  deadlineAdjustments?: LiveEntity[];
 }
 const labels: Record<string, string> = {
   UPLOADING: "等待原批材料传输",
@@ -222,6 +223,19 @@ export function SportsMaterials({
           </button>
         </>
       )}
+      {record && <p>记录编号：{record.id}</p>}
+      {record &&
+        data.deadlineAdjustments
+          ?.filter((a) => a.data.recordId === record.id)
+          .map((a) => (
+            <p key={a.id}>
+              平台故障期限核对：{String(a.data.reason)}
+              {!!a.data.before &&
+                ` · 原截止 ${new Date(Number((a.data.before as { deadline: number }).deadline)).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}`}
+              {!!a.data.after &&
+                ` · 调整后截止 ${new Date(Number((a.data.after as { deadline: number }).deadline)).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}`}
+            </p>
+          ))}
       {message && <p role="status">{message}</p>}
     </section>
   );

@@ -5,9 +5,15 @@ import { SportsMaterials, type MaterialData } from "./SportsMaterials";
 import { SportsReview, type ReviewData } from "./SportsReview";
 import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
+import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 
 interface SportsData
-  extends MaterialData, ReviewData, SportsSystemData, CalendarData {
+  extends
+    MaterialData,
+    ReviewData,
+    SportsSystemData,
+    CalendarData,
+    IncidentData {
   identity: LiveEntity;
   semesters: LiveEntity[];
   templates: LiveEntity[];
@@ -158,6 +164,7 @@ export function LiveSports({
       </section>
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
+      <SportsIncidents data={data} open={open} busy={busy} />
       {role === "admin" && (
         <>
           <div className="live-toolbar">

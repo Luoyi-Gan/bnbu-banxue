@@ -21,6 +21,7 @@ import { sportsReviewCommand } from "./sports/review";
 import { sportsSupplementCommand } from "./sports/supplements";
 import { sportsSystemCommand, sportsWriteGate } from "./sports/system";
 import { sportsCalendarCommand } from "./sports/calendar";
+import { sportsIncidentCommand } from "./sports/incidents";
 
 export function execute(
   db: Database,
@@ -139,6 +140,7 @@ export function execute(
         alumniCommand(repo, actor, action, input) ??
         sportsSystemCommand(repo, actor, action, input) ??
         sportsCalendarCommand(repo, actor, action, input) ??
+        sportsIncidentCommand(repo, actor, action, input) ??
         sportsCourseCommand(repo, actor, action, input) ??
         sportsSessionCommand(repo, actor, action, input) ??
         sportsMaterialCommand(repo, actor, action, input) ??
