@@ -101,6 +101,24 @@ JSON 写请求必须发送 `Content-Type: application/json`，上限 12MB。浏�
 
 ## 数据模型与访问范围
 
+### 体育审核与补证命令
+
+均走 `/api/commands`，保留事务、审计及幂等回执；读取 `/api/sports/workspace`。
+
+| 命令 | 输入与限制 |
+| --- | --- |
+| sports.ai.manual | courseId,endAt,reason；体育总管理员，结束时间须在未来，限定原课程责任教师 |
+| sports.ai.stop | id,version,reason；停止指定人工模式，已排入教师队列的任务继续处理 |
+| sports.ai.retry | id,version；仅技术失败，不覆盖教学结果 |
+| sports.review.decide | id,version,batchId,checksCompleted=true,decision=PASS/RETURN/INVALID；后两者需固定reason，可选publicExplanation；RETURN另需hours=24/72和canSupplementOriginal=true |
+| sports.supplement.prepare | id,version,reuseIds[],files[]；本人待补证记录、未截止，文件结构沿用首版；仅准备，不是正式受理 |
+| sports.supplement.reset | id,version；仅放弃未正式受理准备包，历史保留、计时和次数不重置 |
+| sports.supplement.submit | id,version；本版全部材料到账且严格早于最终截止，正式受理后仅进入教师新轮次 |
+
+补证新材料复用媒体上传接口；准备包状态为UPLOADING/READY，受理变为COMPLETE，放弃为ABANDONED。记录仍使用原运动时长、日期与分类；原始材料永久保留。workspace提供补证倒计时、公开判断、教师轮次和当前进度投影。
+
+AI适配配置 `BNBU_SPORTS_AI_URL`、可选 `BNBU_SPORTS_AI_TOKEN` 与 `BNBU_SPORTS_AI_VALIDATION_REF`。未填写验证引用不发送媒体，进入AI_NOT_VALIDATED；引用只作为当前运维声明，真实学校样本验证与管理界面仍需完成。请求含requestId、recordId/recordVersion、batchId/batchVersion、validationRef、原材料及规则；响应须匹配四项对象/版本和requestId，包含checksCompleted=true、outcome=NORMAL/EXCEPTION、非空modelVersion。限制HTTPS或本地HTTP、20秒超时、响应64KB，不记录密钥和原始响应。验证引用不能用测试值冒充真实效果验收。
+
 `schema_migrations` 管理版本；`accounts`、`sessions`、`email_challenges` 管理身份；`entities` 保存类型、所有人、JSON业务属性、版本和时间；`relations` 以账号、对象、类型为联合主键；`notifications` 保存独立接收及阅读状态；`audit` 追加处理记录；`command_receipts` 防止重试重复执行；`mail_outbox` 区分生成通知与实际邮件发送回执。账号与对象引用设外键；多步操作统一事务。
 
 私聊不因管理员身份开放；队伍聊天只有当前成员可读写。学生不能读取其他人的认证说明、课表、个人通知或预约问题。作者能核对自己的待审内容；收藏引用不使下架正文继续公开。学校邮件原文和发件人只出现在运营可见的 `mail` 实体中，不在公开活动投影中。

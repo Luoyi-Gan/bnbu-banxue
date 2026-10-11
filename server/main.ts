@@ -17,6 +17,8 @@ import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { sessionProjection } from "./sports/sessions";
+import { reviewWorkspace } from "./sports/review";
+import { processSportsReview } from "./sports/review-worker";
 import {
   materialWorkspace,
   readMaterial,
@@ -212,6 +214,7 @@ export function createApiServer(
         return send(response, 200, {
           ...sportsWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
+          ...reviewWorkspace(repo, actor),
           serverNow,
           sessions: repo
             .all("sportsSession")
@@ -283,6 +286,17 @@ export async function startBackend() {
     server.listen(4175, "127.0.0.1", done);
   });
   console.log("BNBU API: http://127.0.0.1:4175 (SQLite)");
-  server.on("close", () => db.close());
+  const worker = setInterval(() => {
+    void processSportsReview(db).catch(() =>
+      console.error(
+        "Sports review worker could not complete its current task.",
+      ),
+    );
+  }, 2000);
+  worker.unref();
+  server.on("close", () => {
+    clearInterval(worker);
+    db.close();
+  });
   return server;
 }

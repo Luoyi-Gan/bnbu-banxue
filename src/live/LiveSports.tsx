@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { api, sportsChangedEvent, type LiveEntity } from "./api";
 import type { Field, OpenForm } from "./ConnectedApp";
 import { SportsMaterials, type MaterialData } from "./SportsMaterials";
+import { SportsReview, type ReviewData } from "./SportsReview";
 
-interface SportsData extends MaterialData {
+interface SportsData extends MaterialData, ReviewData {
   identity: LiveEntity;
   semesters: LiveEntity[];
   templates: LiveEntity[];
@@ -134,6 +135,7 @@ export function LiveSports({
           按课程规则完成运动并提交凭证。实际时长、可计分钟与最终计入分开，材料提交成功不代表审核通过。
         </p>
       </section>
+      <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       {role === "admin" && (
         <>
           <div className="live-toolbar">

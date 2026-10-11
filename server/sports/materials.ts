@@ -12,6 +12,7 @@ import {
 import { sportsRole, version } from "./courses";
 import type { SportsClock } from "./session-clock";
 import { inspectMedia } from "./media-inspection";
+import { supplementClock, supplementOpen } from "./supplements";
 
 export const mediaLimits = {
   image: 10 * 1024 * 1024,
@@ -25,6 +26,48 @@ export function sportsAvailable(repo: Repository) {
     "体育服务当前处于维护模式。",
     503,
   );
+}
+export function validateFiles(values: unknown) {
+  const input = { files: values };
+  demand(
+    Array.isArray(input.files) &&
+      input.files.length >= 1 &&
+      input.files.length <= 7,
+    "每版须包含1–6张照片或最多1段视频。 ",
+  );
+  const files = input.files.map((value: unknown) => {
+    demand(
+      value && typeof value === "object" && !Array.isArray(value),
+      "文件清单无效。",
+    );
+    const f = value as Fields;
+    const mime = enumField(f, "mime", [
+      "image/jpeg",
+      "image/png",
+      "video/mp4",
+    ] as const);
+    const size = integerField(
+      f,
+      "size",
+      1,
+      mime === "video/mp4" ? mediaLimits.video : mediaLimits.image,
+    );
+    const sha256 = textField(f, "sha256", 64);
+    demand(/^[a-f0-9]{64}$/.test(sha256), "文件SHA-256无效。");
+    return { clientId: textField(f, "clientId", 100), mime, size, sha256 };
+  });
+  demand(
+    new Set(files.map((f) => f.clientId)).size === files.length &&
+      new Set(files.map((f) => f.sha256)).size === files.length,
+    "同一批不能重复列出文件。",
+  );
+  demand(
+    files.filter((f) => f.mime !== "video/mp4").length <= 6 &&
+      files.filter((f) => f.mime === "video/mp4").length <= 1 &&
+      files.reduce((sum, f) => sum + f.size, 0) <= mediaLimits.batch,
+    "材料数量或合计大小超过上限。",
+  );
+  return files;
 }
 function ownSession(repo: Repository, actor: Account, id: unknown) {
   sportsRole(repo, actor, "student");
@@ -72,44 +115,7 @@ export function sportsMaterialCommand(
   const description = textField(input, "description", 200);
   // Swimming needs server-linked before/after capture; do not silently accept it as ordinary exercise.
   enumField(input, "activityType", ["EXERCISE"] as const);
-  demand(
-    Array.isArray(input.files) &&
-      input.files.length >= 1 &&
-      input.files.length <= 7,
-    "每版须包含1–6张照片或最多1段视频。 ",
-  );
-  const files = input.files.map((value: unknown) => {
-    demand(
-      value && typeof value === "object" && !Array.isArray(value),
-      "文件清单无效。",
-    );
-    const f = value as Fields;
-    const mime = enumField(f, "mime", [
-      "image/jpeg",
-      "image/png",
-      "video/mp4",
-    ] as const);
-    const size = integerField(
-      f,
-      "size",
-      1,
-      mime === "video/mp4" ? mediaLimits.video : mediaLimits.image,
-    );
-    const sha256 = textField(f, "sha256", 64);
-    demand(/^[a-f0-9]{64}$/.test(sha256), "文件SHA-256无效。");
-    return { clientId: textField(f, "clientId", 100), mime, size, sha256 };
-  });
-  demand(
-    new Set(files.map((f) => f.clientId)).size === files.length &&
-      new Set(files.map((f) => f.sha256)).size === files.length,
-    "同一批不能重复列出文件。",
-  );
-  demand(
-    files.filter((f) => f.mime !== "video/mp4").length <= 6 &&
-      files.filter((f) => f.mime === "video/mp4").length <= 1 &&
-      files.reduce((sum, f) => sum + f.size, 0) <= mediaLimits.batch,
-    "材料数量或合计大小超过上限。",
-  );
+  const files = validateFiles(input.files);
   const record = repo.create("sportsRecord", actor.id, {
     sessionId: session.id,
     courseId: course.id,
@@ -159,6 +165,17 @@ export function writableMaterial(
   demand(material.ownerId === actor.id, "只能上传本人材料。", 403);
   const batch = repo.get(material.data.batchId, "sportsMaterialBatch");
   if (material.data.status !== "COMPLETE") {
+    if (batch.data.sequence === 2) {
+      const record = repo.get(batch.data.recordId, "sportsRecord");
+      supplementOpen(repo, record);
+      demand(
+        record.data.supplementBatchId === batch.id,
+        "补证准备包已更换。",
+        409,
+      );
+      demand(batch.data.status === "UPLOADING", "补证包已锁定。", 409);
+      return material;
+    }
     demand(
       batch.data.status === "UPLOADING" &&
         Date.now() < Number(batch.data.uploadDeadline),
@@ -203,21 +220,25 @@ export async function uploadMaterial(
       .all("sportsMaterial")
       .filter((m) => m.data.batchId === batch.id);
     if (all.every((m) => m.data.status === "COMPLETE")) {
-      repo.save(batch, { status: "COMPLETE", completedAt });
-      const record = repo.get(batch.data.recordId, "sportsRecord");
-      repo.save(record, { status: "PENDING_AI", submittedAt: completedAt });
-      repo.create("sportsReviewEvent", null, {
-        recordId: record.id,
-        batchId: batch.id,
-        action: "MATERIALS_COMPLETE",
-        at: completedAt,
-      });
-      repo.notify(
-        [record.ownerId!],
-        record.id,
-        "sports.material.complete",
-        "运动凭证传输完成，等待AI检查；尚未计入进度。",
-      );
+      if (batch.data.sequence === 2) {
+        repo.save(batch, { status: "READY", completedAt });
+      } else {
+        repo.save(batch, { status: "COMPLETE", completedAt });
+        const record = repo.get(batch.data.recordId, "sportsRecord");
+        repo.save(record, { status: "PENDING_AI", submittedAt: completedAt });
+        repo.create("sportsReviewEvent", null, {
+          recordId: record.id,
+          batchId: batch.id,
+          action: "MATERIALS_COMPLETE",
+          at: completedAt,
+        });
+        repo.notify(
+          [record.ownerId!],
+          record.id,
+          "sports.material.complete",
+          "运动凭证传输完成，等待AI检查；尚未计入进度。",
+        );
+      }
     }
     repo.db
       .prepare(
@@ -253,7 +274,15 @@ export function materialWorkspace(repo: Repository, actor: Account) {
   const records = visibleRecords(repo, actor),
     ids = new Set(records.map((r) => r.id));
   return {
-    records,
+    records: records.map((r) => ({
+      ...r,
+      data: {
+        ...r.data,
+        ...(r.data.status === "SUPPLEMENT_REQUIRED"
+          ? { supplementClock: supplementClock(repo, r) }
+          : {}),
+      },
+    })),
     materialBatches: repo
       .all("sportsMaterialBatch")
       .filter((b) => ids.has(String(b.data.recordId)))
@@ -263,7 +292,12 @@ export function materialWorkspace(repo: Repository, actor: Account) {
           ...b.data,
           canUpload:
             b.data.status === "UPLOADING" &&
-            Date.now() < Number(b.data.uploadDeadline),
+            (b.data.sequence === 2
+              ? supplementClock(repo, repo.get(b.data.recordId, "sportsRecord"))
+                  .canSubmit &&
+                repo.get(b.data.recordId, "sportsRecord").data.status ===
+                  "SUPPLEMENT_REQUIRED"
+              : Date.now() < Number(b.data.uploadDeadline)),
         },
       })),
     materials: repo

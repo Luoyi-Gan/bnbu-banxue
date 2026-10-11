@@ -17,6 +17,8 @@ import { bookingStatus } from "../src/v2/alumniPolicy";
 import { sportsCourseCommand } from "./sports/courses";
 import { sportsSessionCommand } from "./sports/sessions";
 import { sportsMaterialCommand } from "./sports/materials";
+import { sportsReviewCommand } from "./sports/review";
+import { sportsSupplementCommand } from "./sports/supplements";
 
 export function execute(
   db: Database,
@@ -134,7 +136,9 @@ export function execute(
         alumniCommand(repo, actor, action, input) ??
         sportsCourseCommand(repo, actor, action, input) ??
         sportsSessionCommand(repo, actor, action, input) ??
-        sportsMaterialCommand(repo, actor, action, input);
+        sportsMaterialCommand(repo, actor, action, input) ??
+        sportsReviewCommand(repo, actor, action, input) ??
+        sportsSupplementCommand(repo, actor, action, input);
       demand(result, "不支持该业务操作。", 404);
       // A full alumni aggregate must never be returned in a mutation response.
       result = { id: (result as { id: string }).id };

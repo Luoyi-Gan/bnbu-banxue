@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api, command, sportsChangedEvent, type LiveEntity } from "./api";
+import { SportsSupplement } from "./SportsSupplement";
 
 export interface MaterialData {
   records: LiveEntity[];
@@ -114,13 +115,26 @@ export function SportsMaterials({
           ? ` · ${labels[String(record.data.status)] ?? String(record.data.status)}`
           : ""}
       </h4>
+      {!!record?.data.publicReason && (
+        <p>
+          公开原因：{String((record.data.publicReason as { zh: string }).zh)}
+        </p>
+      )}
+      {!!record?.data.publicExplanation && (
+        <p>{String(record.data.publicExplanation)}</p>
+      )}
       {record && (
         <p>
           {String(record.data.description)} ·{" "}
           {record.data.category === "RELATED" ? "课程相关" : "其他运动"}
         </p>
       )}
-      {batch && <p>原批传输截止：{deadline}（截止时刻前须全部到账）</p>}
+      {batch?.data.sequence === 1 && (
+        <p>原批传输截止：{deadline}（截止时刻前须全部到账）</p>
+      )}
+      {record?.data.status === "SUPPLEMENT_REQUIRED" && (
+        <SportsSupplement record={record} data={data} />
+      )}
       {materials.map((m) => (
         <div key={m.id} style={{ marginBottom: 10 }}>
           <span>
@@ -152,7 +166,8 @@ export function SportsMaterials({
           </p>
         )}
       {(!record ||
-        (record.data.status === "UPLOADING" && batch?.data.canUpload === true)) && (
+        (record.data.status === "UPLOADING" &&
+          batch?.data.canUpload === true)) && (
         <>
           {!record && (
             <>
