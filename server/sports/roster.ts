@@ -9,6 +9,7 @@ import {
 import { ownedCourse, version } from "./courses";
 import { parseCsv } from "./csv";
 import { administratorAccess } from "./permissions";
+import type { WorkbookSheet } from "./workbook";
 interface RosterRow {
   row: number;
   studentNumber: string;
@@ -16,6 +17,7 @@ interface RosterRow {
   columnError: boolean;
   excluded: boolean;
   reason?: string;
+  sourceRow?: number;
 }
 function structural(row: RosterRow) {
   return (
@@ -74,7 +76,30 @@ export function sportsRosterCommand(
   actor: Account,
   action: string,
   input: Fields,
+  source?: { entity: Entity; sheet: WorkbookSheet },
 ) {
+  if (action === "sports.roster.source.import") {
+    const entity = repo.get(input.id, "sportsRosterSource");
+    usable(repo, actor, entity.data.courseId);
+    demand(entity.ownerId === actor.id, "只能核对本人受理的名单原件。", 403);
+    const sheet = (entity.data.sheets as WorkbookSheet[]).find(
+      (s) => s.index === input.sheet,
+    );
+    demand(sheet && !sheet.error, "名单工作表不存在或无法解析。");
+    const prior = repo
+      .all("sportsRosterDraft")
+      .find(
+        (d) => d.data.sourceId === entity.id && d.data.sheet === sheet.index,
+      );
+    if (prior) return prior;
+    return sportsRosterCommand(
+      repo,
+      actor,
+      "sports.roster.preview",
+      { courseId: entity.data.courseId, csv: sheet.csv },
+      { entity, sheet },
+    );
+  }
   if (
     ![
       "sports.roster.preview",
@@ -87,7 +112,7 @@ export function sportsRosterCommand(
   if (action === "sports.roster.preview") {
     const course = usable(repo, actor, input.courseId);
     demand(
-      course.data.status === "PUBLISHED",
+      course.data.status === "PUBLISHED" || !!source,
       "课程已关闭，不接受新名单。",
       409,
     );
@@ -106,10 +131,9 @@ export function sportsRosterCommand(
             )[c.trim()] ?? c.trim(),
         ) ?? [];
     demand(
-      header.length === 2 &&
-        header.includes("student_number") &&
-        header.includes("name"),
-      "名单须包含且仅包含student_number,name或学号,姓名两列。",
+      header.filter((h) => h === "student_number").length === 1 &&
+        header.filter((h) => h === "name").length === 1,
+      "名单须有唯一学号和姓名两列（student_number,name）；其他列保留在原件中。",
     );
     demand(
       cells.length > 0 && cells.length <= 500,
@@ -119,7 +143,9 @@ export function sportsRosterCommand(
       row: i + 2,
       studentNumber: (r[header.indexOf("student_number")] ?? "").trim(),
       name: (r[header.indexOf("name")] ?? "").trim(),
-      columnError: r.length !== 2,
+      columnError:
+        r.length !== header.length || !!source?.sheet.issues.includes(i + 2),
+      ...(source ? { sourceRow: source.sheet.rowNumbers[i + 1] } : {}),
       excluded: false,
     }));
     return repo.create("sportsRosterDraft", actor.id, {
@@ -127,6 +153,13 @@ export function sportsRosterCommand(
       csv,
       rows,
       status: "DRAFT",
+      ...(source
+        ? {
+            sourceId: source.entity.id,
+            sheet: source.sheet.index,
+            sourceFormat: source.entity.data.format,
+          }
+        : {}),
     });
   }
   if (action === "sports.roster.restore") {
@@ -390,6 +423,7 @@ export function rosterWorkspace(repo: Repository, actor: Account) {
     bases = owned("sportsRosterBasis");
   return {
     studentRosterChecks,
+    rosterSources: owned("sportsRosterSource"),
     rosterSummaries,
     rosterDrafts: owned("sportsRosterDraft"),
     rosterSnapshots: snapshots,

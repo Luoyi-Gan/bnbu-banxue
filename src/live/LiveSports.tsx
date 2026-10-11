@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsRosterFiles } from "./SportsRosterFiles";
 import { SportsRoster, type RosterCheck } from "./SportsRoster";
 import { SportsOcr } from "./SportsOcr";
 import { SportsWorkbook } from "./SportsWorkbook";
@@ -30,6 +31,7 @@ interface SportsData
   firstLoginOnly?: boolean;
   teacherImports?: LiveEntity[];
   conversionTables?: LiveEntity[];
+  rosterSources?: LiveEntity[];
   rosterDrafts?: LiveEntity[];
   rosterSnapshots?: LiveEntity[];
   rosterBases?: LiveEntity[];
@@ -412,6 +414,14 @@ export function LiveSports({
         {data.courses.map((c) => (
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
+            {role === "teacher" && (
+              <SportsRosterFiles
+                course={c}
+                sources={data.rosterSources ?? []}
+                open={open}
+                busy={busy}
+              />
+            )}
             {role === "student" &&
               data.studentRosterChecks
                 ?.filter((r) => r.courseId === c.id)

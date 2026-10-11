@@ -21,6 +21,7 @@ import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
 import { rosterWorkspace } from "./sports/roster";
+import { uploadRosterFile } from "./sports/roster-files";
 import { enduranceImportWorkspace } from "./sports/endurance-import";
 import { uploadWorkbook, workbookAccess } from "./sports/workbook";
 import {
@@ -231,6 +232,35 @@ export function createApiServer(
             status: source.data.status,
             error: source.data.error,
           });
+        }
+        const rosterUpload =
+          /^\/api\/sports\/roster-files\/([a-f0-9-]+)\/(csv|xlsx)$/.exec(
+            pathname,
+          );
+        if (rosterUpload) {
+          const repo = new Repository(db),
+            token = cookieToken(request) ?? "";
+          workbookAccess(repo, token, rosterUpload[1]);
+          demand(
+            request.headers["content-type"] === "application/octet-stream",
+            "名单文件须为二进制上传。",
+            415,
+          );
+          const chunks: Buffer[] = [];
+          let size = 0;
+          for await (const chunk of request) {
+            size += chunk.length;
+            demand(size <= 100 * 1024 * 1024, "名单文件超过100MB。", 413);
+            chunks.push(chunk);
+          }
+          const source = await uploadRosterFile(
+            repo,
+            token,
+            rosterUpload[1],
+            rosterUpload[2].toUpperCase(),
+            Buffer.concat(chunks),
+          );
+          return send(response, 200, { id: source.id });
         }
         const workbookUpload = /^\/api\/sports\/workbooks\/([a-f0-9-]+)$/.exec(
           pathname,
@@ -466,6 +496,37 @@ export function createApiServer(
           "Cache-Control": "no-store",
           "X-Content-Type-Options": "nosniff",
           "Content-Security-Policy": "default-src 'none'",
+        });
+        return response.end(bytes);
+      }
+      const rosterRead = /^\/api\/sports\/roster-sources\/([a-f0-9-]+)$/.exec(
+        pathname,
+      );
+      if (request.method === "GET" && rosterRead) {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request)),
+          source = repo.get(rosterRead[1], "sportsRosterSource");
+        sportsWriteGate(repo, "sports.roster.preview");
+        ownedCourse(repo, actor, source.data.courseId);
+        demand(
+          source.ownerId === actor.id,
+          "只能读取本人受理的名单原件。",
+          403,
+        );
+        const blob = db
+          .prepare("SELECT bytes FROM sports_media_blobs WHERE sha256=?")
+          .get(String(source.data.sha256));
+        demand(blob, "名单原件不存在。", 404);
+        const bytes = Buffer.from(blob.bytes as Uint8Array),
+          csv = source.data.format === "CSV";
+        response.writeHead(200, {
+          "Content-Type": csv
+            ? "text/csv; charset=utf-8"
+            : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "Content-Disposition": `attachment; filename="school-roster.${csv ? "csv" : "xlsx"}"`,
+          "Content-Length": bytes.length,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
         });
         return response.end(bytes);
       }

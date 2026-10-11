@@ -206,3 +206,151 @@ it("正式快照拒绝结构错误、陈旧基准、越权和结算覆盖；关�
     }),
   ).toThrow("历史报告更正");
 });
+
+it("学校名单CSV文件原件保留、同源去重、关闭后受理链可继续，管理员不读取源", async () => {
+  const f = setup();
+  const { uploadRosterFile } = await import("../server/sports/roster-files");
+  const bytes = Buffer.from("\uFEFF学号,姓名\r\n S001 , student \r\n");
+  const source = await uploadRosterFile(
+    f.repo,
+    f.teacher.token,
+    f.course.id,
+    "CSV",
+    bytes,
+  );
+  expect(
+    (await uploadRosterFile(f.repo, f.teacher.token, f.course.id, "CSV", bytes))
+      .id,
+  ).toBe(source.id);
+  expect(
+    Buffer.from(
+      f.db
+        .prepare("SELECT bytes FROM sports_media_blobs WHERE sha256=?")
+        .get(String(source.data.sha256))!.bytes as Uint8Array,
+    ),
+  ).toEqual(bytes);
+  f.repo.save(f.course, { status: "CLOSED" });
+  const draft = f.run(f.teacher, "sports.roster.source.import", {
+    id: source.id,
+    sheet: 0,
+  });
+  expect(
+    f.run(f.teacher, "sports.roster.source.import", { id: source.id, sheet: 0 })
+      .id,
+  ).toBe(draft.id);
+  const snapshot = f.confirm(draft);
+  expect(
+    (snapshot.data.rows as { studentNumber: string }[])[0].studentNumber,
+  ).toBe("S001");
+  expect(rosterWorkspace(f.repo, f.admin.account).rosterSources).toEqual([]);
+  await expect(
+    uploadRosterFile(f.repo, f.teacher.token, f.course.id, "CSV", bytes),
+  ).rejects.toThrow("不接受新体测");
+});
+it("名单XLSX两列保留实际行号，公式缓存不能直接成为正式名单", async () => {
+  const f = setup();
+  const { uploadRosterFile } = await import("../server/sports/roster-files");
+  const Excel = (await import("exceljs")).default;
+  const book = new Excel.Workbook(),
+    sheet = book.addWorksheet("学校名单");
+  sheet.getRow(3).values = ["学院", "学号", "姓名"];
+  sheet.getRow(8).values = [
+    "测试学院",
+    "S001",
+    { formula: '"student"', result: "student" },
+  ];
+  sheet.getRow(9).values=["仅学院，没有身份字段"];
+  const bytes = Buffer.from(await book.xlsx.writeBuffer());
+  const source = await uploadRosterFile(
+    f.repo,
+    f.teacher.token,
+    f.course.id,
+    "XLSX",
+    bytes,
+  );
+  let draft = f.run(f.teacher, "sports.roster.source.import", {
+    id: source.id,
+    sheet: 0,
+  });
+  expect(
+    (draft.data.rows as { sourceRow: number; columnError: boolean }[])[0],
+  ).toMatchObject({ sourceRow: 8, columnError: true });
+  expect(() => f.confirm(draft)).toThrow("错误字段");
+  draft = f.run(f.teacher, "sports.roster.row", {
+    id: draft.id,
+    version: draft.version,
+    row: 2,
+    studentNumber: "S001",
+    name: "student",
+    reason: "对照学校原件确认姓名原文",
+  });
+  expect((draft.data.rows as unknown[])).toHaveLength(2);
+  expect(()=>f.confirm(draft)).toThrow("错误字段");
+  draft=f.run(f.teacher,"sports.roster.row",{id:draft.id,version:draft.version,row:3,exclude:true,reason:"对照学校原件确认非人员说明行"});
+  expect(f.confirm(draft).data.rawRowCount).toBe(2);
+});
+it("名单文件真实HTTP上传/下载隔离，编码、行数和100MB上限在服务端拒绝", async () => {
+  const f = setup();
+  const { uploadRosterFile } = await import("../server/sports/roster-files");
+  const { createApiServer } = await import("../server/main");
+  await expect(
+    uploadRosterFile(
+      f.repo,
+      f.teacher.token,
+      f.course.id,
+      "CSV",
+      Buffer.from([255, 254, 0]),
+    ),
+  ).rejects.toThrow("UTF-8");
+  await expect(
+    uploadRosterFile(
+      f.repo,
+      f.teacher.token,
+      f.course.id,
+      "CSV",
+      Buffer.from("学号,姓名\n" + Array(501).fill("S001,student").join("\n")),
+    ),
+  ).rejects.toThrow("500");
+  await expect(
+    uploadRosterFile(
+      f.repo,
+      f.teacher.token,
+      f.course.id,
+      "CSV",
+      Buffer.alloc(100 * 1024 * 1024 + 1),
+    ),
+  ).rejects.toThrow("100MB");
+  const server = createApiServer(f.db);
+  await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+  const base = `http://127.0.0.1:${(server.address() as { port: number }).port}`,
+    bytes = Buffer.from("学号,姓名\nS001,student"),
+    cookie = { Cookie: `bnbu_session=${f.teacher.token}` };
+  try {
+    const response = await fetch(
+      `${base}/api/sports/roster-files/${f.course.id}/csv`,
+      {
+        method: "POST",
+        headers: { ...cookie, "Content-Type": "application/octet-stream" },
+        body: bytes,
+      },
+    );
+    expect(response.status).toBe(200);
+    const { id } = await response.json();
+    const raw = await fetch(`${base}/api/sports/roster-sources/${id}`, {
+      headers: cookie,
+    });
+    expect(raw.status).toBe(200);
+    expect(Buffer.from(await raw.arrayBuffer())).toEqual(bytes);
+    for (const who of [f.student, f.admin])
+      expect(
+        (
+          await fetch(`${base}/api/sports/roster-sources/${id}`, {
+            headers: { Cookie: `bnbu_session=${who.token}` },
+          })
+        ).status,
+      ).toBe(403);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((r) => server.close(() => r()));
+  }
+});

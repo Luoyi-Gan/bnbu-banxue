@@ -17,7 +17,10 @@ export interface WorkbookSheet {
   imageIds?: string[];
   sourceIssues?: string[][];
 }
-export function parseWorkbook(bytes: Buffer): Promise<WorkbookSheet[]> {
+export function parseWorkbook(
+  bytes: Buffer,
+  columns: 2 | 5 = 5,
+): Promise<WorkbookSheet[]> {
   demand(
     bytes.length > 0 && bytes.length <= 100 * 1024 * 1024,
     "XLSX须为1字节至100MB。",
@@ -35,13 +38,14 @@ export function parseWorkbook(bytes: Buffer): Promise<WorkbookSheet[]> {
         const results=book.worksheets.map((sheet,index)=>{
           const out={index,name:sheet.name,csv:'',rowNumbers:[],issues:[]};
           try {
-            const matrix=[];
+            const matrix=[];let rosterColumns;
             sheet.eachRow((row,n)=>{
               if(matrix.length>=501)throw Error('工作表超过500个人员行');
-              row.eachCell((cell,c)=>{if(c>5&&cell.value!=null)throw Error('工作表存在五列之外的非空数据，请先核对列');});
+              if(workerData.columns===2&&!matrix.length){const candidates={student_number:[],name:[]};row.eachCell((cell,c)=>{const key=aliases[cell.text.trim()]||cell.text.trim();if(candidates[key])candidates[key].push(c);});if(candidates.student_number.length!==1||candidates.name.length!==1)throw Error('名单必须有唯一学号和姓名列');rosterColumns=[candidates.student_number[0],candidates.name[0]];}
+              if(workerData.columns===5)row.eachCell((cell,c)=>{if(c>5&&cell.value!=null)throw Error('工作表存在要求列数之外的非空数据，请先核对列');});
               const values=[];let issue=false;
-              for(let c=1;c<=5;c++){
-                const cell=row.getCell(c),v=cell.value;let text='';
+              for(let c=1;c<=workerData.columns;c++){
+                const cell=row.getCell(rosterColumns?rosterColumns[c-1]:c),v=cell.value;let text='';
                 if(cell.isMerged)issue=true;
                 if(v instanceof Date){text=v.toISOString().slice(0,10);if(matrix.length&&matrix[0][c-1]!=='test_date')issue=true;}
                 else if(typeof v==='string'||typeof v==='number') {text=String(v);if(typeof v==='number'&&(!Number.isFinite(v)||Math.abs(v)>Number.MAX_SAFE_INTEGER))issue=true;}
@@ -50,7 +54,8 @@ export function parseWorkbook(bytes: Buffer): Promise<WorkbookSheet[]> {
                 if(!matrix.length)text=aliases[text.trim()]||text.trim();
                 values.push(text);
               }
-              if(!matrix.length&&issue)throw Error('表头含公式或合并单元格，须先明确五个字段');
+              if(matrix.length&&workerData.columns===2&&values.every(v=>!v.trim())){values[0]='[待核对：缺少学号与姓名]';issue=true;}
+              if(!matrix.length&&issue)throw Error('表头含公式或合并单元格，须先明确字段');
               matrix.push(values);out.rowNumbers.push(n);if(issue)out.issues.push(matrix.length);
             });
             if(matrix.length<2)throw Error('工作表没有人员行');
@@ -65,6 +70,7 @@ export function parseWorkbook(bytes: Buffer): Promise<WorkbookSheet[]> {
         eval: true,
         workerData: {
           bytes,
+          columns,
           modulePath: createRequire(import.meta.url).resolve("exceljs"),
         },
         resourceLimits: { maxOldGenerationSizeMb: 512 },

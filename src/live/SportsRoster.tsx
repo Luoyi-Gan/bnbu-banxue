@@ -2,6 +2,8 @@ import type { LiveEntity } from "./api";
 import type { OpenForm } from "./ConnectedApp";
 type Row = {
   row: number;
+  sourceRow?: number;
+  columnError?: boolean;
   studentNumber: string;
   name: string;
   excluded?: boolean;
@@ -98,7 +100,10 @@ export function SportsRoster({
               <tbody>
                 {(d.data.rows as Row[]).map((r) => (
                   <tr key={r.row}>
-                    <td>{r.row}</td>
+                    <td>
+                      {r.sourceRow ?? r.row}
+                      {r.columnError && " · 来源字段有疑点，须修正"}
+                    </td>
                     <td>{r.studentNumber}</td>
                     <td>{r.name}</td>
                     <td>
