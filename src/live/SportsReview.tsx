@@ -1,6 +1,7 @@
 import type { LiveEntity } from "./api";
 import type { OpenForm, Field } from "./ConnectedApp";
 import type { MaterialData } from "./SportsMaterials";
+import { ReviewDeadline, type ReviewClock } from "./SportsCalendar";
 export interface ReviewData {
   reviewReasons: { code: string; zh: string; en: string; actions: string[] }[];
   reviewEvents: LiveEntity[];
@@ -212,9 +213,15 @@ export function SportsReview({
                   )}
                 {r.data.status === "TEACHER_PENDING" && (
                   <>
-                    <p>
-                      本轮处理时限需学校确认日历；尚不能可靠计算，未按普通48小时推算。
-                    </p>
+                    <ReviewDeadline
+                      clock={
+                        data.reviewRounds.find(
+                          (round) =>
+                            round.data.recordId === r.id &&
+                            round.data.status === "OPEN",
+                        )?.data.clock as ReviewClock | undefined
+                      }
+                    />
                     <div className="live-actions">
                       <button disabled={busy} onClick={() => review(r, "PASS")}>
                         通过

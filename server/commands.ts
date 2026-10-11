@@ -19,6 +19,8 @@ import { sportsSessionCommand } from "./sports/sessions";
 import { sportsMaterialCommand } from "./sports/materials";
 import { sportsReviewCommand } from "./sports/review";
 import { sportsSupplementCommand } from "./sports/supplements";
+import { sportsSystemCommand, sportsWriteGate } from "./sports/system";
+import { sportsCalendarCommand } from "./sports/calendar";
 
 export function execute(
   db: Database,
@@ -37,6 +39,7 @@ export function execute(
     const actor = authenticate(db, token),
       repo = new Repository(db);
     demand(actor.status !== "banned", "账号已封禁，不能进行业务写入。", 403);
+    sportsWriteGate(repo, action);
     const booleanArguments: Record<string, string> = {
       "content.review": "",
       "room.decide": "accept",
@@ -134,6 +137,8 @@ export function execute(
         governanceCommand(repo, actor, action, input) ??
         activityCommand(repo, actor, action, input) ??
         alumniCommand(repo, actor, action, input) ??
+        sportsSystemCommand(repo, actor, action, input) ??
+        sportsCalendarCommand(repo, actor, action, input) ??
         sportsCourseCommand(repo, actor, action, input) ??
         sportsSessionCommand(repo, actor, action, input) ??
         sportsMaterialCommand(repo, actor, action, input) ??

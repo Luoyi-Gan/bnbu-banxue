@@ -131,3 +131,10 @@ AI适配配置 `BNBU_SPORTS_AI_URL`、可选 `BNBU_SPORTS_AI_TOKEN` 与 `BNBU_SP
 - `BNBU_SPORTS_ORIGIN`：Vite 将原 `/api/v1` 转发到原体育后端；`BNBU_SPORTS_OBJECT_ORIGIN` 可提供原对象服务 `/minio` 转发。未配置返回503，不生成替代体育数据。
 
 正式邮箱接收、AI识别/封面生成、原体育账号统一与真实跨端审核尚需实际服务配置和联调。不得以本地夹具或适配器契约测试宣称这些外部服务已通过验收。
+
+## 体育维护与学校日历
+
+- sports.system.mode：version（初次0）、mode=NORMAL/MAINTENANCE、reason；进入维护另需titleZh/titleEn/bodyZh/bodyEn/estimatedRecoveryAt。服务端写入sportsPause和sportsSystemHistory，恢复仅关闭原暂停。总管理员或体育身份permissions包含SYSTEM_MODE可执行。维护时普通sports命令在幂等读取前也受阻，AI恢复治理命令只由总管理员执行。
+- sports.calendar.publish：name/source/daysText/confirmed=true；daysText每行为YYYY-MM-DD,WORKDAY或YYYY-MM-DD,REST，须覆盖连续日期且包含休息日。仅总管理员，发布新不可变版本。
+- sports.calendar.bind：id（未结束审核轮次）、version、calendarId、reason；明确迁移，写入sportsCalendarBinding历史，不能改写已结束轮次或原入队时间。
+- workspace新增system公告/权限/历史/本人暂停摘要；维护时正常业务集合为空。正常时提供calendars/calendarRounds/slaReminders（总管理员范围），责任教师reviewRounds包含clock。无日历或覆盖不足返回明确calculationStatus及空截止，不猜测普通周一至周五。

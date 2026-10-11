@@ -9,6 +9,7 @@ import {
 import { ownedCourse, sportsRole, version } from "./courses";
 import { sportsAvailable, visibleRecords } from "./materials";
 import { recalculateProgress } from "./progress";
+import { latestCalendar, reviewClock } from "./calendar";
 
 export const reviewReasons = [
   {
@@ -73,6 +74,7 @@ export function enqueueTeacher(
     .all("sportsReviewRound")
     .filter((r) => r.data.recordId === record.id);
   const active = rounds.find((r) => r.data.status === "OPEN");
+  const calendar = latestCalendar(repo);
   if (!active)
     repo.create("sportsReviewRound", course.ownerId, {
       recordId: record.id,
@@ -80,8 +82,9 @@ export function enqueueTeacher(
       sequence: rounds.length + 1,
       status: "OPEN",
       startedAt: Date.now(),
-      calendarVersion: null,
-      calculationStatus: "CALENDAR_REQUIRED",
+      calendarId: calendar?.id ?? null,
+      calendarVersion: calendar?.version ?? null,
+      calculationStatus: calendar ? "BOUND" : "CALENDAR_REQUIRED",
     });
   const saved = repo.save(record, {
     status: "TEACHER_PENDING",
@@ -127,7 +130,6 @@ export function sportsReviewCommand(
 ): Entity | undefined {
   if (action === "sports.ai.manual") {
     superAdmin(repo, actor);
-    sportsAvailable(repo);
     const course = repo.get(input.courseId, "sportsCourse");
     const endAt = Date.parse(textField(input, "endAt", 80)),
       now = Date.now();
@@ -160,7 +162,6 @@ export function sportsReviewCommand(
   }
   if (action === "sports.ai.stop") {
     superAdmin(repo, actor);
-    sportsAvailable(repo);
     const mode = repo.get(input.id, "sportsManualMode");
     version(mode, input);
     return repo.save(mode, {
@@ -171,7 +172,6 @@ export function sportsReviewCommand(
   }
   if (action === "sports.ai.retry") {
     superAdmin(repo, actor);
-    sportsAvailable(repo);
     const record = repo.get(input.id, "sportsRecord");
     version(record, input);
     demand(
@@ -247,7 +247,16 @@ export function sportsReviewCommand(
   for (const round of repo
     .all("sportsReviewRound")
     .filter((r) => r.data.recordId === record.id && r.data.status === "OPEN"))
-    repo.save(round, { status: "CLOSED", endedAt: now, decision });
+    repo.save(round, {
+      status: "CLOSED",
+      endedAt: now,
+      decision,
+      finalClock: reviewClock(
+        repo,
+        { ...round, data: { ...round.data, status: "CLOSED", endedAt: now } },
+        now,
+      ),
+    });
   repo.create("sportsReviewEvent", actor.id, {
     recordId: record.id,
     batchId: batch.id,
@@ -302,7 +311,8 @@ export function reviewWorkspace(repo: Repository, actor: Account) {
       .filter((e) => ids.has(String(e.data.recordId))),
     reviewRounds: repo
       .all("sportsReviewRound")
-      .filter((e) => ids.has(String(e.data.recordId))),
+      .filter((e) => ids.has(String(e.data.recordId)))
+      .map((e) => ({ ...e, data: { ...e.data, clock: reviewClock(repo, e) } })),
     progress: current,
     manualModes: repo
       .all("sportsManualMode")

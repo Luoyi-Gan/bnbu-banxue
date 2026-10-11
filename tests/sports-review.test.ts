@@ -10,10 +10,297 @@ import { execute } from "../server/commands";
 import { uploadMaterial } from "../server/sports/materials";
 import { processSportsReview } from "../server/sports/review-worker";
 import { createApiServer } from "../server/main";
+import { systemWorkspace } from "../server/sports/system";
+import { reviewClock } from "../server/sports/calendar";
 const closes: (() => void | Promise<void>)[] = [];
+const calendarInput = () => ({
+  name: "隔离测试日历",
+  source: "自动化测试夹具，非学校日历",
+  confirmed: true,
+  daysText: Array.from(
+    { length: 10 },
+    (_, i) => `2026-10-${String(9 + i).padStart(2, "0")},WORKDAY`,
+  ).join("\n"),
+});
+const maintenanceInput = () => ({
+  version: 0,
+  mode: "MAINTENANCE",
+  reason: "隔离维护验收",
+  titleZh: "测试维护",
+  titleEn: "Test maintenance",
+  bodyZh: "仅隔离测试",
+  bodyEn: "Isolated test only",
+  estimatedRecoveryAt: new Date(Date.now() + 3600000).toISOString(),
+});
 afterEach(async () => {
   vi.restoreAllMocks();
   for (const close of closes.splice(0).reverse()) await close();
+});
+
+it("日历发布严格校验且只用于新轮次，已有轮次显式迁移保留原起点及历史", async () => {
+  vi.spyOn(Date, "now").mockReturnValue(
+    Date.parse("2026-10-12T10:00:00+08:00"),
+  );
+  const f = await fixture();
+  f.manual();
+  const original = f.repo.all("sportsReviewRound")[0];
+  expect(() =>
+    f.run(f.teacher, "sports.calendar.publish", calendarInput()),
+  ).toThrow(/体育身份/);
+  expect(() =>
+    f.run(f.admin, "sports.calendar.publish", {
+      ...calendarInput(),
+      daysText: "2026-10-09,WORKDAY\n2026-10-11,REST",
+    }),
+  ).toThrow(/连续/);
+  expect(() =>
+    f.run(f.admin, "sports.calendar.publish", {
+      ...calendarInput(),
+      confirmed: false,
+    }),
+  ).toThrow(/确认/);
+  const calendar = f.run(f.admin, "sports.calendar.publish", calendarInput());
+  expect(f.repo.get(original.id)).toEqual(original);
+  const bound = f.run(f.admin, "sports.calendar.bind", {
+    id: original.id,
+    version: original.version,
+    calendarId: calendar.id,
+    reason: "隔离测试明确补充日历",
+  });
+  expect(bound.data.startedAt).toBe(original.data.startedAt);
+  expect(reviewClock(f.repo, bound).calculationStatus).toBe("CALCULABLE");
+  expect(f.repo.all("sportsCalendarBinding")).toHaveLength(1);
+  const next = f.run(f.admin, "sports.calendar.publish", {
+    ...calendarInput(),
+    name: "第二测试版",
+  });
+  expect(f.repo.get(bound.id).data.calendarId).toBe(calendar.id);
+  const record = f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
+  const oldClock = reviewClock(f.repo, f.repo.get(bound.id));
+  const originalMaterial = f.repo.all("sportsMaterial")[0];
+  const draft = f.run(f.student, "sports.supplement.prepare", {
+    id: record.id,
+    version: record.version,
+    reuseIds: [originalMaterial.id],
+    files: [],
+  });
+  f.run(f.student, "sports.supplement.submit", {
+    id: draft.id,
+    version: draft.version,
+  });
+  const newRound = f.repo
+    .all("sportsReviewRound")
+    .find((r) => r.data.status === "OPEN")!;
+  expect(newRound.data.calendarId).toBe(next.id);
+  expect(() =>
+    f.run(f.admin, "sports.calendar.bind", {
+      id: bound.id,
+      version: f.repo.get(bound.id).version,
+      calendarId: next.id,
+      reason: "不允许改写已结束轮次",
+    }),
+  ).toThrow(/已结束/);
+  f.repo.create("sportsPause", null, {
+    status: "CONFIRMED",
+    startAt: Date.now() - 10000,
+    endAt: Date.now() + 10000,
+  });
+  expect(reviewClock(f.repo, f.repo.get(bound.id))).toEqual(oldClock);
+});
+
+it("维护权限、完整公告与模式版本由服务端强制，失败与重复不会追加成功历史", async () => {
+  const f = await fixture(),
+    input = maintenanceInput();
+  expect(systemWorkspace(f.repo, f.admin.account).system.version).toBe(0);
+  expect(f.repo.all("sportsSystem")).toHaveLength(0);
+  expect(() => f.run(f.student, "sports.system.mode", input)).toThrow(
+    /体育身份/,
+  );
+  expect(() => f.run(f.teacher, "sports.system.mode", input)).toThrow(
+    /体育身份/,
+  );
+  expect(() =>
+    f.run(f.admin, "sports.system.mode", { ...input, titleEn: "" }),
+  ).toThrow(/titleEn/);
+  expect(f.repo.all("sportsSystemHistory")).toHaveLength(0);
+  const key = randomUUID(),
+    entered = f.run(f.admin, "sports.system.mode", input, key);
+  f.run(f.admin, "sports.system.mode", input, key);
+  expect(f.repo.all("sportsSystemHistory")).toHaveLength(1);
+  expect(f.repo.all("sportsPause")).toHaveLength(1);
+  expect(() =>
+    f.run(f.admin, "sports.system.mode", {
+      version: 0,
+      mode: "NORMAL",
+      reason: "restore",
+    }),
+  ).toThrow(/版本/);
+  expect(() =>
+    f.run(f.admin, "sports.semester.create", { name: "禁止维护写入" }),
+  ).toThrow(/维护中/);
+  expect(() =>
+    f.run(f.student, "sports.session.start", { courseId: f.course.id }),
+  ).toThrow(/维护中/);
+  // Recovery governance is available to the super-admin, while teaching remains paused.
+  f.manual();
+  expect(f.repo.get(f.record.id).data.status).toBe("TEACHER_PENDING");
+  expect(() => f.decide("PASS")).toThrow(/维护中/);
+  const original = f.repo.all("sportsMaterial")[0];
+  await expect(
+    uploadMaterial(
+      f.repo,
+      f.student.account,
+      original.id,
+      await readFile("artifacts/fixtures/sports-evidence-test.png"),
+    ),
+  ).rejects.toThrow(/维护/);
+  const resumed = f.run(f.admin, "sports.system.mode", {
+    version: entered.version,
+    mode: "NORMAL",
+    reason: "恢复条件已满足",
+  });
+  expect(resumed.data.mode).toBe("NORMAL");
+  expect(f.repo.all("sportsPause")[0].data.endAt).not.toBeNull();
+  expect(f.repo.all("sportsSystemHistory")).toHaveLength(2);
+});
+
+it("维护跨越原补证截止仍冻结剩余时间，显式恢复后只顺延实际暂停并支持再次维护", async () => {
+  const f = await fixture();
+  f.manual();
+  const record = f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
+  const start = Number(record.data.supplementStartedAt),
+    hour = 3600000;
+  const clock = vi.spyOn(Date, "now").mockReturnValue(start + hour);
+  let mode = f.run(f.admin, "sports.system.mode", maintenanceInput());
+  clock.mockReturnValue(start + 30 * hour);
+  await processSportsReview(f.db, {});
+  expect(f.repo.get(record.id).data.status).toBe("SUPPLEMENT_REQUIRED");
+  expect(
+    systemWorkspace(f.repo, f.student.account).system.supplements[0],
+  ).toMatchObject({ paused: true, remaining: 23 * hour });
+  const renewed = login(f.db, "admin@example.test", "Review-test-123");
+  mode = f.run(renewed, "sports.system.mode", {
+    version: mode.version,
+    mode: "NORMAL",
+    reason: "恢复",
+  });
+  expect(supplementClock(f.repo, f.repo.get(record.id))).toMatchObject({
+    paused: false,
+    remaining: 23 * hour,
+    deadline: start + 53 * hour,
+  });
+  clock.mockReturnValue(start + 31 * hour);
+  mode = f.run(renewed, "sports.system.mode", {
+    ...maintenanceInput(),
+    version: mode.version,
+  });
+  clock.mockReturnValue(start + 32 * hour);
+  f.run(renewed, "sports.system.mode", {
+    version: mode.version,
+    mode: "NORMAL",
+    reason: "再次恢复",
+  });
+  expect(supplementClock(f.repo, f.repo.get(record.id))).toMatchObject({
+    remaining: 22 * hour,
+    deadline: start + 54 * hour,
+  });
+  expect(f.repo.get(record.id).data.supplementUsed).toBe(true);
+});
+
+it("维护开始前真实逾期的待补证先终结，维护和恢复不会恢复机会", async () => {
+  const f = await fixture();
+  f.manual();
+  const record = f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
+  vi.spyOn(Date, "now").mockReturnValue(
+    Number(record.data.supplementStartedAt) + 24 * 3600000,
+  );
+  const admin = login(f.db, "admin@example.test", "Review-test-123");
+  const mode = f.run(admin, "sports.system.mode", maintenanceInput());
+  expect(f.repo.get(record.id).data.status).toBe("INVALID");
+  f.run(admin, "sports.system.mode", {
+    version: mode.version,
+    mode: "NORMAL",
+    reason: "恢复",
+  });
+  expect(f.repo.get(record.id).data.status).toBe("INVALID");
+  expect(
+    f.repo
+      .all("sportsReviewEvent")
+      .filter((e) => e.data.action === "SUPPLEMENT_EXPIRED"),
+  ).toHaveLength(1);
+});
+
+it("分管理员须有系统模式权限，维护读取只提供公告与本人暂停摘要", async () => {
+  const f = await fixture();
+  const subId = createAccount(f.db, {
+    email: "mode@example.test",
+    name: "模式管理员",
+    password: "Mode-test-123",
+    roles: ["reviewer"],
+  });
+  const identity = f.repo.create("sportsIdentity", subId, {
+    role: "admin",
+    status: "verified",
+    permissions: [],
+  });
+  const sub = login(f.db, "mode@example.test", "Mode-test-123");
+  expect(() => f.run(sub, "sports.system.mode", maintenanceInput())).toThrow(
+    /模式管理权限/,
+  );
+  f.repo.save(identity, { permissions: ["SYSTEM_MODE"] });
+  const mode = f.run(sub, "sports.system.mode", maintenanceInput());
+  const server = createApiServer(f.db);
+  await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+  closes.push(
+    () =>
+      new Promise<void>((done) => {
+        server.closeAllConnections();
+        server.close(() => done());
+      }),
+  );
+  const base = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
+  for (const actor of [f.student, f.teacher, f.admin]) {
+    const response = await fetch(`${base}/api/sports/workspace`, {
+      headers: { Cookie: `bnbu_session=${actor.token}` },
+    });
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.courses).toEqual([]);
+    expect(data.records).toEqual([]);
+    expect(data.materials).toEqual([]);
+    expect(data.system.mode).toBe("MAINTENANCE");
+    expect(data.system.announcement.titleEn).toBe("Test maintenance");
+  }
+  const media = f.repo.all("sportsMaterial")[0];
+  const response = await fetch(`${base}/api/sports/materials/${media.id}`, {
+    headers: { Cookie: `bnbu_session=${f.student.token}` },
+  });
+  expect(response.status).toBe(503);
+  f.repo.save(f.repo.get(identity.id), { permissions: [] });
+  expect(() =>
+    f.run(sub, "sports.system.mode", {
+      version: mode.version,
+      mode: "NORMAL",
+      reason: "无权恢复",
+    }),
+  ).toThrow(/模式管理权限/);
+  f.run(f.admin, "sports.system.mode", {
+    version: mode.version,
+    mode: "NORMAL",
+    reason: "总管理员恢复",
+  });
 });
 
 it("一次补证可复用原素材且不复制字节，正式受理后只进入新教师轮次", async () => {
@@ -192,52 +479,124 @@ it("补证原材料引用限定本人本记录，不能以另一次准备变更�
       files: [],
     }),
   ).toThrow(/已有补证包/);
-  const reset = f.run(f.student,"sports.supplement.reset",{id:draft.id,version:draft.version});
-  expect(f.repo.get(draft.data.supplementBatchId).data.status).toBe("ABANDONED");
+  const reset = f.run(f.student, "sports.supplement.reset", {
+    id: draft.id,
+    version: draft.version,
+  });
+  expect(f.repo.get(draft.data.supplementBatchId).data.status).toBe(
+    "ABANDONED",
+  );
   expect(reset.data.supplementStartedAt).toBe(r.data.supplementStartedAt);
-  const second = f.run(f.student,"sports.supplement.prepare",{id:reset.id,version:reset.version,reuseIds:[original.id],files:[]});
-  const accepted = f.run(f.student,"sports.supplement.submit",{id:second.id,version:second.version});
-  expect(()=>f.run(f.student,"sports.supplement.reset",{id:accepted.id,version:accepted.version})).toThrow(/不在补证阶段/);
+  const second = f.run(f.student, "sports.supplement.prepare", {
+    id: reset.id,
+    version: reset.version,
+    reuseIds: [original.id],
+    files: [],
+  });
+  const accepted = f.run(f.student, "sports.supplement.submit", {
+    id: second.id,
+    version: second.version,
+  });
+  expect(() =>
+    f.run(f.student, "sports.supplement.reset", {
+      id: accepted.id,
+      version: accepted.version,
+    }),
+  ).toThrow(/不在补证阶段/);
 });
 
 it("真实HTTP命令与读取返回补证状态，教师判定后学生看到相同公开结果", async () => {
-  const f = await fixture(); f.manual();
+  const f = await fixture();
+  f.manual();
   const server = createApiServer(f.db);
-  await new Promise<void>(done=>server.listen(0,"127.0.0.1",done));
-  closes.push(()=>new Promise<void>(done=>{server.closeAllConnections();server.close(()=>done());}));
-  const url=`http://127.0.0.1:${(server.address() as {port:number}).port}`;
-  const post = async (token:string,action:string,input:Fields) => {
-    const response=await fetch(`${url}/api/commands`,{method:"POST",headers:{"Content-Type":"application/json",Cookie:`bnbu_session=${token}`,Origin:"http://127.0.0.1:4174"},body:JSON.stringify({action,input,requestId:randomUUID()})});
-    expect(response.status).toBe(200); return response.json();
+  await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+  closes.push(
+    () =>
+      new Promise<void>((done) => {
+        server.closeAllConnections();
+        server.close(() => done());
+      }),
+  );
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
+  const post = async (token: string, action: string, input: Fields) => {
+    const response = await fetch(`${url}/api/commands`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `bnbu_session=${token}`,
+        Origin: "http://127.0.0.1:4174",
+      },
+      body: JSON.stringify({ action, input, requestId: randomUUID() }),
+    });
+    expect(response.status).toBe(200);
+    return response.json();
   };
-  const current=f.repo.get(f.record.id);
-  await post(f.teacher.token,"sports.review.decide",{id:current.id,version:current.version,batchId:current.data.batchId,checksCompleted:true,decision:"RETURN",reason:"UNCLEAR",hours:24,canSupplementOriginal:true});
+  const current = f.repo.get(f.record.id);
+  await post(f.teacher.token, "sports.review.decide", {
+    id: current.id,
+    version: current.version,
+    batchId: current.data.batchId,
+    checksCompleted: true,
+    decision: "RETURN",
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
   const read = async () => {
-    const response=await fetch(`${url}/api/sports/workspace`,{headers:{Cookie:`bnbu_session=${f.student.token}`}});
-    expect(response.status).toBe(200);return response.json();
+    const response = await fetch(`${url}/api/sports/workspace`, {
+      headers: { Cookie: `bnbu_session=${f.student.token}` },
+    });
+    expect(response.status).toBe(200);
+    return response.json();
   };
-  const workspace=await read(), record=workspace.records[0];
+  const workspace = await read(),
+    record = workspace.records[0];
   expect(record.data.supplementClock.canSubmit).toBe(true);
-  await post(f.student.token,"sports.supplement.prepare",{id:record.id,version:record.version,reuseIds:[workspace.materials[0].id],files:[]});
-  const prepared=(await read()).records[0];
-  await post(f.student.token,"sports.supplement.submit",{id:prepared.id,version:prepared.version});
-  const queued=f.repo.get(record.id);
-  await post(f.teacher.token,"sports.review.decide",{id:queued.id,version:queued.version,batchId:queued.data.batchId,checksCompleted:true,decision:"INVALID",reason:"MISMATCH",publicExplanation:"隔离测试素材，不证明真实运动"});
-  const final=await read();
-  expect(final.records[0].data).toMatchObject({status:"INVALID",publicReason:{code:"MISMATCH"},publicExplanation:"隔离测试素材，不证明真实运动"});
+  await post(f.student.token, "sports.supplement.prepare", {
+    id: record.id,
+    version: record.version,
+    reuseIds: [workspace.materials[0].id],
+    files: [],
+  });
+  const prepared = (await read()).records[0];
+  await post(f.student.token, "sports.supplement.submit", {
+    id: prepared.id,
+    version: prepared.version,
+  });
+  const queued = f.repo.get(record.id);
+  await post(f.teacher.token, "sports.review.decide", {
+    id: queued.id,
+    version: queued.version,
+    batchId: queued.data.batchId,
+    checksCompleted: true,
+    decision: "INVALID",
+    reason: "MISMATCH",
+    publicExplanation: "隔离测试素材，不证明真实运动",
+  });
+  const final = await read();
+  expect(final.records[0].data).toMatchObject({
+    status: "INVALID",
+    publicReason: { code: "MISMATCH" },
+    publicExplanation: "隔离测试素材，不证明真实运动",
+  });
   expect(final.progress[0].data.total).toBe(0);
   expect(final.reviewRounds).toHaveLength(2);
 });
 
 it("未验证AI不发送材料，技术重试复用任务并保留尝试历史", async () => {
-  const f = await fixture();let calls=0;
-  const url=await upstream((input,response)=>{calls++;answer(input,response);});
-  await processSportsReview(f.db,{url});
+  const f = await fixture();
+  let calls = 0;
+  const url = await upstream((input, response) => {
+    calls++;
+    answer(input, response);
+  });
+  await processSportsReview(f.db, { url });
   expect(calls).toBe(0);
   expect(f.repo.get(f.record.id).data.technicalCode).toBe("AI_NOT_VALIDATED");
-  const task=f.repo.all("sportsAiTask")[0],record=f.repo.get(f.record.id);
-  f.run(f.admin,"sports.ai.retry",{id:record.id,version:record.version});
-  await processSportsReview(f.db,{url,validationRef:"ISOLATED-TEST-ONLY"});
+  const task = f.repo.all("sportsAiTask")[0],
+    record = f.repo.get(f.record.id);
+  f.run(f.admin, "sports.ai.retry", { id: record.id, version: record.version });
+  await processSportsReview(f.db, { url, validationRef: "ISOLATED-TEST-ONLY" });
   expect(calls).toBe(1);
   expect(f.repo.all("sportsAiTask")).toHaveLength(1);
   expect(f.repo.get(task.id).data.attempt).toBe(2);

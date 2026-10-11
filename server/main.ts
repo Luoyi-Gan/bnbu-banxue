@@ -19,6 +19,8 @@ import { sportsWorkspace } from "./sports/courses";
 import { sessionProjection } from "./sports/sessions";
 import { reviewWorkspace } from "./sports/review";
 import { processSportsReview } from "./sports/review-worker";
+import { systemWorkspace } from "./sports/system";
+import { calendarWorkspace } from "./sports/calendar";
 import {
   materialWorkspace,
   readMaterial,
@@ -211,10 +213,50 @@ export function createApiServer(
         const repo = new Repository(db),
           actor = authenticate(db, cookieToken(request)),
           serverNow = Date.now();
+        const system = systemWorkspace(repo, actor);
+        if (system.system.mode === "MAINTENANCE") {
+          const canGovernAi =
+            system.identity.data.role === "admin" &&
+            actor.roles.includes("superadmin") &&
+            actor.status !== "banned";
+          const recovery = canGovernAi ? reviewWorkspace(repo, actor) : null;
+          return send(response, 200, {
+            ...system,
+            serverNow,
+            semesters: [],
+            templates: [],
+            courses: [],
+            enrollments: [],
+            invitations: [],
+            sessions: [],
+            records: [],
+            materialBatches: [],
+            materials: [],
+            reviewReasons: [],
+            reviewEvents: [],
+            reviewRounds: [],
+            progress: [],
+            manualModes: recovery?.manualModes ?? [],
+            canGovernAi,
+            technicalTasks: recovery?.technicalTasks ?? [],
+            recoveryCourses: canGovernAi
+              ? repo
+                  .all("sportsCourse")
+                  .filter(
+                    (c) =>
+                      c.data.status !== "DRAFT" &&
+                      c.data.settlementStatus !== "SETTLED",
+                  )
+                  .map((c) => ({ ...c, data: { name: c.data.name } }))
+              : [],
+          });
+        }
         return send(response, 200, {
+          ...system,
           ...sportsWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),
+          ...calendarWorkspace(repo, actor),
           serverNow,
           sessions: repo
             .all("sportsSession")

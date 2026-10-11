@@ -5,6 +5,7 @@ import { Repository, type Fields } from "../repository";
 import { completeBatch, enqueueTeacher, manualMode } from "./review";
 import { recalculateProgress } from "./progress";
 import { expireSupplements } from "./supplements";
+import { checkReviewReminders } from "./calendar";
 
 const running = new WeakSet<Database>();
 export interface AiConnection {
@@ -27,6 +28,7 @@ export async function processSportsReview(
     const repo = new Repository(db);
     if (repo.all("sportsSystem").some((s) => s.data.mode !== "NORMAL")) return;
     transaction(db, () => expireSupplements(repo));
+    transaction(db, () => checkReviewReminders(repo));
     const record = repo
       .all("sportsRecord")
       .find((r) => r.data.status === "PENDING_AI");

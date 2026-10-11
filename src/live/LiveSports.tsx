@@ -3,8 +3,11 @@ import { api, sportsChangedEvent, type LiveEntity } from "./api";
 import type { Field, OpenForm } from "./ConnectedApp";
 import { SportsMaterials, type MaterialData } from "./SportsMaterials";
 import { SportsReview, type ReviewData } from "./SportsReview";
+import { SportsSystem, type SportsSystemData } from "./SportsSystem";
+import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 
-interface SportsData extends MaterialData, ReviewData {
+interface SportsData
+  extends MaterialData, ReviewData, SportsSystemData, CalendarData {
   identity: LiveEntity;
   semesters: LiveEntity[];
   templates: LiveEntity[];
@@ -13,6 +16,7 @@ interface SportsData extends MaterialData, ReviewData {
   invitations: LiveEntity[];
   sessions: LiveEntity[];
   serverNow: number;
+  recoveryCourses?: LiveEntity[];
 }
 const field = (
   key: string,
@@ -94,6 +98,22 @@ export function LiveSports({
       </p>
     );
   const role = data.identity.data.role;
+  if (data.system?.mode === "MAINTENANCE")
+    return (
+      <>
+        {error && <p role="alert">{error}</p>}
+        <SportsSystem data={data} open={open} busy={busy} />
+        {data.canGovernAi && (
+          <SportsReview
+            data={{ ...data, courses: data.recoveryCourses ?? [] }}
+            role={role}
+            open={open}
+            run={run}
+            busy={busy}
+          />
+        )}
+      </>
+    );
   const action = (
     text: string,
     name: string,
@@ -113,6 +133,7 @@ export function LiveSports({
   );
   return (
     <>
+      <SportsSystem data={data} open={open} busy={busy} />
       {error && (
         <p className="live-error" role="alert">
           {error}
@@ -136,6 +157,7 @@ export function LiveSports({
         </p>
       </section>
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
+      <SportsCalendar data={data} open={open} busy={busy} />
       {role === "admin" && (
         <>
           <div className="live-toolbar">
