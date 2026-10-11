@@ -25,6 +25,7 @@ const states: Record<string, string> = {
   VALID: "有效",
   INVALID: "无效",
   UPLOADING: "材料传输中",
+  TRANSFER_PENDING: "材料超时待核对（尚无审核结论）",
 };
 export function SportsReview({
   data,
@@ -54,6 +55,7 @@ export function SportsReview({
         ];
   function review(record: LiveEntity, decision: string, correction = false) {
     const course = data.courses.find((c) => c.id === record.data.courseId);
+    const transfer = record.data.status === "TRANSFER_PENDING";
     const historical =
       correction && course?.data.settlementStatus === "SETTLED";
     open(
@@ -68,7 +70,9 @@ export function SportsReview({
         ? "sports.correction.apply"
         : correction
           ? "sports.review.correct"
-          : "sports.review.decide",
+          : transfer
+            ? "sports.transfer.decide"
+            : "sports.review.decide",
       [
         ...reasonFields(decision).map((f) =>
           historical ? { ...f, key: "reviewReason" } : f,
@@ -79,7 +83,7 @@ export function SportsReview({
             ? "更正依据与原因（必填，学生可见）"
             : "公开补充说明（学生可见）",
           type: "textarea",
-          optional: !correction,
+          optional: !correction && !transfer,
         },
         {
           key: "checksCompleted",
@@ -270,6 +274,36 @@ export function SportsReview({
                         判为无效
                       </button>
                     </div>
+                  </>
+                )}
+                {r.data.status === "TRANSFER_PENDING" && (
+                  <>
+                    <p>
+                      原批文件未齐。核对原因后仅可退回唯一一次补证补齐原文件，或选择固定原因明确判无效；已确认平台故障须技术复核。
+                    </p>
+                    <ReviewDeadline
+                      clock={
+                        data.reviewRounds.find(
+                          (round) =>
+                            round.data.recordId === r.id &&
+                            round.data.status === "OPEN",
+                        )?.data.clock as ReviewClock | undefined
+                      }
+                    />
+                    {r.data.supplementUsed !== true && (
+                      <button
+                        disabled={busy}
+                        onClick={() => review(r, "RETURN")}
+                      >
+                        退回一次补证补齐原文件
+                      </button>
+                    )}
+                    <button
+                      disabled={busy}
+                      onClick={() => review(r, "INVALID")}
+                    >
+                      核对后判为无效
+                    </button>
                   </>
                 )}
                 {r.data.offlineDelay === true && (

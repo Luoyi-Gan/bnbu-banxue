@@ -8,6 +8,7 @@ const labels: Record<string, string> = {
   SUPPLEMENT_EXPIRED: "系统确认补证逾期",
   PLATFORM_EXPIRY_CORRECTED: "平台错误逾期已纠正",
   SUPPLEMENT_ACCEPTED: "补证正式受理",
+  TRANSFER_DEADLINE_MISSED: "原批材料传输超时，待核对原因",
 };
 export function SportsReviewHistory({
   recordId,

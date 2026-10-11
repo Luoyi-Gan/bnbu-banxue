@@ -5,6 +5,7 @@ import { Repository, type Fields } from "../repository";
 import { completeBatch, enqueueTeacher, manualMode } from "./review";
 import { recalculateProgress } from "./progress";
 import { expireSupplements } from "./supplements";
+import { flagExpiredTransfers } from "./material-transfer";
 import { checkReviewReminders } from "./calendar";
 
 const running = new WeakSet<Database>();
@@ -27,6 +28,7 @@ export async function processSportsReview(
   try {
     const repo = new Repository(db);
     if (repo.all("sportsSystem").some((s) => s.data.mode !== "NORMAL")) return;
+    transaction(db, () => flagExpiredTransfers(repo));
     transaction(db, () => expireSupplements(repo));
     transaction(db, () => checkReviewReminders(repo));
     const record = repo

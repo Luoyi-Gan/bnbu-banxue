@@ -63,12 +63,11 @@ export function completeBatch(repo: Repository, record: Entity) {
   );
   return batch;
 }
-export function enqueueTeacher(
+export function startReviewRound(
   repo: Repository,
   record: Entity,
-  source: string,
+  startedAt = Date.now(),
 ) {
-  completeBatch(repo, record);
   const course = repo.get(record.data.courseId, "sportsCourse");
   const rounds = repo
     .all("sportsReviewRound")
@@ -81,11 +80,20 @@ export function enqueueTeacher(
       batchId: record.data.batchId,
       sequence: rounds.length + 1,
       status: "OPEN",
-      startedAt: Date.now(),
+      startedAt,
       calendarId: calendar?.id ?? null,
       calendarVersion: calendar?.version ?? null,
       calculationStatus: calendar ? "BOUND" : "CALENDAR_REQUIRED",
     });
+}
+export function enqueueTeacher(
+  repo: Repository,
+  record: Entity,
+  source: string,
+) {
+  completeBatch(repo, record);
+  startReviewRound(repo, record);
+  const course = repo.get(record.data.courseId, "sportsCourse");
   const saved = repo.save(record, {
     status: "TEACHER_PENDING",
     queueSource: source,
@@ -183,9 +191,14 @@ export function sportsReviewCommand(
     completeBatch(repo, record);
     return repo.save(record, { status: "PENDING_AI", technicalCode: null });
   }
-  if (action !== "sports.review.decide" && action !== "sports.review.correct")
+  if (
+    action !== "sports.review.decide" &&
+    action !== "sports.review.correct" &&
+    action !== "sports.transfer.decide"
+  )
     return undefined;
   const correction = action === "sports.review.correct";
+  const transfer = action === "sports.transfer.decide";
   sportsAvailable(repo);
   const record = repo.get(input.id, "sportsRecord");
   const course = ownedCourse(repo, actor, record.data.courseId);
@@ -193,7 +206,8 @@ export function sportsReviewCommand(
   demand(
     correction
       ? ["VALID", "INVALID"].includes(String(record.data.status))
-      : record.data.status === "TEACHER_PENDING",
+      : record.data.status ===
+          (transfer ? "TRANSFER_PENDING" : "TEACHER_PENDING"),
     correction
       ? "只能依据已有事实更正已形成的有效或无效结果。"
       : "当前记录不在教师待办，不能覆盖已有判断。",
@@ -208,7 +222,38 @@ export function sportsReviewCommand(
       "结算或归档记录需由历史报告更正入口同步产生新版报告；请从历史更正入口操作。",
       409,
     );
-  const batch = completeBatch(repo, record);
+  const batch = transfer
+    ? repo.get(record.data.batchId, "sportsMaterialBatch")
+    : completeBatch(repo, record);
+  if (transfer) {
+    demand(
+      course.data.settlementStatus !== "SETTLED" &&
+        repo.get(record.data.semesterId, "sportsSemester").data.status !==
+          "ARCHIVED",
+      "已结算记录须历史复核。",
+      409,
+    );
+    demand(
+      batch.data.sequence === 1 &&
+        batch.data.status === "TRANSFER_DEADLINE_MISSED",
+      "只有首版未齐的原批可处理。",
+      409,
+    );
+    demand(
+      !repo
+        .all("sportsPause")
+        .some(
+          (p) =>
+            p.data.recordId === record.id &&
+            p.data.source === "INCIDENT" &&
+            p.data.status === "CONFIRMED" &&
+            Number(p.data.startAt) < Number(batch.data.uploadDeadline) &&
+            Number(p.data.endAt) > Number(batch.data.acceptedAt),
+        ),
+      "已有确认平台事故影响原传输窗口，须先技术复核，不能按个人超时处理。",
+      409,
+    );
+  }
   demand(input.batchId === batch.id, "审核材料版本已变化。", 409);
   demand(input.checksCompleted === true, "须完成规定检查与必要复核后确认。 ");
   const decision = enumField(input, "decision", [
@@ -216,6 +261,11 @@ export function sportsReviewCommand(
     "INVALID",
     "RETURN",
   ] as const);
+  demand(
+    !transfer || decision !== "PASS",
+    "材料尚未完整到账，不能直接判有效。",
+    409,
+  );
   demand(
     !correction || decision !== "RETURN",
     "普通误判更正不能重新开放补证。",
@@ -234,7 +284,7 @@ export function sportsReviewCommand(
     input,
     "publicExplanation",
     1000,
-    !correction,
+    !correction && !transfer,
   );
   if (decision === "RETURN") {
     demand(
@@ -262,6 +312,7 @@ export function sportsReviewCommand(
     publicReason: reason ?? null,
     publicExplanation,
     lastDecisionAt: now,
+    ...(transfer ? { transferOriginBatchId: batch.id } : {}),
     ...(decision === "RETURN"
       ? {
           supplementUsed: true,
@@ -287,6 +338,9 @@ export function sportsReviewCommand(
     recordId: record.id,
     batchId: batch.id,
     action: correction ? "CORRECTION" : decision,
+    ...(transfer
+      ? { source: "TRANSFER_TIMEOUT", originalBatchId: batch.id }
+      : {}),
     decision,
     ...(correction
       ? {

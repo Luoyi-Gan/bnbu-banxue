@@ -161,10 +161,38 @@ export function sportsSupplementCommand(
     })),
     ...input.files,
   ]);
+  let lockedOriginals: Entity[] | undefined;
+  if (record.data.transferOriginBatchId) {
+    const originalBatch = repo.get(
+      record.data.transferOriginBatchId,
+      "sportsMaterialBatch",
+    );
+    demand(
+      originalBatch.data.recordId === record.id &&
+        originalBatch.data.sequence === 1 &&
+        originalBatch.data.status === "TRANSFER_DEADLINE_MISSED",
+      "原传输批次不匹配。",
+      409,
+    );
+    const remaining = repo
+      .all("sportsMaterial")
+      .filter((m) => m.data.batchId === originalBatch.id);
+    lockedOriginals = files.map((file) => {
+      const index = remaining.findIndex(
+        (m) =>
+          m.data.sha256 === file.sha256 &&
+          m.data.size === file.size &&
+          m.data.mime === file.mime,
+      );
+      demand(index >= 0, "本次补证只能补齐首版锁定的原文件，不能换批。", 409);
+      return remaining.splice(index, 1)[0];
+    });
+    demand(remaining.length === 0, "须包含首版锁定的全部必需文件。", 409);
+  }
   if (record.data.activityType === "SWIM")
     demand(
-      reused.some((m) => m.data.phase === "BEFORE") &&
-        reused.some((m) => m.data.phase === "AFTER"),
+      (lockedOriginals ?? reused).some((m) => m.data.phase === "BEFORE") &&
+        (lockedOriginals ?? reused).some((m) => m.data.phase === "AFTER"),
       "游泳补证须沿用原运动前、运动后照片，不能事后新拍替代。",
       409,
     );
@@ -183,10 +211,19 @@ export function sportsSupplementCommand(
       batchId: batch.id,
       sessionId: record.data.sessionId,
       status: source ? "COMPLETE" : "PENDING",
+      ...(lockedOriginals
+        ? { lockedOriginalMaterialId: lockedOriginals[index].id }
+        : {}),
       ...(record.data.activityType === "SWIM"
         ? {
-            phase: source?.data.phase ?? "AUXILIARY",
-            beforeEvidenceId: source?.data.beforeEvidenceId ?? null,
+            phase:
+              source?.data.phase ??
+              lockedOriginals?.[index].data.phase ??
+              "AUXILIARY",
+            beforeEvidenceId:
+              source?.data.beforeEvidenceId ??
+              lockedOriginals?.[index].data.beforeEvidenceId ??
+              null,
           }
         : {}),
       ...(source

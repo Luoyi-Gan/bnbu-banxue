@@ -108,6 +108,11 @@ export function SportsSupplement({
   return (
     <section>
       <h4>一次补证</h4>
+      {!!record.data.transferOriginBatchId && (
+        <p>
+          本次用于补齐首版超时的原批文件。请选择全部已到账原材料，并上传原清单中未到账的文件；不能替换文件或补拍。
+        </p>
+      )}
       <p>
         {clock.paused
           ? "计时已暂停"

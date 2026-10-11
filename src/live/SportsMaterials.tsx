@@ -11,6 +11,7 @@ export interface MaterialData {
 }
 const labels: Record<string, string> = {
   UPLOADING: "等待原批材料传输",
+  TRANSFER_PENDING: "材料超时待核对（尚无审核结论）",
   PENDING_AI: "待AI检查",
   TECHNICAL: "技术处理中",
   TEACHER_PENDING: "待教师复核",
