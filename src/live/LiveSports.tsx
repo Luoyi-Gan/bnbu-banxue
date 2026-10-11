@@ -17,6 +17,7 @@ interface SportsData
     CalendarData,
     IncidentData {
   identity: LiveEntity;
+  administratorAccess?: { superAdmin: boolean; permissions: string[] };
   semesters: LiveEntity[];
   templates: LiveEntity[];
   courses: LiveEntity[];
@@ -175,6 +176,9 @@ export function LiveSports({
           <div className="live-toolbar">
             <button
               className="v2-button v2-button-primary"
+              disabled={
+                !data.administratorAccess?.permissions.includes("SEMESTERS")
+              }
               onClick={() =>
                 open("创建体育学期", "sports.semester.create", [
                   field("name", "学期名称"),
@@ -198,6 +202,7 @@ export function LiveSports({
             </button>
             <button
               className="v2-button v2-button-secondary"
+              disabled={!data.administratorAccess?.superAdmin}
               onClick={() =>
                 open("发布V8.1模板", "sports.template.publish", [
                   field("name", "模板名称"),
@@ -216,6 +221,7 @@ export function LiveSports({
                   {states[String(s.data.status)]}
                 </p>
                 {s.data.status === "UPCOMING" &&
+                  data.administratorAccess?.permissions.includes("SEMESTERS") &&
                   action(
                     "切换为当前学期",
                     "sports.semester.activate",

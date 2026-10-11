@@ -9,6 +9,11 @@ import {
   type Fields,
 } from "../repository";
 import { businessWeek, selectCredit, type CreditCandidate } from "./credit";
+import {
+  administratorAccess,
+  requireSportsPermission,
+  requireSportsSuperAdmin,
+} from "./permissions";
 
 export function sportsRole(
   repo: Repository,
@@ -167,6 +172,7 @@ export function sportsCourseCommand(
     action === "sports.semester.update"
   ) {
     sportsRole(repo, actor, "admin");
+    requireSportsPermission(repo, actor, "SEMESTERS");
     const old = action.endsWith("update")
       ? repo.get(input.id, "sportsSemester")
       : undefined;
@@ -210,6 +216,7 @@ export function sportsCourseCommand(
   }
   if (action === "sports.semester.activate") {
     sportsRole(repo, actor, "admin");
+    requireSportsPermission(repo, actor, "SEMESTERS");
     const semester = repo.get(input.id, "sportsSemester");
     version(semester, input);
     demand(
@@ -238,6 +245,7 @@ export function sportsCourseCommand(
   }
   if (action === "sports.template.publish") {
     sportsRole(repo, actor, "admin");
+    requireSportsSuperAdmin(repo, actor);
     return repo.create("sportsTemplate", actor.id, {
       name: textField(input, "name", 100),
       status: "published",
@@ -422,6 +430,7 @@ export function sportsWorkspace(repo: Repository, actor: Account) {
     .find((i) => i.ownerId === actor.id);
   demand(identity?.data.status === "verified", "没有有效体育身份。", 403);
   const role = identity.data.role;
+  const access = administratorAccess(repo, actor);
   const enrollment = repo
     .all("sportsEnrollment")
     .filter((e) => e.ownerId === actor.id);
@@ -434,11 +443,14 @@ export function sportsWorkspace(repo: Repository, actor: Account) {
       role === "teacher"
         ? c.ownerId === actor.id
         : role === "admin"
-          ? c.data.status === "PUBLISHED" && c.data.semesterId === current?.id
+          ? access.permissions.includes("COURSES_VIEW") &&
+            c.data.status === "PUBLISHED" &&
+            c.data.semesterId === current?.id
           : enrollment.some((e) => e.data.courseId === c.id),
     );
   return {
     identity,
+    administratorAccess: access,
     enrollmentFlows:
       role === "student"
         ? repo

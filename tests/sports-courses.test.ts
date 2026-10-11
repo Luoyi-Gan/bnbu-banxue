@@ -24,7 +24,7 @@ function setup() {
       email,
       password,
       name: role,
-      roles: role === "ordinary" ? ["superadmin"] : [],
+      roles: role === "ordinary" || role === "admin" ? ["superadmin"] : [],
     });
     if (role !== "ordinary")
       repo.create("sportsIdentity", id, {
@@ -483,4 +483,42 @@ it("流程严格截止且撤销立即终止宽限，不能伪造登记时间", (
       .canComplete,
   ).toBe(false);
   expect(f.repo.all("sportsEnrollment")).toHaveLength(0);
+});
+
+it("分管理员按固定权限管理学期，规则权限不能发布模板，撤权立即生效", () => {
+  const f = setup();
+  f.db
+    .prepare("UPDATE accounts SET roles=? WHERE id=?")
+    .run(JSON.stringify([]), f.admin.account.id);
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.admin.account.id)!;
+  expect(() =>
+    f.run(f.admin, "sports.semester.create", {
+      ...f.semesterInput,
+      type: "SECOND",
+    }),
+  ).toThrow("管理权限");
+  f.repo.save(identity, { permissions: ["SEMESTERS", "GLOBAL_RULES"] });
+  const semester = f.run(f.admin, "sports.semester.create", {
+    ...f.semesterInput,
+    type: "SECOND",
+  });
+  expect(semester.data.status).toBe("UPCOMING");
+  expect(() =>
+    f.run(f.admin, "sports.template.publish", { name: "不允许下放" }),
+  ).toThrow("总管理员");
+  f.repo.save(f.repo.get(identity.id), { permissions: [] });
+  expect(() =>
+    f.run(f.admin, "sports.semester.update", {
+      ...f.semesterInput,
+      type: "SECOND",
+      id: semester.id,
+      version: semester.version,
+    }),
+  ).toThrow("管理权限");
+  const account = login(f.db, f.admin.account.email, "Sports-test-123").account;
+  expect(
+    sportsWorkspace(f.repo, account).administratorAccess.permissions,
+  ).toEqual([]);
 });

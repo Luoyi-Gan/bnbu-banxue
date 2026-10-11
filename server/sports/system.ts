@@ -2,29 +2,16 @@ import { demand, type Account } from "../auth";
 import {
   Repository,
   enumField,
-  strings,
   textField,
   type Entity,
   type Fields,
 } from "../repository";
 import { sportsRole } from "./courses";
+import { administratorAccess } from "./permissions";
 import { expireSupplements, supplementClock } from "./supplements";
 
 export function canManageMode(repo: Repository, actor: Account) {
-  const identity = repo
-    .all("sportsIdentity")
-    .find(
-      (i) =>
-        i.ownerId === actor.id &&
-        i.data.status === "verified" &&
-        i.data.role === "admin",
-    );
-  return (
-    !!identity &&
-    actor.status !== "banned" &&
-    (actor.roles.includes("superadmin") ||
-      strings(identity.data.permissions).includes("SYSTEM_MODE"))
-  );
+  return administratorAccess(repo, actor).permissions.includes("SYSTEM_MODE");
 }
 export function currentSystem(repo: Repository) {
   return repo.all("sportsSystem")[0];
