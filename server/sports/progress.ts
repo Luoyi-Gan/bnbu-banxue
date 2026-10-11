@@ -70,7 +70,9 @@ export function recalculateProgress(
       actual,
       reason:
         r.data.status !== "VALID"
-          ? "尚未有效，不计入"
+          ? r.data.status === "INVALID"
+            ? "审核无效，不计入"
+            : "尚未有效，不计入"
           : eligible === 0
             ? "未达到本课程最低运动分钟"
             : actual === 0

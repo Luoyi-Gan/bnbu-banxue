@@ -144,3 +144,7 @@ AI适配配置 `BNBU_SPORTS_AI_URL`、可选 `BNBU_SPORTS_AI_TOKEN` 与 `BNBU_SP
 - sports.incident.confirm：reference、evidenceRef、reason、startAt/endAt（已发生实际区间）、recordIdsText（每行或逗号分隔记录编号）。仅总管理员；事故引用唯一。写入sportsIncident、逐记录sportsPause和sportsDeadlineAdjustment，不自动改判。
 - sports.incident.restore：id/version、incidentId、terminalEventId、roundId/roundVersion、reason。仅当前系统错误补证逾期、未结算归档且原剩余时间为正才恢复；错误锁定区间追加去重，原终局和已用次数不删除。写入sportsCorrection及公开事件/通知/进度版本，同事务提交。
 - workspace新增总管理员范围incidents/corrections/expiryCandidates；本人及责任教师的材料投影含deadlineAdjustments。技术证据不投影给学生或教师。维护期间恢复入口关闭，须先明确恢复正常模式。
+
+## 责任教师普通误判更正
+
+sports.review.correct输入id/version/batchId/checksCompleted=true/decision=PASS或INVALID/publicExplanation（必填公开依据）；INVALID还需适用固定reason。仅原责任教师且当前状态VALID/INVALID、材料完整；不提供RETURN，不改变补证机会、运动原事实及素材。追加公开CORRECTION事件含前状态/原因/说明/版本，重新生成进度并通知学生。结算/归档分支当前明确报需历史报告更正入口，待同步报告版本实现后接通。

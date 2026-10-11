@@ -2,6 +2,7 @@ import type { LiveEntity } from "./api";
 import type { OpenForm, Field } from "./ConnectedApp";
 import type { MaterialData } from "./SportsMaterials";
 import { ReviewDeadline, type ReviewClock } from "./SportsCalendar";
+import { SportsReviewHistory } from "./SportsReviewHistory";
 export interface ReviewData {
   reviewReasons: { code: string; zh: string; en: string; actions: string[] }[];
   reviewEvents: LiveEntity[];
@@ -51,21 +52,25 @@ export function SportsReview({
               .map((r) => ({ value: r.code, label: r.zh })),
           },
         ];
-  function review(record: LiveEntity, decision: string) {
+  function review(record: LiveEntity, decision: string, correction = false) {
     open(
-      decision === "PASS"
-        ? "确认审核通过"
-        : decision === "INVALID"
-          ? "确认记录无效"
-          : "退回一次补证",
-      "sports.review.decide",
+      correction
+        ? `确认更正原结果：${decision === "PASS" ? "有效" : "无效"}`
+        : decision === "PASS"
+          ? "确认审核通过"
+          : decision === "INVALID"
+            ? "确认记录无效"
+            : "退回一次补证",
+      correction ? "sports.review.correct" : "sports.review.decide",
       [
         ...reasonFields(decision),
         {
           key: "publicExplanation",
-          label: "公开补充说明（学生可见）",
+          label: correction
+            ? "更正依据与原因（必填，学生可见）"
+            : "公开补充说明（学生可见）",
           type: "textarea",
-          optional: true,
+          optional: !correction,
         },
         {
           key: "checksCompleted",
@@ -249,9 +254,29 @@ export function SportsReview({
                     {String((r.data.publicReason as { zh: string }).zh)}
                   </p>
                 )}
+                {["VALID", "INVALID"].includes(String(r.data.status)) && (
+                  <div className="live-actions">
+                    <button
+                      disabled={busy}
+                      onClick={() => review(r, "PASS", true)}
+                    >
+                      依据原材料更正为有效
+                    </button>
+                    <button
+                      disabled={busy}
+                      onClick={() => review(r, "INVALID", true)}
+                    >
+                      依据原材料更正为无效
+                    </button>
+                  </div>
+                )}
                 {!!r.data.publicExplanation && (
                   <p>{String(r.data.publicExplanation)}</p>
                 )}
+                <SportsReviewHistory
+                  recordId={r.id}
+                  events={data.reviewEvents}
+                />
               </article>
             ))}
           </div>

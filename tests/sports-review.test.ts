@@ -38,6 +38,125 @@ afterEach(async () => {
   for (const close of closes.splice(0).reverse()) await close();
 });
 
+it("责任教师更正结果重算进度并保留原材料、判断、轮次与通知", async () => {
+  const f = await fixture();
+  f.manual();
+  f.decide("PASS");
+  const before = f.repo.get(f.record.id),
+    media = f.repo.all("sportsMaterial"),
+    rounds = f.repo.all("sportsReviewRound"),
+    events = f.repo.all("sportsReviewEvent"),
+    notifications = Number(
+      f.db.prepare("SELECT COUNT(*) AS n FROM notifications").get()?.n,
+    );
+  const input = {
+      id: before.id,
+      version: before.version,
+      batchId: before.data.batchId,
+      decision: "INVALID",
+      reason: "MISMATCH",
+      checksCompleted: true,
+      publicExplanation: "核对已有材料后确认与本次运动不符",
+    },
+    key = randomUUID();
+  const corrected = f.run(f.teacher, "sports.review.correct", input, key);
+  f.run(f.teacher, "sports.review.correct", input, key);
+  expect(corrected.data.status).toBe("INVALID");
+  expect(
+    f.repo
+      .all("sportsProgress")
+      .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence))[0].data
+      .total,
+  ).toBe(0);
+  expect(f.repo.all("sportsProgress").some((p) => p.data.total === 35)).toBe(
+    true,
+  );
+  expect(f.repo.all("sportsMaterial")).toEqual(media);
+  expect(f.repo.all("sportsReviewRound")).toEqual(rounds);
+  for (const event of events) expect(f.repo.get(event.id)).toEqual(event);
+  expect(
+    f.repo
+      .all("sportsReviewEvent")
+      .filter((e) => e.data.action === "CORRECTION"),
+  ).toHaveLength(1);
+  expect(
+    Number(f.db.prepare("SELECT COUNT(*) AS n FROM notifications").get()?.n),
+  ).toBe(notifications + 1);
+  const passed = f.run(f.teacher, "sports.review.correct", {
+    ...input,
+    version: corrected.version,
+    decision: "PASS",
+    publicExplanation: "完成必要复核后，原无效依据不成立",
+  });
+  expect(passed.data.status).toBe("VALID");
+  expect(
+    f.repo
+      .all("sportsProgress")
+      .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence))[0].data
+      .total,
+  ).toBe(35);
+});
+
+it("普通更正不能恢复補证，仍强制责任教师、检查、公开依据、原因及版本", async () => {
+  const f = await fixture();
+  f.manual();
+  f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
+  const start = Number(f.repo.get(f.record.id).data.supplementStartedAt);
+  vi.spyOn(Date, "now").mockReturnValue(start + 24 * 3600000);
+  await processSportsReview(f.db, {});
+  const teacher = login(f.db, "teacher@example.test", "Review-test-123"),
+    admin = login(f.db, "admin@example.test", "Review-test-123"),
+    other = login(f.db, "other@example.test", "Review-test-123"),
+    record = f.repo.get(f.record.id);
+  const input = {
+    id: record.id,
+    version: record.version,
+    batchId: record.data.batchId,
+    decision: "PASS",
+    checksCompleted: true,
+    publicExplanation: "仅根据原已存在材料更正，不重新补证",
+  };
+  expect(() => f.run(admin, "sports.review.correct", input)).toThrow(
+    /体育身份/,
+  );
+  expect(() => f.run(other, "sports.review.correct", input)).toThrow(
+    /本人负责/,
+  );
+  expect(() =>
+    f.run(teacher, "sports.review.correct", { ...input, decision: "RETURN" }),
+  ).toThrow(/不能重新开放/);
+  expect(() =>
+    f.run(teacher, "sports.review.correct", {
+      ...input,
+      publicExplanation: "",
+    }),
+  ).toThrow(/publicExplanation/);
+  expect(() =>
+    f.run(teacher, "sports.review.correct", {
+      ...input,
+      checksCompleted: false,
+    }),
+  ).toThrow(/检查/);
+  expect(() =>
+    f.run(teacher, "sports.review.correct", {
+      ...input,
+      decision: "INVALID",
+      reason: "AUTHENTICITY",
+    }),
+  ).toThrow(/公开原因/);
+  const saved = f.run(teacher, "sports.review.correct", input);
+  expect(saved.data.supplementUsed).toBe(true);
+  expect(saved.data.supplementStartedAt).toBe(start);
+  expect(() => f.run(teacher, "sports.review.correct", input)).toThrow(
+    /记录已变化/,
+  );
+  expect(f.repo.all("sportsReviewRound")).toHaveLength(1);
+});
+
 it("晚确认事故纠正错误逾期，排除错误锁定且只恢复原剩余时间，原终局永久保留", async () => {
   const f = await fixture();
   f.manual();
@@ -159,20 +278,44 @@ it("事故补偿仍采用并集，重复事故引用拒绝，真实逾期不能�
 });
 
 it("平台故障证据仅总管理员可治理，学生只读取本人公开期限调整", async () => {
-  const f=await fixture();f.manual();const record=f.decide("RETURN",{reason:"UNCLEAR",hours:24,canSupplementOriginal:true});
-  const start=Number(record.data.supplementStartedAt);
-  vi.spyOn(Date,"now").mockReturnValue(start+3600000);
-  const input={reference:"PRIVATE-TECH-REF",evidenceRef:"只供治理核对的技术依据",reason:"公开平台影响说明",recordIdsText:record.id,startAt:new Date(start).toISOString(),endAt:new Date(start+1800000).toISOString()};
-  expect(()=>f.run(f.student,"sports.incident.confirm",input)).toThrow(/体育身份/);
-  expect(()=>f.run(f.teacher,"sports.incident.confirm",input)).toThrow(/体育身份/);
-  expect(()=>f.run(f.admin,"sports.incident.confirm",{...input,endAt:new Date(start+7200000).toISOString()})).toThrow(/未来时间/);
-  f.run(f.admin,"sports.incident.confirm",input);
-  expect(incidentWorkspace(f.repo,f.student.account).incidents).toEqual([]);
-  const view=materialWorkspace(f.repo,f.student.account);
+  const f = await fixture();
+  f.manual();
+  const record = f.decide("RETURN", {
+    reason: "UNCLEAR",
+    hours: 24,
+    canSupplementOriginal: true,
+  });
+  const start = Number(record.data.supplementStartedAt);
+  vi.spyOn(Date, "now").mockReturnValue(start + 3600000);
+  const input = {
+    reference: "PRIVATE-TECH-REF",
+    evidenceRef: "只供治理核对的技术依据",
+    reason: "公开平台影响说明",
+    recordIdsText: record.id,
+    startAt: new Date(start).toISOString(),
+    endAt: new Date(start + 1800000).toISOString(),
+  };
+  expect(() => f.run(f.student, "sports.incident.confirm", input)).toThrow(
+    /体育身份/,
+  );
+  expect(() => f.run(f.teacher, "sports.incident.confirm", input)).toThrow(
+    /体育身份/,
+  );
+  expect(() =>
+    f.run(f.admin, "sports.incident.confirm", {
+      ...input,
+      endAt: new Date(start + 7200000).toISOString(),
+    }),
+  ).toThrow(/未来时间/);
+  f.run(f.admin, "sports.incident.confirm", input);
+  expect(incidentWorkspace(f.repo, f.student.account).incidents).toEqual([]);
+  const view = materialWorkspace(f.repo, f.student.account);
   expect(view.deadlineAdjustments).toHaveLength(1);
   expect(JSON.stringify(view)).not.toContain("只供治理核对");
   expect(view.deadlineAdjustments[0].data.reason).toBe("公开平台影响说明");
-  expect(materialWorkspace(f.repo,f.other.account).deadlineAdjustments).toEqual([]);
+  expect(
+    materialWorkspace(f.repo, f.other.account).deadlineAdjustments,
+  ).toEqual([]);
 });
 
 it("P04核对原轮次、当前记录及结算后继版本，冲突不产生部分修复", async () => {

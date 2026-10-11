@@ -182,16 +182,30 @@ export function sportsReviewCommand(
     completeBatch(repo, record);
     return repo.save(record, { status: "PENDING_AI", technicalCode: null });
   }
-  if (action !== "sports.review.decide") return undefined;
+  if (action !== "sports.review.decide" && action !== "sports.review.correct")
+    return undefined;
+  const correction = action === "sports.review.correct";
   sportsAvailable(repo);
   const record = repo.get(input.id, "sportsRecord");
-  ownedCourse(repo, actor, record.data.courseId);
+  const course = ownedCourse(repo, actor, record.data.courseId);
   version(record, input);
   demand(
-    record.data.status === "TEACHER_PENDING",
-    "当前记录不在教师待办，不能覆盖已有判断。",
+    correction
+      ? ["VALID", "INVALID"].includes(String(record.data.status))
+      : record.data.status === "TEACHER_PENDING",
+    correction
+      ? "只能依据已有事实更正已形成的有效或无效结果。"
+      : "当前记录不在教师待办，不能覆盖已有判断。",
     409,
   );
+  if (correction)
+    demand(
+      course.data.settlementStatus !== "SETTLED" &&
+        repo.get(record.data.semesterId, "sportsSemester").data.status !==
+          "ARCHIVED",
+      "结算或归档记录需由历史报告更正入口同步产生新版报告；该入口尚待完成。",
+      409,
+    );
   const batch = completeBatch(repo, record);
   demand(input.batchId === batch.id, "审核材料版本已变化。", 409);
   demand(input.checksCompleted === true, "须完成规定检查与必要复核后确认。 ");
@@ -200,6 +214,11 @@ export function sportsReviewCommand(
     "INVALID",
     "RETURN",
   ] as const);
+  demand(
+    !correction || decision !== "RETURN",
+    "普通误判更正不能重新开放补证。",
+    409,
+  );
   const reason =
     decision === "PASS"
       ? undefined
@@ -209,7 +228,12 @@ export function sportsReviewCommand(
       reason && (reason.actions as readonly string[]).includes(decision),
       "请选择适用于本动作的固定公开原因。",
     );
-  const publicExplanation = textField(input, "publicExplanation", 1000, true);
+  const publicExplanation = textField(
+    input,
+    "publicExplanation",
+    1000,
+    !correction,
+  );
   if (decision === "RETURN") {
     demand(
       record.data.supplementUsed !== true,
@@ -260,19 +284,32 @@ export function sportsReviewCommand(
   repo.create("sportsReviewEvent", actor.id, {
     recordId: record.id,
     batchId: batch.id,
-    action: decision,
+    action: correction ? "CORRECTION" : decision,
+    decision,
+    ...(correction
+      ? {
+          previousStatus: record.data.status,
+          previousPublicReason: record.data.publicReason ?? null,
+          previousPublicExplanation: record.data.publicExplanation ?? "",
+          previousDecisionAt: record.data.lastDecisionAt ?? null,
+        }
+      : {}),
     reason: reason ?? null,
     publicExplanation,
     at: now,
     previousRecordVersion: record.version,
     resultRecordVersion: saved.version,
   });
-  recalculateProgress(repo, saved, `TEACHER_${decision}`);
+  recalculateProgress(
+    repo,
+    saved,
+    `TEACHER_${correction ? "CORRECTION_" : ""}${decision}`,
+  );
   repo.notify(
     [record.ownerId!],
     record.id,
     action,
-    `${decision === "PASS" ? "运动记录审核通过" : decision === "RETURN" ? "运动记录需一次补证" : "运动记录无效"}${reason ? `：${reason.zh}` : ""}${publicExplanation ? `；${publicExplanation}` : ""}`,
+    `${correction ? "原审核结果已更正：" : ""}${decision === "PASS" ? "运动记录审核通过" : decision === "RETURN" ? "运动记录需一次补证" : "运动记录无效"}${reason ? `：${reason.zh}` : ""}${publicExplanation ? `；${publicExplanation}` : ""}`,
   );
   return saved;
 }

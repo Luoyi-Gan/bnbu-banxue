@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, command, sportsChangedEvent, type LiveEntity } from "./api";
 import { SportsSupplement } from "./SportsSupplement";
+import { SportsReviewHistory } from "./SportsReviewHistory";
 
 export interface MaterialData {
   records: LiveEntity[];
@@ -22,7 +23,7 @@ export function SportsMaterials({
   data,
 }: {
   session: LiveEntity;
-  data: MaterialData;
+  data: MaterialData & { reviewEvents?: LiveEntity[] };
 }) {
   const [files, setFiles] = useState<File[]>([]),
     [category, setCategory] = useState("RELATED"),
@@ -224,6 +225,12 @@ export function SportsMaterials({
         </>
       )}
       {record && <p>记录编号：{record.id}</p>}
+      {record && (
+        <SportsReviewHistory
+          recordId={record.id}
+          events={data.reviewEvents ?? []}
+        />
+      )}
       {record &&
         data.deadlineAdjustments
           ?.filter((a) => a.data.recordId === record.id)
