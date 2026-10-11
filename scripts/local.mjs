@@ -22,7 +22,9 @@ const { startBackend } = await import(
   pathToFileURL(resolve(".runtime/backend.mjs")).href
 );
 const backend = await startBackend();
-const frontend = await createServer();
+const frontend = await createServer({
+  server: { host: process.env.BNBU_WEB_HOST ?? "127.0.0.1" },
+});
 await frontend.listen();
 frontend.printUrls();
 async function shutdown() {

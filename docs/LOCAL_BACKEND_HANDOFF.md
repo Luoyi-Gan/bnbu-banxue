@@ -76,6 +76,10 @@
 
 发现两个公开体育候选：`chchaiai/BNBU-Sports-Backend` 与 `chchaiai/BNBU-SPORTS-ONLINE-VERSION`。伴学内置教师协议是 `3.0.0-web-snapshot`，sourceCommit `72ddb5e468e0188e6b5a8ea8321f6056700ccb96`，SHA-256 `baba5b43b23046d97d1b403430b0d819328abdab420fd40b790c5977ebbc74de`。ONLINE-VERSION 当前文档 SHA-256 `a915b2007be0c275b9760e4ce6a175e8c8da530bd610a169100f343b90741f67`，不能默认视为兼容。原后端本地说明依赖 PostgreSQL、MinIO、Mailpit；本机未发现 Docker。需要权威版本明确后继续落地，不能重新发明体育学时替代。
 
+## 2026-10-11 Docker 更新
+
+用户已配置并授权使用 Docker。实际检查 Linux 引擎与 Compose 均可用；新增本地容器入口，配置检查通过。首次构建因 Docker Hub 认证连接超时未完成，不能报告容器验收成功。启动、隔离数据卷及测试账号说明见 [Docker 本地启动](DOCKER_LOCAL.md)。上文“本机未发现 Docker”为历史状态，已失效。体育权威来源与本地测试身份也已由用户确认，当前以 BUSINESS_RULES 开头补充决定为准。
+
 ## 本地归档与续接
 
 源码按 AGENTS 要求仅本地精确路径提交，没有推送、合并或部署。归档目录 `D:\伴学\archive\2026-10-11-bnbu-backend` 将保存 Git bundle、交接文件、验收截图、校验清单和一致性 SQLite 备份；凭据只留本地，不进入 Git。重启验收入口不重置现有记录。
