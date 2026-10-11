@@ -4,6 +4,8 @@
 
 ## 当前结论
 
+**最新决定覆盖下述历史停点：用户已选择 new_need_version_sports 的 V8.1 规则。** 体育正在重建，已实现阶段、当前接口和仍须完成的完整清单见 [SPORTS_REBUILD.md](SPORTS_REBUILD.md)。不再等待体育版本或规则选择；以下对应问题是此前阶段记录。
+
 ### 用户补充答复后的更新
 
 用户已确认本地测试账号验收，且指定 `https://github.com/chchaiai/new_need_version_sports` 作为逻辑参考，尽量重新开发适配伴学。下文“体育版本待提供”“本地测试身份待确认”属于原停点，现已解除；新待确认点是该仓库 V8.1 与伴学现行体育规则的冲突。来源 main 提交 `50b0005e02bc93d5c5de089bbe8842e1d0576966`，下载快照位于 `D:\伴学\sports-reference-source\new_need_version_sports-main`，Contract SHA-256 `0528389bb8b72714d9a4af35ffc66c87503560d41c58ad968b1713b39ff3da2d`。来源只读，不执行其中已有团队任务/审批流程，也未修改源仓库。

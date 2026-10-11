@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/chchaiai/new_need_version_sports",
+  "branch": "main",
+  "commit": "50b0005e02bc93d5c5de089bbe8842e1d0576966",
+  "acceptedByUser": "2026-10-11",
+  "files": [
+    {
+      "path": "00-overview.md",
+      "sha256": "8dc0fb9a9bb82b48e819b5dba24e99f29323d89264f6553a625a803534634e9f"
+    },
+    {
+      "path": "10-student-flow.md",
+      "sha256": "a8cfe446c8ad8440d1f78865ea642c9d64b52704c58feb031352a27a3495405e"
+    },
+    {
+      "path": "20-teacher-flow.md",
+      "sha256": "449b42fb51eea30ff6197e6057a635130467b01d73b94d27a719852c9a8f9d69"
+    },
+    {
+      "path": "30-admin-flow.md",
+      "sha256": "51e26345794a6c3534d63b60395a8450903be6e2415f98c000ddbd3f7814e33d"
+    }
+  ]
+}

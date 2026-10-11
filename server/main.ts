@@ -14,7 +14,8 @@ import {
 } from "./auth";
 import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
-import type { Fields } from "./repository";
+import { Repository, type Fields } from "./repository";
+import { sportsWorkspace } from "./sports/courses";
 import { recognize } from "./timetable";
 import { student } from "./community";
 import { sendVerification } from "./mail-delivery";
@@ -166,6 +167,15 @@ export function createApiServer(
         return send(response, 200, {
           account: authenticate(db, cookieToken(request)),
         });
+      if (request.method === "GET" && pathname === "/api/sports/workspace")
+        return send(
+          response,
+          200,
+          sportsWorkspace(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+          ),
+        );
       if (request.method === "GET" && pathname === "/api/workspace")
         return send(
           response,
