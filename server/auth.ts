@@ -43,6 +43,7 @@ export interface Account {
 type AccountRow = Omit<Account, "roles"> & {
   roles: string;
   password_hash: string;
+  login_kind: "PERSONAL" | "ADMIN";
 };
 const account = (row: AccountRow): Account => ({
   id: row.id,
@@ -163,7 +164,11 @@ export function register(
     "验证码错误。",
   );
   demand(
-    !db.prepare("SELECT id FROM accounts WHERE email=?").get(email),
+    !db
+      .prepare(
+        "SELECT id FROM accounts WHERE email=? AND login_kind='PERSONAL'",
+      )
+      .get(email),
     "该邮箱已注册。",
     409,
   );
@@ -187,6 +192,33 @@ export function register(
 const failures = new Map<string, { count: number; until: number }>();
 export function login(db: Database, rawEmail: unknown, rawPassword: unknown) {
   const email = normalizeEmail(rawEmail);
+  return credentialLogin(db, email, rawPassword, "PERSONAL");
+}
+export function loginAdministrator(
+  db: Database,
+  rawName: unknown,
+  rawPassword: unknown,
+) {
+  demand(
+    typeof rawName === "string" &&
+      rawName.trim().length > 0 &&
+      rawName.trim().length <= 100,
+    "请填写管理登录账号。",
+  );
+  return credentialLogin(
+    db,
+    rawName.trim().toLowerCase(),
+    rawPassword,
+    "ADMIN",
+  );
+}
+function credentialLogin(
+  db: Database,
+  identifier: string,
+  rawPassword: unknown,
+  kind: "PERSONAL" | "ADMIN",
+) {
+  const email = kind + ":" + identifier;
   demand(typeof rawPassword === "string", "邮箱或密码错误。", 401);
   const previous = failures.get(email),
     now = Date.now();
@@ -195,8 +227,13 @@ export function login(db: Database, rawEmail: unknown, rawPassword: unknown) {
     "登录尝试过多，请十五分钟后重试。",
     429,
   );
-  const row = db.prepare("SELECT * FROM accounts WHERE email=?").get(email) as
-    AccountRow | undefined;
+  const row = db
+    .prepare(
+      kind === "PERSONAL"
+        ? "SELECT * FROM accounts WHERE email=? AND login_kind='PERSONAL'"
+        : "SELECT * FROM accounts WHERE login_name=? AND login_kind='ADMIN'",
+    )
+    .get(identifier) as AccountRow | undefined;
   const fallback = "00000000000000000000000000000000:" + "00".repeat(64);
   const valid = matchesPassword(rawPassword, row?.password_hash ?? fallback);
   if (!row || !valid) {
@@ -207,6 +244,19 @@ export function login(db: Database, rawEmail: unknown, rawPassword: unknown) {
     throw new ServiceError(401, "INVALID_CREDENTIALS", "邮箱或密码错误。");
   }
   failures.delete(email);
+  if (kind === "ADMIN") {
+    if (row.status !== "active")
+      throw new ServiceError(403, "ACCOUNT_DISABLED", "管理账号已停用。");
+    demand(
+      db
+        .prepare(
+          "SELECT 1 FROM entities WHERE kind='sportsIdentity' AND owner_id=? AND json_extract(data,'$.role')='admin' AND json_extract(data,'$.status')='verified'",
+        )
+        .get(row.id),
+      "管理账号身份不可用。",
+      403,
+    );
+  }
   const token = randomBytes(32).toString("base64url");
   db.prepare("INSERT INTO sessions VALUES(?,?,?,?)").run(
     digest(token),
@@ -225,5 +275,7 @@ export function authenticate(db: Database, token: string | undefined) {
     .get(digest(token), Date.now()) as AccountRow | undefined;
   if (!row)
     throw new ServiceError(401, "UNAUTHENTICATED", "登录已过期，请重新登录。");
+  if (row.login_kind === "ADMIN" && row.status !== "active")
+    throw new ServiceError(403, "ACCOUNT_DISABLED", "管理账号已停用。");
   return account(row);
 }

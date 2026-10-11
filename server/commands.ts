@@ -26,6 +26,8 @@ import { sportsIncidentCommand } from "./sports/incidents";
 import { sportsSwimCommand } from "./sports/swimming";
 import { sportsPasswordCommand } from "./sports/password";
 import { sportsTeacherAccountCommand } from "./sports/teacher-accounts";
+import { sportsAdministratorCommand } from "./sports/administrators";
+import { requireSportsSuperAdmin } from "./sports/permissions";
 import { sportsFeedbackCommand } from "./sports/feedback";
 import { sportsHelpCommand } from "./sports/help";
 import { sportsConversionCommand } from "./sports/conversion";
@@ -60,6 +62,8 @@ export function execute(
     demand(actor.status !== "banned", "账号已封禁，不能进行业务写入。", 403);
     if (action !== "sports.password.change") sportsAccountGate(repo, actor);
     sportsWriteGate(repo, action);
+    if (action.startsWith("sports.admins."))
+      requireSportsSuperAdmin(repo, actor);
     const booleanArguments: Record<string, string> = {
       "content.review": "",
       "room.decide": "accept",
@@ -154,6 +158,7 @@ export function execute(
       result =
         sportsPasswordCommand(repo, actor, token, action, input) ??
         sportsTeacherAccountCommand(repo, actor, action, input) ??
+        sportsAdministratorCommand(repo, actor, action, input) ??
         sportsFeedbackCommand(repo, actor, action, input) ??
         sportsHelpCommand(repo, actor, action, input) ??
         sportsConversionCommand(repo, actor, action, input) ??

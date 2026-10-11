@@ -58,7 +58,13 @@ function validateRows(repo: Repository, csv: string) {
     }
     if (emails.has(email)) errors.push("本批邮箱重复");
     if (employees.has(raw.employee_id)) errors.push("本批工号重复");
-    if (repo.db.prepare("SELECT id FROM accounts WHERE email=?").get(email))
+    if (
+      repo.db
+        .prepare(
+          "SELECT id FROM accounts WHERE email=? AND login_kind='PERSONAL'",
+        )
+        .get(email)
+    )
       errors.push("邮箱与现有账号冲突");
     if (
       repo

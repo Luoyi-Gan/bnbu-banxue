@@ -327,3 +327,17 @@ GET /api/sports/accounts/students 或 /teachers，须当前有效体育管理员
 验证：Windows与Docker Linux各42文件293项测试通过；前后端类型、Lint、构建通过，原500KB分块提示保留。新增测试覆盖查询无副作用、当前/历史学期与移出状态、邮箱换绑不沿用核验、组合筛选、分页、重复身份、权限撤销、首次改密、维护门禁和HTTP禁止缓存。Docker镜像重建成功，配置sha256:12b75fa6186e7069bd7e832fcd9233225c011841fa4f59b3ebc1526aa60ce60f；本轮运行容器测试，未另起健康验证容器。宿主Acceptance服务已更新；新增目录未浏览器点击验收。
 
 用户本轮确认分管理员使用独立管理登录账号，停用不得影响其原学生/教师登录。该决定已记录业务规则；下一步实现独立凭据/登录名与账号治理，不能将当前只读目录称为完整账号治理。仍有平台故障首版传输恢复、复杂P04复核、名单历史更正、正式身份与邮箱流程、完整规则和浏览器验收等未完成项。OCR按已确认决定保留可配置接口。完整goal继续。
+
+## 独立分管理员账号：建号、资料权限编辑、启停及登录
+
+schema v4事务重建accounts，新增login_kind=PERSONAL|ADMIN与唯一login_name，邮箱唯一键为(email,login_kind)。旧行按PERSONAL保留原ID和所有关联；关闭外键检查仅限迁移事务外围，提交前foreign_key_check，不合格回滚，finally恢复外键。迁移前一致备份before-admin-namespaces.sqlite；本地Acceptance迁移后integrity_check=ok、foreign_key_check=[]。普通注册/邮箱登录/教师批量邮箱冲突检查限定PERSONAL，避免同邮箱管理账号挤占原身份。现有总管理员仍使用原邮箱登录，不自动转换角色或凭据。
+
+POST /api/auth/admin-login {loginName,password}为独立管理登录入口，规范化小写登录名，使用共享scrypt与会话机制，但限流键按登录空间区分；不接受学校邮箱替代登录名，停用返回ACCOUNT_DISABLED且不签发会话。GET /api/sports/administrators只向当前总管理员返回管理账号正向字段及已核验人员候选，不含密码、凭据或私有身份扩展。首次改密、维护和权限门禁继续生效，旧幂等请求也先校验总管理员职责。
+
+命令sports.admins.create：personId,loginName,name,email,department可选,permissions,initialPassword,confirmPassword,confirmed=true。选择当前有效且存在verified体育身份的PERSONAL人员，仅建立独立ADMIN账号与admin体育身份，不复制教师/学生角色。至少一项固定权限，禁止额外字段、重复邮箱或登录名。初始密码只需非空且相等，mustChangePassword=true。sports.admins.edit：id为身份对象ID、version,name,email,department,permissions,confirmed；拒绝登录名和任何密码字段，邮箱变更清除旧邮箱核验。sports.admins.state：id,version,status=ACTIVE|DISABLED,confirmed，停用另需handoverConfirmed=true；撤销仅此管理账号的会话，启用不复活旧会话、不恢复已收回权限。所有写入复用统一事务、版本、回执及审计，并追加sportsAdminHistory。
+
+网页/v2/login增加独立分管理员登录类型，/workspace总管理员体育区域提供已核验人员选择、创建、资料权限编辑和启停。保存前显示完整权限及高风险标记，普通编辑不显示密码字段；初次登录继续原本人改密入口。当前尚未提供删除/本人注销和已验证邮箱密码找回，不宣称完整账号治理完成。
+
+验证：Windows/Docker Linux各43文件297项测试通过，双端类型、Lint与构建通过（原大块提示保留）。覆盖同邮箱不同凭据、首改门禁、本人改密与其他会话失效、管理停用保留原个人登录、启用仅当前权限、重复/越权/非法字段回滚、实际HTTP Cookie/门禁和旧库迁移外键。Docker镜像重建成功，配置sha256:a4cb0247e54fa1b54831394ba25f846a58175e76ebab85b802ae539f2b05c80b。本轮运行容器测试，未另起健康验证容器。
+
+宿主实际HTTP验收已通过：建立local.sports.admin.one、首次门禁、本人改密、停用后原管理会话401、原教师会话仍200、启用后重新登录并查询学生目录。该独立本地测试账号留在启用状态，权限ACCOUNTS/HELP；凭据仅本地data/admin-acceptance-account.json，非秘密结果data/admin-acceptance-result.json，均不提交Git。网页尚未点击验收。剩余包括删除和注销历史匿名化、正式邮箱绑定/找回、平台故障恢复/复杂复核、名单历史更正及全流程规则和浏览器验收；真实外部依赖见前述配置，OCR继续可配置接口。完整goal继续。

@@ -9,6 +9,7 @@ import {
   demand,
   digest,
   login,
+  loginAdministrator,
   register,
   ServiceError,
 } from "./auth";
@@ -17,6 +18,7 @@ import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { accountDirectory } from "./sports/account-directory";
+import { administratorDirectory } from "./sports/administrators";
 import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
@@ -339,8 +341,14 @@ export function createApiServer(
         }
         if (pathname === "/api/auth/register")
           return send(response, 201, register(db, input));
-        if (pathname === "/api/auth/login") {
-          const result = login(db, input.email, input.password);
+        if (
+          pathname === "/api/auth/login" ||
+          pathname === "/api/auth/admin-login"
+        ) {
+          const result =
+            pathname === "/api/auth/admin-login"
+              ? loginAdministrator(db, input.loginName, input.password)
+              : login(db, input.email, input.password);
           response.setHeader(
             "Set-Cookie",
             `bnbu_session=${result.token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`,
@@ -576,6 +584,15 @@ export function createApiServer(
           ),
         );
       }
+      if (request.method === "GET" && pathname === "/api/sports/administrators")
+        return send(
+          response,
+          200,
+          administratorDirectory(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+          ),
+        );
       const directory = /^\/api\/sports\/accounts\/(students|teachers)$/.exec(
         pathname,
       );
