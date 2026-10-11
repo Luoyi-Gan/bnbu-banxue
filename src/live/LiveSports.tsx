@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsTeacherAccounts } from "./SportsTeacherAccounts";
 import { SportsCourseManagement } from "./SportsCourseManagement";
 
 interface SportsData
@@ -18,6 +19,7 @@ interface SportsData
     IncidentData {
   identity: LiveEntity;
   firstLoginOnly?: boolean;
+  teacherImports?: LiveEntity[];
   administratorAccess?: { superAdmin: boolean; permissions: string[] };
   semesters: LiveEntity[];
   templates: LiveEntity[];
@@ -210,6 +212,13 @@ export function LiveSports({
       </section>
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
+      {data.administratorAccess?.permissions.includes("ACCOUNTS") && (
+        <SportsTeacherAccounts
+          imports={data.teacherImports ?? []}
+          open={open}
+          busy={busy}
+        />
+      )}
       {(role === "teacher" || role === "admin") && changePassword}
       <SportsIncidents data={data} open={open} busy={busy} />
       {role === "admin" && (

@@ -16,6 +16,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import {
   requiresPasswordChange,
   sportsAccountGate,
@@ -273,6 +274,7 @@ export function createApiServer(
         return send(response, 200, {
           ...system,
           ...sportsWorkspace(repo, actor),
+          ...teacherAccountWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),
           ...calendarWorkspace(repo, actor),

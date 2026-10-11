@@ -8,6 +8,7 @@ import { sportsWorkspace } from "../server/sports/courses";
 
 const databases: Database[] = [];
 afterEach(() => {
+  vi.unstubAllEnvs();
   databases.splice(0).forEach((db) => db.close());
   vi.useRealTimers();
 });
@@ -676,4 +677,76 @@ it("首次改密HTTP只返回必要状态，媒体请求被阻断且管理员维
     server.closeAllConnections();
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
+});
+
+it("教师CSV预览后整批建立，独立账号携带首次改密门禁且密码不存业务记录", () => {
+  const f = setup();
+  vi.stubEnv("BNBU_SCHOOL_EMAIL_DOMAINS", "school.example.test");
+  const batch = f.run(f.admin, "sports.teachers.preview", {
+    csv: 'employee_id,name,email,college\r\n001,"张,老师",one@school.example.test,体育\r\n002,李老师,two@school.example.test,体育',
+  });
+  expect(batch.data.canCreate).toBe(true);
+  const secret = "Batch-Secret-987";
+  const created = f.run(f.admin, "sports.teachers.create", {
+    id: batch.id,
+    version: batch.version,
+    confirmed: true,
+    initialPassword: secret,
+    confirmPassword: secret,
+  });
+  expect(created.data.status).toBe("CREATED");
+  const teacher = login(f.db, "one@school.example.test", secret);
+  expect(teacher.account.name).toBe("张,老师");
+  expect(() => f.run(teacher, "sports.course.save", f.courseInput)).toThrow(
+    "初始密码",
+  );
+  expect(JSON.stringify(f.repo.all("sportsTeacherImport"))).not.toContain(
+    secret,
+  );
+  expect(
+    JSON.stringify(f.db.prepare("SELECT * FROM audit").all()),
+  ).not.toContain(secret);
+  expect(
+    f.repo.all("sportsIdentity").filter((i) => i.data.importId === batch.id),
+  ).toHaveLength(2);
+});
+it("教师CSV错误和预览后冲突整批拒绝，未知学校域名及密码列不会默认放行", () => {
+  const f = setup();
+  vi.stubEnv("BNBU_SCHOOL_EMAIL_DOMAINS", "");
+  const csv =
+    "employee_id,name,email\n01,A,a@school.example.test\n02,B,b@school.example.test";
+  expect(() => f.run(f.admin, "sports.teachers.preview", { csv })).toThrow(
+    "尚未配置",
+  );
+  vi.stubEnv("BNBU_SCHOOL_EMAIL_DOMAINS", "school.example.test");
+  expect(() =>
+    f.run(f.admin, "sports.teachers.preview", {
+      csv: csv.replace("email\n", "email,password\n"),
+    }),
+  ).toThrow("不得包含密码");
+  const invalid = f.run(f.admin, "sports.teachers.preview", {
+    csv: csv.replace("b@school.example.test", "a@school.example.test"),
+  });
+  expect(invalid.data.canCreate).toBe(false);
+  const batch = f.run(f.admin, "sports.teachers.preview", { csv });
+  createAccount(f.db, {
+    email: "b@school.example.test",
+    name: "existing",
+    password: "Existing-123",
+  });
+  expect(() =>
+    f.run(f.admin, "sports.teachers.create", {
+      id: batch.id,
+      version: batch.version,
+      confirmed: true,
+      initialPassword: "Initial-123",
+      confirmPassword: "Initial-123",
+    }),
+  ).toThrow("整批未建立");
+  expect(
+    f.db
+      .prepare("SELECT id FROM accounts WHERE email=?")
+      .get("a@school.example.test"),
+  ).toBeUndefined();
+  expect(f.repo.get(batch.id).data.status).toBe("PREVIEW");
 });

@@ -140,3 +140,13 @@ sports.password.change(version,currentPassword,newPassword,confirmPassword)仅�
 体育teacher/admin身份mustChangePassword=true时，所有业务命令在幂等回执读取前拒绝（仅sports.password.change例外）。体育角色与记录读取同样检查；体育工作台仅返回身份、必要模式公告和firstLoginOnly，关闭治理权限/历史；通用工作台返回空业务集合，避免通过伴学审计或其他身份绕过。媒体、课表识别、身份核验受阻；网页只显示首次改密入口，保留退出。教师维护期间仅公告并保留门禁；管理员可本人改密，但不能借维护治理跳过门禁。成功改密清除标记后重新获取当前数据。
 
 33文件219项测试、双端类型、Lint、构建通过。新增实际HTTP验证首次工作台无课程/通用业务/审计、媒体403 PASSWORD_CHANGE_REQUIRED；命令测试覆盖旧幂等请求不能绕过、改密后恢复、维护AI治理仍受阻。新增网页点击验收未完成。账号创建流程尚须设置临时密码标记；现有独立测试账号未被擅自重置为初始密码状态。账号创建/停用删除/自助找回及其余完整业务继续推进。
+
+## 2026-10-13 教师批量建号
+
+sports.teachers.preview(csv)要求ACCOUNTS权限，支持粘贴UTF-8 CSV及引号/逗号字段；列仅employee_id,name,email与可选college，禁止密码列，每批1–500行。逐行校验必填、学校域名、批内工号/邮箱重复及现有账号冲突，保存本人预览。sports.teachers.create(id,version,confirmed,initialPassword,confirmPassword)再次全量校验与权限检查，初始密码至少8位且含大小写字母和数字，两次一致；任何失败整批回滚。确认明确要求逐行核实真实教师邮箱和受控告知初始密码。
+
+新账号保存独立scrypt凭据、teacher角色及体育身份，自动mustChangePassword=true；密码不在CSV、预览、业务实体或审计中保存明文。workspace仅有ACCOUNTS权限者可读取本人的teacherImports预览。网页已接通预览表和确认建号，无后台代改个人密码功能。
+
+配置BNBU_SCHOOL_EMAIL_DOMAINS为逗号分隔的已确认学校域名，未配置拒绝建号。正式域名已向用户询问，尚未确认；Start-Local.ps1 -Acceptance在未指定域名时仅设example.test，用于用户已授权的独立本地测试，不证明学校身份。实际运行环境当前也仅配置此测试域名。
+
+33文件221项测试、双端类型、Lint、构建通过；验证带引号CSV、整批成功、首次改密门禁、密码无明文持久化、未配置域名拒绝、密码列拒绝、重复行、预览后冲突整批不建。新增网页点击、正式学校域名/实际教师身份未验收。教师账号删除与历史主体处理、分管理员治理、学生注册及其他完整范围继续进行。
