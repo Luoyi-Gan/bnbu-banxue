@@ -6,6 +6,7 @@ import { completeBatch, enqueueTeacher, manualMode } from "./review";
 import { recalculateProgress } from "./progress";
 import { expireSupplements } from "./supplements";
 import { flagExpiredTransfers } from "./material-transfer";
+import { checkDeadlineReminders } from "./deadline-reminders";
 import { checkReviewReminders } from "./calendar";
 
 const running = new WeakSet<Database>();
@@ -31,6 +32,7 @@ export async function processSportsReview(
     transaction(db, () => flagExpiredTransfers(repo));
     transaction(db, () => expireSupplements(repo));
     transaction(db, () => checkReviewReminders(repo));
+    transaction(db, () => checkDeadlineReminders(repo));
     const record = repo
       .all("sportsRecord")
       .find((r) => r.data.status === "PENDING_AI");

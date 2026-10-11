@@ -15,6 +15,11 @@ export function courseReport(
 ) {
   sportsWriteGate(repo, "sports.report.read");
   const course = ownedCourse(repo, actor, courseId);
+  return buildCourseReport(repo, course);
+}
+/** Shared read-only source projection for authorized readers and server reminders. */
+export function buildCourseReport(repo: Repository, course: Entity) {
+  const courseId = course.id;
   const now = Date.now();
   const cache = new Map<string, Entity[]>();
   const inCourse = (kind: string) => {

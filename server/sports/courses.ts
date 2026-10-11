@@ -9,6 +9,7 @@ import {
   type Fields,
 } from "../repository";
 import { businessWeek, selectCredit, type CreditCandidate } from "./credit";
+import { checkDeadlineReminders } from "./deadline-reminders";
 import { sportsAccountGate } from "./account-gate";
 import {
   administratorAccess,
@@ -292,7 +293,12 @@ export function sportsCourseCommand(
     currentSemester(repo, course.data.semesterId);
     demand(course.data.status === "DRAFT", "课程已发布，不能重复发布。", 409);
     checkFeasibility(course.data);
-    return repo.save(course, { status: "PUBLISHED", enrollmentOpen: true });
+    const published = repo.save(course, {
+      status: "PUBLISHED",
+      enrollmentOpen: true,
+    });
+    checkDeadlineReminders(repo, Date.now(), published);
+    return published;
   }
   if (action === "sports.course.close") {
     const course = ownedCourse(repo, actor, input.id);
