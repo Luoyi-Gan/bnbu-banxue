@@ -1010,3 +1010,75 @@ it("换算表编辑整表验证及版本冲突，历史结果不被修改", asyn
   );
   expect(table.version).toBe(2);
 });
+
+it("教师内部成绩接受完整INT而非0到100，发布历史保留且学生无分数或通知", async () => {
+  const f = managementFixture();
+  const { gradeWorkspace } = await import("../server/sports/grades");
+  const count = Number(
+    f.db.prepare("SELECT count(*) n FROM notifications").get()?.n,
+  );
+  let draft = f.run(f.teacher, "sports.grade.save", {
+    enrollmentId: f.member.id,
+    version: 0,
+    score: 120,
+  });
+  const first = f.run(f.teacher, "sports.grade.publish", {
+    id: draft.id,
+    version: draft.version,
+  });
+  draft = f.repo.get(draft.id);
+  draft = f.run(f.teacher, "sports.grade.save", {
+    enrollmentId: f.member.id,
+    version: draft.version,
+    score: -5,
+  });
+  const second = f.run(f.teacher, "sports.grade.publish", {
+    id: draft.id,
+    version: draft.version,
+  });
+  expect(second.data).toMatchObject({
+    score: -5,
+    sequence: 2,
+    previousId: first.id,
+  });
+  expect(f.repo.get(first.id).data.score).toBe(120);
+  expect(gradeWorkspace(f.repo, f.student.account)).toEqual({
+    gradeDrafts: [],
+    gradePublications: [],
+  });
+  expect(gradeWorkspace(f.repo, f.admin.account)).toEqual({
+    gradeDrafts: [],
+    gradePublications: [],
+  });
+  expect(
+    gradeWorkspace(f.repo, f.teacher.account).gradePublications,
+  ).toHaveLength(2);
+  expect(
+    Number(f.db.prepare("SELECT count(*) n FROM notifications").get()?.n),
+  ).toBe(count);
+  expect(f.repo.all("sportsProgress")).toHaveLength(0);
+});
+it("最终成绩拒绝备注、非整数、越权、陈旧版本和结算后直接覆盖", () => {
+  const f = managementFixture(),
+    input = { enrollmentId: f.member.id, version: 0, score: 1 };
+  expect(() => f.run(f.admin, "sports.grade.save", input)).toThrow("体育身份");
+  expect(() =>
+    f.run(f.teacher, "sports.grade.save", { ...input, note: "隐藏成绩备注" }),
+  ).toThrow("不接受备注");
+  expect(() =>
+    f.run(f.teacher, "sports.grade.save", { ...input, score: 1.5 }),
+  ).toThrow("score");
+  expect(() =>
+    f.run(f.teacher, "sports.grade.save", { ...input, score: 2147483648 }),
+  ).toThrow("score");
+  const draft = f.run(f.teacher, "sports.grade.save", input);
+  expect(() => f.run(f.teacher, "sports.grade.save", input)).toThrow("已变化");
+  f.repo.save(f.course, { settlementStatus: "SETTLED" });
+  expect(() =>
+    f.run(f.teacher, "sports.grade.publish", {
+      id: draft.id,
+      version: draft.version,
+    }),
+  ).toThrow("历史报告更正");
+  expect(f.repo.all("sportsGradePublication")).toHaveLength(0);
+});

@@ -20,6 +20,7 @@ import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
+import { gradeWorkspace } from "./sports/grades";
 import {
   requiresPasswordChange,
   sportsAccountGate,
@@ -91,7 +92,11 @@ export function createApiServer(
         return send(response, 200, {
           ok: true,
           storage: "sqlite",
-          schemaVersion: Number(db.prepare("SELECT MAX(version) AS version FROM schema_migrations").get()?.version ?? 0),
+          schemaVersion: Number(
+            db
+              .prepare("SELECT MAX(version) AS version FROM schema_migrations")
+              .get()?.version ?? 0,
+          ),
         });
       // Same-origin mutations; media has an explicit non-simple binary content type.
       if (request.method === "POST") {
@@ -279,6 +284,7 @@ export function createApiServer(
           ...sportsWorkspace(repo, actor),
           ...teacherAccountWorkspace(repo, actor),
           ...conversionWorkspace(repo, actor),
+          ...gradeWorkspace(repo, actor),
           ...feedbackWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),

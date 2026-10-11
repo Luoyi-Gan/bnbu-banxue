@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsGrades } from "./SportsGrades";
 import { SportsConversion } from "./SportsConversion";
 import { SportsHelp } from "./SportsHelp";
 import { SportsFeedback } from "./SportsFeedback";
@@ -24,6 +25,8 @@ interface SportsData
   firstLoginOnly?: boolean;
   teacherImports?: LiveEntity[];
   conversionTables?: LiveEntity[];
+  gradeDrafts?: LiveEntity[];
+  gradePublications?: LiveEntity[];
   feedback?: LiveEntity[];
   feedbackReplies?: LiveEntity[];
   canManageFeedback?: boolean;
@@ -387,6 +390,16 @@ export function LiveSports({
         {data.courses.map((c) => (
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
+            {role === "teacher" && (
+              <SportsGrades
+                course={c}
+                members={data.enrollments}
+                drafts={data.gradeDrafts ?? []}
+                publications={data.gradePublications ?? []}
+                open={open}
+                busy={busy}
+              />
+            )}
             <p>{String(c.data.description)}</p>
             <p>
               {states[String(c.data.status)]} · 门槛{String(c.data.threshold)}

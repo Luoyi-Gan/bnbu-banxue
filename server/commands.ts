@@ -29,6 +29,7 @@ import { sportsTeacherAccountCommand } from "./sports/teacher-accounts";
 import { sportsFeedbackCommand } from "./sports/feedback";
 import { sportsHelpCommand } from "./sports/help";
 import { sportsConversionCommand } from "./sports/conversion";
+import { sportsGradeCommand } from "./sports/grades";
 import {
   sportsAccountGate,
   requiresPasswordChange,
@@ -150,6 +151,7 @@ export function execute(
         sportsFeedbackCommand(repo, actor, action, input) ??
         sportsHelpCommand(repo, actor, action, input) ??
         sportsConversionCommand(repo, actor, action, input) ??
+        sportsGradeCommand(repo, actor, action, input) ??
         communityCommand(repo, actor, action, input) ??
         coffeeCommand(repo, actor, action, input) ??
         governanceCommand(repo, actor, action, input) ??
