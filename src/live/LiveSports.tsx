@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsCourseManagement } from "./SportsCourseManagement";
 
 interface SportsData
   extends
@@ -21,6 +22,8 @@ interface SportsData
   courses: LiveEntity[];
   enrollments: LiveEntity[];
   invitations: LiveEntity[];
+  makeups?: LiveEntity[];
+  studentStatus?: string;
   sessions: LiveEntity[];
   serverNow: number;
   recoveryCourses?: LiveEntity[];
@@ -327,6 +330,9 @@ export function LiveSports({
               )}
               {role === "student" &&
                 c.data.status === "PUBLISHED" &&
+                data.enrollments.some(
+                  (e) => e.data.courseId === c.id && e.data.status === "ACTIVE",
+                ) &&
                 !running && (
                   <>
                     {action("开始普通运动", "sports.session.start", {
@@ -347,6 +353,40 @@ export function LiveSports({
                 }
               </p>
             )}
+            {role === "teacher" &&
+              c.data.settlementStatus !== "SETTLED" &&
+              data.semesters.some(
+                (s) =>
+                  s.id === c.data.semesterId && s.data.status === "CURRENT",
+              ) && (
+                <SportsCourseManagement
+                  course={c}
+                  enrollments={data.enrollments}
+                  makeups={data.makeups ?? []}
+                  open={open}
+                  busy={busy}
+                />
+              )}
+            {role === "student" && (
+              <p>
+                {data.enrollments.some(
+                  (e) => e.data.courseId === c.id && e.data.status === "ACTIVE",
+                )
+                  ? "已进班"
+                  : "已退班，保留原记录"}
+              </p>
+            )}
+            {role === "student" &&
+              (data.makeups ?? [])
+                .filter(
+                  (m) => m.data.courseId === c.id && m.data.status === "ACTIVE",
+                )
+                .map((m) => (
+                  <p key={m.id}>
+                    指定补练窗口：{date(m.data.startAt)} 至 {date(m.data.endAt)}
+                    ，仍遵守课程每日时间及日周上限。
+                  </p>
+                ))}
           </article>
         ))}
       </div>

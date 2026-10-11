@@ -204,3 +204,209 @@ it("邀请到期、撤销和课程关闭均阻止新入班，保留历史", () =
   ).toThrow("未开放");
   expect(f.repo.all("sportsInvitation")).toHaveLength(2);
 });
+
+function managementFixture() {
+  const f = setup();
+  const draft = f.run(f.teacher, "sports.course.save", f.courseInput);
+  const course = f.run(f.teacher, "sports.course.publish", {
+    id: draft.id,
+    version: draft.version,
+  });
+  const invite = f.run(f.teacher, "sports.invitation.create", {
+    courseId: course.id,
+  });
+  const member = f.run(f.student, "sports.enrollment.join", {
+    code: invite.data.code,
+  });
+  return { ...f, course, invite, member };
+}
+it("移出保留旧会话并阻止新起点，恢复同一成员而不复制历史", () => {
+  const f = managementFixture();
+  vi.setSystemTime(new Date("2026-10-12T10:00:00+08:00"));
+  const student = login(f.db, f.student.account.email, "Sports-test-123"),
+    teacher = login(f.db, f.teacher.account.email, "Sports-test-123");
+  const session = f.run(student, "sports.session.start", {
+    courseId: f.course.id,
+  });
+  const removed = f.run(teacher, "sports.enrollment.remove", {
+    id: f.member.id,
+    version: f.member.version,
+    reason: "隔离测试转班",
+  });
+  expect(sportsWorkspace(f.repo, student.account).studentStatus).toBe(
+    "PENDING",
+  );
+  const ended = f.run(student, "sports.session.end", {
+    id: session.id,
+    version: session.version,
+  });
+  expect((ended.data.clock as { state: string }).state).toBe("ENDED");
+  expect(() =>
+    f.run(student, "sports.session.start", { courseId: f.course.id }),
+  ).toThrow("有效成员");
+  expect(() =>
+    f.run(student, "sports.enrollment.join", { code: f.invite.data.code }),
+  ).toThrow();
+  const restored = f.run(teacher, "sports.enrollment.restore", {
+    id: removed.id,
+    version: removed.version,
+    reason: "恢复原班",
+  });
+  expect(restored.id).toBe(f.member.id);
+  expect(sportsWorkspace(f.repo, student.account).studentStatus).toBe("ACTIVE");
+  expect(f.repo.all("sportsEnrollment")).toHaveLength(1);
+  expect(f.repo.get(ended.id)).toEqual(ended);
+  expect(f.repo.all("sportsCourseHistory")).toHaveLength(2);
+});
+it("恢复不覆盖已加入的新班，跨教师、原因缺失及陈旧版本均拒绝", () => {
+  const f = managementFixture();
+  expect(() =>
+    f.run(f.student, "sports.enrollment.remove", {
+      id: f.member.id,
+      version: f.member.version,
+      reason: "越权",
+    }),
+  ).toThrow("体育身份");
+  expect(() =>
+    f.run(f.teacher, "sports.enrollment.remove", {
+      id: f.member.id,
+      version: f.member.version,
+      reason: " ",
+    }),
+  ).toThrow("reason");
+  const removed = f.run(f.teacher, "sports.enrollment.remove", {
+    id: f.member.id,
+    version: f.member.version,
+    reason: "转班",
+  });
+  const second = f.repo.create("sportsCourse", f.teacher.account.id, {
+    ...f.course.data,
+    name: "新班",
+  });
+  const invitation = f.run(f.teacher, "sports.invitation.create", {
+    courseId: second.id,
+  });
+  f.run(f.student, "sports.enrollment.join", { code: invitation.data.code });
+  expect(() =>
+    f.run(f.teacher, "sports.enrollment.restore", {
+      id: removed.id,
+      version: removed.version,
+      reason: "恢复",
+    }),
+  ).toThrow("另一个有效");
+  expect(f.repo.get(removed.id)).toEqual(removed);
+  expect(() =>
+    f.run(f.teacher, "sports.enrollment.restore", {
+      id: removed.id,
+      version: 1,
+      reason: "旧请求",
+    }),
+  ).toThrow("已变化");
+  const outsider = createAccount(f.db, {
+    email: "outsider@example.test",
+    name: "其他教师",
+    password: "Sports-test-123",
+    roles: [],
+  });
+  f.repo.create("sportsIdentity", outsider, {
+    role: "teacher",
+    status: "verified",
+  });
+  const other = login(f.db, "outsider@example.test", "Sports-test-123");
+  expect(() =>
+    f.run(other, "sports.enrollment.restore", {
+      id: removed.id,
+      version: removed.version,
+      reason: "接管",
+    }),
+  ).toThrow("本人负责");
+});
+it("入班关闭撤销原邀请，重开不复活；名称修正保留锁定规则", () => {
+  const f = managementFixture();
+  let course = f.run(f.teacher, "sports.course.enrollment", {
+    id: f.course.id,
+    version: f.course.version,
+    open: false,
+    reason: "停止新增成员",
+  });
+  expect(f.repo.get(f.invite.id).data.status).toBe("REVOKED");
+  course = f.run(f.teacher, "sports.course.enrollment", {
+    id: course.id,
+    version: course.version,
+    open: true,
+    reason: "重新开放",
+  });
+  expect(f.repo.get(f.invite.id).data.status).toBe("REVOKED");
+  expect(() =>
+    f.run(f.teacher, "sports.course.describe", {
+      id: course.id,
+      version: course.version,
+      name: "新名称",
+      description: "新说明",
+      reason: "勘误",
+    }),
+  ).toThrow("确认");
+  const changed = f.run(f.teacher, "sports.course.describe", {
+    id: course.id,
+    version: course.version,
+    name: "新名称",
+    description: "新说明",
+    reason: "勘误",
+    confirmed: true,
+    threshold: 60,
+  });
+  expect(changed.data.threshold).toBe(30);
+  expect(changed.data.name).toBe("新名称");
+  expect(f.repo.all("sportsCourseHistory").find(event => event.data.action === "sports.course.describe")?.data.before).toEqual(course.data);
+});
+it("指定补练仅允许七天收尾和有效成员，撤销阻止新开始但不截断原会话", () => {
+  const f = managementFixture();
+  const base = {
+    courseId: f.course.id,
+    version: f.course.version,
+    enrollmentId: f.member.id,
+    reason: "指定补练",
+  };
+  expect(() =>
+    f.run(f.teacher, "sports.makeup.create", {
+      ...base,
+      startAt: "2026-12-31T08:00:00+08:00",
+      endAt: "2027-01-01T18:00:00+08:00",
+    }),
+  ).toThrow("七天收尾");
+  expect(() =>
+    f.run(f.teacher, "sports.makeup.create", {
+      ...base,
+      startAt: "2027-01-07T08:00:00+08:00",
+      endAt: "2027-01-08T00:00:01+08:00",
+    }),
+  ).toThrow("七天收尾");
+  const window = f.run(f.teacher, "sports.makeup.create", {
+    ...base,
+    startAt: "2027-01-01T08:00:00+08:00",
+    endAt: "2027-01-01T18:00:00+08:00",
+  });
+  vi.setSystemTime(new Date("2027-01-01T09:00:00+08:00"));
+  const student = login(f.db, f.student.account.email, "Sports-test-123"),
+    teacher = login(f.db, f.teacher.account.email, "Sports-test-123");
+  const session = f.run(student, "sports.session.start", {
+    courseId: f.course.id,
+  });
+  expect((session.data.clock as { businessDate: string }).businessDate).toBe(
+    "2027-01-01",
+  );
+  f.run(teacher, "sports.makeup.revoke", {
+    id: window.id,
+    version: window.version,
+    reason: "关闭余下窗口",
+  });
+  const ended = f.run(student, "sports.session.end", {
+    id: session.id,
+    version: session.version,
+  });
+  expect((ended.data.clock as { state: string }).state).toBe("ENDED");
+  expect(() =>
+    f.run(student, "sports.session.start", { courseId: f.course.id }),
+  ).toThrow("补练窗口");
+  expect(f.repo.get(f.course.id).data.deadlineDate).toBe("2026-12-31");
+});

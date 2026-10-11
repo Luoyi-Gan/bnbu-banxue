@@ -156,3 +156,14 @@ sports.review.correct输入id/version/batchId/checksCompleted=true/decision=PASS
 - sports.record.accept的activityType须匹配原会话。游泳files[]增加phase=BEFORE/AFTER/AUXILIARY，恰好一份BEFORE匹配开始前锁定指纹且至少一份AFTER，两者都须照片，仍受总计6照片/1视频限制。正常严格早于结束+15分钟；offlineDelay=true另需非空delayExplanation，严格早于结束+24小时。两者锁批续传截止均为受理+30分钟。
 - 离线游泳材料全部到账后status=TEACHER_PENDING、queueSource=SWIM_OFFLINE_DELAY，保留说明、不创建AI任务、不使用补证机会。真实格式校验继续走现有二进制上传接口。
 - 游泳sports.supplement.prepare的reuseIds必须保留原BEFORE和AFTER；新照片仅作AUXILIARY，不允许事后替换原取证。补证受理沿用原24/72小时窗口。
+
+## 课程与成员管理命令
+
+以下均仅原责任教师、当前未结算学期，沿用全局维护拦截、事务和幂等。所有命令需version和reason；追加sportsCourseHistory并通知受影响学生。
+
+- sports.course.describe：id/name/description/confirmed=true；只改名称说明，不改发布规则。
+- sports.course.enrollment：id/open:boolean；仅PUBLISHED。关闭时撤销现有有效邀请，重开不恢复旧邀请码。
+- sports.enrollment.remove、sports.enrollment.restore：id为成员关系。ACTIVE→REMOVED及REMOVED→ACTIVE；恢复须课程未关闭且无同学期其他有效班。原对象ID、原记录及原会话保持。
+- sports.makeup.create：courseId、version为课程版本、enrollmentId、startAt/endAt（ISO带时区）。当前有效成员，课程未关闭，开始不早于服务器当前时刻，窗口限常规截止次日00:00起七天内。返回sportsMakeup。
+- sports.makeup.revoke：id/version为补练窗口，撤销后不允许依该窗口建立新运动，已有合法会话不变。
+- workspace增加本人或责任教师可见makeups、由当前成员关系推导的studentStatus；教师成员投影只增加账号姓名摘要，不公开邮箱/密码或其他课程数据。

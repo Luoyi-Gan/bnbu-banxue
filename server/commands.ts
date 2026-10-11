@@ -15,6 +15,7 @@ import { activityCommand } from "./activities";
 import { alumniCommand, readAlumni } from "./alumni";
 import { bookingStatus } from "../src/v2/alumniPolicy";
 import { sportsCourseCommand } from "./sports/courses";
+import { sportsCourseManagementCommand } from "./sports/course-management";
 import { sportsSessionCommand } from "./sports/sessions";
 import { sportsMaterialCommand } from "./sports/materials";
 import { sportsReviewCommand } from "./sports/review";
@@ -144,6 +145,7 @@ export function execute(
         sportsIncidentCommand(repo, actor, action, input) ??
         sportsSwimCommand(repo, actor, action, input) ??
         sportsCourseCommand(repo, actor, action, input) ??
+        sportsCourseManagementCommand(repo, actor, action, input) ??
         sportsSessionCommand(repo, actor, action, input) ??
         sportsMaterialCommand(repo, actor, action, input) ??
         sportsReviewCommand(repo, actor, action, input) ??

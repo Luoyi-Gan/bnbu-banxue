@@ -386,6 +386,25 @@ export function sportsWorkspace(repo: Repository, actor: Account) {
     );
   return {
     identity,
+    studentStatus:
+      role === "student"
+        ? enrollment.some(
+            (e) =>
+              e.data.semesterId === current?.id && e.data.status === "ACTIVE",
+          )
+          ? "ACTIVE"
+          : "PENDING"
+        : null,
+    makeups:
+      role === "teacher" || role === "student"
+        ? repo
+            .all("sportsMakeup")
+            .filter(
+              (m) =>
+                courses.some((c) => c.id === m.data.courseId) &&
+                (role === "teacher" || m.ownerId === actor.id),
+            )
+        : [],
     semesters: repo.all("sportsSemester"),
     templates: repo.all("sportsTemplate"),
     courses,
@@ -394,6 +413,16 @@ export function sportsWorkspace(repo: Repository, actor: Account) {
         ? repo
             .all("sportsEnrollment")
             .filter((e) => courses.some((c) => c.id === e.data.courseId))
+            .map((e) => ({
+              ...e,
+              data: {
+                ...e.data,
+                studentName:
+                  repo.db
+                    .prepare("SELECT name FROM accounts WHERE id=?")
+                    .get(e.ownerId!)?.name ?? "历史学生",
+              },
+            }))
         : role === "student"
           ? enrollment
           : [],
