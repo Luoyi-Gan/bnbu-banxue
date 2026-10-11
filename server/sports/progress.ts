@@ -8,17 +8,25 @@ export function recalculateProgress(
   record: Entity,
   cause: string,
 ) {
-  const course = repo.get(record.data.courseId, "sportsCourse");
+  return repo.create("sportsProgress", record.ownerId, {
+    ...calculateProgress(repo, String(record.data.courseId), record.ownerId),
+    cause,
+    at: Date.now(),
+  });
+}
+/** Read-only calculation shares the exact selection policy with persisted progress. */
+export function calculateProgress(
+  repo: Repository,
+  courseId: string,
+  ownerId: string | null,
+) {
+  const course = repo.get(courseId, "sportsCourse");
   const records = repo
     .all("sportsRecord")
-    .filter(
-      (r) => r.ownerId === record.ownerId && r.data.courseId === course.id,
-    );
+    .filter((r) => r.ownerId === ownerId && r.data.courseId === course.id);
   const previous = repo
     .all("sportsProgress")
-    .filter(
-      (p) => p.ownerId === record.ownerId && p.data.courseId === course.id,
-    )
+    .filter((p) => p.ownerId === ownerId && p.data.courseId === course.id)
     .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence))[0];
   const effective = records.filter((r) => r.data.status === "VALID");
   const candidates: CreditCandidate[] = effective.map((r) => {
@@ -36,7 +44,7 @@ export function recalculateProgress(
     .all("sportsCertification")
     .filter(
       (c) =>
-        c.ownerId === record.ownerId &&
+        c.ownerId === ownerId &&
         c.data.courseId === course.id &&
         c.data.status === "VALID",
     );
@@ -82,12 +90,10 @@ export function recalculateProgress(
                 : "已计入",
     };
   });
-  return repo.create("sportsProgress", record.ownerId, {
+  return {
     courseId: course.id,
     sequence: Number(previous?.data.sequence ?? 0) + 1,
     predecessorId: previous?.id ?? null,
-    cause,
-    at: Date.now(),
     ...result,
     details,
     candidateVersions: effective.map((r) => ({ id: r.id, version: r.version })),
@@ -95,5 +101,5 @@ export function recalculateProgress(
       id: c.id,
       version: c.version,
     })),
-  });
+  };
 }

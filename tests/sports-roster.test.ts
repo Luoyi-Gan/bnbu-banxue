@@ -36,6 +36,11 @@ function setup() {
   const course = repo.create("sportsCourse", teacher.account.id, {
     semesterId: semester.id,
     status: "PUBLISHED",
+    name: "测试教学班",
+    threshold: 30,
+    weeklyLimit: 2,
+    relatedTarget: 600,
+    otherTarget: 600,
   });
   repo.create("sportsEnrollment", student.account.id, {
     courseId: course.id,
@@ -259,7 +264,7 @@ it("名单XLSX两列保留实际行号，公式缓存不能直接成为正式名
     "S001",
     { formula: '"student"', result: "student" },
   ];
-  sheet.getRow(9).values=["仅学院，没有身份字段"];
+  sheet.getRow(9).values = ["仅学院，没有身份字段"];
   const bytes = Buffer.from(await book.xlsx.writeBuffer());
   const source = await uploadRosterFile(
     f.repo,
@@ -284,9 +289,15 @@ it("名单XLSX两列保留实际行号，公式缓存不能直接成为正式名
     name: "student",
     reason: "对照学校原件确认姓名原文",
   });
-  expect((draft.data.rows as unknown[])).toHaveLength(2);
-  expect(()=>f.confirm(draft)).toThrow("错误字段");
-  draft=f.run(f.teacher,"sports.roster.row",{id:draft.id,version:draft.version,row:3,exclude:true,reason:"对照学校原件确认非人员说明行"});
+  expect(draft.data.rows as unknown[]).toHaveLength(2);
+  expect(() => f.confirm(draft)).toThrow("错误字段");
+  draft = f.run(f.teacher, "sports.roster.row", {
+    id: draft.id,
+    version: draft.version,
+    row: 3,
+    exclude: true,
+    reason: "对照学校原件确认非人员说明行",
+  });
   expect(f.confirm(draft).data.rawRowCount).toBe(2);
 });
 it("名单文件真实HTTP上传/下载隔离，编码、行数和100MB上限在服务端拒绝", async () => {
@@ -349,6 +360,144 @@ it("名单文件真实HTTP上传/下载隔离，编码、行数和100MB上限在
           })
         ).status,
       ).toBe(403);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((r) => server.close(() => r()));
+  }
+});
+it("综合报告分别统计注册、体测、计入和待办，复用选择算法且不改变教学事实", async () => {
+  const { courseReport, reportCsv } = await import("../server/sports/report");
+  const f = setup();
+  const snap = f.confirm(
+    f.preview("student_number,name\nS001,student\nS002,=1+1"),
+  );
+  const make = (status: string, minutes: number, category = "RELATED") => {
+    const clock = {
+      state: "ENDED",
+      startedAt: Date.parse("2026-01-05T01:00:00Z"),
+      changedAt: Date.parse("2026-01-05T02:00:00Z"),
+      endedAt: Date.parse("2026-01-05T02:00:00Z"),
+      businessDate: "2026-01-05",
+      activeMilliseconds: minutes * 60000,
+    };
+    const session = f.repo.create("sportsSession", f.student.account.id, {
+      courseId: f.course.id,
+      clock,
+    });
+    return f.repo.create("sportsRecord", f.student.account.id, {
+      courseId: f.course.id,
+      sessionId: session.id,
+      status,
+      category,
+      activeMilliseconds: minutes * 60000,
+    });
+  };
+  make("VALID", 40);
+  make("VALID", 60);
+  make("INVALID", 50);
+  make("TECHNICAL", 45);
+  f.repo.create("sportsEndurance", f.student.account.id, {
+    courseId: f.course.id,
+    event: 800,
+    seconds: 270,
+    testDate: "2026-01-02",
+    conversion: { score: 987, grade: "PRIVATE_GRADE" },
+  });
+  f.repo.create("sportsGrade", f.student.account.id, {
+    courseId: f.course.id,
+    score: 12345,
+    remark: "PRIVATE_REMARK",
+  });
+  const before = f.db.prepare("SELECT COUNT(*) AS n FROM entities").get()?.n;
+  const report = courseReport(f.repo, f.teacher.account, f.course.id);
+  expect(report.snapshotId).toBe(snap.id);
+  expect(report.denominator).toBe(2);
+  const row = report.rows.find((r) => r.studentNumber === "S001")!;
+  expect(row.registration).toBe("INCOMPLETE");
+  expect(row.facts).toMatchObject({
+    enduranceStatus: "RECORDED",
+    actualMinutes: 195,
+    invalidMinutes: 50,
+    validUncountedMinutes: 40,
+    categoryTotals: [60, 0],
+    targets: [600, 600],
+    remaining: [540, 600],
+    met: false,
+    pendingRecords: 1,
+  });
+  expect(report.rows.find((r) => r.studentNumber === "S002")?.facts).toBeNull();
+  expect(report.rows.find((r) => r.studentNumber === "OUT")?.source).toBe(
+    "MEMBER",
+  );
+  expect(report.unresolved).toContainEqual({
+    code: "PENDING_RECORD",
+    count: 1,
+  });
+  expect(f.db.prepare("SELECT COUNT(*) AS n FROM entities").get()?.n).toBe(
+    before,
+  );
+  const csv = reportCsv(report);
+  expect(csv).toContain("'=1+1");
+  expect(csv).toContain(snap.id);
+  for (const secret of [
+    "PRIVATE_GRADE",
+    "PRIVATE_REMARK",
+    '"score":',
+    '"conversion":',
+    '"remark":',
+  ])
+    expect(JSON.stringify(report) + csv).not.toContain(secret);
+});
+it("重复名单不合并身份，回退报告基准不抹除成员事实，未确认名单不虚报完成", async () => {
+  const { courseReport } = await import("../server/sports/report");
+  const f = setup();
+  expect(courseReport(f.repo, f.teacher.account, f.course.id)).toMatchObject({
+    snapshotId: null,
+    denominator: null,
+    unresolved: expect.arrayContaining([
+      { code: "NO_CONFIRMED_ROSTER", count: 1 },
+    ]),
+  });
+  f.confirm(f.preview("学号,姓名\nS001,student\nS001,student"));
+  const report = courseReport(f.repo, f.teacher.account, f.course.id);
+  expect(report.denominator).toBeNull();
+  expect(
+    report.rows.filter((r) => r.source === "SCHOOL").map((r) => r.facts),
+  ).toEqual([null, null]);
+  expect(report.rows.filter((r) => r.source === "MEMBER")).toHaveLength(2);
+});
+it("综合报告HTTP下载仅责任教师，首次改密与维护门禁不能绕过", async () => {
+  const f = setup(),
+    { createApiServer } = await import("../server/main");
+  const server = createApiServer(f.db);
+  await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+  const base = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/sports/course-reports/${f.course.id}`;
+  const get = (token: string, suffix = "") =>
+    fetch(base + suffix, { headers: { Cookie: `bnbu_session=${token}` } });
+  try {
+    f.repo.create("sportsIdentity", f.other.account.id, {
+      role: "teacher",
+      status: "verified",
+    });
+    expect((await get(f.other.token)).status).toBe(403);
+    for (const suffix of ["", ".csv"]) {
+      for (const who of [f.student, f.admin])
+        expect((await get(who.token, suffix)).status).toBe(403);
+    }
+    const csv = await get(f.teacher.token, ".csv");
+    expect(csv.status).toBe(200);
+    expect(csv.headers.get("cache-control")).toBe("no-store");
+    expect(await csv.text()).toContain("生成时间");
+    f.repo.save(f.course, { status: "CLOSED" });
+    expect((await get(f.teacher.token)).status).toBe(200);
+    const identity = f.repo
+      .all("sportsIdentity")
+      .find((i) => i.ownerId === f.teacher.account.id)!;
+    f.repo.save(identity, { mustChangePassword: true });
+    expect((await get(f.teacher.token)).status).toBe(403);
+    f.repo.save(f.repo.get(identity.id), { mustChangePassword: false });
+    f.repo.create("sportsSystem", f.admin.account.id, { mode: "MAINTENANCE" });
+    expect((await get(f.teacher.token, ".csv")).status).toBe(503);
   } finally {
     server.closeAllConnections();
     await new Promise<void>((r) => server.close(() => r()));

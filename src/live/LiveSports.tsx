@@ -8,6 +8,7 @@ import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
 import { SportsRosterFiles } from "./SportsRosterFiles";
+import { SportsReport } from "./SportsReport";
 import { SportsRoster, type RosterCheck } from "./SportsRoster";
 import { SportsOcr } from "./SportsOcr";
 import { SportsWorkbook } from "./SportsWorkbook";
@@ -414,6 +415,7 @@ export function LiveSports({
         {data.courses.map((c) => (
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
+            {role === "teacher" && <SportsReport key={c.version} course={c} />}
             {role === "teacher" && (
               <SportsOcr
                 purpose="ROSTER"

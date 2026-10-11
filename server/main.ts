@@ -21,6 +21,7 @@ import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
 import { rosterWorkspace } from "./sports/roster";
+import { courseReport, reportCsv } from "./sports/report";
 import { uploadRosterFile } from "./sports/roster-files";
 import { enduranceImportWorkspace } from "./sports/endurance-import";
 import { uploadWorkbook, workbookAccess } from "./sports/workbook";
@@ -502,6 +503,24 @@ export function createApiServer(
           "Content-Security-Policy": "default-src 'none'",
         });
         return response.end(bytes);
+      }
+      const reportRead =
+        /^\/api\/sports\/course-reports\/([a-f0-9-]+)(\.csv)?$/.exec(pathname);
+      if (request.method === "GET" && reportRead) {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request));
+        const report = courseReport(repo, actor, reportRead[1]);
+        if (!reportRead[2]) return send(response, 200, report);
+        const bytes = Buffer.from(reportCsv(report), "utf8");
+        response.writeHead(200, {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="course-report.csv"',
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          "Content-Length": bytes.length,
+        });
+        response.end(bytes);
+        return;
       }
       const rosterRead = /^\/api\/sports\/roster-sources\/([a-f0-9-]+)$/.exec(
         pathname,
