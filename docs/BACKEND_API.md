@@ -19,6 +19,7 @@ Node.js 24（使用 `node:sqlite`），SQLite WAL，单进程 HTTP 服务。网�
 | POST `/api/auth/register` | `{email,code,password}`；成功 `{registered:true}`，不自动登录或授予角色 |
 | POST `/api/auth/login` | `{email,password}`；成功 `{authenticated:true,account}`，设置 Cookie |
 | POST `/api/auth/logout` | `{}`；删除当前会话 |
+| POST `/api/identity/check` | 仅接受 `{}`，使用当前登录账号核验；返回 `{verified,subject,checkedAt,authorizationChanged:false}`，不改变职责或体育资格 |
 | GET `/api/auth/me` | 当前账号，未经授权返回 401 |
 | GET `/api/workspace` | 本人可见实体、账号、展示人员、校友、通知、本人关系；有权人员额外获得审核/运营记录 |
 | POST `/api/commands` | 下述命令信封；成功 `{data:{id}}` |
@@ -37,6 +38,8 @@ JSON 写请求必须发送 `Content-Type: application/json`，上限 12MB。浏�
 同一账号同一 `requestId`、相同内容返回原结果；不同内容返回 409。所有业务命令在 `BEGIN IMMEDIATE` 内复核权限、状态、容量及冲突，同时提交业务、站内通知、审计和请求回执。失败回滚。客户端遇到响应不确定时保留同一幂等键重试，收到明确结果后才更新页面。
 
 ## 命令目录
+
+真实身份核验适配：服务端配置 `BNBU_IDENTITY_VERIFICATION_URL` 和可选 `BNBU_IDENTITY_VERIFICATION_TOKEN`。上游接收 `{requestId,accountId,email}`，必须回传相同 requestId/email、明确布尔 verified，verified=true 时还需非空 subject。不跟随重定向；十秒超时或非法/错账号/旧请求响应返回 502；未配置返回 503，不返回假成功。角色映射和学校正式授权政策独立实施，当前不采纳上游 roles。测试只验证适配边界，不是学校真实核验。
 
 未列出的客户端字段不能授予资格。所有 `id`、`slotId` 等来自服务端，不用姓名判断归属。日期使用带时区的 ISO 时间，邮件显式字段沿用现有北京时间格式。
 

@@ -357,6 +357,9 @@ export function snapshot(db: Database, actor: Account) {
           .all()
       : [],
     capabilities: {
+      schoolIdentity: process.env.BNBU_IDENTITY_VERIFICATION_URL
+        ? "configured"
+        : "external-service-required",
       sports: process.env.BNBU_SPORTS_ORIGIN
         ? "configured"
         : "external-service-required",

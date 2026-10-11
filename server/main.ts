@@ -18,6 +18,7 @@ import type { Fields } from "./repository";
 import { recognize } from "./timetable";
 import { student } from "./community";
 import { sendVerification } from "./mail-delivery";
+import { checkSchoolIdentity } from "./identity";
 
 const cookieToken = (request: IncomingMessage) =>
   request.headers.cookie
@@ -121,6 +122,17 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        if (pathname === "/api/identity/check") {
+          demand(
+            Object.keys(input).length === 0,
+            "核验对象只能来自当前登录账号。",
+          );
+          return send(
+            response,
+            200,
+            await checkSchoolIdentity(authenticate(db, token)),
+          );
+        }
         if (pathname === "/api/auth/logout") {
           db.prepare("DELETE FROM sessions WHERE token_hash=?").run(
             digest(token!),
