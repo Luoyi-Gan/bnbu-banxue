@@ -12,12 +12,15 @@ export function SportsOcr({
   sources,
   open,
   busy,
+  purpose = "ENDURANCE",
 }: {
   course: LiveEntity;
   sources: LiveEntity[];
   open: OpenForm;
   busy: boolean;
+  purpose?: "ENDURANCE" | "ROSTER";
 }) {
+  const label = purpose === "ROSTER" ? "纸质学校名单" : "纸质成绩单";
   const [files, setFiles] = useState<File[]>([]),
     [pending, setPending] = useState(false),
     [error, setError] = useState("");
@@ -38,11 +41,14 @@ export function SportsOcr({
           throw Error("每批须为1–20张原图且合计不超过100MB。");
         const form = new FormData();
         files.forEach((f) => form.append("images", f));
-        const response = await fetch(`/api/sports/ocr-sources/${course.id}`, {
-          method: "POST",
-          credentials: "same-origin",
-          body: form,
-        });
+        const response = await fetch(
+          `/api/sports/${purpose === "ROSTER" ? "roster-ocr" : "ocr-sources"}/${course.id}`,
+          {
+            method: "POST",
+            credentials: "same-origin",
+            body: form,
+          },
+        );
         const value = await response.json();
         if (!response.ok) throw Error(value.message ?? "原图上传失败");
         setFiles([]);
@@ -56,7 +62,7 @@ export function SportsOcr({
   }
   return (
     <details>
-      <summary>纸质成绩单原图与OCR核对</summary>
+      <summary>{label}原图与OCR核对</summary>
       <p>
         图片识别只生成草稿，必须对照原图核对。未配置真实识别服务时保留原图并明确提示未接通。
       </p>
@@ -67,7 +73,7 @@ export function SportsOcr({
               type="file"
               multiple
               accept="image/jpeg,image/png,image/webp"
-              aria-label="选择纸质成绩单原图"
+              aria-label={`选择${label}原图`}
               disabled={busy || pending}
               onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
             />
@@ -106,7 +112,7 @@ export function SportsOcr({
                 </a>
                 <img
                   src={`/api/sports/ocr-sources/${s.id}/images/${image.id}`}
-                  alt={`纸质成绩单原图${index + 1}`}
+                  alt={`${label}原图${index + 1}`}
                   loading="lazy"
                   style={{
                     maxWidth: "100%",
@@ -122,7 +128,9 @@ export function SportsOcr({
                 onClick={() =>
                   open(
                     "打开原图对应识别草稿",
-                    "sports.endurance.source.import",
+                    purpose === "ROSTER"
+                      ? "sports.roster.source.import"
+                      : "sports.endurance.source.import",
                     [],
                     { id: s.id, sheet: 0 },
                   )

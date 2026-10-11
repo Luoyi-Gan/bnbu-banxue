@@ -3,6 +3,8 @@ import type { OpenForm } from "./ConnectedApp";
 type Row = {
   row: number;
   sourceRow?: number;
+  sourceImageId?: string;
+  sourceIssues?: string[];
   columnError?: boolean;
   studentNumber: string;
   name: string;
@@ -103,6 +105,18 @@ export function SportsRoster({
                     <td>
                       {r.sourceRow ?? r.row}
                       {r.columnError && " · 来源字段有疑点，须修正"}
+                      {r.sourceIssues?.map((issue, i) => (
+                        <p key={i}>{issue}</p>
+                      ))}
+                      {r.sourceImageId && (
+                        <a
+                          href={`/api/sports/ocr-sources/${d.data.sourceId}/images/${r.sourceImageId}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          对应原图
+                        </a>
+                      )}
                     </td>
                     <td>{r.studentNumber}</td>
                     <td>{r.name}</td>

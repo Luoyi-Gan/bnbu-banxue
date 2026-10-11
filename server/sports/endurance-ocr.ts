@@ -14,11 +14,16 @@ export interface OcrImage {
 }
 export function ocrSourceAccess(repo: Repository, actor: Account, id: string) {
   sportsWriteGate(repo, "sports.endurance.import");
-  const source = repo.get(id, "sportsEnduranceSource");
+  const source = repo.get(id);
+  demand(
+    ["sportsEnduranceSource", "sportsRosterSource"].includes(source.kind),
+    "原图来源无效。",
+    404,
+  );
   ownedCourse(repo, actor, source.data.courseId);
   demand(
     source.ownerId === actor.id && source.data.sourceType === "OCR",
-    "只能读取本人受理的纸质成绩单。",
+    "只能读取本人受理的纸质原件。",
     403,
   );
   return source;
@@ -28,7 +33,10 @@ export async function uploadOcrSource(
   token: string,
   courseId: string,
   files: File[],
+  purpose: "ENDURANCE" | "ROSTER" = "ENDURANCE",
 ) {
+  const kind =
+    purpose === "ROSTER" ? "sportsRosterSource" : "sportsEnduranceSource";
   workbookAccess(repo, token, courseId);
   demand(
     files.length > 0 &&
@@ -82,7 +90,7 @@ export async function uploadOcrSource(
       .update(materials.map((m) => m.sha256).join(":"))
       .digest("hex");
     const prior = repo
-      .all("sportsEnduranceSource")
+      .all(kind)
       .find(
         (s) =>
           s.ownerId === actor.id &&
@@ -99,8 +107,9 @@ export async function uploadOcrSource(
         .run(m.sha256, m.bytes, timestamp());
       return { id: randomUUID(), sha256: m.sha256, mime: m.mime, size: m.size };
     });
-    const source = repo.create("sportsEnduranceSource", actor.id, {
+    const source = repo.create(kind, actor.id, {
       sourceType: "OCR",
+      purpose,
       courseId,
       sha256: hash,
       images,
@@ -145,6 +154,13 @@ function parseResult(
   );
   const data = value as Record<string, unknown>,
     images = source.data.images as OcrImage[];
+  const roster = source.kind === "sportsRosterSource";
+  demand(
+    roster
+      ? data.purpose === "ROSTER"
+      : data.purpose === undefined || data.purpose === "ENDURANCE",
+    "OCR响应业务类型不匹配。",
+  );
   demand(
     data.requestId === requestId &&
       data.sourceId === source.id &&
@@ -157,7 +173,9 @@ function parseResult(
     "OCR须返回1–500行。",
   );
   const matrix: string[][] = [
-      ["student_number", "name", "event", "time", "test_date"],
+      roster
+        ? ["student_number", "name"]
+        : ["student_number", "name", "event", "time", "test_date"],
     ],
     issues: number[] = [],
     rowNumbers = [1],
@@ -188,19 +206,25 @@ function parseResult(
         r.issues.every((e) => typeof e === "string" && e.length <= 200),
       "OCR疑点标记无效。",
     );
-    const fields = ["studentNumber", "name", "event", "time", "testDate"].map(
-      (k) => {
-        demand(
-          typeof r[k] === "string" && (r[k] as string).length <= 200,
-          "OCR字段须为原始短文本。",
-        );
-        return r[k] as string;
-      },
-    );
+    const fields = (
+      roster
+        ? ["studentNumber", "name"]
+        : ["studentNumber", "name", "event", "time", "testDate"]
+    ).map((k) => {
+      demand(
+        typeof r[k] === "string" && (r[k] as string).length <= 200,
+        "OCR字段须为原始短文本。",
+      );
+      return r[k] as string;
+    });
+    const reasons = [...(r.issues as string[])];
+    if (fields.every((v) => !v.trim())) {
+      fields[0] = "[待核对：空白识别行]";
+      reasons.push("原行没有可用识别字段，须核对或明确排除");
+    }
     matrix.push(fields);
     rowNumbers.push(Number(r.row));
     imageIds.push(r.imageId);
-    const reasons = r.issues as string[];
     sourceIssues.push(reasons);
     if (r.reviewRequired || reasons.length) issues.push(index + 2);
   }
@@ -210,7 +234,7 @@ function parseResult(
   demand(csv.length <= 200000, "OCR提取内容超限。");
   return {
     index: 0,
-    name: "纸质成绩单识别草稿",
+    name: roster ? "纸质学校名单识别草稿" : "纸质成绩单识别草稿",
     csv,
     rowNumbers,
     issues,
@@ -233,7 +257,10 @@ export async function recognizeOcrSource(
       409,
     );
     demand(
-      !repo.all("sportsEnduranceImport").some((b) => b.data.sourceId === id),
+      ![
+        ...repo.all("sportsEnduranceImport"),
+        ...repo.all("sportsRosterDraft"),
+      ].some((b) => b.data.sourceId === id),
       "此原件已有核对草稿，请在原草稿处理，不能覆盖识别来源。",
       409,
     );
@@ -288,6 +315,8 @@ export async function recognizeOcrSource(
         },
         body: JSON.stringify({
           schemaVersion: 1,
+          purpose:
+            source.kind === "sportsRosterSource" ? "ROSTER" : "ENDURANCE",
           requestId: source.data.requestId,
           sourceId: id,
           images,

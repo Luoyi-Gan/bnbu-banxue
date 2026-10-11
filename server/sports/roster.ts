@@ -18,6 +18,8 @@ interface RosterRow {
   excluded: boolean;
   reason?: string;
   sourceRow?: number;
+  sourceImageId?: string;
+  sourceIssues?: string[];
 }
 function structural(row: RosterRow) {
   return (
@@ -145,7 +147,13 @@ export function sportsRosterCommand(
       name: (r[header.indexOf("name")] ?? "").trim(),
       columnError:
         r.length !== header.length || !!source?.sheet.issues.includes(i + 2),
-      ...(source ? { sourceRow: source.sheet.rowNumbers[i + 1] } : {}),
+      ...(source
+        ? {
+            sourceRow: source.sheet.rowNumbers[i + 1],
+            sourceImageId: source.sheet.imageIds?.[i + 1],
+            sourceIssues: source.sheet.sourceIssues?.[i + 1],
+          }
+        : {}),
       excluded: false,
     }));
     return repo.create("sportsRosterDraft", actor.id, {
@@ -157,7 +165,8 @@ export function sportsRosterCommand(
         ? {
             sourceId: source.entity.id,
             sheet: source.sheet.index,
-            sourceFormat: source.entity.data.format,
+            sourceFormat:
+              source.entity.data.sourceType ?? source.entity.data.format,
           }
         : {}),
     });
@@ -196,6 +205,7 @@ export function sportsRosterCommand(
             studentNumber: textField(input, "studentNumber", 100),
             name: textField(input, "name", 40),
             columnError: false,
+            sourceIssues: [],
             excluded: false,
             reason,
           };

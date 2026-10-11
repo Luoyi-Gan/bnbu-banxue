@@ -415,6 +415,15 @@ export function LiveSports({
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
             {role === "teacher" && (
+              <SportsOcr
+                purpose="ROSTER"
+                course={c}
+                sources={data.rosterSources ?? []}
+                open={open}
+                busy={busy}
+              />
+            )}
+            {role === "teacher" && (
               <SportsRosterFiles
                 course={c}
                 sources={data.rosterSources ?? []}

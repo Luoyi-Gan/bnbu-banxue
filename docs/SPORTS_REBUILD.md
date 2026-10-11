@@ -198,3 +198,15 @@ workspace仅责任教师取得gradeDrafts/gradePublications，学生和管理员
 2026-10-13：学校名单CSV草稿、正式快照/回退、四类注册核对和分角色投影接通，248测试通过。100MB名单文件、名单XLSX/OCR及综合导出仍待完成；正式学校邮箱验证未被本地登录替代。
 
 2026-10-13：学校名单CSV/XLSX原件上传、受限下载及工作表草稿接通，251测试通过。支持学校附加列并保留缺身份的非空行；学校纸质名单OCR与综合导出等范围继续。
+
+## 学校纸质名单OCR与项目容器复验
+
+遵循用户“暂时没有OCR服务，先保留可配置接口”的决定。POST /api/sports/roster-ocr/:courseId受理纸质学校名单，复用原图校验、100MB总量、最多20图、责任教师访问、异步复核、原字节留存和识别状态历史；保存为sportsRosterSource/sourceType=OCR。名单不走五字段成绩单协议，不直接建账号、入班或保存成绩。未配置BNBU_SPORTS_OCR_URL时返回OCR_NOT_CONFIGURED，保留原图，不生成伪识别结果。
+
+上游请求增加purpose：名单ROSTER，成绩单ENDURANCE。ROSTER响应必须原样回传purpose，行仅提取studentNumber/name；共同必需requestId、sourceId、imageHashes及每行imageId、row、reviewRequired、issues。成绩单仍取原五字段，兼容旧响应不含purpose；如带purpose必须为ENDURANCE。类型错配与对象/原图错配均记技术失败。原图读取与手动重试继续使用/api/sports/ocr-sources/:id/images/:imageId、/:id/recognize。纸质名单不能走电子文件下载接口。
+
+成功识别后sports.roster.source.import(id,sheet=0)生成教师私有核对草稿，保留原图ID、图上行号、疑点原因。疑点必须修正留痕或明确排除后才能确认；全空识别行也保留为待核对，不能因CSV过滤静默丢失。原件已经受理后可关闭续办，结算或归档不允许直接更正。共享网页组件支持名单和成绩单，名单核对行可打开对应原图，仍须明确确认学校快照。
+
+验证：Windows及Docker Linux均36文件254项测试通过，前后端类型检查、Lint、前端构建通过（仍有现有大块打包提示）。项目docker compose build成功，验证容器healthy；容器内部/api/health和/workspace均HTTP200。受控OCR测试覆盖疑点修正、业务类型错配、空白行保留、关闭续办、原图权限与未配置不造数据。只验证适配协议，不代表真实OCR准确率或学校身份服务已验证；新增网页未完成浏览器点击验收。Windows本地验收服务已重启加载代码，保留原验收数据库。
+
+仍待：综合名单/正式报告导出、学校身份与邮箱绑定、免测认证、结算与历史报告更正、账号治理及完整业务交叉验收。真实OCR仍为可配置依赖，完整目标继续。

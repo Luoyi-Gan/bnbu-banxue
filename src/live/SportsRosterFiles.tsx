@@ -72,7 +72,9 @@ export function SportsRosterFiles({
         )}
       {error && <p role="alert">{error}</p>}
       {sources
-        .filter((s) => s.data.courseId === course.id)
+        .filter(
+          (s) => s.data.courseId === course.id && s.data.sourceType !== "OCR",
+        )
         .map((s) => (
           <section key={s.id}>
             <p>

@@ -93,6 +93,7 @@ async function upstream(mode = "normal") {
         JSON.stringify({
           requestId: request.requestId,
           sourceId: request.sourceId,
+          purpose: mode === "wrong-purpose" ? "ENDURANCE" : request.purpose,
           imageHashes:
             mode === "wrong"
               ? ["wrong"]
@@ -101,8 +102,8 @@ async function upstream(mode = "normal") {
             {
               row: 5,
               imageId: request.images[0].id,
-              studentNumber: "S001",
-              name: "student",
+              studentNumber: mode === "blank" ? "" : "S001",
+              name: mode === "blank" ? "" : "student",
               event: "800",
               time: "4:30",
               testDate: "2026-01-02",
@@ -235,11 +236,12 @@ it("上游错配返回只记技术失败，后续正确重试才产生草稿；�
   );
   expect(source.data.status).toBe("READY");
   expect(f.repo.all("sportsEndurance")).toHaveLength(0);
-  expect(f.repo.all("sportsOcrHistory").map((h) => h.data.status).sort()).toEqual([
-    "FAILED",
-    "READY",
-    "UPLOADED",
-  ]);
+  expect(
+    f.repo
+      .all("sportsOcrHistory")
+      .map((h) => h.data.status)
+      .sort(),
+  ).toEqual(["FAILED", "READY", "UPLOADED"]);
 });
 it("真实HTTP多图上传入口和原图读取隔离，未接通状态可见且字节原样保留", async () => {
   vi.stubEnv("BNBU_SPORTS_OCR_URL", undefined);
@@ -270,4 +272,141 @@ it("真实HTTP多图上传入口和原图读取隔离，未接通状态可见且
       (await fetch(url, { headers: { Cookie: `bnbu_session=${user.token}` } }))
         .status,
     ).toBe(403);
+});
+it("纸质名单低可信行核对后才形成快照，不创建账号成员或成绩", async () => {
+  const f = setup();
+  vi.stubEnv("BNBU_SPORTS_OCR_URL", await upstream("low"));
+  let source = await uploadOcrSource(
+    f.repo,
+    f.teacher.token,
+    f.course.id,
+    [await picture()],
+    "ROSTER",
+  );
+  f.repo.save(f.course, { status: "CLOSED" });
+  source = await recognizeOcrSource(
+    f.repo,
+    f.teacher.token,
+    source.id,
+    source.version,
+  );
+  expect(source.kind).toBe("sportsRosterSource");
+  expect(source.data.status).toBe("READY");
+  let draft = f.run("sports.roster.source.import", { id: source.id, sheet: 0 });
+  expect(draft.data.sourceFormat).toBe("OCR");
+  expect(draft.data.rows).toMatchObject([
+    {
+      sourceRow: 5,
+      sourceImageId: (source.data.images as OcrImage[])[0].id,
+      columnError: true,
+    },
+  ]);
+  expect(() =>
+    f.run("sports.roster.confirm", {
+      id: draft.id,
+      version: draft.version,
+      basisVersion: 0,
+      confirmed: true,
+    }),
+  ).toThrow("错误字段");
+  draft = f.run("sports.roster.row", {
+    id: draft.id,
+    version: draft.version,
+    row: 2,
+    studentNumber: "S001",
+    name: "student",
+    reason: "测试：对照原图核对学号姓名",
+  });
+  const snapshot = f.run("sports.roster.confirm", {
+    id: draft.id,
+    version: draft.version,
+    basisVersion: 0,
+    confirmed: true,
+  });
+  expect(snapshot.data.rows).toMatchObject([
+    { studentNumber: "S001", name: "student", sourceIssues: [] },
+  ]);
+  expect(f.repo.all("sportsEnrollment")).toHaveLength(1);
+  expect(f.db.prepare("SELECT COUNT(*) AS n FROM accounts").get()?.n).toBe(3);
+  expect(f.repo.all("sportsEndurance")).toHaveLength(0);
+  expect(f.repo.all("sportsEnduranceImport")).toHaveLength(0);
+});
+it("名单拒绝成绩单业务类型响应，空白识别行保留原行而非消失", async () => {
+  const f = setup();
+  vi.stubEnv("BNBU_SPORTS_OCR_URL", await upstream("wrong-purpose"));
+  let source = await uploadOcrSource(
+    f.repo,
+    f.teacher.token,
+    f.course.id,
+    [await picture()],
+    "ROSTER",
+  );
+  source = await recognizeOcrSource(
+    f.repo,
+    f.teacher.token,
+    source.id,
+    source.version,
+  );
+  expect(source.data).toMatchObject({
+    status: "FAILED",
+    error: "OCR_TECHNICAL_FAILURE",
+    sheets: [],
+  });
+  vi.stubEnv("BNBU_SPORTS_OCR_URL", await upstream("blank"));
+  source = await recognizeOcrSource(
+    f.repo,
+    f.teacher.token,
+    source.id,
+    source.version,
+  );
+  const draft = f.run("sports.roster.source.import", {
+    id: source.id,
+    sheet: 0,
+  });
+  expect(draft.data.rows).toHaveLength(1);
+  expect(draft.data.rows).toMatchObject([{ sourceRow: 5, columnError: true }]);
+  expect(() =>
+    f.run("sports.roster.confirm", {
+      id: draft.id,
+      version: draft.version,
+      basisVersion: 0,
+      confirmed: true,
+    }),
+  ).toThrow("错误字段");
+});
+it("纸质名单HTTP上传与原图权限隔离，未配置时原件保留且无伪草稿", async () => {
+  vi.stubEnv("BNBU_SPORTS_OCR_URL", undefined);
+  const f = setup(),
+    base = await listen(createApiServer(f.db)),
+    file = await picture(),
+    form = new FormData();
+  form.append("images", file);
+  const headers = { Cookie: `bnbu_session=${f.teacher.token}` };
+  const upload = await fetch(`${base}/api/sports/roster-ocr/${f.course.id}`, {
+    method: "POST",
+    headers,
+    body: form,
+  });
+  expect(upload.status).toBe(200);
+  const result = await upload.json();
+  expect(result.error).toBe("OCR_NOT_CONFIGURED");
+  const source = f.repo.get(result.id),
+    image = (source.data.images as OcrImage[])[0];
+  expect(source.kind).toBe("sportsRosterSource");
+  expect(f.repo.all("sportsRosterDraft")).toHaveLength(0);
+  const url = `${base}/api/sports/ocr-sources/${source.id}/images/${image.id}`;
+  const response = await fetch(url, { headers });
+  expect(response.status).toBe(200);
+  expect(Buffer.from(await response.arrayBuffer())).toEqual(
+    Buffer.from(await file.arrayBuffer()),
+  );
+  for (const user of [f.student, f.admin])
+    expect(
+      (await fetch(url, { headers: { Cookie: `bnbu_session=${user.token}` } }))
+        .status,
+    ).toBe(403);
+  expect(
+    (await fetch(`${base}/api/sports/roster-sources/${source.id}`, { headers }))
+      .status,
+  ).toBe(404);
 });

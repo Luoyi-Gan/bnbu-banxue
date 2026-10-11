@@ -166,9 +166,10 @@ export function createApiServer(
             status: saved.data.status,
           });
         }
-        const ocrUpload = /^\/api\/sports\/ocr-sources\/([a-f0-9-]+)$/.exec(
-          pathname,
-        );
+        const ocrUpload =
+          /^\/api\/sports\/(?:ocr-sources|roster-ocr)\/([a-f0-9-]+)$/.exec(
+            pathname,
+          );
         if (ocrUpload) {
           const repo = new Repository(db),
             token = cookieToken(request) ?? "";
@@ -200,6 +201,9 @@ export function createApiServer(
             token,
             ocrUpload[1],
             images as File[],
+            pathname.startsWith("/api/sports/roster-ocr/")
+              ? "ROSTER"
+              : "ENDURANCE",
           );
           if (source.data.status === "AWAITING_OCR")
             source = await recognizeOcrSource(
@@ -506,6 +510,11 @@ export function createApiServer(
         const repo = new Repository(db),
           actor = authenticate(db, cookieToken(request)),
           source = repo.get(rosterRead[1], "sportsRosterSource");
+        demand(
+          source.data.sourceType !== "OCR",
+          "纸质原件请通过原图接口读取。",
+          404,
+        );
         sportsWriteGate(repo, "sports.roster.preview");
         ownedCourse(repo, actor, source.data.courseId);
         demand(
