@@ -24,6 +24,7 @@ import { sportsSystemCommand, sportsWriteGate } from "./sports/system";
 import { sportsCalendarCommand } from "./sports/calendar";
 import { sportsIncidentCommand } from "./sports/incidents";
 import { sportsSwimCommand } from "./sports/swimming";
+import { sportsPasswordCommand } from "./sports/password";
 
 export function execute(
   db: Database,
@@ -135,6 +136,7 @@ export function execute(
       result = { id: entity.id };
     } else {
       result =
+        sportsPasswordCommand(repo, actor, token, action, input) ??
         communityCommand(repo, actor, action, input) ??
         coffeeCommand(repo, actor, action, input) ??
         governanceCommand(repo, actor, action, input) ??

@@ -522,3 +522,79 @@ it("分管理员按固定权限管理学期，规则权限不能发布模板，�
     sportsWorkspace(f.repo, account).administratorAccess.permissions,
   ).toEqual([]);
 });
+
+it("体育本人改密接受短个人密码并注销其他登录，审计不保存密码", () => {
+  const f = setup();
+  const other = login(f.db, f.teacher.account.email, "Sports-test-123");
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.teacher.account.id)!;
+  const changed = f.run(f.teacher, "sports.password.change", {
+    version: identity.version,
+    currentPassword: "Sports-test-123",
+    newPassword: "短",
+    confirmPassword: "短",
+  });
+  expect(changed.data.mustChangePassword).toBe(false);
+  expect(() => f.run(other, "sports.course.save", f.courseInput)).toThrow(
+    "登录已过期",
+  );
+  expect(() => login(f.db, f.teacher.account.email, "Sports-test-123")).toThrow(
+    "邮箱或密码错误",
+  );
+  expect(login(f.db, f.teacher.account.email, "短").account.id).toBe(
+    f.teacher.account.id,
+  );
+  expect(() =>
+    f.run(f.teacher, "sports.course.save", f.courseInput),
+  ).not.toThrow();
+  const audit = JSON.stringify(
+    f.db
+      .prepare("SELECT * FROM audit WHERE action='sports.password.change'")
+      .all(),
+  );
+  expect(audit).not.toContain("Sports-test-123");
+  expect(audit).not.toContain("短");
+});
+it("教师维护中不能改密，管理员允许；错误原密码或不一致确认不改变凭据", () => {
+  const f = setup();
+  const teacherIdentity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.teacher.account.id)!;
+  const base = {
+    version: teacherIdentity.version,
+    currentPassword: "错误",
+    newPassword: "n",
+    confirmPassword: "n",
+  };
+  expect(() => f.run(f.teacher, "sports.password.change", base)).toThrow(
+    "当前密码不正确",
+  );
+  expect(() =>
+    f.run(f.teacher, "sports.password.change", {
+      ...base,
+      currentPassword: "Sports-test-123",
+      confirmPassword: "different",
+    }),
+  ).toThrow("不一致");
+  f.repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
+  expect(() =>
+    f.run(f.teacher, "sports.password.change", {
+      ...base,
+      currentPassword: "Sports-test-123",
+    }),
+  ).toThrow("维护");
+  const adminIdentity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.admin.account.id)!;
+  expect(
+    f.run(f.admin, "sports.password.change", {
+      ...base,
+      version: adminIdentity.version,
+      currentPassword: "Sports-test-123",
+    }).data.mustChangePassword,
+  ).toBe(false);
+  expect(
+    login(f.db, f.teacher.account.email, "Sports-test-123").account.id,
+  ).toBe(f.teacher.account.id);
+});

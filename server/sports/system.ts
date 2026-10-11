@@ -21,6 +21,7 @@ export function sportsWriteGate(repo: Repository, action: string) {
     action.startsWith("sports.") &&
     ![
       "sports.system.mode",
+      "sports.password.change",
       "sports.ai.manual",
       "sports.ai.stop",
       "sports.ai.retry",

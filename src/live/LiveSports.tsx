@@ -110,11 +110,35 @@ export function LiveSports({
       </p>
     );
   const role = data.identity.data.role;
+  const changePassword = (
+    <button
+      disabled={busy}
+      onClick={() =>
+        open(
+          "修改本人密码",
+          "sports.password.change",
+          [
+            { key: "currentPassword", label: "当前密码", type: "password" },
+            { key: "newPassword", label: "新密码", type: "password" },
+            {
+              key: "confirmPassword",
+              label: "再次填写新密码",
+              type: "password",
+            },
+          ],
+          { version: data.identity.version },
+        )
+      }
+    >
+      修改本人密码（其他登录将失效）
+    </button>
+  );
   if (data.system?.mode === "MAINTENANCE")
     return (
       <>
         {error && <p role="alert">{error}</p>}
         <SportsSystem data={data} open={open} busy={busy} />
+        {role === "admin" && changePassword}
         {data.canGovernAi && (
           <SportsReview
             data={{ ...data, courses: data.recoveryCourses ?? [] }}
@@ -170,6 +194,7 @@ export function LiveSports({
       </section>
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
+      {(role === "teacher" || role === "admin") && changePassword}
       <SportsIncidents data={data} open={open} busy={busy} />
       {role === "admin" && (
         <>

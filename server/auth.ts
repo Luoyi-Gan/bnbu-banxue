@@ -63,10 +63,13 @@ export function hashPassword(value: unknown) {
     typeof value === "string" && value.length >= 8 && value.length <= 128,
     "密码须为 8–128 个字符。",
   );
+  return encodePassword(value);
+}
+export function encodePassword(value: string) {
   const salt = randomBytes(16).toString("hex");
   return `${salt}:${scryptSync(value, salt, 64).toString("hex")}`;
 }
-function matchesPassword(value: string, encoded: string) {
+export function matchesPassword(value: string, encoded: string) {
   const [salt, hash] = encoded.split(":");
   const actual = scryptSync(value, salt, 64);
   const expected = Buffer.from(hash, "hex");
@@ -184,11 +187,7 @@ export function register(
 const failures = new Map<string, { count: number; until: number }>();
 export function login(db: Database, rawEmail: unknown, rawPassword: unknown) {
   const email = normalizeEmail(rawEmail);
-  demand(
-    typeof rawPassword === "string" && rawPassword.length <= 128,
-    "邮箱或密码错误。",
-    401,
-  );
+  demand(typeof rawPassword === "string", "邮箱或密码错误。", 401);
   const previous = failures.get(email),
     now = Date.now();
   demand(
