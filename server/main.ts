@@ -16,6 +16,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { accountDirectory } from "./sports/account-directory";
 import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
@@ -571,6 +572,22 @@ export function createApiServer(
           historicalRemarks(
             new Repository(db),
             authenticate(db, cookieToken(request)),
+            Object.fromEntries(params),
+          ),
+        );
+      }
+      const directory = /^\/api\/sports\/accounts\/(students|teachers)$/.exec(
+        pathname,
+      );
+      if (request.method === "GET" && directory) {
+        const params = new URL(request.url!, "http://localhost").searchParams;
+        return send(
+          response,
+          200,
+          accountDirectory(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            directory[1] === "students" ? "student" : "teacher",
             Object.fromEntries(params),
           ),
         );

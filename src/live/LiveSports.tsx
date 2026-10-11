@@ -21,6 +21,7 @@ import { SportsGrades } from "./SportsGrades";
 import { SportsConversion } from "./SportsConversion";
 import { SportsHelp } from "./SportsHelp";
 import { SportsFeedback } from "./SportsFeedback";
+import { SportsAccountDirectory } from "./SportsAccountDirectory";
 import { SportsTeacherAccounts } from "./SportsTeacherAccounts";
 import { SportsCourseManagement } from "./SportsCourseManagement";
 
@@ -256,6 +257,9 @@ export function LiveSports({
         </p>
       </section>
       {role === "teacher" && <SportsHistoricalRemarks />}
+      {data.administratorAccess?.permissions.includes("ACCOUNTS") && (
+        <SportsAccountDirectory />
+      )}
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
       {data.administratorAccess?.permissions.includes("GLOBAL_RULES") && (
