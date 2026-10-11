@@ -458,3 +458,13 @@ sports.admins.delete仅总管理员；sports.account.close仅本人独立管理�
 验证：Windows与Docker Linux各43文件299项测试通过；前后端类型、Lint与构建通过（原大块提示保留）。新增覆盖最新资料核对、权限/交接确认、资料副本清理、凭据NULL、历史内容/外键保留、个人验证码与登录隔离、历史主体禁止恢复、本人注销及审计失败回滚。镜像重建成功，配置sha256:1f8842b1d40cf87e44dd6eded397e2041333b6d495649c11ed1a1c88efb8e179；本轮运行容器测试，未另起健康验证容器。
 
 宿主实际HTTP验收建立两名临时管理账号，分别总管理员删除与本人注销，旧会话和旧凭据均401，同邮箱原学生登录仍200。只删除本轮临时账号，原常用local.sports.admin.one继续保留；结果data/admin-deletion-acceptance.json。验收库integrity_check=ok、foreign_key_check=[]；新增网页未点击验收。下一步仍需管理员验证邮箱/找回，正式学校身份流程、教师和学生注销治理、平台故障恢复/复杂复核、名单历史更正及全流程规则与浏览器验收，完整goal继续。
+
+## 管理邮箱验证与关机前交接
+
+schema v6增加admin_security_challenges，按主体和用途独立于个人email_challenges。GET /api/sports/admin-email读取本人当前邮箱和验证状态；POST /request只接收空对象，返回challengeId及真实投递结果；POST /confirm接收challengeId/code，只能核对本人EMAIL_VERIFY挑战。当前有效管理员、首次改密和NORMAL门禁继续生效。10分钟/60秒/5次参数为工程防重及限流；错误次数在失败后仍提交，审计失败则成功操作整体回滚。当前邮箱或身份版本变化不能沿用旧证明，不修改角色和个人账号。
+
+邮件按明确outbox ID复用已有BNBU_EMAIL_DELIVERY_URL/TOKEN适配，拒绝未配置时假成功；本地BNBU_LOCAL_OUTBOX明确返回未发送真实邮件。已消费code_hash置空、对应邮件正文删除；修改管理邮箱和删除账号清理该主体全部挑战及关联邮件，保留同邮箱个人注册验证码。密码找回尚未实现，schema预留PASSWORD_RESET不等于已交付该流程。
+
+验证：Windows/Docker Linux各44文件303项测试通过，前后端类型、Lint、构建通过（原大块提示保留）。覆盖主体隔离、用途和一次消费、错误次数/限流/严格过期、资料版本变化、邮件任务清理、个人挑战不误删、首次改密、缺配置/投递失败及审计回滚。Docker重建配置sha256:631cc84946df147644d2861b85c32350012d5b2a283ea5cff645bc4ce355fd79。本轮容器测试未另起健康验证容器。宿主实际HTTP独立管理员邮箱false→true验证通过，使用本地outbox，结果data/admin-email-acceptance.json；不宣称学校邮件实送或浏览器点击验收。
+
+用户要求到审核点关机、冻结待审核模块。当前账号管理页面交由用户做效果验收，待审清单见docs/REVIEW_NEXT_MORNING.md；本轮完成后暂停goal并正常关机，不强制关闭有未保存内容的其他应用。未完成：管理员密码找回、正式身份与邮箱全流程、教师/学生注销、平台事故恢复/复杂复核、名单历史更正及全局规则和浏览器验收；整体目标未完成。恢复时先读待审核反馈，不擅自改动被冻结账号模块。

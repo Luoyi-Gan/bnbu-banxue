@@ -20,6 +20,11 @@ import { sportsWorkspace } from "./sports/courses";
 import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
 import { administratorSelf } from "./sports/administrator-deletion";
+import {
+  adminEmailStatus,
+  requestAdminEmail,
+  confirmAdminEmail,
+} from "./sports/admin-email";
 import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
@@ -361,6 +366,27 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        if (pathname === "/api/sports/admin-email/request") {
+          demand(
+            Object.keys(input).length === 0,
+            "邮箱验证只能使用本人当前邮箱。",
+          );
+          return send(
+            response,
+            200,
+            await requestAdminEmail(
+              db,
+              authenticate(db, token),
+              options.localOutbox === true,
+            ),
+          );
+        }
+        if (pathname === "/api/sports/admin-email/confirm")
+          return send(
+            response,
+            200,
+            confirmAdminEmail(db, authenticate(db, token), input),
+          );
         if (pathname === "/api/identity/check") {
           sportsAccountGate(new Repository(db), authenticate(db, token));
           demand(
@@ -602,6 +628,15 @@ export function createApiServer(
           response,
           200,
           administratorSelf(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+          ),
+        );
+      if (request.method === "GET" && pathname === "/api/sports/admin-email")
+        return send(
+          response,
+          200,
+          adminEmailStatus(
             new Repository(db),
             authenticate(db, cookieToken(request)),
           ),

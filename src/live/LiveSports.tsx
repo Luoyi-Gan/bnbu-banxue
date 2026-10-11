@@ -24,6 +24,7 @@ import { SportsFeedback } from "./SportsFeedback";
 import { SportsAccountDirectory } from "./SportsAccountDirectory";
 import { SportsAdministrators } from "./SportsAdministrators";
 import { SportsAdminClosure } from "./SportsAdminClosure";
+import { SportsAdminEmail } from "./SportsAdminEmail";
 import { SportsTeacherAccounts } from "./SportsTeacherAccounts";
 import { SportsCourseManagement } from "./SportsCourseManagement";
 
@@ -260,6 +261,7 @@ export function LiveSports({
       </section>
       {role === "teacher" && <SportsHistoricalRemarks />}
       {data.administratorAccess?.superAdmin && <SportsAdministrators />}
+      {role === "admin" && <SportsAdminEmail />}
       {role === "admin" &&
         data.identity.data.source === "SUPERADMIN_CONFIRMED_PERSON" && (
           <SportsAdminClosure />

@@ -4,6 +4,7 @@ import { requireSportsSuperAdmin } from "./permissions";
 import { version } from "./courses";
 import { sportsAccountGate } from "./account-gate";
 import { sportsWriteGate } from "./system";
+import { clearAdminChallenges } from "./admin-email";
 
 export function administratorSelf(repo: Repository, actor: Account) {
   sportsAccountGate(repo, actor);
@@ -127,8 +128,8 @@ export function sportsAdministratorDeletion(
   repo.db
     .prepare("DELETE FROM command_receipts WHERE actor_id=?")
     .run(identity.ownerId);
-  // Existing email_challenges belong to PERSONAL registration, including the same email.
-  // No ADMIN challenge is implemented yet; future purpose-bound challenges must be erased here.
+  clearAdminChallenges(repo, identity.ownerId);
+  // PERSONAL registration challenges sharing this email are intentionally retained.
   repo.db
     .prepare("DELETE FROM entities WHERE owner_id=? AND kind='sportsIdentity'")
     .run(identity.ownerId);

@@ -15,6 +15,23 @@ export async function sendVerification(
       "SELECT * FROM mail_outbox WHERE recipient=? ORDER BY created_at DESC LIMIT 1",
     )
     .get(String(email).trim().toLowerCase())!;
+  return deliverOutbox(db, String(message.id), localOutbox);
+}
+export async function deliverOutbox(
+  db: Database,
+  id: string,
+  localOutbox: boolean,
+) {
+  const endpoint = process.env.BNBU_EMAIL_DELIVERY_URL;
+  demand(localOutbox || endpoint, "尚未配置验证码邮件服务。", 503);
+  const message = db.prepare("SELECT * FROM mail_outbox WHERE id=?").get(id);
+  demand(message, "邮件任务已失效。", 409);
+  if (!endpoint)
+    return {
+      sent: true,
+      delivery: "local-outbox",
+      message: "验证码已写入本地开发收件箱，未发送至真实邮箱。",
+    };
   const result = await fetch(endpoint, {
     method: "POST",
     headers: {

@@ -11,6 +11,7 @@ import { sportsPermissions, requireSportsSuperAdmin } from "./permissions";
 import { sportsAccountGate } from "./account-gate";
 import { sportsWriteGate } from "./system";
 import { version } from "./courses";
+import { clearAdminChallenges } from "./admin-email";
 
 export function administratorDirectory(repo: Repository, actor: Account) {
   sportsAccountGate(repo, actor);
@@ -226,6 +227,7 @@ export function sportsAdministratorCommand(
   const before = repo.db
     .prepare("SELECT name,email,organization FROM accounts WHERE id=?")
     .get(identity!.ownerId!)!;
+  if (before.email !== email) clearAdminChallenges(repo, identity!.ownerId!);
   repo.db
     .prepare("UPDATE accounts SET name=?,email=?,organization=? WHERE id=?")
     .run(name, email, department, identity!.ownerId!);

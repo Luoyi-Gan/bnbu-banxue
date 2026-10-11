@@ -34,6 +34,15 @@ export function openDatabase(filename: string) {
       id TEXT PRIMARY KEY, recipient TEXT NOT NULL, subject TEXT NOT NULL,
       body TEXT NOT NULL, created_at TEXT NOT NULL, delivered_at TEXT
     );
+    CREATE TABLE IF NOT EXISTS admin_security_challenges (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL REFERENCES accounts(id),
+      purpose TEXT NOT NULL CHECK(purpose IN ('EMAIL_VERIFY','PASSWORD_RESET')),
+      email TEXT NOT NULL, code_hash TEXT, expires_at INTEGER NOT NULL,
+      attempts INTEGER NOT NULL DEFAULT 0, sent_at INTEGER NOT NULL,
+      identity_version INTEGER NOT NULL, mail_id TEXT NOT NULL,
+      consumed_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS admin_challenge_account ON admin_security_challenges(account_id,purpose,sent_at);
     CREATE TABLE IF NOT EXISTS entities (
       id TEXT PRIMARY KEY, kind TEXT NOT NULL,
       owner_id TEXT REFERENCES accounts(id), data TEXT NOT NULL,
@@ -70,6 +79,9 @@ export function openDatabase(filename: string) {
   `);
   migrateAccountNamespaces(db);
   migrateHistoricalSubjects(db);
+  db.exec(
+    "INSERT OR IGNORE INTO schema_migrations VALUES(6,strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+  );
   seedConversions(db);
   return db;
 }
