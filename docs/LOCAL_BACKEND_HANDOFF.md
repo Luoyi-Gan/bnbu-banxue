@@ -262,3 +262,15 @@ XLSX依赖复核补充：npm audit定位到ExcelJS传递uuid旧版本通告GHSA-
 POST /api/sports/ocr-sources/:sourceId/recognize JSON{version}显式重试。PROCESSING请求35秒内不允许重入，超时可重试且旧版本响应不得写入。成功READY或已有核对草稿不能重新识别覆盖原来源；失败可继续重试。异步前后重验登录、身份、维护、责任归属及未结算/未归档；已受理来源允许课程关闭后继续原范围核对。识别过程留下sportsOcrHistory状态记录。
 
 35文件244项Windows测试、双端类型、Lint、构建通过。测试覆盖未配置不造数据、重复/伪造图片拒绝、低可信行修正后才确认、关闭续办、上游对象/图片错配与正确重试、旧版本拒绝，以及真实HTTP上传与原件读取权限。测试上游为受控协议服务、图片为明确测试夹具，真实OCR服务和本校手写准确率尚未验证；没有在本地验收库植入识别假结果。新增网页点击未验收。正式名单、身份资料、免测认证、结算报告等完整范围继续。
+
+## 2026-10-13 正式名单快照与注册核对
+
+sports.roster.preview(courseId,csv)仅责任教师，当前粘贴CSV入口最多200,000字符、1–500行；两列表头student_number,name或学号,姓名，保留重复/错误原行与原CSV。新草稿要求课程已发布、未结算、未归档；关闭前已受理草稿仍可继续。sports.roster.row(id,version,row,studentNumber,name,reason)修正/恢复原行，exclude=true明确排除，sportsRosterRowHistory记录前后值及依据，不修改账号资料。
+
+sports.roster.confirm(id,version,basisVersion,confirmed=true)要求保留行字段完整，生成不可覆盖sportsRosterSnapshot及规则版本、原始行数和确认时间。重复身份允许保留为正式学校名单的核对差异，不静默去重。sportsRosterBasis按basisVersion切换当前基准，sportsRosterHistory追加前后快照关联。sports.roster.restore(id,basisVersion,confirmed=true,reason)只回退核对基准；原成员、打卡、进度和快照不改写，结算/归档须后续历史报告更正。
+
+reconcileRoster实时按学号主键、姓名辅助分为COMPLETE/INCOMPLETE/CONFLICT及OUTSIDE成员。完整匹配必须有唯一已核验学生身份、姓名一致、有效本班成员，同时sportsIdentity.schoolEmailVerified=true且schoolEmail等于当前accounts.email。该字段仅为后续正式绑定服务的写入约定，当前未增加教师或学生自行设置接口；独立本地验收身份不会因已登录就被假定已验证学校邮箱。正式邮箱绑定及身份采集仍待接通。未知注册人员仍在学校名单分母，名单外有效成员不在分母；冲突/重复时denominator与registrationPercent为null，避免虚报100%。
+
+workspace给责任教师rosterDrafts/rosterSnapshots/rosterBases/rosterChecks；学生仅studentRosterChecks的courseId/status，不回放别人名单姓名。具有COURSES_VIEW的管理员仅当前非草稿课程rosterSummaries数量，不取得原始名单或学生身份行。网页接通草稿校对、快照确认、四类核对、名单外成员与版本回退；注册匹配比例明确不等于运动达标或体测完成。
+
+36文件248项Windows测试、双端类型、Lint、构建通过。验证不建号不入班、邮箱验证与当前邮箱绑定、重复分母未知、明确排除保留原行、基准回退不动教学事实、分角色投影、500行限制、结构/版本/结算拒绝和关闭续办。当前为CSV粘贴基础入口，原规则要求的100MB电子文件及名单专用XLSX/纸质OCR、多列综合名单和导出仍未完成；不可将成绩单导入能力当作学校名单输入已完成。注销身份脱敏及正式报告冻结仍须与账号注销/结算一起验收。新增网页点击未验收，完整目标继续。

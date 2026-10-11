@@ -29,6 +29,7 @@ import { sportsTeacherAccountCommand } from "./sports/teacher-accounts";
 import { sportsFeedbackCommand } from "./sports/feedback";
 import { sportsHelpCommand } from "./sports/help";
 import { sportsConversionCommand } from "./sports/conversion";
+import { sportsRosterCommand } from "./sports/roster";
 import { sportsEnduranceImportCommand } from "./sports/endurance-import";
 import { sportsEnduranceCommand } from "./sports/endurance";
 import { sportsGradeCommand } from "./sports/grades";
@@ -153,6 +154,7 @@ export function execute(
         sportsFeedbackCommand(repo, actor, action, input) ??
         sportsHelpCommand(repo, actor, action, input) ??
         sportsConversionCommand(repo, actor, action, input) ??
+        sportsRosterCommand(repo, actor, action, input) ??
         sportsEnduranceImportCommand(repo, actor, action, input) ??
         sportsEnduranceCommand(repo, actor, action, input) ??
         sportsGradeCommand(repo, actor, action, input) ??

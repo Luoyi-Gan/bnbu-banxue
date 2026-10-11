@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsRoster, type RosterCheck } from "./SportsRoster";
 import { SportsOcr } from "./SportsOcr";
 import { SportsWorkbook } from "./SportsWorkbook";
 import { SportsEnduranceImport } from "./SportsEnduranceImport";
@@ -29,6 +30,19 @@ interface SportsData
   firstLoginOnly?: boolean;
   teacherImports?: LiveEntity[];
   conversionTables?: LiveEntity[];
+  rosterDrafts?: LiveEntity[];
+  rosterSnapshots?: LiveEntity[];
+  rosterBases?: LiveEntity[];
+  rosterChecks?: RosterCheck[];
+  studentRosterChecks?: { courseId: string; status: string }[];
+  rosterSummaries?: {
+    courseId: string;
+    denominator: number | null;
+    completeCount: number;
+    incompleteCount: number;
+    conflictCount: number;
+    outsideCount: number;
+  }[];
   enduranceSources?: LiveEntity[];
   enduranceImports?: LiveEntity[];
   enduranceRecords?: LiveEntity[];
@@ -398,6 +412,45 @@ export function LiveSports({
         {data.courses.map((c) => (
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
+            {role === "student" &&
+              data.studentRosterChecks
+                ?.filter((r) => r.courseId === c.id)
+                .map((r) => (
+                  <p key={r.courseId}>
+                    本人学校名单核对：
+                    {
+                      (
+                        {
+                          COMPLETE: "注册入班匹配完成",
+                          INCOMPLETE: "注册或入班条件尚未全部完成",
+                          CONFLICT: "身份资料需教师核对",
+                          OUTSIDE: "当前学校名单未匹配到本人",
+                        } as Record<string, string>
+                      )[r.status]
+                    }
+                  </p>
+                ))}
+            {role === "admin" &&
+              data.rosterSummaries
+                ?.filter((r) => r.courseId === c.id)
+                .map((r) => (
+                  <p key={r.courseId}>
+                    名单治理摘要：分母{r.denominator ?? "核对中"}，匹配完成
+                    {r.completeCount}，未完成{r.incompleteCount}，冲突
+                    {r.conflictCount}，名单外{r.outsideCount}。
+                  </p>
+                ))}
+            {role === "teacher" && (
+              <SportsRoster
+                course={c}
+                drafts={data.rosterDrafts ?? []}
+                snapshots={data.rosterSnapshots ?? []}
+                bases={data.rosterBases ?? []}
+                checks={data.rosterChecks ?? []}
+                open={open}
+                busy={busy}
+              />
+            )}
             {role === "teacher" && (
               <SportsOcr
                 course={c}

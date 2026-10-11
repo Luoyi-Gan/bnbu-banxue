@@ -20,6 +20,7 @@ import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
+import { rosterWorkspace } from "./sports/roster";
 import { enduranceImportWorkspace } from "./sports/endurance-import";
 import { uploadWorkbook, workbookAccess } from "./sports/workbook";
 import {
@@ -392,6 +393,7 @@ export function createApiServer(
           ...gradeWorkspace(repo, actor),
           ...enduranceWorkspace(repo, actor),
           ...enduranceImportWorkspace(repo, actor),
+          ...rosterWorkspace(repo, actor),
           ...feedbackWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),
