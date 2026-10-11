@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsConversion } from "./SportsConversion";
 import { SportsHelp } from "./SportsHelp";
 import { SportsFeedback } from "./SportsFeedback";
 import { SportsTeacherAccounts } from "./SportsTeacherAccounts";
@@ -22,6 +23,7 @@ interface SportsData
   identity: LiveEntity;
   firstLoginOnly?: boolean;
   teacherImports?: LiveEntity[];
+  conversionTables?: LiveEntity[];
   feedback?: LiveEntity[];
   feedbackReplies?: LiveEntity[];
   canManageFeedback?: boolean;
@@ -217,6 +219,13 @@ export function LiveSports({
       </section>
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
+      {data.administratorAccess?.permissions.includes("GLOBAL_RULES") && (
+        <SportsConversion
+          tables={data.conversionTables ?? []}
+          open={open}
+          busy={busy}
+        />
+      )}
       {(role === "student" ||
         data.administratorAccess?.permissions.includes("HELP")) && (
         <SportsHelp />

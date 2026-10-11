@@ -929,10 +929,84 @@ it("帮助管理权限、并发版本和发布内容完整性不能绕过", asyn
   expect(f.repo.all("sportsHelpHistory")).toHaveLength(1);
 });
 
-it("用户确认的正式教师邮箱默认域名为bnbu.edu.cn，测试域名不会混入正式默认",()=>{
-  const f=setup();vi.stubEnv("BNBU_SCHOOL_EMAIL_DOMAINS",undefined);
-  const batch=f.run(f.admin,"sports.teachers.preview",{csv:"employee_id,name,email\nT001,教师,t001@bnbu.edu.cn"});
+it("用户确认的正式教师邮箱默认域名为bnbu.edu.cn，测试域名不会混入正式默认", () => {
+  const f = setup();
+  vi.stubEnv("BNBU_SCHOOL_EMAIL_DOMAINS", undefined);
+  const batch = f.run(f.admin, "sports.teachers.preview", {
+    csv: "employee_id,name,email\nT001,教师,t001@bnbu.edu.cn",
+  });
   expect(batch.data.canCreate).toBe(true);
-  const wrong=f.run(f.admin,"sports.teachers.preview",{csv:"employee_id,name,email\nT002,测试,t002@example.test"});
+  const wrong = f.run(f.admin, "sports.teachers.preview", {
+    csv: "employee_id,name,email\nT002,测试,t002@example.test",
+  });
   expect(wrong.data.canCreate).toBe(false);
+});
+
+it("耐力跑四表初始化404行，闭区间边界与等级精确且学生不取得规则", async () => {
+  const f = setup();
+  const { convertEndurance, conversionWorkspace } =
+    await import("../server/sports/conversion");
+  expect(f.repo.all("sportsConversionTable")).toHaveLength(4);
+  expect(
+    f.repo
+      .all("sportsConversionTable")
+      .reduce((sum, t) => sum + (t.data.rows as unknown[]).length, 0),
+  ).toBe(404);
+  expect(convertEndurance(f.repo, "MALE", "JUNIOR", 1000, 239).score).toBe(100);
+  expect(convertEndurance(f.repo, "MALE", "JUNIOR", 1000, 240).score).toBe(99);
+  expect(convertEndurance(f.repo, "MALE", "JUNIOR", 1000, 536).score).toBe(1);
+  expect(convertEndurance(f.repo, "MALE", "JUNIOR", 1000, 537).score).toBe(0);
+  expect(convertEndurance(f.repo, "FEMALE", "JUNIOR", 800, 230).score).toBe(99);
+  expect(() => convertEndurance(f.repo, "MALE", "JUNIOR", 800, 240)).toThrow(
+    "无法唯一选择",
+  );
+  expect(() => convertEndurance(f.repo, "MALE", "JUNIOR", 1000, 601)).toThrow(
+    "无法唯一匹配",
+  );
+  expect(
+    conversionWorkspace(f.repo, f.student.account).conversionTables,
+  ).toEqual([]);
+});
+it("换算表编辑整表验证及版本冲突，历史结果不被修改", async () => {
+  const f = setup();
+  const { convertEndurance } = await import("../server/sports/conversion");
+  let table = f.repo
+    .all("sportsConversionTable")
+    .find((t) => t.data.key === "MALE_JUNIOR")!;
+  const original = convertEndurance(f.repo, "MALE", "JUNIOR", 1000, 240);
+  const row = (
+    table.data.rows as {
+      id: string;
+      min: number;
+      max: number;
+      score: number;
+      grade: string;
+      note: string;
+    }[]
+  )[1];
+  const input = { ...row, id: table.id, version: table.version, rowId: row.id };
+  expect(() =>
+    f.run(f.admin, "sports.conversion.edit", { ...input, min: 241 }),
+  ).toThrow("不能间断");
+  expect(() =>
+    f.run(f.admin, "sports.conversion.edit", { ...input, grade: "FAIL" }),
+  ).toThrow("等级");
+  expect(() =>
+    f.run(f.admin, "sports.conversion.remove", { ...input, confirmed: true }),
+  ).toThrow("不能间断");
+  expect(() => f.run(f.teacher, "sports.conversion.edit", input)).toThrow(
+    "管理权限",
+  );
+  table = f.run(f.admin, "sports.conversion.edit", {
+    ...input,
+    score: 100,
+    note: "确认调整",
+  });
+  expect(convertEndurance(f.repo, "MALE", "JUNIOR", 1000, 240).score).toBe(100);
+  expect(original.score).toBe(99);
+  expect(f.repo.all("sportsConversionHistory")).toHaveLength(1);
+  expect(() => f.run(f.admin, "sports.conversion.edit", input)).toThrow(
+    "已变化",
+  );
+  expect(table.version).toBe(2);
 });
