@@ -598,3 +598,82 @@ it("教师维护中不能改密，管理员允许；错误原密码或不一致�
     login(f.db, f.teacher.account.email, "Sports-test-123").account.id,
   ).toBe(f.teacher.account.id);
 });
+
+it("首次改密拦截体育命令及既有幂等回执，改密后才恢复", () => {
+  const f = setup(),
+    key = randomUUID();
+  execute(f.db, f.teacher.token, "sports.course.save", f.courseInput, key);
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.teacher.account.id)!;
+  const gated = f.repo.save(identity, { mustChangePassword: true });
+  expect(() =>
+    execute(f.db, f.teacher.token, "sports.course.save", f.courseInput, key),
+  ).toThrow("初始密码");
+  expect(() => sportsWorkspace(f.repo, f.teacher.account)).toThrow("初始密码");
+  f.run(f.teacher, "sports.password.change", {
+    version: gated.version,
+    currentPassword: "Sports-test-123",
+    newPassword: "personal",
+    confirmPassword: "personal",
+  });
+  expect(() =>
+    execute(f.db, f.teacher.token, "sports.course.save", f.courseInput, key),
+  ).not.toThrow();
+});
+it("首次改密HTTP只返回必要状态，媒体请求被阻断且管理员维护门禁不能绕过", async () => {
+  vi.useRealTimers();
+  const f = setup();
+  vi.useRealTimers();
+  // Renew the test login against the real clock for HTTP I/O.
+  const teacher = login(f.db, f.teacher.account.email, "Sports-test-123");
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === teacher.account.id)!;
+  f.repo.save(identity, { mustChangePassword: true });
+  const { createApiServer } = await import("../server/main");
+  const server = createApiServer(f.db);
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    const port = (server.address() as { port: number }).port;
+    const headers = { Cookie: `bnbu_session=${teacher.token}` };
+    const response = await fetch(
+      `http://127.0.0.1:${port}/api/sports/workspace`,
+      { headers },
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.firstLoginOnly).toBe(true);
+    expect(body.courses).toBeUndefined();
+    expect(body.system.canManage).toBe(false);
+    expect(body.system.history).toEqual([]);
+    const general = await fetch(`http://127.0.0.1:${port}/api/workspace`, {
+      headers,
+    });
+    const generalBody = await general.json();
+    expect(generalBody.firstLoginOnly).toBe(true);
+    expect(generalBody.audit).toEqual([]);
+    expect(generalBody.entities).toEqual([]);
+    expect(() =>
+      f.run(teacher, "notification.read", { id: "blocked" }),
+    ).toThrow("初始密码");
+    const media = await fetch(
+      `http://127.0.0.1:${port}/api/sports/materials/00000000-0000-0000-0000-000000000000`,
+      { headers },
+    );
+    expect(media.status).toBe(403);
+    expect((await media.json()).code).toBe("PASSWORD_CHANGE_REQUIRED");
+    const admin = login(f.db, f.admin.account.email, "Sports-test-123");
+    const adminIdentity = f.repo
+      .all("sportsIdentity")
+      .find((i) => i.ownerId === admin.account.id)!;
+    f.repo.save(adminIdentity, { mustChangePassword: true });
+    f.repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
+    expect(() =>
+      f.run(admin, "sports.ai.manual", { courseId: "irrelevant" }),
+    ).toThrow("初始密码");
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});

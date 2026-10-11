@@ -17,6 +17,7 @@ interface SportsData
     CalendarData,
     IncidentData {
   identity: LiveEntity;
+  firstLoginOnly?: boolean;
   administratorAccess?: { superAdmin: boolean; permissions: string[] };
   semesters: LiveEntity[];
   templates: LiveEntity[];
@@ -133,6 +134,21 @@ export function LiveSports({
       修改本人密码（其他登录将失效）
     </button>
   );
+  if (data.firstLoginOnly)
+    return (
+      <section className="v2-panel live-card">
+        <h2>首次登录须修改个人密码</h2>
+        {data.system?.mode === "MAINTENANCE" && (
+          <SportsSystem data={data} open={open} busy={busy} />
+        )}
+        {role === "admin" || data.system?.mode !== "MAINTENANCE" ? (
+          changePassword
+        ) : (
+          <p>维护期间教师暂不能改密，请在恢复正常后继续。</p>
+        )}
+        {error && <p role="alert">{error}</p>}
+      </section>
+    );
   if (data.system?.mode === "MAINTENANCE")
     return (
       <>

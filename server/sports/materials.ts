@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { sportsAccountGate } from "./account-gate";
 import { demand, timestamp, type Account } from "../auth";
 import { transaction } from "../database";
 import {
@@ -291,6 +292,7 @@ export async function uploadMaterial(
   });
 }
 export function visibleRecords(repo: Repository, actor: Account) {
+  sportsAccountGate(repo, actor);
   const identity = repo
     .all("sportsIdentity")
     .find((i) => i.ownerId === actor.id && i.data.status === "verified");

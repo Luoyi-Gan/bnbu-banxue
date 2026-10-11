@@ -16,6 +16,10 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import {
+  requiresPasswordChange,
+  sportsAccountGate,
+} from "./sports/account-gate";
 import { sessionProjection } from "./sports/sessions";
 import { reviewWorkspace } from "./sports/review";
 import { processSportsReview } from "./sports/review-worker";
@@ -104,6 +108,7 @@ export function createApiServer(
         );
         if (pathname === "/api/timetable/recognize") {
           const actor = authenticate(db, cookieToken(request));
+          sportsAccountGate(new Repository(db), actor);
           student(actor);
           demand(actor.status !== "banned", "账号已封禁。", 403);
           return send(response, 200, await recognize(request));
@@ -167,6 +172,7 @@ export function createApiServer(
         const token = cookieToken(request);
         authenticate(db, token);
         if (pathname === "/api/identity/check") {
+          sportsAccountGate(new Repository(db), authenticate(db, token));
           demand(
             Object.keys(input).length === 0,
             "核验对象只能来自当前登录账号。",
@@ -215,6 +221,18 @@ export function createApiServer(
           actor = authenticate(db, cookieToken(request)),
           serverNow = Date.now();
         const system = systemWorkspace(repo, actor);
+        if (requiresPasswordChange(repo, actor))
+          return send(response, 200, {
+            identity: system.identity,
+            firstLoginOnly: true,
+            serverNow,
+            system: {
+              ...system.system,
+              canManage: false,
+              history: [],
+              supplements: [],
+            },
+          });
         if (system.system.mode === "MAINTENANCE") {
           const canGovernAi =
             system.identity.data.role === "admin" &&
@@ -270,6 +288,10 @@ export function createApiServer(
         pathname,
       );
       if (request.method === "GET" && mediaRead) {
+        sportsAccountGate(
+          new Repository(db),
+          authenticate(db, cookieToken(request)),
+        );
         const media = readMaterial(
           new Repository(db),
           authenticate(db, cookieToken(request)),

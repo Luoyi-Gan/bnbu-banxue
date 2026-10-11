@@ -17,6 +17,7 @@ export interface LiveEntity {
   updatedAt: string;
 }
 export interface Workspace {
+  firstLoginOnly?: boolean;
   notificationBatches?: {
     id: string;
     createdAt: string;

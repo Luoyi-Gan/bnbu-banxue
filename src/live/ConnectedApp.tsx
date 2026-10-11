@@ -302,8 +302,7 @@ function EditForm({
 
 export function ConnectedApp() {
   const location = useLocation(),
-    navigate = useNavigate(),
-    module = location.pathname.split("/")[2] || "home";
+    navigate = useNavigate();
   const [data, setData] = useState<Workspace | null>(null),
     [error, setError] = useState(""),
     [message, setMessage] = useState(""),
@@ -457,27 +456,38 @@ export function ConnectedApp() {
       </button>
     </div>
   );
-  const nav: [string, string, LucideIcon][] = [
-    ["home", "概览", LayoutDashboard],
-    ...(student || teacher || operate
-      ? [["sports", "体育课程", CalendarDays] as [string, string, LucideIcon]]
-      : []),
-    ...(student
-      ? [
-          ["activities", "校园活动", Compass],
-          ["community", "社区", MessageCircle],
-          ["teams", "找搭子", UsersRound],
-          ["alumni", "校友同行", UsersRound],
-          ["campus", "校园服务", BookOpen],
-        ]
-      : []),
-    ...(student || teacher || operate
-      ? [["coffee", "Coffee Chat", Coffee]]
-      : []),
-    ...(review || operate ? [["admin", "审核与运营", ShieldCheck]] : []),
-    ["notifications", "消息通知", Bell],
-    ["profile", "个人资料", CalendarDays],
-  ] as [string, string, LucideIcon][];
+  const module = data.firstLoginOnly
+    ? "sports"
+    : location.pathname.split("/")[2] || "home";
+  const nav: [string, string, LucideIcon][] = data.firstLoginOnly
+    ? [["sports", "首次改密", ShieldCheck]]
+    : ([
+        ["home", "概览", LayoutDashboard],
+        ...(student || teacher || operate
+          ? [
+              ["sports", "体育课程", CalendarDays] as [
+                string,
+                string,
+                LucideIcon,
+              ],
+            ]
+          : []),
+        ...(student
+          ? [
+              ["activities", "校园活动", Compass],
+              ["community", "社区", MessageCircle],
+              ["teams", "找搭子", UsersRound],
+              ["alumni", "校友同行", UsersRound],
+              ["campus", "校园服务", BookOpen],
+            ]
+          : []),
+        ...(student || teacher || operate
+          ? [["coffee", "Coffee Chat", Coffee]]
+          : []),
+        ...(review || operate ? [["admin", "审核与运营", ShieldCheck]] : []),
+        ["notifications", "消息通知", Bell],
+        ["profile", "个人资料", CalendarDays],
+      ] as [string, string, LucideIcon][]);
   const moduleTitle = nav.find((n) => n[0] === module)?.[1] ?? "伴学";
   const coffeeSlots = all("coffeeSlot"),
     coffeeBookings = all("coffeeBooking");

@@ -9,6 +9,7 @@ import {
   type Fields,
 } from "../repository";
 import { businessWeek, selectCredit, type CreditCandidate } from "./credit";
+import { sportsAccountGate } from "./account-gate";
 import {
   administratorAccess,
   requireSportsPermission,
@@ -20,6 +21,7 @@ export function sportsRole(
   actor: Account,
   role: "student" | "teacher" | "admin",
 ) {
+  sportsAccountGate(repo, actor);
   demand(
     actor.status !== "banned" &&
       repo
@@ -425,6 +427,7 @@ export function sportsCourseCommand(
 }
 
 export function sportsWorkspace(repo: Repository, actor: Account) {
+  sportsAccountGate(repo, actor);
   const identity = repo
     .all("sportsIdentity")
     .find((i) => i.ownerId === actor.id);

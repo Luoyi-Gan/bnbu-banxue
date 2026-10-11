@@ -25,6 +25,10 @@ import { sportsCalendarCommand } from "./sports/calendar";
 import { sportsIncidentCommand } from "./sports/incidents";
 import { sportsSwimCommand } from "./sports/swimming";
 import { sportsPasswordCommand } from "./sports/password";
+import {
+  sportsAccountGate,
+  requiresPasswordChange,
+} from "./sports/account-gate";
 
 export function execute(
   db: Database,
@@ -43,6 +47,7 @@ export function execute(
     const actor = authenticate(db, token),
       repo = new Repository(db);
     demand(actor.status !== "banned", "账号已封禁，不能进行业务写入。", 403);
+    if (action !== "sports.password.change") sportsAccountGate(repo, actor);
     sportsWriteGate(repo, action);
     const booleanArguments: Record<string, string> = {
       "content.review": "",
@@ -187,6 +192,26 @@ export function execute(
 }
 
 export function snapshot(db: Database, actor: Account) {
+  if (requiresPasswordChange(new Repository(db), actor))
+    return {
+      firstLoginOnly: true,
+      account: actor,
+      entities: [],
+      people: [],
+      notifications: [],
+      relations: [],
+      audit: [],
+      notificationBatches: [],
+      alumni: {
+        profiles: [],
+        follows: [],
+        slots: [],
+        bookings: [],
+        notices: [],
+        history: [],
+      },
+      capabilities: {},
+    };
   const repo = new Repository(db),
     review = has(actor, "reviewer", "superadmin"),
     operate = has(actor, "operator", "superadmin");
