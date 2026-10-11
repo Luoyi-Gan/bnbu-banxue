@@ -533,3 +533,13 @@ workspace仅责任教师取得gradeDrafts/gradePublications，学生和管理员
 已使用当前 PowerShell 代理重新执行 docker compose build，项目镜像构建成功，包含业务提交8699738；镜像ID为sha256:da5a7d26e0340cf2b27f250b519065115802663ea753ebcb24552d04b00e8d3d。独立临时容器启动成功，health为healthy，经容器内部4174访问/workspace及/api/health均为200。未发布临时容器端口，Windows验收服务保持4174/4175运行。
 
 Linux容器挂载只读测试fixtures和integrations后，33文件230项测试全部通过。该结果验证当前项目容器与自动测试，不代表新增页面完成浏览器点击验收或真实学校服务接通。临时验证容器用后删除，保留镜像和数据卷。教师正式域名确认为bnbu.edu.cn，Windows Acceptance仍显式使用example.test。
+
+## 2026-10-13 耐力跑原始事实与冻结换算
+
+sports.endurance.confirm(enrollmentId,version,event,seconds,testDate,confirmed=true)仅责任教师。首次version=0，更正须当前sportsEndurance版本；event只接受800/1000，seconds非负整数，日期须合法且不在未来，必须明确确认。不接受手工分数、指定表或额外字段。新记录要求已发布课程有效成员；关闭或移出后只可更正已有事实，结算/归档须后续报告更正入口。
+
+每次确认保存当前sportsEndurance并追加不可覆盖sportsEnduranceRevision。服务端读取唯一已核验sportsIdentity的sex(MALE/FEMALE)及当前year(1–4)，据此选择项目及JUNIOR/SENIOR；教师不能从录入请求指定这些字段。现有本地验收身份尚未填写这些人口属性，不假造资料，因此会明确换算不可用。正式注册资料采集及年级维护仍须后续接通。已知性别与项目冲突拒绝；缺资料、缺唯一表或区间不匹配时保留原始事实和UNAVAILABLE原因。成功换算保存表ID、版本、原行、分数和等级；表变更不重算旧结果，相同原始事实重复确认也不触发重算。
+
+workspace增加enduranceRecords/enduranceHistory。责任教师取得本人课程完整内容；学生投影只含原始项目、秒数、日期及必要课程/版本标识，管理员无此教学明细。通知只含原始事实，不携带分数、等级或换算原因。不改变运动分钟、进度或教师最终成绩。教师课程卡逐人核对、更正，学生查看原始记录与确认历史。此入口是人工逐人确认；电子表格/OCR导入、免测及结算后更正未完成，不以人工入口替代这些需求。
+
+33文件233项测试全部通过，双端类型、Lint和构建通过；已有大块构建提示仍存在。验证原始事实及更正、旧换算冻结、学生/管理员隔离、无分数通知、资料/区间不足、非法输入、权限、版本、关闭更正和结算阻止。新增浏览器点击尚未验收。Docker此前230项验证对应8699738，此次新增分支为Windows验证。

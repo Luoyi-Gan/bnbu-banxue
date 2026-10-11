@@ -1082,3 +1082,184 @@ it("最终成绩拒绝备注、非整数、越权、陈旧版本和结算后直�
   ).toThrow("历史报告更正");
   expect(f.repo.all("sportsGradePublication")).toHaveLength(0);
 });
+
+it("耐力跑保存真实秒数、冻结自动换算版本，更正追加历史且学生投影不含内部字段", async () => {
+  const f = managementFixture();
+  const { enduranceWorkspace } = await import("../server/sports/endurance");
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.student.account.id)!;
+  f.repo.save(identity, { sex: "MALE", year: 2 });
+  const input = {
+    enrollmentId: f.member.id,
+    version: 0,
+    event: 1000,
+    seconds: 240,
+    testDate: "2026-10-11",
+    confirmed: true,
+  };
+  const first = f.run(f.teacher, "sports.endurance.confirm", input);
+  expect(first.data.conversion).toMatchObject({
+    status: "AVAILABLE",
+    score: 99,
+    tableVersion: 1,
+  });
+  const table = f.repo
+    .all("sportsConversionTable")
+    .find((t) => t.data.key === "MALE_JUNIOR")!;
+  const rows = table.data.rows as Record<string, unknown>[];
+  f.run(f.admin, "sports.conversion.edit", {
+    ...rows[1],
+    id: table.id,
+    version: table.version,
+    rowId: rows[1].id,
+    score: 100,
+  });
+  expect(f.repo.get(first.id).data.conversion).toMatchObject({
+    score: 99,
+    tableVersion: 1,
+  });
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", { ...input, version: 1 }),
+  ).toThrow("未变化");
+  const second = f.run(f.teacher, "sports.endurance.confirm", {
+    ...input,
+    version: 1,
+    seconds: 241,
+  });
+  expect(second.data.conversion).toMatchObject({ score: 100, tableVersion: 2 });
+  const history = f.repo
+    .all("sportsEnduranceRevision")
+    .sort(
+      (a, b) => Number(a.data.recordVersion) - Number(b.data.recordVersion),
+    );
+  expect(history).toHaveLength(2);
+  expect(history[0].data.conversion).toMatchObject({
+    score: 99,
+    tableVersion: 1,
+  });
+  const projection = enduranceWorkspace(f.repo, f.student.account);
+  expect(projection.enduranceRecords[0].data).toEqual({
+    courseId: f.course.id,
+    event: 1000,
+    seconds: 241,
+    testDate: "2026-10-11",
+    recordId: first.id,
+    recordVersion: 2,
+  });
+  expect(JSON.stringify(projection)).not.toMatch(
+    /conversion|score|grade|tableVersion|confirmedBy/,
+  );
+  expect(enduranceWorkspace(f.repo, f.admin.account).enduranceRecords).toEqual(
+    [],
+  );
+  expect(
+    enduranceWorkspace(f.repo, f.teacher.account).enduranceRecords[0].data
+      .conversion,
+  ).toMatchObject({ score: 100 });
+  expect(f.repo.all("sportsProgress")).toHaveLength(0);
+  expect(f.repo.all("sportsGradeDraft")).toHaveLength(0);
+  const messages = f.db
+    .prepare("SELECT body FROM notifications WHERE entity_id=?")
+    .all(first.id);
+  expect(messages).toHaveLength(2);
+  expect(JSON.stringify(messages)).not.toMatch(/分数|等级|99|100分/);
+});
+it("缺资料或无匹配区间保留真实用时但不猜分，不允许教师指定表或分数", () => {
+  const f = managementFixture();
+  const input = {
+    enrollmentId: f.member.id,
+    version: 0,
+    event: 800,
+    seconds: 270,
+    testDate: "2026-10-11",
+    confirmed: true,
+  };
+  const first = f.run(f.teacher, "sports.endurance.confirm", input);
+  expect(first.data.conversion).toMatchObject({ status: "UNAVAILABLE" });
+  expect(
+    (first.data.conversion as Record<string, unknown>).score,
+  ).toBeUndefined();
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.student.account.id)!;
+  f.repo.save(identity, { sex: "FEMALE", year: 4 });
+  const second = f.run(f.teacher, "sports.endurance.confirm", {
+    ...input,
+    version: 1,
+    seconds: 601,
+  });
+  expect(second.data.seconds).toBe(601);
+  expect(second.data.conversion).toMatchObject({ status: "UNAVAILABLE" });
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      ...input,
+      version: 2,
+      score: 100,
+    }),
+  ).toThrow("指定换算表");
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      ...input,
+      version: 2,
+      event: 1000,
+    }),
+  ).toThrow("性别不符");
+});
+it("原始体测拒绝歧义用时、越权、陈旧版本、未来或无效日期，关闭保留更正但结算要求报告更正", () => {
+  const f = managementFixture();
+  const input = {
+    enrollmentId: f.member.id,
+    version: 0,
+    event: 800,
+    seconds: 270,
+    testDate: "2026-10-11",
+    confirmed: true,
+  };
+  expect(() => f.run(f.admin, "sports.endurance.confirm", input)).toThrow(
+    "体育身份",
+  );
+  expect(() => f.run(f.student, "sports.endurance.confirm", input)).toThrow(
+    "体育身份",
+  );
+  for (const seconds of ["4.30", 4.3, -1])
+    expect(() =>
+      f.run(f.teacher, "sports.endurance.confirm", { ...input, seconds }),
+    ).toThrow("seconds");
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      ...input,
+      testDate: "2026-02-30",
+    }),
+  ).toThrow("日期无效");
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      ...input,
+      testDate: "2099-10-11",
+    }),
+  ).toThrow("未来");
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      ...input,
+      confirmed: false,
+    }),
+  ).toThrow("确认");
+  f.run(f.teacher, "sports.endurance.confirm", input);
+  expect(() => f.run(f.teacher, "sports.endurance.confirm", input)).toThrow(
+    "已变化",
+  );
+  f.repo.save(f.course, { status: "CLOSED" });
+  f.run(f.teacher, "sports.endurance.confirm", {
+    ...input,
+    version: 1,
+    seconds: 275,
+  });
+  f.repo.save(f.repo.get(f.course.id), { settlementStatus: "SETTLED" });
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      ...input,
+      version: 2,
+      seconds: 280,
+    }),
+  ).toThrow("历史报告更正");
+});
