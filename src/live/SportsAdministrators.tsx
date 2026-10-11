@@ -91,6 +91,32 @@ export function SportsAdministrators() {
                 {row.status === "ACTIVE" ? "已启用" : "已停用"}
               </p>
               <p>{row.permissions.map((p) => labels[p]).join("、")}</p>
+              <button
+                disabled={busy}
+                onClick={() => {
+                  if (
+                    !window.confirm(
+                      `确认已完成全部职责移交并删除？\n姓名：${row.name}\n账号：${row.loginName}\n学校邮箱：${row.email}\n管理登录资料将删除，业务历史保留，原个人账号不受影响。`,
+                    )
+                  )
+                    return;
+                  void run(async () => {
+                    await command("sports.admins.delete", {
+                      id: row.identityId,
+                      version: row.version,
+                      name: row.name,
+                      loginName: row.loginName,
+                      email: row.email,
+                      confirmed: true,
+                      handoverConfirmed: true,
+                    });
+                    setShow(false);
+                    await refresh();
+                  });
+                }}
+              >
+                删除管理账号
+              </button>
               <button disabled={busy} onClick={() => open(row)}>
                 编辑资料和权限
               </button>

@@ -19,6 +19,7 @@ import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
+import { administratorSelf } from "./sports/administrator-deletion";
 import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
@@ -589,6 +590,18 @@ export function createApiServer(
           response,
           200,
           administratorDirectory(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+          ),
+        );
+      if (
+        request.method === "GET" &&
+        pathname === "/api/sports/administrator-self"
+      )
+        return send(
+          response,
+          200,
+          administratorSelf(
             new Repository(db),
             authenticate(db, cookieToken(request)),
           ),

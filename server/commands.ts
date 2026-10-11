@@ -27,6 +27,7 @@ import { sportsSwimCommand } from "./sports/swimming";
 import { sportsPasswordCommand } from "./sports/password";
 import { sportsTeacherAccountCommand } from "./sports/teacher-accounts";
 import { sportsAdministratorCommand } from "./sports/administrators";
+import { sportsAdministratorDeletion } from "./sports/administrator-deletion";
 import { requireSportsSuperAdmin } from "./sports/permissions";
 import { sportsFeedbackCommand } from "./sports/feedback";
 import { sportsHelpCommand } from "./sports/help";
@@ -159,6 +160,7 @@ export function execute(
         sportsPasswordCommand(repo, actor, token, action, input) ??
         sportsTeacherAccountCommand(repo, actor, action, input) ??
         sportsAdministratorCommand(repo, actor, action, input) ??
+        sportsAdministratorDeletion(repo, actor, action, input) ??
         sportsFeedbackCommand(repo, actor, action, input) ??
         sportsHelpCommand(repo, actor, action, input) ??
         sportsConversionCommand(repo, actor, action, input) ??

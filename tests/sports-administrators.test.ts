@@ -15,7 +15,134 @@ import { execute } from "../server/commands";
 import { administratorDirectory } from "../server/sports/administrators";
 import { migrateAccountNamespaces } from "../server/account-migration";
 import { createApiServer } from "../server/main";
+import { administratorSelf } from "../server/sports/administrator-deletion";
 const dbs: Database[] = [];
+it("删除清空独立登录资料和资料副本，业务历史及个人账号保留且历史主体不能复活", () => {
+  const f = setup(),
+    identity = f.create();
+  f.cmd("sports.admins.edit", {
+    id: identity.id,
+    version: identity.version,
+    name: "管理专属新名",
+    email: "adminonly@example.test",
+    department: "私人部门",
+    permissions: ["HELP"],
+    confirmed: true,
+  });
+  const logged = loginAdministrator(f.db, "staff.one", "x");
+  f.db
+    .prepare("INSERT INTO email_challenges VALUES(?,?,?,0,?)")
+    .run(f.input.email, "personal-challenge", Date.now() + 10000, Date.now());
+  const business = f.repo.create("sportsHelp", identity.ownerId, {
+    titleZh: "保留的工作成果",
+    status: "draft",
+  });
+  const row = administratorDirectory(f.repo, f.root.account).items[0];
+  const input = {
+    id: identity.id,
+    version: row.version,
+    name: row.name,
+    email: row.email,
+    loginName: row.loginName,
+    confirmed: true,
+    handoverConfirmed: true,
+  };
+  expect(() =>
+    f.cmd("sports.admins.delete", { ...input, handoverConfirmed: false }),
+  ).toThrow("职责移交");
+  expect(() =>
+    f.cmd("sports.admins.delete", { ...input, name: "过时" }),
+  ).toThrow("资料已变化");
+  expect(() => f.cmd("sports.admins.delete", input, f.personal.token)).toThrow(
+    "总管理员",
+  );
+  f.cmd("sports.admins.delete", input);
+  expect(
+    f.db
+      .prepare(
+        "SELECT email,password_hash,name,organization,login_name,login_kind,roles FROM accounts WHERE id=?",
+      )
+      .get(identity.ownerId!),
+  ).toEqual({
+    email: null,
+    password_hash: null,
+    name: null,
+    organization: null,
+    login_name: null,
+    login_kind: "HISTORY",
+    roles: "[]",
+  });
+  expect(() => authenticate(f.db, logged.token)).toThrow();
+  expect(() => loginAdministrator(f.db, "staff.one", "x")).toThrow();
+  expect(authenticate(f.db, f.personal.token).id).toBe(f.personId);
+  expect(
+    f.db
+      .prepare("SELECT code_hash FROM email_challenges WHERE email=?")
+      .get(f.input.email)?.code_hash,
+  ).toBe("personal-challenge");
+  expect(f.repo.get(business.id).data.titleZh).toBe("保留的工作成果");
+  expect(f.repo.person(identity.ownerId!).name).toBe("已注销用户");
+  expect(f.repo.people().some((p) => p.id === identity.ownerId)).toBe(false);
+  expect(administratorDirectory(f.repo, f.root.account).items).toEqual([]);
+  expect(JSON.stringify(f.repo.all("sportsAdminHistory"))).not.toMatch(
+    /管理专属新名|adminonly@example.test|私人部门/,
+  );
+  expect(
+    f.db
+      .prepare(
+        "SELECT COUNT(*) AS n FROM audit WHERE action='sports.admins.delete'",
+      )
+      .get()?.n,
+  ).toBe(1);
+  expect(() =>
+    f.db
+      .prepare(
+        "UPDATE accounts SET login_kind='ADMIN',login_name='revive',email='revive@example.test',name='revive',password_hash='hash',organization='',roles='[]',status='active' WHERE id=?",
+      )
+      .run(identity.ownerId!),
+  ).toThrow("cannot regain login");
+  expect(f.db.prepare("PRAGMA foreign_key_check").all()).toEqual([]);
+});
+it("本人注销只作用于本人独立账号，审计失败则资料与登录全部回滚", () => {
+  const f = setup(),
+    identity = f.create(),
+    logged = loginAdministrator(f.db, "staff.one", "x");
+  f.cmd(
+    "sports.password.change",
+    {
+      version: identity.version,
+      currentPassword: "x",
+      newPassword: "y",
+      confirmPassword: "y",
+    },
+    logged.token,
+  );
+  const self = administratorSelf(f.repo, logged.account),
+    input = { ...self, confirmed: true, handoverConfirmed: true };
+  expect(() => f.cmd("sports.account.close", input, f.personal.token)).toThrow(
+    "无权",
+  );
+  f.db.exec(
+    "CREATE TRIGGER reject_closure_audit BEFORE INSERT ON audit WHEN NEW.action='sports.account.close' BEGIN SELECT RAISE(ABORT,'audit unavailable'); END;",
+  );
+  expect(() => f.cmd("sports.account.close", input, logged.token)).toThrow(
+    "audit unavailable",
+  );
+  expect(authenticate(f.db, logged.token).id).toBe(identity.ownerId);
+  expect(f.repo.get(identity.id).data.role).toBe("admin");
+  f.db.exec("DROP TRIGGER reject_closure_audit");
+  f.cmd("sports.account.close", input, logged.token);
+  expect(() => authenticate(f.db, logged.token)).toThrow();
+  expect(authenticate(f.db, f.personal.token).id).toBe(f.personId);
+  expect(
+    f.db
+      .prepare(
+        "SELECT COUNT(*) AS n FROM audit WHERE action='sports.account.close'",
+      )
+      .get()?.n,
+  ).toBe(1);
+  expect(f.db.prepare("PRAGMA foreign_key_check").all()).toEqual([]);
+});
 it("HTTP独立登录发放本人会话且普通邮箱入口不能误登录管理身份", async () => {
   const f = setup(),
     identity = f.create(),

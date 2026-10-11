@@ -116,7 +116,9 @@ export class Repository {
   }
   people(): Omit<Account, "email">[] {
     return this.db
-      .prepare("SELECT id,name,organization,status,roles FROM accounts")
+      .prepare(
+        "SELECT id,name,organization,status,roles FROM accounts WHERE login_kind<>'HISTORY'",
+      )
       .all()
       .map((row) => ({
         id: String(row.id),
@@ -129,7 +131,7 @@ export class Repository {
   person(id: string): Account {
     const row = this.db
       .prepare(
-        "SELECT id,email,name,organization,status,roles FROM accounts WHERE id=?",
+        "SELECT id,COALESCE(email,'') AS email,COALESCE(name,'已注销用户') AS name,COALESCE(organization,'') AS organization,status,roles FROM accounts WHERE id=?",
       )
       .get(id);
     demand(row, "账号不存在。", 404);

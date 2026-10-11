@@ -746,3 +746,15 @@ POST /api/auth/admin-login {loginName,password}为独立管理登录入口，规
 验证：Windows/Docker Linux各43文件297项测试通过，双端类型、Lint与构建通过（原大块提示保留）。覆盖同邮箱不同凭据、首改门禁、本人改密与其他会话失效、管理停用保留原个人登录、启用仅当前权限、重复/越权/非法字段回滚、实际HTTP Cookie/门禁和旧库迁移外键。Docker镜像重建成功，配置sha256:a4cb0247e54fa1b54831394ba25f846a58175e76ebab85b802ae539f2b05c80b。本轮运行容器测试，未另起健康验证容器。
 
 宿主实际HTTP验收已通过：建立local.sports.admin.one、首次门禁、本人改密、停用后原管理会话401、原教师会话仍200、启用后重新登录并查询学生目录。该独立本地测试账号留在启用状态，权限ACCOUNTS/HELP；凭据仅本地data/admin-acceptance-account.json，非秘密结果data/admin-acceptance-result.json，均不提交Git。网页尚未点击验收。剩余包括删除和注销历史匿名化、正式邮箱绑定/找回、平台故障恢复/复杂复核、名单历史更正及全流程规则和浏览器验收；真实外部依赖见前述配置，OCR继续可配置接口。完整goal继续。
+
+## 独立分管理员删除／本人注销
+
+schema v5在现有账号主键空间增加HISTORY内部主体，email/password_hash/name/organization/login_name均须为NULL、roles为空、status=banned；CHECK及不可恢复登录触发器约束，认证显式拒绝HISTORY。其作用是保留历史外键，不是可用账号或停用资料。迁移保持旧PERSONAL/ADMIN行及关联，提交前检查外键；本地迁移前before-admin-history.sqlite一致备份已保存。Repository.people排除历史主体，person只提供已注销占位名和空当前邮箱，不能据旧资料恢复当前身份。
+
+sports.admins.delete仅总管理员；sports.account.close仅本人独立管理账号，不适用总管理员或原个人账号。输入id（sportsIdentity ID）、version、name、loginName、email、confirmed=true、handoverConfirmed=true；字段与当前资料不符返回409。首次改密及维护门禁仍有效，注销前须先改初始密码。GET /api/sports/administrator-self仅返回本人独立管理员的删除核对字段，无管理其他人员能力。网页总管理员列表增加删除确认，独立分管理员增加本人注销确认，展示姓名、登录名和邮箱；成功注销返回登录页。
+
+同一命令事务删除该管理主体身份资料、会话、收件通知、关系和旧回执，清空当前登录及资料字段；清除sportsAdminHistory前后资料副本中的姓名、邮箱和部门，保留权限、状态、业务内容和必要历史关联。追加删除事件与统一审计。审计失败则全部回滚，不能发生资料已删除但审计失败的半状态。同邮箱个人注册email_challenges属于个人登录空间，不能连带清除。管理员邮箱找回尚未接入；未来目的与主体绑定的管理员挑战必须接入本删除清理链。
+
+验证：Windows与Docker Linux各43文件299项测试通过；前后端类型、Lint与构建通过（原大块提示保留）。新增覆盖最新资料核对、权限/交接确认、资料副本清理、凭据NULL、历史内容/外键保留、个人验证码与登录隔离、历史主体禁止恢复、本人注销及审计失败回滚。镜像重建成功，配置sha256:1f8842b1d40cf87e44dd6eded397e2041333b6d495649c11ed1a1c88efb8e179；本轮运行容器测试，未另起健康验证容器。
+
+宿主实际HTTP验收建立两名临时管理账号，分别总管理员删除与本人注销，旧会话和旧凭据均401，同邮箱原学生登录仍200。只删除本轮临时账号，原常用local.sports.admin.one继续保留；结果data/admin-deletion-acceptance.json。验收库integrity_check=ok、foreign_key_check=[]；新增网页未点击验收。下一步仍需管理员验证邮箱/找回，正式学校身份流程、教师和学生注销治理、平台故障恢复/复杂复核、名单历史更正及全流程规则与浏览器验收，完整goal继续。

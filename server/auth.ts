@@ -43,7 +43,7 @@ export interface Account {
 type AccountRow = Omit<Account, "roles"> & {
   roles: string;
   password_hash: string;
-  login_kind: "PERSONAL" | "ADMIN";
+  login_kind: "PERSONAL" | "ADMIN" | "HISTORY";
 };
 const account = (row: AccountRow): Account => ({
   id: row.id,
@@ -275,6 +275,8 @@ export function authenticate(db: Database, token: string | undefined) {
     .get(digest(token), Date.now()) as AccountRow | undefined;
   if (!row)
     throw new ServiceError(401, "UNAUTHENTICATED", "登录已过期，请重新登录。");
+  if (row.login_kind === "HISTORY")
+    throw new ServiceError(401, "UNAUTHENTICATED", "登录已失效。");
   if (row.login_kind === "ADMIN" && row.status !== "active")
     throw new ServiceError(403, "ACCOUNT_DISABLED", "管理账号已停用。");
   return account(row);

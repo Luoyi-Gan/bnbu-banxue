@@ -2,7 +2,10 @@ import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { seedConversions } from "./sports/conversion-seed";
-import { migrateAccountNamespaces } from "./account-migration";
+import {
+  migrateAccountNamespaces,
+  migrateHistoricalSubjects,
+} from "./account-migration";
 
 export function openDatabase(filename: string) {
   if (filename !== ":memory:")
@@ -66,6 +69,7 @@ export function openDatabase(filename: string) {
     INSERT OR IGNORE INTO schema_migrations VALUES (1, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
   `);
   migrateAccountNamespaces(db);
+  migrateHistoricalSubjects(db);
   seedConversions(db);
   return db;
 }
