@@ -14,6 +14,7 @@ export function sportsEnduranceCommand(
   actor: Account,
   action: string,
   input: Fields,
+  acceptedEnrollmentIds: readonly string[] = [],
 ) {
   if (action !== "sports.endurance.confirm") return undefined;
   demand(
@@ -44,6 +45,7 @@ export function sportsEnduranceCommand(
     .find((r) => r.data.enrollmentId === member.id);
   demand(
     old ||
+      acceptedEnrollmentIds.includes(member.id) ||
       (course.data.status === "PUBLISHED" && member.data.status === "ACTIVE"),
     "关闭课程或移出成员只能更正已有体测事实。",
     409,

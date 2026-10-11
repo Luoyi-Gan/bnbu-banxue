@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsEnduranceImport } from "./SportsEnduranceImport";
 import { SportsEndurance } from "./SportsEndurance";
 import { SportsGrades } from "./SportsGrades";
 import { SportsConversion } from "./SportsConversion";
@@ -26,6 +27,7 @@ interface SportsData
   firstLoginOnly?: boolean;
   teacherImports?: LiveEntity[];
   conversionTables?: LiveEntity[];
+  enduranceImports?: LiveEntity[];
   enduranceRecords?: LiveEntity[];
   enduranceHistory?: LiveEntity[];
   gradeDrafts?: LiveEntity[];
@@ -393,6 +395,14 @@ export function LiveSports({
         {data.courses.map((c) => (
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
+            {role === "teacher" && (
+              <SportsEnduranceImport
+                course={c}
+                imports={data.enduranceImports ?? []}
+                open={open}
+                busy={busy}
+              />
+            )}
             {(role === "teacher" || role === "student") && (
               <SportsEndurance
                 course={c}

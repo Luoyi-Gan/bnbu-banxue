@@ -1263,3 +1263,206 @@ it("原始体测拒绝歧义用时、越权、陈旧版本、未来或无效日�
     }),
   ).toThrow("历史报告更正");
 });
+
+it("电子成绩单逐行草稿、部分确认和明确排除保留原始材料及待处理状态", async () => {
+  const f = managementFixture();
+  const { enduranceImportWorkspace } =
+    await import("../server/sports/endurance-import");
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.student.account.id)!;
+  f.repo.save(identity, { studentNumber: "S001", sex: "FEMALE", year: 1 });
+  const csv =
+    "student_number,name,event,time,test_date\nS001,student,800,4:30,2026-10-11\nmissing,student,800,4.30,2026-10-11";
+  let batch = f.run(f.teacher, "sports.endurance.import", {
+    courseId: f.course.id,
+    csv,
+  });
+  const projected = enduranceImportWorkspace(f.repo, f.teacher.account)
+    .enduranceImports[0];
+  expect((projected.data.rows as { errors: string[] }[])[0].errors).toEqual([]);
+  expect(
+    (projected.data.rows as { errors: string[] }[])[1].errors.join(),
+  ).toMatch(/学号无法|4.30/);
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.batch.confirm", {
+      id: batch.id,
+      version: batch.version,
+      rows: [2, 3],
+      confirmed: true,
+    }),
+  ).toThrow("整批未保存");
+  expect(f.repo.all("sportsEndurance")).toHaveLength(0);
+  batch = f.run(f.teacher, "sports.endurance.batch.confirm", {
+    id: batch.id,
+    version: batch.version,
+    rows: [2],
+    confirmed: true,
+  });
+  expect(batch.data.status).toBe("PENDING");
+  expect(f.repo.all("sportsEndurance")[0].data.seconds).toBe(270);
+  expect(batch.data.csv).toBe(csv);
+  expect(
+    enduranceImportWorkspace(f.repo, f.student.account).enduranceImports,
+  ).toEqual([]);
+  expect(
+    enduranceImportWorkspace(f.repo, f.admin.account).enduranceImports,
+  ).toEqual([]);
+  batch = f.run(f.teacher, "sports.endurance.row", {
+    id: batch.id,
+    version: batch.version,
+    row: 3,
+    exclude: true,
+    reason: "对照原成绩单确认是错误重复抄录",
+  });
+  expect(batch.data.status).toBe("COMPLETE");
+  expect((batch.data.rows as { state: string }[]).map((r) => r.state)).toEqual([
+    "CONFIRMED",
+    "EXCLUDED",
+  ]);
+  expect(f.repo.all("sportsEnduranceImportHistory")).toHaveLength(1);
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.row", {
+      id: batch.id,
+      version: batch.version,
+      row: 2,
+      exclude: true,
+      reason: "不能覆盖正式行",
+    }),
+  ).toThrow("已经确认");
+});
+it("重复行全部标疑，修正明确留痕；课程关闭不截断已受理成绩单", async () => {
+  const f = managementFixture();
+  const { enduranceImportWorkspace } =
+    await import("../server/sports/endurance-import");
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.student.account.id)!;
+  f.repo.save(identity, { studentNumber: "S001", sex: "FEMALE", year: 1 });
+  let batch = f.run(f.teacher, "sports.endurance.import", {
+    courseId: f.course.id,
+    csv: "student_number,name,event,time,test_date\nS001,student,800,4.30,2026-10-11\nS001,student,800,270,2026-10-11",
+  });
+  expect(
+    (
+      enduranceImportWorkspace(f.repo, f.teacher.account).enduranceImports[0]
+        .data.rows as { errors: string[] }[]
+    ).every((r) => r.errors.some((e) => e.includes("重复"))),
+  ).toBe(true);
+  batch = f.run(f.teacher, "sports.endurance.row", {
+    id: batch.id,
+    version: batch.version,
+    row: 3,
+    exclude: true,
+    reason: "重复抄写",
+  });
+  batch = f.run(f.teacher, "sports.endurance.row", {
+    id: batch.id,
+    version: batch.version,
+    row: 2,
+    studentNumber: "S001",
+    name: "student",
+    event: "800",
+    time: "4:30",
+    testDate: "2026-10-11",
+    reason: "对照成绩单确认为4分30秒",
+  });
+  f.repo.save(f.course, { status: "CLOSED" });
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.import", {
+      courseId: f.course.id,
+      csv: "x",
+    }),
+  ).toThrow("不接受新体测");
+  batch = f.run(f.teacher, "sports.endurance.batch.confirm", {
+    id: batch.id,
+    version: batch.version,
+    rows: [2],
+    confirmed: true,
+  });
+  expect(batch.data.status).toBe("COMPLETE");
+  expect(f.repo.all("sportsEndurance")[0].data.seconds).toBe(270);
+  expect(f.repo.all("sportsEnduranceImportHistory")).toHaveLength(2);
+});
+it("正式数据变化必须重新核对导入行，越权、陈旧版本、500行上限与批量写入故障回滚", () => {
+  const f = managementFixture();
+  const identity = f.repo
+    .all("sportsIdentity")
+    .find((i) => i.ownerId === f.student.account.id)!;
+  f.repo.save(identity, { studentNumber: "S001", sex: "FEMALE", year: 1 });
+  const header = "student_number,name,event,time,test_date\n",
+    line = "S001,student,800,270,2026-10-11";
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.import", {
+      courseId: f.course.id,
+      csv: header + Array(501).fill(line).join("\n"),
+    }),
+  ).toThrow("500行");
+  expect(() =>
+    f.run(f.admin, "sports.endurance.import", {
+      courseId: f.course.id,
+      csv: header + line,
+    }),
+  ).toThrow("体育身份");
+  let batch = f.run(f.teacher, "sports.endurance.import", {
+    courseId: f.course.id,
+    csv: header + line,
+  });
+  f.run(f.teacher, "sports.endurance.confirm", {
+    enrollmentId: f.member.id,
+    version: 0,
+    event: 800,
+    seconds: 260,
+    testDate: "2026-10-11",
+    confirmed: true,
+  });
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.batch.confirm", {
+      id: batch.id,
+      version: batch.version,
+      rows: [2],
+      confirmed: true,
+    }),
+  ).toThrow("整批未保存");
+  const stale = batch.version;
+  batch = f.run(f.teacher, "sports.endurance.row", {
+    id: batch.id,
+    version: batch.version,
+    row: 2,
+    studentNumber: "S001",
+    name: "student",
+    event: "800",
+    time: "270",
+    testDate: "2026-10-11",
+    reason: "已核对最新正式版本，更正为270秒",
+  });
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.batch.confirm", {
+      id: batch.id,
+      version: stale,
+      rows: [2],
+      confirmed: true,
+    }),
+  ).toThrow("已变化");
+  f.db.exec(
+    "CREATE TRIGGER fail_endurance_revision BEFORE INSERT ON entities WHEN NEW.kind='sportsEnduranceRevision' BEGIN SELECT RAISE(ABORT,'test transaction failure'); END",
+  );
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.batch.confirm", {
+      id: batch.id,
+      version: batch.version,
+      rows: [2],
+      confirmed: true,
+    }),
+  ).toThrow("test transaction failure");
+  expect(f.repo.all("sportsEndurance")[0].data.seconds).toBe(260);
+  expect(f.repo.get(batch.id).version).toBe(batch.version);
+  f.db.exec("DROP TRIGGER fail_endurance_revision");
+  f.run(f.teacher, "sports.endurance.batch.confirm", {
+    id: batch.id,
+    version: batch.version,
+    rows: [2],
+    confirmed: true,
+  });
+  expect(f.repo.all("sportsEndurance")[0].data.seconds).toBe(270);
+});
