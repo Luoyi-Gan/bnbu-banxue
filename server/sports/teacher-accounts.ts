@@ -70,7 +70,7 @@ function validateRows(repo: Repository, csv: string) {
     parsed.length > 0 && parsed.length <= 500,
     "每批须有1–500行教师资料。",
   );
-  const domains = (process.env.BNBU_SCHOOL_EMAIL_DOMAINS ?? "")
+  const domains = (process.env.BNBU_SCHOOL_EMAIL_DOMAINS ?? "bnbu.edu.cn")
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);

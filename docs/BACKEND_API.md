@@ -209,3 +209,13 @@ sports.feedback.submit(type,description)仅体育学生本人；类型BUG/SUGGES
 workspace提供feedback、feedbackReplies、canManageFeedback；学生仅本人、授权管理员全部，教师无访问权。管理员读取当前姓名/邮箱和已知学号（缺少时不编造）；学生不取得管理端身份补充字段。网页具备数量概况、编号/身份/描述搜索、分类和状态筛选、清除筛选、六条分页、公开历史及回复入口。
 
 33文件223项全量测试通过，随后补强不同学生隔离和同时间回复顺序，课程/账号/反馈20项复测通过；双端类型、Lint、构建通过。新增网页点击未验收；历史主体注销后的身份清理须随注销流程补齐，不宣称已完成注销隐私验收。学校域名仍待确认，账号治理、名单/OCR、认证免测、成绩与结算等完整范围继续。
+
+## 2026-10-13 帮助中心与正式教师域名确认
+
+用户明确正式教师邮箱为@bnbu.edu.cn，正式环境未覆盖BNBU_SCHOOL_EMAIL_DOMAINS时默认仅bnbu.edu.cn；Acceptance显式使用example.test测试域名。域名不是身份真实性证明，仍须授权管理员逐行核实。此前“正式域名待确认”是历史状态，本决定已解除该待确认项。
+
+帮助管理要求HELP权限。sports.help.save输入id/version/updatedAt（编辑时）、titleZh/titleEn/bodyZh/bodyEn/keywords/category/weight/publish；关键词按中英文逗号拆分、去空去重，权重接受有限小数及负数。草稿至少双语标题与分类，任何公开保存需双语正文和关键词。sports.help.state仅允许draft→published、published→archived、archived→published，检查版本及打开时更新时间，无删除/回退草稿。每次追加sportsHelpHistory前后内容、操作者与结果，首次发布事实保留，无发布通知。
+
+GET /api/sports/help?lang=zh|en：授权管理员取得编辑源，学生仅当前语言已发布标题、正文和分类，不含另一语言、关键词、权重或历史。教师无帮助管理资格，维护及首次改密期间不能读取普通帮助。网页有状态概况、搜索分类、五条分页、双语编辑预览、关闭/Escape未保存提示、发布/下线确认及刷新当前内容；正文按文本核对，不执行HTML或承诺Markdown排版。
+
+33文件225项全量回归通过，新增正式域名测试后对应23项复测通过，合计226项；类型/Lint/构建通过。新增网页点击尚未验收，暂无植入测试帮助文章。整体目标仍含账号治理、名单/OCR、免测/认证、内部成绩、结算报告及真实服务联调。

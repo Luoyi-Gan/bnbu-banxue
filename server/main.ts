@@ -18,6 +18,7 @@ import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { teacherAccountWorkspace } from "./sports/teacher-accounts";
 import { feedbackWorkspace } from "./sports/feedback";
+import { helpRead } from "./sports/help";
 import {
   requiresPasswordChange,
   sportsAccountGate,
@@ -288,6 +289,18 @@ export function createApiServer(
             .map((s) => sessionProjection(s, serverNow)),
         });
       }
+      if (request.method === "GET" && pathname === "/api/sports/help")
+        return send(
+          response,
+          200,
+          helpRead(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            new URL(request.url!, "http://localhost").searchParams.get(
+              "lang",
+            ) ?? "zh",
+          ),
+        );
       const mediaRead = /^\/api\/sports\/materials\/([a-f0-9-]+)$/.exec(
         pathname,
       );

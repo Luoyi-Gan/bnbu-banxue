@@ -7,6 +7,7 @@ import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
+import { SportsHelp } from "./SportsHelp";
 import { SportsFeedback } from "./SportsFeedback";
 import { SportsTeacherAccounts } from "./SportsTeacherAccounts";
 import { SportsCourseManagement } from "./SportsCourseManagement";
@@ -216,6 +217,10 @@ export function LiveSports({
       </section>
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
+      {(role === "student" ||
+        data.administratorAccess?.permissions.includes("HELP")) && (
+        <SportsHelp />
+      )}
       <SportsFeedback
         items={data.feedback ?? []}
         replies={data.feedbackReplies ?? []}

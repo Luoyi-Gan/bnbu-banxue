@@ -763,8 +763,11 @@ it("学生反馈仅本人和授权管理员可见，回复关闭后可追加跟�
   expect(feedback.data.status).toBe("NEW");
   expect(feedback.data.assignedTo).toBeUndefined();
   expect(feedbackWorkspace(f.repo, f.teacher.account).feedback).toEqual([]);
-  f.repo.create("sportsIdentity",f.ordinary.account.id,{role:"student",status:"verified"});
-  expect(feedbackWorkspace(f.repo,f.ordinary.account).feedback).toEqual([]);
+  f.repo.create("sportsIdentity", f.ordinary.account.id, {
+    role: "student",
+    status: "verified",
+  });
+  expect(feedbackWorkspace(f.repo, f.ordinary.account).feedback).toEqual([]);
   expect(() =>
     f.run(f.teacher, "sports.feedback.reply", {
       id: feedback.id,
@@ -828,4 +831,108 @@ it("反馈状态必须伴随公开回复，不能回待受理，撤销反馈权�
   ).toThrow("管理权限");
   expect(f.repo.get(feedback.id).data.status).toBe("NEW");
   expect(f.repo.all("sportsFeedbackReply")).toHaveLength(0);
+});
+
+it("双语帮助发布校验、单语言公开、下线与重新上线保持同一文章和历史", async () => {
+  const f = setup();
+  const { helpRead } = await import("../server/sports/help");
+  const fields = {
+    titleZh: "帮助",
+    titleEn: "Help",
+    bodyZh: "",
+    bodyEn: "",
+    keywords: "",
+    category: "LOGIN",
+    weight: -1.25,
+  };
+  let article = f.run(f.admin, "sports.help.save", fields);
+  expect(helpRead(f.repo, f.student.account, "zh").articles).toEqual([]);
+  expect(() =>
+    f.run(f.admin, "sports.help.state", {
+      id: article.id,
+      version: article.version,
+      updatedAt: article.updatedAt,
+      status: "published",
+    }),
+  ).toThrow("完整中英文");
+  article = f.run(f.admin, "sports.help.save", {
+    ...fields,
+    id: article.id,
+    version: article.version,
+    updatedAt: article.updatedAt,
+    bodyZh: "中文正文",
+    bodyEn: "English body",
+    keywords: "验证码， code,验证码, ",
+    publish: true,
+  });
+  const zh = helpRead(f.repo, f.student.account, "zh").articles[0];
+  expect(zh.data).toEqual({
+    title: "帮助",
+    body: "中文正文",
+    category: "LOGIN",
+  });
+  expect(helpRead(f.repo, f.student.account, "en").articles[0].data.body).toBe(
+    "English body",
+  );
+  const first = article.data.firstPublishedAt;
+  article = f.run(f.admin, "sports.help.state", {
+    id: article.id,
+    version: article.version,
+    updatedAt: article.updatedAt,
+    status: "archived",
+  });
+  expect(helpRead(f.repo, f.student.account, "en").articles).toEqual([]);
+  article = f.run(f.admin, "sports.help.state", {
+    id: article.id,
+    version: article.version,
+    updatedAt: article.updatedAt,
+    status: "published",
+  });
+  expect(article.data.firstPublishedAt).toBe(first);
+  expect(f.repo.all("sportsHelpHistory")).toHaveLength(4);
+  expect(f.repo.all("sportsHelp")).toHaveLength(1);
+});
+it("帮助管理权限、并发版本和发布内容完整性不能绕过", async () => {
+  const f = setup();
+  const { helpRead } = await import("../server/sports/help");
+  const fields = {
+    titleZh: "标题",
+    titleEn: "Title",
+    bodyZh: "正文",
+    bodyEn: "Body",
+    keywords: "test",
+    category: "LOGIN",
+    weight: 0.5,
+    publish: true,
+  };
+  expect(() => f.run(f.teacher, "sports.help.save", fields)).toThrow(
+    "管理权限",
+  );
+  expect(() => helpRead(f.repo, f.teacher.account, "zh")).toThrow("体育身份");
+  const article = f.run(f.admin, "sports.help.save", fields);
+  const input = {
+    ...fields,
+    id: article.id,
+    version: article.version,
+    updatedAt: article.updatedAt,
+  };
+  expect(() =>
+    f.run(f.admin, "sports.help.save", { ...input, bodyEn: " " }),
+  ).toThrow("完整中英文");
+  expect(() =>
+    f.run(f.admin, "sports.help.save", { ...input, updatedAt: "stale" }),
+  ).toThrow("已更新");
+  expect(() =>
+    f.run(f.admin, "sports.help.state", { ...input, status: "draft" }),
+  ).toThrow("status");
+  expect(f.repo.get(article.id)).toEqual(article);
+  expect(f.repo.all("sportsHelpHistory")).toHaveLength(1);
+});
+
+it("用户确认的正式教师邮箱默认域名为bnbu.edu.cn，测试域名不会混入正式默认",()=>{
+  const f=setup();vi.stubEnv("BNBU_SCHOOL_EMAIL_DOMAINS",undefined);
+  const batch=f.run(f.admin,"sports.teachers.preview",{csv:"employee_id,name,email\nT001,教师,t001@bnbu.edu.cn"});
+  expect(batch.data.canCreate).toBe(true);
+  const wrong=f.run(f.admin,"sports.teachers.preview",{csv:"employee_id,name,email\nT002,测试,t002@example.test"});
+  expect(wrong.data.canCreate).toBe(false);
 });
