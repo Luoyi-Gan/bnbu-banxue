@@ -30,6 +30,11 @@ export function SportsMaterials({
     [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState("");
+  const swimming = session.data.activityType === "SWIM";
+  const [beforeFile, setBeforeFile] = useState<File | null>(null),
+    [afterFile, setAfterFile] = useState<File | null>(null),
+    [offlineDelay, setOfflineDelay] = useState(false),
+    [delayExplanation, setDelayExplanation] = useState("");
   const record = data.records.find((r) => r.data.sessionId === session.id);
   const batch = data.materialBatches.find((b) => b.id === record?.data.batchId);
   const materials = data.materials.filter((m) => m.data.batchId === batch?.id);
@@ -43,9 +48,19 @@ export function SportsMaterials({
     setBusy(true);
     setMessage("");
     try {
-      if (!files.length) throw new Error("请选择原始凭证文件。");
+      const sources =
+        swimming && !record
+          ? [beforeFile, afterFile, ...files].filter(
+              (f): f is File => f !== null,
+            )
+          : files;
+      if (
+        !sources.length ||
+        (swimming && !record && (!beforeFile || !afterFile))
+      )
+        throw new Error("请选择完整原始凭证文件；游泳须包含前后照片。");
       const prepared = [];
-      for (const file of files) {
+      for (const file of sources) {
         if (!["image/jpeg", "image/png", "video/mp4"].includes(file.type))
           throw new Error("仅接受JPEG、PNG和MP4。");
         if (file.size > (file.type === "video/mp4" ? 100 : 10) * 1024 * 1024)
@@ -61,6 +76,12 @@ export function SportsMaterials({
           size: file.size,
           mime: file.type,
           clientId: sha256,
+          phase:
+            file === beforeFile
+              ? "BEFORE"
+              : file === afterFile
+                ? "AFTER"
+                : "AUXILIARY",
         });
       }
       let currentId = record?.id;
@@ -70,12 +91,15 @@ export function SportsMaterials({
           version: session.version,
           category,
           description,
-          activityType: "EXERCISE",
-          files: prepared.map(({ sha256, size, mime, clientId }) => ({
+          activityType: swimming ? "SWIM" : "EXERCISE",
+          offlineDelay,
+          delayExplanation,
+          files: prepared.map(({ sha256, size, mime, clientId, phase }) => ({
             sha256,
             size,
             mime,
             clientId,
+            phase,
           })),
         });
         currentId = accepted.data.id;
@@ -140,6 +164,11 @@ export function SportsMaterials({
       {materials.map((m) => (
         <div key={m.id} style={{ marginBottom: 10 }}>
           <span>
+            {m.data.phase === "BEFORE"
+              ? "运动前 · "
+              : m.data.phase === "AFTER"
+                ? "运动后 · "
+                : ""}
             {m.data.mime === "video/mp4" ? "视频" : "照片"} ·{" "}
             {m.data.status === "COMPLETE" ? "已到账" : "未到账"}
           </span>
@@ -174,7 +203,9 @@ export function SportsMaterials({
           {!record && (
             <>
               <p>
-                普通运动凭证。游泳须走运动前后取证专用流程，此入口不受理游泳。
+                {swimming
+                  ? "游泳须在结束后15分钟内受理。运动前原照片必须与开始前锁定文件一致，运动后照片须为本次运动凭证。"
+                  : "普通运动凭证。游泳应从开始游泳入口建立会话。"}
               </p>
               <label>
                 运动类别
@@ -201,6 +232,48 @@ export function SportsMaterials({
           <p>
             最多6张JPEG/PNG（每张10MB）、1段含音轨MP4（1–15秒、100MB）。受理后只能续传同批原文件，不能替换。
           </p>
+          {swimming && !record && (
+            <>
+              <label>
+                开始前锁定的原照片
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  disabled={busy}
+                  onChange={(e) => setBeforeFile(e.target.files?.[0] ?? null)}
+                />
+              </label>
+              <label>
+                本次运动后照片
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  disabled={busy}
+                  onChange={(e) => setAfterFile(e.target.files?.[0] ?? null)}
+                />
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={offlineDelay}
+                  disabled={busy}
+                  onChange={(e) => setOfflineDelay(e.target.checked)}
+                />
+                完全离线导致延迟，申请在结束后24小时内进入教师异常复核
+              </label>
+              {offlineDelay && (
+                <label>
+                  延迟说明
+                  <textarea
+                    value={delayExplanation}
+                    maxLength={1000}
+                    disabled={busy}
+                    onChange={(e) => setDelayExplanation(e.target.value)}
+                  />
+                </label>
+              )}
+            </>
+          )}
           <label>
             选择运动凭证
             <input
@@ -213,7 +286,16 @@ export function SportsMaterials({
           </label>
           <button
             type="button"
-            disabled={busy || !files.length || (!record && !description.trim())}
+            disabled={
+              busy ||
+              (!(swimming && !record) && !files.length) ||
+              (swimming &&
+                !record &&
+                (!beforeFile ||
+                  !afterFile ||
+                  (offlineDelay && !delayExplanation.trim()))) ||
+              (!record && !description.trim())
+            }
             onClick={() => void submit()}
           >
             {busy

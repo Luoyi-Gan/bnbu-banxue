@@ -161,6 +161,13 @@ export function sportsSupplementCommand(
     })),
     ...input.files,
   ]);
+  if (record.data.activityType === "SWIM")
+    demand(
+      reused.some((m) => m.data.phase === "BEFORE") &&
+        reused.some((m) => m.data.phase === "AFTER"),
+      "游泳补证须沿用原运动前、运动后照片，不能事后新拍替代。",
+      409,
+    );
   const batch = repo.create("sportsMaterialBatch", actor.id, {
     recordId: record.id,
     sessionId: record.data.sessionId,
@@ -176,6 +183,12 @@ export function sportsSupplementCommand(
       batchId: batch.id,
       sessionId: record.data.sessionId,
       status: source ? "COMPLETE" : "PENDING",
+      ...(record.data.activityType === "SWIM"
+        ? {
+            phase: source?.data.phase ?? "AUXILIARY",
+            beforeEvidenceId: source?.data.beforeEvidenceId ?? null,
+          }
+        : {}),
       ...(source
         ? {
             sourceMaterialId: source.id,

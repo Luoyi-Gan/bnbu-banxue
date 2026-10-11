@@ -13,6 +13,8 @@ import { sportsRole, version } from "./courses";
 import type { SportsClock } from "./session-clock";
 import { inspectMedia } from "./media-inspection";
 import { supplementClock, supplementOpen } from "./supplements";
+import { swimmingFiles } from "./swimming";
+import { enqueueTeacher } from "./review";
 
 export const mediaLimits = {
   image: 10 * 1024 * 1024,
@@ -113,16 +115,38 @@ export function sportsMaterialCommand(
   );
   const category = enumField(input, "category", ["RELATED", "OTHER"] as const);
   const description = textField(input, "description", 200);
-  // Swimming needs server-linked before/after capture; do not silently accept it as ordinary exercise.
-  enumField(input, "activityType", ["EXERCISE"] as const);
-  const files = validateFiles(input.files);
+  const activityType = enumField(input, "activityType", [
+    "EXERCISE",
+    "SWIM",
+  ] as const);
+  demand(
+    activityType === (session.data.activityType ?? "EXERCISE"),
+    "运动项目须与原会话一致，不能绕过游泳凭证要求。",
+    409,
+  );
+  let files: (ReturnType<typeof validateFiles>[number] & Fields)[] =
+    validateFiles(input.files);
+  const offlineDelay = activityType === "SWIM" && input.offlineDelay === true;
+  const delayExplanation = offlineDelay
+    ? textField(input, "delayExplanation", 1000)
+    : "";
+  if (activityType === "SWIM") {
+    demand(
+      offlineDelay || now < clock.endedAt + 15 * 60000,
+      "游泳首次受理须在结束后15分钟内；完全离线延迟须明确说明并进入教师异常队列。",
+      409,
+    );
+    files = swimmingFiles(repo, session, files, input.files);
+  }
   const record = repo.create("sportsRecord", actor.id, {
     sessionId: session.id,
     courseId: course.id,
     semesterId: semester.id,
     category,
     description,
-    activityType: "EXERCISE",
+    activityType,
+    offlineDelay,
+    delayExplanation,
     status: "UPLOADING",
     supplementUsed: false,
     businessDate: clock.businessDate,
@@ -225,7 +249,15 @@ export async function uploadMaterial(
       } else {
         repo.save(batch, { status: "COMPLETE", completedAt });
         const record = repo.get(batch.data.recordId, "sportsRecord");
-        repo.save(record, { status: "PENDING_AI", submittedAt: completedAt });
+        const submitted = repo.save(record, {
+          status: "PENDING_AI",
+          submittedAt: completedAt,
+        });
+        if (
+          record.data.activityType === "SWIM" &&
+          record.data.offlineDelay === true
+        )
+          enqueueTeacher(repo, submitted, "SWIM_OFFLINE_DELAY");
         repo.create("sportsReviewEvent", null, {
           recordId: record.id,
           batchId: batch.id,
@@ -236,7 +268,9 @@ export async function uploadMaterial(
           [record.ownerId!],
           record.id,
           "sports.material.complete",
-          "运动凭证传输完成，等待AI检查；尚未计入进度。",
+          record.data.offlineDelay === true
+            ? "游泳延迟凭证完整到账，等待责任教师异常复核；尚未计入进度。"
+            : "运动凭证传输完成，等待AI检查；尚未计入进度。",
         );
       }
     }

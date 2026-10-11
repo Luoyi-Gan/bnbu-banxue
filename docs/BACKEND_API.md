@@ -148,3 +148,11 @@ AI适配配置 `BNBU_SPORTS_AI_URL`、可选 `BNBU_SPORTS_AI_TOKEN` 与 `BNBU_SP
 ## 责任教师普通误判更正
 
 sports.review.correct输入id/version/batchId/checksCompleted=true/decision=PASS或INVALID/publicExplanation（必填公开依据）；INVALID还需适用固定reason。仅原责任教师且当前状态VALID/INVALID、材料完整；不提供RETURN，不改变补证机会、运动原事实及素材。追加公开CORRECTION事件含前状态/原因/说明/版本，重新生成进度并通知学生。结算/归档分支当前明确报需历史报告更正入口，待同步报告版本实现后接通。
+
+## 游泳专用协议
+
+- sports.swim.before：courseId、file={clientId,sha256,size,mime}。有效课程成员提交JPEG/PNG原图指纹承诺，服务器记录committedAt。返回sportsSwimEvidence；此步未上传照片，不视为完整材料。
+- sports.session.start新增activityType=EXERCISE/SWIM（旧客户端默认EXERCISE）。SWIM必须携带本人、本课且未绑定的beforeEvidenceId，同事务绑定，不能跨会话复用。
+- sports.record.accept的activityType须匹配原会话。游泳files[]增加phase=BEFORE/AFTER/AUXILIARY，恰好一份BEFORE匹配开始前锁定指纹且至少一份AFTER，两者都须照片，仍受总计6照片/1视频限制。正常严格早于结束+15分钟；offlineDelay=true另需非空delayExplanation，严格早于结束+24小时。两者锁批续传截止均为受理+30分钟。
+- 离线游泳材料全部到账后status=TEACHER_PENDING、queueSource=SWIM_OFFLINE_DELAY，保留说明、不创建AI任务、不使用补证机会。真实格式校验继续走现有二进制上传接口。
+- 游泳sports.supplement.prepare的reuseIds必须保留原BEFORE和AFTER；新照片仅作AUXILIARY，不允许事后替换原取证。补证受理沿用原24/72小时窗口。

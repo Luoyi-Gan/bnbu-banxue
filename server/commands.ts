@@ -22,6 +22,7 @@ import { sportsSupplementCommand } from "./sports/supplements";
 import { sportsSystemCommand, sportsWriteGate } from "./sports/system";
 import { sportsCalendarCommand } from "./sports/calendar";
 import { sportsIncidentCommand } from "./sports/incidents";
+import { sportsSwimCommand } from "./sports/swimming";
 
 export function execute(
   db: Database,
@@ -141,6 +142,7 @@ export function execute(
         sportsSystemCommand(repo, actor, action, input) ??
         sportsCalendarCommand(repo, actor, action, input) ??
         sportsIncidentCommand(repo, actor, action, input) ??
+        sportsSwimCommand(repo, actor, action, input) ??
         sportsCourseCommand(repo, actor, action, input) ??
         sportsSessionCommand(repo, actor, action, input) ??
         sportsMaterialCommand(repo, actor, action, input) ??

@@ -82,6 +82,7 @@ export async function processSportsReview(
             return {
               id: m.id,
               mime: m.data.mime,
+              phase: m.data.phase ?? "AUXILIARY",
               sha256: m.data.sha256,
               contentBase64: Buffer.from(blob.bytes as Uint8Array).toString(
                 "base64",
@@ -107,6 +108,7 @@ export async function processSportsReview(
             validationRef: connection.validationRef,
             description: record.data.description,
             category: record.data.category,
+            activityType: record.data.activityType,
             ruleSnapshot: record.data.ruleSnapshot,
             materials,
           }),

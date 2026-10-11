@@ -208,12 +208,20 @@ export function SportsReview({
                         style={{ width: "100%" }}
                       />
                     ) : (
-                      <img
-                        key={m.id}
-                        alt="运动凭证"
-                        src={`/api/sports/materials/${m.id}`}
-                        style={{ maxWidth: "100%", maxHeight: 200 }}
-                      />
+                      <figure key={m.id}>
+                        <figcaption>
+                          {m.data.phase === "BEFORE"
+                            ? "运动前原照片"
+                            : m.data.phase === "AFTER"
+                              ? "运动后照片"
+                              : "运动凭证"}
+                        </figcaption>
+                        <img
+                          alt="运动凭证"
+                          src={`/api/sports/materials/${m.id}`}
+                          style={{ maxWidth: "100%", maxHeight: 200 }}
+                        />
+                      </figure>
                     ),
                   )}
                 {r.data.status === "TEACHER_PENDING" && (
@@ -247,6 +255,9 @@ export function SportsReview({
                       </button>
                     </div>
                   </>
+                )}
+                {r.data.offlineDelay === true && (
+                  <p>游泳离线延迟说明：{String(r.data.delayExplanation)}</p>
                 )}
                 {!!r.data.publicReason && (
                   <p>

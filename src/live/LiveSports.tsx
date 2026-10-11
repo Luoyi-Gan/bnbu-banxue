@@ -6,6 +6,7 @@ import { SportsReview, type ReviewData } from "./SportsReview";
 import { SportsSystem, type SportsSystemData } from "./SportsSystem";
 import { SportsCalendar, type CalendarData } from "./SportsCalendar";
 import { SportsIncidents, type IncidentData } from "./SportsIncidents";
+import { SportsSwimStart } from "./SportsSwimStart";
 
 interface SportsData
   extends
@@ -326,8 +327,14 @@ export function LiveSports({
               )}
               {role === "student" &&
                 c.data.status === "PUBLISHED" &&
-                !running &&
-                action("开始运动", "sports.session.start", { courseId: c.id })}
+                !running && (
+                  <>
+                    {action("开始普通运动", "sports.session.start", {
+                      courseId: c.id,
+                    })}
+                    <SportsSwimStart courseId={c.id} />
+                  </>
+                )}
             </div>
             {role === "teacher" && (
               <p>

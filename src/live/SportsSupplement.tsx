@@ -132,7 +132,12 @@ export function SportsSupplement({
                 )
               }
             />
-            沿用原材料 {index + 1}
+            沿用原材料 {index + 1}{" "}
+            {m.data.phase === "BEFORE"
+              ? "（运动前）"
+              : m.data.phase === "AFTER"
+                ? "（运动后）"
+                : ""}
           </label>
         ))}
       {materials.map((m, index) => (

@@ -1,5 +1,6 @@
 import { demand, type Account } from "../auth";
-import { Repository, type Entity, type Fields } from "../repository";
+import { Repository, enumField, type Entity, type Fields } from "../repository";
+import { beforeEvidence } from "./swimming";
 import { sportsRole, version } from "./courses";
 import {
   startClock,
@@ -77,7 +78,18 @@ export function sportsSessionCommand(
       "当前不在课程允许的当日运动时间内。",
       409,
     );
+    const activityType = enumField(
+      { activityType: input.activityType ?? "EXERCISE" },
+      "activityType",
+      ["EXERCISE", "SWIM"] as const,
+    );
+    const evidence =
+      activityType === "SWIM"
+        ? beforeEvidence(repo, actor, course.id, input.beforeEvidenceId)
+        : null;
     const session = repo.create("sportsSession", actor.id, {
+      activityType,
+      beforeEvidenceId: evidence?.id ?? null,
       courseId: course.id,
       enrollmentId: enrollment.id,
       semesterId: semester.id,
@@ -91,6 +103,7 @@ export function sportsSessionCommand(
       },
       clock,
     });
+    if (evidence) repo.save(evidence, { sessionId: session.id, boundAt: now });
     repo.create("sportsSessionEvent", actor.id, {
       sessionId: session.id,
       action: "start",
