@@ -14,6 +14,8 @@ export interface WorkbookSheet {
   rowNumbers: number[];
   issues: number[];
   error?: string;
+  imageIds?: string[];
+  sourceIssues?: string[][];
 }
 export function parseWorkbook(bytes: Buffer): Promise<WorkbookSheet[]> {
   demand(

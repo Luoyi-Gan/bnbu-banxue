@@ -21,6 +21,8 @@ interface ImportRow {
   testDate: string;
   columnError?: boolean;
   sourceRow?: number;
+  sourceImageId?: string;
+  sourceIssues?: string[];
   state: "PENDING" | "CONFIRMED" | "EXCLUDED";
   reason?: string;
   expectedEnrollmentId: string | null;
@@ -37,7 +39,8 @@ function review(repo: Repository, batch: Entity, rows: ImportRow[]) {
   return rows.map((row) => {
     const errors: string[] = [];
     if (row.columnError)
-      errors.push("原行列数、公式或单元格格式有疑点，请逐字段核对修正");
+      errors.push("来源行存在识别、列数或格式疑点，请对照原件逐字段核对修正");
+    errors.push(...(row.sourceIssues ?? []));
     const ids = identities.filter(
       (i) => i.data.studentNumber === row.studentNumber && row.studentNumber,
     );
@@ -198,6 +201,8 @@ export function sportsEnduranceImportCommand(
         ...(source
           ? {
               sourceRow: source.sheet.rowNumbers[index + 1],
+              sourceImageId: source.sheet.imageIds?.[index + 1],
+              sourceIssues: source.sheet.sourceIssues?.[index + 1],
               columnError:
                 values.length !== 5 || source.sheet.issues.includes(index + 2),
             }
@@ -209,7 +214,7 @@ export function sportsEnduranceImportCommand(
     });
     const batch = repo.create("sportsEnduranceImport", actor.id, {
       courseId: course.id,
-      source: source ? "XLSX" : "CSV",
+      source: source ? (source.entity.data.sourceType ?? "XLSX") : "CSV",
       ...(source
         ? {
             sourceId: source.entity.id,
@@ -267,6 +272,7 @@ export function sportsEnduranceImportCommand(
         time: textField(input, "time", 30),
         testDate: textField(input, "testDate", 10),
         columnError: false,
+        sourceIssues: [],
         state: "PENDING",
         reason,
         expectedEnrollmentId: null,

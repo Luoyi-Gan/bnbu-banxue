@@ -22,6 +22,12 @@ import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
 import { enduranceImportWorkspace } from "./sports/endurance-import";
 import { uploadWorkbook, workbookAccess } from "./sports/workbook";
+import {
+  uploadOcrSource,
+  recognizeOcrSource,
+  ocrSourceAccess,
+  type OcrImage,
+} from "./sports/endurance-ocr";
 import { ownedCourse } from "./sports/courses";
 import { sportsWriteGate } from "./sports/system";
 import { enduranceWorkspace } from "./sports/endurance";
@@ -156,6 +162,73 @@ export function createApiServer(
           return send(response, 200, {
             id: saved.id,
             status: saved.data.status,
+          });
+        }
+        const ocrUpload = /^\/api\/sports\/ocr-sources\/([a-f0-9-]+)$/.exec(
+          pathname,
+        );
+        if (ocrUpload) {
+          const repo = new Repository(db),
+            token = cookieToken(request) ?? "";
+          workbookAccess(repo, token, ocrUpload[1]);
+          demand(
+            request.headers["content-type"]?.startsWith("multipart/form-data"),
+            "请上传原图表单。",
+            415,
+          );
+          const chunks: Buffer[] = [];
+          let size = 0;
+          for await (const chunk of request) {
+            size += chunk.length;
+            demand(size <= 101 * 1024 * 1024, "图片批次超过100MB。", 413);
+            chunks.push(chunk);
+          }
+          const form = await new Request("http://localhost/upload", {
+            method: "POST",
+            headers: { "Content-Type": request.headers["content-type"]! },
+            body: new Blob([Uint8Array.from(Buffer.concat(chunks))]),
+          }).formData();
+          const images = form.getAll("images");
+          demand(
+            images.every((f) => f instanceof File),
+            "必须上传图片文件。",
+          );
+          let source = await uploadOcrSource(
+            repo,
+            token,
+            ocrUpload[1],
+            images as File[],
+          );
+          if (source.data.status === "AWAITING_OCR")
+            source = await recognizeOcrSource(
+              repo,
+              token,
+              source.id,
+              source.version,
+            );
+          return send(response, 200, {
+            id: source.id,
+            status: source.data.status,
+            error: source.data.error,
+          });
+        }
+        const ocrRetry =
+          /^\/api\/sports\/ocr-sources\/([a-f0-9-]+)\/recognize$/.exec(
+            pathname,
+          );
+        if (ocrRetry) {
+          const input = await body(request);
+          demand(Number.isInteger(input.version), "缺少原图当前版本。");
+          const source = await recognizeOcrSource(
+            new Repository(db),
+            cookieToken(request) ?? "",
+            ocrRetry[1],
+            Number(input.version),
+          );
+          return send(response, 200, {
+            id: source.id,
+            status: source.data.status,
+            error: source.data.error,
           });
         }
         const workbookUpload = /^\/api\/sports\/workbooks\/([a-f0-9-]+)$/.exec(
@@ -364,6 +437,35 @@ export function createApiServer(
           "Content-Security-Policy": "default-src 'none'",
         });
         return response.end(media.bytes);
+      }
+      const ocrRead =
+        /^\/api\/sports\/ocr-sources\/([a-f0-9-]+)\/images\/([a-f0-9-]+)$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && ocrRead) {
+        const repo = new Repository(db),
+          source = ocrSourceAccess(
+            repo,
+            authenticate(db, cookieToken(request)),
+            ocrRead[1],
+          );
+        const image = (source.data.images as OcrImage[]).find(
+          (i) => i.id === ocrRead[2],
+        );
+        demand(image, "原图不存在。", 404);
+        const blob = db
+          .prepare("SELECT bytes FROM sports_media_blobs WHERE sha256=?")
+          .get(image.sha256);
+        demand(blob, "原图不存在。", 404);
+        const bytes = Buffer.from(blob.bytes as Uint8Array);
+        response.writeHead(200, {
+          "Content-Type": image.mime,
+          "Content-Length": bytes.length,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          "Content-Security-Policy": "default-src 'none'",
+        });
+        return response.end(bytes);
       }
       const workbookRead =
         /^\/api\/sports\/workbook-sources\/([a-f0-9-]+)$/.exec(pathname);

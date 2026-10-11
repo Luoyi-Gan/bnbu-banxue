@@ -569,3 +569,15 @@ Windows34文件240项测试、双端类型、Lint、构建通过。新增测试�
 XLSX依赖复核补充：npm audit定位到ExcelJS传递uuid旧版本通告GHSA-w5hq-g745-h8pq。检查上游仅调用uuid.v4后，限定exceljs的uuid覆盖为已修复11.1.1；Windows重新安装审计0漏洞，四项XLSX解析/HTTP测试复测通过。未使用自动强制降级ExcelJS。
 
 最终依赖版本已在Windows和Docker Linux分别通过34文件240项全量测试。Docker镜像sha256:5b90f46ffe0b6e9fb8fae9cb84081782ce9b5c693c813009b89be822c8411ab0构建成功，npm ci审计0漏洞；容器启动、网页/API均200，health为healthy。验证容器删除，Windows本地验收服务保留。
+
+## 2026-10-13 纸质成绩单OCR可配置接口
+
+用户确认没有真实OCR服务，先保留接口。POST /api/sports/ocr-sources/:courseId接受multipart/form-data的images文件列表，每批1–20张JPEG/PNG/WebP、合计100MB；服务器检查类型、单帧、40百万像素上限并完整解码。原始字节按SHA256进入既有BLOB表；图片顺序及摘要组成批次摘要，同教师同课同批重传复用。受理时保存有效成员范围，原图只由本人责任教师读取。GET /api/sports/ocr-sources/:sourceId/images/:imageId返回原图、no-store；学生、管理员和其他教师不能访问。
+
+上传完成尝试识别；未配置BNBU_SPORTS_OCR_URL保存FAILED/OCR_NOT_CONFIGURED，原图保留，不生成识别行。配置URL仅HTTPS或本机HTTP，拒绝重定向；可选BNBU_SPORTS_OCR_TOKEN以Bearer发送。识别POST JSON为schemaVersion:1、requestId、sourceId、images[{id,sha256,mime,size,contentBase64}]；不把密钥或上游原始错误写入日志。25秒请求时限、1MiB响应上限；错误统一OCR_TECHNICAL_FAILURE。
+
+上游须返回JSON：requestId、sourceId、imageHashes（与请求原图顺序一致）、rows数组1–500项。每行须包含imageId、row(1–10000)、studentNumber/name/event/time/testDate（均原始短文本）、reviewRequired布尔值、issues字符串数组。imageId须属于原批，图号/行号组合不得重复，响应请求ID/源ID/摘要必须完全匹配。上游应将低可信、错行等标reviewRequired或issues；最终教师确认永远保留。正常返回READY，只建立服务器源提取，打开后复用既有sports.endurance.source.import与核对批次；疑点行不能直接批量确认，修正须原因与历史，对应原图ID和行号保留。
+
+POST /api/sports/ocr-sources/:sourceId/recognize JSON{version}显式重试。PROCESSING请求35秒内不允许重入，超时可重试且旧版本响应不得写入。成功READY或已有核对草稿不能重新识别覆盖原来源；失败可继续重试。异步前后重验登录、身份、维护、责任归属及未结算/未归档；已受理来源允许课程关闭后继续原范围核对。识别过程留下sportsOcrHistory状态记录。
+
+35文件244项Windows测试、双端类型、Lint、构建通过。测试覆盖未配置不造数据、重复/伪造图片拒绝、低可信行修正后才确认、关闭续办、上游对象/图片错配与正确重试、旧版本拒绝，以及真实HTTP上传与原件读取权限。测试上游为受控协议服务、图片为明确测试夹具，真实OCR服务和本校手写准确率尚未验证；没有在本地验收库植入识别假结果。新增网页点击未验收。正式名单、身份资料、免测认证、结算报告等完整范围继续。
