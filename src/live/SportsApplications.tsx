@@ -94,6 +94,7 @@ export function SportsApplications({
   history,
   creditHistory,
   credits,
+  exemptions,
   teacher,
   canApply,
   open,
@@ -104,6 +105,7 @@ export function SportsApplications({
   history: LiveEntity[];
   creditHistory: LiveEntity[];
   credits: LiveEntity[];
+  exemptions: LiveEntity[];
   teacher: boolean;
   canApply: boolean;
   open: OpenForm;
@@ -208,6 +210,10 @@ export function SportsApplications({
               unknown
             > | null,
             ownCredits = credits.filter((c) => c.data.applicationId === a.id);
+          const exemption = exemptions.find(
+            (e) =>
+              e.data.applicationId === a.id && e.data.status === "APPROVED",
+          );
           return (
             <section key={a.id}>
               <h4>
@@ -217,9 +223,41 @@ export function SportsApplications({
                   : `组织认证：${labels[String(certification?.certificationKind)] ?? ""} ${certification?.organizationOrTeamName ?? ""}`}
               </h4>
               <p>
-                {labels[String(a.data.status)]} ·{" "}
-                {String(a.data.publicReason ?? "")}
+                {a.data.exemptionStatus === "REVOKED"
+                  ? "原免测批准已撤销"
+                  : labels[String(a.data.status)]}{" "}
+                · {String(a.data.publicReason ?? "")}
               </p>
+              {a.data.exemptionStatus === "REVOKED" && (
+                <p>免测已撤销；无原体测记录则显示未录入，结算后不安排补测。</p>
+              )}
+              {teacher && exemption && (
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    open(
+                      "核对原依据并撤销误批免测",
+                      course.data.settlementStatus === "SETTLED"
+                        ? "sports.correction.apply"
+                        : "sports.exemption.revoke",
+                      [{ key: "reason", label: "公开撤销原因" }],
+                      {
+                        id: exemption.id,
+                        version: exemption.version,
+                        ...(course.data.settlementStatus === "SETTLED"
+                          ? {
+                              kind: "EXEMPTION",
+                              previousReportId: course.data.settlementReportId,
+                              confirmed: true,
+                            }
+                          : {}),
+                      },
+                    )
+                  }
+                >
+                  撤销误批免测
+                </button>
+              )}
               {certification && (
                 <p>
                   {String(certification.validFrom)} 至{" "}

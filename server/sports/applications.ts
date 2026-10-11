@@ -166,6 +166,52 @@ export function sportsApplicationCommand(
   input: Fields,
   historicalCorrection = false,
 ) {
+  if (action === "sports.exemption.revoke") {
+    const exemption = repo.get(input.id, "sportsExemption"),
+      course = ownedCourse(repo, actor, exemption.data.courseId);
+    if (!historicalCorrection) mutable(repo, course);
+    version(exemption, input);
+    demand(
+      exemption.data.status === "APPROVED" &&
+        approvedExemption(repo, exemption.ownerId, course.id)?.id ===
+          exemption.id,
+      "只能撤销当前有效免测。",
+      409,
+    );
+    const reason = textField(input, "reason", 1000);
+    const app = repo.get(exemption.data.applicationId, "sportsApplication");
+    demand(
+      app.data.applicationType === "EXEMPTION" &&
+        app.ownerId === exemption.ownerId &&
+        app.data.courseId === course.id,
+      "免测原申请关联不一致。",
+      409,
+    );
+    const saved = repo.save(exemption, {
+      status: "REVOKED",
+      reason,
+      revokedBy: actor.id,
+      revokedAt: Date.now(),
+    });
+    repo.save(app, { exemptionStatus: "REVOKED", publicReason: reason });
+    repo.create("sportsApplicationHistory", actor.id, {
+      applicationId: app.id,
+      courseId: course.id,
+      action: "REVOKE_EXEMPTION",
+      exemptionId: exemption.id,
+      previousVersion: exemption.version,
+      resultVersion: saved.version,
+      reason,
+      at: Date.now(),
+    });
+    repo.notify(
+      [exemption.ownerId!],
+      app.id,
+      action,
+      "原免测已撤销；已有体测记录恢复展示，无原记录则显示未录入。" + reason,
+    );
+    return saved;
+  }
   if (
     ![
       "sports.application.submit",

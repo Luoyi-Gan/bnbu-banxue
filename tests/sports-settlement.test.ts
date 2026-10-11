@@ -686,3 +686,125 @@ it("归档认证调整撤销重算个人进度，保留认可历史和冻结统�
     }),
   ).toThrow("历史报告更正");
 });
+
+it.each([false, true])(
+  "归档撤销误批免测保留结算与原事实（存在旧体测=%s）",
+  (hasRaw) => {
+    const f = setup();
+    const app = f.repo.create("sportsApplication", f.student.account.id, {
+      courseId: f.course.id,
+      enrollmentId: f.member.id,
+      applicationType: "EXEMPTION",
+      status: "APPROVED",
+      assetIds: ["原证明ID"],
+    });
+    const exemption = f.repo.save(f.repo.all("sportsExemption")[0], {
+      applicationId: app.id,
+    });
+    const raw = hasRaw
+      ? f.repo.create("sportsEndurance", f.student.account.id, {
+          courseId: f.course.id,
+          enrollmentId: f.member.id,
+          event: 1000,
+          seconds: 305,
+          testDate: "2026-01-01",
+          conversion: { status: "UNAVAILABLE" },
+        })
+      : null;
+    const prep = f.prepare(),
+      first = f.run(f.teacher, "sports.settlement.confirm", {
+        id: prep.id,
+        version: prep.version,
+        confirmed: true,
+      });
+    f.repo.save(f.semester, { status: "ARCHIVED" });
+    const old = JSON.stringify(first),
+      input = {
+        kind: "EXEMPTION",
+        id: exemption.id,
+        version: exemption.version,
+        previousReportId: first.id,
+        reason: "核对原证明，先前免测批准错误",
+        confirmed: true,
+      };
+    for (const who of [f.student, f.admin, f.other])
+      expect(() => f.run(who, "sports.correction.apply", input)).toThrow();
+    const key = randomUUID(),
+      next = f.run(f.teacher, "sports.correction.apply", input, key);
+    expect(f.run(f.teacher, "sports.correction.apply", input, key).id).toBe(
+      next.id,
+    );
+    const report = next.data.report as {
+      rows: {
+        facts: { enduranceStatus: string; endurance: unknown; total: number };
+      }[];
+      unresolved: { code: string; count: number }[];
+    };
+    expect(report.rows[0].facts).toMatchObject({
+      enduranceStatus: hasRaw ? "RECORDED" : "NOT_RECORDED",
+      total: 0,
+      endurance: hasRaw
+        ? { event: 1000, seconds: 305, testDate: "2026-01-01" }
+        : null,
+    });
+    expect(report.unresolved).toEqual(
+      hasRaw ? [] : [{ code: "ENDURANCE_NOT_RECORDED", count: 1 }],
+    );
+    expect(JSON.stringify(f.repo.get(first.id))).toBe(old);
+    expect(f.repo.get(f.course.id).data.settlementStatus).toBe("SETTLED");
+    expect(f.repo.get(f.semester.id).data.status).toBe("ARCHIVED");
+    expect(f.repo.get(exemption.id).data.status).toBe("REVOKED");
+    expect(f.repo.get(app.id).data.assetIds).toEqual(["原证明ID"]);
+    expect(f.repo.all("sportsApplicationHistory")).toHaveLength(1);
+    expect(f.repo.all("sportsEndurance")).toHaveLength(hasRaw ? 1 : 0);
+    if (raw) expect(f.repo.get(raw.id)).toEqual(raw);
+    expect(() =>
+      f.run(f.teacher, "sports.endurance.confirm", {
+        enrollmentId: f.member.id,
+        version: raw?.version ?? 0,
+        event: 1000,
+        seconds: 300,
+        testDate: "2026-01-01",
+        confirmed: true,
+      }),
+    ).toThrow("历史报告更正");
+    expect(() =>
+      f.run(f.teacher, "sports.exemption.revoke", {
+        id: exemption.id,
+        version: 2,
+        reason: "普通入口",
+      }),
+    ).toThrow("历史报告更正");
+  },
+);
+
+it("已关闭但尚未结算课程撤销免测后保留缺测，服务端拒绝新增补测事实", () => {
+  const f = setup();
+  const app = f.repo.create("sportsApplication", f.student.account.id, {
+    courseId: f.course.id,
+    enrollmentId: f.member.id,
+    applicationType: "EXEMPTION",
+    status: "APPROVED",
+  });
+  const exemption = f.repo.save(f.repo.all("sportsExemption")[0], {
+    applicationId: app.id,
+  });
+  f.run(f.teacher, "sports.exemption.revoke", {
+    id: exemption.id,
+    version: exemption.version,
+    reason: "误批撤销",
+  });
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      enrollmentId: f.member.id,
+      version: 0,
+      event: 1000,
+      seconds: 300,
+      testDate: "2026-01-01",
+      confirmed: true,
+    }),
+  ).toThrow("关闭课程");
+  expect(f.repo.all("sportsEndurance")).toHaveLength(0);
+  expect(f.repo.get(f.course.id).data.status).toBe("CLOSED");
+  expect(f.prepare().data.status).toBe("BLOCKED");
+});

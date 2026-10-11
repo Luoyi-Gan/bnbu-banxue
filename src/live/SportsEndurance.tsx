@@ -32,7 +32,7 @@ export function SportsEndurance({
           ? "对照真实测试记录逐人核对。用时填写整数秒（例如4分30秒填270），不能填写4.30。换算由系统选择，学生只看到原始事实。"
           : "这里只显示老师确认的项目、原始用时和测试日期。"}
       </p>
-      {!people.length && <p>暂无已确认记录。</p>}
+      {!people.length && <p>未录入体测。</p>}
       {people.map((person) => {
         const exempt = !!exemptions.find(
           (e) =>
@@ -64,7 +64,7 @@ export function SportsEndurance({
                   ? row.data.exempt
                     ? "耐力跑已批准免测"
                     : `${row.data.event}米 · ${row.data.seconds}秒 · ${row.data.testDate}`
-                  : "尚未确认原始测试事实"}
+                  : "未录入体测"}
             </p>
             {teacher && conversion && (
               <p>
@@ -113,7 +113,7 @@ export function SportsEndurance({
                     )
                   }
                 >
-                  录入 / 更正原始事实
+                  {row ? "更正原始事实" : "手动录入体测／补测结果"}
                 </button>
               )}
             {teacher &&
@@ -157,6 +157,22 @@ export function SportsEndurance({
                   }
                 >
                   更正旧事实并出新报告
+                </button>
+              )}
+            {teacher &&
+              !exempt &&
+              !row &&
+              (course.data.status === "CLOSED" ||
+                course.data.settlementStatus === "SETTLED") && (
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    window.alert(
+                      "课程已结课，不能新增体测或补测结果。缺测记录继续保留，请联系责任教师按人工流程处理；此操作不会补入成绩或重开课程。",
+                    )
+                  }
+                >
+                  手动录入补测结果
                 </button>
               )}
             {!!versions.length && (

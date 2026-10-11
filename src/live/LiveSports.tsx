@@ -16,6 +16,7 @@ import { SportsOcr } from "./SportsOcr";
 import { SportsWorkbook } from "./SportsWorkbook";
 import { SportsEnduranceImport } from "./SportsEnduranceImport";
 import { SportsEndurance } from "./SportsEndurance";
+import { SportsHistoricalRemarks } from "./SportsHistoricalRemarks";
 import { SportsGrades } from "./SportsGrades";
 import { SportsConversion } from "./SportsConversion";
 import { SportsHelp } from "./SportsHelp";
@@ -254,6 +255,7 @@ export function LiveSports({
           按课程规则完成运动并提交凭证。实际时长、可计分钟与最终计入分开，材料提交成功不代表审核通过。
         </p>
       </section>
+      {role === "teacher" && <SportsHistoricalRemarks />}
       <SportsReview data={data} role={role} open={open} run={run} busy={busy} />
       <SportsCalendar data={data} open={open} busy={busy} />
       {data.administratorAccess?.permissions.includes("GLOBAL_RULES") && (
@@ -440,6 +442,7 @@ export function LiveSports({
                 history={data.applicationHistory ?? []}
                 creditHistory={data.certificationHistory ?? []}
                 credits={data.certifications ?? []}
+                exemptions={data.exemptions ?? []}
                 teacher={role === "teacher"}
                 canApply={data.enrollments.some(
                   (m) => m.data.courseId === c.id && m.data.status === "ACTIVE",

@@ -40,6 +40,7 @@ import {
 import { ownedCourse } from "./sports/courses";
 import { sportsWriteGate } from "./sports/system";
 import { enduranceWorkspace } from "./sports/endurance";
+import { historicalRemarks } from "./sports/historical-remarks";
 import { gradeWorkspace } from "./sports/grades";
 import {
   requiresPasswordChange,
@@ -558,6 +559,21 @@ export function createApiServer(
         });
         response.end(bytes);
         return;
+      }
+      if (
+        request.method === "GET" &&
+        pathname === "/api/sports/historical-final-grade-remarks"
+      ) {
+        const params = new URL(request.url!, "http://localhost").searchParams;
+        return send(
+          response,
+          200,
+          historicalRemarks(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            Object.fromEntries(params),
+          ),
+        );
       }
       const frozenRead =
         /^\/api\/sports\/settlement-reports\/([a-f0-9-]+)(\.csv)?$/.exec(

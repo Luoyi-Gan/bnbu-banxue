@@ -1,5 +1,10 @@
 import { demand, type Account } from "../auth";
-import { Repository, integerField, type Fields } from "../repository";
+import {
+  Repository,
+  integerField,
+  type Fields,
+  type Entity,
+} from "../repository";
 import { ownedCourse, version } from "./courses";
 export function sportsGradeCommand(
   repo: Repository,
@@ -104,12 +109,35 @@ export function gradeWorkspace(repo: Repository, actor: Account) {
           .map((c) => c.id)
       : [],
   );
+  const project = (entity: Entity) => ({
+    ...entity,
+    data: Object.fromEntries(
+      [
+        "courseId",
+        "enrollmentId",
+        "semesterId",
+        "score",
+        "teacherId",
+        "publishedAt",
+        "sequence",
+        "previousId",
+        "draftId",
+        "draftVersion",
+        "status",
+        "publicationId",
+      ]
+        .filter((k) => Object.hasOwn(entity.data, k))
+        .map((k) => [k, entity.data[k]]),
+    ),
+  });
   return {
     gradeDrafts: repo
       .all("sportsGradeDraft")
-      .filter((g) => ids.has(String(g.data.courseId))),
+      .filter((g) => ids.has(String(g.data.courseId)))
+      .map(project),
     gradePublications: repo
       .all("sportsGradePublication")
-      .filter((g) => ids.has(String(g.data.courseId))),
+      .filter((g) => ids.has(String(g.data.courseId)))
+      .map(project),
   };
 }

@@ -28,6 +28,7 @@ export function sportsCorrectionCommand(
     "ENDURANCE",
     "REVIEW",
     "CERTIFICATION",
+    "EXEMPTION",
   ] as const);
   demand(
     Object.keys(input).every((k) =>
@@ -44,7 +45,9 @@ export function sportsCorrectionCommand(
             ? ["event", "seconds", "testDate"]
             : kind === "REVIEW"
               ? ["decision", "batchId", "checksCompleted", "reviewReason"]
-              : ["decision", "relatedMinutes", "otherMinutes"]),
+              : kind === "EXEMPTION"
+                ? []
+                : ["decision", "relatedMinutes", "otherMinutes"]),
       ].includes(k),
     ),
     "更正只接受指定旧事实字段，不接受新成员、统计或备注。",
@@ -58,7 +61,9 @@ export function sportsCorrectionCommand(
         ? "sportsEndurance"
         : kind === "REVIEW"
           ? "sportsRecord"
-          : "sportsApplication",
+          : kind === "EXEMPTION"
+            ? "sportsExemption"
+            : "sportsApplication",
   );
   version(original, input);
   const course = ownedCourse(repo, actor, original.data.courseId);
@@ -177,6 +182,14 @@ export function sportsCorrectionCommand(
       },
       true,
     )!;
+  } else if (kind === "EXEMPTION") {
+    result = sportsApplicationCommand(
+      repo,
+      actor,
+      "sports.exemption.revoke",
+      { id: original.id, version: original.version, reason },
+      true,
+    )!;
   } else {
     const decision = enumField(input, "decision", [
       "ADJUST",
@@ -233,6 +246,25 @@ export function sportsCorrectionCommand(
         },
       };
     }
+    if (kind === "EXEMPTION") {
+      const endurance = repo
+        .all("sportsEndurance")
+        .find((e) => e.data.enrollmentId === enrollmentId);
+      return {
+        ...row,
+        facts: {
+          ...row.facts,
+          enduranceStatus: endurance ? "RECORDED" : "NOT_RECORDED",
+          endurance: endurance
+            ? {
+                event: endurance.data.event,
+                seconds: endurance.data.seconds,
+                testDate: endurance.data.testDate,
+              }
+            : null,
+        },
+      };
+    }
     return {
       ...row,
       facts: {
@@ -246,7 +278,30 @@ export function sportsCorrectionCommand(
       },
     };
   });
-  const report = { ...oldReport, generatedAt: new Date().toISOString(), rows };
+  const unresolved =
+    kind === "EXEMPTION"
+      ? [
+          ...oldReport.unresolved.filter(
+            (b) => b.code !== "ENDURANCE_NOT_RECORDED",
+          ),
+          ...(rows.some((r) => r.facts?.enduranceStatus === "NOT_RECORDED")
+            ? [
+                {
+                  code: "ENDURANCE_NOT_RECORDED",
+                  count: rows.filter(
+                    (r) => r.facts?.enduranceStatus === "NOT_RECORDED",
+                  ).length,
+                },
+              ]
+            : []),
+        ]
+      : oldReport.unresolved;
+  const report = {
+    ...oldReport,
+    generatedAt: new Date().toISOString(),
+    rows,
+    unresolved,
+  };
   const correction = repo.create("sportsHistoricalCorrection", actor.id, {
     courseId: course.id,
     kind,
