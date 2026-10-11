@@ -234,3 +234,19 @@ sports.endurance.row(id,version,row,reason,exclude?)：未确认行可对照原�
 sports.endurance.batch.confirm(id,version,rows,confirmed=true)要求所选行全部为无疑点待处理行；调用同一原始体测确认逻辑，在execute事务内保存，任一失败全部回滚。成功行标CONFIRMED并关联结果，其余行保持待处理；只有全部确认或明确排除才COMPLETE。已受理批次在关闭/移出后可继续原有效成员处理，服务器内部传递受理范围，客户端不能伪造该范围。结算/归档仍要求未完成的历史报告更正流程。学生和管理员均不取得草稿、原始CSV或行核对历史。
 
 workspace新增仅责任教师可读的enduranceImports；前端支持原件对照、逐行疑点、修正/排除、勾选范围和确认声明。33文件236项测试、双端类型、Lint和构建通过。测试涵盖部分确认、错误整批阻止、重复行处理、明确4:30、记录版本竞争、CSV上限、权限投影、关闭续办和数据库故障回滚。新增网页点击未验收。XLSX、纸质OCR原图/识别服务、正式学生身份资料与名单、免测认证及结算继续进行；本轮CSV技术入口不代表全部电子表格文件范围已完成。
+
+## 2026-10-13 XLSX成绩单上传与工作表选择
+
+POST /api/sports/workbooks/:courseId接收application/octet-stream，最大100MB；上传前、读取结束及异步解析后重新校验登录、首次改密、体育教师、责任课程、维护和课程可受理状态。解析在独立Worker内完成，30秒上限、512MB V8堆限制；这些是本地资源边界，不代表完成恶意压缩文件或大文件生产压测。固定exceljs4.4.0依赖和package-lock，解析器用法参考[上游文档](https://github.com/exceljs/exceljs)。安装输出存在传递依赖弃用提示，后续生产依赖治理仍需单独验证。
+
+原始XLSX以SHA256存入既有BLOB表，sportsEnduranceSource保留课程、源文件摘要/字节数、工作表提取及受理时有效成员；同教师同课同摘要重复上传复用原受理记录。文件与受理元数据同事务保存，留上传审计。GET /api/sports/workbook-sources/:id仅责任且原受理教师下载原件；学生、管理员和其他教师拒绝，响应no-store且attachment。原件不经OCR，不执行公式；不需要客户端把文件转CSV后再声称保留XLSX。
+
+工作簿最多32表，每表最多500个人员行和200,000提取字符，保留空白间隔后的实际Excel源行号。第一非空行为五字段，可用学号/姓名/项目/用时/测试日期或对应英文字段；未知表头在草稿建立时拒绝。标准日期单元格转日期；公式、合并单元格、错误值、日期型用时及不安全数值标疑，明确核对修正前不能确认。错误工作表列出原因，不能静默删除数据后宣称成功。
+
+sports.endurance.source.import(id,sheet)读取服务器已解析的指定表，复用CSV核对、修正/排除和事务批量确认；同一源表重复选择返回同一批次。合法原件已受理后课程关闭仍可建立原范围草稿，不能引入受理后新增成员，结算/归档仍拒绝直接覆盖。workspace仅责任教师取得enduranceSources，网页支持上传、查看各表解析状态、选择表和下载原件。
+
+Windows34文件240项测试、双端类型、Lint、构建通过。新增测试覆盖XLSX中文表头/日期/源行号、公式疑点、损坏文件、原始字节一致、同源去重、关闭续办、解析期间关闭后拒绝且无孤立文件，以及真实HTTP上传下载的跨角色与跨站限制。新增浏览器点击未验收，纸质OCR、正式名单/身份资料、免测认证、结算报告等完整范围继续。
+
+XLSX依赖复核补充：npm audit定位到ExcelJS传递uuid旧版本通告GHSA-w5hq-g745-h8pq。检查上游仅调用uuid.v4后，限定exceljs的uuid覆盖为已修复11.1.1；Windows重新安装审计0漏洞，四项XLSX解析/HTTP测试复测通过。未使用自动强制降级ExcelJS。
+
+最终依赖版本已在Windows和Docker Linux分别通过34文件240项全量测试。Docker镜像sha256:5b90f46ffe0b6e9fb8fae9cb84081782ce9b5c693c813009b89be822c8411ab0构建成功，npm ci审计0漏洞；容器启动、网页/API均200，health为healthy。验证容器删除，Windows本地验收服务保留。

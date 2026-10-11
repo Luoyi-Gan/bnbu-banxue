@@ -3,6 +3,7 @@ import type { LiveEntity } from "./api";
 import type { OpenForm } from "./ConnectedApp";
 type Row = {
   row: number;
+  sourceRow?: number;
   studentNumber: string;
   name: string;
   event: string;
@@ -62,7 +63,7 @@ function Batch({
                 />
               </td>
               <td>
-                {row.row} · {row.studentNumber} · {row.name}
+                {row.sourceRow ?? row.row} · {row.studentNumber} · {row.name}
               </td>
               <td>
                 {row.event}米 · {row.time} · {row.testDate}
@@ -190,7 +191,7 @@ export function SportsEnduranceImport({
       <summary>电子成绩单CSV导入</summary>
       <p>
         UTF-8
-        CSV直接读取，最多500行、200,000字符。用时填写整数秒或分:秒；4.30须人工核对。当前不接收XLSX或图片OCR。
+        CSV直接读取，最多500行、200,000字符。用时填写整数秒或分:秒；4.30须人工核对。XLSX使用独立上传入口；图片OCR尚未接通。
       </p>
       {course.data.status === "PUBLISHED" &&
         course.data.settlementStatus !== "SETTLED" && (

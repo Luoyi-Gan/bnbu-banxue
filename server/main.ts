@@ -21,6 +21,9 @@ import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
 import { enduranceImportWorkspace } from "./sports/endurance-import";
+import { uploadWorkbook, workbookAccess } from "./sports/workbook";
+import { ownedCourse } from "./sports/courses";
+import { sportsWriteGate } from "./sports/system";
 import { enduranceWorkspace } from "./sports/endurance";
 import { gradeWorkspace } from "./sports/grades";
 import {
@@ -154,6 +157,33 @@ export function createApiServer(
             id: saved.id,
             status: saved.data.status,
           });
+        }
+        const workbookUpload = /^\/api\/sports\/workbooks\/([a-f0-9-]+)$/.exec(
+          pathname,
+        );
+        if (workbookUpload) {
+          demand(
+            request.headers["content-type"] === "application/octet-stream",
+            "工作簿上传须为二进制文件。",
+            415,
+          );
+          const repo = new Repository(db),
+            token = cookieToken(request) ?? "";
+          workbookAccess(repo, token, workbookUpload[1]);
+          const chunks: Buffer[] = [];
+          let size = 0;
+          for await (const chunk of request) {
+            size += chunk.length;
+            demand(size <= 100 * 1024 * 1024, "XLSX不能超过100MB。", 413);
+            chunks.push(chunk);
+          }
+          const saved = await uploadWorkbook(
+            repo,
+            token,
+            workbookUpload[1],
+            Buffer.concat(chunks),
+          );
+          return send(response, 200, { id: saved.id });
         }
         const input = await body(request);
         if (pathname === "/api/auth/verification-codes") {
@@ -334,6 +364,34 @@ export function createApiServer(
           "Content-Security-Policy": "default-src 'none'",
         });
         return response.end(media.bytes);
+      }
+      const workbookRead =
+        /^\/api\/sports\/workbook-sources\/([a-f0-9-]+)$/.exec(pathname);
+      if (request.method === "GET" && workbookRead) {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request));
+        sportsWriteGate(repo, "sports.endurance.import");
+        const source = repo.get(workbookRead[1], "sportsEnduranceSource");
+        ownedCourse(repo, actor, source.data.courseId);
+        demand(
+          source.ownerId === actor.id,
+          "只能读取本人受理的原始文件。",
+          403,
+        );
+        const blob = db
+          .prepare("SELECT bytes FROM sports_media_blobs WHERE sha256=?")
+          .get(String(source.data.sha256));
+        demand(blob, "原始文件不存在。", 404);
+        const bytes = Buffer.from(blob.bytes as Uint8Array);
+        response.writeHead(200, {
+          "Content-Type":
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "Content-Disposition": 'attachment; filename="endurance-source.xlsx"',
+          "Content-Length": bytes.length,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+        });
+        return response.end(bytes);
       }
       if (request.method === "GET" && pathname === "/api/workspace")
         return send(

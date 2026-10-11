@@ -17,6 +17,7 @@
   "dependencies": {
     "cytoscape": "^3.34.3",
     "cytoscape-fcose": "^2.2.0",
+    "exceljs": "4.4.0",
     "ffprobe-static": "^3.1.0",
     "gsap": "^3.15.0",
     "lucide-react": "^0.468.0",
@@ -45,5 +46,10 @@
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    }
   }
 }

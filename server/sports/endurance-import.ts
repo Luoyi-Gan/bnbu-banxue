@@ -10,6 +10,7 @@ import { ownedCourse, version } from "./courses";
 import { businessWeek } from "./credit";
 import { parseCsv } from "./csv";
 import { sportsEnduranceCommand } from "./endurance";
+import type { WorkbookSheet } from "./workbook";
 
 interface ImportRow {
   row: number;
@@ -19,6 +20,7 @@ interface ImportRow {
   time: string;
   testDate: string;
   columnError?: boolean;
+  sourceRow?: number;
   state: "PENDING" | "CONFIRMED" | "EXCLUDED";
   reason?: string;
   expectedEnrollmentId: string | null;
@@ -34,7 +36,8 @@ function review(repo: Repository, batch: Entity, rows: ImportRow[]) {
     .filter((i) => i.data.role === "student" && i.data.status === "verified");
   return rows.map((row) => {
     const errors: string[] = [];
-    if (row.columnError) errors.push("原行列数不符，请逐字段核对修正");
+    if (row.columnError)
+      errors.push("原行列数、公式或单元格格式有疑点，请逐字段核对修正");
     const ids = identities.filter(
       (i) => i.data.studentNumber === row.studentNumber && row.studentNumber,
     );
@@ -121,7 +124,37 @@ export function sportsEnduranceImportCommand(
   actor: Account,
   action: string,
   input: Fields,
+  source?: { entity: Entity; sheet: WorkbookSheet },
 ) {
+  if (action === "sports.endurance.source.import") {
+    const entity = repo.get(input.id, "sportsEnduranceSource");
+    const course = ownedCourse(repo, actor, entity.data.courseId);
+    demand(entity.ownerId === actor.id, "只能读取本人受理的原始文件。", 403);
+    demand(
+      course.data.settlementStatus !== "SETTLED" &&
+        repo.get(course.data.semesterId, "sportsSemester").data.status !==
+          "ARCHIVED",
+      "已结算或归档须通过历史报告更正流程。",
+      409,
+    );
+    const sheet = (entity.data.sheets as WorkbookSheet[]).find(
+      (s) => s.index === input.sheet,
+    );
+    demand(sheet && !sheet.error, "工作表不存在或无法解析，请核对原始文件。");
+    const prior = repo
+      .all("sportsEnduranceImport")
+      .find(
+        (b) => b.data.sourceId === entity.id && b.data.sheet === sheet.index,
+      );
+    if (prior) return prior;
+    return sportsEnduranceImportCommand(
+      repo,
+      actor,
+      "sports.endurance.import",
+      { courseId: course.id, csv: sheet.csv },
+      { entity, sheet },
+    );
+  }
   if (
     ![
       "sports.endurance.import",
@@ -133,7 +166,7 @@ export function sportsEnduranceImportCommand(
   if (action === "sports.endurance.import") {
     const course = ownedCourse(repo, actor, input.courseId);
     demand(
-      course.data.status === "PUBLISHED" &&
+      (course.data.status === "PUBLISHED" || !!source) &&
         course.data.settlementStatus !== "SETTLED" &&
         repo.get(course.data.semesterId, "sportsSemester").data.status !==
           "ARCHIVED",
@@ -162,6 +195,13 @@ export function sportsEnduranceImportCommand(
         time: read("time"),
         testDate: read("test_date"),
         columnError: values.length !== 5,
+        ...(source
+          ? {
+              sourceRow: source.sheet.rowNumbers[index + 1],
+              columnError:
+                values.length !== 5 || source.sheet.issues.includes(index + 2),
+            }
+          : {}),
         state: "PENDING",
         expectedEnrollmentId: null,
         expectedVersion: 0,
@@ -169,16 +209,25 @@ export function sportsEnduranceImportCommand(
     });
     const batch = repo.create("sportsEnduranceImport", actor.id, {
       courseId: course.id,
-      source: "CSV",
+      source: source ? "XLSX" : "CSV",
+      ...(source
+        ? {
+            sourceId: source.entity.id,
+            sheet: source.sheet.index,
+            sheetName: source.sheet.name,
+          }
+        : {}),
       csv,
       rows,
       status: "PENDING",
-      acceptedEnrollmentIds: repo
-        .all("sportsEnrollment")
-        .filter(
-          (m) => m.data.courseId === course.id && m.data.status === "ACTIVE",
-        )
-        .map((m) => m.id),
+      acceptedEnrollmentIds:
+        source?.entity.data.acceptedEnrollmentIds ??
+        repo
+          .all("sportsEnrollment")
+          .filter(
+            (m) => m.data.courseId === course.id && m.data.status === "ACTIVE",
+          )
+          .map((m) => m.id),
     });
     const checked = review(repo, batch, rows);
     return repo.save(batch, {
@@ -296,6 +345,15 @@ export function enduranceImportWorkspace(repo: Repository, actor: Account) {
         i.data.status === "verified",
     );
   return {
+    enduranceSources: teacher
+      ? repo
+          .all("sportsEnduranceSource")
+          .filter(
+            (b) =>
+              b.ownerId === actor.id &&
+              repo.get(b.data.courseId, "sportsCourse").ownerId === actor.id,
+          )
+      : [],
     enduranceImports: teacher
       ? repo
           .all("sportsEnduranceImport")
