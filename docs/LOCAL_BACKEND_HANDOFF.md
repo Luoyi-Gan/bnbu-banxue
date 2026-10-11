@@ -36,6 +36,8 @@
 
 ## 验证结果
 
+续轮修复：改期提出和接受复核教师当前角色、封禁及服务状态，防止学生接受已经失效的教师时段。新增两项回归（身份撤销、封禁），`tests/backend.test.ts` 8/8 通过，后端类型检查及相关 lint 通过；此前 138 项全套结果仍为上一提交的验证记录。
+
 - `node node_modules/vitest/vitest.mjs run`：22 个文件，138 项测试通过。
 - 前端 `tsconfig.app.json` 与后端 `tsconfig.server.json` 类型检查通过。
 - ESLint 通过；Vite 构建通过。保留原三维/关系图及主包超过 500KB 的构建提示。

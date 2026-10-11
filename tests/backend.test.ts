@@ -44,6 +44,52 @@ const period = (hours: number) => ({
   location: "交流室",
 });
 describe("数据库与真实账号边界", () => {
+  it.each(["revoked", "banned"])(
+    "教师资格失效 %s 后不能接受改期，但仍可拒绝并释放预留",
+    (change) => {
+      const { db, repo, a, teacher } = setup();
+      const old = coffeeCommand(
+        repo,
+        teacher,
+        "coffee.slot.create",
+        period(24),
+      )!;
+      const next = coffeeCommand(
+        repo,
+        teacher,
+        "coffee.slot.create",
+        period(26),
+      )!;
+      const booking = coffeeCommand(repo, a, "coffee.book", {
+        slotId: old.id,
+        topic: "交流",
+      })!;
+      coffeeCommand(repo, teacher, "coffee.move", {
+        id: booking.id,
+        slotId: next.id,
+        reason: "安排调整",
+      });
+      if (change === "revoked")
+        db.prepare("UPDATE accounts SET roles='[]' WHERE id=?").run(teacher.id);
+      else
+        db.prepare("UPDATE accounts SET status='banned' WHERE id=?").run(
+          teacher.id,
+        );
+      expect(() =>
+        coffeeCommand(repo, a, "coffee.answer", {
+          id: booking.id,
+          accept: true,
+        }),
+      ).toThrow("新时段已经失效");
+      expect(repo.get(booking.id, "coffeeBooking").data.slotId).toBe(old.id);
+      expect([occupied(repo, old.id), occupied(repo, next.id)]).toEqual([1, 1]);
+      coffeeCommand(repo, a, "coffee.answer", {
+        id: booking.id,
+        accept: false,
+      });
+      expect([occupied(repo, old.id), occupied(repo, next.id)]).toEqual([1, 0]);
+    },
+  );
   it("密码哈希、会话校验和注销后的失效", () => {
     const { db, a } = setup();
     expect(

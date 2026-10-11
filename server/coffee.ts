@@ -73,6 +73,18 @@ function manageTeacher(actor: Account, teacherId: string) {
   if (actor.id === teacherId && has(actor, "teacher")) return;
   operator(actor);
 }
+function availableSlot(repo: Repository, slot: Entity) {
+  const teacher = repo.person(slot.ownerId!);
+  return (
+    !slot.data.closed &&
+    Date.parse(String(slot.data.startAt)) > Date.now() &&
+    teacher.status !== "banned" &&
+    has(teacher, "teacher") &&
+    !repo
+      .all("teacherProfile")
+      .some((p) => p.ownerId === slot.ownerId && p.data.enabled === false)
+  );
+}
 export function coffeeCommand(
   repo: Repository,
   actor: Account,
@@ -166,18 +178,8 @@ export function coffeeCommand(
   }
   if (action === "coffee.book") {
     student(actor);
-    const slot = repo.get(input.slotId, "coffeeSlot"),
-      teacher = repo.person(slot.ownerId!);
-    demand(
-      !slot.data.closed &&
-        Date.parse(String(slot.data.startAt)) > Date.now() &&
-        teacher.status !== "banned" &&
-        has(teacher, "teacher") &&
-        !repo
-          .all("teacherProfile")
-          .some((p) => p.ownerId === slot.ownerId && p.data.enabled === false),
-      "该时段不可预约。",
-    );
+    const slot = repo.get(input.slotId, "coffeeSlot");
+    demand(availableSlot(repo, slot), "该时段不可预约。");
     demand(
       occupied(repo, slot.id) < Number(slot.data.capacity) &&
         !hasConflict(repo, actor.id, slot),
@@ -234,8 +236,7 @@ export function coffeeCommand(
     demand(
       next.id !== booking.data.slotId &&
         next.ownerId === booking.data.teacherId &&
-        !next.data.closed &&
-        Date.parse(String(next.data.startAt)) > Date.now(),
+        availableSlot(repo, next),
       "请选择同一教师的其他未来开放时段。",
     );
     demand(
@@ -265,8 +266,7 @@ export function coffeeCommand(
       accept = input.accept === true;
     if (accept)
       demand(
-        !next.data.closed &&
-          Date.parse(String(next.data.startAt)) > Date.now() &&
+        availableSlot(repo, next) &&
           occupied(repo, next.id) <= Number(next.data.capacity) &&
           !hasConflict(repo, actor.id, next, booking.id),
         "新时段已经失效或冲突，请拒绝后重新协调。",
