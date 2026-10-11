@@ -5,6 +5,7 @@ import { calculateProgress } from "./progress";
 import { reconcileRoster } from "./roster";
 import { sportsWriteGate } from "./system";
 import type { SportsClock } from "./session-clock";
+import { approvedExemption } from "./applications";
 
 /** Current teaching report, never a settlement publication or student-facing grade export. */
 export function courseReport(
@@ -41,6 +42,12 @@ export function courseReport(
   if (!snapshot) add("NO_CONFIRMED_ROSTER", 1);
   add("ROSTER_INCOMPLETE", check?.incompleteCount ?? 0);
   add("ROSTER_OUTSIDE", check?.outside.length ?? 0);
+  add(
+    "APPLICATION_PENDING",
+    inCourse("sportsApplication").filter((a) =>
+      ["SUBMITTED", "SUPPLEMENT_REQUIRED"].includes(String(a.data.status)),
+    ).length,
+  );
   add(
     "ROSTER_DRAFT",
     inCourse("sportsRosterDraft").filter((e) => e.data.status === "DRAFT")
@@ -84,9 +91,10 @@ export function courseReport(
         !ownRecords.some((r) => r.data.sessionId === s.id),
     );
     const progress = calculateProgress(repo, courseId, ownerId);
-    const endurance = inCourse("sportsEndurance").find(
-      (e) => e.ownerId === ownerId,
-    );
+    const exempt = approvedExemption(repo, ownerId, courseId);
+    const endurance = exempt
+      ? undefined
+      : inCourse("sportsEndurance").find((e) => e.ownerId === ownerId);
     const actualMinutes = ownSessions
       .filter((s) => (s.data.clock as unknown as SportsClock).state === "ENDED")
       .reduce(
@@ -98,7 +106,11 @@ export function courseReport(
         0,
       );
     return {
-      enduranceStatus: endurance ? "RECORDED" : "NOT_RECORDED",
+      enduranceStatus: exempt
+        ? "EXEMPT"
+        : endurance
+          ? "RECORDED"
+          : "NOT_RECORDED",
       endurance: endurance
         ? {
             event: endurance.data.event,
@@ -211,6 +223,7 @@ export function courseReport(
     members.filter(
       (m) =>
         m.data.status === "ACTIVE" &&
+        !approvedExemption(repo, m.ownerId, courseId) &&
         !inCourse("sportsEndurance").some((e) => e.ownerId === m.ownerId),
     ).length,
   );
@@ -231,10 +244,7 @@ export function courseReport(
     excludedCount: check?.excludedCount ?? 0,
     unresolved,
     rows,
-    limitations: [
-      "当前教学报告不是冻结结算版本",
-      "免测认证及正式结算报告尚待接通",
-    ],
+    limitations: ["当前教学报告不是冻结结算版本", "正式结算报告尚待接通"],
   };
 }
 export type CourseReport = ReturnType<typeof courseReport>;

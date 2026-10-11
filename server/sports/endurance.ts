@@ -8,6 +8,7 @@ import {
 import { ownedCourse } from "./courses";
 import { businessWeek } from "./credit";
 import { convertEndurance } from "./conversion";
+import { approvedExemption } from "./applications";
 
 export function sportsEnduranceCommand(
   repo: Repository,
@@ -33,6 +34,11 @@ export function sportsEnduranceCommand(
   demand(input.confirmed === true, "请对照真实测试记录确认项目、用时和日期。");
   const member = repo.get(input.enrollmentId, "sportsEnrollment");
   const course = ownedCourse(repo, actor, member.data.courseId);
+  demand(
+    !approvedExemption(repo, member.ownerId, course.id),
+    "当前耐力跑已获免测，不能录入普通用时。",
+    409,
+  );
   const semester = repo.get(course.data.semesterId, "sportsSemester");
   demand(
     course.data.settlementStatus !== "SETTLED" &&
@@ -164,7 +170,9 @@ export function enduranceWorkspace(repo: Repository, actor: Account) {
       .filter(
         (r) =>
           courseIds.has(String(r.data.courseId)) ||
-          (roles.includes("student") && r.ownerId === actor.id),
+          (roles.includes("student") &&
+            r.ownerId === actor.id &&
+            !approvedExemption(repo, actor.id, r.data.courseId)),
       )
       .map((r) => {
         if (courseIds.has(String(r.data.courseId))) return r;
@@ -181,7 +189,22 @@ export function enduranceWorkspace(repo: Repository, actor: Account) {
         };
       });
   return {
-    enduranceRecords: project("sportsEndurance"),
+    enduranceRecords: [
+      ...project("sportsEndurance"),
+      ...repo
+        .all("sportsExemption")
+        .filter(
+          (e) =>
+            roles.includes("student") &&
+            e.ownerId === actor.id &&
+            e.data.status === "APPROVED" &&
+            !courseIds.has(String(e.data.courseId)),
+        )
+        .map((e) => ({
+          ...e,
+          data: { courseId: e.data.courseId, exempt: true },
+        })),
+    ],
     enduranceHistory: project("sportsEnduranceRevision"),
   };
 }

@@ -9,6 +9,7 @@ import { SportsIncidents, type IncidentData } from "./SportsIncidents";
 import { SportsSwimStart } from "./SportsSwimStart";
 import { SportsRosterFiles } from "./SportsRosterFiles";
 import { SportsReport } from "./SportsReport";
+import { SportsApplications } from "./SportsApplications";
 import { SportsRoster, type RosterCheck } from "./SportsRoster";
 import { SportsOcr } from "./SportsOcr";
 import { SportsWorkbook } from "./SportsWorkbook";
@@ -29,6 +30,11 @@ interface SportsData
     CalendarData,
     IncidentData {
   identity: LiveEntity;
+  applications?: LiveEntity[];
+  applicationHistory?: LiveEntity[];
+  certifications?: LiveEntity[];
+  exemptions?: LiveEntity[];
+  certificationHistory?: LiveEntity[];
   firstLoginOnly?: boolean;
   teacherImports?: LiveEntity[];
   conversionTables?: LiveEntity[];
@@ -415,6 +421,21 @@ export function LiveSports({
         {data.courses.map((c) => (
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
+            {(role === "student" || role === "teacher") && (
+              <SportsApplications
+                course={c}
+                applications={data.applications ?? []}
+                history={data.applicationHistory ?? []}
+                creditHistory={data.certificationHistory ?? []}
+                credits={data.certifications ?? []}
+                teacher={role === "teacher"}
+                canApply={data.enrollments.some(
+                  (m) => m.data.courseId === c.id && m.data.status === "ACTIVE",
+                )}
+                open={open}
+                busy={busy}
+              />
+            )}
             {role === "teacher" && <SportsReport key={c.version} course={c} />}
             {role === "teacher" && (
               <SportsOcr
@@ -502,6 +523,7 @@ export function LiveSports({
                 members={data.enrollments}
                 records={data.enduranceRecords ?? []}
                 history={data.enduranceHistory ?? []}
+                exemptions={data.exemptions ?? []}
                 teacher={role === "teacher"}
                 open={open}
                 busy={busy}

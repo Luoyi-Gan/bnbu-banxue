@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, type LiveEntity } from "./api";
 import type { CourseReport } from "../../server/sports/report";
 const status: Record<string, string> = {
+  EXEMPT: "已免测",
   COMPLETE: "注册匹配完成",
   INCOMPLETE: "注册入班未完成",
   CONFLICT: "身份冲突",
@@ -14,6 +15,7 @@ const status: Record<string, string> = {
   NOT_RECORDED: "未录入",
 };
 const todo: Record<string, string> = {
+  APPLICATION_PENDING: "免测/认证待处理",
   NO_CONFIRMED_ROSTER: "尚无确认名单",
   ROSTER_INCOMPLETE: "名单内注册核对未完成",
   ROSTER_OUTSIDE: "名单外有效成员",

@@ -33,6 +33,7 @@ import { sportsRosterCommand } from "./sports/roster";
 import { sportsEnduranceImportCommand } from "./sports/endurance-import";
 import { sportsEnduranceCommand } from "./sports/endurance";
 import { sportsGradeCommand } from "./sports/grades";
+import { sportsApplicationCommand } from "./sports/applications";
 import {
   sportsAccountGate,
   requiresPasswordChange,
@@ -158,6 +159,7 @@ export function execute(
         sportsEnduranceImportCommand(repo, actor, action, input) ??
         sportsEnduranceCommand(repo, actor, action, input) ??
         sportsGradeCommand(repo, actor, action, input) ??
+        sportsApplicationCommand(repo, actor, action, input) ??
         communityCommand(repo, actor, action, input) ??
         coffeeCommand(repo, actor, action, input) ??
         governanceCommand(repo, actor, action, input) ??

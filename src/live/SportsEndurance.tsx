@@ -6,6 +6,7 @@ export function SportsEndurance({
   members,
   records,
   history,
+  exemptions,
   teacher,
   open,
   busy,
@@ -14,6 +15,7 @@ export function SportsEndurance({
   members: LiveEntity[];
   records: LiveEntity[];
   history: LiveEntity[];
+  exemptions: LiveEntity[];
   teacher: boolean;
   open: OpenForm;
   busy: boolean;
@@ -32,6 +34,12 @@ export function SportsEndurance({
       </p>
       {!people.length && <p>暂无已确认记录。</p>}
       {people.map((person) => {
+        const exempt = !!exemptions.find(
+          (e) =>
+            e.data.courseId === course.id &&
+            e.ownerId === person.ownerId &&
+            e.data.status === "APPROVED",
+        );
         const row = teacher
           ? rows.find((r) => r.data.enrollmentId === person.id)
           : person;
@@ -50,9 +58,13 @@ export function SportsEndurance({
               <h4>{String(person.data.studentName ?? person.ownerId)}</h4>
             )}
             <p>
-              {row
-                ? `${row.data.event}米 · ${row.data.seconds}秒 · ${row.data.testDate}`
-                : "尚未确认原始测试事实"}
+              {exempt
+                ? "耐力跑已批准免测（原始历史仍保留）"
+                : row
+                  ? row.data.exempt
+                    ? "耐力跑已批准免测"
+                    : `${row.data.event}米 · ${row.data.seconds}秒 · ${row.data.testDate}`
+                  : "尚未确认原始测试事实"}
             </p>
             {teacher && conversion && (
               <p>
@@ -63,6 +75,7 @@ export function SportsEndurance({
               </p>
             )}
             {teacher &&
+              !exempt &&
               course.data.settlementStatus !== "SETTLED" &&
               (row ||
                 (course.data.status === "PUBLISHED" &&

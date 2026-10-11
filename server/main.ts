@@ -22,6 +22,11 @@ import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
 import { rosterWorkspace } from "./sports/roster";
 import { courseReport, reportCsv } from "./sports/report";
+import {
+  applicationWorkspace,
+  uploadApplicationAsset,
+  readApplicationAsset,
+} from "./sports/applications";
 import { uploadRosterFile } from "./sports/roster-files";
 import { enduranceImportWorkspace } from "./sports/endurance-import";
 import { uploadWorkbook, workbookAccess } from "./sports/workbook";
@@ -166,6 +171,29 @@ export function createApiServer(
             id: saved.id,
             status: saved.data.status,
           });
+        }
+        const proofUpload =
+          /^\/api\/sports\/application-assets\/([a-f0-9-]+)(?:\/([a-f0-9-]+))?$/.exec(
+            pathname,
+          );
+        if (proofUpload) {
+          const chunks: Buffer[] = [];
+          let size = 0;
+          authenticate(db, cookieToken(request));
+          for await (const chunk of request) {
+            size += chunk.length;
+            demand(size <= 10 * 1024 * 1024, "单张证明图片超过10MB。", 413);
+            chunks.push(chunk);
+          }
+          const saved = await uploadApplicationAsset(
+            new Repository(db),
+            cookieToken(request) ?? "",
+            proofUpload[1],
+            Buffer.concat(chunks),
+            request.headers["content-type"] ?? "",
+            proofUpload[2],
+          );
+          return send(response, 200, { id: saved.id });
         }
         const ocrUpload =
           /^\/api\/sports\/(?:ocr-sources|roster-ocr)\/([a-f0-9-]+)$/.exec(
@@ -429,6 +457,7 @@ export function createApiServer(
           ...enduranceWorkspace(repo, actor),
           ...enduranceImportWorkspace(repo, actor),
           ...rosterWorkspace(repo, actor),
+          ...applicationWorkspace(repo, actor),
           ...feedbackWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),
@@ -503,6 +532,30 @@ export function createApiServer(
           "Content-Security-Policy": "default-src 'none'",
         });
         return response.end(bytes);
+      }
+      const proofRead =
+        /^\/api\/sports\/application-assets\/([a-f0-9-]+)$/.exec(pathname);
+      if (request.method === "GET" && proofRead) {
+        const repo = new Repository(db),
+          asset = readApplicationAsset(
+            repo,
+            authenticate(db, cookieToken(request)),
+            proofRead[1],
+          );
+        const blob = db
+          .prepare("SELECT bytes FROM sports_media_blobs WHERE sha256=?")
+          .get(String(asset.data.sha256));
+        demand(blob, "证明原图不存在。", 404);
+        const bytes = Buffer.from(blob.bytes as Uint8Array);
+        response.writeHead(200, {
+          "Content-Type": String(asset.data.mime),
+          "Content-Length": bytes.length,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          "Content-Security-Policy": "default-src 'none'",
+        });
+        response.end(bytes);
+        return;
       }
       const reportRead =
         /^\/api\/sports\/course-reports\/([a-f0-9-]+)(\.csv)?$/.exec(pathname);

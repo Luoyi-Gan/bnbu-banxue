@@ -11,6 +11,7 @@ import { businessWeek } from "./credit";
 import { parseCsv } from "./csv";
 import { sportsEnduranceCommand } from "./endurance";
 import type { WorkbookSheet } from "./workbook";
+import { approvedExemption } from "./applications";
 
 interface ImportRow {
   row: number;
@@ -95,6 +96,8 @@ function review(repo: Repository, batch: Entity, rows: ImportRow[]) {
           .all("sportsEndurance")
           .find((r) => r.data.enrollmentId === member.id)
       : undefined;
+    if (member && approvedExemption(repo, member.ownerId, batch.data.courseId))
+      errors.push("此学生已批准耐力跑免测，不能确认普通用时");
     if (
       member &&
       !(batch.data.acceptedEnrollmentIds as string[]).includes(member.id)

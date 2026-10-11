@@ -326,10 +326,22 @@ export function reviewWorkspace(repo: Repository, actor: Account) {
     );
   const progress = repo
     .all("sportsProgress")
-    .filter((p) =>
-      records.some(
-        (r) => r.ownerId === p.ownerId && r.data.courseId === p.data.courseId,
-      ),
+    .filter(
+      (p) =>
+        repo
+          .all("sportsIdentity")
+          .some(
+            (i) =>
+              i.ownerId === actor.id &&
+              i.data.status === "verified" &&
+              ((i.data.role === "student" && p.ownerId === actor.id) ||
+                (i.data.role === "teacher" &&
+                  repo.get(p.data.courseId, "sportsCourse").ownerId ===
+                    actor.id)),
+          ) ||
+        records.some(
+          (r) => r.ownerId === p.ownerId && r.data.courseId === p.data.courseId,
+        ),
     );
   const current = progress.filter(
     (p) =>
