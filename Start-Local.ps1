@@ -10,6 +10,8 @@ if (-not (Test-Path -LiteralPath 'node_modules/vite/package.json')) { throw '请
 if ($Acceptance) {
   & $bnbuNodePath scripts/acceptance.mjs prepare
   if ($LASTEXITCODE -ne 0) { throw '验收数据库初始化失败。' }
+  & $bnbuNodePath scripts/acceptance.mjs sports
+  if ($LASTEXITCODE -ne 0) { throw '体育验收身份初始化失败。' }
   $env:BNBU_DATABASE = Join-Path $PSScriptRoot 'data/browser-acceptance.sqlite'
   $env:BNBU_LOCAL_OUTBOX = '1'
   Write-Host '使用独立验收数据库（非学校真实身份）。账号见 data/browser-acceptance-accounts.json。'

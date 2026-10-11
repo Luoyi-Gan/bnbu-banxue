@@ -27,12 +27,14 @@ import {
   ApiError,
   command,
   loadWorkspace,
+  sportsChangedEvent,
   type LiveEntity,
   type Workspace,
 } from "./api";
 import { prepareCommunityImage } from "../v2/communityImages";
 import { ManagementTools } from "./ManagementTools";
 import { LiveTimetable } from "./LiveTimetable";
+import { LiveSports } from "./LiveSports";
 import { Modal, PageHeading } from "../v2/ui";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import "../v2/v2.css";
@@ -43,6 +45,9 @@ export type Field = {
   key: string;
   label: string;
   type?:
+    | "text"
+    | "date"
+    | "time"
     | "textarea"
     | "number"
     | "datetime-local"
@@ -50,6 +55,7 @@ export type Field = {
     | "image"
     | "images"
     | "checkbox";
+  min?: number;
   options?: { value: string; label: string }[];
   value?: string | number | boolean;
   optional?: boolean;
@@ -268,7 +274,7 @@ function EditForm({
                     : String(field.value ?? "")
                 }
                 required={!field.optional}
-                min={field.type === "number" ? 1 : undefined}
+                min={field.type === "number" ? (field.min ?? 1) : undefined}
                 maxLength={field.max ?? 2000}
                 onChange={(event) => event.currentTarget.setCustomValidity("")}
               />
@@ -339,6 +345,7 @@ export function ConnectedApp() {
     setMessage("");
     try {
       await command(action, input);
+      if (action.startsWith("sports.")) window.dispatchEvent(new Event(sportsChangedEvent));
       setForm(null);
       setMessage("已保存到本地服务。");
       await refresh();
@@ -450,6 +457,9 @@ export function ConnectedApp() {
   );
   const nav: [string, string, LucideIcon][] = [
     ["home", "概览", LayoutDashboard],
+    ...(student || teacher || operate
+      ? [["sports", "体育课程", CalendarDays] as [string, string, LucideIcon]]
+      : []),
     ...(student
       ? [
           ["activities", "校园活动", Compass],
@@ -627,6 +637,9 @@ export function ConnectedApp() {
             <p className="live-success" role="status">
               {message}
             </p>
+          )}
+          {module === "sports" && (
+            <LiveSports open={open} run={run} busy={busy} />
           )}
           {module === "home" && (
             <>

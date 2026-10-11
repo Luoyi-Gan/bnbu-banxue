@@ -79,6 +79,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
   return data as T;
 }
 export const loadWorkspace = () => api<Workspace>("/api/workspace");
+export const sportsChangedEvent = "bnbu:sports-updated";
 const uncertainRequests = new Map<string, string>();
 export async function command(
   action: string,

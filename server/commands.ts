@@ -15,6 +15,7 @@ import { activityCommand } from "./activities";
 import { alumniCommand, readAlumni } from "./alumni";
 import { bookingStatus } from "../src/v2/alumniPolicy";
 import { sportsCourseCommand } from "./sports/courses";
+import { sportsSessionCommand } from "./sports/sessions";
 
 export function execute(
   db: Database,
@@ -130,7 +131,8 @@ export function execute(
         governanceCommand(repo, actor, action, input) ??
         activityCommand(repo, actor, action, input) ??
         alumniCommand(repo, actor, action, input) ??
-        sportsCourseCommand(repo, actor, action, input);
+        sportsCourseCommand(repo, actor, action, input) ??
+        sportsSessionCommand(repo, actor, action, input);
       demand(result, "不支持该业务操作。", 404);
       // A full alumni aggregate must never be returned in a mutation response.
       result = { id: (result as { id: string }).id };

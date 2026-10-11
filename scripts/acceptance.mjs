@@ -27,5 +27,6 @@ if (process.argv[2] === "outbox")
     ),
   );
 else if (process.argv[2] === "prepare") tooling.prepareBrowserAcceptance();
+else if (process.argv[2] === "sports") tooling.prepareSportsAcceptance();
 else
-  throw new Error("用法：node scripts/acceptance.mjs prepare | outbox <email>");
+  throw new Error("用法：node scripts/acceptance.mjs prepare | sports | outbox <email>");

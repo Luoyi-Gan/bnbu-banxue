@@ -16,6 +16,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { sessionProjection } from "./sports/sessions";
 import { recognize } from "./timetable";
 import { student } from "./community";
 import { sendVerification } from "./mail-delivery";
@@ -167,15 +168,19 @@ export function createApiServer(
         return send(response, 200, {
           account: authenticate(db, cookieToken(request)),
         });
-      if (request.method === "GET" && pathname === "/api/sports/workspace")
-        return send(
-          response,
-          200,
-          sportsWorkspace(
-            new Repository(db),
-            authenticate(db, cookieToken(request)),
-          ),
-        );
+      if (request.method === "GET" && pathname === "/api/sports/workspace") {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request)),
+          serverNow = Date.now();
+        return send(response, 200, {
+          ...sportsWorkspace(repo, actor),
+          serverNow,
+          sessions: repo
+            .all("sportsSession")
+            .filter((s) => s.ownerId === actor.id)
+            .map((s) => sessionProjection(s, serverNow)),
+        });
+      }
       if (request.method === "GET" && pathname === "/api/workspace")
         return send(
           response,
