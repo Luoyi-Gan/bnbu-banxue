@@ -10,6 +10,7 @@ import { SportsSwimStart } from "./SportsSwimStart";
 import { SportsRosterFiles } from "./SportsRosterFiles";
 import { SportsReport } from "./SportsReport";
 import { SportsApplications } from "./SportsApplications";
+import { SportsSettlement } from "./SportsSettlement";
 import { SportsRoster, type RosterCheck } from "./SportsRoster";
 import { SportsOcr } from "./SportsOcr";
 import { SportsWorkbook } from "./SportsWorkbook";
@@ -30,6 +31,8 @@ interface SportsData
     CalendarData,
     IncidentData {
   identity: LiveEntity;
+  settlementPreparations?: LiveEntity[];
+  settlementReports?: LiveEntity[];
   applications?: LiveEntity[];
   applicationHistory?: LiveEntity[];
   certifications?: LiveEntity[];
@@ -421,6 +424,15 @@ export function LiveSports({
         {data.courses.map((c) => (
           <article className="v2-panel live-card" key={c.id}>
             <h3>{String(c.data.name)}</h3>
+            {role === "teacher" && (
+              <SportsSettlement
+                course={c}
+                preparations={data.settlementPreparations ?? []}
+                reports={data.settlementReports ?? []}
+                open={open}
+                busy={busy}
+              />
+            )}
             {(role === "student" || role === "teacher") && (
               <SportsApplications
                 course={c}

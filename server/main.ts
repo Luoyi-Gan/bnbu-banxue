@@ -21,7 +21,8 @@ import { feedbackWorkspace } from "./sports/feedback";
 import { helpRead } from "./sports/help";
 import { conversionWorkspace } from "./sports/conversion";
 import { rosterWorkspace } from "./sports/roster";
-import { courseReport, reportCsv } from "./sports/report";
+import { courseReport, reportCsv, type CourseReport } from "./sports/report";
+import { settlementWorkspace } from "./sports/settlement";
 import {
   applicationWorkspace,
   uploadApplicationAsset,
@@ -458,6 +459,7 @@ export function createApiServer(
           ...enduranceImportWorkspace(repo, actor),
           ...rosterWorkspace(repo, actor),
           ...applicationWorkspace(repo, actor),
+          ...settlementWorkspace(repo, actor),
           ...feedbackWorkspace(repo, actor),
           ...materialWorkspace(repo, actor),
           ...reviewWorkspace(repo, actor),
@@ -553,6 +555,32 @@ export function createApiServer(
           "Cache-Control": "no-store",
           "X-Content-Type-Options": "nosniff",
           "Content-Security-Policy": "default-src 'none'",
+        });
+        response.end(bytes);
+        return;
+      }
+      const frozenRead =
+        /^\/api\/sports\/settlement-reports\/([a-f0-9-]+)(\.csv)?$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && frozenRead) {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request)),
+          entry = repo.get(frozenRead[1], "sportsSettlementReport");
+        sportsWriteGate(repo, "sports.settlement.read");
+        ownedCourse(repo, actor, entry.data.courseId);
+        if (!frozenRead[2]) return send(response, 200, entry);
+        const bytes = Buffer.from(
+          `\uFEFF"冻结报告ID","${entry.id}"\r\n"报告版本","${Number(entry.data.sequence)}"\r\n"内容摘要","${String(entry.data.contentHash)}"\r\n` +
+            reportCsv(entry.data.report as CourseReport).slice(1),
+          "utf8",
+        );
+        response.writeHead(200, {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="settlement-report.csv"',
+          "Content-Length": bytes.length,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
         });
         response.end(bytes);
         return;

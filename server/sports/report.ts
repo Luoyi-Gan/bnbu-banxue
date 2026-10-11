@@ -15,6 +15,7 @@ export function courseReport(
 ) {
   sportsWriteGate(repo, "sports.report.read");
   const course = ownedCourse(repo, actor, courseId);
+  const now = Date.now();
   const cache = new Map<string, Entity[]>();
   const inCourse = (kind: string) => {
     if (!cache.has(kind))
@@ -88,7 +89,9 @@ export function courseReport(
     const awaitingMaterials = ownSessions.filter(
       (s) =>
         (s.data.clock as unknown as SportsClock).state === "ENDED" &&
-        !ownRecords.some((r) => r.data.sessionId === s.id),
+        !ownRecords.some((r) => r.data.sessionId === s.id) &&
+        now <
+          Number((s.data.clock as unknown as SportsClock).endedAt) + 86400000,
     );
     const progress = calculateProgress(repo, courseId, ownerId);
     const exempt = approvedExemption(repo, ownerId, courseId);
@@ -150,6 +153,13 @@ export function courseReport(
       pendingRecords: pendingRecords.length,
       openSessions: openSessions.length,
       awaitingMaterials: awaitingMaterials.length,
+      expiredWithoutMaterials: ownSessions.filter(
+        (s) =>
+          (s.data.clock as unknown as SportsClock).state === "ENDED" &&
+          !ownRecords.some((r) => r.data.sessionId === s.id) &&
+          now >=
+            Number((s.data.clock as unknown as SportsClock).endedAt) + 86400000,
+      ).length,
       pendingStatuses: [
         ...new Set(pendingRecords.map((r) => String(r.data.status))),
       ],
@@ -170,6 +180,8 @@ export function courseReport(
       : undefined;
     return {
       source: "SCHOOL",
+      enrollmentId: member?.id ?? null,
+      studentId: member?.ownerId ?? null,
       sourceRow: row.row,
       studentNumber: row.studentNumber,
       name: row.name,
@@ -187,6 +199,8 @@ export function courseReport(
       .get(member.ownerId ?? "");
     rows.push({
       source: "MEMBER",
+      enrollmentId: member.id,
+      studentId: member.ownerId,
       sourceRow: 0,
       studentNumber:
         identity.length === 1
@@ -210,7 +224,9 @@ export function courseReport(
     sessions.filter(
       (s) =>
         (s.data.clock as unknown as SportsClock).state === "ENDED" &&
-        !records.some((r) => r.data.sessionId === s.id),
+        !records.some((r) => r.data.sessionId === s.id) &&
+        now <
+          Number((s.data.clock as unknown as SportsClock).endedAt) + 86400000,
     ).length,
   );
   add(
@@ -244,7 +260,7 @@ export function courseReport(
     excludedCount: check?.excludedCount ?? 0,
     unresolved,
     rows,
-    limitations: ["当前教学报告不是冻结结算版本", "正式结算报告尚待接通"],
+    limitations: ["当前教学报告不是冻结结算版本"],
   };
 }
 export type CourseReport = ReturnType<typeof courseReport>;
@@ -286,6 +302,7 @@ export function reportCsv(report: CourseReport) {
       "异常待办",
       "未结束会话",
       "待首版材料",
+      "首次窗口已过且未提交",
       "结算状态",
       "核对说明",
     ],
@@ -313,6 +330,7 @@ export function reportCsv(report: CourseReport) {
         f?.pendingRecords ?? "",
         f?.openSessions ?? "",
         f?.awaitingMaterials ?? "",
+        f?.expiredWithoutMaterials ?? "",
         report.settlementStatus,
         r.reason,
       ];

@@ -236,7 +236,15 @@ export function sportsCourseCommand(
           .some(
             (c) =>
               c.data.semesterId === old.id &&
-              c.data.settlementStatus !== "SETTLED",
+              (c.data.settlementStatus !== "SETTLED" ||
+                !repo
+                  .all("sportsSettlementReport")
+                  .some(
+                    (r) =>
+                      r.id === c.data.settlementReportId &&
+                      r.data.courseId === c.id &&
+                      r.data.semesterId === old.id,
+                  )),
           ),
         "旧学期存在未完成收尾结算的课程，不能切换。",
         409,
