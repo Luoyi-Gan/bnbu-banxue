@@ -144,8 +144,8 @@ function bindEvidence(
       ids.length === input.assetIds.length &&
       ids.length > 0 &&
       new Set(ids).size === ids.length &&
-      ids.length + old.length <= 3,
-    "同一申请首次与全部补充累计最多3张，且须至少一张新证明。",
+      ids.length <= 3,
+    "每次提交须为1–3张新证明，补充提交单独计算。",
   );
   const assets = ids.map((id) => repo.get(id, "sportsApplicationAsset"));
   for (const asset of assets)

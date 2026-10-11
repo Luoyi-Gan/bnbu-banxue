@@ -30,14 +30,16 @@ function ProofUpload({
     try {
       if (
         !files.length ||
-        files.length + prior > 3 ||
+        files.length > 3 ||
         files.some(
           (f) =>
             f.size > 10 * 1024 * 1024 ||
             !["image/jpeg", "image/png", "image/webp"].includes(f.type),
         )
       )
-        throw Error("首次与补充累计最多3张JPEG/PNG/WebP，单张不超过10MB。");
+        throw Error(
+          "每次上传最多3张JPEG/PNG/WebP，单张不超过10MB；补充上传单独计算。",
+        );
       const ids = uploaded.current;
       for (const file of files.slice(ids.length)) {
         const res = await fetch(
@@ -76,7 +78,8 @@ function ProofUpload({
         }}
       />
       <p>
-        已有{prior}张证明，本次选择{files.length}张；累计最多3张。
+        历史已有{prior}张证明，本次选择{files.length}
+        张；每次最多3张，补充上传单独计算。
       </p>
       <button disabled={busy || !files.length} onClick={() => void submit()}>
         {busy ? "提交中…" : application ? "正式提交补充证明" : "正式提交申请"}
@@ -334,7 +337,9 @@ export function SportsApplications({
                   .map((h) => (
                     <p key={h.id}>
                       认可历史：
-                      {h.data.category === "RELATED" ? "课程相关" : "其他运动"}{" "}
+                      {h.data.category === "RELATED"
+                        ? "课程相关"
+                        : "其他运动"}{" "}
                       {String(h.data.minutes)}分钟 ·{" "}
                       {h.data.status === "VALID" ? "有效" : "撤销"} ·{" "}
                       {String(h.data.reason)}

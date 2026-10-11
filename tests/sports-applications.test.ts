@@ -149,9 +149,15 @@ it("证明按原字节私有保存，未正式提交不授予教师查看，格�
   ).toHaveLength(0);
   expect(app.data.status).toBe("SUBMITTED");
 });
-it("补充沿用原申请，关闭或移出后合法受理链继续，累计三图不能靠多个补充绕过", async () => {
+it("首次及每次补充独立限三图，累计超过三图保留历史且关闭移出后可继续原链", async () => {
   const f = setup();
-  let app = f.submit([(await f.image()).id]);
+  const initial = [
+    (await f.image()).id,
+    (await f.image()).id,
+    (await f.image()).id,
+  ];
+  expect(() => f.submit([...initial, randomUUID()])).toThrow();
+  let app = f.submit(initial);
   app = f.run(f.teacher, "sports.application.decide", {
     id: app.id,
     version: app.version,
@@ -163,34 +169,35 @@ it("补充沿用原申请，关闭或移出后合法受理链继续，累计三�
   await expect(f.image()).rejects.toThrow("关闭");
   const a = await f.image(app.id),
     b = await f.image(app.id),
-    c = await f.image(app.id);
+    c = await f.image(app.id),
+    d = await f.image(app.id);
   expect(() =>
     f.run(f.student, "sports.application.supplement", {
       id: app.id,
       version: app.version,
-      assetIds: [a.id, b.id, c.id],
+      assetIds: [a.id, b.id, c.id, d.id],
     }),
-  ).toThrow("最多3张");
+  ).toThrow("1–3张");
   app = f.run(f.student, "sports.application.supplement", {
     id: app.id,
     version: app.version,
-    assetIds: [a.id, b.id],
+    assetIds: [a.id, b.id, c.id],
   });
-  expect(app.data.assetIds).toHaveLength(3);
+  expect(app.data.assetIds).toHaveLength(6);
   app = f.run(f.teacher, "sports.application.decide", {
     id: app.id,
     version: app.version,
     decision: "REQUEST_SUPPLEMENT",
     reason: "需进一步证明",
   });
-  expect(() =>
-    f.run(f.student, "sports.application.supplement", {
-      id: app.id,
-      version: app.version,
-      assetIds: [c.id],
-    }),
-  ).toThrow("最多3张");
-  expect(f.repo.all("sportsApplicationHistory")).toHaveLength(4);
+  app = f.run(f.student, "sports.application.supplement", {
+    id: app.id,
+    version: app.version,
+    assetIds: [d.id],
+  });
+  expect(app.data.assetIds).toHaveLength(7);
+  expect((app.data.assetIds as string[]).slice(0, 3)).toEqual(initial);
+  expect(f.repo.all("sportsApplicationHistory")).toHaveLength(5);
 });
 it("免测隐藏学生原用时和换算，不删除教师历史或增加运动分钟/成绩", async () => {
   const f = setup();
