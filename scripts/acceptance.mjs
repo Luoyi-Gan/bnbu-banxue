@@ -13,7 +13,7 @@ await build({
       formats: ["es"],
       fileName: () => "tooling.mjs",
     },
-    rollupOptions: { external: [/^node:/] },
+    rollupOptions: { external: [/^node:/, "sharp", "ffprobe-static"] },
   },
 });
 const tooling = await import(

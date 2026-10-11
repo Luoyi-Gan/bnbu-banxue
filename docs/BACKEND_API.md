@@ -2,6 +2,8 @@
 
 日期：2026-10-11。业务依据为根目录 `BUSINESS_RULES.md`。本协议描述新增 `/workspace` 持久化业务入口；旧 `/v2` 演示数据不导入后端。
 
+体育V8.1的命令、材料锁批和二进制上传/读取接口见 [SPORTS_REBUILD.md](SPORTS_REBUILD.md)。数据库迁移2新增按SHA-256保留原文件的 `sports_media_blobs`；原表和历史数据不删除。图片解析依赖sharp，视频解析依赖ffprobe-static（也可配置 `BNBU_FFPROBE` 绝对路径）。JSON请求仍限制12MiB；锁定媒体使用独立二进制入口，大小须与受理清单一致。
+
 ## 运行与身份
 
 Node.js 24（使用 `node:sqlite`），SQLite WAL，单进程 HTTP 服务。网页在 `127.0.0.1:4174`，后端在 `127.0.0.1:4175`，浏览器仅访问同源 `/api`。默认数据库 `data/bnbu.sqlite`，可由 `BNBU_DATABASE` 指定。

@@ -17,6 +17,7 @@
   "dependencies": {
     "cytoscape": "^3.34.3",
     "cytoscape-fcose": "^2.2.0",
+    "ffprobe-static": "^3.1.0",
     "gsap": "^3.15.0",
     "lucide-react": "^0.468.0",
     "motion": "^12.43.0",
@@ -25,6 +26,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
+    "sharp": "^0.35.5",
     "three": "^0.180.0"
   },
   "devDependencies": {

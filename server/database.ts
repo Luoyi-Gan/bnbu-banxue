@@ -57,6 +57,10 @@ export function openDatabase(filename: string) {
       request_hash TEXT NOT NULL, result TEXT NOT NULL, created_at TEXT NOT NULL,
       PRIMARY KEY (actor_id, request_id)
     );
+    CREATE TABLE IF NOT EXISTS sports_media_blobs (
+      sha256 TEXT PRIMARY KEY, bytes BLOB NOT NULL, created_at TEXT NOT NULL
+    );
+    INSERT OR IGNORE INTO schema_migrations VALUES (2, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     INSERT OR IGNORE INTO schema_migrations VALUES (1, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
   `);
   return db;

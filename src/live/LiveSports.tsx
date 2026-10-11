@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { api, sportsChangedEvent, type LiveEntity } from "./api";
 import type { Field, OpenForm } from "./ConnectedApp";
+import { SportsMaterials, type MaterialData } from "./SportsMaterials";
 
-interface SportsData {
+interface SportsData extends MaterialData {
   identity: LiveEntity;
   semesters: LiveEntity[];
   templates: LiveEntity[];
@@ -82,7 +83,7 @@ export function LiveSports({
     return () => {
       alive = false;
       clearInterval(timer);
-      window.removeEventListener(sportsChangedEvent,onChange);
+      window.removeEventListener(sportsChangedEvent, onChange);
     };
   }, []);
   if (!data)
@@ -130,7 +131,7 @@ export function LiveSports({
             : "学校体育身份"}
         </p>
         <p>
-          计时事实、可计分钟与审核后实际计入分开。当前阶段已开放课程、入班与运动计时；凭证和审核链正在接通。
+          按课程规则完成运动并提交凭证。实际时长、可计分钟与最终计入分开，材料提交成功不代表审核通过。
         </p>
       </section>
       {role === "admin" && (
@@ -365,7 +366,7 @@ export function LiveSports({
                   </p>
                   <p>
                     可计分钟：{Number(s.data.eligibleMinutes)}
-                    ；尚未提交审核，不代表实际计入。
+                    ；最终计入以审核后进度为准。
                   </p>
                   <div className="live-actions">
                     {clock.state === "ACTIVE" &&
@@ -375,6 +376,9 @@ export function LiveSports({
                     {clock.state !== "ENDED" &&
                       action("结束运动", "sports.session.end", version(s))}
                   </div>
+                  {clock.state === "ENDED" && (
+                    <SportsMaterials session={s} data={data} />
+                  )}
                 </article>
               );
             })}

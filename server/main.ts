@@ -17,6 +17,12 @@ import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { sessionProjection } from "./sports/sessions";
+import {
+  materialWorkspace,
+  readMaterial,
+  uploadMaterial,
+  writableMaterial,
+} from "./sports/materials";
 import { recognize } from "./timetable";
 import { student } from "./community";
 import { sendVerification } from "./mail-delivery";
@@ -72,9 +78,9 @@ export function createApiServer(
         return send(response, 200, {
           ok: true,
           storage: "sqlite",
-          schemaVersion: 1,
+          schemaVersion: 2,
         });
-      // All browser mutations use same-origin JSON. Cross-origin simple forms cannot invoke them.
+      // Same-origin mutations; media has an explicit non-simple binary content type.
       if (request.method === "POST") {
         const origin = request.headers.origin;
         if (origin) {
@@ -96,6 +102,37 @@ export function createApiServer(
           student(actor);
           demand(actor.status !== "banned", "账号已封禁。", 403);
           return send(response, 200, await recognize(request));
+        }
+        const mediaUpload = /^\/api\/sports\/materials\/([a-f0-9-]+)$/.exec(
+          pathname,
+        );
+        if (mediaUpload) {
+          demand(
+            request.headers["content-type"] === "application/octet-stream",
+            "材料上传须为二进制文件。",
+            415,
+          );
+          const actor = authenticate(db, cookieToken(request)),
+            repo = new Repository(db);
+          const material = writableMaterial(repo, actor, mediaUpload[1]);
+          const expectedSize = Number(material.data.size),
+            chunks: Buffer[] = [];
+          let size = 0;
+          for await (const chunk of request) {
+            size += chunk.length;
+            demand(size <= expectedSize, "文件超出锁定大小。", 413);
+            chunks.push(chunk);
+          }
+          const saved = await uploadMaterial(
+            repo,
+            authenticate(db, cookieToken(request)),
+            mediaUpload[1],
+            Buffer.concat(chunks),
+          );
+          return send(response, 200, {
+            id: saved.id,
+            status: saved.data.status,
+          });
         }
         const input = await body(request);
         if (pathname === "/api/auth/verification-codes") {
@@ -174,12 +211,31 @@ export function createApiServer(
           serverNow = Date.now();
         return send(response, 200, {
           ...sportsWorkspace(repo, actor),
+          ...materialWorkspace(repo, actor),
           serverNow,
           sessions: repo
             .all("sportsSession")
             .filter((s) => s.ownerId === actor.id)
             .map((s) => sessionProjection(s, serverNow)),
         });
+      }
+      const mediaRead = /^\/api\/sports\/materials\/([a-f0-9-]+)$/.exec(
+        pathname,
+      );
+      if (request.method === "GET" && mediaRead) {
+        const media = readMaterial(
+          new Repository(db),
+          authenticate(db, cookieToken(request)),
+          mediaRead[1],
+        );
+        response.writeHead(200, {
+          "Content-Type": media.mime,
+          "Content-Length": media.bytes.length,
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          "Content-Security-Policy": "default-src 'none'",
+        });
+        return response.end(media.bytes);
       }
       if (request.method === "GET" && pathname === "/api/workspace")
         return send(
