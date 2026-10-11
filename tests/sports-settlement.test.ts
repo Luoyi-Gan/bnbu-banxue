@@ -494,3 +494,195 @@ it("历史更正拒绝无变化、冻结范围外成员和丢失原行，不创�
   expect(f.repo.all("sportsHistoricalCorrection")).toHaveLength(0);
   expect(f.repo.all("sportsSettlementReport")).toHaveLength(1);
 });
+
+function settledExerciseFixture() {
+  const f = setup();
+  const records = [35, 45].map((minutes, i) => {
+    const session = f.repo.create("sportsSession", f.student.account.id, {
+      courseId: f.course.id,
+      clock: {
+        state: "ENDED",
+        startedAt: Date.parse("2026-01-02T00:00:00Z") + i * 3600000,
+        endedAt:
+          Date.parse("2026-01-02T00:00:00Z") + i * 3600000 + minutes * 60000,
+        activeMilliseconds: minutes * 60000,
+        businessDate: "2026-01-02",
+      },
+    });
+    const record = f.repo.create("sportsRecord", f.student.account.id, {
+      courseId: f.course.id,
+      semesterId: f.semester.id,
+      sessionId: session.id,
+      category: "RELATED",
+      status: "VALID",
+      activeMilliseconds: minutes * 60000,
+      supplementUsed: true,
+    });
+    const batch = f.repo.create("sportsMaterialBatch", f.student.account.id, {
+      recordId: record.id,
+      status: "COMPLETE",
+    });
+    f.repo.create("sportsMaterial", f.student.account.id, {
+      recordId: record.id,
+      batchId: batch.id,
+      status: "COMPLETE",
+    });
+    return f.repo.save(record, { batchId: batch.id });
+  });
+  const prep = f.prepare(),
+    first = f.run(f.teacher, "sports.settlement.confirm", {
+      id: prep.id,
+      version: prep.version,
+      confirmed: true,
+    });
+  f.repo.save(f.semester, { status: "ARCHIVED" });
+  return { ...f, records, first };
+}
+it("归档审核更正沿用原材料和一次补证限制，重新选择其他有效记录并追加报告", () => {
+  const f = settledExerciseFixture(),
+    r = f.records[1];
+  const original = JSON.stringify(f.first),
+    sessions = JSON.stringify(f.repo.all("sportsSession")),
+    materials = JSON.stringify(f.repo.all("sportsMaterial"));
+  const input = {
+    kind: "REVIEW",
+    id: r.id,
+    version: r.version,
+    previousReportId: f.first.id,
+    decision: "INVALID",
+    reviewReason: "MISMATCH",
+    batchId: r.data.batchId,
+    checksCompleted: true,
+    reason: "核对原材料确认不属于本次运动",
+    confirmed: true,
+  };
+  for (const who of [f.admin, f.student, f.other])
+    expect(() => f.run(who, "sports.correction.apply", input)).toThrow();
+  expect(() =>
+    f.run(f.teacher, "sports.correction.apply", {
+      ...input,
+      checksCompleted: false,
+    }),
+  ).toThrow("规定检查");
+  expect(() =>
+    f.run(f.teacher, "sports.correction.apply", {
+      ...input,
+      decision: "RETURN",
+    }),
+  ).toThrow();
+  const key = randomUUID(),
+    result = f.run(f.teacher, "sports.correction.apply", input, key);
+  expect(f.run(f.teacher, "sports.correction.apply", input, key).id).toBe(
+    result.id,
+  );
+  const facts = (
+    result.data.report as {
+      rows: {
+        facts: { total: number; invalidMinutes: number; actualMinutes: number };
+      }[];
+    }
+  ).rows[0].facts;
+  expect(facts).toMatchObject({
+    total: 35,
+    invalidMinutes: 45,
+    actualMinutes: 80,
+  });
+  expect(f.repo.get(r.id).data.supplementUsed).toBe(true);
+  expect(JSON.stringify(f.repo.get(f.first.id))).toBe(original);
+  expect(JSON.stringify(f.repo.all("sportsSession"))).toBe(sessions);
+  expect(JSON.stringify(f.repo.all("sportsMaterial"))).toBe(materials);
+  expect(f.repo.all("sportsReviewEvent")).toHaveLength(1);
+  expect(f.repo.all("sportsReviewEvent")[0].data).toMatchObject({
+    action: "CORRECTION",
+    previousStatus: "VALID",
+    decision: "INVALID",
+  });
+  expect(() =>
+    f.run(f.teacher, "sports.review.correct", {
+      ...input,
+      version: f.repo.get(r.id).version,
+      publicExplanation: "尝试普通入口",
+      historicalCorrection: true,
+    }),
+  ).toThrow("历史报告更正");
+});
+it("归档认证调整撤销重算个人进度，保留认可历史和冻结统计原版，不重开新业务", () => {
+  const f = setup();
+  const app = f.repo.create("sportsApplication", f.student.account.id, {
+    courseId: f.course.id,
+    enrollmentId: f.member.id,
+    applicationType: "CERTIFICATION",
+    status: "APPROVED",
+  });
+  for (const [category, minutes] of [
+    ["RELATED", 100],
+    ["OTHER", 200],
+  ])
+    f.repo.create("sportsCertification", f.student.account.id, {
+      courseId: f.course.id,
+      enrollmentId: f.member.id,
+      applicationId: app.id,
+      category,
+      minutes,
+      status: "VALID",
+    });
+  const prep = f.prepare(),
+    first = f.run(f.teacher, "sports.settlement.confirm", {
+      id: prep.id,
+      version: prep.version,
+      confirmed: true,
+    });
+  f.repo.save(f.semester, { status: "ARCHIVED" });
+  const original = JSON.stringify(first),
+    input = {
+      kind: "CERTIFICATION",
+      id: app.id,
+      version: app.version,
+      previousReportId: first.id,
+      decision: "ADJUST",
+      relatedMinutes: 50,
+      otherMinutes: 60,
+      reason: "根据原认证依据更正额度",
+      confirmed: true,
+    };
+  expect(() =>
+    f.run(f.teacher, "sports.correction.apply", {
+      ...input,
+      relatedMinutes: 601,
+    }),
+  ).toThrow();
+  expect(f.repo.get(app.id).version).toBe(app.version);
+  expect(f.repo.all("sportsCertificationHistory")).toHaveLength(0);
+  const next = f.run(f.teacher, "sports.correction.apply", input);
+  expect(
+    (next.data.report as { rows: { facts: { total: number } }[] }).rows[0].facts
+      .total,
+  ).toBe(110);
+  const last = f.run(f.teacher, "sports.correction.apply", {
+    ...input,
+    version: f.repo.get(app.id).version,
+    previousReportId: next.id,
+    decision: "REVOKE",
+    reason: "核对后撤销原错误认可",
+  });
+  expect(
+    (last.data.report as { rows: { facts: { total: number } }[] }).rows[0].facts
+      .total,
+  ).toBe(0);
+  expect(JSON.stringify(f.repo.get(first.id))).toBe(original);
+  expect(f.repo.all("sportsCertificationHistory")).toHaveLength(4);
+  expect(f.repo.all("sportsSettlementReport")).toHaveLength(3);
+  expect(
+    f.repo.all("sportsCertification").every((c) => c.data.status === "REVOKED"),
+  ).toBe(true);
+  expect(() =>
+    f.run(f.teacher, "sports.certification.adjust", {
+      id: app.id,
+      version: f.repo.get(app.id).version,
+      relatedMinutes: 1,
+      otherMinutes: 1,
+      reason: "普通入口",
+      historicalCorrection: true,
+    }),
+  ).toThrow("历史报告更正");
+});

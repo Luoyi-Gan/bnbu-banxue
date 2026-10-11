@@ -53,6 +53,9 @@ export function SportsReview({
           },
         ];
   function review(record: LiveEntity, decision: string, correction = false) {
+    const course = data.courses.find((c) => c.id === record.data.courseId);
+    const historical =
+      correction && course?.data.settlementStatus === "SETTLED";
     open(
       correction
         ? `确认更正原结果：${decision === "PASS" ? "有效" : "无效"}`
@@ -61,11 +64,17 @@ export function SportsReview({
           : decision === "INVALID"
             ? "确认记录无效"
             : "退回一次补证",
-      correction ? "sports.review.correct" : "sports.review.decide",
+      historical
+        ? "sports.correction.apply"
+        : correction
+          ? "sports.review.correct"
+          : "sports.review.decide",
       [
-        ...reasonFields(decision),
+        ...reasonFields(decision).map((f) =>
+          historical ? { ...f, key: "reviewReason" } : f,
+        ),
         {
-          key: "publicExplanation",
+          key: historical ? "reason" : "publicExplanation",
           label: correction
             ? "更正依据与原因（必填，学生可见）"
             : "公开补充说明（学生可见）",
@@ -94,6 +103,13 @@ export function SportsReview({
           : []),
       ],
       {
+        ...(historical
+          ? {
+              kind: "REVIEW",
+              previousReportId: course?.data.settlementReportId,
+              confirmed: true,
+            }
+          : {}),
         id: record.id,
         version: record.version,
         batchId: record.data.batchId,

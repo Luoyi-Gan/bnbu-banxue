@@ -164,6 +164,7 @@ export function sportsApplicationCommand(
   actor: Account,
   action: string,
   input: Fields,
+  historicalCorrection = false,
 ) {
   if (
     ![
@@ -246,7 +247,7 @@ export function sportsApplicationCommand(
   }
   const app = repo.get(input.id, "sportsApplication"),
     course = ownedCourse(repo, actor, app.data.courseId);
-  mutable(repo, course);
+  if (!historicalCorrection) mutable(repo, course);
   version(app, input);
   const reason = textField(input, "reason", 1000);
   if (action === "sports.application.decide") {

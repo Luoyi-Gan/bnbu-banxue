@@ -11,6 +11,9 @@ import { ownedCourse, version } from "./courses";
 import { sportsGradeCommand } from "./grades";
 import { sportsEnduranceCommand } from "./endurance";
 import { sourceManifest } from "./settlement";
+import { sportsReviewCommand } from "./review";
+import { sportsApplicationCommand } from "./applications";
+import { calculateProgress } from "./progress";
 import type { CourseReport } from "./report";
 /** Only this command grants the internal historical-write path, under execute's transaction. */
 export function sportsCorrectionCommand(
@@ -20,7 +23,12 @@ export function sportsCorrectionCommand(
   input: Fields,
 ) {
   if (action !== "sports.correction.apply") return undefined;
-  const kind = enumField(input, "kind", ["GRADE", "ENDURANCE"] as const);
+  const kind = enumField(input, "kind", [
+    "GRADE",
+    "ENDURANCE",
+    "REVIEW",
+    "CERTIFICATION",
+  ] as const);
   demand(
     Object.keys(input).every((k) =>
       [
@@ -30,7 +38,13 @@ export function sportsCorrectionCommand(
         "previousReportId",
         "reason",
         "confirmed",
-        ...(kind === "GRADE" ? ["score"] : ["event", "seconds", "testDate"]),
+        ...(kind === "GRADE"
+          ? ["score"]
+          : kind === "ENDURANCE"
+            ? ["event", "seconds", "testDate"]
+            : kind === "REVIEW"
+              ? ["decision", "batchId", "checksCompleted", "reviewReason"]
+              : ["decision", "relatedMinutes", "otherMinutes"]),
       ].includes(k),
     ),
     "更正只接受指定旧事实字段，不接受新成员、统计或备注。",
@@ -38,7 +52,13 @@ export function sportsCorrectionCommand(
   demand(input.confirmed === true, "请确认原始依据和历史更正原因。");
   const original = repo.get(
     input.id,
-    kind === "GRADE" ? "sportsGradePublication" : "sportsEndurance",
+    kind === "GRADE"
+      ? "sportsGradePublication"
+      : kind === "ENDURANCE"
+        ? "sportsEndurance"
+        : kind === "REVIEW"
+          ? "sportsRecord"
+          : "sportsApplication",
   );
   version(original, input);
   const course = ownedCourse(repo, actor, original.data.courseId);
@@ -64,15 +84,23 @@ export function sportsCorrectionCommand(
     "原结算成员集合已变化，须定向复核，不能扩大更正范围。",
     409,
   );
+  const memberships = repo
+    .all("sportsEnrollment")
+    .filter(
+      (m) => m.data.courseId === course.id && m.ownerId === original.ownerId,
+    );
+  demand(memberships.length === 1, "原事实成员关系不唯一，须定向复核。", 409);
+  const enrollmentId = String(original.data.enrollmentId ?? memberships[0].id);
+  demand(enrollmentId === memberships[0].id, "原事实与成员归属不符。", 409);
   demand(
-    oldManifest.membershipIds.includes(String(original.data.enrollmentId)),
+    oldManifest.membershipIds.includes(enrollmentId),
     "原事实不属于冻结报告成员范围。",
     409,
   );
   const reason = textField(input, "reason", 1000);
   demand(
     (previous.data.report as CourseReport).rows.some(
-      (r) => r.enrollmentId === original.data.enrollmentId,
+      (r) => r.enrollmentId === enrollmentId,
     ),
     "冻结报告没有对应成员行，须定向复核。",
     409,
@@ -116,7 +144,7 @@ export function sportsCorrectionCommand(
       { id: saved.id, version: saved.version },
       true,
     )!;
-  } else
+  } else if (kind === "ENDURANCE")
     result = sportsEnduranceCommand(
       repo,
       actor,
@@ -132,11 +160,79 @@ export function sportsCorrectionCommand(
       [],
       true,
     )!;
+  else if (kind === "REVIEW") {
+    const decision = enumField(input, "decision", ["PASS", "INVALID"] as const);
+    result = sportsReviewCommand(
+      repo,
+      actor,
+      "sports.review.correct",
+      {
+        id: original.id,
+        version: original.version,
+        batchId: input.batchId,
+        decision,
+        reason: input.reviewReason,
+        publicExplanation: reason,
+        checksCompleted: input.checksCompleted,
+      },
+      true,
+    )!;
+  } else {
+    const decision = enumField(input, "decision", [
+      "ADJUST",
+      "REVOKE",
+    ] as const);
+    result = sportsApplicationCommand(
+      repo,
+      actor,
+      decision === "ADJUST"
+        ? "sports.certification.adjust"
+        : "sports.certification.revoke",
+      {
+        id: original.id,
+        version: original.version,
+        reason,
+        relatedMinutes: input.relatedMinutes,
+        otherMinutes: input.otherMinutes,
+      },
+      true,
+    )!;
+  }
   const oldReport = previous.data.report as CourseReport;
   const rows = oldReport.rows.map((row) => {
-    if (kind !== "ENDURANCE" || row.enrollmentId !== original.data.enrollmentId)
-      return row;
+    if (kind === "GRADE" || row.enrollmentId !== enrollmentId) return row;
     demand(row.facts, "冻结行缺少原始统计，不能补造。", 409);
+    if (kind === "REVIEW" || kind === "CERTIFICATION") {
+      const progress = calculateProgress(repo, course.id, original.ownerId);
+      return {
+        ...row,
+        facts: {
+          ...row.facts,
+          invalidMinutes: repo
+            .all("sportsRecord")
+            .filter(
+              (r) =>
+                r.data.courseId === course.id &&
+                r.ownerId === original.ownerId &&
+                r.data.status === "INVALID",
+            )
+            .reduce(
+              (n, r) =>
+                n + Math.floor(Number(r.data.activeMilliseconds) / 60000),
+              0,
+            ),
+          validUncountedMinutes: progress.details
+            .filter((d) => d.status === "VALID")
+            .reduce((n, d) => n + d.eligible - d.actual, 0),
+          categoryTotals: progress.categoryTotals,
+          total: progress.total,
+          remaining: row.facts.targets.map((t, i) =>
+            Math.max(0, t - progress.categoryTotals[i]),
+          ),
+          met: progress.total >= row.facts.targets.reduce((a, b) => a + b, 0),
+        },
+      };
+    }
     return {
       ...row,
       facts: {
@@ -177,7 +273,7 @@ export function sportsCorrectionCommand(
     confirmedAt: Date.now(),
   });
   repo.save(course, { settlementReportId: saved.id });
-  // No score, conversion, free-form correction reason or internal grade object enters a student notice.
+  // This report notice reveals no internal grade or conversion; domain commands publish their own public reasons.
   repo.notify(
     [original.ownerId!],
     saved.id,

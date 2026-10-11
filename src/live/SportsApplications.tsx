@@ -304,12 +304,26 @@ export function SportsApplications({
                       onClick={() =>
                         open(
                           "调整认证认可分钟",
-                          "sports.certification.adjust",
+                          course.data.settlementStatus === "SETTLED"
+                            ? "sports.correction.apply"
+                            : "sports.certification.adjust",
                           [
                             ...minutes,
                             { key: "reason", label: "公开调整原因" },
                           ],
-                          { id: a.id, version: a.version },
+                          {
+                            id: a.id,
+                            version: a.version,
+                            ...(course.data.settlementStatus === "SETTLED"
+                              ? {
+                                  kind: "CERTIFICATION",
+                                  decision: "ADJUST",
+                                  previousReportId:
+                                    course.data.settlementReportId,
+                                  confirmed: true,
+                                }
+                              : {}),
+                          },
                         )
                       }
                     >
@@ -320,9 +334,23 @@ export function SportsApplications({
                       onClick={() =>
                         open(
                           "撤销认证认可",
-                          "sports.certification.revoke",
+                          course.data.settlementStatus === "SETTLED"
+                            ? "sports.correction.apply"
+                            : "sports.certification.revoke",
                           [{ key: "reason", label: "公开撤销原因" }],
-                          { id: a.id, version: a.version },
+                          {
+                            id: a.id,
+                            version: a.version,
+                            ...(course.data.settlementStatus === "SETTLED"
+                              ? {
+                                  kind: "CERTIFICATION",
+                                  decision: "REVOKE",
+                                  previousReportId:
+                                    course.data.settlementReportId,
+                                  confirmed: true,
+                                }
+                              : {}),
+                          },
                         )
                       }
                     >

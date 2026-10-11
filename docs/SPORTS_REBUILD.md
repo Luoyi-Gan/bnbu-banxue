@@ -271,3 +271,14 @@ GET /api/sports/settlement-reports/:id[.csv]仅原责任教师、通过首次改
 验证：Windows及Docker Linux各38文件272项测试通过，覆盖归档更正、旧版本不变、冻结身份保留、幂等、越权/漂移拒绝、隐私、原体测历史、失败无半次更正。双端TypeScript、ESLint、Vite构建通过（原500KB大块提示保留）。Docker镜像重新构建成功，配置摘要sha256:665a11740f78743b6e12b7e967621daf53595c92b80f4cf6fb120b2b44c82011；独立验证容器healthy，内部API4175与网页4174均HTTP200，验证后已移除容器。宿主本地Acceptance服务已重启，不改测试业务事实；新增网页尚未浏览器点击验收。
 
 剩余：审核/认证/免测/名单等其他旧事实更正与复杂P04定向复核，超时已锁材料收尾，正式身份邮箱绑定及账号治理、自动提醒、完整跨端验收与整体文档核对。OCR仍按用户决定保留可配置接口；每次上传独立最多三张的规则已确认落实，无累计三张待决。完整goal继续，不宣称整体流程交付完成。
+
+
+## 历史审核与认证报告更正版
+
+sports.correction.apply新增kind=REVIEW|CERTIFICATION，沿用原id/version/previousReportId/reason/confirmed。REVIEW的id为原sportsRecord，decision=PASS|INVALID，batchId绑定现有完整材料，checksCompleted=true，判无效另传reviewReason固定原因码；reason是必填学生可见更正依据。不得RETURN或新增补证。CERTIFICATION的id为原已批准申请，decision=ADJUST|REVOKE；ADJUST另传relatedMinutes/otherMinutes，复用原分类目标/合计上限与有效认可校验。原普通入口仍拒绝结算/归档写入，客户端不能通过historicalCorrection字段绕过。
+
+原记录无enrollmentId时服务端按原课程与owner唯一定位冻结成员，不能由客户端指定。事务内保存原教学更正历史、进度投影、历史更正对象和连续报告新版本，只更新原冻结成员行的有效分类/总量/剩余、无效及有效未计入分钟，保留其他原统计与身份。原材料、会话时长、补证次数与旧报告不变。审核及认证公开原因由原业务通知提供，内部成绩仍不向学生暴露。原网页审核按钮与认证调整/撤销在SETTLED课程转入此更正版入口。
+
+验证：Windows及Docker Linux各38文件274项测试通过；双端类型、Lint、前端构建通过（保留原500KB大块提示）。新增测试证明归档后纠正45分钟同日记录会重新选中35分钟有效记录，实际80分钟保持；检查未确认/RETURN/越权拒绝，原材料/会话/补证不变，幂等只发一版。认证额度300→110→0对应三份冻结报告，超目标失败回滚，普通入口不能绕过。镜像重建成功，配置摘要sha256:df8e8e55e77d301c7cb07599e0f3db4f654f23c12080df1bbe64ad8e4546e49e；本轮运行容器测试，未另起健康检查容器。宿主Acceptance服务已更新，未将测试伪造材料写入验收库；新增网页尚未点击验收。
+
+剩余：免测及名单历史更正、复杂P04定向复核、超时已锁材料收尾、正式身份邮箱绑定和账号治理、自动提醒，以及完整跨端与整体规则核对。OCR保持可配置接口，真实学校/AI/邮件接入依赖保持；完整goal未完成。

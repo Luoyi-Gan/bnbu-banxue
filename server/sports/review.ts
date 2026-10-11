@@ -127,6 +127,7 @@ export function sportsReviewCommand(
   actor: Account,
   action: string,
   input: Fields,
+  historicalCorrection = false,
 ): Entity | undefined {
   if (action === "sports.ai.manual") {
     superAdmin(repo, actor);
@@ -200,10 +201,11 @@ export function sportsReviewCommand(
   );
   if (correction)
     demand(
-      course.data.settlementStatus !== "SETTLED" &&
-        repo.get(record.data.semesterId, "sportsSemester").data.status !==
-          "ARCHIVED",
-      "结算或归档记录需由历史报告更正入口同步产生新版报告；该入口尚待完成。",
+      historicalCorrection ||
+        (course.data.settlementStatus !== "SETTLED" &&
+          repo.get(record.data.semesterId, "sportsSemester").data.status !==
+            "ARCHIVED"),
+      "结算或归档记录需由历史报告更正入口同步产生新版报告；请从历史更正入口操作。",
       409,
     );
   const batch = completeBatch(repo, record);
