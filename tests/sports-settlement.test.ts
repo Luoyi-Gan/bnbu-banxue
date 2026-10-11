@@ -320,3 +320,177 @@ it("旧结算标记而没有对应冻结报告不能被当作可归档凭据", (
     }),
   ).toThrow("未完成收尾结算");
 });
+
+it("归档后原内部成绩更正追加报告，保留旧版及冻结身份，幂等且不泄露分数原因", () => {
+  const f = setup(),
+    prep = f.prepare();
+  const first = f.run(f.teacher, "sports.settlement.confirm", {
+    id: prep.id,
+    version: prep.version,
+    confirmed: true,
+  });
+  const original = f.repo.all("sportsGradePublication")[0],
+    old = JSON.stringify(first);
+  f.repo.save(f.semester, { status: "ARCHIVED" });
+  f.db
+    .prepare("UPDATE accounts SET name=? WHERE id=?")
+    .run("改名后", f.student.account.id);
+  const input = {
+      kind: "GRADE",
+      id: original.id,
+      version: original.version,
+      previousReportId: first.id,
+      score: 86420,
+      reason: "PRIVATE_REASON 原始成绩单核对",
+      confirmed: true,
+    },
+    key = randomUUID();
+  for (const who of [f.student, f.admin, f.other])
+    expect(() => f.run(who, "sports.correction.apply", input)).toThrow();
+  const result = f.run(f.teacher, "sports.correction.apply", input, key);
+  expect(result.data).toMatchObject({
+    sequence: 2,
+    previousId: first.id,
+    correctionReason: input.reason,
+  });
+  expect(JSON.stringify(f.repo.get(first.id))).toBe(old);
+  expect((result.data.report as { rows: unknown[] }).rows).toEqual(
+    (first.data.report as { rows: unknown[] }).rows,
+  );
+  expect(f.repo.get(original.id).data.score).toBe(97531);
+  expect(f.repo.all("sportsGradePublication")).toHaveLength(2);
+  expect(f.repo.get(f.course.id).data).toMatchObject({
+    status: "CLOSED",
+    settlementStatus: "SETTLED",
+    settlementReportId: result.id,
+  });
+  expect(f.run(f.teacher, "sports.correction.apply", input, key).id).toBe(
+    result.id,
+  );
+  expect(f.repo.all("sportsSettlementReport")).toHaveLength(2);
+  const notices = JSON.stringify(
+    f.db
+      .prepare("SELECT body FROM notifications WHERE recipient_id=?")
+      .all(f.student.account.id),
+  );
+  expect(notices).not.toMatch(/86420|97531|PRIVATE_REASON/);
+  expect(() => f.run(f.teacher, "sports.correction.apply", input)).toThrow(
+    "已有后继",
+  );
+  expect(() =>
+    f.run(f.teacher, "sports.grade.save", {
+      enrollmentId: f.member.id,
+      version: 2,
+      score: 1,
+      historicalCorrection: true,
+    }),
+  ).toThrow("附加字段");
+});
+it("结算体测更正仅更新原冻结行体测事实，保留旧历史和其他统计，失败不留下半次更正", () => {
+  const f = setup();
+  f.repo.save(f.repo.all("sportsExemption")[0], { status: "REVOKED" });
+  f.repo.save(f.course, { status: "PUBLISHED" });
+  const endurance = f.run(f.teacher, "sports.endurance.confirm", {
+    enrollmentId: f.member.id,
+    version: 0,
+    event: 1000,
+    seconds: 300,
+    testDate: "2026-01-01",
+    confirmed: true,
+  });
+  f.repo.save(f.repo.get(f.course.id), { status: "CLOSED" });
+  const prep = f.prepare(),
+    first = f.run(f.teacher, "sports.settlement.confirm", {
+      id: prep.id,
+      version: prep.version,
+      confirmed: true,
+    });
+  f.repo.save(f.semester, { status: "ARCHIVED" });
+  const original = JSON.stringify(first),
+    revisions = JSON.stringify(f.repo.all("sportsEnduranceRevision"));
+  const input = {
+    kind: "ENDURANCE",
+    id: endurance.id,
+    version: endurance.version,
+    previousReportId: first.id,
+    event: 1000,
+    seconds: 290,
+    testDate: "2026-01-01",
+    reason: "核对原计时单",
+    confirmed: true,
+  };
+  expect(() =>
+    f.run(f.teacher, "sports.correction.apply", { ...input, seconds: -1 }),
+  ).toThrow();
+  expect(f.repo.all("sportsHistoricalCorrection")).toHaveLength(0);
+  expect(JSON.stringify(f.repo.all("sportsEnduranceRevision"))).toBe(revisions);
+  const next = f.run(f.teacher, "sports.correction.apply", input);
+  expect(JSON.stringify(f.repo.get(first.id))).toBe(original);
+  expect(f.repo.all("sportsEnduranceRevision")).toHaveLength(2);
+  const oldRows = (
+    first.data.report as { rows: { facts: Record<string, unknown> }[] }
+  ).rows;
+  expect((next.data.report as { rows: unknown[] }).rows).toEqual(
+    oldRows.map((r) => ({
+      ...r,
+      facts: {
+        ...r.facts,
+        enduranceStatus: "RECORDED",
+        endurance: { event: 1000, seconds: 290, testDate: "2026-01-01" },
+      },
+    })),
+  );
+  expect(f.repo.get(endurance.id).data.seconds).toBe(290);
+  expect(() =>
+    f.run(f.teacher, "sports.endurance.confirm", {
+      enrollmentId: f.member.id,
+      version: 2,
+      event: 1000,
+      seconds: 280,
+      testDate: "2026-01-01",
+      confirmed: true,
+    }),
+  ).toThrow("历史报告更正");
+});
+it("历史更正拒绝无变化、冻结范围外成员和丢失原行，不创建事实或报告", () => {
+  const f = setup(),
+    prep = f.prepare(),
+    first = f.run(f.teacher, "sports.settlement.confirm", {
+      id: prep.id,
+      version: prep.version,
+      confirmed: true,
+    });
+  const grade = f.repo.all("sportsGradePublication")[0],
+    input = {
+      kind: "GRADE",
+      id: grade.id,
+      version: grade.version,
+      previousReportId: first.id,
+      score: 123,
+      reason: "核对原件",
+      confirmed: true,
+    };
+  expect(() =>
+    f.run(f.teacher, "sports.correction.apply", { ...input, score: 97531 }),
+  ).toThrow("未变化");
+  expect(() =>
+    f.run(f.teacher, "sports.correction.apply", { ...input, reason: "" }),
+  ).toThrow();
+  f.repo.save(first, {
+    report: { ...(first.data.report as object), rows: [] },
+  });
+  expect(() => f.run(f.teacher, "sports.correction.apply", input)).toThrow(
+    "对应成员行",
+  );
+  f.repo.save(f.repo.get(first.id), { report: first.data.report });
+  f.repo.create("sportsEnrollment", f.other.account.id, {
+    courseId: f.course.id,
+    status: "REMOVED",
+  });
+  expect(() => f.run(f.teacher, "sports.correction.apply", input)).toThrow(
+    "成员集合已变化",
+  );
+  expect(f.repo.all("sportsGradePublication")).toHaveLength(1);
+  expect(f.repo.all("sportsHistoricalCorrection")).toHaveLength(0);
+  expect(f.repo.all("sportsSettlementReport")).toHaveLength(1);
+});

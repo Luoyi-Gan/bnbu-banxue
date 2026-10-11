@@ -9,7 +9,7 @@ import type { SportsClock } from "./session-clock";
 const hash = (value: unknown) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
 /** Local SQLite is the shared authoritative source; reads are complete, never paginated. */
-function sourceManifest(repo: Repository, course: Entity) {
+export function sourceManifest(repo: Repository, course: Entity) {
   const all = (
     repo.db
       .prepare("SELECT id,kind,owner_id,data,version FROM entities ORDER BY id")

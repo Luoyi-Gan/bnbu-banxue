@@ -146,12 +146,17 @@ export function SportsSettlement({
           <p key={r.id}>
             冻结报告第{String(r.data.sequence)}版 ·{" "}
             {new Date(Number(r.data.confirmedAt)).toLocaleString()} ·{" "}
+            {r.data.correctionReason
+              ? `更正原因：${String(r.data.correctionReason)} · `
+              : ""}
             <a href={`/api/sports/settlement-reports/${r.id}.csv`}>
               下载此固定版本
             </a>
           </p>
         ))}
-      <p>结算后旧事实更正及更正版流程仍待接通。</p>
+      <p>
+        结算后可在内部成绩或原始体测中更正已有事实，填写原因后生成新报告，原版保留。其他类型的历史更正尚待接通。
+      </p>
     </details>
   );
 }

@@ -6,6 +6,7 @@ export function sportsGradeCommand(
   actor: Account,
   action: string,
   input: Fields,
+  historicalCorrection = false,
 ) {
   if (action !== "sports.grade.save" && action !== "sports.grade.publish")
     return undefined;
@@ -25,9 +26,10 @@ export function sportsGradeCommand(
   );
   const course = ownedCourse(repo, actor, member.data.courseId);
   demand(
-    course.data.settlementStatus !== "SETTLED" &&
-      repo.get(course.data.semesterId, "sportsSemester").data.status !==
-        "ARCHIVED",
+    historicalCorrection ||
+      (course.data.settlementStatus !== "SETTLED" &&
+        repo.get(course.data.semesterId, "sportsSemester").data.status !==
+          "ARCHIVED"),
     "已结算或归档成绩须通过历史报告更正流程。",
     409,
   );

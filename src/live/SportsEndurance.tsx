@@ -116,6 +116,49 @@ export function SportsEndurance({
                   录入 / 更正原始事实
                 </button>
               )}
+            {teacher &&
+              !exempt &&
+              row &&
+              course.data.settlementStatus === "SETTLED" && (
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    open(
+                      "核对旧体测事实并生成报告更正版",
+                      "sports.correction.apply",
+                      [
+                        {
+                          key: "event",
+                          label: "原始项目（800或1000米）",
+                          type: "number",
+                          value: Number(row.data.event),
+                        },
+                        {
+                          key: "seconds",
+                          label: "真实用时（整数秒）",
+                          type: "number",
+                          value: Number(row.data.seconds),
+                        },
+                        {
+                          key: "testDate",
+                          label: "实际测试日期 YYYY-MM-DD",
+                          value: String(row.data.testDate),
+                        },
+                        { key: "reason", label: "原始依据与更正原因" },
+                      ],
+                      {
+                        kind: "ENDURANCE",
+                        id: row.id,
+                        version: row.version,
+                        previousReportId: course.data.settlementReportId,
+                        confirmed: true,
+                      },
+                    )
+                  }
+                >
+                  更正旧事实并出新报告
+                </button>
+              )}
             {!!versions.length && (
               <details>
                 <summary>确认历史（{versions.length}）</summary>

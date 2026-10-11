@@ -41,6 +41,38 @@ export function SportsGrades({
                 · 最新内部发布：
                 {history.length ? String(history[0].data.score) : "未发布"}
               </p>
+              {course.data.settlementStatus === "SETTLED" && history[0] && (
+                <button
+                  disabled={busy}
+                  onClick={() =>
+                    open(
+                      "更正原内部成绩并生成报告更正版",
+                      "sports.correction.apply",
+                      [
+                        {
+                          key: "score",
+                          label: "核对后的INT成绩",
+                          type: "number",
+                          value: Number(history[0].data.score),
+                        },
+                        {
+                          key: "reason",
+                          label: "原始依据与更正原因（不作为成绩备注）",
+                        },
+                      ],
+                      {
+                        kind: "GRADE",
+                        id: history[0].id,
+                        version: history[0].version,
+                        previousReportId: course.data.settlementReportId,
+                        confirmed: true,
+                      },
+                    )
+                  }
+                >
+                  更正旧事实并出新报告
+                </button>
+              )}
               {course.data.settlementStatus !== "SETTLED" && (
                 <button
                   disabled={busy}

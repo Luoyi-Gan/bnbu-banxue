@@ -16,6 +16,7 @@ export function sportsEnduranceCommand(
   action: string,
   input: Fields,
   acceptedEnrollmentIds: readonly string[] = [],
+  historicalCorrection = false,
 ) {
   if (action !== "sports.endurance.confirm") return undefined;
   demand(
@@ -41,8 +42,9 @@ export function sportsEnduranceCommand(
   );
   const semester = repo.get(course.data.semesterId, "sportsSemester");
   demand(
-    course.data.settlementStatus !== "SETTLED" &&
-      semester.data.status !== "ARCHIVED",
+    historicalCorrection ||
+      (course.data.settlementStatus !== "SETTLED" &&
+        semester.data.status !== "ARCHIVED"),
     "已结算或归档体测须通过历史报告更正流程。",
     409,
   );
