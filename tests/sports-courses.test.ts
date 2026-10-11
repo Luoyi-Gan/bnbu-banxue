@@ -357,7 +357,12 @@ it("入班关闭撤销原邀请，重开不复活；名称修正保留锁定规�
   });
   expect(changed.data.threshold).toBe(30);
   expect(changed.data.name).toBe("新名称");
-  expect(f.repo.all("sportsCourseHistory").find(event => event.data.action === "sports.course.describe")?.data.before).toEqual(course.data);
+  expect(
+    f.repo
+      .all("sportsCourseHistory")
+      .find((event) => event.data.action === "sports.course.describe")?.data
+      .before,
+  ).toEqual(course.data);
 });
 it("指定补练仅允许七天收尾和有效成员，撤销阻止新开始但不截断原会话", () => {
   const f = managementFixture();
@@ -409,4 +414,73 @@ it("指定补练仅允许七天收尾和有效成员，撤销阻止新开始但�
     f.run(student, "sports.session.start", { courseId: f.course.id }),
   ).toThrow("补练窗口");
   expect(f.repo.get(f.course.id).data.deadlineDate).toBe("2026-12-31");
+});
+
+it("服务器登记流程仅获得固定十分钟自然到期宽限，重复登记不续期", () => {
+  const f = setup(),
+    draft = f.run(f.teacher, "sports.course.save", f.courseInput);
+  const course = f.run(f.teacher, "sports.course.publish", {
+    id: draft.id,
+    version: draft.version,
+  });
+  const invite = f.run(f.teacher, "sports.invitation.create", {
+    courseId: course.id,
+    minutes: 5,
+  });
+  const flow = f.run(f.student, "sports.enrollment.begin", {
+    code: invite.data.code,
+  });
+  expect(
+    f.run(f.student, "sports.enrollment.begin", { code: invite.data.code }),
+  ).toEqual(flow);
+  vi.setSystemTime(Number(invite.data.expiresAt));
+  expect(() =>
+    f.run(f.student, "sports.enrollment.begin", { code: invite.data.code }),
+  ).toThrow("过期");
+  expect(() =>
+    f.run(f.student, "sports.enrollment.join", { code: invite.data.code }),
+  ).toThrow("过期");
+  vi.setSystemTime(Number(flow.data.deadline) - 1);
+  const member = f.run(f.student, "sports.enrollment.join", {
+    flowId: flow.id,
+  });
+  expect(member.data.status).toBe("ACTIVE");
+  expect(f.repo.get(flow.id).data.status).toBe("COMPLETED");
+  expect(() =>
+    f.run(f.student, "sports.enrollment.join", { flowId: flow.id }),
+  ).toThrow("已结束");
+});
+it("流程严格截止且撤销立即终止宽限，不能伪造登记时间", () => {
+  const f = setup(),
+    draft = f.run(f.teacher, "sports.course.save", f.courseInput);
+  const course = f.run(f.teacher, "sports.course.publish", {
+    id: draft.id,
+    version: draft.version,
+  });
+  const invite = f.run(f.teacher, "sports.invitation.create", {
+    courseId: course.id,
+    minutes: 5,
+  });
+  const flow = f.run(f.student, "sports.enrollment.begin", {
+    code: invite.data.code,
+    deadline: Date.now() + 999999999,
+  });
+  expect(flow.data.deadline).toBe(Number(invite.data.expiresAt) + 600000);
+  vi.setSystemTime(Number(flow.data.deadline));
+  expect(() =>
+    f.run(f.student, "sports.enrollment.join", { flowId: flow.id }),
+  ).toThrow("过期");
+  vi.setSystemTime(Number(invite.data.expiresAt) + 1);
+  f.run(f.teacher, "sports.invitation.revoke", {
+    id: invite.id,
+    version: invite.version,
+  });
+  expect(() =>
+    f.run(f.student, "sports.enrollment.join", { flowId: flow.id }),
+  ).toThrow("过期");
+  expect(
+    sportsWorkspace(f.repo, f.student.account).enrollmentFlows[0].data
+      .canComplete,
+  ).toBe(false);
+  expect(f.repo.all("sportsEnrollment")).toHaveLength(0);
 });

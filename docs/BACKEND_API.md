@@ -167,3 +167,9 @@ sports.review.correct输入id/version/batchId/checksCompleted=true/decision=PASS
 - sports.makeup.create：courseId、version为课程版本、enrollmentId、startAt/endAt（ISO带时区）。当前有效成员，课程未关闭，开始不早于服务器当前时刻，窗口限常规截止次日00:00起七天内。返回sportsMakeup。
 - sports.makeup.revoke：id/version为补练窗口，撤销后不允许依该窗口建立新运动，已有合法会话不变。
 - workspace增加本人或责任教师可见makeups、由当前成员关系推导的studentStatus；教师成员投影只增加账号姓名摘要，不公开邮箱/密码或其他课程数据。
+
+## 2026-10-13 邀请登记与自然到期宽限
+
+已授权学生可先登记邀请、查看课程/学期/责任教师摘要，再确认入班。sports.enrollment.begin(code)保存本人sportsEnrollmentFlow及服务器startedAt、固定deadline=邀请到期+10分钟；同一账号同一邀请重复登记返回原流程，不续期。sports.enrollment.join(flowId)仅接受本人未完成流程，继续校验邀请未撤销、课程入班开放、当前学期和唯一有效班。无flowId仍可在邀请有效期内直接加入，到期后不能伪造宽限。workspace仅公开本人流程及canComplete。
+
+33文件214项测试、双端类型检查、Lint、构建通过；含到期前登记、到期后拒绝新流程、十分钟严格端点、重复登记不续期、撤销立即终止、伪造截止无效及完成后重放拒绝。新增网页点击验收未完成，Docker仍为此前201项验证。学校首次注册、资料与邮箱绑定仍待实现，本阶段并非正式注册流程完整交付。完整目标继续进行。

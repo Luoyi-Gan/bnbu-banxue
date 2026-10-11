@@ -308,14 +308,35 @@ export function sportsCourseCommand(
     version(invite, input);
     return repo.save(invite, { status: "REVOKED" });
   }
-  if (action === "sports.enrollment.join") {
+  if (
+    action === "sports.enrollment.join" ||
+    action === "sports.enrollment.begin"
+  ) {
     sportsRole(repo, actor, "student");
-    const code = textField(input, "code", 100),
-      invite = repo.all("sportsInvitation").find((i) => i.data.code === code);
+    const flow = input.flowId
+      ? repo.get(input.flowId, "sportsEnrollmentFlow")
+      : undefined;
+    if (flow)
+      demand(
+        action === "sports.enrollment.join" &&
+          flow.ownerId === actor.id &&
+          flow.data.status === "OPEN",
+        "入班流程不属于本人或已结束。",
+        409,
+      );
+    const invite = flow
+      ? repo.get(flow.data.invitationId, "sportsInvitation")
+      : repo
+          .all("sportsInvitation")
+          .find((i) => i.data.code === textField(input, "code", 100));
+    const now = Date.now();
     demand(
       invite &&
         invite.data.status === "ACTIVE" &&
-        Number(invite.data.expiresAt) > Date.now(),
+        (Number(invite.data.expiresAt) > now ||
+          (flow &&
+            Number(flow.data.startedAt) < Number(invite.data.expiresAt) &&
+            now < Number(flow.data.deadline))),
       "邀请无效或已过期。",
     );
     const course = repo.get(invite.data.courseId, "sportsCourse");
@@ -347,11 +368,43 @@ export function sportsCourseCommand(
         ),
       "已移出的原班成员须由责任教师恢复。",
     );
+    if (action === "sports.enrollment.begin") {
+      const existing = repo
+        .all("sportsEnrollmentFlow")
+        .find(
+          (f) =>
+            f.ownerId === actor.id &&
+            f.data.invitationId === invite.id &&
+            f.data.status === "OPEN",
+        );
+      return (
+        existing ??
+        repo.create("sportsEnrollmentFlow", actor.id, {
+          invitationId: invite.id,
+          courseId: course.id,
+          courseName: course.data.name,
+          semesterName: repo.get(course.data.semesterId).data.name,
+          teacherName:
+            repo.db
+              .prepare("SELECT name FROM accounts WHERE id=?")
+              .get(course.ownerId!)?.name ?? "责任教师",
+          startedAt: now,
+          deadline: Number(invite.data.expiresAt) + 10 * 60000,
+          status: "OPEN",
+        })
+      );
+    }
     const member = repo.create("sportsEnrollment", actor.id, {
       courseId: course.id,
       semesterId: course.data.semesterId,
       status: "ACTIVE",
     });
+    if (flow)
+      repo.save(flow, {
+        status: "COMPLETED",
+        completedAt: now,
+        enrollmentId: member.id,
+      });
     repo.notify(
       [actor.id, course.ownerId!],
       member.id,
@@ -386,6 +439,29 @@ export function sportsWorkspace(repo: Repository, actor: Account) {
     );
   return {
     identity,
+    enrollmentFlows:
+      role === "student"
+        ? repo
+            .all("sportsEnrollmentFlow")
+            .filter((f) => f.ownerId === actor.id)
+            .map((f) => {
+              const invite = repo.get(f.data.invitationId),
+                course = repo.get(f.data.courseId);
+              return {
+                ...f,
+                data: {
+                  ...f.data,
+                  canComplete:
+                    f.data.status === "OPEN" &&
+                    Date.now() < Number(f.data.deadline) &&
+                    invite.data.status === "ACTIVE" &&
+                    course.data.status === "PUBLISHED" &&
+                    course.data.enrollmentOpen === true &&
+                    course.data.semesterId === current?.id,
+                },
+              };
+            })
+        : [],
     studentStatus:
       role === "student"
         ? enrollment.some(

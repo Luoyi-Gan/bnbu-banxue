@@ -22,6 +22,7 @@ interface SportsData
   courses: LiveEntity[];
   enrollments: LiveEntity[];
   invitations: LiveEntity[];
+  enrollmentFlows?: LiveEntity[];
   makeups?: LiveEntity[];
   studentStatus?: string;
   sessions: LiveEntity[];
@@ -268,7 +269,7 @@ export function LiveSports({
         <button
           className="v2-button v2-button-primary"
           onClick={() =>
-            open("凭邀请加入体育教学班", "sports.enrollment.join", [
+            open("登记邀请并核对教学班", "sports.enrollment.begin", [
               field("code", "邀请码"),
             ])
           }
@@ -276,6 +277,29 @@ export function LiveSports({
           输入邀请码入班
         </button>
       )}
+      {role === "student" &&
+        (data.enrollmentFlows ?? [])
+          .filter((f) => f.data.status === "OPEN")
+          .map((f) => (
+            <article key={f.id} className="v2-panel live-card">
+              <h3>{String(f.data.courseName)}</h3>
+              <p>
+                {String(f.data.semesterName)} · {String(f.data.teacherName)}
+              </p>
+              <p>
+                本次流程最晚完成时间：
+                {date(new Date(Number(f.data.deadline)).toISOString())}
+                。邀请撤销、关闭入班或学期失效会立即终止资格。
+              </p>
+              {f.data.canComplete ? (
+                action("确认加入教学班", "sports.enrollment.join", {
+                  flowId: f.id,
+                })
+              ) : (
+                <p>本次流程已不可继续，请取得新邀请。</p>
+              )}
+            </article>
+          ))}
       <h2>体育课程</h2>
       <div className="live-cards">
         {data.courses.map((c) => (
