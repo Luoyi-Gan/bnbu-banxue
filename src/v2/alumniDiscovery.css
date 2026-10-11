@@ -1,0 +1,30 @@
+.alumni-discovery-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:8px 0 12px}
+.alumni-discovery-toolbar .v2-animated-search{min-height:42px}
+.v2-app-student .v2-alumni-page>.v2-page-heading{flex-direction:row;align-items:center;gap:12px;margin:16px 0 20px}
+.v2-app-student .v2-alumni-page>.v2-page-heading .v2-heading-action{width:auto;flex:none}
+.v2-app-student .v2-alumni-page>.v2-page-heading .v2-heading-action .v2-button{min-height:36px;padding:8px 12px;white-space:nowrap;font-size:12px}
+.alumni-discovery-categories{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;min-width:0;padding:3px 0}
+.alumni-discovery-categories button{flex:none;white-space:nowrap;border:0;padding:10px 16px;min-height:42px;border-radius:22px;background:transparent;color:var(--v2-muted);font:inherit;font-size:13px;cursor:pointer}
+.alumni-discovery-categories button.is-active{background:var(--v2-surface);color:var(--v2-ink);font-weight:650}
+.alumni-discovery-note{margin:0 0 22px;font-size:12px;color:var(--v2-muted);line-height:1.7}
+.alumni-discovery-note>span{display:block;font-size:10px;margin-top:3px}
+.alumni-discovery-cover{color:var(--v2-ink);background:var(--v2-soft)}
+.alumni-discovery-cover img{position:absolute;inset:0}
+.alumni-discovery-cover.is-loading{background:linear-gradient(110deg,var(--v2-line),var(--v2-soft),var(--v2-line));animation:discovery-loading 1.4s ease-in-out infinite}
+.alumni-discovery-cover.is-loading img{opacity:0}
+.alumni-discovery-category{position:absolute;bottom:9px;left:9px;max-width:calc(100% - 18px);border-radius:5px;padding:4px 7px;font-size:10px;line-height:1.4;background:rgb(255 255 255 / 94%);color:var(--v2-ink)}
+.alumni-discovery-open{position:absolute;inset:0;width:100%;border:0;border-radius:12px;background:transparent;cursor:pointer;z-index:1}
+.alumni-discovery-card .discovery-title{margin:0;min-height:58px;font-size:15px;line-height:1.5}
+.alumni-discovery-card .discovery-author{position:relative;z-index:2;color:var(--v2-muted);text-decoration:none;min-height:36px}
+.alumni-discovery-card .discovery-meta button,.alumni-discovery-card .discovery-save{position:relative;z-index:2;min-width:34px;min-height:36px}
+.alumni-discovery-card .discovery-save{position:absolute;width:34px;height:34px;min-height:34px}
+.alumni-discovery-card .discovery-meta button.is-liked,.alumni-discovery-card .discovery-save.is-saved{color:var(--v2-action)}
+.alumni-discovery-card .discovery-avatar{width:24px;height:24px;background:var(--v2-surface)}
+.alumni-discovery-card .discovery-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.alumni-discovery-card button:disabled{opacity:.45;cursor:default}
+.alumni-discovery-card :is(button,a):focus-visible,.alumni-discovery-categories button:focus-visible{outline:2px solid var(--v2-action);outline-offset:3px}
+.v2-post-alumni-link{display:block;margin:0 0 18px;color:var(--v2-action);font-size:13px;text-decoration:none}
+.v2-post-media-error{display:grid;place-items:center;min-height:140px;color:var(--v2-muted)}
+.v2-alumni-page .alumni-story-publish{margin-top:24px}
+@media(max-width:720px){.alumni-discovery-toolbar{flex-direction:column;align-items:stretch;gap:10px}.alumni-discovery-categories{width:100%;gap:3px}.alumni-discovery-categories button{font-size:12px;padding:9px 14px}.alumni-discovery-note{font-size:11px;margin-bottom:15px}.alumni-discovery-card .discovery-title{font-size:13px;min-height:54px}.alumni-discovery-card .discovery-meta{font-size:10px}.alumni-discovery-category{font-size:9px;left:7px;bottom:7px}.v2-alumni-page>.v2-tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}.v2-alumni-page>.v2-tabs a{white-space:nowrap}}
+@media(prefers-reduced-motion:reduce){.alumni-discovery-cover.is-loading{animation:none}}

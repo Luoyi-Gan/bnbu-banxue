@@ -1,5 +1,5 @@
 import { AdminMailActivities } from './AdminMailActivities'
-import { Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { Mail, BookOpen, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -18,10 +18,13 @@ import { V2AI, V2Campus, V2Me, V2Settings } from './services'
 import { DraggableAI } from './DraggableAI'
 import { V2Alumni } from './V2Alumni'
 import { V2Sports } from './V2Sports'
+import { useSportsHomeScroll } from './useSportsHomeScroll'
 import { V2CampusExplore } from './V2CampusExplorer'
 import './v2.css'
 import './aRedesign.css'
 import './aControls.css'
+import './timetableShortcut.css'
+import './studentTheme.css'
 
 const studentNav = [
   { path: '/v2', label: '首页', icon: LayoutDashboard, end: true },
@@ -48,6 +51,7 @@ const adminNav = [
 function V2Shell({ children }: { children: ReactNode }) {
   const { state } = useV2()
   const location = useLocation()
+  useSportsHomeScroll()
   const [mobileMenu, setMobileMenu] = useState(false)
   const [roleMenu, setRoleMenu] = useState(false)
   const roleMenuRef = useRef<HTMLDivElement>(null)
@@ -66,7 +70,7 @@ function V2Shell({ children }: { children: ReactNode }) {
   const unread = state.conversations.reduce((sum, item) => sum + item.unread, 0)
   const unreadNotices = state.notifications.filter((item) => !item.read).length
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
-  useEffect(() => { setMobileMenu(false); setRoleMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname, location.search])
+  useEffect(() => { setMobileMenu(false); setRoleMenu(false) }, [location.pathname, location.search])
   useEffect(() => {
     if (!roleMenu) return
     const closeOutside = (event: PointerEvent) => { if (!roleMenuRef.current?.contains(event.target as Node)) setRoleMenu(false) }
@@ -88,12 +92,14 @@ function V2Shell({ children }: { children: ReactNode }) {
       <header className="v2-topbar">
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>BNBU 伴学</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
         <div className="v2-top-actions">
+          {!admin && !teacher && <NavLink to="/v2/messages" className={({ isActive }) => `v2-icon-button v2-header-messages${isActive ? ' is-active' : ''}`} aria-label={unread + unreadNotices > 0 ? `消息，${unread + unreadNotices} 条未读` : '消息，暂无未读'} title={`消息 · 聊天 ${unread} 条未读，通知 ${unreadNotices} 条未读`}><MessageCircle size={19} aria-hidden="true"/>{unread + unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unread + unreadNotices > 99 ? '99+' : unread + unreadNotices}</span>}</NavLink>}
           {!admin && !teacher && <StudentSearch/>}
           <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? (managedTeachers(state).find(t => t.id === teacherAccount(state).id)?.name ?? '老师') + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}</div>}</div>
         </div>
       </header>
       <main className="v2-main">{children}</main>
     </div>
+    {!admin && !teacher && !sports && !mobileMenu && <Link className="v2-timetable-shortcut" to="/v2/me?tab=timetable" aria-label="打开我的课表" aria-current={location.pathname === '/v2/me' && new URLSearchParams(location.search).get('tab') === 'timetable' ? 'page' : undefined}><BookOpen size={19}/><span>我的课表</span></Link>}
     {!admin && !teacher && !sports && <><nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.slice(0, 5).map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>{location.pathname !== '/v2/ai' && <DraggableAI src={state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon}/>}</>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label="手机教师导航">{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label="手机管理导航">{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}

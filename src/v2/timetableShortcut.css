@@ -1,0 +1,32 @@
+.v2-timetable-shortcut {
+  position: fixed;
+  left: 240px;
+  bottom: 24px;
+  z-index: 43;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid var(--v2-line);
+  border-radius: 22px;
+  background: var(--v2-surface);
+  color: var(--v2-ink);
+  box-shadow: 0 3px 12px rgb(36 36 36 / 7%);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.v2-timetable-shortcut:hover,
+.v2-timetable-shortcut[aria-current="page"] {
+  background: var(--v2-soft);
+  border-color: var(--v2-line);
+}
+.v2-timetable-shortcut:focus-visible { outline: 3px solid var(--v2-muted); outline-offset: 3px; }
+@media (max-width: 900px) {
+  .v2-timetable-shortcut { left: max(16px, env(safe-area-inset-left)); }
+}
+@media (max-width: 720px) {
+  .v2-timetable-shortcut { bottom: calc(74px + env(safe-area-inset-bottom)); }
+}
