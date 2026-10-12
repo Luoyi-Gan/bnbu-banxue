@@ -186,6 +186,16 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           response.setHeader('Set-Cookie',cookie(result.token,43200));
           return send(response,200,{data:{user:result.user}});
         }
+        if(pathname==='/api/v1/auth/own-password') {
+          demand(Object.keys(input).every(k=>['currentPassword','newPassword','confirmPassword','expectedVersion'].includes(k)),'修改密码参数无效。');
+          const key=request.headers['idempotency-key'];
+          demand(typeof key==='string','缺少操作幂等标识。');
+          const token=cookieToken(request) ?? '';
+          await postgresPortalSecurity(db,token);
+          await executePostgres(db,token,'sports.password.change',{currentPassword:input.currentPassword,newPassword:input.newPassword,confirmPassword:input.confirmPassword,version:input.expectedVersion},key);
+          const security=await postgresPortalSecurity(db,token);
+          return send(response,200,{data:{userId:security.userId,version:security.version,mustChangePassword:security.mustChangePassword}});
+        }
         if(pathname==='/api/v1/auth/logout') {
           demand(Object.keys(input).length===0,'退出参数无效。');
           await auth.logout(cookieToken(request));response.setHeader('Set-Cookie',cookie('',0));

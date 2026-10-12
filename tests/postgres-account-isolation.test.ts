@@ -46,10 +46,20 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
       expect(portalCookie).toMatch(/^bnbu_sports_session=/);
       const security=await fetch(urls[1]+'/api/v1/auth/account-security',{headers:{Cookie:portalCookie}});
       expect(security.status).toBe(200);expect((await security.json()).data.mustChangePassword).toBe(true);
+      const other=await post(1,'/api/v1/auth/password-login',{account:identifier,password});
+      const otherCookie=other.headers.get('set-cookie')!.split(';')[0];
+      const changeBody={currentPassword:password,newPassword:password+'-updated',confirmPassword:password+'-updated',expectedVersion:identity.version};
+      const changeKey=randomUUID();
+      const change=()=>fetch(urls[1]+'/api/v1/auth/own-password',{method:'POST',headers:{'Content-Type':'application/json',Cookie:portalCookie,'Idempotency-Key':changeKey},body:JSON.stringify(changeBody)});
+      const changed=await change();expect(changed.status).toBe(200);
+      const changedData=await changed.json();expect(changedData.data.mustChangePassword).toBe(false);
+      expect(await (await change()).json()).toEqual(changedData);
+      expect((await fetch(urls[1]+'/api/v1/auth/account-security',{headers:{Cookie:otherCookie}})).status).toBe(401);
+      expect((await post(1,'/api/v1/auth/password-login',{account:identifier,password})).status).toBe(401);
       await databases[1].pool.query("UPDATE entities SET data=jsonb_set(data::jsonb,'{status}','\"revoked\"')::text WHERE id=$1",[identity.id]);
       expect((await fetch(urls[1]+'/api/v1/auth/account-security',{headers:{Cookie:portalCookie}})).status).toBe(403);
       const count=await sessionCount();
-      expect((await post(1,'/api/v1/auth/password-login',{account:identifier,password})).status).toBe(403);
+      expect((await post(1,'/api/v1/auth/password-login',{account:identifier,password:password+'-updated'})).status).toBe(403);
       expect(await sessionCount()).toBe(count);
       expect((await post(1,'/api/v1/auth/logout',{},portalCookie)).status).toBe(200);
     }

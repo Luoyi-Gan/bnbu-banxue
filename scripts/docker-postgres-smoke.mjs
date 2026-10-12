@@ -215,7 +215,11 @@ try {
   await request('/api/commands',{action:'sports.conversion.edit',input:{id:conversionTable.id,version:changedConversion.version,rowId:conversionRow.id,min:conversionRow.min,max:conversionRow.max,score:conversionRow.score,grade:conversionRow.grade,note:conversionRow.note},requestId:randomUUID()});
   const mode=(await request('/api/commands',{action:'sports.ai.manual',input:{courseId,endAt:new Date(Date.now()+3600000).toISOString(),reason:'Docker manual review fixture'},requestId:randomUUID()})).data;
   assert.equal((await request('/api/v1/auth/password-login',{account:teacherEmail,password})).data.user.role,'TEACHER');
-  assert.equal((await request('/api/v1/auth/account-security')).data.mustChangePassword,false);
+  const teacherSecurity=(await request('/api/v1/auth/account-security')).data;
+  assert.equal(teacherSecurity.mustChangePassword,false);
+  const changedPassword=await sessionWrite('/api/v1/auth/own-password',{currentPassword:password,newPassword:password+'-updated',confirmPassword:password+'-updated',expectedVersion:teacherSecurity.version});
+  assert.equal(changedPassword.mustChangePassword,false);
+  assert.ok(changedPassword.version>teacherSecurity.version);
   const teacherWorkspace=await request('/api/sports/workspace');let reviewRecord=teacherWorkspace.records.find(r=>r.data.sourceDraftId===finalDraft.id);
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
