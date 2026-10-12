@@ -193,6 +193,22 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:{user:result.user}});
         }
         const subadminWrite=/^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(pathname);
+        const subadminDelete=/^\/api\/v1\/admin\/subadmins\/([^/]+)\/delete$/.exec(pathname);
+        if(pathname==='/api/v1/me/account-deletion') {
+          demand(Object.keys(input).every(k=>['expectedVersion','account','name','email','confirmed','handoverCompleted'].includes(k)),'注销账号参数无效。');
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          const token=cookieToken(request) ?? '',own=await postgresAdministratorSelf(db,token);
+          const result=await executePostgres(db,token,'sports.account.close',{id:own.id,version:input.expectedVersion,loginName:input.account,name:input.name,email:input.email,confirmed:input.confirmed,handoverConfirmed:input.handoverCompleted},key);
+          response.setHeader('Set-Cookie',cookie('',0));
+          return send(response,200,{data:{userId:result.id,deleted:true}});
+        }
+        if(subadminDelete) {
+          demand(Object.keys(input).every(k=>['expectedVersion','handoverCompleted'].includes(k)),'删除账号参数无效。');
+          demand(input.handoverCompleted===true,'删除前须确认已完成职责移交。');
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          const result=await executePostgres(db,cookieToken(request) ?? '','sports.admins.delete',{accountId:decodeURIComponent(subadminDelete[1]),version:input.expectedVersion,confirmed:true,handoverConfirmed:true},key);
+          return send(response,200,{data:result});
+        }
         if(subadminWrite) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
           return send(response,200,{data:await postgresPortalSubadminWrite(db,cookieToken(request) ?? '',subadminWrite[1]?decodeURIComponent(subadminWrite[1]):undefined,(subadminWrite[2] ?? 'create') as 'create'|'profile'|'status',input,key)});

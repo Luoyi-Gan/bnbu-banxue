@@ -205,6 +205,9 @@ try {
   assert.deepEqual(editedSubadmin.permissions,['AUDIT_QUERY']);
   const disabledSubadmin=await sessionWrite('/api/v1/admin/subadmins/'+subadmin.id+'/status',{expectedVersion:editedSubadmin.version,status:'DISABLED',handoverCompleted:true});
   assert.equal(disabledSubadmin.status,'DISABLED');
+  const deletedSubadmin=await sessionWrite('/api/v1/admin/subadmins/'+subadmin.id+'/delete',{expectedVersion:disabledSubadmin.version,handoverCompleted:true});
+  assert.equal(deletedSubadmin.deleted,true);
+  assert.ok(!(await request('/api/v1/admin/subadmins')).data.items.some(item=>item.id===subadmin.id));
   const publishedTemplate=(await request('/api/commands',{action:'sports.template.publish',input:{name:'Docker fixed V8.1'},requestId:randomUUID()})).data;
   const futureYear=2100+Math.floor(Math.random()*7000),futureSemester={name:'Docker future semester',academicYear:futureYear+'-'+(futureYear+1),type:'SUMMER',startDate:futureYear+'-06-01',endDate:futureYear+'-08-31'};
   const createdSemester=(await request('/api/commands',{action:'sports.semester.create',input:futureSemester,requestId:randomUUID()})).data;

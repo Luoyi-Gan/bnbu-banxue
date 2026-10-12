@@ -59,6 +59,7 @@ export async function postgresAdministratorDelete(repo:PostgresRepository,actor:
   await repo.client.query('DELETE FROM admin_security_challenges WHERE account_id=$1',[identity.ownerId]);
   await repo.client.query("DELETE FROM entities WHERE owner_id=$1 AND kind='sportsIdentity'",[identity.ownerId]);
   await repo.client.query("UPDATE accounts SET email=NULL,password_hash=NULL,name=NULL,organization=NULL,roles='[]',status='banned',login_name=NULL,login_kind='HISTORY' WHERE id=$1",[identity.ownerId]);
-  await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action,handoverConfirmed:true,deletedAt:Date.now(),deletedVersion:identity.version+1});
-  return {id:identity.ownerId};
+  const deletedAt=Date.now(),deletedVersion=identity.version+1;
+  await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action,handoverConfirmed:true,deletedAt,deletedVersion});
+  return {id:identity.ownerId,deleted:true,deletedAt:new Date(deletedAt).toISOString(),version:deletedVersion};
 }
