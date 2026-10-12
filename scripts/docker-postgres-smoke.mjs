@@ -67,6 +67,27 @@ assert.equal(sportsMe.user.role,'STUDENT');
 assert.equal(sportsMe.user.emailVerified,false);
 assert.equal(sportsMe.studentProfile.studentNumber,null);
 assert.equal(sportsMe.studentProfile.fullName,actor.name);
+const semesterId=randomUUID(),courseId=randomUUID(),enrollmentId=randomUUID();
+// Create isolated read fixtures; this does not claim the course creation flow is migrated.
+const fixtureRows=[
+  [semesterId,'sportsSemester',{name:'Docker 学期',academicYear:'2026-2027',type:'AUTUMN',status:'ARCHIVED',startDate:'2026-09-01',endDate:'2027-01-31'}],
+  [courseId,'sportsCourse',{name:'Docker 课程',semesterId,status:'PUBLISHED',description:'Local fixture',startDate:'2026-09-01',deadlineDate:'2027-01-20',enrollmentOpen:true}],
+  [enrollmentId,'sportsEnrollment',{courseId,semesterId,status:'ACTIVE'}],
+];
+for(const [id,kind,data] of fixtureRows) execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO entities(id,kind,owner_id,data,version,created_at,updated_at) VALUES('${id}','${kind}','${actor.id}','${JSON.stringify(data).replaceAll("'","''")}',1,'2026-10-12T00:00:00Z','2026-10-12T00:00:00Z')`],{stdio:'pipe'});
+try {
+  assert.equal((await request(`/api/v1/courses/${courseId}`)).data.courseName,'Docker 课程');
+  const section=(await request(`/api/v1/class-sections/${courseId}`)).data;
+  assert.equal(section.semesterId,semesterId);
+  assert.equal(section.status,'ARCHIVED');
+  assert.equal(section.submissionDeadlineAt,'2027-01-20T15:59:59.000Z');
+  const members=await request(`/api/v1/enrollments?classSectionId=${courseId}`);
+  assert.equal(members.data[0].studentId,actor.id);
+  assert.equal(members.data[0].id,enrollmentId);
+  assert.equal(members.meta.pagination.hasMore,false);
+} finally {
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${semesterId}','${courseId}','${enrollmentId}')`],{stdio:'pipe'});
+}
 await request('/api/auth/logout',{});
 assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
 console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence, sports help publication and student reading, logout.');

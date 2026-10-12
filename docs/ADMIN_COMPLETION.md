@@ -1593,3 +1593,7 @@ PostgreSQL 接通 /api/v1/semesters/current、courses、class-sections 及课程
 ### PostgreSQL 入班成员列表
 
 接通 GET /api/v1/enrollments，学生仅本人记录，教师仅本人课程成员；显式指定其他课程返回 404。保留原成员字段、历史状态/结束原因、审计派生的入班来源及 meta.pagination 协议；审计查询限于当前页成员，不返回其他业务审计。真实 PostgreSQL 补充其他课程成员隔离、学生/教师合法列表一致、双方跨课程过滤拒绝，37 项数据库测试通过，服务端类型检查和 lint 通过。当前学期/班级完整数据 fixture 和容器业务测试仍待补充，运动写入尚未接通，UI 未改。
+
+### 课程与成员 Docker 验证
+
+Compose 重建并健康启动，扩展 Docker 冒烟：显式创建隔离学期/课程/成员读取 fixture，验证课程名称、班级学期关联、归档学期状态、上海截止时间转 UTC、本人成员及分页结构；finally 清理本轮三条课程 fixture。通过真实反向代理/API/PostgreSQL 读取，未将直接插入 fixture 视为课程创建业务完成。原登录、帮助及重启持久化断言继续通过。随机 schema 新增当前学期缺失 404、合法响应与重复当前学期 409，PostgreSQL 38 项通过。UI 未改；课程写入、运动会话/材料/审核主流程仍待迁移。

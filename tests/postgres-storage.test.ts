@@ -146,6 +146,19 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(postgresSportsMe(db,studentLogin.token)).rejects.toMatchObject({status:403});
     await db.pool.query('DELETE FROM entities WHERE id=$1',[duplicate.id]);
   });
+  it('returns the current semester without inventing one and rejects conflicting current semesters', async () => {
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    await expect(postgresStudentCourses(db,login.token,'/api/v1/semesters/current',{})).rejects.toMatchObject({status:404});
+    const ids:string[]=[];
+    try {
+      const semester=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{name:'当前学期',academicYear:'2026-2027',type:'AUTUMN',status:'CURRENT',startDate:'2026-09-01',endDate:'2027-01-31'}));
+      ids.push(semester.id);
+      expect(await postgresStudentCourses(db,login.token,'/api/v1/semesters/current',{})).toMatchObject({data:{id:semester.id,displayName:'当前学期',academicYear:'2026-2027',termCode:'AUTUMN'}});
+      const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{status:'CURRENT'}));
+      ids.push(duplicate.id);
+      await expect(postgresStudentCourses(db,login.token,'/api/v1/semesters/current',{})).rejects.toMatchObject({status:409});
+    } finally {await db.pool.query('DELETE FROM entities WHERE id=ANY($1::text[])',[ids]);}
+  });
   it('changes an initial administrator password atomically and revokes other sessions', async () => {
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,login_kind,login_name) VALUES('password-admin','password@example.test',$1,'管理员','now','ADMIN','password-manager')",[hashPassword('Initial-test-123')]);
     const identity=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','password-admin',{role:'admin',status:'verified',mustChangePassword:true}));
