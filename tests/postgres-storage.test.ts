@@ -6,7 +6,7 @@ import { processPostgresSportsReview } from '../backend/src/storage/postgres-rev
 import { createServer } from 'node:http';
 import sharp from 'sharp';
 import { postgresMediaPut, postgresMediaRead, postgresMediaOriginal } from '../backend/src/storage/postgres-student-media';
-import { postgresStudentRecords, postgresStudentWorkflow } from '../backend/src/storage/postgres-student-records';
+import { postgresStudentRecords, postgresStudentWorkflow, postgresProofTodos } from '../backend/src/storage/postgres-student-records';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { randomUUID, createHash } from 'node:crypto';
 import { Pool } from 'pg';
@@ -329,12 +329,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const result=await postgresStudentWorkflow(db,login.token,'workflow-public');
     expect(result.data).toMatchObject({recordId:'workflow-public',stage:'AWAITING_SUPPLEMENT',version:record.version,supplement:{paused:false,expired:false},materials:[{mediaId:'workflow-media',materialVersion:1}]});
     expect(JSON.stringify(result)).not.toMatch(/secret-review|private-key/);
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{publicReason:{code:'UNCLEAR',zh:'材料不清晰'},publicExplanation:'请提供清晰原图'});});
+    const todos=(await postgresProofTodos(db,login.token,{limit:100})).data;
+    expect(todos.items.find(t=>t.recordId==='workflow-public')).toMatchObject({reasonCode:'UNCLEAR_EVIDENCE',publicComment:'请提供清晰原图',expired:false});
+    expect(todos.nextCursor).toBe(null);
+    expect((await postgresStudentRecords(db,login.token,{},'workflow-public')).data).toMatchObject({currentReview:{reasonCode:'UNCLEAR_EVIDENCE',publicComment:'请提供清晰原图'}});
     await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{supplementStartedAt:Date.now()-172800000});});
     expect((await postgresStudentWorkflow(db,login.token,record.id)).data.supplement?.expired).toBe(true);
     const foreign=await db.transaction(client=>new PostgresRepository(client).create('sportsRecord','sports-reader-other',{status:'VALID'}));
     await expect(postgresStudentWorkflow(db,login.token,foreign.id)).rejects.toMatchObject({status:404});
     await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{status:'TEACHER_PENDING'});});
     expect((await postgresStudentRecords(db,login.token,{},'workflow-public')).data).toMatchObject({workflowStage:'PENDING_TEACHER'});
+    expect((await postgresProofTodos(db,login.token,{})).data.items.some(t=>t.recordId==='workflow-public')).toBe(false);
   });
   it('allows supplementary uploads after the original window but rechecks paused and closed review', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
