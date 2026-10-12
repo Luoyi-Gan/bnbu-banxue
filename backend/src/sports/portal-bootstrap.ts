@@ -64,7 +64,7 @@ export function portalEnduranceWrite(
   )!;
 }
 
-export function portalAnnouncement(repo: Repository) {
+export function portalAnnouncement(repo: Pick<Repository, 'all'>) {
   const system = currentSystem(repo);
   const mode = system?.data.mode ?? "NORMAL";
   const announcement = system?.data.announcement as Fields | null | undefined;

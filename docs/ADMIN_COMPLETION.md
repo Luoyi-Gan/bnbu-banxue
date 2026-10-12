@@ -1555,3 +1555,9 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 将帮助中心写策略改为同步/异步共用实现，接通 sports.help.save、sports.help.state 及 GET /api/sports/help。发布保留中英文正文和关键词要求、版本及更新时间检查，历史、审计和回执同事务保存；重试前重新检查当前 HELP 权限与维护门禁。学生读取保留发布过滤、语言投影与作者隐藏。原体育课程 36 项和 PostgreSQL 35 项共 71 项通过；服务端类型检查、相关 lint 通过。
 
 Compose 已重新构建并启动全部健康容器，Docker 冒烟新增管理员发布帮助、改为学生身份后读取英文内容及作者隐藏断言，全部通过；原注册、统一登录、设置、头像对象存储、数据库/API 重启持久化及退出断言继续通过。授权身份仅由独立 Docker 测试脚本显式创建，不由注册自动授予。未修改 UI；完整体育工作台和学生 /api/v1 仍待迁移，真实 COS 联通仍为外部依赖。
+
+### 学生协议缺口与公共启动接口
+
+实际核对发现 SQLite 的 /api/v1/me 调用 portalMe，而其 portalIdentity 只接受教师/管理员；学生前端 loadApiStudentIdentity 明确要求 studentProfile。因此不能把旧 SQLite 体育协议视为学生主流程已完整实现；需要按现有学生协议补身份、入班及后续运动接口，而非仅机械迁移。
+
+本轮接通 PostgreSQL GET /api/v1/system-mode/announcement，复用原公告投影及 data 包装，不要求登录，且仅返回公开维护字段。真实 HTTP 测试覆盖默认正常模式、维护公告、恢复时间格式和内部字段不外泄；PostgreSQL 36 项测试、服务端类型检查和相关 lint 通过。此新启动接口尚未进入 Docker 镜像，身份主流程仍未完成，前端未改。

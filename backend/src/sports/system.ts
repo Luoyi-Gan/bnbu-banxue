@@ -13,7 +13,7 @@ import { expireSupplements, supplementClock } from "./supplements";
 export function canManageMode(repo: Repository, actor: Account) {
   return administratorAccess(repo, actor).permissions.includes("SYSTEM_MODE");
 }
-export function currentSystem(repo: Repository) {
+export function currentSystem(repo: Pick<Repository, 'all'>) {
   return repo.all("sportsSystem")[0];
 }
 export function sportsWriteGate(repo: Repository, action: string) {

@@ -46,6 +46,25 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       finally { await admin.end(); }
     }
   });
+  it('serves the public sports maintenance announcement without exposing internal fields', async () => {
+    const server=createPostgresApiServer(db);
+    await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+    const url=`http://127.0.0.1:${(server.address() as AddressInfo).port}/api/v1/system-mode/announcement`;
+    let id:string|undefined;
+    try {
+      expect(await (await fetch(url)).json()).toEqual({data:{mode:'NORMAL',policyVersion:0,updatedAt:null,announcement:null}});
+      const system=await db.transaction(client=>new PostgresRepository(client).create('sportsSystem',null,{mode:'MAINTENANCE',privateNote:'private',announcement:{titleZh:'维护',titleEn:'Maintenance',bodyZh:'稍后恢复',bodyEn:'Back soon',estimatedRecoveryAt:1800000000000,internalReason:'private'}}));
+      id=system.id;
+      const response=await fetch(url),body=await response.json();
+      expect(response.status).toBe(200);
+      expect(body.data.mode).toBe('MAINTENANCE');
+      expect(body.data.announcement.estimatedRecoveryAt).toBe(new Date(1800000000000).toISOString());
+      expect(JSON.stringify(body)).not.toContain('private');
+    } finally {
+      if(id) await db.pool.query('DELETE FROM entities WHERE id=$1',[id]);
+      await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));
+    }
+  });
   it('scopes sports courses to the teacher or enrolled student and preserves first-password gating', async () => {
     for (const [id,role] of [['sports-reader-teacher','teacher'],['sports-reader-student','student'],['sports-reader-other','teacher']]) {
       await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES($1,$2,$3,$1,$4,$5)',[id,`${id}@example.test`,hashPassword('Sports-read-123'),'now',JSON.stringify([role])]);
