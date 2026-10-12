@@ -60,7 +60,7 @@ export function beforeEvidence(
   return evidence;
 }
 export function swimmingFiles(
-  repo: Repository,
+  repo: Pick<Repository, "get">,
   session: Entity,
   files: ReturnType<typeof validateFiles>,
   raw: unknown,

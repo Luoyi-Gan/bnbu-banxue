@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { createHash } from "node:crypto";
 import { sportsAccountGate } from "./account-gate";
 import { demand, timestamp, type Account } from "../auth";
@@ -72,22 +73,23 @@ export function validateFiles(values: unknown) {
   );
   return files;
 }
-function ownSession(repo: Repository, actor: Account, id: unknown) {
-  sportsRole(repo, actor, "student");
-  sportsAvailable(repo);
-  const session = repo.get(id, "sportsSession");
-  demand(session.ownerId === actor.id, "只能提交本人运动材料。", 403);
-  demand(!session.data.cancelledAt, "已取消的运动不能提交材料。", 409);
-  return session;
-}
 export function sportsMaterialCommand(
   repo: Repository,
   actor: Account,
   action: string,
   input: Fields,
 ): Entity | undefined {
+  return runSync(sportsMaterialPolicy(repo, actor, action, input));
+}
+export function* sportsMaterialPolicy(repo: BusinessRepository, actor: Account, action: string, input: Fields): Generator<unknown, Entity | undefined, unknown> {
   if (action !== "sports.record.accept") return undefined;
-  const session = ownSession(repo, actor, input.sessionId);
+  const identities = yield* effect(repo.all("sportsIdentity"));
+  sportsRole({all:()=>identities}, actor, "student");
+  const systems = yield* effect(repo.all("sportsSystem"));
+  sportsAvailable({all:()=>systems});
+  const session = yield* effect(repo.get(input.sessionId, "sportsSession"));
+  demand(session.ownerId === actor.id, "只能提交本人运动材料。", 403);
+  demand(!session.data.cancelledAt, "已取消的运动不能提交材料。", 409);
   version(session, input);
   const clock = session.data.clock as unknown as SportsClock;
   demand(
@@ -96,7 +98,7 @@ export function sportsMaterialCommand(
     409,
   );
   demand(
-    !repo.all("sportsRecord").some((r) => r.data.sessionId === session.id),
+    !(yield* effect(repo.all("sportsRecord"))).some((r) => r.data.sessionId === session.id),
     "本次运动已有材料批次，请续传原批次。",
     409,
   );
@@ -107,8 +109,8 @@ export function sportsMaterialCommand(
     "首次材料受理须严格早于运动结束后24小时。",
     409,
   );
-  const course = repo.get(session.data.courseId, "sportsCourse");
-  const semester = repo.get(session.data.semesterId, "sportsSemester");
+  const course = yield* effect(repo.get(session.data.courseId, "sportsCourse"));
+  const semester = yield* effect(repo.get(session.data.semesterId, "sportsSemester"));
   demand(
     semester.data.status !== "ARCHIVED" &&
       course.data.settlementStatus !== "SETTLED",
@@ -138,9 +140,10 @@ export function sportsMaterialCommand(
       "游泳首次受理须在结束后15分钟内；完全离线延迟须明确说明并进入教师异常队列。",
       409,
     );
-    files = swimmingFiles(repo, session, files, input.files);
+    const evidence = yield* effect(repo.get(session.data.beforeEvidenceId, "sportsSwimEvidence"));
+    files = swimmingFiles({get:()=>evidence}, session, files, input.files);
   }
-  const record = repo.create("sportsRecord", actor.id, {
+  const record = yield* effect(repo.create("sportsRecord", actor.id, {
     sessionId: session.id,
     courseId: course.id,
     semesterId: semester.id,
@@ -154,31 +157,31 @@ export function sportsMaterialCommand(
     businessDate: clock.businessDate,
     activeMilliseconds: clock.activeMilliseconds,
     ruleSnapshot: session.data.ruleSnapshot,
-  });
-  const batch = repo.create("sportsMaterialBatch", actor.id, {
+  }));
+  const batch = yield* effect(repo.create("sportsMaterialBatch", actor.id, {
     recordId: record.id,
     sessionId: session.id,
     sequence: 1,
     status: "UPLOADING",
     acceptedAt: now,
     uploadDeadline: now + 30 * 60000,
-  });
+  }));
   for (const file of files)
-    repo.create("sportsMaterial", actor.id, {
+    yield* effect(repo.create("sportsMaterial", actor.id, {
       ...file,
       recordId: record.id,
       batchId: batch.id,
       sessionId: session.id,
       status: "PENDING",
-    });
-  repo.save(record, { batchId: batch.id });
-  repo.notify(
+    }));
+  yield* effect(repo.save(record, { batchId: batch.id }));
+  yield* effect(repo.notify(
     [actor.id],
     record.id,
     action,
     "运动材料批次已受理，请在30分钟内传完原批文件；受理不代表审核通过。",
-  );
-  return repo.get(record.id);
+  ));
+  return yield* effect(repo.get(record.id));
 }
 export function writableMaterial(
   repo: Repository,

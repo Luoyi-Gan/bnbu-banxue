@@ -182,6 +182,28 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const events=await db.transaction(client=>new PostgresRepository(client).all('sportsSessionEvent'));
     expect(events.filter(e=>e.data.sessionId===session.id)).toHaveLength(3);
   });
+  it('atomically accepts a material manifest in PostgreSQL with retry and duplicate protection', async () => {
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const session=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      const semester=await repo.create('sportsSemester',null,{status:'DRAFT'});
+      const course=await repo.create('sportsCourse',null,{semesterId:semester.id});
+      return repo.create('sportsSession','sports-reader-student',{courseId:course.id,semesterId:semester.id,activityType:'EXERCISE',ruleSnapshot:{threshold:30},clock:{...startClock(Date.now()-1800000),state:'ENDED',endedAt:Date.now(),activeMilliseconds:1800000}});
+    });
+    const input={sessionId:session.id,version:session.version,category:'RELATED',description:'材料受理测试',activityType:'EXERCISE',files:[{clientId:'photo',mime:'image/jpeg',size:123,sha256:'a'.repeat(64)}]},key=randomUUID();
+    const result=await executePostgres(db,login.token,'sports.record.accept',input,key);
+    expect(await executePostgres(db,login.token,'sports.record.accept',input,key)).toEqual(result);
+    await expect(executePostgres(db,login.token,'sports.record.accept',input,randomUUID())).rejects.toMatchObject({status:409});
+    await db.transaction(async client=>{
+      const repo=new PostgresRepository(client),record=await repo.get(result.id);
+      expect(record.data.status).toBe('UPLOADING');
+      const batch=await repo.get(record.data.batchId);
+      expect(Number(batch.data.uploadDeadline)-Number(batch.data.acceptedAt)).toBe(1800000);
+      expect((await repo.all('sportsMaterial')).filter(m=>m.data.recordId===record.id)).toHaveLength(1);
+      expect((await client.query('SELECT id FROM notifications WHERE entity_id=$1',[record.id])).rows).toHaveLength(1);
+      await client.query('DELETE FROM notifications WHERE entity_id=$1',[record.id]);
+    });
+  });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const session=await db.transaction(client=>new PostgresRepository(client).create('sportsSession','sports-reader-student',{enrollmentId:'cancel-fixture',clock:startClock(Date.now()-2000)}));

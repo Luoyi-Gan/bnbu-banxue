@@ -1,3 +1,4 @@
+import { sportsMaterialPolicy } from "../sports/materials";
 import { randomUUID } from 'node:crypto';
 import { demand, digest, ServiceError, timestamp } from '../auth';
 import { communityPolicy } from '../community';
@@ -80,6 +81,10 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       const session=await runAsync(sportsSessionPolicy(repo,actor,`sports.session.${operation==='finish'?'end':operation}`,fields));
       demand(session,'运动会话操作失败。',500);
       result=studentSessionProjection(session);
+    }
+    else if(action==='sports.record.accept') {
+      const record=await runAsync(sportsMaterialPolicy(repo,actor,action,input));
+      if(record) result={id:record.id};
     }
     else if(action==='sports.preferences.save') result=await saveSportsPreferences(repo,actor,input);
     else if(action.startsWith('sports.session.')) {
