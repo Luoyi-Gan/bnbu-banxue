@@ -12,7 +12,35 @@ export function sportsGradeCommand(
   action: string,
   input: Fields,
   historicalCorrection = false,
-) {
+): Entity | undefined {
+  if (action === "sports.grade.append") {
+    demand(
+      Object.keys(input).every((key) =>
+        ["enrollmentId", "version", "score", "published"].includes(key),
+      ),
+      "成绩提交参数无效。",
+    );
+    demand(typeof input.published === "boolean", "请明确选择是否发布成绩。");
+    const saved = sportsGradeCommand(repo, actor, "sports.grade.save", {
+      enrollmentId: input.enrollmentId,
+      version: input.version,
+      score: input.score,
+    })!;
+    if (input.published)
+      return sportsGradeCommand(repo, actor, "sports.grade.publish", {
+        id: saved.id,
+        version: saved.version,
+      });
+    const history = repo
+      .all("sportsGradeHistory")
+      .find(
+        (row) =>
+          row.data.draftId === saved.id &&
+          row.data.resultVersion === saved.version,
+      );
+    demand(history, "成绩保存记录不完整。", 409);
+    return history;
+  }
   if (action !== "sports.grade.save" && action !== "sports.grade.publish")
     return undefined;
   const allowed = action.endsWith("save")

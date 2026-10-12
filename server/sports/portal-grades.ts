@@ -1,7 +1,56 @@
-import { demand, type Account } from "../auth";
+import { authenticate, demand, type Account } from "../auth";
+import { execute } from "../commands";
+import type { Database } from "../database";
 import { integerField, Repository, type Fields } from "../repository";
 import { ownedCourse } from "./courses";
 import { sportsWriteGate } from "./system";
+
+export function portalFinalGradeWrite(
+  db: Database,
+  token: string,
+  enrollmentId: string,
+  input: Fields,
+  key: string,
+) {
+  demand(
+    Object.keys(input).every((field) =>
+      ["finalGrade", "published", "expectedVersion"].includes(field),
+    ),
+    "最终成绩不接受备注或其他附加字段。",
+  );
+  const repo = new Repository(db),
+    actor = authenticate(db, token),
+    member = repo.get(enrollmentId, "sportsEnrollment");
+  ownedCourse(repo, actor, member.data.courseId);
+  const result = execute(
+    db,
+    token,
+    "sports.grade.append",
+    {
+      enrollmentId,
+      version: input.expectedVersion,
+      score: input.finalGrade,
+      published: input.published,
+    },
+    key,
+  ) as { id: string };
+  const saved = repo.get(result.id),
+    published = saved.kind === "sportsGradePublication";
+  demand(
+    published || saved.kind === "sportsGradeHistory",
+    "成绩提交回执无效。",
+    409,
+  );
+  return {
+    enrollmentId,
+    version: published
+      ? Number(saved.data.draftVersion) + 1
+      : Number(saved.data.resultVersion),
+    finalGrade: saved.data.score,
+    published,
+    createdAt: saved.createdAt,
+  };
+}
 
 export function portalGradeHistory(
   repo: Repository,

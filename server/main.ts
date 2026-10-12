@@ -17,7 +17,10 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
-import { portalGradeHistory } from "./sports/portal-grades";
+import {
+  portalGradeHistory,
+  portalFinalGradeWrite,
+} from "./sports/portal-grades";
 import {
   portalApplications,
   portalApplicationReview,
@@ -440,6 +443,21 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const finalGradeWrite =
+          /^\/api\/v1\/enrollments\/([^/]+)\/final-grades$/.exec(pathname);
+        if (finalGradeWrite) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalFinalGradeWrite(
+              db,
+              token!,
+              finalGradeWrite[1],
+              input,
+              key,
+            ),
+          });
+        }
         const certificationChange =
           /^\/api\/v1\/activity-certification-applications\/([^/]+)\/(revoke|recognition-allocation-revisions)$/.exec(
             pathname,

@@ -115,6 +115,61 @@ it("原版成绩页区分缺测、零秒和草稿/发布版本，历史分页不
     expect((await get("physical-results?beforeVersion=invalid")).status).toBe(
       400,
     );
+    const write = (input: object, key: string) =>
+      fetch(
+        `http://127.0.0.1:${address.port}/api/v1/enrollments/${member.id}/final-grades`,
+        {
+          method: "POST",
+          headers: {
+            Cookie: `bnbu_session=${teacher.token}`,
+            "Content-Type": "application/json",
+            "Idempotency-Key": key,
+          },
+          body: JSON.stringify(input),
+        },
+      );
+    const saveInput = { finalGrade: 82, published: false, expectedVersion: 3 };
+    const saved = await write(saveInput, "portal-save-grade");
+    expect(saved.status).toBe(200);
+    const savedReceipt = await saved.json();
+    expect(savedReceipt.data).toMatchObject({
+      version: 4,
+      finalGrade: 82,
+      published: false,
+    });
+    const publishInput = {
+      finalGrade: 85,
+      published: true,
+      expectedVersion: 4,
+    };
+    const publication = await write(publishInput, "portal-publish-grade");
+    expect(publication.status).toBe(200);
+    const receipt = await publication.json();
+    expect(receipt.data).toMatchObject({
+      version: 6,
+      finalGrade: 85,
+      published: true,
+    });
+    expect(await (await write(saveInput, "portal-save-grade")).json()).toEqual(
+      savedReceipt,
+    );
+    expect(
+      await (await write(publishInput, "portal-publish-grade")).json(),
+    ).toEqual(receipt);
+    expect(repo.all("sportsGradePublication")).toHaveLength(2);
+    expect((await write(publishInput, "stale-portal-publish")).status).toBe(
+      409,
+    );
+    repo.save(repo.get(course.id), { settlementStatus: "SETTLED" });
+    expect(
+      (
+        await write(
+          { finalGrade: 90, published: true, expectedVersion: 6 },
+          "settled-grade-write",
+        )
+      ).status,
+    ).toBe(409);
+    expect(repo.all("sportsGradePublication")).toHaveLength(2);
     repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
     expect((await get("final-grades")).status).toBe(503);
   } finally {
