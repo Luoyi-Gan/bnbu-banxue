@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-11",
+  "scope": "Local SQLite backend and workspace UI; isolated synthetic accounts only",
+  "baseline": "f8f4ca6d466907961fbb6de2137fc11a3fbb7270",
+  "checks": [
+    { "command": "node node_modules/vitest/vitest.mjs run", "exitCode": 0, "filesPassed": 22, "testsPassed": 138, "timeLocal": "22:07:26" },
+    { "command": "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.server.json", "exitCode": 0 },
+    { "command": "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.app.json", "exitCode": 0 },
+    { "command": "node node_modules/eslint/bin/eslint.js .", "exitCode": 0 },
+    { "command": "node node_modules/vite/bin/vite.js build", "exitCode": 0, "warning": "Existing graph, 3D and main chunks exceed 500kB" },
+    { "command": "npm audit fix --ignore-scripts", "exitCode": 0, "vulnerabilities": 0 }
+  ],
+  "browser": [
+    "Student A submits post; administrator approves same record; student B reads published post",
+    "Teacher opens two slots; student books first; teacher proposes move; both slots occupied until student accepts; first slot then releases",
+    "Backend and frontend stop and restart; booking and home schedule remain available",
+    "Desktop and 393px browser viewport checked for horizontal overflow; no physical device test"
+  ],
+  "pending": ["Authoritative sports service version and complete original sports workflow", "School identity authorization source", "Real email delivery", "Real timetable OCR", "Full migration of legacy v2 visual pages"]
+}

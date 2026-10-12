@@ -4,17 +4,21 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "dev:local": "node scripts/local.mjs",
+    "typecheck:server": "tsc --noEmit -p tsconfig.server.json",
     "dev": "vite --host 127.0.0.1 --strictPort",
     "dev:v2": "vite --host 127.0.0.1 --strictPort",
     "build": "tsc --noEmit -p tsconfig.app.json && vite build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --pretty false",
     "test": "vitest run",
-    "dev:sports-teacher": "npm --prefix integrations/sports-teacher run dev -- --port 4186"
+    "dev:sports-teacher": "node scripts/sports-teacher.mjs"
   },
   "dependencies": {
     "cytoscape": "^3.34.3",
     "cytoscape-fcose": "^2.2.0",
+    "exceljs": "4.4.0",
+    "ffprobe-static": "^3.1.0",
     "gsap": "^3.15.0",
     "lucide-react": "^0.468.0",
     "motion": "^12.43.0",
@@ -23,6 +27,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
+    "sharp": "^0.35.5",
     "three": "^0.180.0"
   },
   "devDependencies": {
@@ -41,5 +46,10 @@
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    }
   }
 }

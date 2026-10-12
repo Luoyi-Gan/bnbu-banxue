@@ -1,9 +1,9 @@
 import { Link, Navigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { useSportsAccount } from '../live/useSportsAccount'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 
 export function V2Sports() {
-  const live = useSportsAccount()
+  const live = useWorkspaceBackend()
   if (!live.data) return <p role="status">{live.error || '正在读取体育账号…'}</p>
   if (live.data.sports?.role !== 'student') return <Navigate to="/v2" replace/>
   return <section className="v2-sports-embedded" aria-label="体育运动平台">

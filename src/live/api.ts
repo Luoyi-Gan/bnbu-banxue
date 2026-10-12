@@ -1,5 +1,15 @@
+import type { RelationshipHistory } from '../v2/relationshipAdapter';
+import type { AlumniData } from "../v2/alumniModel";
 import type { SportsCompanion } from "./sportsCompanion";
-
+export interface LiveAccount {
+  studentNumber?: string | null;
+  id: string;
+  email: string;
+  name: string;
+  organization: string;
+  status: string;
+  roles: string[];
+}
 export interface LiveEntity {
   id: string;
   kind: string;
@@ -10,19 +20,106 @@ export interface LiveEntity {
   updatedAt: string;
 }
 export interface Workspace {
-  account: { id: string; name: string; roles: string[] };
-  firstLoginOnly?: boolean;
   sports?: SportsCompanion | null;
+  firstLoginOnly?: boolean;
+  notificationBatches?: {
+    id: string;
+    createdAt: string;
+    total: number;
+    read: number;
+    readRate: number | null;
+  }[];
+  capabilities?: Record<string, string>;
+  account: LiveAccount;
+  entities: LiveEntity[];
+  alumni: AlumniData;
+  notifications: {
+    event: string;
+    entityId: string | null;
+    id: string;
+    body: string;
+    readAt: string | null;
+    createdAt: string;
+  }[];
+  people: {
+    id: string;
+    name: string;
+    organization: string;
+    status?: string;
+    roles?: string[];
+  }[];
+  relations: { entityId: string; kind: string; createdAt: string }[];
+  relationshipHistory?: RelationshipHistory[];
+  audit: {
+    id: string;
+    actor_id: string;
+    action: string;
+    entity_id: string;
+    reason: string;
+    created_at: string;
+  }[];
 }
-
-/** Read-only contract with the separately supplied, authenticated Companion service. */
-export async function api<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(path, { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" }, signal });
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+export async function api<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(path, {
+    method: body === undefined ? "GET" : "POST",
+    credentials: "same-origin",
+    cache: "no-store",
+    signal,
+    headers: {
+      Accept: "application/json",
+      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+    },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  });
   const data = await response.json().catch(() => null);
-  if (!response.ok) throw new Error(data?.message ?? (response.status === 401 ? "请先登录伴学账号。" : "体育数据暂不可用，请稍后重试。"));
-  if (!data || typeof data !== "object") throw new Error("体育数据接口尚未连接，请配置伴学数据服务。");
-  if (path === "/api/workspace" && (!data.account?.id || !Array.isArray(data.account?.roles))) throw new Error("账号接口尚未返回有效身份，暂不展示体育数据。");
-  if (path === "/api/sports/workspace" && !data.firstLoginOnly && data.system?.mode !== "MAINTENANCE" && !data.identity?.data?.role) throw new Error("体育接口尚未返回有效身份，暂不展示统计。");
+  if (!response.ok)
+    throw new ApiError(
+      response.status,
+      data?.message ?? "暂时无法连接后端，请检查本地服务。",
+    );
+  if (!data || typeof data !== "object")
+    throw new ApiError(response.status, "数据接口尚未连接，请检查本地服务。");
+  if (path === "/api/workspace" && (!data.account?.id || !Array.isArray(data.account?.roles)))
+    throw new ApiError(response.status, "账号接口尚未返回有效身份，暂不展示业务数据。");
+  if (path === "/api/sports/workspace" && !data.firstLoginOnly && data.system?.mode !== "MAINTENANCE" && !data.identity?.data?.role)
+    throw new ApiError(response.status, "体育接口尚未返回有效身份，暂不展示统计。");
   return data as T;
 }
+export const loadWorkspace = () => api<Workspace>("/api/workspace");
 export const sportsChangedEvent = "bnbu:sports-updated";
+export const workspaceChangedEvent = "bnbu:workspace-updated";
+const uncertainRequests = new Map<string, string>();
+export async function command(
+  action: string,
+  input: Record<string, unknown>,
+  requestId?: string,
+) {
+  const fingerprint = JSON.stringify({ action, input });
+  const id =
+    requestId ?? uncertainRequests.get(fingerprint) ?? crypto.randomUUID();
+  uncertainRequests.set(fingerprint, id);
+  try {
+    const result = await api<{ data: { id: string } }>("/api/commands", {
+      action,
+      input,
+      requestId: id,
+    });
+    uncertainRequests.delete(fingerprint);
+    if (typeof window !== "undefined") window.dispatchEvent(new Event(workspaceChangedEvent));
+    return result;
+  } catch (error) {
+    // Keep the same idempotency key when the server may have committed but its
+    // response was lost. A definitive business rejection may be corrected.
+    if (error instanceof ApiError && error.status >= 400 && error.status < 500)
+      uncertainRequests.delete(fingerprint);
+    throw error;
+  }
+}

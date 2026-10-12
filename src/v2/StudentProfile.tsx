@@ -1,19 +1,34 @@
+import {api,workspaceChangedEvent} from '../live/api'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { flushSync } from 'react-dom'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { useV2 } from './useV2'
-import { studentName, v2StorageKey } from './model'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { PageHeading } from './ui'
-import { updateStudentProfile } from './profilePolicy'
 
 export function StudentProfile() {
-  const { state, setState } = useV2()
+  const live = useWorkspaceBackend()
+  if (!live.data) return <div className="v2-page"><PageHeading eyebrow="MY PROFILE" title="个人资料" description="设置头像与昵称，让同学更容易认识你。"/><p role={live.error ? 'alert' : 'status'}>{live.error || '正在读取本人资料…'}</p></div>
+  return <StudentProfileEditor key={live.data.account.id} live={live}/>
+}
+
+function StudentProfileEditor({live}: {live: ReturnType<typeof useWorkspaceBackend>}) {
+  const account = live.data!.account
+  const profile = live.data!.entities.find(e => e.kind === 'profile' && e.ownerId === account.id)?.data
   const navigate = useNavigate()
-  const [nickname, setNickname] = useState(state.profile?.nickname ?? studentName)
-  const [avatar, setAvatar] = useState(state.profile?.avatar ?? '')
+  const [nickname, setNickname] = useState(String(profile?.nickname ?? account.name))
+  const [avatar, setAvatar] = useState(String(profile?.avatar ?? ''))
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [code,setCode]=useState('')
+  const [verification,setVerification]=useState('')
+  async function verifyEmail(confirm:boolean) {
+    setLoading(true);setVerification('');
+    try {
+      const result=await api<{message?:string}>(confirm ? '/api/auth/email/confirm' : '/api/auth/email/request',confirm ? {code} : {});
+      setVerification(confirm ? '邮箱已验证，学号已更新。' : result.message ?? '验证码已发送。');
+      if(confirm) window.dispatchEvent(new Event(workspaceChangedEvent));
+    } catch(error) {setVerification(error instanceof Error ? error.message : '验证失败')} finally {setLoading(false)}
+  }
   async function upload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     event.target.value = ''
@@ -29,21 +44,18 @@ export function StudentProfile() {
       bitmap.close(); setAvatar(canvas.toDataURL('image/webp', .85))
     } catch { setError('图片无法读取，请重新选择。') } finally { setLoading(false) }
   }
-  function save(event: FormEvent) {
+  async function save(event: FormEvent) {
     event.preventDefault()
     const name = nickname.trim()
     if (!name || name.length > 20) { setError('昵称需要填写 1–20 个字符。'); return }
-    const next = updateStudentProfile(state, name, avatar)
-    try { localStorage.setItem(v2StorageKey, JSON.stringify({ ...next, role: undefined })) }
-    catch { setError('保存失败，浏览器存储空间不足，请缩小头像后重试。'); return }
-    flushSync(() => setState(next)); navigate('/v2/me')
+    if (await live.mutate('profile.save', {nickname: name, avatar})) navigate('/v2/me')
   }
   return <div className="v2-page"><Link className="v2-button v2-button-secondary" style={{ marginBottom: 16 }} to="/v2/me"><ArrowLeft size={17}/> 返回我的</Link><PageHeading eyebrow="MY PROFILE" title="个人资料" description="设置头像与昵称，让同学更容易认识你。"/>
     <form className="v2-profile-editor v2-panel v2-form" onSubmit={save}>
-      <div className="v2-profile-photo-row"><span className="v2-profile-avatar">{avatar ? <img src={avatar} alt="头像预览"/> : nickname.slice(0, 1)}</span><div><label className="v2-button v2-button-secondary">{loading ? '处理图片中…' : '更换头像'}<input type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择头像" disabled={loading} onChange={upload}/></label><p>JPG、PNG、WebP，最大 5 MB；头像居中裁剪。</p>{avatar && <button type="button" className="v2-text-button" onClick={() => setAvatar('')}>恢复默认头像</button>}</div></div>
+      <div className="v2-profile-photo-row"><span className="v2-profile-avatar">{avatar ? <img src={avatar} alt="头像预览"/> : nickname.slice(0, 1)}</span><div><label className="v2-button v2-button-secondary">{loading ? '处理图片中…' : '更换头像'}<input type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择头像" disabled={loading || live.busy} onChange={upload}/></label><p>JPG、PNG、WebP，最大 5 MB；头像居中裁剪。</p>{avatar && <button type="button" className="v2-text-button" onClick={() => setAvatar('')}>恢复默认头像</button>}</div></div>
       <label>昵称<input value={nickname} maxLength={20} required onChange={event => setNickname(event.target.value)} placeholder="填写你的昵称"/></label>
-      <div className="v2-profile-facts"><div><span>姓名</span><strong>{studentName}</strong></div><div><span>学号</span><strong>22301142</strong></div><div><span>学院</span><strong>工商管理学院</strong></div><div><span>身份</span><strong>学生</strong></div></div>
-      <p className="v2-form-note">昵称用于展示；姓名、学号与身份由学校资料维护。当前修改保存在本地浏览器。</p>
-      {error && <p role="alert">{error}</p>}<div className="v2-form-actions"><Link to="/v2/me" className="v2-button v2-button-secondary">取消</Link><button className="v2-button v2-button-primary" disabled={loading} type="submit">保存资料</button></div>
+      <div className="v2-profile-facts"><div><span>姓名</span><strong>{account.name}</strong></div><div><span>学号</span><strong>{account.studentNumber ?? '未验证学校邮箱'}</strong></div><div><span>学院</span><strong>{account.organization}</strong></div><div><span>身份</span><strong>{account.roles.includes('student') ? '已授权学生' : '以账号授权为准'}</strong></div></div>
+      {!account.studentNumber && account.email.endsWith('@bnbu.edu.cn') && <div className="v2-form-note"><p>验证本人学校邮箱后，自动绑定邮箱前缀为学号：{account.email}</p><button type="button" className="v2-button v2-button-secondary" disabled={loading} onClick={() => void verifyEmail(false)}>获取验证码</button><input aria-label="邮箱验证码" value={code} maxLength={6} onChange={event=>setCode(event.target.value)}/><button type="button" className="v2-button v2-button-secondary" disabled={loading || !code.trim()} onClick={() => void verifyEmail(true)}>验证邮箱</button></div>}{verification && <p role="status">{verification}</p>}<p className="v2-form-note">昵称用于展示；姓名、学号与身份由学校资料维护。当前修改保存到伴学后台。</p>
+      {(error || live.error) && <p role="alert">{error || live.error}</p>}<div className="v2-form-actions"><Link to="/v2/me" className="v2-button v2-button-secondary">取消</Link><button className="v2-button v2-button-primary" disabled={loading} type="submit">保存资料</button></div>
     </form></div>
 }

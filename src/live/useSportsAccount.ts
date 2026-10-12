@@ -10,7 +10,7 @@ export function useSportsAccount() {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 20000);
     try {
-      const next = await api<Workspace>("/api/workspace", controller.signal);
+      const next = await api<Workspace>("/api/workspace", undefined, controller.signal);
       if (active.current && current === generation.current) { setData(next); setError(""); }
     } catch (failure) {
       if (active.current && current === generation.current) { setData(null); setError(failure instanceof Error ? failure.message : "体育账号读取失败。"); }

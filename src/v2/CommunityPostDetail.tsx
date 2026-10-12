@@ -6,6 +6,7 @@ import { alumniData } from './alumniPolicy'
 import { addPostComment, canReadPost, setPostReaction } from './postInteractions'
 import { photosForPost, usesCampusIllustration } from './postPresentation'
 import { useV2 } from './useV2'
+import type { CommunityBackend } from './useCommunityBackend'
 import { Drawer, SectionHeading } from './ui'
 
 function PostMedia({ post }: { post: Post }) {
@@ -21,24 +22,25 @@ function PostMedia({ post }: { post: Post }) {
   </div>{usesCampusIllustration(post) && <p className="v2-form-note">校园配图，仅作内容封面。</p>}</>
 }
 
-export function CommunityPostDetail({ id, onClose }: { id: string; onClose: () => void }) {
-  const { state, setState, persistenceError } = useV2()
+export function CommunityPostDetail({ id, onClose, live }: { id: string; onClose: () => void; live?: CommunityBackend }) {
+  const { state: previewState, setState, persistenceError } = useV2()
+  const state = live ? { ...previewState, posts: live.posts, likedPosts: live.likedPosts, savedPosts: live.savedPosts } : previewState
   const [text, setText] = useState('')
-  const post = state.posts.find(item => item.id === id && canReadPost(state, item))
+  const post = state.posts.find(item => item.id === id && (live || canReadPost(state, item)))
   if (!post) return <Drawer title="内容暂不可见" onClose={onClose}><p>该内容已下架或暂无查看权限。</p></Drawer>
   const liked = state.likedPosts.includes(id), saved = state.savedPosts.includes(id)
   const publicPost = post.status === 'visible'
-  const alumnus = alumniData(state).profiles.find(profile => profile.id === post.alumniId && profile.status === 'approved')
-  const toggle = (kind: 'likedPosts' | 'savedPosts') => setState(value => setPostReaction(value, id, kind, !value[kind].includes(id)))
-  const comment = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setState(value => addPostComment(value, id, text)); setText('') }
+  const alumnus = live ? live.alumniProfiles?.find(profile => profile.id === post.alumniId) : alumniData(state).profiles.find(profile => profile.id === post.alumniId && profile.status === 'approved')
+  const toggle = (kind: 'likedPosts' | 'savedPosts') => { if (live) { void live.mutate('relation.set', { id, kind: kind === 'likedPosts' ? 'like' : 'save', enabled: !state[kind].includes(id) }); return } setState(value => setPostReaction(value, id, kind, !value[kind].includes(id))) }
+  const comment = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); if (live) { if (await live.mutate('comment.create', { postId: id, body: text })) setText(''); return } setState(value => addPostComment(value, id, text)); setText('') }
   return <Drawer title={post.title} eyebrow={`${post.board} · ${post.author}`} onClose={onClose}>
     <div className="v2-social-detail-media"><PostMedia key={id} post={post}/></div>
     <p className="v2-detail-date">{post.date}{!publicPost ? ' · 待审核' : ''}</p><p className="v2-detail-lead">{post.body}</p>
     {alumnus && <Link className="v2-post-alumni-link" to={`/v2/alumni?person=${encodeURIComponent(alumnus.id)}`} onClick={onClose}>了解{alumnus.name} · 查看交流时段</Link>}
     <div className="v2-detail-actions"><button type="button" className={`v2-pulse-heart${liked ? ' is-active' : ''}`} disabled={!publicPost} aria-label={`${liked ? '取消点赞' : '点赞'}，当前 ${post.likes} 个赞`} aria-pressed={liked} onClick={() => toggle('likedPosts')}><span className="v2-pulse-heart-icon"><Heart size={22} fill={liked ? 'currentColor' : 'none'}/></span><span>{post.likes} 次赞</span></button><button type="button" className="v2-button v2-button-secondary" disabled={!publicPost} aria-pressed={saved} onClick={() => toggle('savedPosts')}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'}/>{saved ? '已收藏' : '收藏'}</button></div>
-    {persistenceError && <p role="alert" className="v2-form-note">本机保存失败，请检查浏览器存储空间。</p>}
-    <div className="v2-comments"><SectionHeading title="评论" detail={`${post.comments.filter(item => item.status === 'visible').length} 条已展示`}/>{post.comments.filter(item => item.status === 'visible' || item.status === 'pending' && item.author === studentName).map(item => <div className="v2-comment" key={item.id}><span className="v2-avatar">{item.author.slice(0, 1)}</span><div><strong>{item.author} {item.status === 'pending' && <small>待审核</small>}</strong><p>{item.body}</p><small>{item.date}</small></div></div>)}
-      {publicPost ? <form onSubmit={comment} className="v2-comment-form"><input value={text} onChange={event => setText(event.target.value)} placeholder="写下你的评论" maxLength={300} aria-label="评论内容"/><button type="submit" aria-label="提交评论" className="v2-button v2-button-primary" disabled={!text.trim()}><Send size={16}/></button></form> : <p className="v2-form-note">内容审核通过后可点赞、收藏和评论。</p>}
+    {(live ? live.error : persistenceError) && <p role="alert" className="v2-form-note">{live ? live.error : '本机保存失败，请检查浏览器存储空间。'}</p>}
+    <div className="v2-comments"><SectionHeading title="评论" detail={`${post.comments.filter(item => item.status === 'visible').length} 条已展示`}/>{post.comments.filter(item => live || item.status === 'visible' || item.status === 'pending' && item.author === studentName).map(item => <div className="v2-comment" key={item.id}><span className="v2-avatar">{item.author.slice(0, 1)}</span><div><strong>{item.author} {item.status === 'pending' && <small>待审核</small>}</strong><p>{item.body}</p><small>{item.date}</small></div></div>)}
+      {publicPost ? <form onSubmit={comment} className="v2-comment-form"><input value={text} onChange={event => setText(event.target.value)} placeholder="写下你的评论" maxLength={300} aria-label="评论内容"/><button type="submit" aria-label="提交评论" className="v2-button v2-button-primary" disabled={!text.trim() || live?.busy}><Send size={16}/></button></form> : <p className="v2-form-note">内容审核通过后可点赞、收藏和评论。</p>}
     </div>
   </Drawer>
 }

@@ -1,20 +1,20 @@
 import { ApiError, request } from './api-client';
 export function createTeacherCourse(displayName:string,key:string){return request('/teacher/courses',{method:'POST',body:{displayName},headers:{'Idempotency-Key':key}});}
 export function revokeCourseInvite(classSectionId:string,inviteToken:string,key:string){return request(`/class-sections/${encodeURIComponent(classSectionId)}/course-invites/revocations`,{method:'POST',body:{inviteToken},headers:{'Idempotency-Key':key}});}
-export function createCoursePublicationIntent<T>(fingerprint:string,writeWindow:(key:string)=>Promise<T>,writeRules:(key:string)=>Promise<unknown>){
+export function createCoursePublicationIntent<T>(fingerprint:string,writeWindow:(key:string)=>Promise<T>,writeRules:(key:string,windowResult:T)=>Promise<unknown>){
   const windowKey=globalThis.crypto.randomUUID(),rulesKey=globalThis.crypto.randomUUID();
   let windowResult:T|undefined,windowDone=false,running:Promise<T>|null=null;
   return {fingerprint,run():Promise<T>{
     if(running)return running;
-    running=(async()=>{if(!windowDone){windowResult=await writeWindow(windowKey);windowDone=true;}await writeRules(rulesKey);return windowResult as T;})()
+    running=(async()=>{if(!windowDone){windowResult=await writeWindow(windowKey);windowDone=true;}await writeRules(rulesKey,windowResult as T);return windowResult as T;})()
       .finally(()=>{running=null;});
     return running;
   }};
 }
 export type CourseTemplate = {id:string;version:number;displayName:string;rules:{totalTargetMinutes:number;minimumMinutesOptions:number[];weeklyLimitOptions:number[];defaultMinimumMinutes:number;defaultWeeklyLimit:number};publishedAt:string};
-export type CourseRules = {version:number;template_id:string|null;published_at:string|null;minimum_minutes:number;maximum_minutes:number;global_target_minutes:number;global_target_version:number;allocation_pending:boolean;weekly_limit:number;daily_limit:number;course_target:number;general_target:number;regular_deadline:string;closing_deadline:string;settlement_planned_at:string};
+export type CourseRules = {description?:string;version:number;template_id:string|null;published_at:string|null;minimum_minutes:number;maximum_minutes:number;global_target_minutes:number;global_target_version:number;allocation_pending:boolean;weekly_limit:number;daily_limit:number;course_target:number;general_target:number;regular_deadline:string;closing_deadline:string;settlement_planned_at:string};
 export function publishCourseRules(id:string,input:{templateId:string;minimumMinutes:number;maximumMinutes?:number;globalTargetVersion?:number;weeklyLimit:number;dailyLimit?:number;courseTarget:number;generalTarget:number;
-  regularDeadline:string;closingDeadline:string;settlementPlannedAt:string;expectedVersion:number},key:string){
+  regularDeadline:string;closingDeadline:string;settlementPlannedAt:string;expectedVersion:number;expectedCourseVersion?:number;description?:string},key:string){
   return request(`/class-sections/${encodeURIComponent(id)}/v81-rules`,{method:'POST',body:{...input,publish:true},headers:{'Idempotency-Key':key}});
 }
 export async function loadCourseRuleSettings(id:string) {

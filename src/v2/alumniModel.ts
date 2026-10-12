@@ -11,12 +11,14 @@ export interface AlumniProfile {
   experience: string
   topics: string
   bio: string
+  studentNumber?: string
+  studentNumberSource?: 'verified-email' | 'applicant'
   evidence: string
   status: 'pending' | 'approved' | 'rejected'
   reviewNote: string
   accepting: boolean
 }
-export interface AlumniSlot { id: string; alumniId: string; startAt: string; endAt: string; location: string; open: boolean }
+export interface AlumniSlot { id: string; alumniId: string; startAt: string; endAt: string; location: string; open: boolean; occupied?: boolean }
 export type AlumniBookingStatus = 'pending' | 'confirmed' | 'rejected' | 'withdrawn' | 'cancelled' | 'expired' | 'unavailable'
 export interface AlumniBooking { id: string; slotId: string; student: string; question: string; status: AlumniBookingStatus; reason: string; createdAt: string }
 export interface AlumniData {

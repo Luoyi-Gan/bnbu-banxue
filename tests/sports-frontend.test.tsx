@@ -26,7 +26,11 @@ it("服务端确认小时呈现圆环与剩余时长，确认零值不隐藏", (
   expect(card({source: "local", role: "student", progress: progress(0)})).toContain("体育打卡进度");
 });
 it("普通教师只看到无体育记录状态，不依据校园角色显示统计", () => {
-  const html = renderToStaticMarkup(<MemoryRouter><SportsPortal workspace={{account:{id: "teacher",name: "教师",roles:["teacher"]},sports:null}}/></MemoryRouter>);
+  const html = renderToStaticMarkup(<MemoryRouter><SportsPortal workspace={{
+    account: {id: "teacher", name: "教师", email: "teacher@example.test", organization: "学院", status: "active", roles: ["teacher"]},
+    sports: null, entities: [], notifications: [], people: [], relations: [], audit: [],
+    alumni: { profiles: [], slots: [], bookings: [], follows: [], notices: [], history: [] },
+  }}/></MemoryRouter>);
   expect(html).toContain("暂无已接入的体育记录");
   expect(html).not.toContain("运动数据总览");
 });

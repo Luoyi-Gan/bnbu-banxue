@@ -1,3 +1,5 @@
+import type { Workspace } from '../live/api'
+import { liveRelationships, liveRelationshipChanges } from './liveRelationships'
 import { ArrowRight, CalendarDays, Maximize, Minus, Network, Plus, RotateCcw, Search, UsersRound, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Link } from 'react-router-dom'
@@ -11,10 +13,11 @@ import './relationshipGraph.css'
 type Engine = typeof import('./relationshipEngine')
 const dateLabel = (date: string | null) => date ? new Date(date).toLocaleString('zh-CN') : '未提供（不推测历史时间）'
 
-export function V2RelationshipGraph({ state }: { state: V2State }) {
+export function V2RelationshipGraph({ state, workspace }: { state: V2State; workspace?: Workspace | null }) {
   const { persistenceError } = useV2()
   const [demo, setDemo] = useState(false), [kind, setKind] = useState('all'), [relation, setRelation] = useState('all'), [query, setQuery] = useState(''), [history, setHistory] = useState(false), [page, setPage] = useState(0)
-  const real = useMemo(() => adaptRelationships(state), [state])
+  const selfName = workspace !== undefined ? String(workspace?.entities.find(e => e.kind === 'profile' && e.ownerId === workspace.account.id)?.data.nickname ?? workspace?.account.name ?? '我') : state.profile?.nickname ?? '我'
+  const real = useMemo(() => workspace !== undefined ? liveRelationships(workspace) : adaptRelationships(state), [state, workspace])
   const entities = useMemo(() => demo ? relationshipDemo() : real, [demo, real])
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(real.filter(e => e.members.length).slice(0, 2).map(e => e.id)))
   const [selectedId, setSelectedId] = useState('self'), [ready, setReady] = useState(false), [loadError, setLoadError] = useState(false), [retry, setRetry] = useState(0), [zoom, setZoom] = useState(100), [announcement, setAnnouncement] = useState('')
@@ -26,7 +29,7 @@ export function V2RelationshipGraph({ state }: { state: V2State }) {
   const selectedNode = graph.nodes.find(n => n.id === selectedId)
   const selected = entities.find(e => e.id === selectedNode?.entityId)
   const effectiveId = selectedNode ? selectedId : 'self'
-  const selectedChanges = !demo && selected ? state.relationshipHistory?.[selected.id]?.changes ?? [] : []
+  const selectedChanges = !demo && selected ? (workspace !== undefined ? liveRelationshipChanges(workspace, selected.id) : state.relationshipHistory?.[selected.id]?.changes ?? []) : []
 
   useEffect(() => {
     let disposed = false
@@ -95,7 +98,7 @@ export function V2RelationshipGraph({ state }: { state: V2State }) {
       {!ready && <div className="v2-network-loading">{loadError ? <><p>关系图加载失败，连接列表仍可使用。</p><button className="v2-button v2-button-secondary" onClick={() => setRetry(n => n + 1)}>重新加载</button></> : '正在整理校园关系…'}</div>}
       {ready && !slice.length && <p className="v2-network-empty">{entities.length ? '没有符合筛选条件的连接' : '还没有连接，标记活动或加入队伍后会自动出现。'}</p>}
       <p id="v2-network-help" className="v2-network-help">拖动节点或空白处 · 滚轮/双指缩放 · 点击查看详情</p></div>
-    <aside className="v2-network-detail" aria-label="当前连接"><span className="v2-eyebrow">当前连接</span><h4>{selectedNode?.kind === 'person' ? selectedNode.label : selected?.title ?? (state.profile?.nickname ?? '我')}</h4><dl><dt>类型</dt><dd>{selectedNode?.kind === 'person' ? '其他同学' : selected ? entityLabels[selected.kind] : '学生本人'}</dd><dt>关系</dt><dd>{selectedNode?.kind === 'person' ? selectedNode.detail : selected ? relationLabels[selected.relation] : '校园关系的中心节点'}</dd><dt>当前状态</dt><dd>{selected?.status ?? '当前账号'}</dd><dt>建立时间</dt><dd>{selectedNode?.kind === 'person' ? '成员关系时间未提供' : selected ? dateLabel(selected.establishedAt) : '—'}</dd></dl>
+    <aside className="v2-network-detail" aria-label="当前连接"><span className="v2-eyebrow">当前连接</span><h4>{selectedNode?.kind === 'person' ? selectedNode.label : selected?.title ?? selfName}</h4><dl><dt>类型</dt><dd>{selectedNode?.kind === 'person' ? '其他同学' : selected ? entityLabels[selected.kind] : '学生本人'}</dd><dt>关系</dt><dd>{selectedNode?.kind === 'person' ? selectedNode.detail : selected ? relationLabels[selected.relation] : '校园关系的中心节点'}</dd><dt>当前状态</dt><dd>{selected?.status ?? '当前账号'}</dd><dt>建立时间</dt><dd>{selectedNode?.kind === 'person' ? '成员关系时间未提供' : selected ? dateLabel(selected.establishedAt) : '—'}</dd></dl>
       {selected && <><p className="v2-network-privacy">{selected.memberAccess}</p>{selectedNode?.kind !== 'person' && <button className="v2-button v2-button-secondary" disabled={!selected.active || !selected.members.some(m => m.canView)} onClick={() => toggle(selected.id)}>{expanded.has(selected.id) ? '收起关联成员' : '展开关联成员'}{selected.members.some(m => m.canView) ? ` (${selected.members.filter(m => m.canView).length})` : ''}</button>}{expanded.has(selected.id) && selected.members.filter(m => m.canView).length > 6 && <small>每个连接最多展开 6 位可见成员；完整列表请查看来源。</small>}<button disabled={!ready} className="v2-button v2-button-secondary" onClick={focus}>聚焦当前连接</button>{selected.path ? <Link to={selected.path}>查看来源 <ArrowRight size={15}/></Link> : <small>虚构示例，无真实来源入口</small>}</>}
       {selectedChanges.length > 0 && <details><summary>状态历史（{selectedChanges.length}）</summary><ol>{selectedChanges.slice(-10).reverse().map((item, i) => <li key={`${item.at}-${i}`}>{item.status}<small>{dateLabel(item.at)}</small></li>)}</ol>{selectedChanges.length > 10 && <small>显示最近 10 次变化，完整本地历史仍保留。</small>}</details>}
       <div className="v2-network-stats">{(['activity', 'team', 'organization'] as EntityKind[]).map(type => <span key={type}>{type === 'activity' ? <CalendarDays size={16}/> : <UsersRound size={16}/>}<strong>{entities.filter(e => e.kind === type && e.active).length}</strong>{entityLabels[type]}</span>)}</div>

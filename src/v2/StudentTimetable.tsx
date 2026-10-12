@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { BookOpen, CalendarDays, Check, Clock3, ImagePlus, LoaderCircle, MapPin, Upload, UserRound } from 'lucide-react'
-import { useV2 } from './useV2'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, Modal, SectionHeading } from './ui'
-import { campusWeekday, correctTimetableLesson, lessonsForDay, saveTimetable, weekDays, type TimetableLesson } from './timetableModel'
-import { demonstrateRecognition, recognizeTimetable, timetableRecognitionPath, validateTimetablePhoto, type RecognitionStage } from './timetableAdapter'
+import { campusWeekday, lessonsForDay, weekDays, type StudentTimetable as Timetable, type TimetableLesson } from './timetableModel'
+import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, type RecognitionStage } from './timetableAdapter'
 import './timetable.css'
 
 const stages: Record<RecognitionStage, string> = { preparing: '准备图片', recognizing: '识别课程信息', organizing: '整理一周课表' }
 export function StudentTimetable() {
-  const { state, setState, persistenceError } = useV2()
-  const table = state.timetable
+  const live = useWorkspaceBackend()
+  const record = live.data?.entities.find(e => e.kind === 'timetable' && e.ownerId === live.data?.account.id)
+  const table = record ? {...record.data, updatedAt: record.updatedAt} as unknown as Timetable : undefined
+  const recognitionPath = live.data?.capabilities?.timetableRecognition === 'configured' ? '/api/timetable/recognize' : ''
   const [today, setToday] = useState(() => campusWeekday())
   const [day, setDay] = useState(today)
   const [importOpen, setImportOpen] = useState(false)
@@ -40,6 +42,7 @@ export function StudentTimetable() {
   }, [file])
   useEffect(() => () => { controller.current?.abort(); photoVersion.current++ }, [])
   const closeImport = () => {
+    if (live.busy) return
     controller.current?.abort(); controller.current = null; photoVersion.current++; setReadingPhoto(false)
     setStage(null); setImportOpen(false); setFile(null); setSampleLoading(false); setError('')
   }
@@ -61,12 +64,11 @@ export function StudentTimetable() {
     setStage('preparing'); setSampleLoading(demo); setError(''); setMessage('')
     const timeout = setTimeout(() => request.abort('timeout'), 60000)
     try {
-      const result = demo ? await demonstrateRecognition(request.signal, setStage) : await recognizeTimetable(file!, request.signal, setStage)
+      const result = demo ? await demonstrateRecognition(request.signal, setStage) : await recognizeTimetable(file!, request.signal, setStage, recognitionPath)
       if (request.signal.aborted || controller.current !== request) return
       if (demo) { setSample(result); setMessage('正在查看示例课表，未读取照片，也未写入你的个人课表。') }
       else {
-        const next = saveTimetable(result, file!.name)
-        setState(value => value.role === 'student' ? { ...value, timetable: next } : value)
+        if (!await live.mutate('timetable.save', {lessons: result, fileName: file!.name})) return
         setSample(null); setMessage('识别完成，课表已自动显示。请核对课程及周次，必要时点击课程修正。')
       }
       setDay(campusWeekday()); setSelected(null); setFile(null); setImportOpen(false)
@@ -78,21 +80,20 @@ export function StudentTimetable() {
       if (controller.current === request) { controller.current = null; setStage(null); setSampleLoading(false) }
     }
   }
-  const edit = (event: FormEvent<HTMLFormElement>) => {
+  const edit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!table || !current || sample) return
     const data = new FormData(event.currentTarget)
     const input = { name: String(data.get('name')), weekday: Number(data.get('weekday')), startTime: String(data.get('startTime')), endTime: String(data.get('endTime')), period: String(data.get('period')), location: String(data.get('location')), teacher: String(data.get('teacher')), weeks: String(data.get('weeks')), note: String(data.get('note')), needsReview: false }
     try {
-      const next = correctTimetableLesson(table, current.id, input)
-      setState(value => value.role === 'student' ? { ...value, timetable: next } : value)
+      if (!await live.mutate('timetable.correct', {...input, lessonId: current.id})) return
       setDay(input.weekday); setSelected(null); setMessage('课程信息已更新。'); setError('')
     } catch (failure) { setError(failure instanceof Error ? failure.message : '保存失败') }
   }
   return <section className="v2-timetable" aria-label="我的课表">
     <div className="v2-panel v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div><h2>我的课表</h2><p>{table ? `已导入 ${table.lessons.length} 条课程安排` : '上传一张课表照片，查看一周的课程安排。'}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table ? '重新导入' : '导入课表'}</button></div>
     {message && <p className="v2-timetable-message" role="status">{message}</p>}
-    {persistenceError && <p role="alert" className="v2-info-box">本地保存失败，当前更改尚未可靠保存，请勿关闭页面。</p>}
+    {live.error && <p role="alert" className="v2-info-box">{live.error}</p>}
     {sample && <div className="v2-info-box">示例模式 · 以下课程为虚构内容。<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>退出示例</button></div>}
     <section className="v2-panel v2-timetable-calendar">
       <SectionHeading title="一周课程" detail="按星期查看；单 / 双周和上课周次以课程标注为准。" action={<button className="v2-text-button" onClick={() => setDay(campusWeekday())}>回到今天</button>}/>
@@ -102,16 +103,16 @@ export function StudentTimetable() {
         {!shown.length && <Empty icon={table || sample ? BookOpen : CalendarDays} title={table || sample ? `${weekDays[day - 1]}暂无课程记录` : '还没有个人课表'} description={table || sample ? '可切换其他星期查看课程；安排以学校课表为准。' : '点击“导入课表”，上传完整清晰的课表照片。'}/>}
       </div>
     </section>
-    <div className="v2-timetable-footnote"><span>{table && !sample ? `来源：${table.fileName} · 更新于 ${new Date(table.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '识别后自动按星期归类；未识别清楚的内容保留待核对。'}</span><small>当前课表保存在本浏览器，尚未接入账号云端同步。</small></div>
+    <div className="v2-timetable-footnote"><span>{table && !sample ? `来源：${table.fileName} · 更新于 ${new Date(table.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '识别后自动按星期归类；未识别清楚的内容保留待核对。'}</span><small>个人课表保存到伴学后台，示例课表不会保存。</small></div>
     {importOpen && <Modal title="导入我的课表" onClose={closeImport}>
-      {stage ? <div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading ? '正在演示识别过程' : '正在识别课表'}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{label}</li>)}</ol><p>识别完成后自动显示课表，原有课表在识别成功前保留。</p><button className="v2-button v2-button-secondary" onClick={closeImport}>取消识别</button></div> : <div className="v2-timetable-import">
+      {stage ? <div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading ? '正在演示识别过程' : '正在识别课表'}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{label}</li>)}</ol><p>识别完成后自动显示课表，原有课表在识别成功前保留。</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy ? '正在保存' : '取消识别'}</button></div> : <div className="v2-timetable-import">
         <p>请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。</p>
         <label className="v2-timetable-upload"><input type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择课表照片" onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = '' }}/>{preview ? <img src={preview} alt="待识别的课表照片"/> : <><ImagePlus size={32}/><strong>选择课表照片</strong><span>上传照片或课表截图</span></>}</label>
         {readingPhoto && <p role="status">正在读取图片…</p>}
         {file && <p className="v2-timetable-filename">{file.name} · {(file.size / 1024 / 1024).toFixed(1)} MB</p>}
         {table && <p>识别成功后将替换当前课表；失败或取消保留原有记录。</p>}
-        {!timetableRecognitionPath && <div className="v2-info-box">图片识别服务尚未接入，当前照片不会上传。可先体验加载过程和示例课表。</div>}
-        {error && <p role="alert">{error}</p>}
+        {!recognitionPath && <div className="v2-info-box">图片识别服务尚未接入，当前照片不会上传。可先体验加载过程和示例课表。</div>}
+        {(error || live.error) && <p role="alert">{error || live.error}</p>}
         <button className="v2-button v2-button-primary" disabled={!file || readingPhoto} onClick={() => void start(false)}><Upload size={16}/>开始识别</button>
         <button className="v2-button v2-button-secondary" onClick={() => void start(true)}>体验示例识别流程</button>
       </div>}
@@ -123,7 +124,7 @@ export function StudentTimetable() {
         <label>上课星期<select name="weekday" defaultValue={current.weekday}>{weekDays.map((name, index) => <option value={index + 1} key={name}>{name}</option>)}</select></label>
         <div className="v2-form-two"><label>开始时间<input type="time" name="startTime" defaultValue={current.startTime}/></label><label>结束时间<input type="time" name="endTime" defaultValue={current.endTime}/></label></div>
         <label>节次<input name="period" maxLength={60} defaultValue={current.period}/></label><label>上课地点<input name="location" maxLength={100} defaultValue={current.location}/></label><label>任课老师<input name="teacher" maxLength={80} defaultValue={current.teacher}/></label><label>上课周次<input name="weeks" maxLength={100} defaultValue={current.weeks} placeholder="例如：1–16 周 / 单周"/></label><label>备注<textarea name="note" maxLength={300} defaultValue={current.note}/></label>
-        {error && <p role="alert">{error}</p>}<button className="v2-button v2-button-primary">保存修正</button>
+        {(error || live.error) && <p role="alert">{error || live.error}</p>}<button disabled={live.busy} className="v2-button v2-button-primary">保存修正</button>
       </form>}
     </Drawer>}
   </section>

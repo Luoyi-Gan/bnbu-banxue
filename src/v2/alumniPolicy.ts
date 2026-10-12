@@ -69,7 +69,7 @@ export function cancelAlumniBooking(state: V2State, actor: AlumniActor, id: stri
   return { ...state, alumni: record(next, actor, id, status === 'pending' ? '校友交流申请已撤回' : '校友交流预约已取消', reason.trim(), [booking!.student, person!.owner], now) }
 }
 
-export function submitAlumniCertification(state: V2State, actor: AlumniActor, input: Pick<AlumniProfile, 'name' | 'major' | 'graduationYear' | 'city' | 'direction' | 'experience' | 'topics' | 'bio' | 'evidence'>, now = Date.now()): V2State {
+export function submitAlumniCertification(state: V2State, actor: AlumniActor, input: Pick<AlumniProfile, 'name' | 'major' | 'graduationYear' | 'city' | 'direction' | 'experience' | 'topics' | 'bio' | 'evidence' | 'studentNumber' | 'studentNumberSource'>, now = Date.now()): V2State {
   const data = alumniData(state), previous = data.profiles.find(p => p.owner === actor.id)
   demand(actor.role === 'student' && (!previous || previous.status === 'rejected'), '已有待审或通过的校友认证。')
   demand(input.name.trim() && input.major.trim() && input.evidence.trim() && input.city.trim() && input.experience.trim() && input.topics.trim(), '请补充必填资料与核验说明。')
@@ -98,7 +98,7 @@ export function hasAlumniConflict(state: V2State, personId: string, slot: Pick<A
 
 function hasConflict(state: V2State, student: string, slot: AlumniSlot, except?: string) {
   const data = alumniData(state)
-  return (student === studentName && managedSlots(state).some(s => (state.coffeeBookings.includes(s.id) || coffeeData(state).bookings.some(b => b.student === studentName && b.status === 'confirmed' && b.proposedSlotId === s.id)) && overlap(s, slot))) || data.bookings.some(b => b.id !== except && b.status === 'confirmed' && b.student === student && data.slots.some(s => s.id === b.slotId && overlap(s, slot)))
+  return managedSlots(state).some(s => ((student === studentName && state.coffeeBookings.includes(s.id)) || coffeeData(state).bookings.some(b => b.student === student && b.status === 'confirmed' && (b.slotId === s.id || b.proposedSlotId === s.id))) && overlap(s, slot)) || data.bookings.some(b => b.id !== except && b.status === 'confirmed' && (b.student === student || data.profiles.some(p => p.owner === student && data.slots.some(s => s.id === b.slotId && s.alumniId === p.id))) && data.slots.some(s => s.id === b.slotId && overlap(s, slot)))
 }
 
 export function requestAlumniChat(state: V2State, actor: AlumniActor, slotId: string, question: string, now = Date.now()): V2State {
