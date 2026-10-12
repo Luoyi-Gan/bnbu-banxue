@@ -231,6 +231,7 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   const organization=(await command('organization.apply',{name:'测试组织-'+randomUUID(),description:'本地说明',category:'学习',contact:'本地测试联系人'})).data;
   cookie=memberCookie;
   assert.ok(!(await request('/api/workspace')).entities.some(e=>e.id===organization.id));
+  await rejectCommand('relation.set',{id:organization.id,kind:'follow',enabled:true},400);
   cookie=reviewerCookie;
   await command('certification.review',{id:certification.id,approve:true});
   await command('organization.review',{id:organization.id,approve:true});
@@ -240,6 +241,9 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   const publishedView=await request('/api/workspace');
   assert.ok(publishedView.entities.some(e=>e.id===organization.id));
   assert.ok(publishedView.entities.some(e=>e.id===memberActivity.id));
+  await command('relation.set',{id:organization.id,kind:'follow',enabled:true});
+  await command('relation.set',{id:organization.id,kind:'follow',enabled:true});
+  assert.equal((await request('/api/workspace')).relations.filter(r=>r.entityId===organization.id && r.kind==='follow').length,1);
   cookie=reviewerCookie;
   await command('certification.review',{id:certification.id,approve:false,reason:'本地验收撤销'});
   cookie=authorCookie;
@@ -250,6 +254,9 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   await command('organization.update',{id:organization.id,description:'本地说明',contact:'本地测试联系人',visibility:'hidden',reason:'验收结束'});
   cookie=memberCookie;
   assert.ok(!(await request('/api/workspace')).entities.some(e=>[organization.id,memberActivity.id].includes(e.id)));
+  await rejectCommand('relation.set',{id:organization.id,kind:'follow',enabled:true},400);
+  await command('relation.set',{id:organization.id,kind:'follow',enabled:false});
+  assert.ok(!(await request('/api/workspace')).relations.some(r=>r.entityId===organization.id && r.kind==='follow'));
   cookie=authorCookie;
   assert.ok((await request('/api/workspace')).notifications.some(n=>n.entityId===organization.id && n.event==='organization.update'));
   cookie=operatorCookie;

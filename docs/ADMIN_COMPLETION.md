@@ -2333,3 +2333,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 教师失效修复的真实 PostgreSQL 补验：Docker smoke 现直接断言停用教师的当事人取消历史仍可读、资料投影 disabled、时段不可预约；无关审核员看不到该教师交流资料、时段及人员条目。扩展后的完整容器脚本通过，未改写既有历史实体。
 
 2026-10-12 组织与成员活动真实 PostgreSQL 容器补验：无认证学生发活动被拒；社团认证和组织申请由审核员通过（通过无需原因）；另一学生读取已公开组织及成员活动；认证撤销后禁止新建和恢复活动，但允许作者下架；运营下架已入驻组织后公开视图移除并通知申请人。扩展 scripts/docker-postgres-smoke.mjs 完整通过，不改 UI 或业务规则。
+
+组织关注边界补验：待审或下架组织不能新增关注；公开组织可以关注，重复请求不产生重复关系；下架后仍允许取消原有关注。扩展 Docker smoke 全部通过。学生 services.tsx 读取共享 entities/relations 并调用 relation.set，无本地模拟关注写入。
