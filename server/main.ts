@@ -22,6 +22,8 @@ import {
   portalRosterRead,
   portalRosterSource,
   portalRosterEntries,
+  portalRosterConfirmation,
+  portalRosterConfirm,
 } from "./sports/portal-roster";
 import {
   portalSettlementPreview,
@@ -495,6 +497,21 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const rosterConfirmationWrite =
+          /^\/api\/v1\/roster-imports\/([^/]+)\/confirmation$/.exec(pathname);
+        if (rosterConfirmationWrite) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalRosterConfirm(
+              new Repository(db),
+              token!,
+              rosterConfirmationWrite[1],
+              input,
+              key,
+            ),
+          });
+        }
         const settlementConfirm =
           /^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(
             pathname,
@@ -944,6 +961,16 @@ export function createApiServer(
           ),
         );
       }
+      const rosterConfirmationRead =
+        /^\/api\/v1\/roster-imports\/([^/]+)\/confirmation$/.exec(pathname);
+      if (request.method === "GET" && rosterConfirmationRead)
+        return send(response, 200, {
+          data: portalRosterConfirmation(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            rosterConfirmationRead[1],
+          ),
+        });
       const rosterImportsRead =
         /^\/api\/v1\/class-sections\/([^/]+)\/roster-imports(\/current)?$/.exec(
           pathname,

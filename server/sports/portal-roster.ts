@@ -1,4 +1,4 @@
-import { demand, ServiceError, type Account } from "../auth";
+import { authenticate, demand, ServiceError, type Account } from "../auth";
 import { execute } from "../commands";
 import {
   Repository,
@@ -10,6 +10,55 @@ import { ownedCourse } from "./courses";
 import { sportsWriteGate } from "./system";
 import { uploadRosterFile } from "./roster-files";
 import { workbookAccess, type WorkbookSheet } from "./workbook";
+
+export function portalRosterConfirmation(
+  repo: Repository,
+  actor: Account,
+  id: string,
+) {
+  const imported = repo.get(id, "sportsPortalRosterImport");
+  ownedCourse(repo, actor, imported.data.courseId);
+  sportsWriteGate(repo, "sports.roster.read");
+  const confirmed = repo
+    .all("sportsPortalRosterConfirmation")
+    .find((row) => row.data.importId === id);
+  if (!confirmed)
+    throw new ServiceError(
+      404,
+      "PERMISSION_RESOURCE_NOT_FOUND",
+      "该名单尚未确认。",
+    );
+  return {
+    id: confirmed.id,
+    rosterImportId: id,
+    snapshotId: confirmed.data.snapshotId,
+    confirmedAt: confirmed.createdAt,
+  };
+}
+
+export function portalRosterConfirm(
+  repo: Repository,
+  token: string,
+  id: string,
+  input: Fields,
+  key: string,
+) {
+  demand(
+    Object.keys(input).every((k) => k === "expectedVersion"),
+    "名单确认参数无效。",
+  );
+  const actor = authenticate(repo.db, token),
+    imported = repo.get(id, "sportsPortalRosterImport");
+  ownedCourse(repo, actor, imported.data.courseId);
+  execute(
+    repo.db,
+    token,
+    "sports.roster.portal.confirm",
+    { id, expectedVersion: input.expectedVersion },
+    key,
+  );
+  return portalRosterConfirmation(repo, actor, id);
+}
 
 export async function portalRosterUpload(
   repo: Repository,

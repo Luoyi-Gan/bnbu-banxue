@@ -148,6 +148,42 @@ it("原版multipart名单上传保留原件与列选择，重试不重复且不�
     ).toBe(1);
     for (const who of [f.student, f.other, f.admin])
       expect((await post(randomUUID(), who)).status).toBe(403);
+    const confirmationUrl =
+      root + "/roster-imports/" + saved.id + "/confirmation";
+    const missing = await read(confirmationUrl);
+    expect(missing.status).toBe(404);
+    expect((await missing.json()).code).toBe("PERMISSION_RESOURCE_NOT_FOUND");
+    const confirm = (version: number, key = randomUUID(), who = f.teacher) =>
+      fetch(confirmationUrl, {
+        method: "POST",
+        headers: {
+          Cookie: `bnbu_session=${who.token}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": key,
+        },
+        body: JSON.stringify({ expectedVersion: version }),
+      });
+    expect((await confirm(99)).status).toBe(409);
+    for (const who of [f.student, f.other, f.admin])
+      expect((await confirm(saved.version, randomUUID(), who)).status).toBe(
+        403,
+      );
+    const confirmationKey = randomUUID(),
+      confirmation = await confirm(saved.version, confirmationKey);
+    expect(confirmation.status).toBe(200);
+    const confirmed = (await confirmation.json()).data;
+    expect(
+      (await (await confirm(saved.version, confirmationKey)).json()).data,
+    ).toEqual(confirmed);
+    expect((await (await read(confirmationUrl)).json()).data).toEqual(
+      confirmed,
+    );
+    expect(f.repo.all("sportsRosterSnapshot")).toHaveLength(1);
+    expect(f.repo.all("sportsRosterBasis")[0].data.snapshotId).toBe(
+      confirmed.snapshotId,
+    );
+    expect(f.repo.all("sportsEnrollment")).toHaveLength(1);
+    expect((await confirm(saved.version)).status).toBe(409);
   } finally {
     server.closeAllConnections();
     await new Promise<void>((resolve) => server.close(() => resolve()));

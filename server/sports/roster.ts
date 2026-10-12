@@ -81,6 +81,44 @@ export function sportsRosterCommand(
   input: Fields,
   source?: { entity: Entity; sheet: WorkbookSheet },
 ): Entity | undefined {
+  if (action === "sports.roster.portal.confirm") {
+    demand(
+      Object.keys(input).every((k) => ["id", "expectedVersion"].includes(k)),
+      "名单确认参数无效。",
+    );
+    const imported = repo.get(input.id, "sportsPortalRosterImport");
+    usable(repo, actor, imported.data.courseId);
+    demand(imported.ownerId === actor.id, "只能确认本人导入的名单。", 403);
+    version(imported, { version: input.expectedVersion });
+    const latest = repo
+      .all("sportsPortalRosterImport")
+      .filter((row) => row.data.courseId === imported.data.courseId)
+      .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence))[0];
+    demand(
+      latest.id === imported.id,
+      "已有更新名单，请刷新后核对当前版本。",
+      409,
+    );
+    demand(
+      !repo
+        .all("sportsPortalRosterConfirmation")
+        .some((row) => row.data.importId === imported.id),
+      "名单已经确认，请刷新确认结果。",
+      409,
+    );
+    const snapshot = sportsRosterCommand(repo, actor, "sports.roster.confirm", {
+      id: imported.data.draftId,
+      version: imported.data.draftVersion,
+      basisVersion: imported.data.basisVersion,
+      confirmed: true,
+    })!;
+    return repo.create("sportsPortalRosterConfirmation", actor.id, {
+      courseId: imported.data.courseId,
+      importId: imported.id,
+      importVersion: imported.version,
+      snapshotId: snapshot.id,
+    });
+  }
   if (action === "sports.roster.portal.import") {
     demand(
       Object.keys(input).every((k) =>
@@ -104,6 +142,8 @@ export function sportsRosterCommand(
     return repo.create("sportsPortalRosterImport", actor.id, {
       courseId: draft.data.courseId,
       draftId: draft.id,
+      draftVersion: draft.version,
+      basisVersion: basis(repo, String(draft.data.courseId))?.version ?? 0,
       sourceId: input.id,
       sheet: input.sheet,
       sequence:

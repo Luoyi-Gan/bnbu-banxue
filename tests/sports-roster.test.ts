@@ -48,6 +48,46 @@ it("原件按列选择生成可确认草稿，同原件不同选择不能静默�
   const snapshot = f.confirm(draft);
   expect(snapshot.data.rows).toEqual(draft.data.rows);
 });
+it("原版确认拒绝旧上传或已修改草稿，不覆盖当前名单基准", () => {
+  const f = setup();
+  const upload = (number: string) => {
+    const source = f.repo.create("sportsRosterSource", f.teacher.account.id, {
+      courseId: f.course.id,
+      sheets: [
+        {
+          index: 0,
+          name: "名单",
+          csv: `学号,姓名\n${number},学生`,
+          rowNumbers: [1, 2],
+          issues: [],
+        },
+      ],
+    });
+    return f.run(f.teacher, "sports.roster.portal.import", {
+      id: source.id,
+      sheet: 0,
+      fieldMapping: { studentNumber: "学号", fullName: "姓名" },
+    });
+  };
+  const first = upload("001"),
+    second = upload("002");
+  expect(() =>
+    f.run(f.teacher, "sports.roster.portal.confirm", {
+      id: first.id,
+      expectedVersion: first.version,
+    }),
+  ).toThrow("更新名单");
+  const draft = f.repo.get(second.data.draftId);
+  f.repo.save(draft, { csv: "外部核对发生变化" });
+  expect(() =>
+    f.run(f.teacher, "sports.roster.portal.confirm", {
+      id: second.id,
+      expectedVersion: second.version,
+    }),
+  ).toThrow();
+  expect(f.repo.all("sportsRosterSnapshot")).toHaveLength(0);
+  expect(f.repo.all("sportsRosterBasis")).toHaveLength(0);
+});
 function setup() {
   const db = openDatabase(":memory:");
   dbs.push(db);
