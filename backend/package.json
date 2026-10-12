@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "start": "node dist/main.mjs"
+    "start": "node dist/main.mjs",
+    "start:postgres": "node dist/postgres.mjs"
   }
 }

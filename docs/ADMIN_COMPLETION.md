@@ -1439,3 +1439,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### PostgreSQL 注册与邮箱验证码
 新增 PostgresEmail：发送间隔、验证码有效期、错误次数和单次消费由数据库事务与邮箱锁保护；注册与邮箱证明同事务写入，注册角色保持空列表，不通过邮箱自动授予学校职责。原外部邮件发送传输层提取为共享函数，SQLite 和 PostgreSQL 复用同一协议及发送确认逻辑；发信网络请求在事务外执行，不长期占用事务锁。
 真实 PostgreSQL 11 项与原 backend-http 17 项共 28 项通过；服务端类型检查及修改文件 lint 通过。新案例覆盖并发发送、并发注册、重放拒绝、连续错误上限、封禁账号和本人邮箱确认；测试强制使用开发收件箱，不向真实邮箱发信。当前 API 路由尚未切换 PostgreSQL，剩余业务命令异步迁移与三端 Docker 联调仍待完成。
+
+### PostgreSQL 账号 HTTP 路由
+提取原 HTTP JSON 读取、Cookie 读取和响应辅助函数供两套数据层复用，增加 PostgreSQL API 路由和独立 postgres.mjs 启动入口；默认端口 4180，要求显式 DATABASE_URL，Cookie Secure 与来源白名单可配置。尚未迁移的业务接口明确返回 503，不回退 SQLite。原 4174 服务未切换。
+真实 PostgreSQL HTTP 注册、登录、会话恢复、退出、跨域拒绝新增案例通过；与原 HTTP 测试合计 29 项通过，后端类型检查、修改文件 lint 与双入口构建通过。PostgreSQL 下完整业务路由仍待迁移，当前入口不能作为三端已完成的交付。

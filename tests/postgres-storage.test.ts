@@ -9,6 +9,8 @@ import { openDatabase } from '../backend/src/database';
 import { createAccount, hashPassword, digest } from '../backend/src/auth';
 import { PostgresAuth } from '../backend/src/storage/postgres-auth';
 import { PostgresEmail } from '../backend/src/storage/postgres-email';
+import { createPostgresApiServer } from '../backend/src/postgres-api';
+import type { AddressInfo } from 'node:net';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -188,5 +190,30 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(mail.verifyOwnEmail({...actor,status:'banned'},ownCode)).rejects.toMatchObject({status:403});
     expect(await mail.verifyOwnEmail(actor,ownCode)).toEqual({verified:true});
     await expect(mail.verifyOwnEmail(actor,ownCode)).rejects.toThrow('验证码已失效');
+  });
+  it('serves real HTTP registration, cookies, session restoration and logout using PostgreSQL', async () => {
+    const server = createPostgresApiServer(db,{localOutbox:true});
+    await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+    const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    const post = (path:string,data:unknown,cookie?:string,origin?:string)=>fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{}),...(origin?{Origin:origin}:{})},body:JSON.stringify(data)});
+    try {
+      expect((await (await fetch(base+'/api/health')).json()).storage).toBe('postgresql');
+      expect((await fetch(base+'/api/auth/me')).status).toBe(401);
+      const email='http-postgres@example.test',password='Http-postgres-123';
+      expect((await post('/api/auth/verification-codes',{email},undefined,'https://untrusted.example')).status).toBe(403);
+      expect((await post('/api/auth/verification-codes',{email})).status).toBe(200);
+      const code=/\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1',[email])).rows[0].body)![0];
+      expect((await post('/api/auth/register',{email,password,code})).status).toBe(201);
+      const login=await post('/api/auth/sign-in',{identifier:email,password});
+      expect(login.status).toBe(200);
+      expect(login.headers.get('set-cookie')).toContain('HttpOnly; SameSite=Strict');
+      const cookie=login.headers.get('set-cookie')!.split(';')[0];
+      const me=await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}});
+      expect((await me.json()).account.email).toBe(email);
+      expect((await post('/api/auth/logout',{},cookie)).status).toBe(200);
+      expect((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status).toBe(401);
+    } finally {
+      await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));
+    }
   });
 });

@@ -1,8 +1,6 @@
 import { searchStudents } from './student-search';
 import {
   createServer,
-  type IncomingMessage,
-  type ServerResponse,
 } from "node:http";
 import { resolve } from "node:path";
 import {
@@ -145,45 +143,7 @@ import { student } from "./community";
 import { sendVerification } from "./mail-delivery";
 import { checkSchoolIdentity } from "./identity";
 
-const cookieToken = (request: IncomingMessage) =>
-  request.headers.cookie
-    ?.split(";")
-    .map((s) => s.trim())
-    .find((s) => s.startsWith("bnbu_session="))
-    ?.slice("bnbu_session=".length);
-function send(response: ServerResponse, status: number, data: unknown) {
-  response.writeHead(status, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
-  });
-  response.end(JSON.stringify(data));
-}
-async function body(request: IncomingMessage): Promise<Fields> {
-  demand(
-    request.headers["content-type"]?.startsWith("application/json"),
-    "请求必须使用 JSON。",
-    415,
-  );
-  let size = 0;
-  const chunks: Buffer[] = [];
-  for await (const chunk of request) {
-    size += chunk.length;
-    demand(size <= 12 * 1024 * 1024, "请求过大。", 413);
-    chunks.push(chunk);
-  }
-  let value: unknown;
-  try {
-    value = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    throw new ServiceError(400, "INVALID_JSON", "JSON 格式无效。");
-  }
-  demand(
-    value && typeof value === "object" && !Array.isArray(value),
-    "请求须为 JSON 对象。",
-  );
-  return value as Fields;
-}
+import { cookieToken, send, body } from "./http";
 export function createApiServer(
   db: Database,
   options: { localOutbox?: boolean } = {},

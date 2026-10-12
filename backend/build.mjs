@@ -11,7 +11,7 @@ await build({
     outDir: 'backend/dist',
     emptyOutDir: true,
     minify: false,
-    lib: { entry: fileURLToPath(new URL('./main.ts', import.meta.url)), formats: ['es'], fileName: () => 'main.mjs' },
-    rollupOptions: { external: [/^node:/, 'sharp', 'ffprobe-static'] },
+    lib: { entry: { main: fileURLToPath(new URL('./main.ts', import.meta.url)), postgres: fileURLToPath(new URL('./postgres-main.ts', import.meta.url)) }, formats: ['es'], fileName: (_format, name) => `${name}.mjs` },
+    rollupOptions: { external: [/^node:/, 'sharp', 'ffprobe-static', 'pg'] },
   },
 });
