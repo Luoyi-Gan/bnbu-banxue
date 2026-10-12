@@ -38,6 +38,23 @@ export function studentMediaProjection(m:Entity) {
 }
 export async function mediaCommand(repo:PostgresRepository,actor:Account,operation:string,input:Fields) {
   await recordDraftGate(repo,actor);
+  if(operation==='capture') {
+    demand(Object.keys(input).every(k=>['sessionId','mimeType','fileSizeBytes','declaredContentSha256'].includes(k)),'拍摄登记参数无效。');
+    const session=await repo.get(input.sessionId,'sportsSession');
+    demand(session.ownerId===actor.id,'只能登记本人运动照片。',403);
+    const clock=session.data.clock as unknown as SportsClock,now=Date.now();
+    demand(clock.state==='ACTIVE' && !session.data.cancelledAt && now>=clock.changedAt,'只能在运动进行中登记实时照片。',409);
+    const course=await repo.get(session.data.courseId,'sportsCourse'),semester=await repo.get(session.data.semesterId,'sportsSemester');
+    demand(course.data.settlementStatus!=='SETTLED' && semester.data.status!=='ARCHIVED','课程已结算或学期已归档。',409);
+    const mimeType=enumField(input,'mimeType',['image/jpeg','image/png'] as const);
+    const fileSizeBytes=integerField(input,'fileSizeBytes',1,10*1024*1024);
+    const declaredContentSha256=textField(input,'declaredContentSha256',64);
+    demand(/^[a-f0-9]{64}$/.test(declaredContentSha256),'照片校验值无效。');
+    const captures=(await repo.all('sportsPhotoCapture')).filter(c=>c.ownerId===actor.id && c.data.sessionId===session.id);
+    demand(!captures.some(c=>c.data.declaredContentSha256===declaredContentSha256),'同一张照片已经登记。',409);
+    const capture=await repo.create('sportsPhotoCapture',actor.id,{sessionId:session.id,courseId:course.id,mimeType,fileSizeBytes,declaredContentSha256,registeredAt:now,sessionVersion:session.version});
+    return {captureId:capture.id,sessionId:session.id,registeredAt:new Date(now).toISOString(),declaredContentSha256};
+  }
   if(operation==='initiate') {
     demand(Object.keys(input).every(k=>['sessionId','businessPurpose','mediaType','mimeType','fileSizeBytes','captureSource','declaredContentSha256','durationSeconds'].includes(k)),'材料上传参数无效。');
     const session=await repo.get(input.sessionId,'sportsSession');

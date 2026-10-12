@@ -354,6 +354,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', recordSubmit[2]==='supplements'?'sports.record.supplement':'sports.record.submit',{...input,id:decodeURIComponent(recordSubmit[1])},key)});
         }
         const mediaWrite=/^\/api\/v1\/(media-uploads|media)(?:\/([^/]+)\/(confirm|bind))?$/.exec(pathname);
+        const captureWrite=/^\/api\/v1\/exercise-sessions\/([^/]+)\/photo-captures$/.exec(pathname);
+        if(captureWrite) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('sessionId' in input),'运动标识须来自路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.media.capture',{...input,sessionId:decodeURIComponent(captureWrite[1])},key)});
+        }
         if(mediaWrite) {
           demand((mediaWrite[1]==='media-uploads' && (!mediaWrite[3] || mediaWrite[3]==='confirm')) || (mediaWrite[1]==='media' && mediaWrite[3]==='bind'),'接口不存在。',404);
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'材料标识须使用路径。');

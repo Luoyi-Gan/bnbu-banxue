@@ -348,6 +348,23 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     } finally {await new Promise<void>(resolve=>ai.close(()=>resolve()));}
 
   });
+  it('registers immutable photo hashes only during an owned active exercise',async()=>{
+    const auth=new PostgresAuth(db),student=await auth.login('sports-reader-student@example.test','Sports-read-123'),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123');
+    const session=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'UPCOMING'}),course=await repo.create('sportsCourse',teacher.account.id,{semesterId:semester.id});
+      return repo.create('sportsSession',student.account.id,{courseId:course.id,semesterId:semester.id,clock:startClock(Date.now()-1000)});
+    });
+    const fields={sessionId:session.id,mimeType:'image/jpeg',fileSizeBytes:123,declaredContentSha256:'a'.repeat(64)},key=randomUUID();
+    const capture=await executePostgres(db,student.token,'sports.media.capture',fields,key);
+    expect(capture).toMatchObject({captureId:expect.any(String),sessionId:session.id,declaredContentSha256:fields.declaredContentSha256});
+    expect(await executePostgres(db,student.token,'sports.media.capture',fields,key)).toEqual(capture);
+    await expect(executePostgres(db,student.token,'sports.media.capture',fields,randomUUID())).rejects.toMatchObject({status:409});
+    await expect(executePostgres(db,teacher.token,'sports.media.capture',fields,randomUUID())).rejects.toMatchObject({status:403});
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(session.id),{clock:{...startClock(Date.now()-1000),state:'ENDED',endedAt:Date.now()}});});
+    await expect(executePostgres(db,student.token,'sports.media.capture',{...fields,declaredContentSha256:'b'.repeat(64)},randomUUID())).rejects.toMatchObject({status:409});
+    expect(await executePostgres(db,student.token,'sports.media.capture',fields,key)).toEqual(capture);
+    const saved=await db.transaction(client=>new PostgresRepository(client).get(capture.captureId));expect(saved.data).toMatchObject({sessionId:session.id,fileSizeBytes:123,sessionVersion:1});
+  });
   it('uses the shared teacher decision policy with PostgreSQL ownership and atomic progress', async()=>{
     const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),other=await auth.login('sports-reader-teacher@example.test','Sports-read-123');
     const proof=await sharp({create:{width:4,height:4,channels:3,background:'#102030'}}).png().toBuffer(),proofHash=createHash('sha256').update(proof).digest('hex');
