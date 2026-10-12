@@ -70,13 +70,13 @@ export function communityCommand(
     const entity = repo.get(input.id);
     demand(["post", "comment"].includes(entity.kind), "对象类型无效。");
     const status = enumField(input, "status", ["visible", "hidden"]);
-    const reason = textField(input, "reason", 1000);
+    const reason = textField(input, "reason", 1000, entity.data.status === "pending" && status === "visible");
     demand(entity.data.status !== status, "内容已处于该状态。", 409);
     repo.notify(
       [entity.ownerId!],
       entity.id,
       action,
-      `内容${status === "visible" ? "已公开" : "已隐藏"}：${reason}`,
+      `内容${status === "visible" ? "已公开" : "已隐藏"}${reason ? `：${reason}` : ""}`,
     );
     return repo.save(entity, { status, reviewNote: reason });
   }

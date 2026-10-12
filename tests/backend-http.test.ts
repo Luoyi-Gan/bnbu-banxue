@@ -42,6 +42,19 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("待审帖子和评论通过可不填原因，驳回下架恢复仍须原因",()=>{
+    const {a,reviewer,repo,run,db}=setup();
+    for(const kind of ['post','comment']) {
+      const item=repo.create(kind,a.id,{status:'pending',title:'测试',body:'测试'});
+      expect(()=>run(reviewer,'content.review',{id:item.id,status:'hidden'})).toThrow();
+      run(reviewer,'content.review',{id:item.id,status:'visible'});
+      expect(repo.get(item.id).data).toMatchObject({status:'visible',reviewNote:''});
+      expect(snapshot(db,a.account).notifications.some(n=>n.body==='内容已公开')).toBe(true);
+      expect(()=>run(reviewer,'content.review',{id:item.id,status:'hidden',reason:''})).toThrow();
+      run(reviewer,'content.review',{id:item.id,status:'hidden',reason:'核查'});
+      expect(()=>run(reviewer,'content.review',{id:item.id,status:'visible',reason:''})).toThrow();
+    }
+  });
   it("关闭提醒只保存本人偏好，不删通知或改阅读状态", () => {
     const {a,b,run,repo,db} = setup();
     repo.notify([a.id],null,"room.apply","有人申请加入队伍");
@@ -265,7 +278,7 @@ describe("API、持久化和跨角色联动", () => {
       body: JSON.stringify({action:'content.review',input:{id:post.id,status,reason},requestId}),
     });
     expect((await reviewRequest(f.b,'visible','越权')).status).toBe(403);
-    expect((await reviewRequest(f.reviewer,'visible','')).status).toBe(400);
+    expect((await reviewRequest(f.reviewer,'hidden','')).status).toBe(400);
     expect(f.repo.get(post.id).data.status).toBe('pending');
     const reviewKey = randomUUID();
     expect((await reviewRequest(f.reviewer,'visible','符合社区要求',reviewKey)).status).toBe(200);
