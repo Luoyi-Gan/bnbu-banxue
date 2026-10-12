@@ -263,7 +263,7 @@ export function sportsCourseCommand(
   if (action === "sports.template.publish") {
     sportsRole(repo, actor, "admin");
     requireSportsSuperAdmin(repo, actor);
-    return repo.create("sportsTemplate", actor.id, {
+    const template = repo.create("sportsTemplate", actor.id, {
       name: textField(input, "name", 100),
       status: "published",
       policy: "V8.1",
@@ -273,6 +273,12 @@ export function sportsCourseCommand(
       singleCap: 60,
       dailyLimit: 1,
     });
+    repo.db
+      .prepare(
+        "INSERT INTO sports_template_publications(template_id) VALUES(?)",
+      )
+      .run(template.id);
+    return template;
   }
   if (action === "sports.course.window") {
     const course = ownedCourse(repo, actor, input.id);

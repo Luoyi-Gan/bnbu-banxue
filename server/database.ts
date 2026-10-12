@@ -83,6 +83,20 @@ export function openDatabase(filename: string) {
     "INSERT OR IGNORE INTO schema_migrations VALUES(6,strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
   );
   seedConversions(db);
+  transaction(db, () => {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS sports_template_publications (
+        sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+        template_id TEXT NOT NULL UNIQUE REFERENCES entities(id)
+      );
+      INSERT INTO sports_template_publications(template_id)
+      SELECT id FROM entities
+      WHERE kind='sportsTemplate' AND json_extract(data,'$.status')='published'
+        AND id NOT IN (SELECT template_id FROM sports_template_publications)
+      ORDER BY created_at,id;
+      INSERT OR IGNORE INTO schema_migrations VALUES(7,strftime('%Y-%m-%dT%H:%M:%fZ','now'));
+    `);
+  });
   return db;
 }
 

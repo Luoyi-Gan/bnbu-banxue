@@ -17,6 +17,10 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import {
+  portalExerciseGoal,
+  portalRuleTemplates,
+} from "./sports/portal-rule-templates";
 import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
 import { portalLogin, portalMe, portalSecurity } from "./sports/portal";
@@ -737,6 +741,29 @@ export function createApiServer(
           data: pathname.endsWith("/history")
             ? portalSystemHistory(repo, actor, before)
             : portalSystemRead(repo, actor),
+        });
+      }
+      if (
+        request.method === "GET" &&
+        ["/api/v1/rule-templates", "/api/v1/admin/exercise-goal"].includes(
+          pathname,
+        )
+      ) {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request));
+        return send(response, 200, {
+          data: pathname.endsWith("/rule-templates")
+            ? portalRuleTemplates(
+                repo,
+                actor,
+                Object.fromEntries(
+                  new URL(
+                    request.url!,
+                    "http://localhost",
+                  ).searchParams.entries(),
+                ),
+              )
+            : portalExerciseGoal(repo, actor),
         });
       }
       if (request.method === "GET" && pathname === "/api/v1/me/administrator")
