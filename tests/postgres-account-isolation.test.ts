@@ -81,6 +81,10 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     expect(directory.meta.pagination.limit).toBe(1);
     expect(directory.data[0]).toMatchObject({id:'account-1',studentNumber:'2030123456',collegeName:'Test college',majorName:'Test major'});
     expect(directory.data[0]).not.toHaveProperty('identityId');
+    const adminStudent=await fetch(urls[1]+'/api/v1/students/account-1',{headers:{Cookie:governorCookie}});
+    expect(adminStudent.status).toBe(200);expect((await adminStudent.json()).data.studentNumber).toBe('2030123456');
+    expect((await fetch(urls[1]+'/api/v1/students/account-1',{headers:{Cookie:sportsCookie}})).status).toBe(403);
+    expect((await fetch(urls[1]+'/api/v1/students/missing',{headers:{Cookie:governorCookie}})).status).toBe(404);
     expect((await fetch(urls[1]+'/api/v1/students',{headers:{Cookie:sportsCookie}})).status).toBe(403);
     expect((await fetch(urls[1]+'/api/v1/admin/teacher-accounts',{headers:{Cookie:governorCookie}})).status).toBe(200);
     for(let i=0;i<6;i++)await databases[1].transaction(client=>new PostgresRepository(client).create('sportsHelp','governor',{status:i===0?'published':'draft',firstPublishedAt:Date.now(),titleZh:'帮助'+i,titleEn:'Help '+i,bodyZh:'内容',bodyEn:'Content',keywords:['help'],category:'LOGIN',weight:i}));

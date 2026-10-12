@@ -6,6 +6,20 @@ import { PostgresAuth } from './postgres-auth';
 import type { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
 import {portalAccountProjection} from '../sports/portal-accounts';
+import {administratorAccess} from '../sports/permissions';
+
+export async function postgresAdminAccountDetail(db:PostgresDatabase,token:string,kind:'student'|'teacher',id:string) {
+  const allowed=await db.transaction(async client=>{
+    const actor=await new PostgresAuth(db).authenticate(token,client);
+    const identities=await new PostgresRepository(client).all('sportsIdentity');
+    return administratorAccess({all:()=>identities},actor).permissions.includes('ACCOUNTS');
+  });
+  if(!allowed)return null;
+  // The directory rechecks authorization and mode in its own consistent snapshot.
+  const page=await postgresAccountDirectory(db,token,kind,{id},true);
+  demand(page.items.length===1,'账号不存在或身份资料需核对。',404);
+  return {data:page.items[0]};
+}
 
 export async function postgresAccountDirectory(db:PostgresDatabase,token:string,kind:'student'|'teacher',input:Fields,native=false) {
   return db.transaction(async client=>{

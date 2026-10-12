@@ -35,7 +35,7 @@ import { passwordChangeRequired } from './sports/account-gate';
 import { PostgresRepository } from './storage/postgres-repository';
 import { postgresAdministratorDirectory } from './storage/postgres-administrators';
 import { postgresAdministratorSelf } from './storage/postgres-admin-deletion';
-import { postgresAccountDirectory } from './storage/postgres-account-directory';
+import { postgresAccountDirectory,postgresAdminAccountDetail } from './storage/postgres-account-directory';
 import { postgresSportsHelp,postgresAdminHelp,postgresStudentHelp } from './storage/postgres-sports-help';
 import { portalAnnouncement } from './sports/portal-bootstrap';
 import { postgresSportsMe } from './storage/postgres-sports-me';
@@ -77,6 +77,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(request.method==='GET' && pathname==='/api/v1/auth/account-security')return send(response,200,{data:await postgresPortalSecurity(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && teacherStudent) {
         demand([...new URL(request.url ?? '/', 'http://localhost').searchParams.keys()].length===0,'学生资料查询参数无效。');
+        const detail=await postgresAdminAccountDetail(db,cookieToken(request) ?? '','student',decodeURIComponent(teacherStudent[1]));
+        if(detail)return send(response,200,detail);
         return send(response,200,await postgresTeacherStudent(db,cookieToken(request) ?? '',decodeURIComponent(teacherStudent[1])));
       }
       const invitePreview=/^\/api\/v1\/course-invites\/([^/]+)\/preview$/.exec(pathname);
@@ -136,7 +138,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(request.method==='GET' && sportsSessionRead) return send(response,200,{data:await postgresSportsSession(db,cookieToken(request) ?? '',decodeURIComponent(sportsSessionRead[1]))});
       if(request.method==='GET' && pathname==='/api/v1/me/preferences') return send(response,200,{data:await postgresSportsPreferences(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && pathname==='/api/v1/notifications') return send(response,200,await postgresSportsNotifications(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
-      if(request.method==='GET' && /^\/api\/v1\/teachers\/[^/]+$/.test(pathname)) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
+      if(request.method==='GET' && /^\/api\/v1\/teachers\/[^/]+$/.test(pathname)) {
+        demand([...new URL(request.url ?? '/','http://localhost').searchParams.keys()].length===0,'教师资料查询参数无效。');
+        const detail=await postgresAdminAccountDetail(db,cookieToken(request) ?? '','teacher',decodeURIComponent(pathname.split('/').at(-1)!));
+        return send(response,200,detail ?? await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,{}));
+      }
       if(request.method==='GET' && (['/api/v1/teacher/semesters','/api/v1/semesters/current','/api/v1/enrollments'].includes(pathname) || /^\/api\/v1\/class-sections\/[^/]+\/v81-rules$/.test(pathname) || /^\/api\/v1\/(courses|class-sections)(\/[^/]+)?$/.test(pathname))) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && pathname==='/api/v1/me') return send(response,200,{data:await postgresSportsMe(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && pathname==='/api/v1/system-mode/announcement') {
