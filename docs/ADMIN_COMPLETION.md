@@ -1767,3 +1767,7 @@ API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入�
 ### PostgreSQL 成绩草稿和发布命令
 
 抽出sportsGradePolicy供SQLite和PostgreSQL共享save/publish/append规则，沿用任课教师、版本、结算归档及禁止备注规则；发布保存独立对象，后来草稿不改原发布。workspace复用gradeWorkspace限定教师课程范围，学生成绩数组为空。新增82发布后91草稿、幂等、历史三版及学生权限测试；完整70文件458测试、类型和lint通过。首轮直接调用workspace受到旧测试会话缺ruleSnapshot夹具影响，改为对真实PG读取实体运行同一gradeWorkspace投影以隔离无关夹具。原版final-grades写入协议及Docker验证尚待接通，UI未改。
+
+### 教师最终成绩页面写入及Docker验证
+
+接通POST enrollments/:id/final-grades，适配现有expectedVersion/finalGrade/published，事务内复用append规则，回执与版本按原版协议返回，白名单拒绝备注。类型和lint通过，API重建健康，Docker真实HTTP验证先草稿、发布82、再存91草稿，教师发布快照仍82、历史最新为未发布91；学生workspace成绩草稿与发布数组均为空。体测及补证审核整链继续通过。结算后更正协议仍待迁移，UI未改。

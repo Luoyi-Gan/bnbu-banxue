@@ -185,6 +185,13 @@ try {
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
   const teacherCookie=cookie;
+  const gradePath='/api/v1/enrollments/'+enrollmentId+'/final-grades';
+  const gradeDraft=await sessionWrite(gradePath,{expectedVersion:0,finalGrade:82,published:false});assert.equal(gradeDraft.published,false);
+  const gradePublished=await sessionWrite(gradePath,{expectedVersion:gradeDraft.version,finalGrade:82,published:true});assert.equal(gradePublished.published,true);
+  const nextDraft=await sessionWrite(gradePath,{expectedVersion:gradePublished.version,finalGrade:91,published:false});assert.equal(nextDraft.published,false);
+  const gradeWorkspace=await request('/api/sports/workspace');assert.equal(gradeWorkspace.gradePublications.find(g=>g.data.enrollmentId===enrollmentId).data.score,82);
+  const gradeHistory=(await request(gradePath+'?limit=100')).data;assert.equal(gradeHistory.items[0].finalGrade,91);assert.equal(gradeHistory.items[0].published,false);
+  cookie=studentCookie;const studentGradeView=await request('/api/sports/workspace');assert.deepEqual(studentGradeView.gradePublications,[]);assert.deepEqual(studentGradeView.gradeDrafts,[]);cookie=teacherCookie;
   const physical=await sessionWrite('/api/v1/enrollments/'+enrollmentId+'/physical-results',{expectedVersion:0,runType:'1000m',elapsedSeconds:245,testedOn:'2026-10-01'});
   assert.equal(physical.version,1);assert.equal(physical.elapsedSeconds,245);
   const physicalHistory=(await request('/api/v1/enrollments/'+enrollmentId+'/physical-results?limit=1')).data;

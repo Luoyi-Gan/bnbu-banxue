@@ -48,7 +48,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
-    if(['sports.endurance.confirm','sports.physical.confirm','sports.grade.save','sports.grade.publish','sports.grade.append'].includes(action)) {
+    if(['sports.endurance.confirm','sports.physical.confirm','sports.grade.save','sports.grade.publish','sports.grade.append','sports.grade.portal'].includes(action)) {
       const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
       sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
     }
@@ -104,6 +104,13 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     else if(['sports.grade.save','sports.grade.publish','sports.grade.append'].includes(action)) {
       const record=await runAsync(sportsGradePolicy(repo,actor,action,input));if(record) result={id:record.id};
+    }
+    else if(action==='sports.grade.portal') {
+      demand(Object.keys(input).every(k=>['enrollmentId','expectedVersion','finalGrade','published'].includes(k)),'最终成绩不接受备注或其他附加字段。');
+      const saved=await runAsync(sportsGradePolicy(repo,actor,'sports.grade.append',{enrollmentId:input.enrollmentId,version:input.expectedVersion,score:input.finalGrade,published:input.published}));
+      demand(saved && ['sportsGradePublication','sportsGradeHistory'].includes(saved.kind),'成绩提交回执无效。',409);
+      const published=saved.kind==='sportsGradePublication';
+      result={enrollmentId:input.enrollmentId,version:published?Number(saved.data.draftVersion)+1:Number(saved.data.resultVersion),finalGrade:saved.data.score,published,createdAt:saved.createdAt};
     }
     else if(action==='sports.physical.confirm') {
       demand(Object.keys(input).every(k=>['enrollmentId','expectedVersion','runType','elapsedSeconds','testedOn'].includes(k)),'体测录入只接受实际项目、用时和测试日期。');

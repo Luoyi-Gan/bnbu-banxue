@@ -138,6 +138,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const gradeWrite=/^\/api\/v1\/enrollments\/([^/]+)\/final-grades$/.exec(pathname);
+        if(gradeWrite) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('enrollmentId' in input),'成员标识须使用路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.grade.portal',{...input,enrollmentId:decodeURIComponent(gradeWrite[1])},key)});
+        }
         const physicalWrite=/^\/api\/v1\/enrollments\/([^/]+)\/physical-results$/.exec(pathname);
         if(physicalWrite) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('enrollmentId' in input),'成员标识须使用路径。');
