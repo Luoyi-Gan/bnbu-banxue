@@ -198,6 +198,11 @@ try {
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
   const teacherCookie=cookie;
+  const teachingReport=await request('/api/sports/course-reports/'+courseId);
+  assert.equal(teachingReport.reportType,'CURRENT_TEACHING_REPORT');
+  assert.equal(teachingReport.rows.find(r=>r.enrollmentId===enrollmentId).facts.enduranceStatus,'NOT_RECORDED');
+  const reportCsvResponse=await fetch(base+'/api/sports/course-reports/'+courseId+'.csv',{headers:{Cookie:teacherCookie}});
+  assert.equal(reportCsvResponse.status,200);assert.ok((await reportCsvResponse.text()).includes('Docker 课程'));
   const gradePath='/api/v1/enrollments/'+enrollmentId+'/final-grades';
   const gradeDraft=await sessionWrite(gradePath,{expectedVersion:0,finalGrade:82,published:false});assert.equal(gradeDraft.published,false);
   const gradePublished=await sessionWrite(gradePath,{expectedVersion:gradeDraft.version,finalGrade:82,published:true});assert.equal(gradePublished.published,true);

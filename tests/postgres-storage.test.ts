@@ -1,3 +1,4 @@
+import { postgresCourseReport } from '../backend/src/storage/postgres-course-report';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
@@ -434,6 +435,35 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect(rows.map(r=>r.template_id)).toEqual([first.id,second.id]);
       expect((await db.transaction(client=>new PostgresRepository(client).get(first.id))).data).toMatchObject({status:'published',thresholds:[30,45,60],weeklyLimits:[2,3,4],totalTarget:1200,singleCap:60,dailyLimit:1});
     } finally {await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='ai-governor'");}
+  });
+  it('reads course reports from PostgreSQL with shared credit facts and owner-only CSV export', async()=>{
+    const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const course=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client),course=await repo.create('sportsCourse','sports-reader-other',{name:'报表核对',status:'PUBLISHED',relatedTarget:600,otherTarget:600,threshold:30,weeklyLimit:3});
+      await repo.create('sportsEnrollment','sports-reader-student',{courseId:course.id,status:'ACTIVE'});
+      const clock={...startClock(Date.parse('2026-10-01T08:00:00+08:00')),state:'ENDED',endedAt:Date.parse('2026-10-01T09:00:00+08:00'),activeMilliseconds:3600000};
+      const session=await repo.create('sportsSession','sports-reader-student',{courseId:course.id,clock});
+      await repo.create('sportsRecord','sports-reader-student',{courseId:course.id,sessionId:session.id,status:'VALID',category:'RELATED',activeMilliseconds:3600000});
+      await repo.create('sportsGradePublication','sports-reader-student',{courseId:course.id,score:97,privateNote:'REPORT_MUST_NOT_LEAK'});
+      return course;
+    });
+    const report=await postgresCourseReport(db,teacher.token,course.id);
+    expect(report.denominator).toBeNull();
+    expect(report.rows).toHaveLength(1);
+    expect(report.rows[0]).toMatchObject({studentId:'sports-reader-student',registration:'NO_ROSTER',facts:{total:60,remaining:[540,600],enduranceStatus:'NOT_RECORDED'}});
+    expect(report.unresolved).toEqual(expect.arrayContaining([{code:'NO_CONFIRMED_ROSTER',count:1},{code:'ENDURANCE_NOT_RECORDED',count:1}]));
+    expect(JSON.stringify(report)).not.toContain('REPORT_MUST_NOT_LEAK');
+    await expect(postgresCourseReport(db,student.token,course.id)).rejects.toMatchObject({status:403});
+    const foreign=await db.transaction(client=>new PostgresRepository(client).create('sportsCourse','sports-reader-teacher',{}));
+    await expect(postgresCourseReport(db,teacher.token,foreign.id)).rejects.toMatchObject({status:403});
+    const server=createPostgresApiServer(db);await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+    try {
+      const url=`http://127.0.0.1:${(server.address() as AddressInfo).port}/api/sports/course-reports/${course.id}.csv`;
+      const response=await fetch(url,{headers:{Cookie:`bnbu_session=${teacher.token}`}});
+      expect(response.status).toBe(200);expect(response.headers.get('content-type')).toContain('text/csv');
+      expect(await response.text()).toContain('报表核对');
+      expect((await fetch(url,{headers:{Cookie:`bnbu_session=${student.token}`}})).status).toBe(403);
+    } finally {await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
   });
   it('creates teacher course drafts without inventing rules or opening enrollment', async()=>{
     const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');

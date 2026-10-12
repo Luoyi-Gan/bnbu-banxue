@@ -1,3 +1,5 @@
+import { postgresCourseReport } from './storage/postgres-course-report';
+import { reportCsv } from './sports/report';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
 import { postgresStudentProgress } from './storage/postgres-student-progress';
 import { postgresStudentRoster } from './storage/postgres-student-roster';
@@ -41,6 +43,14 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const reportRead=/^\/api\/sports\/course-reports\/([a-f0-9-]+)(\.csv)?$/.exec(pathname);
+      if(request.method==='GET' && reportRead) {
+        const report=await postgresCourseReport(db,cookieToken(request) ?? '',reportRead[1]);
+        if(!reportRead[2]) return send(response,200,report);
+        const bytes=Buffer.from(reportCsv(report),'utf8');
+        response.writeHead(200,{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="course-report.csv"','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Length':bytes.length});
+        return response.end(bytes);
+      }
       const gradeHistory=/^\/api\/v1\/enrollments\/([^/]+)\/(physical-results|final-grades)$/.exec(pathname);
       if(request.method==='GET' && gradeHistory) return send(response,200,await postgresTeacherHistory(db,cookieToken(request) ?? '',decodeURIComponent(gradeHistory[1]),gradeHistory[2] as 'physical-results'|'final-grades',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams)));
       const physicalResult=/^\/api\/v1\/student\/enrollments\/([^/]+)\/physical-result$/.exec(pathname);

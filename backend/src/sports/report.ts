@@ -1,8 +1,8 @@
 import { type Account } from "../auth";
-import { Repository, type Entity } from "../repository";
+import { Repository, type Entity, type Fields } from "../repository";
 import { ownedCourse } from "./courses";
 import { calculateProgress } from "./progress";
-import { reconcileRoster } from "./roster";
+import { reconcileRosterData } from "./roster";
 import { sportsWriteGate } from "./system";
 import type { SportsClock } from "./session-clock";
 import { approvedExemption } from "./applications";
@@ -21,6 +21,13 @@ export function courseReport(
 }
 /** Shared read-only source projection for authorized readers and server reminders. */
 export function buildCourseReport(repo: Repository, course: Entity): CourseReport {
+  return buildCourseReportData(repo, course, id => repo.db.prepare("SELECT name,email FROM accounts WHERE id=?").get(id));
+}
+export function buildCourseReportData(
+  repo: Pick<Repository, "all" | "get">,
+  course: Entity,
+  personById: (id: string) => Fields | undefined,
+): CourseReport {
   const courseId = course.id;
   const now = Date.now();
   const cache = new Map<string, Entity[]>();
@@ -39,7 +46,7 @@ export function buildCourseReport(repo: Repository, course: Entity): CourseRepor
   const snapshot = basis
     ? repo.get(basis.data.snapshotId, "sportsRosterSnapshot")
     : undefined;
-  const check = snapshot ? reconcileRoster(repo, snapshot) : undefined;
+  const check = snapshot ? reconcileRosterData(repo, snapshot, personById) : undefined;
   const identities = repo
     .all("sportsIdentity")
     .filter((i) => i.data.role === "student" && i.data.status === "verified");
@@ -201,9 +208,7 @@ export function buildCourseReport(repo: Repository, course: Entity): CourseRepor
   for (const member of members) {
     if (member.ownerId && represented.has(member.ownerId)) continue;
     const identity = identities.filter((i) => i.ownerId === member.ownerId);
-    const person = repo.db
-      .prepare("SELECT name FROM accounts WHERE id=?")
-      .get(member.ownerId ?? "");
+    const person = personById(member.ownerId ?? "");
     rows.push({
       source: "MEMBER",
       enrollmentId: member.id,
