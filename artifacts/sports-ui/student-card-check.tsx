@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { SportsProgressCard } from "../../src/v2/SportsProgressCard";
-import { mapSportsProgress } from "../../src/v2/sportsProgress";
+import { mapSportsProgress } from "../../shared/v2/sportsProgress";
 import "../../src/styles/base.css";
 import "../../src/v2/v2.css";
 import "../../src/v2/aRedesign.css";
