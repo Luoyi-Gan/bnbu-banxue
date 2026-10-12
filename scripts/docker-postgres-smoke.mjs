@@ -52,8 +52,8 @@ const stored=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu',
 assert.equal(stored,'false');
 assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Image did not survive restart');
 {
-  const authorCookie=cookie,viewerId=randomUUID(),reviewerId=randomUUID(),operatorId=randomUUID();
-  for(const [id,role] of [[viewerId,'student'],[reviewerId,'reviewer'],[operatorId,'operator']]) {
+  const authorCookie=cookie,viewerId=randomUUID(),reviewerId=randomUUID(),operatorId=randomUUID(),teacherId=randomUUID();
+  for(const [id,role] of [[viewerId,'student'],[reviewerId,'reviewer'],[operatorId,'operator'],[teacherId,'teacher']]) {
     docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at) SELECT '${id}','${id}@example.test',password_hash,'Docker ${role}','["${role}"]','now' FROM accounts WHERE id='${actor.id}'`],{stdio:'pipe'});
   }
   const command=(action,input,requestId=randomUUID())=>request('/api/commands',{action,input,requestId});
@@ -98,6 +98,40 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   const reviewInput={id:room.id,targetId:actor.id,stars:5,comment:'合作愉快'};
   await command('room.review',reviewInput);
   await rejectCommand('room.review',reviewInput,409);
+  await request('/api/auth/sign-in',{identifier:teacherId+'@example.test',password});
+  const teacherCookie=cookie,start=Date.now()+86400000;
+  const slots=[];
+  for(const offset of [0,7200000]) slots.push((await command('coffee.slot.create',{startAt:new Date(start+offset).toISOString(),endAt:new Date(start+offset+3600000).toISOString(),capacity:1,location:'本地测试交流室'})).data);
+  cookie=authorCookie;
+  const booking=(await command('coffee.book',{slotId:slots[0].id,topic:'Docker交流预约'})).data;
+  cookie=teacherCookie;
+  assert.ok((await request('/api/workspace')).entities.some(e=>e.id===booking.id));
+  await command('coffee.move',{id:booking.id,slotId:slots[1].id,reason:'本地改期验证'});
+  cookie=authorCookie;
+  assert.equal((await request('/api/workspace')).entities.find(e=>e.id===booking.id).data.slotId,slots[0].id);
+  cookie=memberCookie;
+  assert.ok(!(await request('/api/workspace')).entities.some(e=>e.id===booking.id));
+  await rejectCommand('coffee.book',{slotId:slots[1].id,topic:'预留名额不可抢占'},409);
+  cookie=authorCookie;
+  await command('coffee.answer',{id:booking.id,accept:true});
+  for(const session of [authorCookie,teacherCookie]) {
+    cookie=session;
+    assert.equal((await request('/api/workspace')).entities.find(e=>e.id===booking.id).data.slotId,slots[1].id);
+  }
+  cookie=authorCookie;
+  await command('coffee.cancel',{id:booking.id,reason:'本地取消验证'});
+  cookie=memberCookie;
+  const released=(await command('coffee.book',{slotId:slots[1].id,topic:'使用释放的名额'})).data;
+  await command('coffee.cancel',{id:released.id,reason:'验收收尾'});
+  cookie=teacherCookie;
+  assert.equal((await request('/api/workspace')).entities.find(e=>e.id===booking.id).data.status,'cancelled');
+  const teacherView=await request('/api/workspace');
+  for(const slot of slots) {
+    const data=teacherView.entities.find(e=>e.id===slot.id).data;
+    await command('coffee.slot.update',{id:slot.id,startAt:data.startAt,endAt:data.endAt,capacity:1,location:data.location,closed:true});
+  }
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`DELETE FROM sessions WHERE account_id='${teacherId}'; UPDATE accounts SET status='banned',roles='[]' WHERE id='${teacherId}'`],{stdio:'pipe'});
+  console.log('PASS Docker teacher appointments: shared booking, reschedule reservation and consent, privacy, cancellation and released capacity.');
   await request('/api/auth/sign-in',{identifier:operatorId+'@example.test',password});
   const keyword=randomUUID();
   const knowledgeInput={title:'容器知识验证',body:'测试资料第一版',keywords:keyword,source:'本地验收资料',status:'published'};
