@@ -64,3 +64,20 @@ it('HTTP 本人邮箱验证、学号搜索和隐私设置贯通',async()=>{
   expect((await post('/api/auth/email/confirm',{code})).status).toBe(400);
  } finally {server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));db.close()}
 });
+
+it('接受字母和数字两种独立学号，不按邮箱前缀转换或合并账号',()=>{
+ const db=openDatabase(':memory:');
+ try {
+  const repo=new Repository(db);
+  const ids=['u123456','24123456'].map((number,index)=>{
+   const email=index===0?'u123456@bnbu.edu.cn':'v654321@bnbu.edu.cn';
+   const id=createAccount(db,{email,name:number,password:'Acceptance-123',roles:['student']});
+   repo.create('companionIdentity',id,{role:'student',status:'verified',studentNumber:number});
+   return id;
+  });
+  const viewer=login(db,'u123456@bnbu.edu.cn','Acceptance-123').account;
+  expect(searchStudents(db,viewer,'u123456').students.map(p=>p.id)).toEqual([ids[0]]);
+  expect(searchStudents(db,viewer,'24123456').students.map(p=>p.id)).toEqual([ids[1]]);
+  expect(searchStudents(db,viewer,'v654321').students).toEqual([]);
+ }finally{db.close();}
+});

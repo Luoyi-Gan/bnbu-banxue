@@ -295,11 +295,11 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     try {
       const data=await postgresAccountDirectory(db,token,'student',{id:'state-person'});
       expect(data.items).toHaveLength(1);
-      expect(data.items[0].status).toBe('PENDING');
+      expect(data.items[0].status).toBe('ACTIVE');
       expect(data.items[0].verifiedEmail).toBeNull();
       expect(JSON.stringify(data)).not.toContain('password_hash');
       expect(JSON.stringify(data)).not.toContain('state@example.test');
-      await expect(postgresAccountDirectory(db,token,'student',{status:'DISABLED'})).rejects.toThrow('筛选状态');
+      await expect(postgresAccountDirectory(db,token,'student',{status:'PENDING'})).rejects.toThrow('筛选状态');
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
   it('keeps a multi-activity split atomic when a later activity is invalid', async () => {

@@ -7,7 +7,6 @@ import {
 } from "../repository";
 import { requireSportsPermission } from "./permissions";
 import { sportsAccountGate } from "./account-gate";
-import { studentMembershipStatus } from './student-status';
 /** Current account data only; no membership, credential, grade or media mutation. */
 export function accountDirectory(
   repo: Repository,
@@ -35,7 +34,7 @@ export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fie
   demand(
     !status ||
       (kind === "student"
-        ? ["ACTIVE", "PENDING"]
+        ? ["ACTIVE", "MUTED", "DISABLED"]
         : ["ACTIVE", "DISABLED", "RECOVERY_REQUIRED"]
       ).includes(status),
     "账号筛选状态无效。",
@@ -52,7 +51,6 @@ export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fie
     .flatMap((i) => {
       const row = accounts.find(a=>a.id===i.ownerId);
       if (!row) return [];
-      const active = studentMembershipStatus(repo,i.ownerId)==='ACTIVE';
       return [
         {
           id: i.ownerId!,
@@ -87,9 +85,7 @@ export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fie
           title: kind === "teacher" ? String(i.data.title ?? "") : null,
           status:
             kind === "student"
-              ? active
-                ? "ACTIVE"
-                : "PENDING"
+              ? row.status === "banned" ? "DISABLED" : row.status === "muted" ? "MUTED" : "ACTIVE"
               : row.status === "banned" || i.data.accountState === "DISABLED"
                 ? "DISABLED"
                 : i.data.accountState === "RECOVERY_REQUIRED"

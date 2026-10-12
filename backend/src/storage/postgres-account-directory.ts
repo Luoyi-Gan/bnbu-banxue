@@ -15,7 +15,7 @@ export async function postgresAccountDirectory(db:PostgresDatabase,token:string,
     const identity=identities.find(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified');
     demand(identity && actor.status!=='banned' && (actor.roles.includes('superadmin') || Array.isArray(identity.data.permissions) && identity.data.permissions.includes('ACCOUNTS')),'没有该体育管理权限。',403);
 
-    const entities=[...identities,...await repo.all('sportsSemester'),...await repo.all('sportsEnrollment'),...await repo.all('sportsCourse')];
+    const entities=identities;
     const accounts=(await client.query<Fields>('SELECT id,name,organization,status,email FROM accounts')).rows;
     const page=projectAccountDirectory({all:type=>entities.filter(e=>e.kind===type)},accounts,kind,input);
     return page;

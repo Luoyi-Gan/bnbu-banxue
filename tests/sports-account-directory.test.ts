@@ -63,7 +63,7 @@ function setup() {
     member,
   };
 }
-it("账号只读投影不泄露凭据或教学事实，当前学期关系决定学生状态", () => {
+it("账号只读投影不泄露凭据或教学事实，学生状态只取伴学账号状态", () => {
   const f = setup(),
     before = f.db.prepare("SELECT * FROM entities ORDER BY id").all();
   const page = accountDirectory(f.repo, f.admin.account, "student", {});
@@ -74,7 +74,7 @@ it("账号只读投影不泄露凭据或教学事实，当前学期关系决定�
     verifiedEmail: "student@example.test",
   });
   expect(page.items.find((r) => r.id === f.pending.account.id)?.status).toBe(
-    "PENDING",
+    "ACTIVE",
   );
   expect(JSON.stringify(page)).not.toMatch(
     /password|hash|987654|SECRET_GRADE|DO_NOT_EXPOSE|permissions/,
@@ -87,15 +87,18 @@ it("账号只读投影不泄露凭据或教学事实，当前学期关系决定�
     accountDirectory(f.repo, f.admin.account, "student", {
       id: f.student.account.id,
     }).items[0].status,
-  ).toBe("PENDING");
+  ).toBe("ACTIVE");
   f.repo.save(f.repo.get(f.member.id), { status: "ACTIVE" });
   f.repo.save(f.semester, { status: "ARCHIVED" });
   expect(
     accountDirectory(f.repo, f.admin.account, "student", { status: "ACTIVE" })
       .total,
-  ).toBe(0);
-  f.db
-    .prepare("UPDATE accounts SET email=? WHERE id=?")
+  ).toBe(2);
+  f.db.prepare("UPDATE accounts SET status='muted' WHERE id=?").run(f.student.account.id);
+  expect(accountDirectory(f.repo,f.admin.account,"student",{status:"MUTED"}).items.map(i=>i.id)).toEqual([f.student.account.id]);
+  f.db.prepare("UPDATE accounts SET status='banned' WHERE id=?").run(f.student.account.id);
+  expect(accountDirectory(f.repo,f.admin.account,"student",{status:"DISABLED"}).items.map(i=>i.id)).toEqual([f.student.account.id]);
+  f.db.prepare("UPDATE accounts SET email=? WHERE id=?")
     .run("changed@example.test", f.student.account.id);
   expect(
     accountDirectory(f.repo, f.admin.account, "student", {
@@ -117,7 +120,7 @@ it("搜索筛选分页可组合，过期游标、重复身份和非法学生状�
     2,
   );
   expect(() => read({ cursor: "missing" })).toThrow("分页基准");
-  expect(() => read({ status: "DISABLED" })).toThrow("筛选状态");
+  expect(() => read({ status: "PENDING" })).toThrow("筛选状态");
   expect(() => read({ limit: 101 })).toThrow();
   expect(() => read({ password: "x" })).toThrow();
   f.repo.create("companionIdentity", f.student.account.id, {
