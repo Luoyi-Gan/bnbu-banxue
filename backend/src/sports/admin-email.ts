@@ -4,11 +4,9 @@ import { Repository, textField, type Fields } from "../repository";
 import { transaction, type Database } from "../database";
 import { deliverOutbox } from "../mail-delivery";
 import { sportsAccountGate } from "./account-gate";
-import { sportsWriteGate } from "./system";
 
 function current(repo: Repository, actor: Account) {
   sportsAccountGate(repo, actor);
-  sportsWriteGate(repo, "sports.account.email");
   const identity = repo
     .all("sportsIdentity")
     .find(

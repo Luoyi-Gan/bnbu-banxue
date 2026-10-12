@@ -89,7 +89,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(JSON.stringify(directory)).not.toContain('Changed-test-123');
     expect(directory.permissions).toHaveLength(8);
     const system=await db.transaction(client=>new PostgresRepository(client).create('sportsSystem','password-admin',{mode:'MAINTENANCE'}));
-    await expect(postgresAdministratorDirectory(db,login.token)).rejects.toMatchObject({status:503});
+    expect((await postgresAdministratorDirectory(db,login.token)).items).toEqual(directory.items);
     await db.transaction(client=>new PostgresRepository(client).save(system,{mode:'NORMAL'}));
     await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'");
   });

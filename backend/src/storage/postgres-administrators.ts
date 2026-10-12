@@ -11,8 +11,7 @@ import type { PostgresDatabase } from './postgres';
 export async function requirePostgresSuperAdmin(repo:PostgresRepository,actor:Account) {
   const identities=await repo.all('sportsIdentity');
   demand(actor.status!=='banned' && actor.roles.includes('superadmin') && identities.some(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified'),'仅体育总管理员可执行此治理操作。',403);
-  const system=(await repo.all('sportsSystem'))[0];
-  demand(!system || system.data.mode==='NORMAL','体育服务维护中，普通业务暂停。',503);
+
 }
 
 export async function postgresAdministratorState(repo:PostgresRepository,actor:Account,input:Fields) {

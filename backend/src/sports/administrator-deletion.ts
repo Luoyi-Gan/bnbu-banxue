@@ -3,12 +3,10 @@ import { Repository, type Fields } from "../repository";
 import { requireSportsSuperAdmin } from "./permissions";
 import { version } from "../version-check";
 import { sportsAccountGate } from "./account-gate";
-import { sportsWriteGate } from "./system";
 import { clearAdminChallenges } from "./admin-email";
 
 export function administratorSelf(repo: Repository, actor: Account) {
   sportsAccountGate(repo, actor);
-  sportsWriteGate(repo, "sports.account.read");
   const row = repo.db
     .prepare(
       "SELECT login_name,name,email FROM accounts WHERE id=? AND login_kind='ADMIN'",

@@ -7,7 +7,6 @@ import {
 } from "../repository";
 import { requireSportsPermission } from "./permissions";
 import { sportsAccountGate } from "./account-gate";
-import { sportsWriteGate } from "./system";
 import { studentMembershipStatus } from './student-status';
 /** Current account data only; no membership, credential, grade or media mutation. */
 export function accountDirectory(
@@ -18,7 +17,6 @@ export function accountDirectory(
 ) {
   sportsAccountGate(repo, actor);
   requireSportsPermission(repo, actor, "ACCOUNTS");
-  sportsWriteGate(repo, "sports.accounts.read");
   const accounts=repo.db.prepare('SELECT id,name,organization,status,email FROM accounts').all();
   return projectAccountDirectory(repo,accounts,kind,input);
 }

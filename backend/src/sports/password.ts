@@ -29,12 +29,6 @@ export function sportsPasswordCommand(
     "仅有效教师或管理员可修改本人密码。",
     403,
   );
-  demand(
-    identity.data.role === "admin" ||
-      !repo.all("sportsSystem").some((s) => s.data.mode !== "NORMAL"),
-    "维护期间教师只能查看维护公告。",
-    503,
-  );
   version(identity, input);
   demand(
     typeof input.currentPassword === "string" &&

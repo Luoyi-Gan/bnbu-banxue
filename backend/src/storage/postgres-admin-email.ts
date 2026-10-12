@@ -12,8 +12,7 @@ async function current(db:PostgresDatabase,client:PoolClient,token:string) {
   const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
   const identities=await repo.all('sportsIdentity');
   if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
-  const system=(await repo.all('sportsSystem'))[0];
-  demand(!system || system.data.mode==='NORMAL','体育服务维护中，普通业务暂停。',503);
+
   const identity=identities.find(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified');
   const account=(await client.query('SELECT email,status,login_kind,roles FROM accounts WHERE id=$1',[actor.id])).rows[0];
   demand(identity && account?.status==='active' && (account.login_kind==='ADMIN' || JSON.parse(account.roles).includes('superadmin')),'仅当前有效管理员可验证本人邮箱。',403);

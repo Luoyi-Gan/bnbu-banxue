@@ -9,14 +9,12 @@ import {
 import { Repository, textField, type Fields } from "../repository";
 import { sportsPermissions, requireSportsSuperAdmin } from "./permissions";
 import { sportsAccountGate } from "./account-gate";
-import { sportsWriteGate } from "./system";
 import { version } from "../version-check";
 import { clearAdminChallenges } from "./admin-email";
 
 export function administratorDirectory(repo: Repository, actor: Account) {
   sportsAccountGate(repo, actor);
   requireSportsSuperAdmin(repo, actor);
-  sportsWriteGate(repo, "sports.admins.read");
   const accounts = repo.db
     .prepare(
       "SELECT id,login_name,name,email,organization,status FROM accounts WHERE login_kind='ADMIN' ORDER BY login_name",

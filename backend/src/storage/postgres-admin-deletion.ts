@@ -12,8 +12,7 @@ export async function postgresAdministratorSelf(db:PostgresDatabase,token:string
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client),identities=await repo.all('sportsIdentity');
     if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
-    const system=(await repo.all('sportsSystem'))[0];
-    demand(!system || system.data.mode==='NORMAL','体育服务维护中，普通业务暂停。',503);
+
     const row=(await client.query("SELECT login_name,name,email FROM accounts WHERE id=$1 AND login_kind='ADMIN'",[actor.id])).rows[0];
     const identity=identities.find(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified');
     demand(row && identity && !actor.roles.includes('superadmin'),'该流程仅适用独立分管理员。',403);
@@ -24,8 +23,7 @@ export async function postgresAdministratorSelf(db:PostgresDatabase,token:string
 export async function postgresAdministratorDelete(repo:PostgresRepository,actor:Account,action:string,input:Fields) {
   const self=action==='sports.account.close';
   if(!self) await requirePostgresSuperAdmin(repo,actor);
-  const system=(await repo.all('sportsSystem'))[0];
-  demand(!system || system.data.mode==='NORMAL','体育服务维护中，普通业务暂停。',503);
+
   if(!self && input.accountId!==undefined) {
     demand(Object.keys(input).every(k=>['accountId','version','confirmed','handoverConfirmed'].includes(k)),'账号删除参数无效。');
     const identities=(await repo.all('sportsIdentity')).filter(i=>i.ownerId===input.accountId && i.data.role==='admin');

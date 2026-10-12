@@ -126,7 +126,7 @@ it("搜索筛选分页可组合，过期游标、重复身份和非法学生状�
   });
   expect(() => read({})).toThrow("重复");
 });
-it("教师三种状态只读；授权、首次改密和维护门禁即时生效", () => {
+it("教师三种状态只读；授权和首次改密即时生效，外部体育维护不影响伴学", () => {
   const f = setup(),
     read = () => accountDirectory(f.repo, f.admin.account, "teacher", {});
   expect(read().items[0]).toMatchObject({
@@ -152,7 +152,7 @@ it("教师三种状态只读；授权、首次改密和维护门禁即时生效"
   expect(read).toThrow("管理权限");
   f.repo.save(f.repo.get(f.admin.identity.id), { permissions: ["ACCOUNTS"] });
   f.repo.create("sportsSystem", f.admin.account.id, { mode: "MAINTENANCE" });
-  expect(read).toThrow("维护中");
+  expect(read().items[0].status).toBe("DISABLED");
 });
 it("HTTP读取校验当前登录和权限、禁止缓存，不提供修改账号入口", async () => {
   const f = setup(),
