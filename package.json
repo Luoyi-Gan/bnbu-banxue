@@ -15,6 +15,7 @@
     "dev:sports-teacher": "node scripts/sports-teacher.mjs"
   },
   "dependencies": {
+    "cos-nodejs-sdk-v5": "3.0.0",
     "cytoscape": "^3.34.3",
     "cytoscape-fcose": "^2.2.0",
     "exceljs": "4.4.0",
