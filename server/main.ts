@@ -30,6 +30,7 @@ import {
   portalFinalGradeWrite,
   portalSettlementReports,
   portalPhysicalWrite,
+  portalPhysicalCorrection,
 } from "./sports/portal-grades";
 import {
   portalApplications,
@@ -465,6 +466,23 @@ export function createApiServer(
               db,
               token!,
               settlementConfirm[1],
+              input,
+              key,
+            ),
+          });
+        }
+        const physicalCorrection =
+          /^\/api\/v1\/enrollments\/([^/]+)\/physical-results\/corrections$/.exec(
+            pathname,
+          );
+        if (physicalCorrection) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalPhysicalCorrection(
+              db,
+              token!,
+              physicalCorrection[1],
               input,
               key,
             ),

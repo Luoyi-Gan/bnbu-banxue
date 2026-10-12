@@ -583,6 +583,82 @@ it("归档后原内部成绩更正追加报告，保留旧版及冻结身份，�
     }),
   ).toThrow("附加字段");
 });
+it("原版体测历史更正保留旧报告，重放返回旧修订，缺测不可补造", async () => {
+  const f = setup();
+  f.repo.save(f.repo.all("sportsExemption")[0], { status: "REVOKED" });
+  f.repo.save(f.course, { status: "PUBLISHED" });
+  f.run(f.teacher, "sports.endurance.confirm", {
+    enrollmentId: f.member.id,
+    version: 0,
+    event: 1000,
+    seconds: 300,
+    testDate: "2026-01-01",
+    confirmed: true,
+  });
+  f.repo.save(f.repo.get(f.course.id), { status: "CLOSED" });
+  const prep = f.prepare(),
+    first = f.run(f.teacher, "sports.settlement.confirm", {
+      id: prep.id,
+      version: prep.version,
+      confirmed: true,
+    });
+  const original = JSON.stringify(first);
+  const server = createApiServer(f.db);
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/v1/enrollments/${f.member.id}/physical-results/corrections`;
+  const post = (body: unknown, key = randomUUID(), who = f.teacher) =>
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Cookie: `bnbu_session=${who.token}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": key,
+      },
+      body: JSON.stringify(body),
+    });
+  try {
+    const body = {
+      expectedVersion: 1,
+      runType: "1000m",
+      elapsedSeconds: 290,
+      testedOn: "2026-01-01",
+      correctionReason: "核对原计时单",
+    };
+    for (const who of [f.student, f.other, f.admin])
+      expect((await post(body, randomUUID(), who)).status).toBe(403);
+    const key = randomUUID(),
+      response = await post(body, key);
+    expect(response.status).toBe(200);
+    const saved = (await response.json()).data;
+    expect(saved).toMatchObject({ version: 2, elapsedSeconds: 290 });
+    expect(
+      (await post({ ...body, expectedVersion: 2, elapsedSeconds: 280 })).status,
+    ).toBe(200);
+    expect((await (await post(body, key)).json()).data).toEqual(saved);
+    expect(JSON.stringify(f.repo.get(first.id))).toBe(original);
+    expect(f.repo.all("sportsSettlementReport")).toHaveLength(3);
+    expect((await post(body)).status).toBe(409);
+    const missing = setup(),
+      missingPrep = missing.prepare();
+    missing.run(missing.teacher, "sports.settlement.confirm", {
+      id: missingPrep.id,
+      version: missingPrep.version,
+      confirmed: true,
+    });
+    expect(() =>
+      missing.run(missing.teacher, "sports.physical.correct", {
+        ...body,
+        enrollmentId: missing.member.id,
+        expectedVersion: 0,
+      }),
+    ).toThrow("缺测记录保留");
+    expect(missing.repo.all("sportsEndurance")).toHaveLength(0);
+    expect(missing.repo.all("sportsSettlementReport")).toHaveLength(1);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
 it("结算体测更正仅更新原冻结行体测事实，保留旧历史和其他统计，失败不留下半次更正", () => {
   const f = setup();
   f.repo.save(f.repo.all("sportsExemption")[0], { status: "REVOKED" });

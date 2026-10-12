@@ -6,6 +6,7 @@ import {
   integerField,
   enumField,
   type Fields,
+  type Entity,
 } from "../repository";
 import { ownedCourse, version } from "./courses";
 import { sportsGradeCommand } from "./grades";
@@ -21,7 +22,52 @@ export function sportsCorrectionCommand(
   actor: Account,
   action: string,
   input: Fields,
-) {
+): Entity | undefined {
+  if (action === "sports.physical.correct") {
+    demand(
+      Object.keys(input).every((k) =>
+        [
+          "enrollmentId",
+          "expectedVersion",
+          "runType",
+          "elapsedSeconds",
+          "testedOn",
+          "correctionReason",
+        ].includes(k),
+      ),
+      "体测更正参数无效。",
+    );
+    const member = repo.get(input.enrollmentId, "sportsEnrollment");
+    const course = ownedCourse(repo, actor, member.data.courseId);
+    const originals = repo
+      .all("sportsEndurance")
+      .filter((row) => row.data.enrollmentId === member.id);
+    demand(
+      originals.length === 1,
+      "结课后缺测记录保留，不能在历史更正中新增体测；请人工处理。",
+      409,
+    );
+    demand(
+      input.expectedVersion === originals[0].version,
+      "体测已变化，请刷新后重新核对。",
+      409,
+    );
+    demand(
+      input.runType === "800m" || input.runType === "1000m",
+      "体测项目无效。",
+    );
+    return sportsCorrectionCommand(repo, actor, "sports.correction.apply", {
+      kind: "ENDURANCE",
+      id: originals[0].id,
+      version: originals[0].version,
+      previousReportId: course.data.settlementReportId,
+      reason: input.correctionReason,
+      confirmed: true,
+      event: input.runType === "800m" ? 800 : 1000,
+      seconds: input.elapsedSeconds,
+      testDate: input.testedOn,
+    });
+  }
   if (action !== "sports.correction.apply") return undefined;
   const kind = enumField(input, "kind", [
     "GRADE",

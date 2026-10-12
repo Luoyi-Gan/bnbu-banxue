@@ -5,6 +5,57 @@ import { integerField, Repository, type Fields } from "../repository";
 import { ownedCourse } from "./courses";
 import { sportsWriteGate } from "./system";
 
+export function portalPhysicalCorrection(
+  db: Database,
+  token: string,
+  enrollmentId: string,
+  input: Fields,
+  key: string,
+) {
+  demand(
+    Object.keys(input).every((field) =>
+      [
+        "expectedVersion",
+        "runType",
+        "elapsedSeconds",
+        "testedOn",
+        "correctionReason",
+      ].includes(field),
+    ),
+    "体测更正参数无效。",
+  );
+  const repo = new Repository(db),
+    member = repo.get(enrollmentId, "sportsEnrollment");
+  ownedCourse(repo, authenticate(db, token), member.data.courseId);
+  const result = execute(
+    db,
+    token,
+    "sports.physical.correct",
+    { ...input, enrollmentId },
+    key,
+  ) as { id: string };
+  const report = repo.get(result.id, "sportsSettlementReport");
+  const correction = repo.get(
+    report.data.correctionId,
+    "sportsHistoricalCorrection",
+  );
+  const history = repo
+    .all("sportsEnduranceRevision")
+    .find(
+      (row) =>
+        row.data.recordId === correction.data.resultId &&
+        row.data.recordVersion === correction.data.resultVersion,
+    );
+  demand(history, "体测更正历史不完整。", 409);
+  return {
+    version: history.data.recordVersion,
+    runType: history.data.event === 800 ? "800m" : "1000m",
+    elapsedSeconds: history.data.seconds,
+    testedOn: history.data.testDate,
+    createdAt: history.createdAt,
+  };
+}
+
 export function portalPhysicalWrite(
   db: Database,
   token: string,
