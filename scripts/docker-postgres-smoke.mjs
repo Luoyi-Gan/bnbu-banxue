@@ -34,6 +34,11 @@ assert.match(actor.id,/^[0-9a-f-]{36}$/);
 // Local fixture authorization is explicit; registration itself grants no school role.
 execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE accounts SET roles='["student"]' WHERE id='${actor.id}'`],{stdio:'pipe'});
 await request('/api/commands',{action:'preferences.preview',input:{enabled:false},requestId:randomUUID()});
+const avatar='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=';
+await request('/api/commands',{action:'profile.save',input:{nickname:'容器验证',avatar},requestId:randomUUID()});
+const profile=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data FROM entities WHERE kind='profile' AND owner_id='${actor.id}'`],{encoding:'utf8'});
+assert.ok(profile.includes('$bnbuStoredImage'));
+assert.ok(!profile.includes('data:image'));
 execFileSync('docker',['restart','bnbu-postgres-local-postgres-1','bnbu-postgres-local-api-1'],{stdio:'pipe'});
 let ready=false;
 for(let i=0;i<30;i++) {
@@ -44,6 +49,7 @@ assert.ok(ready,'API did not recover after restart');
 assert.equal((await request('/api/auth/me')).account.id,actor.id);
 const stored=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data::jsonb->>'profilePreview' FROM entities WHERE kind='preferences' AND owner_id='${actor.id}'`],{encoding:'utf8'}).trim();
 assert.equal(stored,'false');
+assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Image did not survive restart');
 await request('/api/auth/logout',{});
 assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
-console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, restart persistence and logout.');
+console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence and logout.');

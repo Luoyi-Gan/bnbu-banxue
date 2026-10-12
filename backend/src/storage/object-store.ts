@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, link, unlink, writeFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 
 export interface ObjectStore {
@@ -22,7 +22,13 @@ export class LocalObjectStore implements ObjectStore {
     await mkdir(this.root,{recursive:true});
     const temporary=join(this.root,`${key}.${randomUUID()}.tmp`);
     await writeFile(temporary,bytes,{flag:'wx',mode:0o600});
-    try { await rename(temporary,path); }
+    try {
+      try { await link(temporary,path); }
+      catch(error) {
+        if((error as NodeJS.ErrnoException).code!=='EEXIST') throw error;
+        await this.get(key);
+      }
+    }
     finally { await unlink(temporary).catch(error=>{if(error.code!=='ENOENT') throw error;}); }
     return key;
   }
