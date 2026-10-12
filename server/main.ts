@@ -19,6 +19,7 @@ import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
+import { portalMe, portalSecurity } from "./sports/portal";
 import { administratorSelf } from "./sports/administrator-deletion";
 import {
   adminEmailStatus,
@@ -427,6 +428,19 @@ export function createApiServer(
           );
           return send(response, 200, { data: result });
         }
+      }
+      if (
+        request.method === "GET" &&
+        ["/api/v1/me", "/api/v1/auth/account-security"].includes(pathname)
+      ) {
+        const actor = authenticate(db, cookieToken(request));
+        const repo = new Repository(db);
+        return send(response, 200, {
+          data:
+            pathname === "/api/v1/me"
+              ? portalMe(repo, actor)
+              : portalSecurity(repo, actor),
+        });
       }
       if (request.method === "GET" && pathname === "/api/auth/me")
         return send(response, 200, {

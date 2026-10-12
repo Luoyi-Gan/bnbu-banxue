@@ -6,10 +6,20 @@ import { fileURLToPath } from "node:url";
 const portal = new URL("../integrations/sports-teacher/", import.meta.url);
 const cli = new URL("node_modules/vinext/dist/cli.js", portal);
 if (!existsSync(cli)) {
-  console.error("请先在 integrations/sports-teacher 中执行 npm ci 安装原版前端依赖。");
+  console.error(
+    "请先在 integrations/sports-teacher 中执行 npm ci 安装原版前端依赖。",
+  );
   process.exit(1);
 }
 process.chdir(fileURLToPath(portal));
 process.env.BNBU_LOCAL_BACKEND_ORIGIN ??= "http://127.0.0.1:4175";
-process.argv = [process.execPath, fileURLToPath(cli), "dev", "--hostname", "127.0.0.1", "--port", "4186"];
+process.argv = [
+  process.execPath,
+  fileURLToPath(cli),
+  "dev",
+  "--hostname",
+  "127.0.0.1",
+  "--port",
+  "4186",
+];
 await import(cli.href);
