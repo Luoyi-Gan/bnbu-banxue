@@ -5,6 +5,122 @@ import { integerField, Repository, type Fields } from "../repository";
 import { ownedCourse } from "./courses";
 import { sportsWriteGate } from "./system";
 
+export function portalPhysicalWrite(
+  db: Database,
+  token: string,
+  enrollmentId: string,
+  input: Fields,
+  key: string,
+) {
+  demand(
+    Object.keys(input).every((field) =>
+      ["expectedVersion", "runType", "elapsedSeconds", "testedOn"].includes(
+        field,
+      ),
+    ),
+    "体测录入只接受实际项目、用时和测试日期。",
+  );
+  demand(
+    input.runType === "800m" || input.runType === "1000m",
+    "体测项目无效。",
+  );
+  const repo = new Repository(db),
+    actor = authenticate(db, token),
+    member = repo.get(enrollmentId, "sportsEnrollment");
+  ownedCourse(repo, actor, member.data.courseId);
+  const result = execute(
+    db,
+    token,
+    "sports.endurance.confirm",
+    {
+      enrollmentId,
+      version: input.expectedVersion,
+      event: input.runType === "800m" ? 800 : 1000,
+      seconds: input.elapsedSeconds,
+      testDate: input.testedOn,
+      confirmed: true,
+    },
+    key,
+  ) as { id: string };
+  const revision = repo
+    .all("sportsEnduranceRevision")
+    .find(
+      (row) =>
+        row.data.recordId === result.id &&
+        row.data.recordVersion === Number(input.expectedVersion) + 1,
+    );
+  demand(revision, "原始体测保存历史不完整。", 409);
+  return {
+    version: revision.data.recordVersion,
+    runType: revision.data.event === 800 ? "800m" : "1000m",
+    elapsedSeconds: revision.data.seconds,
+    testedOn: revision.data.testDate,
+    createdAt: revision.createdAt,
+  };
+}
+
+export function portalSettlementReports(
+  repo: Repository,
+  actor: Account,
+  courseId: string,
+  input: Fields,
+) {
+  const course = ownedCourse(repo, actor, courseId);
+  sportsWriteGate(repo, "sports.report.read");
+  demand(
+    Object.keys(input).every((key) => ["limit", "beforeVersion"].includes(key)),
+    "结算报告查询参数无效。",
+  );
+  const limit =
+    input.limit === undefined
+      ? 20
+      : integerField({ value: Number(input.limit) }, "value", 1, 100);
+  const before =
+    input.beforeVersion === undefined
+      ? Number.MAX_SAFE_INTEGER
+      : integerField(
+          { value: Number(input.beforeVersion) },
+          "value",
+          1,
+          Number.MAX_SAFE_INTEGER,
+        );
+  const reports = repo
+    .all("sportsSettlementReport")
+    .filter((report) => report.data.courseId === course.id)
+    .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence));
+  demand(
+    course.data.settlementStatus !== "SETTLED" ||
+      (reports.length > 0 && reports[0].id === course.data.settlementReportId),
+    "课程已结算，但报告记录不完整，须先核对。",
+    409,
+  );
+  demand(
+    reports.every(
+      (report) =>
+        Number.isSafeInteger(report.data.sequence) &&
+        Number(report.data.sequence) > 0,
+    ) &&
+      new Set(reports.map((report) => report.data.sequence)).size ===
+        reports.length,
+    "结算报告版本不完整，须先核对。",
+    409,
+  );
+  const remaining = reports.filter(
+    (report) => Number(report.data.sequence) < before,
+  );
+  const items = remaining.slice(0, limit).map((report) => ({
+    id: report.id,
+    version: Number(report.data.sequence),
+    kind: report.data.previousId ? "CORRECTION" : "INITIAL",
+    createdAt: report.createdAt,
+    correctionReason: report.data.correctionReason ?? null,
+  }));
+  return {
+    items,
+    nextBeforeVersion: remaining.length > limit ? items.at(-1)!.version : null,
+  };
+}
+
 export function portalFinalGradeWrite(
   db: Database,
   token: string,

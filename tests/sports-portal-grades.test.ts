@@ -72,6 +72,49 @@ it("原版成绩页区分缺测、零秒和草稿/发布版本，历史分页不
       runType: "800m",
       testedOn: "2026-01-02",
     });
+    const physicalWrite = (input: object, key: string) =>
+      fetch(
+        `http://127.0.0.1:${address.port}/api/v1/enrollments/${member.id}/physical-results`,
+        {
+          method: "POST",
+          headers: {
+            Cookie: `bnbu_session=${teacher.token}`,
+            "Content-Type": "application/json",
+            "Idempotency-Key": key,
+          },
+          body: JSON.stringify(input),
+        },
+      );
+    const physicalInput = {
+      expectedVersion: 1,
+      runType: "800m",
+      elapsedSeconds: 240,
+      testedOn: "2026-01-03",
+    };
+    const savedPhysical = await physicalWrite(
+      physicalInput,
+      "save-physical-two",
+    );
+    expect(savedPhysical.status).toBe(200);
+    const physicalReceipt = await savedPhysical.json();
+    expect(physicalReceipt.data).toMatchObject({
+      version: 2,
+      elapsedSeconds: 240,
+    });
+    expect(
+      (
+        await physicalWrite(
+          { ...physicalInput, expectedVersion: 2, elapsedSeconds: 230 },
+          "save-physical-three",
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      await (await physicalWrite(physicalInput, "save-physical-two")).json(),
+    ).toEqual(physicalReceipt);
+    expect((await physicalWrite(physicalInput, "stale-physical")).status).toBe(
+      409,
+    );
     const draft = execute(
       db,
       teacher.token,
@@ -170,7 +213,49 @@ it("原版成绩页区分缺测、零秒和草稿/发布版本，历史分页不
       ).status,
     ).toBe(409);
     expect(repo.all("sportsGradePublication")).toHaveLength(2);
+    const reports = (query = "", token = teacher.token) =>
+      fetch(
+        `http://127.0.0.1:${address.port}/api/v1/class-sections/${course.id}/settlement-reports${query}`,
+        { headers: { Cookie: `bnbu_session=${token}` } },
+      );
+    expect((await reports()).status).toBe(409);
+    const originalReport = repo.create(
+      "sportsSettlementReport",
+      teacher.account.id,
+      {
+        courseId: course.id,
+        sequence: 1,
+        previousId: null,
+        report: { privateMarker: "PRIVATE" },
+      },
+    );
+    const correctedReport = repo.create(
+      "sportsSettlementReport",
+      teacher.account.id,
+      {
+        courseId: course.id,
+        sequence: 2,
+        previousId: originalReport.id,
+        correctionReason: "更正旧成绩",
+        report: { privateMarker: "PRIVATE" },
+      },
+    );
+    repo.save(repo.get(course.id), { settlementReportId: correctedReport.id });
+    const reportPage = (await (await reports("?limit=1")).json()).data;
+    expect(reportPage.items[0]).toMatchObject({
+      id: correctedReport.id,
+      version: 2,
+      kind: "CORRECTION",
+      correctionReason: "更正旧成绩",
+    });
+    expect(reportPage.nextBeforeVersion).toBe(2);
+    expect(JSON.stringify(reportPage)).not.toContain("PRIVATE");
+    expect(
+      (await (await reports("?limit=1&beforeVersion=2")).json()).data.items[0],
+    ).toMatchObject({ version: 1, kind: "INITIAL", correctionReason: null });
+    expect((await reports("", student.token)).status).toBe(403);
     repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
+    expect((await reports()).status).toBe(503);
     expect((await get("final-grades")).status).toBe(503);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));

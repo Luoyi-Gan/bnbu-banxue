@@ -20,6 +20,8 @@ import { sportsWorkspace } from "./sports/courses";
 import {
   portalGradeHistory,
   portalFinalGradeWrite,
+  portalSettlementReports,
+  portalPhysicalWrite,
 } from "./sports/portal-grades";
 import {
   portalApplications,
@@ -443,6 +445,15 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const physicalWrite =
+          /^\/api\/v1\/enrollments\/([^/]+)\/physical-results$/.exec(pathname);
+        if (physicalWrite) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalPhysicalWrite(db, token!, physicalWrite[1], input, key),
+          });
+        }
         const finalGradeWrite =
           /^\/api\/v1\/enrollments\/([^/]+)\/final-grades$/.exec(pathname);
         if (finalGradeWrite) {
@@ -846,6 +857,21 @@ export function createApiServer(
           ),
         );
       }
+      const settlementReports =
+        /^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && settlementReports)
+        return send(response, 200, {
+          data: portalSettlementReports(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            settlementReports[1],
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        });
       const gradeHistory =
         /^\/api\/v1\/enrollments\/([^/]+)\/(physical-results|final-grades)$/.exec(
           pathname,
