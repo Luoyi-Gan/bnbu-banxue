@@ -8,6 +8,7 @@ import {
 import { requireSportsPermission } from "./permissions";
 import { sportsAccountGate } from "./account-gate";
 import { sportsWriteGate } from "./system";
+import { studentMembershipStatus } from './student-status';
 /** Current account data only; no membership, credential, grade or media mutation. */
 export function accountDirectory(
   repo: Repository,
@@ -45,11 +46,6 @@ export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fie
     input.limit === undefined
       ? 20
       : integerField({ limit: Number(input.limit) }, "limit", 1, 100);
-  const current = repo
-    .all("sportsSemester")
-    .find((s) => s.data.status === "CURRENT");
-  const members = repo.all("sportsEnrollment");
-  const courses = new Map(repo.all("sportsCourse").map((c) => [c.id, c]));
   const fields = repo
     .all("sportsIdentity")
     .filter(
@@ -58,16 +54,7 @@ export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fie
     .flatMap((i) => {
       const row = accounts.find(a=>a.id===i.ownerId);
       if (!row) return [];
-      const active =
-        !!current &&
-        members.some(
-          (m) =>
-            m.ownerId === i.ownerId &&
-            m.data.status === "ACTIVE" &&
-            (m.data.semesterId === current?.id ||
-              courses.get(String(m.data.courseId))?.data.semesterId ===
-                current?.id),
-        );
+      const active = studentMembershipStatus(repo,i.ownerId)==='ACTIVE';
       return [
         {
           id: i.ownerId!,

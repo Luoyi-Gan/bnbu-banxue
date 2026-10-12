@@ -66,6 +66,7 @@ assert.equal(studentArticle.ownerId,null);
 const sportsMe=(await request('/api/v1/me')).data;
 assert.equal(sportsMe.user.id,actor.id);
 assert.equal(sportsMe.user.role,'STUDENT');
+assert.equal(sportsMe.user.status,'PENDING');
 assert.equal(sportsMe.user.emailVerified,false);
 assert.equal(sportsMe.studentProfile.studentNumber,null);
 assert.equal(sportsMe.studentProfile.fullName,actor.name);
@@ -107,6 +108,7 @@ try {
   const members=await request(`/api/v1/enrollments?classSectionId=${courseId}`);
   assert.equal(members.data[0].studentId,actor.id);
   assert.equal(members.data[0].id,enrollmentId);
+  assert.equal((await request('/api/v1/me')).data.user.status,'PENDING');
   const roster=(await request('/api/v1/enrollments/'+enrollmentId+'/roster-status')).data;
   assert.deepEqual(Object.keys(roster).sort(),['enrollmentId','classSectionId','generatedAt','available','rosterVersion','status','registrationComplete'].sort());
   assert.equal(roster.available,false);assert.equal(roster.registrationComplete,false);assert.equal(roster.status,null);
@@ -118,6 +120,7 @@ try {
     const response=await fetch(base+path,{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(input)});
     const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;
   };
+  assert.equal((await request('/api/v1/me')).data.user.status,'ACTIVE');
   let session=await sessionWrite('/api/v1/exercise-sessions',{enrollmentId,clientObservedAt:new Date().toISOString()});
   assert.equal((await request('/api/v1/exercise-sessions/active')).data.id,session.id);
   for(const [action,status] of [['pause','PAUSED'],['resume','IN_PROGRESS'],['finish','COMPLETED']]) {

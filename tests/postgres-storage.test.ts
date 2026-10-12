@@ -165,6 +165,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(studentMe.user.role).toBe('STUDENT');
     expect(studentMe.studentProfile).toMatchObject({userId:'sports-reader-student',studentNumber:null,gradeYear:null});
     expect(studentMe.user).toMatchObject({emailVerified:false,primaryEmailMasked:null});
+    expect(studentMe.user.status).toBe('PENDING');
+    const semester=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{status:'CURRENT'}));
+    const member=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-student',{semesterId:semester.id,status:'ACTIVE'}));
+    expect((await postgresSportsMe(db,studentLogin.token)).user.status).toBe('ACTIVE');
+    await db.transaction(client=>new PostgresRepository(client).save(member,{...member.data,status:'REMOVED'}));
+    expect((await postgresSportsMe(db,studentLogin.token)).user.status).toBe('PENDING');
+    await db.pool.query('DELETE FROM entities WHERE id=ANY($1::text[])',[[member.id,semester.id]]);
     const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','sports-reader-student',{role:'student',status:'verified'}));
     await expect(postgresSportsMe(db,studentLogin.token)).rejects.toMatchObject({status:403});
     await db.pool.query('DELETE FROM entities WHERE id=$1',[duplicate.id]);

@@ -4,6 +4,8 @@ import { portalMe } from '../sports/portal';
 import type { PostgresDatabase } from './postgres';
 import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
+import { studentMembershipStatus } from '../sports/student-status';
+import type { Entity } from '../repository';
 
 export async function postgresSportsMe(db: PostgresDatabase, token: string) {
   return db.transaction(async client => {
@@ -20,10 +22,14 @@ export async function postgresSportsMe(db: PostgresDatabase, token: string) {
     const personal=await client.query("SELECT 1 FROM accounts WHERE id=$1 AND login_kind='PERSONAL'",[actor.id]);
     demand(personal.rows.length===1 && actor.roles.includes('student'),'需要有效学生个人账号。',403);
     const emailVerified=data.schoolEmailVerified===true && data.schoolEmail===actor.email;
+    const membershipRepo=new PostgresRepository(client);
+    const membershipEntities:Entity[]=[];
+    for(const kind of ['sportsSemester','sportsCourse','sportsEnrollment'])membershipEntities.push(...await membershipRepo.all(kind));
+    const status=studentMembershipStatus({all:kind=>membershipEntities.filter(e=>e.kind===kind)},actor.id);
     const [prefix,domain]=actor.email.split('@');
     const nullable=(key:string)=>typeof data[key]==='string' ? data[key] : null;
     return {
-      user:{id:actor.id,role:'STUDENT',status:'ACTIVE',version:identity.version,emailVerified,primaryEmailMasked:emailVerified ? `${prefix.slice(0,1)}***@${domain}` : null},
+      user:{id:actor.id,role:'STUDENT',status,version:identity.version,emailVerified,primaryEmailMasked:emailVerified ? `${prefix.slice(0,1)}***@${domain}` : null},
       studentProfile:{
         id:actor.id,userId:actor.id,organizationId:'BNBU',version:identity.version,
         fullName:actor.name,studentNumber:nullable('studentNumber'),
