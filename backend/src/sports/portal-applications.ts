@@ -126,7 +126,7 @@ export function portalApplications(
   };
 }
 
-function applicationProjection(app: Entity, histories: Entity[]) {
+export function applicationProjection(app: Entity, histories: Entity[]) {
   const certification = app.data.certification as Fields | null;
   demand(
     ["EXEMPTION", "CERTIFICATION"].includes(String(app.data.applicationType)),

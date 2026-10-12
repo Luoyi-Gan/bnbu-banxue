@@ -1,3 +1,4 @@
+import { postgresStudentApplications } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
@@ -301,6 +302,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const saved=await db.transaction(client=>new PostgresRepository(client).get(mode.id));
     await executePostgres(db,admin.token,'sports.ai.stop',{id:saved.id,version:saved.version,reason:'验证结束'},randomUUID());
     await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(record.id)).data.status).toBe('TEACHER_PENDING');expect((await repo.get(mode.id)).data.status).toBe('STOPPED');expect((await repo.all('sportsReviewRound')).filter(r=>r.data.recordId===record.id)).toHaveLength(1);await client.query('DELETE FROM notifications WHERE entity_id=ANY($1::text[])',[[record.id,String(record.data.courseId)]]);await client.query("UPDATE accounts SET roles='[]' WHERE id='ai-governor'");});
+  });
+  it('reads only owned structured applications and keeps teacher decision dates', async()=>{
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const owned=await db.transaction(async client=>{const repo=new PostgresRepository(client);const a=await repo.create('sportsApplication','sports-reader-student',{applicationType:'CERTIFICATION',enrollmentId:'app-read-fixture',status:'APPROVED',reason:'student reason',certification:{certificationKind:'SCHOOL_TEAM',organizationOrTeamName:'Test team'},privateInternal:'do not expose'});await repo.create('sportsApplication','sports-reader-other',{applicationType:'EXEMPTION',status:'SUBMITTED',reason:'foreign secret'});await repo.create('sportsApplicationHistory','sports-reader-other',{applicationId:a.id,version:a.version,action:'APPROVE',at:Date.now()});return a;});
+    const result=await postgresStudentApplications(db,login.token,{enrollmentId:'app-read-fixture'},true);
+    expect(result.data).toEqual([expect.objectContaining({id:owned.id,certificationType:'SCHOOL_TEAM',organizationName:'Test team',decidedAt:expect.any(String)})]);
+    expect(JSON.stringify(result)).not.toContain('privateInternal');expect(JSON.stringify(result)).not.toContain('foreign secret');
   });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

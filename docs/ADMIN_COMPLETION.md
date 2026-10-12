@@ -1699,3 +1699,7 @@ GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需�
 ### 学生课程 V8.1 规则协议
 
 提取原教师 publishedCourseRules 共用投影，PostgreSQL class-sections/:id/v81-rules 按既有课程读取范围供学生和责任教师使用。包含最低分钟、单次上限、每周／每天名额、分类目标和三个截止时点；发布时间读取课程事实或真实发布审计，缺失明确 409，不填演示默认。50 项 PostgreSQL／体育协议测试通过，覆盖缺发布记录拒绝、真实字段读回和非本人课程拒绝；类型与 lint 通过。UI 未改，本轮尚未重建 Docker；规则接通不代表课程创建和其余学生模块已完成。
+
+### 全量回归与学生申请列表
+
+本轮修改前执行完整回归，70 文件 450 测试通过（含真实 PostgreSQL）。随后接通 exemption-application-details 与 activity-certification-applications 的本人列表，复用原申请公开投影，支持成员筛选／分页，教师历史记录仅用于本申请公开决定时间，不泄露内部字段。新增本人／他人隔离、组织类型及教师决定时间测试；相关两组 54 测试通过，类型和 lint 通过。申请写入、图片、认可历史协议仍待迁移，本轮未重建 Docker，不将列表读取表述为申请流程完成。

@@ -1,3 +1,4 @@
+import { postgresStudentApplications } from './storage/postgres-student-applications';
 import { postgresStudentProgress } from './storage/postgres-student-progress';
 import { postgresReviewMaterial } from './storage/postgres-review-material';
 import { postgresSportsWorkspace } from './storage/postgres-sports-workspace';
@@ -38,6 +39,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
       if(request.method==='GET' && pathname==='/api/sports/workspace') return send(response,200,await postgresSportsWorkspace(db,cookieToken(request) ?? ''));
+      if(request.method==='GET' && ['/api/v1/exemption-application-details','/api/v1/activity-certification-applications'].includes(pathname)) return send(response,200,await postgresStudentApplications(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),pathname.includes('activity-certification')));
       const progressTarget=/^\/api\/v1\/class-sections\/([^/]+)\/progress-target$/.exec(pathname);
       if(request.method==='GET' && (pathname==='/api/v1/student-progress' || progressTarget)) return send(response,200,await postgresStudentProgress(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),progressTarget?decodeURIComponent(progressTarget[1]):undefined));
       const reviewMaterial=/^\/api\/sports\/materials\/([^/]+)$/.exec(pathname);
