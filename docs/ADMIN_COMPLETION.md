@@ -1291,3 +1291,7 @@ Docker Desktop 启动后，使用现有代理环境 docker compose build 成功�
 
 Docker 健康检查补充：首次 PowerShell Invoke-RestMethod 返回 502，该请求不算成功。重新启动同镜像临时容器后，用宿主 Node fetch 访问 4188/api/health，以及容器内 Node fetch 访问 4175/api/health，均实际返回 200 和 schemaVersion 7；随后停止临时容器。健康通过结论以这两次实测为依据。
 
+
+### 2026-10-12 原版内容审核接线（已获用户同意）
+用户明确允许在原审核窗口增加处理原因。帖子／评论队列现读取共享后端，通过、驳回、下架、恢复调用 content.review，必须填写原因，后台保存并通知作者。失败保留窗口和输入，成功后关闭；不再写浏览器演示审核状态或伪造通知。前端类型、文件 ESLint、14 项后端回归通过。窗口视觉与实际点击验收尚待完成。
+
