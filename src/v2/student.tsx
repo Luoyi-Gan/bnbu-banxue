@@ -152,7 +152,7 @@ export function V2Partners() {
   const [buildingPickerOpen, setBuildingPickerOpen] = useState(false)
   const rooms = state.rooms.filter((room) => room.status === 'open' && (type === 'all' || room.type === type) && `${room.title} ${room.body} ${room.place}`.toLowerCase().includes(query.toLowerCase()))
   const current = state.rooms.find((room) => room.id === (selected ?? new URLSearchParams(location.search).get('item')))
-  const application = current && state.applications.find((item) => item.roomId === current.id)
+  const application = current && state.applications.find((item) => item.roomId === current.id && item.status === 'pending')
   const create = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
