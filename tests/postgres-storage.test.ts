@@ -56,6 +56,37 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       finally { await admin.end(); }
     }
   });
+  it('rolls report decisions, notifications and receipts back when audit insertion fails', async () => {
+    const owner=randomUUID(),reporter=randomUUID(),reviewer=randomUUID(),token=randomUUID(),key=randomUUID();
+    for(const [id,role] of [[owner,'student'],[reporter,'student'],[reviewer,'reviewer']])
+      await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',[id,id+'@example.test','unused','测试账号',JSON.stringify([role]),'now']);
+    await db.pool.query('INSERT INTO sessions(token_hash,account_id,expires_at,created_at) VALUES($1,$2,$3,$4)',[digest(token),reviewer,Date.now()+60000,'now']);
+    const {post,report}=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      const post=await repo.create('post',owner,{title:'故障回滚',body:'测试',status:'visible'});
+      const report=await repo.create('report',reporter,{targetId:post.id,snapshot:post.data,reason:'测试',status:'pending'});
+      return {post,report};
+    });
+    const input={id:report.id,upheld:true,reason:'确认测试'};
+    await db.pool.query("CREATE FUNCTION reject_report_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='report.decide' THEN RAISE EXCEPTION 'injected report audit failure'; END IF; RETURN NEW; END; $$");
+    await db.pool.query('CREATE TRIGGER reject_report_audit BEFORE INSERT ON audit FOR EACH ROW EXECUTE FUNCTION reject_report_audit()');
+    try {
+      await expect(executePostgres(db,token,'report.decide',input,key)).rejects.toThrow('injected report audit failure');
+      await db.transaction(async client=>{
+        const repo=new PostgresRepository(client);
+        expect((await repo.get(post.id)).data.status).toBe('visible');
+        expect((await repo.get(report.id)).data.status).toBe('pending');
+      });
+      expect((await db.pool.query('SELECT id FROM notifications WHERE entity_id=$1',[post.id])).rows).toHaveLength(0);
+      expect((await db.pool.query('SELECT request_id FROM command_receipts WHERE actor_id=$1 AND request_id=$2',[reviewer,key])).rows).toHaveLength(0);
+    } finally {
+      await db.pool.query('DROP TRIGGER reject_report_audit ON audit');
+      await db.pool.query('DROP FUNCTION reject_report_audit()');
+    }
+    const result=await executePostgres(db,token,'report.decide',input,key);
+    expect(await executePostgres(db,token,'report.decide',input,key)).toEqual(result);
+    expect((await db.pool.query('SELECT id FROM notifications WHERE entity_id=$1',[post.id])).rows).toHaveLength(2);
+  });
   it('changes an initial administrator password atomically and revokes other sessions', async () => {
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,login_kind,login_name) VALUES('password-admin','password@example.test',$1,'管理员','now','ADMIN','password-manager')",[hashPassword('Initial-test-123')]);
     const identity=await db.transaction(client=>new PostgresRepository(client).create('companionIdentity','password-admin',{role:'admin',status:'verified',mustChangePassword:true}));

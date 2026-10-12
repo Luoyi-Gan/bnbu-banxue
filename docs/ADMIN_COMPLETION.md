@@ -2339,3 +2339,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 当前 API 协议清理：旧 BACKEND_API.md 完整存档为 archive/goal-scope-rollback-20261012/BACKEND_API-before-current-protocol.md；当前文档移除撤回的体育写入、OCR成绩单、建课结算等协议，保留伴学命令并补充统一登录、独立管理账号 /api/accounts、只读体育边界和 PostgreSQL 事务说明。依据当前路由和账号命令核对，未更改运行代码。
 
 2026-10-12 举报 Docker 补验：重复待处理举报409、学生审核403、无原因审核400且举报保持pending；审核成立后公开帖子移除，作者保留hidden原帖并收到通知，举报人收到处理结果，作者不能读取举报记录；重复处理409。完整 Docker smoke 通过。本次验证校验失败与成功状态联动，不将其称为数据库中途故障注入测试。
+
+2026-10-12 举报事务故障注入：在真实测试 PostgreSQL 的独立随机 schema 中通过 audit 触发器注入 report.decide 失败；验证帖子仍visible、举报仍pending、无通知、无命令回执。移除测试触发器后同一幂等键可成功重试，重复成功请求不重复生成两方通知。tests/postgres-storage.test.ts 34/34通过；触发器在finally清理，不操作4188业务库或外部体育库。
