@@ -21,10 +21,20 @@ export function liveRelationships(data: Workspace | null): RelationshipEntity[] 
   }
   for (const b of data.alumni.bookings) {
     if (!['confirmed', 'cancelled'].includes(b.status)) continue
+    const confirmation = data.alumni.history?.find(h => h.objectId === b.id && h.action === '校友交流预约已确认')
+    if (b.status === 'cancelled' && !confirmation) continue
     const slot = data.alumni.slots.find(s => s.id === b.slotId), person = data.alumni.profiles.find(p => p.id === slot?.alumniId)
     if (!person || (b.student !== actor && person.owner !== actor)) continue
     const own = person.owner === actor
     result.push({...base, id: 'coffee:alumni:' + b.id, sourceId: b.id, title: '与' + (own ? data.people.find(p => p.id === b.student)?.name ?? '同学' : person.name) + '交流', kind: 'coffee', relation: 'booked', active: b.status === 'confirmed', status: b.status === 'confirmed' ? '校友已确认 · 未核实到场' : '交流申请或预约已取消', path: own ? '/v2/alumni?view=manage' : '/v2/alumni?view=bookings'})
   }
-  return result
+  return result.map(item => {
+    if (item.kind === 'activity' && item.relation === 'hosted')
+      return {...item, establishedAt: data.entities.find(e => e.id === item.sourceId)?.createdAt ?? null}
+    if (item.relation === 'marked' || item.relation === 'followed')
+      return {...item, establishedAt: data.relations.find(r => r.entityId === item.sourceId && r.kind === (item.relation === 'marked' ? 'participate' : 'follow'))?.createdAt ?? null}
+    if (item.id.startsWith('coffee:alumni:'))
+      return {...item, establishedAt: data.alumni.history?.find(h => h.objectId === item.sourceId && h.action === '校友交流预约已确认')?.at ?? null}
+    return item
+  })
 }
