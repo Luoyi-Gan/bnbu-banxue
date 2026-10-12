@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { postgresMediaPut, postgresMediaRead } from '../backend/src/storage/postgres-student-media';
+import { postgresMediaPut, postgresMediaRead, postgresMediaOriginal } from '../backend/src/storage/postgres-student-media';
 import { postgresStudentRecords } from '../backend/src/storage/postgres-student-records';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { randomUUID, createHash } from 'node:crypto';
@@ -215,6 +215,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const verified=await executePostgres(db,login.token,'sports.media.confirm',{id:lease.mediaId,etag:createHash('sha256').update(bytes).digest('hex')},randomUUID());
     const bound=await executePostgres(db,login.token,'sports.media.bind',{id:lease.mediaId,sessionId:session.id,expectedVersion:verified.version},randomUUID());
     expect(bound.uploadStatus).toBe('AVAILABLE');
+    const access=await executePostgres(db,login.token,'sports.media.access',{id:lease.mediaId,purpose:'VIEW_ORIGINAL'},randomUUID());
+    const accessId=String(access.accessUrl).split('/').at(-1)!;
+    expect((await postgresMediaOriginal(db,login.token,accessId)).bytes).toEqual(bytes);
+    await expect(postgresMediaOriginal(db,'invalid-token',accessId)).rejects.toMatchObject({status:401});
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(accessId),{expiresAt:Date.now()-1});});
+    await expect(postgresMediaOriginal(db,login.token,accessId)).rejects.toMatchObject({status:410});
+
     expect(await postgresMediaRead(db,login.token,String(lease.mediaId))).toMatchObject({verifiedFileSizeBytes:bytes.length,verificationStatus:'VERIFIED'});
     await expect(executePostgres(db,login.token,'sports.record.submit',{id:draft.id,expectedVersion:edited.version,mediaIds:[lease.mediaId,lease.mediaId]},randomUUID())).rejects.toMatchObject({status:400});
     await expect(executePostgres(db,login.token,'sports.record.submit',{id:draft.id,expectedVersion:draft.version,mediaIds:[lease.mediaId]},randomUUID())).rejects.toMatchObject({status:409});

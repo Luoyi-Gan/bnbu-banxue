@@ -1,4 +1,4 @@
-import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext } from './storage/postgres-student-media';
+import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresMediaOriginal } from './storage/postgres-student-media';
 import { postgresStudentRecords } from './storage/postgres-student-records';
 import { createServer } from 'node:http';
 import { demand, ServiceError } from './auth';
@@ -34,6 +34,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const originalRead=/^\/api\/v1\/media-access\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && originalRead) {
+        const original=await postgresMediaOriginal(db,cookieToken(request) ?? '',decodeURIComponent(originalRead[1]));
+        response.writeHead(200,{'Content-Type':original.mime,'Content-Length':original.bytes.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Cross-Origin-Resource-Policy':'same-origin'});return response.end(original.bytes);
+      }
       const evidenceRead=/^\/api\/v1\/exercise-records\/([^/]+)\/evidence-context$/.exec(pathname);
       if(request.method==='GET' && evidenceRead) return send(response,200,{data:await postgresEvidenceContext(db,cookieToken(request) ?? '',decodeURIComponent(evidenceRead[1]))});
       const mediaRead=/^\/api\/v1\/media\/([^/]+)$/.exec(pathname);
@@ -106,6 +111,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const mediaAccess=/^\/api\/v1\/media\/([^/]+)\/access-url$/.exec(pathname);
+        if(mediaAccess) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'材料标识须使用路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.media.access',{...input,id:decodeURIComponent(mediaAccess[1])},key)});
+        }
         const recordSubmit=/^\/api\/v1\/exercise-records\/([^/]+)\/submit$/.exec(pathname);
         if(recordSubmit) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'记录标识须使用路径。');

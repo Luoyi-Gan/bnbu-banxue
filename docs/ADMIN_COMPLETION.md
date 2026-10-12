@@ -1663,3 +1663,7 @@ POST /api/v1/exercise-sessions 及 pause/resume/finish 接入共享命令事务�
 ### 普通运动正式提交与 Docker 验证
 
 POST exercise-records/:id/submit 现在校验草稿版本、本人已验证且绑定原会话的材料、对象存储实际可读性，复用原受理策略核对时限并锁定材料清单；同事务保存完整材料批次、PENDING_AI 记录、事件、通知和原草稿关联。公开 ID 维持草稿 ID，读取不重复展示同会话草稿。幂等重试返回原提交；不自动有效、不计入。Docker 真实 HTTP 从计时结束、草稿、PNG 上传、绑定到 submit、重试、详情和唯一列表已通过。61 项相关测试通过，新增重复材料、过期版本拒绝且草稿保留验证；类型和 lint 通过。游泳明确要求专门预受理，不走普通提交。后续 AI、教师审核 PostgreSQL 适配、证据下载与完整 workflow 仍需继续，三端整体目标未完成。
+
+### 私有运动凭证查看
+
+接通 media/:id/access-url 和私有原件 GET，访问授权绑定本人账号、5 分钟有效期，并在每次读取重新验证登录和体育门禁。原件从私有 ObjectStore 返回，限制媒体类型、禁止缓存和嗅探，不公开存储键。补齐 verifiedMimeType；已提交记录 evidence-context 只返回正式锁定材料，未选中的历史上传不混入提交证据。44 项 PostgreSQL 测试通过，新增原件字节一致、未登录拒绝、过期拒绝；类型和 lint 通过。Docker API 重建健康，真实 HTTP 请求访问链接／读取原件并比较字节、无 Cookie 拒绝均通过。教师按课程权限查看及其他业务材料仍待接通，当前仅学生本人运动凭证。

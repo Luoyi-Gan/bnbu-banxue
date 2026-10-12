@@ -12,7 +12,7 @@ import { inspectMedia } from '../sports/media-inspection';
 
 export function studentMediaProjection(m:Entity) {
   const d=m.data;
-  return {id:m.id,sessionId:d.sessionId,businessPurpose:d.businessPurpose,mediaType:d.mediaType,mimeType:d.mimeType,
+  return {id:m.id,sessionId:d.sessionId,businessPurpose:d.businessPurpose,mediaType:d.mediaType,mimeType:d.mimeType,verifiedMimeType:d.uploadStatus==='AVAILABLE'?d.mimeType:null,
     uploadStatus:d.uploadStatus,verificationStatus:d.uploadStatus==='AVAILABLE'?'VERIFIED':'PENDING',
     declaredContentSha256:d.declaredContentSha256,declaredFileSizeBytes:d.fileSizeBytes,declaredDurationSeconds:d.durationSeconds,
     verifiedFileSizeBytes:d.verifiedFileSizeBytes ?? null,verifiedDurationSeconds:d.verifiedDurationSeconds ?? null,
@@ -43,6 +43,13 @@ export async function mediaCommand(repo:PostgresRepository,actor:Account,operati
     return {mediaId:m.id,uploadSessionId:m.id,uploadUrl:'/api/v1/media-uploads/'+m.id+'/object',uploadMethod:'PUT',requiredHeaders:{'Content-Type':mimeType},expiresAt:new Date(expiresAt).toISOString()};
   }
   const m=await repo.get(input.id,'sportsMediaUpload');demand(m.ownerId===actor.id,'材料不存在。',404);
+  if(operation==='access') {
+    demand(Object.keys(input).every(k=>['id','purpose'].includes(k)) && input.purpose==='VIEW_ORIGINAL','凭证访问用途无效。');
+    demand(m.data.uploadStatus==='AVAILABLE','凭证尚未验证。',409);
+    const expiresAt=Date.now()+5*60000;
+    const grant=await repo.create('sportsMediaAccess',actor.id,{mediaId:m.id,expiresAt});
+    return {accessUrl:'/api/v1/media-access/'+grant.id,expiresAt:new Date(expiresAt).toISOString()};
+  }
   if(operation==='confirm') {
     demand(Object.keys(input).every(k=>['id','etag'].includes(k)),'确认参数无效。');
     demand(m.data.uploadStatus==='AVAILABLE' && input.etag===m.data.declaredContentSha256,'文件尚未验证或校验值不一致。',409);
@@ -76,7 +83,19 @@ export async function postgresEvidenceContext(db:PostgresDatabase,token:string,i
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);await recordDraftGate(repo,actor);
     const record=await repo.get(id);demand(['sportsRecordDraft','sportsRecord'].includes(record.kind) && record.ownerId===actor.id,'运动记录不存在。',404);
-    const media=(await repo.all('sportsMediaUpload')).filter(m=>m.ownerId===actor.id && m.data.sessionId===record.data.sessionId && m.data.uploadStatus==='AVAILABLE' && m.data.bound===true);
+    const canonical=record.kind==='sportsRecord'?record.id:record.data.recordId;
+    const media=(await repo.all('sportsMediaUpload')).filter(m=>m.ownerId===actor.id && m.data.sessionId===record.data.sessionId && m.data.uploadStatus==='AVAILABLE' && m.data.bound===true && (!canonical || m.data.recordId===canonical));
     return {recordId:record.id,sessionId:record.data.sessionId,mediaIds:media.map(m=>m.id)};
+  });
+}
+
+export async function postgresMediaOriginal(db:PostgresDatabase,token:string,id:string) {
+  return db.transaction(async client=>{
+    const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);await recordDraftGate(repo,actor);
+    const grant=await repo.get(id,'sportsMediaAccess');demand(grant.ownerId===actor.id,'凭证访问不存在。',404);
+    demand(Date.now()<Number(grant.data.expiresAt),'凭证查看链接已过期，请重新打开。',410);
+    const media=await repo.get(grant.data.mediaId,'sportsMediaUpload');demand(media.ownerId===actor.id && media.data.uploadStatus==='AVAILABLE','凭证不可用。',404);
+    const mime=String(media.data.mimeType);demand(['image/png','image/jpeg','video/mp4'].includes(mime),'凭证类型无效。',500);
+    return {bytes:await configuredObjectStore().get(String(media.data.objectKey)),mime};
   });
 }

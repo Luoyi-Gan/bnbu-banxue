@@ -137,6 +137,12 @@ try {
   const confirmed=await sessionWrite('/api/v1/media-uploads/'+lease.uploadSessionId+'/confirm',{etag:hash});
   await sessionWrite('/api/v1/media/'+lease.mediaId+'/bind',{sessionId:session.id,expectedVersion:confirmed.version});
   assert.equal((await request('/api/v1/media/'+lease.mediaId)).data.uploadStatus,'AVAILABLE');
+  const access=await sessionWrite('/api/v1/media/'+lease.mediaId+'/access-url',{purpose:'VIEW_ORIGINAL'});
+  const original=await fetch(base+access.accessUrl,{headers:{Cookie:cookie}});
+  assert.equal(original.status,200);assert.equal(original.headers.get('content-type'),'image/png');
+  assert.deepEqual(Buffer.from(await original.arrayBuffer()),bytes);
+  assert.equal((await fetch(base+access.accessUrl)).status,401);
+
   assert.ok((await request('/api/v1/exercise-records/'+draft.id+'/evidence-context')).data.mediaIds.includes(lease.mediaId));
   const discarded=await sessionWrite('/api/v1/exercise-records/'+draft.id+'/discard',{expectedVersion:edited.version,reason:'Docker test cleanup'});
   assert.equal(discarded.status,'DISCARDED');
