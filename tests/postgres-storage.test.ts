@@ -276,6 +276,20 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(await executePostgres(db,teacher.token,'sports.review.decide',input,key)).toEqual(result);
     await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(record.id)).data.status).toBe('VALID');const progress=(await repo.all('sportsProgress')).find(p=>p.data.courseId===record.data.courseId)!;expect((progress.data.details as {recordId:string;actual:number}[]).find(d=>d.recordId===record.id)?.actual).toBe(30);await client.query('DELETE FROM notifications WHERE entity_id=$1',[record.id]);});
   });
+  it('governs technical AI retries and limited manual review without changing teaching decisions', async()=>{
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('ai-governor','ai-governor@example.test',$1,'AI测试总管','now','[\"superadmin\"]')",[hashPassword('Ai-govern-123')]);
+    const record=await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.create('sportsIdentity','ai-governor',{role:'admin',status:'verified'});const course=await repo.create('sportsCourse','sports-reader-other',{});const r=await repo.create('sportsRecord','sports-reader-student',{courseId:course.id,status:'TECHNICAL'});const batch=await repo.create('sportsMaterialBatch',r.ownerId,{recordId:r.id,status:'COMPLETE'});await repo.create('sportsMaterial',r.ownerId,{batchId:batch.id,status:'COMPLETE'});return repo.save(r,{batchId:batch.id});});
+    const auth=new PostgresAuth(db),admin=await auth.login('ai-governor@example.test','Ai-govern-123'),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123');
+    await expect(executePostgres(db,teacher.token,'sports.ai.retry',{id:record.id,version:record.version},randomUUID())).rejects.toMatchObject({status:403});
+    await executePostgres(db,admin.token,'sports.ai.retry',{id:record.id,version:record.version},randomUUID());
+    const retried=await db.transaction(client=>new PostgresRepository(client).get(record.id));expect(retried.data.status).toBe('PENDING_AI');
+    await expect(executePostgres(db,admin.token,'sports.ai.retry',{id:record.id,version:retried.version},randomUUID())).rejects.toMatchObject({status:409});
+    const key=randomUUID(),input={courseId:record.data.courseId,endAt:new Date(Date.now()+3600000).toISOString(),reason:'本地验证限时人工处理'};
+    const mode=await executePostgres(db,admin.token,'sports.ai.manual',input,key);expect(await executePostgres(db,admin.token,'sports.ai.manual',input,key)).toEqual(mode);
+    const saved=await db.transaction(client=>new PostgresRepository(client).get(mode.id));
+    await executePostgres(db,admin.token,'sports.ai.stop',{id:saved.id,version:saved.version,reason:'验证结束'},randomUUID());
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(record.id)).data.status).toBe('TEACHER_PENDING');expect((await repo.get(mode.id)).data.status).toBe('STOPPED');expect((await repo.all('sportsReviewRound')).filter(r=>r.data.recordId===record.id)).toHaveLength(1);await client.query('DELETE FROM notifications WHERE entity_id=ANY($1::text[])',[[record.id,String(record.data.courseId)]]);await client.query("UPDATE accounts SET roles='[]' WHERE id='ai-governor'");});
+  });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const session=await db.transaction(client=>new PostgresRepository(client).create('sportsSession','sports-reader-student',{enrollmentId:'cancel-fixture',clock:startClock(Date.now()-2000)}));

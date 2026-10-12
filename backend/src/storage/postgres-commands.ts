@@ -1,3 +1,4 @@
+import { postgresAiGovernance, requireAiGovernor } from './postgres-ai-governance';
 import { sportsReviewDecisionPolicy } from '../sports/review';
 import { submitStudentRecord } from './postgres-record-submit';
 import { mediaCommand } from './postgres-student-media';
@@ -44,6 +45,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action.startsWith('sports.ai.')) await requireAiGovernor(repo,actor);
     if(action==='sports.record.submit') await recordDraftGate(repo,actor);
     if(action.startsWith('sports.media.')) await recordDraftGate(repo,actor);
     if(action.startsWith('sports.recorddraft.')) await recordDraftGate(repo,actor);
@@ -89,6 +91,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       demand(session,'运动会话操作失败。',500);
       result=studentSessionProjection(session);
     }
+    else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
     else if(['sports.review.decide','sports.review.correct','sports.transfer.decide'].includes(action)) {
       const record=await runAsync(sportsReviewDecisionPolicy(repo,actor,action,input));if(record)result={id:record.id};
     }

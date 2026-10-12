@@ -8,7 +8,7 @@ import { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
 import { configuredObjectStore } from './cos-object-store';
 
-async function enqueue(repo:PostgresRepository,record:Entity,source:string) {
+export async function enqueuePostgresTeacher(repo:PostgresRepository,record:Entity,source:string) {
   const course=await repo.get(record.data.courseId,'sportsCourse');
   const rounds=(await repo.all('sportsReviewRound')).filter(r=>r.data.recordId===record.id);
   const calendar=(await repo.all('sportsCalendar')).sort((a,b)=>Number(b.data.sequence)-Number(a.data.sequence))[0];
@@ -28,7 +28,7 @@ export async function processPostgresSportsReview(db:PostgresDatabase,connection
     const materials=(await repo.all('sportsMaterial')).filter(m=>m.data.batchId===batch.id);
     demand(batch.data.status==='COMPLETE' && materials.length>0 && materials.every(m=>m.data.status==='COMPLETE'),'材料未完整到账，不能审核。',409);
     const mode=(await repo.all('sportsManualMode')).find(m=>m.data.courseId===record.data.courseId && m.data.status==='ACTIVE' && Number(m.data.startAt)<=Date.now() && Date.now()<Number(m.data.endAt));
-    if(mode) {await enqueue(repo,record,'MANUAL:'+mode.id);return null;}
+    if(mode) {await enqueuePostgresTeacher(repo,record,'MANUAL:'+mode.id);return null;}
     const old=tasks.find(t=>t.data.recordId===record.id && t.data.batchId===batch.id);
     const fields={recordId:record.id,batchId:batch.id,recordVersion:record.version,batchVersion:batch.version,requestId:randomUUID(),startedAt:Date.now(),status:'PROCESSING',attempt:Number(old?.data.attempt ?? 0)+1};
     const task=old?await repo.save(old,fields):await repo.create('sportsAiTask',null,fields);
@@ -55,7 +55,7 @@ export async function processPostgresSportsReview(db:PostgresDatabase,connection
       await repo.save(latest,{status:'TECHNICAL',technicalCode});
       await repo.create('sportsReviewEvent',null,{recordId:record.id,batchId:batch.id,taskId:task.id,action:'TECHNICAL_FAILURE',technicalCode,at:Date.now()});
       await repo.notify([record.ownerId!],record.id,'sports.ai.technical','运动材料已保存，检查服务暂不可用，正在技术处理中；不会因此判为无效。');
-    } else if(result?.outcome==='EXCEPTION') await enqueue(repo,latest,'AI:'+task.id);
+    } else if(result?.outcome==='EXCEPTION') await enqueuePostgresTeacher(repo,latest,'AI:'+task.id);
     else {
       const saved=await repo.save(latest,{status:'VALID',lastDecisionAt:Date.now(),aiTaskId:task.id,technicalCode:null});
       const kinds=['sportsCourse','sportsRecord','sportsSession','sportsProgress','sportsCertification'],entities:Entity[]=[];
