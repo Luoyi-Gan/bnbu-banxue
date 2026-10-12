@@ -2313,3 +2313,7 @@ Docker smoke 增加进程退出收尾：仅追踪本次创建的随机账号，�
 已以 25ab7ca 工作树重新执行 docker compose -f compose.postgres.yaml up -d --build，前后端镜像构建成功并更新运行容器。真实 PostgreSQL 测试环境下 vitest 全量 260/260 通过，零失败、零跳过。scripts/docker-postgres-smoke.mjs 通过社区、组队、教师预约、校友认证与撤销、邮件活动、知识问答、重启持久化和退出登录验证；测试账号自动收尾，无外部体育写入。服务地址仍为 http://127.0.0.1:4188。
 
 构建有资源包超过 500kB 的提示，不影响构建通过。Compose 提示存在此前停止的 sports-api 孤立容器，本次未启动或删除该容器，保留历史数据。真实体育源、收件邮箱及外部服务配置边界不变。PR 尚未创建，不能将本地验证称为远端交付。
+
+### 2026-10-12 交付分支整合 origin/main 14fa16c
+
+新建 codex/banxue-postgres-readonly-delivery 合并远端已交付的 PR #10/#11 历史，保留当前验证版本。远端差异共 11 个路径已逐项核对：API 通用读取取消、身份响应校验和可配置代理已由 25ab7ca 纳入并测试；远端新增的独立 WorkspaceSportsPage、useSportsAccount、专用 CSS 与旧体育门禁测试并非当前 ConnectedApp 路由，不恢复已清理的替代入口。业务规则和交接采用最新只读源、部署时配置边界，不能恢复远端旧“先接本地体育库”和 server/ 路径说明。截图保留本地既有历史版本，不作为新整合验收。三个冲突文件（api.ts、api.test.ts、ADMIN_COMPLETION.md）保留已通过 260 项测试的当前实现与完整后续交接。
