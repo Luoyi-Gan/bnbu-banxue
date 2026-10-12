@@ -2008,3 +2008,9 @@ Docker 四服务构建健康，完整冒烟新增原生建号、列表、权限�
 新增 /api/v1/admin/semesters/:id/switch，映射独立 sports.semester.switch 命令，复用共享学期切换策略。提交时校验当前学期ID及版本、目标版本、唯一当前学期、上海开始日期和旧课程结算报告；启用/归档与回执同事务，重试返回原切换快照。旧activate也加强当前学期唯一校验，并统一上海日期判断。
 
 65项相关PostgreSQL测试通过，包括报告缺失拒绝、当前版本漂移拒绝、补齐报告后原子切换及相同请求回执一致。类型检查及lint通过。Docker四服务构建健康，完整冒烟新增正式接口拒绝未来学期切换后通过；成功切换路径由隔离PostgreSQL HTTP测试验证，未切换共享Docker验收学期。前端未改。仍需其他未迁移业务和三端原页面验收。
+
+### 教师原页面连接独立Docker体育服务
+
+发现 scripts/sports-teacher.mjs 默认仍指向旧4175，已改为4188统一代理，可用BNBU_LOCAL_BACKEND_ORIGIN显式覆盖。compose仅体育API增加本地4186允许来源，伴学API不扩大来源范围。保持同源 /api/v1 与独立 bnbu_sports_session，不改UI。
+
+原教师页面已通过启动脚本运行在4186（本轮exec会话99744）。新增 scripts/docker-teacher-proxy-smoke.mjs：独立测试教师夹具经4186真实代理登录、读取本人、拒绝外部Origin、退出后401，全部通过；夹具随后停用并撤销身份。Docker体育服务重建健康。此验证覆盖页面入口和真实代理链，不等于浏览器内所有管理操作已验收。下一步继续浏览器页面及剩余接口核对。

@@ -53,6 +53,7 @@ services:
     environment:
       <<: *api-environment
       BNBU_APP_SURFACE: sports
+      BNBU_ALLOWED_ORIGINS: http://127.0.0.1:4188,http://localhost:4188,http://127.0.0.1:4186,http://localhost:4186
       BNBU_POSTGRES_SCHEMA: sports
       BNBU_OBJECT_DIRECTORY: /app/data/sports-objects
     volumes:
