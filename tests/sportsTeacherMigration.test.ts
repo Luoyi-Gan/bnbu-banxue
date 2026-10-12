@@ -4,7 +4,7 @@ import { expect, it } from 'vitest'
 import manifest from '../docs/SPORTS_TEACHER_SOURCE.json'
 import adaptations from '../docs/SPORTS_TEACHER_ADAPTATIONS.json'
 
-it('preserves original portal sources and assets except explicitly recorded transport adaptations', () => {
+it('preserves original portal sources and assets except recorded transport and user-approved closure integration', () => {
   expect(adaptations.files.map(file => file.path).sort()).toEqual(['app/api-client.ts', 'app/portal-app.tsx'])
   for (const file of manifest.files) {
     const adaptation = adaptations.files.find(item => item.path === file.path)

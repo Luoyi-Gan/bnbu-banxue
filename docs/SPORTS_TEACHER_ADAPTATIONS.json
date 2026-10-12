@@ -3,14 +3,14 @@
     {
       "path": "app/api-client.ts",
       "originalSha256": "684CCDF1A23C96A485120C12F431559129601906EC4362FFB879DA251BF4EA64",
-      "sha256": "29B6F7E0031C14A39333D2A4AC895904B5D825AE951AE386EF096D9E869EF7DA",
+      "sha256": "CA1BA03D2A8FBAB19DC5DD03A8804A6CF6CE38C559E9C7C89663913CD000921E",
       "reason": "Adapt existing API transport to shared HttpOnly session; no UI markup."
     },
     {
       "path": "app/portal-app.tsx",
       "originalSha256": "947E62D385674A955489184135E0727A3E30B5F271D8C2433A62398224D7909A",
-      "sha256": "345A321E285D7E2220A4A59243DDC5140D5E25949E936E005BABDF09AA48F542",
-      "reason": "Wire existing session restoration; preserve all JSX and styles."
+      "sha256": "DBD847770ECD21B8C7788656F89EFCF628AF7D5CF2CD28F7C186674B22B505E7",
+      "reason": "Wire session restoration and add user-approved independent subadministrator closure in the existing personal modal; no email entry or style changes."
     }
   ]
 }

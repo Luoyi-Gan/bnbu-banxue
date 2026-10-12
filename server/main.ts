@@ -392,6 +392,36 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        if (pathname === "/api/v1/me/account-deletion") {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          const own = administratorSelf(
+            new Repository(db),
+            authenticate(db, token),
+          );
+          const result = execute(
+            db,
+            token!,
+            "sports.account.close",
+            {
+              id: own.id,
+              version: input.expectedVersion,
+              loginName: input.account,
+              name: input.name,
+              email: input.email,
+              confirmed: input.confirmed,
+              handoverConfirmed: input.handoverCompleted,
+            },
+            key,
+          );
+          response.setHeader(
+            "Set-Cookie",
+            "bnbu_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0",
+          );
+          return send(response, 200, {
+            data: { userId: result.id, deleted: true },
+          });
+        }
         if (pathname === "/api/v1/system-mode/changes") {
           const key = request.headers["idempotency-key"];
           demand(typeof key === "string", "缺少操作幂等标识。");
@@ -653,6 +683,13 @@ export function createApiServer(
             : portalSystemRead(repo, actor),
         });
       }
+      if (request.method === "GET" && pathname === "/api/v1/me/administrator")
+        return send(response, 200, {
+          data: administratorSelf(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+          ),
+        });
       if (request.method === "GET" && pathname === "/api/auth/me")
         return send(response, 200, {
           account: authenticate(db, cookieToken(request)),

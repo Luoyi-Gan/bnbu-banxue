@@ -1135,6 +1135,7 @@ export function requestFormData<T>(
 
 // ── Auth ─────────────────────────────────────────────────────────
 export interface AccountSecurityData {
+  canDeleteOwnAccount?: boolean;
   userId: string;
   version: number;
   mustChangePassword: boolean;

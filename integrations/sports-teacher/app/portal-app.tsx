@@ -77,6 +77,7 @@ import {
 } from "./teacher-tab-page-transition";
 import { PageHeader } from "./teacher-ui";
 import { PortalNotifications, type NotificationTarget } from "./portal-notifications";
+import { OwnAdministratorClosure } from "./own-administrator-closure";
 import { clearRosterReconciliationCache } from "./roster-reconciliation-api-service";
 import { clearStudentProfileCache } from "./use-student-profile";
 import type { AdminRoute, SystemMode } from "./admin-types";
@@ -2344,6 +2345,7 @@ function Modal({ notifications, onNotificationNavigate, onNotificationChanged, r
                 去修改
               </button>
             </section>
+            {role === "admin" && mode === "real" && <OwnAdministratorClosure locale={locale} onClosed={logout} />}
             <div className="modal-footer">
               <button className="secondary-button" type="button" onClick={close}>
                 取消

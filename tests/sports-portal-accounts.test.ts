@@ -10,6 +10,92 @@ import {
   portalSubadminDelete,
 } from "../server/sports/portal-accounts";
 
+it("本人注销仅允许独立分管理员，核对资料后清除会话且不影响个人账号", async () => {
+  const db = openDatabase(":memory:"),
+    repo = new Repository(db),
+    server = createApiServer(db);
+  try {
+    const personalId = createAccount(db, {
+      name: "个人",
+      email: "closure-person@example.test",
+      password: "Password-123",
+      roles: [],
+    });
+    repo.create("sportsIdentity", personalId, {
+      role: "admin",
+      status: "verified",
+    });
+    const personal = login(db, "closure-person@example.test", "Password-123");
+    const id = createAccount(db, {
+      name: "分管",
+      email: "closure-admin@example.test",
+      password: "Password-123",
+      roles: [],
+    });
+    const session = login(db, "closure-admin@example.test", "Password-123");
+    db.prepare(
+      "UPDATE accounts SET login_kind='ADMIN',login_name='closure.admin' WHERE id=?",
+    ).run(id);
+    repo.create("sportsIdentity", id, { role: "admin", status: "verified" });
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", resolve),
+    );
+    const address = server.address();
+    if (!address || typeof address === "string")
+      throw new Error("missing listener");
+    const base = `http://127.0.0.1:${address.port}/api/v1`;
+    const get = (path: string, token: string) =>
+      fetch(base + path, { headers: { Cookie: `bnbu_session=${token}` } });
+    expect(
+      (await (await get("/auth/account-security", personal.token)).json()).data
+        .canDeleteOwnAccount,
+    ).toBe(false);
+    expect((await get("/me/administrator", personal.token)).status).toBe(403);
+    expect(
+      (await (await get("/auth/account-security", session.token)).json()).data
+        .canDeleteOwnAccount,
+    ).toBe(true);
+    const own = (await (await get("/me/administrator", session.token)).json())
+      .data;
+    const input = {
+      expectedVersion: own.version,
+      account: own.loginName,
+      name: own.name,
+      email: own.email,
+      confirmed: true,
+      handoverCompleted: true,
+    };
+    const post = (body: unknown) =>
+      fetch(base + "/me/account-deletion", {
+        method: "POST",
+        headers: {
+          Cookie: `bnbu_session=${session.token}`,
+          Origin: "http://127.0.0.1:4186",
+          "Content-Type": "application/json",
+          "Idempotency-Key": "close-own-account",
+        },
+        body: JSON.stringify(body),
+      });
+    expect((await post({ ...input, email: "wrong@example.test" })).status).toBe(
+      409,
+    );
+    expect((await post({ ...input, handoverCompleted: false })).status).toBe(
+      400,
+    );
+    const closed = await post(input);
+    expect(closed.status).toBe(200);
+    expect(await closed.json()).toEqual({
+      data: { deleted: true, userId: id },
+    });
+    expect(closed.headers.get("set-cookie")).toContain("Max-Age=0");
+    expect((await get("/me", session.token)).status).toBe(401);
+    expect((await get("/me", personal.token)).status).toBe(200);
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    db.close();
+  }
+});
+
 it("原版删除核对版本并支持重试，保留个人账号和业务历史，重新检查操作者权限", () => {
   const db = openDatabase(":memory:"),
     repo = new Repository(db);

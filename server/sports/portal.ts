@@ -82,6 +82,13 @@ export function portalSecurity(repo: Repository, actor: Account) {
           : "SUB"
         : null,
     permissions: access.permissions.map((p) => permissionNames[p]),
+    canDeleteOwnAccount:
+      identity.data.role === "admin" &&
+      !access.superAdmin &&
+      actor.status === "active" &&
+      repo.db
+        .prepare("SELECT login_kind FROM accounts WHERE id=?")
+        .get(actor.id)?.login_kind === "ADMIN",
   };
 }
 
