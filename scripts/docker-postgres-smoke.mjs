@@ -94,7 +94,7 @@ const semesterId=randomUUID(),courseId=randomUUID(),enrollmentId=randomUUID();
 // Create isolated read fixtures; this does not claim the course creation flow is migrated.
 const fixtureRows=[
   [semesterId,'sportsSemester',{name:'Docker 学期',academicYear:'2026-2027',type:'AUTUMN',status:'ARCHIVED',startDate:'2026-09-01',endDate:'2027-01-31'}],
-  [courseId,'sportsCourse',{name:'Docker 课程',semesterId,status:'PUBLISHED',description:'Local fixture',startDate:'2026-09-01',deadlineDate:'2027-01-20',enrollmentOpen:true}],
+  [courseId,'sportsCourse',{name:'Docker 课程',semesterId,status:'PUBLISHED',description:'Local fixture',publishedAt:'2026-09-01T00:00:00Z',closingDate:'2027-01-27',settlementDate:'2027-01-28',startDate:'2026-09-01',deadlineDate:'2027-01-20',enrollmentOpen:true}],
   [enrollmentId,'sportsEnrollment',{courseId,semesterId,status:'ACTIVE'}],
 ];
 for(const [id,kind,data] of fixtureRows) execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO entities(id,kind,owner_id,data,version,created_at,updated_at) VALUES('${id}','${kind}','${actor.id}','${JSON.stringify(data).replaceAll("'","''")}',1,'2026-10-12T00:00:00Z','2026-10-12T00:00:00Z')`],{stdio:'pipe'});
@@ -183,6 +183,9 @@ try {
   await request('/api/commands',{action:'sports.review.decide',input:{id:reviewRecord.id,version:reviewRecord.version,batchId:reviewRecord.data.batchId,checksCompleted:true,decision:'PASS'},requestId:randomUUID()});
   cookie=studentCookie;const reviewed=(await request('/api/v1/exercise-records/'+finalDraft.id)).data;
   assert.equal(reviewed.status,'REVIEWED');assert.equal(reviewed.currentReview.result,'VALID');assert.equal(reviewed.creditedDurationSeconds,0,'Short fixture must not receive unearned credit');
+  assert.equal((await request('/api/v1/class-sections/'+courseId+'/v81-rules')).data.minimum_minutes,30);
+  assert.deepEqual((await request('/api/v1/exemption-application-details')).data,[]);
+  assert.deepEqual((await request('/api/v1/activity-certification-applications?limit=100')).data,[]);
   const studentProgress=(await request('/api/v1/student-progress?limit=100')).data.find(p=>p.enrollmentId===enrollmentId);
   assert.ok(studentProgress);assert.equal(studentProgress.general.effectiveSeconds,0);
   assert.equal((await request('/api/v1/class-sections/'+courseId+'/progress-target')).data.totalTargetSeconds,72000);

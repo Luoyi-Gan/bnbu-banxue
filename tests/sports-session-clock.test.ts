@@ -52,3 +52,10 @@ describe("体育服务端计时事实", () => {
     expect(elapsedMilliseconds(startClock(start), start + 59999)).toBe(59999);
   });
 });
+
+it("已结束记录读取固定时长，不受之后服务器时钟调整影响", () => {
+  const started=startClock(1000000);
+  const ended=transitionClock(started,"end",1060000);
+  expect(elapsedMilliseconds(ended,900000)).toBe(60000);
+  expect(()=>transitionClock(started,"pause",900000)).toThrow("时间回退");
+});

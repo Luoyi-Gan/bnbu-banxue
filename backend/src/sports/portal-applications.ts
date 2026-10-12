@@ -233,6 +233,9 @@ export function portalRecognitionHistory(
     "此申请不是组织认证。",
     409,
   );
+  return recognitionHistoryProjection(repo.all("sportsCertificationHistory"),id,input);
+}
+export function recognitionHistoryProjection(rows:Entity[],id:string,input:Fields) {
   demand(
     Object.keys(input).every((key) => ["limit", "cursor"].includes(key)),
     "认可历史查询参数无效。",
@@ -241,9 +244,7 @@ export function portalRecognitionHistory(
     input.limit === undefined
       ? 100
       : integerField({ value: Number(input.limit) }, "value", 1, 100);
-  const histories = repo
-    .all("sportsCertificationHistory")
-    .filter((row) => row.data.applicationId === id);
+  const histories = rows.filter(row=>row.data.applicationId===id);
   const versions = [
     ...new Set(histories.map((row) => Number(row.data.creditVersion))),
   ].sort((a, b) => b - a);

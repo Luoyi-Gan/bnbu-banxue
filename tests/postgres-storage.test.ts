@@ -1,4 +1,4 @@
-import { postgresStudentApplications } from '../backend/src/storage/postgres-student-applications';
+import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
@@ -309,6 +309,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const result=await postgresStudentApplications(db,login.token,{enrollmentId:'app-read-fixture'},true);
     expect(result.data).toEqual([expect.objectContaining({id:owned.id,certificationType:'SCHOOL_TEAM',organizationName:'Test team',decidedAt:expect.any(String)})]);
     expect(JSON.stringify(result)).not.toContain('privateInternal');expect(JSON.stringify(result)).not.toContain('foreign secret');
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);for(const [category,minutes] of [['RELATED',60],['OTHER',120]]) await repo.create('sportsCertificationHistory','sports-reader-other',{applicationId:owned.id,creditVersion:1,category,minutes,status:'VALID',reason:'原认可'});});
+    expect((await postgresStudentRecognitionHistory(db,login.token,owned.id,{})).data).toEqual([expect.objectContaining({courseSeconds:3600,generalSeconds:7200,revisionNumber:1,active:true})]);
+    const foreign=await db.transaction(client=>new PostgresRepository(client).create('sportsApplication','sports-reader-other',{applicationType:'CERTIFICATION'}));
+    await expect(postgresStudentRecognitionHistory(db,login.token,foreign.id,{})).rejects.toMatchObject({status:404});
+    await db.transaction(client=>new PostgresRepository(client).create('sportsCertificationHistory','sports-reader-other',{applicationId:owned.id,creditVersion:2,category:'RELATED',minutes:20,status:'VALID',reason:'缺失另一类'}));
+    await expect(postgresStudentRecognitionHistory(db,login.token,owned.id,{})).rejects.toMatchObject({status:409});
+
   });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

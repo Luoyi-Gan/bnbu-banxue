@@ -40,6 +40,7 @@ export function startClock(serverNow: number): SportsClock {
 }
 export function elapsedMilliseconds(clock: SportsClock, serverNow: number) {
   validTime(serverNow);
+  if (clock.state === "ENDED") return clock.activeMilliseconds;
   demand(serverNow >= clock.changedAt, "服务端时间回退，请稍后重试。", 503);
   return (
     clock.activeMilliseconds +
