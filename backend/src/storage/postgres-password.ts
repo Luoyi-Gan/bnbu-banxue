@@ -15,6 +15,6 @@ export async function postgresPassword(client: PoolClient, repo: PostgresReposit
   await client.query('UPDATE accounts SET password_hash=$1 WHERE id=$2',[encodePassword(input.newPassword),actor.id]);
   await client.query('DELETE FROM sessions WHERE account_id=$1 AND token_hash<>$2',[actor.id,digest(token)]);
   const saved=await repo.save(identity,{mustChangePassword:false,passwordChangedAt:Date.now()});
-  await repo.notify([actor.id],identity.id,'sports.password.change','本人密码已更新，其他设备的登录状态已失效。');
+  await repo.notify([actor.id],identity.id,'accounts.password.change','本人密码已更新，其他设备的登录状态已失效。');
   return {id:saved.id};
 }

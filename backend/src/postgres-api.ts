@@ -31,12 +31,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
       const sportsPath=pathname.startsWith('/api/v1/') || pathname.startsWith('/api/sports/');
-      if(options.surface==='companion')demand(!sportsPath,'接口不存在。',404);
-      const accountDirectory=/^\/api\/sports\/accounts\/(students|teachers)$/.exec(pathname);
+      demand(!sportsPath,'接口不存在。',404);
+      const accountDirectory=/^\/api\/accounts\/(students|teachers)$/.exec(pathname);
       if(request.method==='GET' && accountDirectory) return send(response,200,await postgresAccountDirectory(db,cookieToken(request) ?? '',accountDirectory[1]==='students'?'student':'teacher',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
-      if(request.method==='GET' && pathname==='/api/sports/administrator-self') return send(response,200,await postgresAdministratorSelf(db,cookieToken(request) ?? ''));
-      if(request.method==='GET' && pathname==='/api/sports/admin-email') return send(response,200,await postgresAdminEmailStatus(db,cookieToken(request) ?? ''));
-      if(request.method==='GET' && pathname==='/api/sports/administrators') return send(response,200,await postgresAdministratorDirectory(db,cookieToken(request) ?? ''));
+      if(request.method==='GET' && pathname==='/api/accounts/administrator-self') return send(response,200,await postgresAdministratorSelf(db,cookieToken(request) ?? ''));
+      if(request.method==='GET' && pathname==='/api/accounts/admin-email') return send(response,200,await postgresAdminEmailStatus(db,cookieToken(request) ?? ''));
+      if(request.method==='GET' && pathname==='/api/accounts/administrators') return send(response,200,await postgresAdministratorDirectory(db,cookieToken(request) ?? ''));
       if (request.method==='GET' && pathname==='/api/students/search') return send(response,200,await postgresStudentSearch(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('number') ?? ''));
       if (request.method === 'GET' && pathname === '/api/workspace') return send(response,200,await postgresWorkspace(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityView(db,cookieToken(request) ?? ''));
@@ -53,21 +53,21 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           student(actor);
           demand(actor.status!=='banned','账号已封禁。',403);
           const mustChange=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
-          if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
+          if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
           return send(response,200,await recognize(request));
         }
         const input = await body(request);
-        if(pathname==='/api/sports/admin-email/request') {
+        if(pathname==='/api/accounts/admin-email/request') {
           demand(Object.keys(input).length===0,'邮箱验证只能使用本人当前邮箱。');
           return send(response,200,await postgresAdminEmailRequest(db,cookieToken(request) ?? '',options.localOutbox===true));
         }
-        if(pathname==='/api/sports/admin-email/confirm') return send(response,200,await postgresAdminEmailConfirm(db,cookieToken(request) ?? '',input));
+        if(pathname==='/api/accounts/admin-email/confirm') return send(response,200,await postgresAdminEmailConfirm(db,cookieToken(request) ?? '',input));
         if(pathname==='/api/identity/check') return send(response,200,await checkSchoolIdentity(await auth.authenticate(cookieToken(request))));
         if (pathname === '/api/commands') {
           const key = input.requestId;
           demand(typeof key==='string','缺少操作幂等标识。');
           demand(typeof input.action==='string' && input.input && typeof input.input==='object' && !Array.isArray(input.input),'请求格式无效。');
-          if(options.surface==='companion')demand(!input.action.startsWith('sports.'),'该操作不属于伴学系统。',403);
+          demand(!input.action.startsWith('sports.'),'该操作不属于伴学系统。',403);
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '',input.action,input.input as Record<string,unknown>,key)});
         }
         if (pathname === '/api/auth/sign-in' || pathname === '/api/auth/login' || pathname === '/api/auth/admin-login') {

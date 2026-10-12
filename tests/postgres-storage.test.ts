@@ -64,12 +64,12 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const other=await auth.login('password-manager','Initial-test-123');
     await expect(executePostgres(db,first.token,'preferences.preview',{enabled:false},randomUUID())).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
     const input={version:identity.version,currentPassword:'wrong',newPassword:'Changed-test-123',confirmPassword:'Changed-test-123'};
-    await expect(executePostgres(db,first.token,'sports.password.change',input,randomUUID())).rejects.toMatchObject({status:403});
+    await expect(executePostgres(db,first.token,'accounts.password.change',input,randomUUID())).rejects.toMatchObject({status:403});
     expect((await auth.authenticate(other.token)).id).toBe('password-admin');
     input.currentPassword='Initial-test-123';
     const key=randomUUID();
-    expect(await executePostgres(db,first.token,'sports.password.change',input,key)).toEqual({id:identity.id});
-    expect(await executePostgres(db,first.token,'sports.password.change',input,key)).toEqual({id:identity.id});
+    expect(await executePostgres(db,first.token,'accounts.password.change',input,key)).toEqual({id:identity.id});
+    expect(await executePostgres(db,first.token,'accounts.password.change',input,key)).toEqual({id:identity.id});
     await expect(auth.authenticate(other.token)).rejects.toMatchObject({status:401});
     expect((await auth.authenticate(first.token)).id).toBe('password-admin');
     await expect(auth.login('password-manager','Initial-test-123')).rejects.toMatchObject({status:401});
@@ -104,18 +104,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const management=(await auth.login('state-manager','State-test-123')).token;
       const personal=(await auth.login('state@example.test','State-test-123')).token;
       const input={id:identity.id,version:identity.version,status:'DISABLED',confirmed:true,handoverConfirmed:false};
-      await expect(executePostgres(db,management,'sports.admins.state',input,randomUUID())).rejects.toMatchObject({status:403});
-      await expect(executePostgres(db,root,'sports.admins.state',input,randomUUID())).rejects.toThrow('职责移交');
+      await expect(executePostgres(db,management,'accounts.admins.state',input,randomUUID())).rejects.toMatchObject({status:403});
+      await expect(executePostgres(db,root,'accounts.admins.state',input,randomUUID())).rejects.toThrow('职责移交');
       expect((await auth.authenticate(management)).id).toBe('state-admin');
       input.handoverConfirmed=true;
       const key=randomUUID();
-      await executePostgres(db,root,'sports.admins.state',input,key);
-      await executePostgres(db,root,'sports.admins.state',input,key);
+      await executePostgres(db,root,'accounts.admins.state',input,key);
+      await executePostgres(db,root,'accounts.admins.state',input,key);
       await expect(auth.authenticate(management)).rejects.toMatchObject({status:401});
       await expect(auth.login('state-manager','State-test-123')).rejects.toMatchObject({code:'ACCOUNT_DISABLED'});
       expect((await auth.authenticate(personal)).id).toBe('state-person');
-      await expect(executePostgres(db,root,'sports.admins.state',{...input,status:'ACTIVE'},randomUUID())).rejects.toMatchObject({status:409});
-      await executePostgres(db,root,'sports.admins.state',{...input,version:identity.version+1,status:'ACTIVE'},randomUUID());
+      await expect(executePostgres(db,root,'accounts.admins.state',{...input,status:'ACTIVE'},randomUUID())).rejects.toMatchObject({status:409});
+      await executePostgres(db,root,'accounts.admins.state',{...input,version:identity.version+1,status:'ACTIVE'},randomUUID());
       await expect(auth.authenticate(management)).rejects.toMatchObject({status:401});
       expect((await auth.login('state-manager','State-test-123')).account.id).toBe('state-admin');
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
@@ -126,13 +126,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
     const input={personId:'state-person',loginName:' NEW-MANAGER ',name:'新管理员',email:'new-manager@bnbu.edu.cn',department:'测试',permissions:['ACCOUNTS'],initialPassword:'New-manager-123',confirmPassword:'New-manager-123',confirmed:true};
     try {
-      await expect(executePostgres(db,root,'sports.admins.create',input,randomUUID())).rejects.toThrow('身份核验');
+      await expect(executePostgres(db,root,'accounts.admins.create',input,randomUUID())).rejects.toThrow('身份核验');
       await db.transaction(client=>new PostgresRepository(client).create('companionIdentity','state-person',{role:'student',status:'verified'}));
-      await expect(executePostgres(db,root,'sports.admins.create',{...input,permissions:['SUPERADMIN']},randomUUID())).rejects.toThrow('固定业务权限');
-      await expect(executePostgres(db,root,'sports.admins.create',{...input,email:'bad@example.test'},randomUUID())).rejects.toThrow('学校域名');
+      await expect(executePostgres(db,root,'accounts.admins.create',{...input,permissions:['SUPERADMIN']},randomUUID())).rejects.toThrow('固定业务权限');
+      await expect(executePostgres(db,root,'accounts.admins.create',{...input,email:'bad@example.test'},randomUUID())).rejects.toThrow('学校域名');
       const key=randomUUID();
-      const result=await executePostgres(db,root,'sports.admins.create',input,key);
-      expect(await executePostgres(db,root,'sports.admins.create',input,key)).toEqual(result);
+      const result=await executePostgres(db,root,'accounts.admins.create',input,key);
+      expect(await executePostgres(db,root,'accounts.admins.create',input,key)).toEqual(result);
       const identity=await db.transaction(client=>new PostgresRepository(client).get(result.id));
       expect(identity.ownerId).not.toBe('state-person');
       expect(identity.data.mustChangePassword).toBe(true);
@@ -140,7 +140,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const login=await auth.login('new-manager','New-manager-123');
       expect(login.account.roles).toEqual(['admin']);
       await expect(executePostgres(db,login.token,'preferences.preview',{enabled:false},randomUUID())).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
-      await expect(executePostgres(db,root,'sports.admins.create',{...input,loginName:'another-manager'},randomUUID())).rejects.toMatchObject({status:409});
+      await expect(executePostgres(db,root,'accounts.admins.create',{...input,loginName:'another-manager'},randomUUID())).rejects.toMatchObject({status:409});
       expect((await auth.login('state@example.test','State-test-123')).account.id).toBe('state-person');
       const history=(await db.pool.query("SELECT data FROM entities WHERE kind='sportsAdminHistory' AND data::jsonb->>'administratorId'=$1",[identity.ownerId])).rows;
       expect(history).toHaveLength(1);
@@ -149,10 +149,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await db.pool.query("INSERT INTO admin_security_challenges(id,account_id,purpose,email,code_hash,expires_at,sent_at,identity_version,mail_id) VALUES('admin-edit-challenge',$1,'EMAIL_VERIFY',$2,'hash',9999999999999,1,1,'admin-edit-mail')",[identity.ownerId,input.email]);
       await db.pool.query("INSERT INTO email_challenges VALUES($1,'personal-proof',9999999999999,0,1)",[input.email]);
       const edit={id:identity.id,version:identity.version,name:'修改后',email:'changed-manager@bnbu.edu.cn',department:'新部门',permissions:['HELP'],confirmed:true};
-      await expect(executePostgres(db,root,'sports.admins.edit',{...edit,loginName:'forbidden'},randomUUID())).rejects.toThrow('不允许的字段');
-      await expect(executePostgres(db,root,'sports.admins.edit',{...edit,version:0},randomUUID())).rejects.toMatchObject({status:409});
+      await expect(executePostgres(db,root,'accounts.admins.edit',{...edit,loginName:'forbidden'},randomUUID())).rejects.toThrow('不允许的字段');
+      await expect(executePostgres(db,root,'accounts.admins.edit',{...edit,version:0},randomUUID())).rejects.toMatchObject({status:409});
       expect((await db.pool.query("SELECT id FROM admin_security_challenges WHERE id='admin-edit-challenge'")).rows).toHaveLength(1);
-      await executePostgres(db,root,'sports.admins.edit',edit,randomUUID());
+      await executePostgres(db,root,'accounts.admins.edit',edit,randomUUID());
       const changed=await db.transaction(client=>new PostgresRepository(client).get(identity.id));
       expect(changed.data.permissions).toEqual(['HELP']);
       expect(changed.data.schoolEmailVerified).toBe(false);
@@ -167,7 +167,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(postgresAdminEmailRequest(db,token,true)).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
     const account=await auth.authenticate(token);
     const identity=await db.transaction(async client=>(await new PostgresRepository(client).all('companionIdentity')).find(i=>i.ownerId===account.id)!);
-    await executePostgres(db,token,'sports.password.change',{version:identity.version,currentPassword:'New-manager-123',newPassword:'Changed-manager-123',confirmPassword:'Changed-manager-123'},randomUUID());
+    await executePostgres(db,token,'accounts.password.change',{version:identity.version,currentPassword:'New-manager-123',newPassword:'Changed-manager-123',confirmPassword:'Changed-manager-123'},randomUUID());
     expect((await postgresAdminEmailStatus(db,token)).verified).toBe(false);
     const challenge=await postgresAdminEmailRequest(db,token,true);
     await expect(postgresAdminEmailRequest(db,token,true)).rejects.toMatchObject({status:429});
@@ -220,10 +220,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   it('closes an independent admin login while retaining history and the personal account', async () => {
     const auth=new PostgresAuth(db),login=await auth.login('new-manager','Changed-manager-123');
     const snapshot=await postgresAdministratorSelf(db,login.token);
-    await expect(executePostgres(db,login.token,'sports.account.close',{...snapshot,confirmed:true,handoverConfirmed:false},randomUUID())).rejects.toThrow('职责移交');
-    await expect(executePostgres(db,login.token,'sports.account.close',{...snapshot,email:'stale@bnbu.edu.cn',confirmed:true,handoverConfirmed:true},randomUUID())).rejects.toMatchObject({status:409});
+    await expect(executePostgres(db,login.token,'accounts.close',{...snapshot,confirmed:true,handoverConfirmed:false},randomUUID())).rejects.toThrow('职责移交');
+    await expect(executePostgres(db,login.token,'accounts.close',{...snapshot,email:'stale@bnbu.edu.cn',confirmed:true,handoverConfirmed:true},randomUUID())).rejects.toMatchObject({status:409});
     const id=login.account.id;
-    await executePostgres(db,login.token,'sports.account.close',{...snapshot,confirmed:true,handoverConfirmed:true},randomUUID());
+    await executePostgres(db,login.token,'accounts.close',{...snapshot,confirmed:true,handoverConfirmed:true},randomUUID());
     await expect(auth.authenticate(login.token)).rejects.toMatchObject({status:401});
     await expect(auth.login('new-manager','Changed-manager-123')).rejects.toMatchObject({status:401});
     const row=(await db.pool.query('SELECT * FROM accounts WHERE id=$1',[id])).rows[0];
@@ -242,10 +242,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
     const identity=await db.transaction(async client=>(await new PostgresRepository(client).all('companionIdentity')).find(i=>i.ownerId===target.account.id)!);
     const input={accountId:target.account.id,version:identity.version,confirmed:true,handoverConfirmed:true};
-    await db.pool.query("CREATE FUNCTION reject_delete_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='sports.admins.delete' THEN RAISE EXCEPTION 'injected deletion audit failure'; END IF; RETURN NEW; END; $$");
+    await db.pool.query("CREATE FUNCTION reject_delete_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='accounts.admins.delete' THEN RAISE EXCEPTION 'injected deletion audit failure'; END IF; RETURN NEW; END; $$");
     await db.pool.query('CREATE TRIGGER reject_delete_audit BEFORE INSERT ON audit FOR EACH ROW EXECUTE FUNCTION reject_delete_audit()');
     try {
-      await expect(executePostgres(db,root,'sports.admins.delete',input,randomUUID())).rejects.toThrow('injected deletion audit failure');
+      await expect(executePostgres(db,root,'accounts.admins.delete',input,randomUUID())).rejects.toThrow('injected deletion audit failure');
       expect((await auth.authenticate(target.token)).id).toBe(target.account.id);
       expect((await db.pool.query('SELECT login_kind FROM accounts WHERE id=$1',[target.account.id])).rows[0].login_kind).toBe('ADMIN');
     } finally {
@@ -254,12 +254,12 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     }
     try {
       const key=randomUUID();
-      const result=await executePostgres(db,root,'sports.admins.delete',input,key);
-      expect(await executePostgres(db,root,'sports.admins.delete',input,key)).toEqual(result);
+      const result=await executePostgres(db,root,'accounts.admins.delete',input,key);
+      expect(await executePostgres(db,root,'accounts.admins.delete',input,key)).toEqual(result);
       await expect(auth.authenticate(target.token)).rejects.toMatchObject({status:401});
       expect((await auth.login('state@example.test','State-test-123')).account.id).toBe('state-person');
       await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'");
-      await expect(executePostgres(db,root,'sports.admins.delete',input,key)).rejects.toMatchObject({status:403});
+      await expect(executePostgres(db,root,'accounts.admins.delete',input,key)).rejects.toMatchObject({status:403});
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
   it('stores image bytes outside PostgreSQL and rolls the entity back on object write failure', async () => {

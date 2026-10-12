@@ -18,6 +18,6 @@ export function sportsAccountGate(repo: Pick<Repository, "all">, actor: Account)
     throw new ServiceError(
       403,
       "PASSWORD_CHANGE_REQUIRED",
-      "请先修改本人初始密码，再进入体育业务。",
+      "请先修改本人初始密码，再继续操作。",
     );
 }

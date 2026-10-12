@@ -40,9 +40,9 @@ export function sportsAdministratorDeletion(
   action: string,
   input: Fields,
 ) {
-  if (!["sports.admins.delete", "sports.account.close"].includes(action))
+  if (!["accounts.admins.delete", "accounts.close"].includes(action))
     return undefined;
-  const self = action === "sports.account.close";
+  const self = action === "accounts.close";
   if (!self) requireSportsSuperAdmin(repo, actor);
   // The original portal confirms the displayed account and immutable version.
   // Resolve that snapshot inside execute's transaction; the receipt hashes the

@@ -158,7 +158,7 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
-        if (pathname === "/api/sports/admin-email/request") {
+        if (pathname === "/api/accounts/admin-email/request") {
           demand(
             Object.keys(input).length === 0,
             "邮箱验证只能使用本人当前邮箱。",
@@ -173,7 +173,7 @@ export function createApiServer(
             ),
           );
         }
-        if (pathname === "/api/sports/admin-email/confirm")
+        if (pathname === "/api/accounts/admin-email/confirm")
           return send(
             response,
             200,
@@ -233,7 +233,7 @@ export function createApiServer(
         return send(response, 200, {
           account: authenticate(db, cookieToken(request)),
         });
-      if (request.method === "GET" && pathname === "/api/sports/administrators")
+      if (request.method === "GET" && pathname === "/api/accounts/administrators")
         return send(
           response,
           200,
@@ -244,7 +244,7 @@ export function createApiServer(
         );
       if (
         request.method === "GET" &&
-        pathname === "/api/sports/administrator-self"
+        pathname === "/api/accounts/administrator-self"
       )
         return send(
           response,
@@ -254,7 +254,7 @@ export function createApiServer(
             authenticate(db, cookieToken(request)),
           ),
         );
-      if (request.method === "GET" && pathname === "/api/sports/admin-email")
+      if (request.method === "GET" && pathname === "/api/accounts/admin-email")
         return send(
           response,
           200,
@@ -263,7 +263,7 @@ export function createApiServer(
             authenticate(db, cookieToken(request)),
           ),
         );
-      const directory = /^\/api\/sports\/accounts\/(students|teachers)$/.exec(
+      const directory = /^\/api\/accounts\/(students|teachers)$/.exec(
         pathname,
       );
       if (request.method === "GET" && directory) {

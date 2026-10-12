@@ -19,9 +19,7 @@ import { postgresAdministratorDelete } from './postgres-admin-deletion';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
-  // These legacy names are still used by Banxue account controls, not sports teaching.
-  const accountActions=['sports.password.change','sports.admins.state','sports.admins.create','sports.admins.edit','sports.admins.delete','sports.account.close'];
-  demand(!action.startsWith('sports.') || accountActions.includes(action),'伴学不提供体育业务写入。',404);
+  demand(!action.startsWith('sports.'),'伴学不提供体育业务写入。',404);
   return db.transaction(async client => {
     // Preserve SQLite's serialized business-command boundary while policies are migrated.
     // All API instances share this lock; external I/O must remain outside this transaction.
@@ -29,23 +27,23 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     const actor = await new PostgresAuth(db).authenticate(token,client);
     demand(actor.status!=='banned','账号已封禁，不能进行业务写入。',403);
     const repo = new PostgresRepository(client);
-    if(action!=='sports.password.change' && passwordChangeRequired(await repo.all('companionIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
+    if(action!=='accounts.password.change' && passwordChangeRequired(await repo.all('companionIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
     for(const [name,key] of [['room.decide','accept'],['report.decide','upheld'],['coffee.answer','accept'],['coffee.slot.update','closed'],['certification.review','approve'],['organization.review','approve'],['activity.visibility','publish'],['mail.visibility','publish'],['alumni.review','approve'],['alumni.decide','accept'],['alumni.profile','accepting']] as const) {
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
-    if(action.startsWith('sports.admins.')) await requirePostgresSuperAdmin(repo,actor);
+    if(action.startsWith('accounts.admins.')) await requirePostgresSuperAdmin(repo,actor);
     const previous = (await client.query<{request_hash:string;result:string}>('SELECT request_hash,result FROM command_receipts WHERE actor_id=$1 AND request_id=$2',[actor.id,requestId])).rows[0];
     if(previous) {
       demand(previous.request_hash===hash,'该请求标识已用于不同操作。',409);
       return JSON.parse(previous.result) as Fields;
     }
     let result:Fields|undefined;
-    if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
-    else if(action==='sports.admins.state') result=await postgresAdministratorState(repo,actor,input);
-    else if(action==='sports.admins.create') result=await postgresAdministratorCreate(repo,actor,input);
-    else if(action==='sports.admins.edit') result=await postgresAdministratorEdit(repo,actor,input);
-    else if(action==='sports.admins.delete' || action==='sports.account.close') result=await postgresAdministratorDelete(repo,actor,action,input);
+    if(action==='accounts.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action==='accounts.admins.state') result=await postgresAdministratorState(repo,actor,input);
+    else if(action==='accounts.admins.create') result=await postgresAdministratorCreate(repo,actor,input);
+    else if(action==='accounts.admins.edit') result=await postgresAdministratorEdit(repo,actor,input);
+    else if(action==='accounts.admins.delete' || action==='accounts.close') result=await postgresAdministratorDelete(repo,actor,action,input);
     else if(action.startsWith('notification.')) result=await runAsync(notificationPolicy(repo,actor,action,input));
     else {
       const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input)) ?? await runAsync(alumniPolicy(repo,actor,action,input));

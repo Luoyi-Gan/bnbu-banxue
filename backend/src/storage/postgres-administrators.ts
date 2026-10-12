@@ -29,7 +29,7 @@ export async function postgresAdministratorState(repo:PostgresRepository,actor:A
   if(next==='banned') demand(input.handoverConfirmed===true,'停用前须确认已完成职责移交。');
   await repo.client.query('UPDATE accounts SET status=$1 WHERE id=$2',[next,identity.ownerId]);
   if(next==='banned') await repo.client.query('DELETE FROM sessions WHERE account_id=$1',[identity.ownerId]);
-  await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action:'sports.admins.state',before:row.status,after:next});
+  await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action:'accounts.admins.state',before:row.status,after:next});
   const saved=await repo.save(identity,{accountState:input.status});
   return {id:saved.id};
 }
@@ -52,7 +52,7 @@ export async function postgresAdministratorCreate(repo:PostgresRepository,actor:
   const id=randomUUID();
   await repo.client.query("INSERT INTO accounts(id,email,password_hash,name,organization,roles,created_at,login_kind,login_name) VALUES($1,$2,$3,$4,$5,$6,$7,'ADMIN',$8)",[id,email,encodePassword(input.initialPassword),name,department,JSON.stringify(['admin']),timestamp(),loginName]);
   const saved=await repo.create('companionIdentity',id,{role:'admin',status:'verified',permissions:input.permissions,mustChangePassword:true,accountState:'ACTIVE',source:'SUPERADMIN_CONFIRMED_PERSON',verifiedPersonId:personId});
-  await repo.create('sportsAdminHistory',actor.id,{administratorId:id,action:'sports.admins.create',permissions:input.permissions});
+  await repo.create('sportsAdminHistory',actor.id,{administratorId:id,action:'accounts.admins.create',permissions:input.permissions});
   return {id:saved.id};
 }
 
@@ -75,7 +75,7 @@ export async function postgresAdministratorEdit(repo:PostgresRepository,actor:Ac
     await repo.client.query('DELETE FROM admin_security_challenges WHERE account_id=$1',[identity.ownerId]);
   }
   await repo.client.query('UPDATE accounts SET name=$1,email=$2,organization=$3 WHERE id=$4',[name,email,department,identity.ownerId]);
-  await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action:'sports.admins.edit',before:{name:row.name,email:row.email,organization:row.organization,permissions:identity.data.permissions},after:{name,email,organization:department,permissions:input.permissions}});
+  await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action:'accounts.admins.edit',before:{name:row.name,email:row.email,organization:row.organization,permissions:identity.data.permissions},after:{name,email,organization:department,permissions:input.permissions}});
   const saved=await repo.save(identity,{permissions:input.permissions,...(row.email!==email?{schoolEmailVerified:false,schoolEmail:null}:{})});
   return {id:saved.id};
 }
@@ -85,7 +85,7 @@ export async function postgresAdministratorDirectory(db:PostgresDatabase, token:
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client);
     const repo=new PostgresRepository(client), identities=await repo.all('companionIdentity');
-    if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
+    if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
     await requirePostgresSuperAdmin(repo,actor);
     const rows=(await client.query("SELECT id,login_name,name,email,organization,status FROM accounts WHERE login_kind='ADMIN' ORDER BY login_name")).rows;
     return {

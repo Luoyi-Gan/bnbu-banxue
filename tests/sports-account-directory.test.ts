@@ -161,7 +161,7 @@ it("HTTP读取校验当前登录和权限、禁止缓存，不提供修改账号
   const base =
     "http://127.0.0.1:" +
     (server.address() as { port: number }).port +
-    "/api/sports/accounts/students";
+    "/api/accounts/students";
   try {
     expect((await fetch(base)).status).toBe(401);
     expect(

@@ -39,14 +39,13 @@ export function execute(
       requestId.length <= 100,
     "请求格式无效。",
   );
-  const accountActions=['sports.password.change','sports.admins.state','sports.admins.create','sports.admins.edit','sports.admins.delete','sports.account.close'];
-  demand(!action.startsWith('sports.') || accountActions.includes(action),'伴学不提供体育业务写入。',404);
+  demand(!action.startsWith('sports.'),'伴学不提供体育业务写入。',404);
   return transaction(db, () => {
     const actor = authenticate(db, token),
       repo = new Repository(db);
     demand(actor.status !== "banned", "账号已封禁，不能进行业务写入。", 403);
-    if (action !== "sports.password.change") sportsAccountGate(repo, actor);
-    if (action.startsWith("sports.admins."))
+    if (action !== "accounts.password.change") sportsAccountGate(repo, actor);
+    if (action.startsWith("accounts.admins."))
       requireSportsSuperAdmin(repo, actor);
     const booleanArguments: Record<string, string> = {
       "content.review": "",

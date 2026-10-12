@@ -15,7 +15,7 @@ export function sportsPasswordCommand(
   action: string,
   input: Fields,
 ) {
-  if (action !== "sports.password.change") return undefined;
+  if (action !== "accounts.password.change") return undefined;
   const identity = repo
     .all("companionIdentity")
     .find(

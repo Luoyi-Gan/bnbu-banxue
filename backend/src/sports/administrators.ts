@@ -54,15 +54,15 @@ export function sportsAdministratorCommand(
 ) {
   if (
     ![
-      "sports.admins.create",
-      "sports.admins.edit",
-      "sports.admins.state",
+      "accounts.admins.create",
+      "accounts.admins.edit",
+      "accounts.admins.state",
     ].includes(action)
   )
     return undefined;
   requireSportsSuperAdmin(repo, actor);
-  const create = action === "sports.admins.create",
-    state = action === "sports.admins.state";
+  const create = action === "accounts.admins.create",
+    state = action === "accounts.admins.state";
   const allowed = create
     ? [
         "personId",

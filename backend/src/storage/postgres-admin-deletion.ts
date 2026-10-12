@@ -11,7 +11,7 @@ export async function postgresAdministratorSelf(db:PostgresDatabase,token:string
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client),identities=await repo.all('companionIdentity');
-    if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
+    if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
 
     const row=(await client.query("SELECT login_name,name,email FROM accounts WHERE id=$1 AND login_kind='ADMIN'",[actor.id])).rows[0];
     const identity=identities.find(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified');
@@ -21,7 +21,7 @@ export async function postgresAdministratorSelf(db:PostgresDatabase,token:string
 }
 
 export async function postgresAdministratorDelete(repo:PostgresRepository,actor:Account,action:string,input:Fields) {
-  const self=action==='sports.account.close';
+  const self=action==='accounts.close';
   if(!self) await requirePostgresSuperAdmin(repo,actor);
 
   if(!self && input.accountId!==undefined) {

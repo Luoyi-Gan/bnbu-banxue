@@ -20,7 +20,7 @@ const dbs: Database[] = [];
 it("删除清空独立登录资料和资料副本，业务历史及个人账号保留且历史主体不能复活", () => {
   const f = setup(),
     identity = f.create();
-  f.cmd("sports.admins.edit", {
+  f.cmd("accounts.admins.edit", {
     id: identity.id,
     version: identity.version,
     name: "管理专属新名",
@@ -48,15 +48,15 @@ it("删除清空独立登录资料和资料副本，业务历史及个人账号�
     handoverConfirmed: true,
   };
   expect(() =>
-    f.cmd("sports.admins.delete", { ...input, handoverConfirmed: false }),
+    f.cmd("accounts.admins.delete", { ...input, handoverConfirmed: false }),
   ).toThrow("职责移交");
   expect(() =>
-    f.cmd("sports.admins.delete", { ...input, name: "过时" }),
+    f.cmd("accounts.admins.delete", { ...input, name: "过时" }),
   ).toThrow("资料已变化");
-  expect(() => f.cmd("sports.admins.delete", input, f.personal.token)).toThrow(
+  expect(() => f.cmd("accounts.admins.delete", input, f.personal.token)).toThrow(
     "总管理员",
   );
-  f.cmd("sports.admins.delete", input);
+  f.cmd("accounts.admins.delete", input);
   expect(
     f.db
       .prepare(
@@ -90,7 +90,7 @@ it("删除清空独立登录资料和资料副本，业务历史及个人账号�
   expect(
     f.db
       .prepare(
-        "SELECT COUNT(*) AS n FROM audit WHERE action='sports.admins.delete'",
+        "SELECT COUNT(*) AS n FROM audit WHERE action='accounts.admins.delete'",
       )
       .get()?.n,
   ).toBe(1);
@@ -108,7 +108,7 @@ it("本人注销只作用于本人独立账号，审计失败则资料与登录�
     identity = f.create(),
     logged = loginAdministrator(f.db, "staff.one", "x");
   f.cmd(
-    "sports.password.change",
+    "accounts.password.change",
     {
       version: identity.version,
       currentPassword: "x",
@@ -119,25 +119,25 @@ it("本人注销只作用于本人独立账号，审计失败则资料与登录�
   );
   const self = administratorSelf(f.repo, logged.account),
     input = { ...self, confirmed: true, handoverConfirmed: true };
-  expect(() => f.cmd("sports.account.close", input, f.personal.token)).toThrow(
+  expect(() => f.cmd("accounts.close", input, f.personal.token)).toThrow(
     "无权",
   );
   f.db.exec(
-    "CREATE TRIGGER reject_closure_audit BEFORE INSERT ON audit WHEN NEW.action='sports.account.close' BEGIN SELECT RAISE(ABORT,'audit unavailable'); END;",
+    "CREATE TRIGGER reject_closure_audit BEFORE INSERT ON audit WHEN NEW.action='accounts.close' BEGIN SELECT RAISE(ABORT,'audit unavailable'); END;",
   );
-  expect(() => f.cmd("sports.account.close", input, logged.token)).toThrow(
+  expect(() => f.cmd("accounts.close", input, logged.token)).toThrow(
     "audit unavailable",
   );
   expect(authenticate(f.db, logged.token).id).toBe(identity.ownerId);
   expect(f.repo.get(identity.id).data.role).toBe("admin");
   f.db.exec("DROP TRIGGER reject_closure_audit");
-  f.cmd("sports.account.close", input, logged.token);
+  f.cmd("accounts.close", input, logged.token);
   expect(() => authenticate(f.db, logged.token)).toThrow();
   expect(authenticate(f.db, f.personal.token).id).toBe(f.personId);
   expect(
     f.db
       .prepare(
-        "SELECT COUNT(*) AS n FROM audit WHERE action='sports.account.close'",
+        "SELECT COUNT(*) AS n FROM audit WHERE action='accounts.close'",
       )
       .get()?.n,
   ).toBe(1);
@@ -171,7 +171,7 @@ it("HTTP独立登录发放本人会话且普通邮箱入口不能误登录管理
     expect((await workspace.json()).firstLoginOnly).toBe(true);
     expect(
       (
-        await fetch(base + "/api/sports/administrators", {
+        await fetch(base + "/api/accounts/administrators", {
           headers: { Cookie: cookie },
         })
       ).status,
@@ -184,7 +184,7 @@ it("HTTP独立登录发放本人会话且普通邮箱入口不能误登录管理
         })
       ).status,
     ).toBe(401);
-    const directory = await fetch(base + "/api/sports/administrators", {
+    const directory = await fetch(base + "/api/accounts/administrators", {
       headers: { Cookie: "bnbu_session=" + f.root.token },
     });
     expect(directory.status).toBe(200);
@@ -240,7 +240,7 @@ function setup() {
     token = root.token,
   ) => execute(db, token, action, input, "admin-test-" + ++n);
   const create = () => {
-    const result = cmd("sports.admins.create", input) as { id: string };
+    const result = cmd("accounts.admins.create", input) as { id: string };
     return repo.get(result.id);
   };
   return { db, repo, root, personal, personId, input, cmd, create };
@@ -258,7 +258,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
     f.cmd("profile.save", { nickname: "未改密账号" }, first.token),
   ).toThrow("初始密码");
   f.cmd(
-    "sports.password.change",
+    "accounts.password.change",
     {
       id: identity.id,
       version: identity.version,
@@ -274,7 +274,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
   expect(loginAdministrator(f.db, "staff.one", "y").account.id).toBe(
     identity.ownerId,
   );
-  f.cmd("sports.admins.state", {
+  f.cmd("accounts.admins.state", {
     id: identity.id,
     version: f.repo.get(identity.id).version,
     status: "DISABLED",
@@ -287,7 +287,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
   expect(login(f.db, "teacher@example.test", "Personal123").account.id).toBe(
     f.personId,
   );
-  f.cmd("sports.admins.edit", {
+  f.cmd("accounts.admins.edit", {
     id: identity.id,
     version: f.repo.get(identity.id).version,
     name: "更新",
@@ -296,7 +296,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
     permissions: ["HELP"],
     confirmed: true,
   });
-  f.cmd("sports.admins.state", {
+  f.cmd("accounts.admins.state", {
     id: identity.id,
     version: f.repo.get(identity.id).version,
     status: "ACTIVE",
@@ -311,7 +311,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
 it("只有总管理员可建管，禁止改登录名或密码，重复和无权限创建原子失败", () => {
   const f = setup();
   expect(() =>
-    f.cmd("sports.admins.create", f.input, f.personal.token),
+    f.cmd("accounts.admins.create", f.input, f.personal.token),
   ).toThrow("总管理员");
   for (const patch of [
     { permissions: [] },
@@ -321,17 +321,17 @@ it("只有总管理员可建管，禁止改登录名或密码，重复和无权�
     { confirmed: false },
   ])
     expect(() =>
-      f.cmd("sports.admins.create", { ...f.input, ...patch }),
+      f.cmd("accounts.admins.create", { ...f.input, ...patch }),
     ).toThrow();
   expect(
     f.db.prepare("SELECT * FROM accounts WHERE login_kind='ADMIN'").all(),
   ).toHaveLength(0);
   const identity = f.create();
   expect(() =>
-    f.cmd("sports.admins.create", { ...f.input, loginName: "another" }),
+    f.cmd("accounts.admins.create", { ...f.input, loginName: "another" }),
   ).toThrow("邮箱");
   expect(() =>
-    f.cmd("sports.admins.create", {
+    f.cmd("accounts.admins.create", {
       ...f.input,
       email: "another@example.test",
     }),
@@ -349,11 +349,11 @@ it("只有总管理员可建管，禁止改登录名或密码，重复和无权�
     { initialPassword: "new" },
     { loginName: "replacement" },
   ])
-    expect(() => f.cmd("sports.admins.edit", { ...change, ...patch })).toThrow(
+    expect(() => f.cmd("accounts.admins.edit", { ...change, ...patch })).toThrow(
       "不允许",
     );
   expect(() =>
-    f.cmd("sports.admins.state", {
+    f.cmd("accounts.admins.state", {
       id: identity.id,
       version: identity.version,
       status: "DISABLED",
