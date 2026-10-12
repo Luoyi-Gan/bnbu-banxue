@@ -135,6 +135,25 @@ it("邮件来源去重、人工修正保留及内部原文隔离", () => {
   expect(
     snapshot(db, a.account).entities.some((e) => e.kind === "activity"),
   ).toBe(false);
+  const second = run(admin, "mail.import", {
+    ...source, messageId: "mail-test-2", subject: "另一活动",
+    body: source.body.replace("公开讲座", "另一讲座"),
+  });
+  // Whichever order the repository returns, address a non-first record.
+  const target = repo.all("mail")[1];
+  const record = target.data.record as { status: string };
+  const beforeMails = repo.all("mail");
+  const beforeEvents = repo.all("activity");
+  const result = run(admin, "mail.visibility", {
+    id: target.id, publish: record.status === "published", reason: "核对当前状态",
+  });
+  expect(result.id).toBe(target.id);
+  expect(repo.all("mail")).toEqual(beforeMails);
+  expect(repo.all("activity")).toEqual(beforeEvents);
+  run(admin, "mail.visibility", { id: mail.id, publish: true, reason: "恢复原活动" });
+  expect(repo.all("activity").find(e => e.data.mailId === mail.id)?.data)
+    .toMatchObject({ title: "修正后的名称", status: "published" });
+  expect(repo.get(second.id)).toEqual(beforeMails.find(e => e.id === second.id));
 });
 
 it("无效课表不能覆盖本人数据，也不能被其他账号读取", () => {

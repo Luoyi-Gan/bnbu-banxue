@@ -181,14 +181,17 @@ export function activityCommand(
         fields,
         textField(input, "reason", 1000),
       );
-    } else if (action === "mail.visibility")
+    } else if (action === "mail.visibility") {
       next = setMailActivityVisibility(
         state,
         record.id,
         input.publish === true,
         textField(input, "reason", 1000),
       );
-    else return undefined;
+      // An unchanged visibility request must return this mail, not the first
+      // unrelated record in the shared collection, and must not bump versions.
+      if (next === state) return stored;
+    } else return undefined;
   }
   const record = next.mailActivities![0];
   record.history = record.history.map((h) =>
