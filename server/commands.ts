@@ -330,7 +330,7 @@ export function snapshot(db: Database, actor: Account) {
         ...r.data,
         memberCount: strings(r.data.members).length,
         members:
-          memberRooms.some((m) => m.id === r.id) || review || own(r.ownerId)
+          strings(r.data.members).includes(actor.id) || review || own(r.ownerId)
             ? r.data.members
             : [],
         isMember: strings(r.data.members).includes(actor.id),

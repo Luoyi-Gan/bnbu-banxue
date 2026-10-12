@@ -145,6 +145,19 @@ it("队伍消息阅读受成员权限约束，不能跨会话读取，撤销成�
   expect(snapshot(db, b.account).entities.filter(e => e.kind === "message")).toHaveLength(0);
 });
 
+it("结束队伍后成员仍能读取互评名单，外人不获得名单且会话关闭", () => {
+  const {db, a, b, teacher, run} = fixture();
+  const room = run(a, "room.create", {type: "study", title: "学习", body: "一起学习", time: "周末", place: "图书馆", capacity: 3});
+  const application = run(b, "room.apply", {id: room.id});
+  run(a, "room.decide", {id: application.id, accept: true});
+  run(a, "room.finish", {id: room.id});
+  expect(snapshot(db, b.account).entities.find(e => e.id === room.id)!.data.members).toEqual([a.account.id, b.account.id]);
+  expect(snapshot(db, teacher.account).entities.find(e => e.id === room.id)!.data.members).toEqual([]);
+  expect(() => run(b, "message.send", {roomId: room.id, body: "结束后消息"})).toThrow();
+  run(b, "room.review", {id: room.id, targetId: a.account.id, stars: 5, comment: "合作愉快"});
+  expect(() => run(b, "room.review", {id: room.id, targetId: a.account.id, stars: 5})).toThrow();
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {
