@@ -1478,3 +1478,7 @@ activityCommand 提取为同步/异步共用 activityPolicy，包含社团发布
 ### PostgreSQL 校友认证与交流主链
 alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态规则和教师预约冲突输入；邮箱学号提取为共用纯判断，SQLite 学号查询、PostgreSQL 工作台和校友申请统一调用。PostgreSQL 入口增加校友审批、确认、资料接受交流开关的布尔校验。
 52 项针对测试通过（PostgreSQL 20、原 HTTP/并发 32）；服务端类型检查和修改文件 lint 通过。新增真实 PostgreSQL 主链验证申请学号→审核→公开资料去除学号/证明→开放时段→学生申请→校友确认→撤销认证取消预约与禁止新时段。原 UI 未改动，COS、独立前后端 Compose、学号搜索/外部适配等尚未完成的路由继续推进。
+
+### PostgreSQL 学号查询与外部适配入口
+学号搜索接入 PostgreSQL 只读一致性事务，复用已验证学校邮箱前缀、精确匹配和 searchable/profilePreview 隐私规则；不公开邮箱或角色。PostgreSQL HTTP 增加课表识别与学校身份核验入口，继续使用原可配置适配器，不伪造外部服务成功。
+恢复工作后重新运行 PostgreSQL、原 HTTP、课表及身份适配回归，4 文件 42 项通过。其中 PostgreSQL 21 项包含未验证不可搜索、验证后精确搜索、关闭资料预览隐藏学院及关闭搜索返回空结果。外部适配原有测试通过，但尚未声称 PostgreSQL 下真实外部服务已联通。前端未改动；分离 Compose、COS 和剩余管理接口继续推进。

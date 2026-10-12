@@ -7,6 +7,12 @@ import type { PostgresDatabase } from './storage/postgres';
 import { executePostgres } from './storage/postgres-commands';
 import { postgresCommunityView } from './storage/postgres-community-view';
 import { postgresWorkspace } from './storage/postgres-workspace';
+import { postgresStudentSearch } from './storage/postgres-student-search';
+import { checkSchoolIdentity } from './identity';
+import { recognize } from './timetable';
+import { student } from './community';
+import { passwordChangeRequired } from './sports/account-gate';
+import { PostgresRepository } from './storage/postgres-repository';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean} = {}) {
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
@@ -15,6 +21,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      if (request.method==='GET' && pathname==='/api/students/search') return send(response,200,await postgresStudentSearch(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('number') ?? ''));
       if (request.method === 'GET' && pathname === '/api/workspace') return send(response,200,await postgresWorkspace(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityView(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/health') {
@@ -25,7 +32,16 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if (request.method === 'POST') {
         demand(!request.headers.origin || origins.has(request.headers.origin),'来源不允许。',403);
         demand(request.headers['sec-fetch-site'] !== 'cross-site','跨站请求不允许。',403);
+        if(pathname==='/api/timetable/recognize') {
+          const actor=await auth.authenticate(cookieToken(request));
+          student(actor);
+          demand(actor.status!=='banned','账号已封禁。',403);
+          const mustChange=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('sportsIdentity'),actor));
+          if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
+          return send(response,200,await recognize(request));
+        }
         const input = await body(request);
+        if(pathname==='/api/identity/check') return send(response,200,await checkSchoolIdentity(await auth.authenticate(cookieToken(request))));
         if (pathname === '/api/commands') {
           const key = input.requestId;
           demand(typeof key==='string','缺少操作幂等标识。');
