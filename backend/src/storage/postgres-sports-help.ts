@@ -1,4 +1,4 @@
-import { helpRead } from '../sports/help';
+import { helpRead,portalHelpCategories } from '../sports/help';
 import type { PostgresDatabase } from './postgres';
 import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
@@ -6,7 +6,7 @@ import {demand} from '../auth';
 import type {Entity} from '../repository';
 
 export function portalHelpArticle(article:Entity) {
-  return {id:article.id,version:article.version,status:article.data.status,titleZh:article.data.titleZh,titleEn:article.data.titleEn,bodyZh:article.data.bodyZh,bodyEn:article.data.bodyEn,keywords:article.data.keywords,category:article.data.category,sortWeight:article.data.weight,updatedAt:article.updatedAt};
+  return {id:article.id,version:article.version,status:article.data.status,titleZh:article.data.titleZh,titleEn:article.data.titleEn,bodyZh:article.data.bodyZh,bodyEn:article.data.bodyEn,keywords:article.data.keywords,category:Object.keys(portalHelpCategories).find(k=>portalHelpCategories[k]===article.data.category),sortWeight:article.data.weight,updatedAt:article.updatedAt};
 }
 export async function postgresAdminHelp(db:PostgresDatabase,token:string,query:Record<string,string>,id?:string) {
   demand(Object.keys(query).every(k=>!id && ['page','status'].includes(k)),'帮助查询参数无效。');

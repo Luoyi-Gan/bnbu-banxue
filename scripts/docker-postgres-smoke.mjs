@@ -10,6 +10,10 @@ const email=`smoke-${randomUUID()}@example.test`;
 const password=randomBytes(24).toString('base64url');
 let cookie='';
 let sportsMode=false;
+async function sessionWrite(path,input,key=randomUUID()) {
+  const response=await fetch(base+path,{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(input)});
+  const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;
+}
 function docker(args,options) {
   if(sportsMode && args[0]==='exec' && args[1]==='bnbu-postgres-local-postgres-1')args=['exec','-e','PGOPTIONS=-c search_path=sports',...args.slice(1)];
   return execFileSync('docker',args,options);
@@ -79,6 +83,12 @@ assert.ok((await request('/api/sports/help?lang=zh')).articles.some(article=>art
 const adminHelpPage=(await request('/api/v1/admin/help-articles?status=published&page=1')).data;
 assert.equal(adminHelpPage.pageSize,5);assert.ok(adminHelpPage.total>=1);
 assert.equal((await request('/api/v1/admin/help-articles/'+help.id)).data.titleEn,helpInput.titleEn);
+const nativeHelpInput={expectedVersion:0,titleZh:'原生帮助',titleEn:'Native help',bodyZh:'说明',bodyEn:'Instructions',category:'checkin',keywords:['native'],sortWeight:10,status:'draft'};
+const nativeHelp=await sessionWrite('/api/v1/admin/help-articles',nativeHelpInput);
+const nativePublished=await sessionWrite('/api/v1/admin/help-articles/'+nativeHelp.id,{...nativeHelpInput,expectedVersion:nativeHelp.version,status:'published'});
+assert.equal(nativePublished.status,'published');assert.equal(nativePublished.category,'checkin');
+const nativeArchived=await sessionWrite('/api/v1/admin/help-articles/'+nativeHelp.id,{...nativeHelpInput,expectedVersion:nativePublished.version,status:'archived'});
+assert.equal(nativeArchived.status,'archived');
 docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data='{"role":"student","status":"verified"}' WHERE id='${sportsIdentity}'`],{stdio:'pipe'});
 const studentArticle=(await request('/api/sports/help?lang=en')).articles.find(article=>article.id===help.id);
 assert.equal(studentArticle.data.body,'Local acceptance fixture');
@@ -136,10 +146,6 @@ try {
   assert.equal(members.meta.pagination.hasMore,false);
   const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'});
   docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data=(data::jsonb || '{"status":"CURRENT"}'::jsonb)::text WHERE id='${semesterId}'; UPDATE entities SET data=(data::jsonb || '{"startDate":"${today}","deadlineDate":"${today}","startTime":"00:00","endTime":"23:59","threshold":30}'::jsonb)::text WHERE id='${courseId}'`],{stdio:'pipe'});
-  const sessionWrite=async(path,input,key=randomUUID())=>{
-    const response=await fetch(base+path,{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(input)});
-    const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;
-  };
   assert.equal((await request('/api/v1/me')).data.user.status,'ACTIVE');
   let session=await sessionWrite('/api/v1/exercise-sessions',{enrollmentId,clientObservedAt:new Date().toISOString()});
   assert.equal((await request('/api/v1/exercise-sessions/active')).data.id,session.id);

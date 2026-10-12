@@ -27,6 +27,7 @@ import { postgresPassword } from './postgres-password';
 import { postgresAdministratorState, postgresAdministratorCreate, postgresAdministratorEdit, requirePostgresSuperAdmin } from './postgres-administrators';
 import { postgresAdministratorDelete } from './postgres-admin-deletion';
 import { sportsHelpPolicy } from '../sports/help';
+import {portalHelpArticle} from './postgres-sports-help';
 import { requireSportsPermission } from '../sports/permissions';
 import { sportsAvailable } from '../sports/materials';
 import { projectSportsNotification } from '../sports/portal-notifications';
@@ -186,7 +187,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     else if(action.startsWith('sports.help.')) {
       const article=await runAsync(sportsHelpPolicy(repo,actor,action,input));
-      if(article) result={id:article.id};
+      if(article) result=action==='sports.help.portal'?portalHelpArticle(article):{id:article.id};
     }
     else if(action==='sports.admins.state') result=await postgresAdministratorState(repo,actor,input);
     else if(action==='sports.admins.create') result=await postgresAdministratorCreate(repo,actor,input);

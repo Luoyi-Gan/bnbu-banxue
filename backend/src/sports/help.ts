@@ -17,6 +17,7 @@ export const helpCategories = [
   "MAINTENANCE",
   "FEEDBACK",
 ] as const;
+export const portalHelpCategories:Record<string,string>={login:'LOGIN',enrollment:'ENROLLMENT',checkin:'EXERCISE',evidence:'EVIDENCE',course:'COURSES',exemption:'EXEMPTION',organization:'CERTIFICATION',notification:'NOTIFICATIONS',maintenance:'MAINTENANCE',feedback:'FEEDBACK'};
 function publication(data: Fields) {
   demand(
     String(data.bodyZh ?? "").trim() &&
@@ -35,14 +36,26 @@ export function* sportsHelpPolicy(
   action: string,
   input: Fields,
 ) {
-  if (action !== "sports.help.save" && action !== "sports.help.state")
+  const native=action==='sports.help.portal';
+  if (!native && action !== "sports.help.save" && action !== "sports.help.state")
     return undefined;
+  if(native) {
+    demand(Object.keys(input).every(k=>['id','expectedVersion','titleZh','titleEn','bodyZh','bodyEn','keywords','category','sortWeight','status'].includes(k)),'帮助保存参数无效。');
+    demand(typeof input.category==='string' && Object.hasOwn(portalHelpCategories,input.category),'帮助分类无效。');
+    demand(Array.isArray(input.keywords) && input.keywords.every(k=>typeof k==='string' && !/[,，]/.test(k)),'关键词必须是独立文本列表。');
+    input={...input,version:input.expectedVersion,category:portalHelpCategories[input.category],weight:input.sortWeight,keywords:input.keywords.join(',')};
+  }
   const identities = yield* effect(repo.all("sportsIdentity"));
   requireSportsPermission({all: () => identities}, actor, "HELP");
   const old = input.id ? yield* effect(repo.get(input.id, "sportsHelp")) : null;
   if (old) {
     version(old, input);
-    demand(input.updatedAt === old.updatedAt, "文章已更新，请重新打开。", 409);
+    if(!native)demand(input.updatedAt === old.updatedAt, "文章已更新，请重新打开。", 409);
+  }
+  if(native) {
+    demand(old || input.version===0,'新文章版本必须为0。',409);
+    demand(['draft','published','archived'].includes(String(input.status)),'帮助状态无效。');
+    demand(old ? input.status===old.data.status || input.status==='published' || (old.data.status==='published' && input.status==='archived') : ['draft','published'].includes(String(input.status)),'文章状态转换不允许。',409);
   }
   let data: Fields;
   if (action === "sports.help.state") {
@@ -63,7 +76,7 @@ export function* sportsHelpPolicy(
       typeof input.weight === "number" && Number.isFinite(input.weight),
       "排序权重须为有限数值。",
     );
-    const status = old
+    const status = native ? input.status : old
       ? input.publish === true
         ? "published"
         : old.data.status

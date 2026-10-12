@@ -195,6 +195,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:{user:result.user}});
         }
         const subadminWrite=/^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(pathname);
+        if(adminHelp) {
+          demand(!Object.hasOwn(input,'id'),'文章标识只能来自路径。');
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.help.portal',{...input,...(adminHelp[1]?{id:decodeURIComponent(adminHelp[1])}:{})},key)});
+        }
         const subadminDelete=/^\/api\/v1\/admin\/subadmins\/([^/]+)\/delete$/.exec(pathname);
         if(pathname==='/api/v1/me/account-deletion') {
           demand(Object.keys(input).every(k=>['expectedVersion','account','name','email','confirmed','handoverCompleted'].includes(k)),'注销账号参数无效。');
