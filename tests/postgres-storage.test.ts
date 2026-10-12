@@ -336,6 +336,24 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{status:'TEACHER_PENDING'});});
     expect((await postgresStudentRecords(db,login.token,{},'workflow-public')).data).toMatchObject({workflowStage:'PENDING_TEACHER'});
   });
+  it('allows supplementary uploads after the original window but rechecks paused and closed review', async()=>{
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const record=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'DRAFT'});
+      const course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id});
+      const session=await repo.create('sportsSession','sports-reader-student',{clock:{...startClock(Date.now()-172800000),state:'ENDED',endedAt:Date.now()-90000000,activeMilliseconds:1800000}});
+      return repo.create('sportsRecord',session.ownerId,{sessionId:session.id,courseId:course.id,semesterId:semester.id,status:'SUPPLEMENT_REQUIRED',supplementStartedAt:Date.now(),supplementWindowMilliseconds:86400000});
+    });
+    const bytes=await sharp({create:{width:2,height:2,channels:3,background:'blue'}}).png().toBuffer();
+    const input={sessionId:record.data.sessionId,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'FILE_PICKER',declaredContentSha256:createHash('sha256').update(bytes).digest('hex')};
+    const lease=await executePostgres(db,login.token,'sports.media.initiate',input,randomUUID());
+    const pause=await db.transaction(client=>new PostgresRepository(client).create('sportsPause',null,{recordId:record.id,status:'CONFIRMED',startAt:Date.now()-1000,endAt:null}));
+    await expect(postgresMediaPut(db,login.token,String(lease.mediaId),bytes,'image/png')).rejects.toMatchObject({status:409});
+    await db.pool.query('DELETE FROM entities WHERE id=$1',[pause.id]);
+    await expect(postgresMediaPut(db,login.token,String(lease.mediaId),bytes,'image/png')).resolves.toBe(input.declaredContentSha256);
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{status:'TEACHER_PENDING'});});
+    await expect(executePostgres(db,login.token,'sports.media.initiate',input,randomUUID())).rejects.toMatchObject({status:409});
+  });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const session=await db.transaction(client=>new PostgresRepository(client).create('sportsSession','sports-reader-student',{enrollmentId:'cancel-fixture',clock:startClock(Date.now()-2000)}));

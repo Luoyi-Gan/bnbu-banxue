@@ -9,6 +9,24 @@ import type { PostgresDatabase } from './postgres';
 import { configuredObjectStore } from './cos-object-store';
 import { objectKey } from './object-store';
 import { inspectMedia } from '../sports/media-inspection';
+import { supplementClock, supplementOpen } from '../sports/supplements';
+
+async function mediaWindow(repo:PostgresRepository,actor:Account,session:Entity) {
+  const record=(await repo.all('sportsRecord')).find(r=>r.data.sessionId===session.id);
+  if(record) {
+    demand(record.ownerId===actor.id,'运动记录不存在。',404);
+    const pauses=await repo.all('sportsPause'),systems=await repo.all('sportsSystem');
+    const course=await repo.get(record.data.courseId,'sportsCourse'),semester=await repo.get(record.data.semesterId,'sportsSemester');
+    const reader={all:(kind:string)=>kind==='sportsPause'?pauses:systems,get:()=>course};
+    supplementOpen({...reader,get:id=>id===course.id?course:semester},record);
+    return {deadline:supplementClock(reader,record).deadline,recordId:record.id};
+  }
+  const clock=session.data.clock as unknown as SportsClock;
+  demand(clock.state==='ENDED' && clock.endedAt!==null && !session.data.cancelledAt,'请先正常结束运动。',409);
+  demand(Date.now()<clock.endedAt+24*3600000,'首次材料受理窗口已结束。',409);
+  demand((await repo.all('sportsRecordDraft')).some(r=>r.ownerId===actor.id && r.data.sessionId===session.id && r.data.status==='DRAFT'),'请先保存本次运动草稿。',409);
+  return {deadline:clock.endedAt+24*3600000,recordId:null};
+}
 
 export function studentMediaProjection(m:Entity) {
   const d=m.data;
@@ -26,9 +44,7 @@ export async function mediaCommand(repo:PostgresRepository,actor:Account,operati
     demand(session.ownerId===actor.id,'只能上传本人的运动材料。',403);
     const clock=session.data.clock as unknown as SportsClock;
     demand(clock.state==='ENDED' && !session.data.cancelledAt && clock.endedAt!==null,'请先正常结束运动。',409);
-    demand(Date.now()<clock.endedAt+24*3600000,'首次材料受理窗口已结束。',409);
-    demand((await repo.all('sportsRecordDraft')).some(r=>r.ownerId===actor.id && r.data.sessionId===session.id && r.data.status==='DRAFT'),'请先保存本次运动草稿。',409);
-    demand(!(await repo.all('sportsRecord')).some(r=>r.data.sessionId===session.id),'本次运动已受理，请使用原材料批次。',409);
+    const window=await mediaWindow(repo,actor,session);
     const businessPurpose=enumField(input,'businessPurpose',['EXERCISE_RECORD'] as const),mediaType=enumField(input,'mediaType',['IMAGE','VIDEO'] as const),mimeType=enumField(input,'mimeType',['image/jpeg','image/png','video/mp4'] as const);
     demand((mediaType==='VIDEO')===(mimeType==='video/mp4'),'文件类型不一致。');
     const fileSizeBytes=integerField(input,'fileSizeBytes',1,mediaType==='VIDEO'?100*1024*1024:10*1024*1024);
@@ -38,8 +54,8 @@ export async function mediaCommand(repo:PostgresRepository,actor:Account,operati
     demand(mediaType==='IMAGE' || (Number.isFinite(durationSeconds) && durationSeconds!>=1 && durationSeconds!<=15),'视频须为1–15秒。');
     const reserved=(await repo.all('sportsMediaUpload')).filter(m=>m.ownerId===actor.id && m.data.sessionId===session.id && (m.data.uploadStatus==='AVAILABLE' || Number(m.data.expiresAt)>Date.now()));
     demand(reserved.filter(m=>m.data.mediaType===mediaType).length<(mediaType==='IMAGE'?6:1),'运动材料数量超过上限。',409);
-    const expiresAt=Math.min(Date.now()+30*60000,clock.endedAt+24*3600000);
-    const m=await repo.create('sportsMediaUpload',actor.id,{sessionId:session.id,businessPurpose,mediaType,mimeType,fileSizeBytes,captureSource,declaredContentSha256:hash,durationSeconds,expiresAt,uploadStatus:'PENDING'});
+    const expiresAt=Math.min(Date.now()+30*60000,window.deadline);
+    const m=await repo.create('sportsMediaUpload',actor.id,{sessionId:session.id,supplementRecordId:window.recordId,businessPurpose,mediaType,mimeType,fileSizeBytes,captureSource,declaredContentSha256:hash,durationSeconds,expiresAt,uploadStatus:'PENDING'});
     return {mediaId:m.id,uploadSessionId:m.id,uploadUrl:'/api/v1/media-uploads/'+m.id+'/object',uploadMethod:'PUT',requiredHeaders:{'Content-Type':mimeType},expiresAt:new Date(expiresAt).toISOString()};
   }
   const m=await repo.get(input.id,'sportsMediaUpload');demand(m.ownerId===actor.id,'材料不存在。',404);
@@ -72,7 +88,8 @@ export async function postgresMediaPut(db:PostgresDatabase,token:string,id:strin
     demand(bytes.length===m.data.fileSizeBytes && objectKey(bytes)===m.data.declaredContentSha256 && mime===m.data.mimeType,'文件内容与上传声明不一致。',409);
     if(m.data.uploadStatus==='AVAILABLE') return String(m.data.declaredContentSha256);
     demand(Date.now()<Number(m.data.expiresAt),'上传凭据已过期。',409);
-    demand((await repo.all('sportsRecordDraft')).some(r=>r.ownerId===actor.id && r.data.sessionId===m.data.sessionId && r.data.status==='DRAFT'),'本次运动草稿已关闭。',409);
+    const window=await mediaWindow(repo,actor,await repo.get(m.data.sessionId,'sportsSession'));
+    demand((m.data.supplementRecordId ?? null)===window.recordId,'材料上传阶段已变化，请重新准备。',409);
     const inspected=await inspectMedia(bytes,mime),key=await configuredObjectStore().put(bytes,mime);
     await repo.save(m,{uploadStatus:'AVAILABLE',objectKey:key,verifiedFileSizeBytes:bytes.length,verifiedDurationSeconds:'durationSeconds' in inspected?inspected.durationSeconds:null,verifiedAt:Date.now()});
     return key;

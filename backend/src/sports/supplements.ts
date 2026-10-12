@@ -49,7 +49,7 @@ export function supplementClock(
     canSubmit: !paused && remaining > 0,
   };
 }
-export function supplementOpen(repo: Repository, record: Entity) {
+export function supplementOpen(repo: Pick<Repository,"all"|"get">, record: Entity) {
   demand(
     record.data.status === "SUPPLEMENT_REQUIRED",
     "本记录不在补证阶段。",

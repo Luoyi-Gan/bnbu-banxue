@@ -1711,3 +1711,7 @@ GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需�
 ### PostgreSQL 学生审核阶段与补证期限读取
 
 接通 exercise-records/:id/workflow，兼容正式记录与原草稿公开标识，沿用本人身份和维护门禁；返回公开字段与已有媒体标识，隐藏内部备注及存储路径。修复 TEACHER_PENDING / SUPPLEMENT_REQUIRED 与学生现有页面协议不一致，分别投影 PENDING_TEACHER / AWAITING_SUPPLEMENT。期限使用共享 supplementClock，不因查询执行逾期裁决。真实 PostgreSQL 48 测试通过，覆盖本人、他人、期限、材料版本及状态映射；类型和 lint 通过。补证上传、正式提交及 Docker 新接口验证仍待完成，UI 未改。
+
+### PostgreSQL 补证文件上传窗口
+
+上传准备及原件 PUT 复用 supplementOpen／supplementClock 检查，已正式受理记录只有待补证且未暂停、未结算／归档时可上传，不再被首次24小时限制误挡；凭据记录补证对象，拒绝原上传凭据跨阶段复用。49项真实 PostgreSQL 测试通过，新增首次窗口结束后的补证上传、暂停拒绝、恢复保存、已进入教师复核拒绝；类型及 lint 通过。API Docker 已重建健康，既有完整 HTTP 冒烟通过。此 Docker 冒烟尚未新增补证写入步骤，补证正式提交仍待接通；未改 UI。
