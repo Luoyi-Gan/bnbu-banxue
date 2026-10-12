@@ -1623,3 +1623,7 @@ Compose 重建并健康启动，扩展 Docker 冒烟：显式创建隔离学期/
 ### 体育偏好读取和语言保存
 
 接通 GET/PATCH /api/v1/me/preferences，保留学生页面的 locale/pushEnabled/emailEnabled/version 协议。复用本人 preferences 实体，新增体育字段而不覆盖资料预览、学号搜索或伴学提醒开关。语言默认 zh-CN，邮件/推送默认 false，尚未接通发送服务时开启请求明确 503；版本冲突返回前端识别的 CONFLICT_VERSION_MISMATCH。保存复用事务、审计、幂等回执，PATCH 保留同源检查。真实 PostgreSQL 验证默认值、语言保存、重试、旧版本拒绝、发送开关拒绝及原隐私字段保留，41 项数据库测试、类型检查及 lint 通过。HTTP/Docker 端到端偏好验证仍需补充，UI 未改。
+
+### 偏好 Docker 与运动开始验证
+
+重建 API 镜像并健康启动，Docker 冒烟新增 GET 偏好默认关闭、PATCH 保存英文、同幂等键重试一致及再次 GET 读回，通过真实 Nginx/API/PostgreSQL。原通知、课程和持久化检查继续通过。随机 schema 新增运动开始的无成员拒绝、有效成员启动及已有未结束会话时第二次启动拒绝，数据库 42 项通过。当前镜像包含共享运动命令，但学生 exercise-sessions 协议尚未适配，不能宣称页面运动操作完成。UI 未改。

@@ -179,6 +179,20 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const events=await db.transaction(client=>new PostgresRepository(client).all('sportsSessionEvent'));
     expect(events.filter(e=>e.data.sessionId===session.id)).toHaveLength(3);
   });
+  it('starts a sports session only with active membership and prevents a second live session', async () => {
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const day=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'}),ids:string[]=[];
+    try {
+      const semester=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{status:'CURRENT'}));ids.push(semester.id);
+      const course=await db.transaction(client=>new PostgresRepository(client).create('sportsCourse','sports-reader-other',{semesterId:semester.id,status:'PUBLISHED',startDate:day,deadlineDate:day,startTime:'00:00',endTime:'23:59',threshold:30}));ids.push(course.id);
+      await expect(executePostgres(db,login.token,'sports.session.start',{courseId:course.id},randomUUID())).rejects.toMatchObject({status:403});
+      const member=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-student',{courseId:course.id,status:'ACTIVE'}));ids.push(member.id);
+      const started=await executePostgres(db,login.token,'sports.session.start',{courseId:course.id},randomUUID());ids.push(String(started.id));
+      const session=await db.transaction(client=>new PostgresRepository(client).get(started.id));
+      expect(session.data).toMatchObject({enrollmentId:member.id,courseId:course.id,semesterId:semester.id});
+      await expect(executePostgres(db,login.token,'sports.session.start',{courseId:course.id},randomUUID())).rejects.toMatchObject({status:409});
+    } finally {await db.pool.query('DELETE FROM entities WHERE id=ANY($1::text[])',[ids]);}
+  });
   it('paginates only the current recipients sports notifications', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const ids=[randomUUID(),randomUUID(),randomUUID(),randomUUID()];
