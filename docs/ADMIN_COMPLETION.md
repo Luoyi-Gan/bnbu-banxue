@@ -2030,3 +2030,8 @@ Docker 四服务构建健康，完整冒烟新增原生建号、列表、权限�
 ### PostgreSQL结算预检
 抽出settlementManifestData、settlementCheckData及portalSettlementPreviewData，由SQLite与PostgreSQL共用，接入GET /api/v1/class-sections/:id/settlement-check。PostgreSQL在repeatable-read只读事务内完整读取来源，权限、原阻塞项及摘要保持一致。82项测试通过（64项PostgreSQL及18项结算），覆盖草稿/名单阻塞、来源变动摘要变化、学生权限拒绝；类型检查与lint通过。新增预检夹具使用UPCOMING，避免污染其他测试的当前学期。
 Docker重建健康，经4186原代理调用预检200，确认草稿课程返回规则未发布、仍可开始运动、无确认名单三个阻塞项；未执行或声称正式结算。下一步仍需将正式确认写入同一事务并重核摘要，接通导出及其他待迁移功能。
+
+### PostgreSQL正式结算事务及最新照片规则
+接入原页面POST /api/v1/class-sections/:id/settlement-reports，使用现有串行命令事务及回执，重核完整来源摘要、全部阻塞项及唯一正式报告。准备记录、冻结报告、课程关闭/结算标记、通知、审计、幂等回执同事务提交；重试前重新检查教师身份、课程归属和维护限制。同一请求返回原结果，不新增通知，新的重复结算拒绝。
+82项测试通过：真实PostgreSQL HTTP测试覆盖来源变动409、满足名单/邮箱/免测/成绩条件后结算成功、课程指向冻结报告、同键重试一致、新键重复409和仅一次通知。测试通知清理避免污染后续通知分页用例。类型检查及lint通过；Docker服务健康，4186代理实测未完成课程409且未生成报告。成功路径由独立PostgreSQL测试库验证，未结算共享Docker浏览器草稿课程。导出及后续更正版联动仍待继续。
+用户最终明确补传只针对已有运动记录、使用当次实时拍摄照片，已记入BUSINESS_RULES并替代此前历史补卡方案。下一步核查现有FILE_PICKER来源、实时拍摄与原件绑定，不能仅信任客户端captureSource字段即宣称完成防替换保障。未更改现有UI布局。

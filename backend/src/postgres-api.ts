@@ -321,6 +321,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           demand(Object.keys(input).every(field=>field==='displayName'),'新建课程参数无效。');
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.course.create',{name:input.displayName},key)});
         }
+        const settlementConfirm=/^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(pathname);
+        if(settlementConfirm) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'课程标识须使用路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.settlement.finalize',{...input,id:decodeURIComponent(settlementConfirm[1])},key)});
+        }
         const courseRulesPublish=/^\/api\/v1\/class-sections\/([^/]+)\/v81-rules$/.exec(pathname);
         if(courseRulesPublish) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'课程标识须来自请求路径。');

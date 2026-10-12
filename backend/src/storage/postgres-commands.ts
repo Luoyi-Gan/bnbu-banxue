@@ -1,4 +1,5 @@
 import { postgresAiGovernance, requireAiGovernor } from './postgres-ai-governance';
+import { postgresSettlementFinalize, postgresSettlementGate } from './postgres-settlement';
 import { sportsReviewDecisionPolicy } from '../sports/review';
 import { sportsEndurancePolicy } from '../sports/endurance';
 import { sportsGradePolicy } from '../sports/grades';
@@ -96,6 +97,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       requireSportsPermission({all:()=>identities},actor,'HELP');
       sportsAvailable({all:()=>system});
     }
+    if(action==='sports.settlement.finalize')await postgresSettlementGate(repo,actor,input.id);
     const previous = (await client.query<{request_hash:string;result:string}>('SELECT request_hash,result FROM command_receipts WHERE actor_id=$1 AND request_id=$2',[actor.id,requestId])).rows[0];
     if(previous) {
       demand(previous.request_hash===hash,'该请求标识已用于不同操作。',409);
@@ -103,6 +105,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     let result:Fields|undefined;
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action==='sports.settlement.finalize') result=await postgresSettlementFinalize(repo,actor,input);
     else if(action.startsWith('sports.exercise.')) {
       const operation=action.split('.')[2];
       demand(['start','pause','resume','finish','cancel'].includes(operation),'未知运动动作。');

@@ -560,6 +560,29 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(draftCourse.id),{name:'预检资料已变化'});});
       expect((await (await fetch(previewUrl,{headers:teacherHeaders})).json()).data.previewFingerprint).not.toBe(preview.previewFingerprint);
       expect((await fetch(previewUrl,{headers:{Cookie:`bnbu_session=${student.token}`}})).status).toBe(403);
+      const finalizeUrl=base+'/api/v1/class-sections/'+draftCourse.id+'/settlement-reports';
+      const finalize=(fingerprint:string,key=randomUUID())=>fetch(finalizeUrl,{method:'POST',headers:{...teacherHeaders,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify({expectedVersion:0,previewFingerprint:fingerprint})});
+      expect((await finalize(preview.previewFingerprint)).status).toBe(409);
+      const settlementIdentity=await db.transaction(async client=>{
+        const repo=new PostgresRepository(client),identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-student')!;
+        await repo.save(identity,{studentNumber:'finalize-test',schoolEmailVerified:true,schoolEmail:'sports-reader-student@example.test'});
+        await repo.save(await repo.get(draftCourse.id),{status:'CLOSED',relatedTarget:600,otherTarget:600,threshold:30,weeklyLimit:2});
+        const member=await repo.create('sportsEnrollment','sports-reader-student',{courseId:draftCourse.id,status:'ACTIVE'});
+        const snapshot=await repo.create('sportsRosterSnapshot',teacher.account.id,{courseId:draftCourse.id,rows:[{row:2,studentNumber:'finalize-test',name:'sports-reader-student',columnError:false,excluded:false}]});
+        await repo.create('sportsRosterBasis',teacher.account.id,{courseId:draftCourse.id,snapshotId:snapshot.id});
+        await repo.create('sportsExemption','sports-reader-student',{courseId:draftCourse.id,enrollmentId:member.id,status:'APPROVED'});
+        await repo.create('sportsGradePublication','sports-reader-student',{courseId:draftCourse.id,enrollmentId:member.id,score:88,sequence:1});
+        return identity;
+      });
+      const ready=(await (await fetch(previewUrl,{headers:teacherHeaders})).json()).data;expect(ready.checks).toEqual([]);expect(ready.canConfirm).toBe(true);
+      const finalKey=randomUUID(),finalResponse=await finalize(ready.previewFingerprint,finalKey);expect(finalResponse.status).toBe(200);
+      const finalized=await finalResponse.json();expect(finalized.data).toMatchObject({kind:'INITIAL',version:1});
+      expect(await (await finalize(ready.previewFingerprint,finalKey)).json()).toEqual(finalized);
+      expect((await finalize(ready.previewFingerprint)).status).toBe(409);
+      expect((await db.transaction(client=>new PostgresRepository(client).get(draftCourse.id))).data).toMatchObject({settlementStatus:'SETTLED',settlementReportId:finalized.data.id,enrollmentOpen:false});
+      expect((await db.pool.query('SELECT id FROM notifications WHERE entity_id=$1',[finalized.data.id])).rows).toHaveLength(1);
+      await db.pool.query('DELETE FROM notifications WHERE entity_id=$1',[finalized.data.id]);
+      await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(settlementIdentity.id),settlementIdentity.data);});
       expect((await (await fetch(reportsUrl,{headers:teacherHeaders})).json()).data).toEqual({items:[],nextBeforeVersion:null});
       const reports=await db.transaction(async client=>{
         const repo=new PostgresRepository(client);
@@ -1544,3 +1567,4 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(application).toMatchObject({studentNumber:'20260001',studentNumberSource:'enrollment'});
   });
 });
+
