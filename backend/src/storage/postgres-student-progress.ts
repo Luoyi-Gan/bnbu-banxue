@@ -9,12 +9,13 @@ import { PostgresAuth } from './postgres-auth';
 import { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
 
-export async function postgresStudentProgress(db:PostgresDatabase,token:string,input:Fields,courseId?:string) {
+export async function postgresStudentProgress(db:PostgresDatabase,token:string,input:Fields,courseId?:string,teacherOnly=false) {
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
     const identities=await repo.all('sportsIdentity');
     const teacher=identities.some(i=>i.ownerId===actor.id && i.data.status==='verified' && i.data.role==='teacher');
+    demand(!teacherOnly || teacher,'仅教师可读取教学进度。',403);
     if(teacher) {
       sportsRole({all:()=>identities},actor,'teacher');
       const systems=await repo.all('sportsSystem');sportsAvailable({all:()=>systems});

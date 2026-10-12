@@ -111,7 +111,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       const recognitionRead=/^\/api\/v1\/activity-certification-applications\/([^/]+)\/recognition-allocation-revisions$/.exec(pathname);
       if(request.method==='GET' && recognitionRead) return send(response,200,await postgresStudentRecognitionHistory(db,cookieToken(request) ?? '',decodeURIComponent(recognitionRead[1]),Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams)));
       const progressTarget=/^\/api\/v1\/class-sections\/([^/]+)\/progress-target$/.exec(pathname);
-      if(request.method==='GET' && (pathname==='/api/v1/student-progress' || progressTarget)) return send(response,200,await postgresStudentProgress(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),progressTarget?decodeURIComponent(progressTarget[1]):undefined));
+      if(request.method==='GET' && (['/api/v1/student-progress','/api/v1/teacher-progress'].includes(pathname) || progressTarget)) return send(response,200,await postgresStudentProgress(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),progressTarget?decodeURIComponent(progressTarget[1]):undefined,pathname==='/api/v1/teacher-progress'));
       const reviewMaterial=/^\/api\/sports\/materials\/([^/]+)$/.exec(pathname);
       if(request.method==='GET' && reviewMaterial) {
         const original=await postgresReviewMaterial(db,cookieToken(request) ?? '',decodeURIComponent(reviewMaterial[1]));

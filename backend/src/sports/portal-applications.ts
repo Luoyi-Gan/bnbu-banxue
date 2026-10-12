@@ -73,7 +73,7 @@ export function portalApplicationReview(
 }
 
 export function portalApplications(
-  repo: Repository,
+  repo: Pick<Repository, 'all' | 'get'>,
   actor: Account,
   input: Fields,
 ) {

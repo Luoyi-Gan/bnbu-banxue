@@ -2014,3 +2014,7 @@ Docker 四服务构建健康，完整冒烟新增原生建号、列表、权限�
 发现 scripts/sports-teacher.mjs 默认仍指向旧4175，已改为4188统一代理，可用BNBU_LOCAL_BACKEND_ORIGIN显式覆盖。compose仅体育API增加本地4186允许来源，伴学API不扩大来源范围。保持同源 /api/v1 与独立 bnbu_sports_session，不改UI。
 
 原教师页面已通过启动脚本运行在4186（本轮exec会话99744）。新增 scripts/docker-teacher-proxy-smoke.mjs：独立测试教师夹具经4186真实代理登录、读取本人、拒绝外部Origin、退出后401，全部通过；夹具随后停用并撤销身份。Docker体育服务重建健康。此验证覆盖页面入口和真实代理链，不等于浏览器内所有管理操作已验收。下一步继续浏览器页面及剩余接口核对。
+
+### 原教师端浏览器首页实测与读取接线修复
+浏览器经4186原页面登录独立Docker测试教师。首次发现Docker库无当前学期，已创建明确命名的浏览器本地验收学期（仅测试夹具）；随后定位teacher-progress缺路由、申请列表误走学生权限，现已接入共享进度计算和教师申请投影。没有修改前端布局。
+64项PostgreSQL测试通过，新增真实HTTP验证教师进度、学生403、本人课程免测投影和他人课程403；类型检查、lint通过。Docker sports-api重建健康，刷新原页面后显示当前测试学期和空课程首页，无错误提示。截图位于.runtime/evidence/teacher-home-docker.png，测试账号定位文件.runtime/teacher-browser-fixture.json（忽略入库）。这只证明登录和空首页读取，建课、入班及其他三端操作仍需继续验收；目标未完成。
