@@ -125,7 +125,7 @@ function V2Routes() {
   if (!session) return <p role="status">正在核对登录状态…</p>
   if (session.anonymous) return <Navigate to="/v2/login" state={{returnTo: location.pathname + location.search + location.hash}} replace/>
   if (session.error) return <p role="alert">{session.error}</p>
-  if (!authorized) return <Navigate to="/workspace" replace/>
+  if (!authorized) return <Navigate to="/v2/login" state={{returnTo:location.pathname + location.search, roleMismatch:true}} replace/>
   if (state.role !== requestedRole) return <p role="status">正在切换本人已授权身份…</p>
   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>
   return <V2Shell accountName={session.account!.name}><Routes>

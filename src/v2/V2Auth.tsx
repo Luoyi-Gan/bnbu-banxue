@@ -1,3 +1,4 @@
+import {api,type LiveAccount} from '../live/api';
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,7 +13,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import { authApi, AuthServiceError } from "./authApi";
-import { authReturnPath } from "./authReturnPath";
+import { roleLoginPath } from "./authReturnPath";
 import "./auth.css";
 
 type AuthMode = "login" | "register";
@@ -106,7 +107,8 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
       if (mode === "login") {
         if (adminLogin) await authApi.adminLogin(normalizedEmail, password);
         else await authApi.login(normalizedEmail, password);
-        navigate(authReturnPath(location.state?.returnTo), { replace: true });
+        const {account} = await api<{account:LiveAccount}>("/api/auth/me");
+        navigate(roleLoginPath(location.state?.returnTo, account.roles), { replace: true });
       } else {
         await authApi.register(normalizedEmail, code.trim(), password);
         navigate("/v2/login", { replace: true, state: { registered: true } });
@@ -180,6 +182,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
               </span>
             </div>
           )}
+          {location.state?.roleMismatch && <p role="status">当前账号没有此页面的身份权限，请切换到对应的学生、教师或管理员账号。</p>}
           <form className="v2-auth-form" onSubmit={onSubmit} noValidate>
             {mode === "login" && (
               <label>
