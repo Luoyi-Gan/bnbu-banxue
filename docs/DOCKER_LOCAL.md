@@ -1,3 +1,7 @@
+# 当前入口说明
+
+当前交付使用前后端独立容器与 PostgreSQL，请按 [PostgreSQL Docker 指南](POSTGRES_DOCKER.md) 启动，入口为 http://127.0.0.1:4188/v2/login 。以下是旧 SQLite 单容器验证历史，历史测试数字、体育能力和网络失败状态不作为当前结论。当前范围见 [本地后端交接](LOCAL_BACKEND_HANDOFF.md)。
+
 # Docker 本地启动
 
 最新验证（2026-10-12）：用户修复代理后，项目镜像构建与容器启动成功；容器内网页 `/workspace` 和代理 `/api/health` 返回200，Docker健康状态healthy。Linux下32文件201项测试通过，前后端类型检查及Vite构建通过。临时无端口验证容器已停止并移除，命名数据卷保留；Windows原验收服务未切换。下面首次失败记录仅供追溯。
