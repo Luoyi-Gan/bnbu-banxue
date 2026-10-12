@@ -1297,5 +1297,17 @@
       "path": "vendor/pdfjs/wasm/quickjs-eval.wasm",
       "sha256": "7bcacc9f22cacf7e9b23866d2a6d1639693d40c7f144e41b7c69ed37ba9cbe8f"
     }
+  ],
+  "integrationOverrides": [
+    {
+      "path": "js/api.js",
+      "sha256": "cb88d17674666e8e97f79e169c25097bbe33cb1c2f584e83d312f90dd45dc2d6",
+      "reason": "同源伴学会话恢复与退出接线；未修改布局或样式"
+    },
+    {
+      "path": "js/app.js",
+      "sha256": "a9419d013d74cdd3125ff143a6e59853e04571ce6081af162a836d0c871d6e64",
+      "reason": "同源伴学会话恢复与退出接线；未修改布局或样式"
+    }
   ]
 }

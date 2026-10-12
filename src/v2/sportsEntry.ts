@@ -1,4 +1,5 @@
 export function sportsStudentHref(hostname: string) {
-  const local = ['localhost', '127.0.0.1', '::1', '[::1]'].includes(hostname)
-  return `/student/index.html${local ? '?preview=student' : ''}`
+  // Host must not choose a demo identity in the real companion business flow.
+  void hostname
+  return '/student/index.html'
 }

@@ -6,15 +6,17 @@ import { sportsStudentHref } from '../src/v2/sportsEntry'
 import manifest from '../docs/SPORTS_STUDENT_SOURCE.json'
 
 describe('Sports student migration', () => {
-  it('preserves every original runtime file byte for byte', () => {
+  it('preserves original files except explicitly recorded integration changes', () => {
+    expect(manifest.integrationOverrides.map(file=>file.path).sort()).toEqual(['js/api.js','js/app.js'])
     for (const file of manifest.files) {
       const bytes = readFileSync(new URL(`../public/student/${file.path}`, import.meta.url))
-      expect(createHash('sha256').update(bytes).digest('hex'), file.path).toBe(file.sha256)
+      const integration=manifest.integrationOverrides.find(item=>item.path===file.path)
+      expect(createHash('sha256').update(bytes).digest('hex'), file.path).toBe(integration?.sha256 ?? file.sha256)
     }
   })
-  it('only requests the existing local preview on loopback hosts', () => {
-    expect(sportsStudentHref('127.0.0.1')).toBe('/student/index.html?preview=student')
-    expect(sportsStudentHref('localhost')).toContain('preview=student')
+  it('opens the real student flow on both local and deployed hosts', () => {
+    expect(sportsStudentHref('127.0.0.1')).toBe('/student/index.html')
+    expect(sportsStudentHref('localhost')).not.toContain('preview=')
     expect(sportsStudentHref('example.com')).toBe('/student/index.html')
     expect(sportsStudentHref('127.0.0.1.example.com')).not.toContain('preview=')
   })
@@ -28,5 +30,6 @@ describe('Sports student migration', () => {
     }
     runInNewContext(script, context)
     expect(listeners).toEqual([])
+    expect((context as typeof context & {__BNBU_PUBLIC_CONFIG__:{appEnv:string}}).__BNBU_PUBLIC_CONFIG__.appEnv).toBe('qa')
   })
 })
