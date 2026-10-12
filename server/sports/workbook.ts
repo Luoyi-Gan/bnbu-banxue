@@ -19,7 +19,7 @@ export interface WorkbookSheet {
 }
 export function parseWorkbook(
   bytes: Buffer,
-  columns: 2 | 5 = 5,
+  columns: 2 | 5 | "ROSTER_MAPPING" = 5,
 ): Promise<WorkbookSheet[]> {
   demand(
     bytes.length > 0 && bytes.length <= 100 * 1024 * 1024,
@@ -38,20 +38,22 @@ export function parseWorkbook(
         const results=book.worksheets.map((sheet,index)=>{
           const out={index,name:sheet.name,csv:'',rowNumbers:[],issues:[]};
           try {
+            const columnCount=workerData.columns==='ROSTER_MAPPING'?sheet.columnCount:workerData.columns;
+            if(workerData.columns==='ROSTER_MAPPING'&&(columnCount<2||columnCount>128))throw Error('名单工作表须有2–128列');
             const matrix=[];let rosterColumns;
             sheet.eachRow((row,n)=>{
               if(matrix.length>=501)throw Error('工作表超过500个人员行');
               if(workerData.columns===2&&!matrix.length){const candidates={student_number:[],name:[]};row.eachCell((cell,c)=>{const key=aliases[cell.text.trim()]||cell.text.trim();if(candidates[key])candidates[key].push(c);});if(candidates.student_number.length!==1||candidates.name.length!==1)throw Error('名单必须有唯一学号和姓名列');rosterColumns=[candidates.student_number[0],candidates.name[0]];}
               if(workerData.columns===5)row.eachCell((cell,c)=>{if(c>5&&cell.value!=null)throw Error('工作表存在要求列数之外的非空数据，请先核对列');});
               const values=[];let issue=false;
-              for(let c=1;c<=workerData.columns;c++){
+              for(let c=1;c<=columnCount;c++){
                 const cell=row.getCell(rosterColumns?rosterColumns[c-1]:c),v=cell.value;let text='';
                 if(cell.isMerged)issue=true;
                 if(v instanceof Date){text=v.toISOString().slice(0,10);if(matrix.length&&matrix[0][c-1]!=='test_date')issue=true;}
                 else if(typeof v==='string'||typeof v==='number') {text=String(v);if(typeof v==='number'&&(!Number.isFinite(v)||Math.abs(v)>Number.MAX_SAFE_INTEGER))issue=true;}
                 else if(v&&typeof v==='object'&&v.richText)text=v.richText.map(x=>x.text).join('');
                 else if(v!=null){text=cell.text;issue=true;}
-                if(!matrix.length)text=aliases[text.trim()]||text.trim();
+                if(!matrix.length)text=workerData.columns==='ROSTER_MAPPING'?text.trim():(aliases[text.trim()]||text.trim());
                 values.push(text);
               }
               if(matrix.length&&workerData.columns===2&&values.every(v=>!v.trim())){values[0]='[待核对：缺少学号与姓名]';issue=true;}

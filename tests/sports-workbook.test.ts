@@ -8,6 +8,35 @@ import { execute } from "../server/commands";
 import { createApiServer } from "../server/main";
 import { parseWorkbook, uploadWorkbook } from "../server/sports/workbook";
 import { enduranceImportWorkspace } from "../server/sports/endurance-import";
+import { mappedRosterCsv } from "../server/sports/roster-mapping";
+import { parseCsv } from "../server/sports/csv";
+
+it("原版列选择工作簿保留自定义表头、跨空列和原行号，公式仍待核对", async () => {
+  const book = new ExcelJS.Workbook(),
+    sheet = book.addWorksheet("选课表");
+  sheet.getCell("B3").value = "注册号";
+  sheet.getCell("G3").value = "学生姓名";
+  sheet.getCell("B9").value = "0001";
+  sheet.getCell("G9").value = "学生甲";
+  sheet.getCell("B12").value = { formula: '"0002"', result: "0002" };
+  sheet.getCell("G12").value = "学生乙";
+  const sheets = await parseWorkbook(
+    Buffer.from(await book.xlsx.writeBuffer()),
+    "ROSTER_MAPPING",
+  );
+  expect(sheets[0].error).toBeUndefined();
+  expect(sheets[0].rowNumbers).toEqual([3, 9, 12]);
+  expect(sheets[0].issues).toEqual([3]);
+  const mapped = mappedRosterCsv(sheets[0].csv, {
+    studentNumber: "注册号",
+    fullName: "学生姓名",
+  });
+  const rows = parseCsv(mapped.csv);
+  expect(rows[0][1]).toBe("student_number");
+  expect(rows[0][6]).toBe("name");
+  expect(rows[1][1]).toBe("0001");
+  expect(rows[1][6]).toBe("学生甲");
+});
 const databases: Database[] = [];
 afterEach(() => databases.splice(0).forEach((db) => db.close()));
 async function workbook(formula = false) {
