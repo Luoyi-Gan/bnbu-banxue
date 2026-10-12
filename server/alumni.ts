@@ -167,7 +167,9 @@ export function alumniCommand(
     case "alumni.decide": {
       const booking = before.bookings.find((b) => b.id === input.id);
       demand(
-        booking && repo.person(booking.student).status !== "banned",
+        booking &&
+          (input.accept !== true ||
+            repo.person(booking.student).status !== "banned"),
         "申请人当前无法预约。",
       );
       next = decideAlumniChat(

@@ -41,6 +41,48 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("申请人被封禁后校友仍可拒绝，但不能确认新预约", () => {
+    const { a, b, c, admin, db, run } = setup();
+    run(a, "alumni.apply", {
+      major: "计算机", graduationYear: 2024, city: "珠海",
+      direction: "就业", experience: "工作", topics: "实习",
+      bio: "", evidence: "本地验收说明",
+    });
+    const profile = snapshot(db, admin.account).alumni.profiles[0];
+    run(admin, "alumni.review", { id: profile.id, approve: true });
+    run(a, "alumni.slot.create", {
+      startAt: new Date(Date.now() + 86400000).toISOString(),
+      endAt: new Date(Date.now() + 90000000).toISOString(),
+      location: "图书馆",
+    });
+    const slot = snapshot(db, a.account).alumni.slots[0];
+    run(b, "alumni.request", { slotId: slot.id, question: "就业问题" });
+    const booking = snapshot(db, b.account).alumni.bookings[0];
+    db.prepare("UPDATE accounts SET status='banned' WHERE id=?").run(b.id);
+    expect(() => run(a, "alumni.decide", { id: booking.id, accept: true }))
+      .toThrow("申请人当前无法预约");
+    expect(() => run(c, "alumni.decide", {
+      id: booking.id, accept: false, reason: "越权拒绝",
+    })).toThrow();
+    expect(() => run(a, "alumni.decide", { id: booking.id, accept: false }))
+      .toThrow();
+    expect(snapshot(db, a.account).alumni.bookings[0].status).toBe("pending");
+    const input = { id: booking.id, accept: false, reason: "当前无法安排交流" };
+    const key = randomUUID();
+    run(a, "alumni.decide", input, key);
+    const notices = db.prepare("SELECT COUNT(*) AS n FROM notifications").get()!.n;
+    run(a, "alumni.decide", input, key);
+    expect(db.prepare("SELECT COUNT(*) AS n FROM notifications").get()!.n).toBe(notices);
+    expect(snapshot(db, a.account).alumni.bookings[0]).toMatchObject({
+      id: booking.id, status: "rejected", reason: input.reason,
+    });
+    expect(db.prepare("SELECT body FROM notifications WHERE recipient_id=? AND event=?")
+      .all(b.id, "alumni.decide")).toHaveLength(1);
+    run(c, "alumni.request", { slotId: slot.id, question: "另一份申请" });
+    const next = snapshot(db, c.account).alumni.bookings[0];
+    run(a, "alumni.decide", { id: next.id, accept: true });
+    expect(snapshot(db, c.account).alumni.bookings[0].status).toBe("confirmed");
+  });
   it("原版社区投影用账号隔离同名作者，点赞共享而收藏只归本人", async () => {
     const f = setup();
     f.db
