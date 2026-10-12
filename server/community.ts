@@ -235,6 +235,17 @@ export function communityCommand(
       tags: strings(input.tags).slice(0, 10),
     });
   }
+  if (action === "message.read") {
+    student(actor);
+    const room = repo.get(input.roomId, "room");
+    demand(room.data.status === "open" && room.data.visibility === "visible" && strings(room.data.members).includes(actor.id), "当前没有此队伍的聊天权限。", 403);
+    demand(Array.isArray(input.ids) && input.ids.length > 0 && input.ids.every(id => typeof id === "string"), "请选择已读取的消息。");
+    const ids = [...new Set(input.ids as string[])];
+    for (const id of ids) demand(repo.get(id, "message").data.roomId === room.id, "消息不属于当前会话。", 403);
+    const insert = repo.db.prepare("INSERT OR IGNORE INTO relations(account_id,entity_id,kind,created_at) VALUES(?,?,'message.read',?)");
+    for (const id of ids) insert.run(actor.id, id, new Date().toISOString());
+    return room;
+  }
   if (action === "message.send") {
     student(actor);
     canSpeak(actor);

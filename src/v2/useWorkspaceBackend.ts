@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { command, loadWorkspace, workspaceChangedEvent, type Workspace } from '../live/api'
 
-export function useWorkspaceBackend() {
+export function useWorkspaceBackend(pollMs = 0) {
   const [data, setData] = useState<Workspace | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -19,8 +19,9 @@ export function useWorkspaceBackend() {
     active.current = true; void refresh()
     window.addEventListener('focus', refresh)
     window.addEventListener(workspaceChangedEvent, refresh)
-    return () => {active.current = false; window.removeEventListener('focus', refresh); window.removeEventListener(workspaceChangedEvent, refresh)}
-  }, [refresh])
+    const timer = pollMs ? window.setInterval(() => {if (document.visibilityState === 'visible') void refresh()}, pollMs) : undefined
+    return () => {active.current = false; window.clearInterval(timer); window.removeEventListener('focus', refresh); window.removeEventListener(workspaceChangedEvent, refresh)}
+  }, [refresh, pollMs])
   async function mutate(action: string, input: Record<string, unknown>) {
     if (locked.current) return false
     locked.current = true; setBusy(true); setError('')

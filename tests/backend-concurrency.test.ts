@@ -125,6 +125,26 @@ it("批量已读仅处理本人选中的通知，混入他人通知整批失败�
   expect(() => run(a, "notification.readmany", {ids: []})).toThrow();
 });
 
+it("队伍消息阅读受成员权限约束，不能跨会话读取，撤销成员后失去消息访问", () => {
+  const {db, a, b, admin, run} = fixture();
+  const room = run(a, "room.create", {type: "study", title: "学习", body: "一起学习", time: "周末", place: "图书馆", capacity: 3});
+  const application = run(b, "room.apply", {id: room.id, note: "加入"});
+  run(a, "room.decide", {id: application.id, accept: true});
+  const message = run(a, "message.send", {roomId: room.id, body: "你好"});
+  expect(() => run(admin, "message.read", {roomId: room.id, ids: [message.id]})).toThrow();
+  const otherRoom = run(a, "room.create", {type: "study", title: "其他", body: "学习", time: "周末", place: "教室", capacity: 3});
+  const other = run(a, "message.send", {roomId: otherRoom.id, body: "私密"});
+  expect(() => run(b, "message.read", {roomId: room.id, ids: [message.id, other.id]})).toThrow();
+  expect(snapshot(db, b.account).relations.filter(r => r.kind === "message.read")).toHaveLength(0);
+  run(b, "message.read", {roomId: room.id, ids: [message.id]});
+  run(b, "message.read", {roomId: room.id, ids: [message.id]});
+  expect(snapshot(db, b.account).relations.filter(r => r.kind === "message.read")).toHaveLength(1);
+  expect(snapshot(db, a.account).relations.filter(r => r.kind === "message.read")).toHaveLength(0);
+  const repo = new Repository(db); repo.save(repo.get(room.id), {members: [a.account.id]});
+  expect(() => run(b, "message.read", {roomId: room.id, ids: [message.id]})).toThrow();
+  expect(snapshot(db, b.account).entities.filter(e => e.kind === "message")).toHaveLength(0);
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {
