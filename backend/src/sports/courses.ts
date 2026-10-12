@@ -19,7 +19,7 @@ import {
 } from "./permissions";
 
 export function sportsRole(
-  repo: Repository,
+  repo: Pick<Repository, "all">,
   actor: Account,
   role: "student" | "teacher" | "admin",
 ) {

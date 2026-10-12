@@ -22,6 +22,7 @@ import { postgresAdministratorSelf } from '../backend/src/storage/postgres-admin
 import { postgresCommunityView } from '../backend/src/storage/postgres-community-view';
 import { postgresAccountDirectory } from '../backend/src/storage/postgres-account-directory';
 import { postgresSportsCourses } from '../backend/src/storage/postgres-sports-courses';
+import { postgresSportsHelp } from '../backend/src/storage/postgres-sports-help';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -74,6 +75,28 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await repo.save(identity,{...identity.data,mustChangePassword:true});
     });
     await expect(postgresSportsCourses(db,teacher.token)).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
+  });
+  it('publishes sports help atomically with permission checks, localized reading and archival', async () => {
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at) VALUES('help-manager','help-manager@example.test',$1,'帮助管理员','now')",[hashPassword('Help-test-123')]);
+    const identity=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','help-manager',{role:'admin',status:'verified',permissions:['HELP']}));
+    const auth=new PostgresAuth(db),manager=await auth.login('help-manager@example.test','Help-test-123');
+    const student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const input={titleZh:'运动帮助',titleEn:'Exercise help',bodyZh:'中文说明',bodyEn:'English instructions',category:'EXERCISE',weight:1,keywords:'运动,exercise',publish:true};
+    await expect(executePostgres(db,student.token,'sports.help.save',input,randomUUID())).rejects.toMatchObject({status:403});
+    await expect(executePostgres(db,manager.token,'sports.help.save',{...input,bodyEn:''},randomUUID())).rejects.toMatchObject({status:400});
+    const key=randomUUID(),saved=await executePostgres(db,manager.token,'sports.help.save',input,key);
+    expect(await executePostgres(db,manager.token,'sports.help.save',input,key)).toEqual(saved);
+    const visible=await postgresSportsHelp(db,student.token,'en');
+    const article=visible.articles.find(a=>a.id===saved.id)!;
+    expect(article.data).toEqual({title:'Exercise help',body:'English instructions',category:'EXERCISE'});
+    expect(article.ownerId).toBeNull();
+    const original=await db.transaction(client=>new PostgresRepository(client).get(saved.id));
+    await expect(executePostgres(db,manager.token,'sports.help.state',{id:saved.id,version:0,updatedAt:original.updatedAt,status:'archived'},randomUUID())).rejects.toMatchObject({status:409});
+    await executePostgres(db,manager.token,'sports.help.state',{id:saved.id,version:original.version,updatedAt:original.updatedAt,status:'archived'},randomUUID());
+    expect((await postgresSportsHelp(db,student.token,'zh')).articles.some(a=>a.id===saved.id)).toBe(false);
+    expect((await postgresSportsHelp(db,manager.token,'zh')).articles.some(a=>a.id===saved.id)).toBe(true);
+    await db.transaction(client=>new PostgresRepository(client).save(identity,{...identity.data,permissions:[]}));
+    await expect(executePostgres(db,manager.token,'sports.help.save',input,key)).rejects.toMatchObject({status:403});
   });
   it('changes an initial administrator password atomically and revokes other sessions', async () => {
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,login_kind,login_name) VALUES('password-admin','password@example.test',$1,'管理员','now','ADMIN','password-manager')",[hashPassword('Initial-test-123')]);

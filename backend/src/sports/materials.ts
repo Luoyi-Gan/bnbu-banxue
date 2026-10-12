@@ -22,7 +22,7 @@ export const mediaLimits = {
   video: 100 * 1024 * 1024,
   batch: 250 * 1024 * 1024,
 };
-export function sportsAvailable(repo: Repository) {
+export function sportsAvailable(repo: Pick<Repository, "all">) {
   const mode = repo.all("sportsSystem")[0];
   demand(
     !mode || mode.data.mode === "NORMAL",

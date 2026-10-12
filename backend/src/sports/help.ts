@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { demand, type Account } from "../auth";
 import { Repository, enumField, textField, type Fields } from "../repository";
 import { administratorAccess, requireSportsPermission } from "./permissions";
@@ -25,16 +26,20 @@ function publication(data: Fields) {
     "发布须有完整中英文正文和至少一个关键词。",
   );
 }
-export function sportsHelpCommand(
-  repo: Repository,
+export function sportsHelpCommand(repo: Repository, actor: Account, action: string, input: Fields) {
+  return runSync(sportsHelpPolicy(repo, actor, action, input));
+}
+export function* sportsHelpPolicy(
+  repo: BusinessRepository,
   actor: Account,
   action: string,
   input: Fields,
 ) {
   if (action !== "sports.help.save" && action !== "sports.help.state")
     return undefined;
-  requireSportsPermission(repo, actor, "HELP");
-  const old = input.id ? repo.get(input.id, "sportsHelp") : null;
+  const identities = yield* effect(repo.all("sportsIdentity"));
+  requireSportsPermission({all: () => identities}, actor, "HELP");
+  const old = input.id ? yield* effect(repo.get(input.id, "sportsHelp")) : null;
   if (old) {
     version(old, input);
     demand(input.updatedAt === old.updatedAt, "文章已更新，请重新打开。", 409);
@@ -87,19 +92,19 @@ export function sportsHelpCommand(
   if (data.status === "published" && !old?.data.firstPublishedAt)
     data.firstPublishedAt = Date.now();
   const saved = old
-    ? repo.save(old, data)
-    : repo.create("sportsHelp", actor.id, data);
-  repo.create("sportsHelpHistory", actor.id, {
+    ? yield* effect(repo.save(old, data))
+    : yield* effect(repo.create("sportsHelp", actor.id, data));
+  yield* effect(repo.create("sportsHelpHistory", actor.id, {
     articleId: saved.id,
     action,
     at: Date.now(),
     before: old?.data ?? null,
     after: saved.data,
     result: "SUCCESS",
-  });
+  }));
   return saved;
 }
-export function helpRead(repo: Repository, actor: Account, lang: unknown) {
+export function helpRead(repo: Pick<Repository, "all">, actor: Account, lang: unknown) {
   sportsAccountGate(repo, actor);
   sportsAvailable(repo);
   demand(lang === "zh" || lang === "en", "帮助语言只能为zh或en。");
