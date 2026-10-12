@@ -1,5 +1,5 @@
 import { effect, runSync, type BusinessRepository } from "./storage/effects";
-import { verifiedStudentNumber } from './student-search';
+import { recordedStudentNumber } from './student-search';
 import { initialV2State, type V2State } from "../../shared/v2/model";
 import type { AlumniData } from "../../shared/v2/alumniModel";
 import {
@@ -48,7 +48,7 @@ export function* alumniPolicy(
   if (action === "alumni.review") reviewer(actor);
   else student(actor);
   const before = ((yield* effect(repo.all("alumniState")))[0]?.data.value as AlumniData | undefined) ?? emptyAlumni();
-  const verifiedNumber=verifiedStudentNumber(actor,(yield* effect(repo.all("verifiedEmail"))));
+  const enrolledNumber=recordedStudentNumber(actor,(yield* effect(repo.all("sportsIdentity"))));
   if (action === "alumni.post") {
     canSpeak(actor);
     const profile = before.profiles.find(
@@ -117,8 +117,8 @@ export function* alumniPolicy(
       next = submitAlumniCertification(state, policyActor, {
         ...profileInput(),
         name: actor.name,
-        studentNumber: verifiedNumber ?? textField(input, "studentNumber", 100),
-        studentNumberSource: verifiedNumber ? "verified-email" : "applicant",
+        studentNumber: enrolledNumber ?? textField(input, "studentNumber", 100),
+        studentNumberSource: enrolledNumber ? "enrollment" : "applicant",
         major: textField(input, "major", 80),
         graduationYear: integerField(
           input,

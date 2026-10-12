@@ -45,6 +45,8 @@ it('keeps the existing cookie session after a successful member join',async()=>{
   expect(currentApiUserId()).toBe('student-one');
   expect(hasApiSession()).toBe(true);
   expect(fetcher.mock.calls.at(-1)[1].headers['X-Join-Capability']).toBe('one-time');
+  expect(fetcher.mock.calls.at(-1)[1].headers['Content-Type']).toBe('application/json');
+  expect(fetcher.mock.calls.at(-1)[1].body).toBe('{}');
 });
 it('rejects nonstudents and ignores a restore response that arrives after logout', async () => {
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({data:{user:{role:'TEACHER'}}}),{status:200})));

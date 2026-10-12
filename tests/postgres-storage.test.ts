@@ -1434,9 +1434,9 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await postgresWorkspace(db,student)).alumni.bookings.find(b=>b.id===booking.id)?.status).toBe('cancelled');
     await expect(command(alumni,'alumni.slot.create',{startAt:new Date(start+7200_000).toISOString(),endAt:new Date(start+10800_000).toISOString(),location:'图书馆'})).rejects.toThrow();
   });
-  it('requires verified school email for number search and respects search and profile privacy switches', async () => {
+  it('uses independent enrolled numbers for search and respects search and profile privacy switches', async () => {
     const auth=new PostgresAuth(db),mail=new PostgresEmail(db);
-    const email='20260001@bnbu.edu.cn';
+    const email='y123456789@bnbu.edu.cn';
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,organization,created_at,roles) VALUES('search-person',$1,$2,'搜索学生','学院','now','[\"student\"]')",[email,hashPassword('Search-test-123')]);
     const target=await auth.login(email,'Search-test-123');
     const requester=(await auth.login('coffee-b@example.test','Coffee-test-123')).token;
@@ -1444,11 +1444,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await mail.sendVerification(email,true);
     const code=/\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1',[email])).rows[0].body)![0];
     await mail.verifyOwnEmail(target.account,code);
+    expect(await postgresStudentSearch(db,requester,'20260001')).toEqual({students:[]});
+    await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','search-person',{role:'student',status:'verified',studentNumber:'20260001'}));
+    expect(await postgresStudentSearch(db,requester,'y123456789')).toEqual({students:[]});
     expect(await postgresStudentSearch(db,requester,'20260001')).toEqual({students:[{id:'search-person',name:'搜索学生',organization:'学院'}]});
     await executePostgres(db,target.token,'preferences.preview',{enabled:false},randomUUID());
     expect((await postgresStudentSearch(db,requester,'20260001')).students[0].organization).toBe('');
     await executePostgres(db,target.token,'preferences.searchable',{enabled:false},randomUUID());
     expect(await postgresStudentSearch(db,requester,'20260001')).toEqual({students:[]});
     expect(await postgresStudentSearch(db,requester,'2026')).toEqual({students:[]});
+    await executePostgres(db,target.token,'alumni.apply',{studentNumber:'ignored-client-value',major:'计算机',graduationYear:2024,city:'珠海',direction:'就业',experience:'工作',topics:'实习',bio:'',evidence:'核对说明'},randomUUID());
+    const alumniState=await db.transaction(client=>new PostgresRepository(client).all('alumniState'));
+    const application=(alumniState[0].data.value as {profiles:Array<{owner:string;studentNumber:string;studentNumberSource:string}>}).profiles.find(p=>p.owner==='search-person');
+    expect(application).toMatchObject({studentNumber:'20260001',studentNumberSource:'enrollment'});
   });
 });

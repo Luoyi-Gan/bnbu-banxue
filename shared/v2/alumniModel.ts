@@ -12,7 +12,7 @@ export interface AlumniProfile {
   topics: string
   bio: string
   studentNumber?: string
-  studentNumberSource?: 'verified-email' | 'applicant'
+  studentNumberSource?: 'verified-email' | 'applicant' | 'enrollment'
   evidence: string
   status: 'pending' | 'approved' | 'rejected'
   reviewNote: string

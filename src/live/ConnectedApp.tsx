@@ -1595,7 +1595,7 @@ export function ConnectedApp() {
                         <p>
                           {p.major} · {p.graduationYear}
                         </p>
-                        <p>学号：{p.studentNumber || "旧申请未提供"}（{p.studentNumberSource === "verified-email" ? "已验证邮箱" : "申请人填写，待核对"}）</p><p>{p.evidence}</p>
+                        <p>学号：{p.studentNumber || "旧申请未提供"}（{p.studentNumberSource === "enrollment" ? "入班填写，待学校名单核对" : p.studentNumberSource === "verified-email" ? "历史邮箱前缀，待重新核对" : "申请人填写，待核对"}）</p><p>{p.evidence}</p>
                         <div className="live-actions">
                           {button("通过", "alumni.review", {
                             id: p.id,

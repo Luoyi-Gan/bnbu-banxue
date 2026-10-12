@@ -9,10 +9,10 @@ export async function postgresStudentSearch(db:PostgresDatabase,token:string,que
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client);
     validateStudentSearch(actor,query);
-    const row=(await client.query<AccountRow>("SELECT * FROM accounts WHERE email=$1 AND login_kind='PERSONAL'",[query.trim().toLowerCase()+'@bnbu.edu.cn'])).rows[0];
-    if(!row) return {students:[]};
     const repo=new PostgresRepository(client);
-    const preferences=(await repo.all('preferences')).find(p=>p.ownerId===row.id)?.data;
-    return studentSearchResult(account(row),preferences,await repo.all('verifiedEmail'));
+    const identities=await repo.all('sportsIdentity'),preferences=await repo.all('preferences');
+    const ids=[...new Set(identities.filter(i=>i.data.studentNumber===query.trim()).map(i=>i.ownerId))];
+    const rows=(await client.query<AccountRow>("SELECT * FROM accounts WHERE id=ANY($1::text[]) AND login_kind='PERSONAL'",[ids])).rows;
+    return {students:rows.flatMap(row=>studentSearchResult(account(row),preferences.find(p=>p.ownerId===row.id)?.data,identities).students)};
   });
 }

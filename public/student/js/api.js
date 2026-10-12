@@ -1041,7 +1041,7 @@ export async function joinWithInvite(inviteToken, profile) {
   });
   if (flow.epoch !== authSessionEpoch) throw new Error('AUTH_SESSION_CHANGED');
   const joined = await rawRequest(`/course-invites/${encodeURIComponent(inviteToken)}/join`, {
-    method: "POST", auth: false,
+    method: "POST", auth: false, body: {},
     headers: { "X-Join-Capability": flow.capability.joinCapability, "Idempotency-Key":flow.joinKey },
   });
   if (flow.epoch !== authSessionEpoch) throw new Error('AUTH_SESSION_CHANGED');

@@ -237,6 +237,9 @@ try {
   assert.equal(joinedResponse.status,200);const joined=await joinedResponse.json();
   assert.deepEqual(await (await fetch(base+memberPath+'/join',{method:'POST',headers:joinHeaders,body:'{}'})).json(),joined);
   assert.equal(joined.data.authSession.kind,'COMPANION');
+  assert.equal((await request('/api/workspace')).account.studentNumber,memberProfile.studentNumber);
+  assert.ok((await request('/api/students/search?number='+memberProfile.studentNumber)).students.some(s=>s.id===joinStudentId));
+  assert.equal((await request('/api/students/search?number='+joinStudentEmail.split('@')[0])).students.length,0);
   assert.ok((await request('/api/v1/enrollments?classSectionId='+createdCourse.id)).data.some(e=>e.id===joined.data.enrollment.id && e.status==='ACTIVE'));
   cookie=teacherCookie;
   assert.ok((await request('/api/v1/enrollments?classSectionId='+createdCourse.id)).data.some(e=>e.studentId===joinStudentId));
