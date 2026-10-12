@@ -383,6 +383,7 @@ export function snapshot(db: Database, actor: Account) {
     ...repo.all("answer").filter((a) => own(a.ownerId)),
     ...repo.all("feedback").filter((f) => own(f.ownerId) || operate),
     ...repo.all("profile").filter((p) => own(p.ownerId)),
+    ...repo.all("preferences").filter((p) => own(p.ownerId)),
     ...repo.all("timetable").filter((t) => own(t.ownerId)),
     ...repo.all("teacherProfile"),
     ...repo.all("coffeeSlot").map((s) => ({
@@ -426,6 +427,7 @@ export function snapshot(db: Database, actor: Account) {
     ...memberRooms.flatMap((r) => strings(r.data.members)),
     ...repo.all("coffeeSlot").map((s) => s.ownerId),
   ]);
+  const hiddenProfiles = new Set(repo.all("preferences").filter(p => p.data.profilePreview === false).map(p => p.ownerId));
   const people = repo
     .people()
     .filter(
@@ -435,7 +437,7 @@ export function snapshot(db: Database, actor: Account) {
     .map((p) =>
       has(actor, "superadmin")
         ? p
-        : { id: p.id, name: p.name, organization: p.organization },
+        : { id: p.id, name: p.name, organization: p.id !== actor.id && hiddenProfiles.has(p.id) && !has(actor, "teacher", "reviewer", "operator") ? "" : p.organization },
     );
   return {
     account: actor,

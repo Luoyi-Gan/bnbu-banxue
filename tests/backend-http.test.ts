@@ -42,6 +42,22 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("资料预览由本人保存，向其他学生隐藏学院而保留业务人员权限", () => {
+    const {a,b,teacher,admin,run,db} = setup();
+    db.prepare("UPDATE accounts SET organization=? WHERE id=?").run("计算机学院",a.id);
+    run(a,"room.create",{type:"study",title:"学习",body:"说明",time:"周末",place:"图书馆",capacity:3});
+    run(a,"preferences.preview",{enabled:false,id:b.id});
+    const person = (who: typeof a) => snapshot(db,who.account).people.find(p=>p.id===a.id);
+    expect(person(b)).toMatchObject({name:a.account.name,organization:""});
+    expect(person(teacher)).toMatchObject({organization:"计算机学院"});
+    expect(person(admin)).toMatchObject({organization:"计算机学院"});
+    expect(snapshot(db,b.account).entities.some(e=>e.kind==='preferences' && e.ownerId===a.id)).toBe(false);
+    expect(() => run(a,"preferences.preview",{enabled:"false"})).toThrow();
+    run(a,"profile.save",{nickname:"本人昵称",avatar:""});
+    expect(person(b)?.organization).toBe("");
+    run(a,"preferences.preview",{enabled:true});
+    expect(person(b)?.organization).toBe("计算机学院");
+  });
   it("关系历史只返回本人操作，下架对象不泄露旧标题", () => {
     const {a,b,run,repo,db} = setup();
     const event = repo.create("activity", b.id, {title:"私有后续标题",status:"published",startAt:new Date(Date.now()+86400000).toISOString()});

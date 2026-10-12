@@ -198,6 +198,12 @@ export function governanceCommand(
     );
     return repo.save(feedback, { status: "resolved", resolution: reason });
   }
+  if (action === "preferences.preview") {
+    student(actor);
+    demand(typeof input.enabled === "boolean", "资料预览开关必须为布尔值。");
+    const previous = repo.all("preferences").find(p => p.ownerId === actor.id);
+    return previous ? repo.save(previous, {profilePreview: input.enabled}) : repo.create("preferences", actor.id, {profilePreview: input.enabled});
+  }
   if (action === "profile.save") {
     const avatar = textField(input, "avatar", 7_000_000, true);
     demand(
