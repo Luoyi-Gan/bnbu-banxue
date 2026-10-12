@@ -188,6 +188,19 @@ it("HTTP 组队从收藏申请到审批聊天结束互评保持同一成员关�
   expect(repo.all("roomReview")).toHaveLength(1);
 });
 
+it("下架队伍保留申请结果和受限摘要，不向申请人开放隐藏正文和成员名单", () => {
+  const {db, a, b, admin, run} = fixture();
+  const room = run(a, "room.create", {type: "study", title: "历史队伍", body: "隐藏正文不可见", time: "周末", place: "教室", capacity: 2});
+  const application = run(b, "room.apply", {id: room.id});
+  run(a, "room.decide", {id: application.id, accept: false});
+  run(admin, "room.moderate", {id: room.id, decision: "hide", reason: "处理异常"});
+  const view = snapshot(db, b.account);
+  expect(view.entities.some(e => e.id === room.id)).toBe(false);
+  expect(view.entities.find(e => e.id === application.id)!.data).toMatchObject({status: "rejected", roomSummary: {id: room.id, title: "历史队伍", visibility: "hidden", status: "open"}});
+  expect(JSON.stringify(view)).not.toContain("隐藏正文不可见");
+  expect(Object.keys(view.entities.find(e => e.id === application.id)!.data.roomSummary as object).sort()).toEqual(["id", "status", "title", "visibility"]);
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {

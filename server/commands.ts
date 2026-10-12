@@ -342,7 +342,12 @@ export function snapshot(db: Database, actor: Account) {
         (a) =>
           own(a.ownerId) ||
           rooms.some((r) => r.id === a.data.roomId && own(r.ownerId)),
-      ),
+      ).map((application) => {
+        const room = repo.get(application.data.roomId, "room");
+        return {...application, data: {...application.data, roomSummary: {
+          id: room.id, title: room.data.title, status: room.data.status, visibility: room.data.visibility,
+        }}};
+      }),
     ...repo
       .all("roomReview")
       .filter((r) => rooms.some((room) => room.id === r.data.roomId)),
