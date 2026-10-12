@@ -5,10 +5,22 @@ import {
   clearApiSession,
   hasApiSession,
   logoutApi,
+  passwordLogin,
   request,
   restoreCookieSession,
   setApiRequestMode,
 } from "../integrations/sports-teacher/app/api-client";
+
+it("原版密码表单接受 cookie 登录响应，不要求伪造令牌", async () => {
+  vi.stubEnv("NEXT_PUBLIC_BNBU_COOKIE_SESSION", "true");
+  const fetcher = vi.fn().mockResolvedValue(Response.json({ data: { user: { id: "teacher", role: "TEACHER", version: 1, status: "ACTIVE" } } }));
+  vi.stubGlobal("fetch", fetcher);
+  const result = await passwordLogin("teacher@example.test", "Password-123");
+  expect(result.user.id).toBe("teacher");
+  expect(hasApiSession()).toBe(true);
+  expect(apiSessionUserId()).toBe("teacher");
+  expect(fetcher.mock.calls[0][1].body).toBe(JSON.stringify({ account: "teacher@example.test", password: "Password-123" }));
+});
 
 afterEach(() => {
   clearApiSession();

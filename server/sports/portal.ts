@@ -1,4 +1,5 @@
-import { demand, type Account } from "../auth";
+import { demand, login, loginAdministrator, type Account } from "../auth";
+import { transaction, type Database } from "../database";
 import { Repository } from "../repository";
 import { requiresPasswordChange, sportsAccountGate } from "./account-gate";
 import { administratorAccess } from "./permissions";
@@ -13,6 +14,44 @@ const permissionNames = {
   HELP: "HELP_CENTER",
   AUDIT: "AUDIT_QUERY",
 } as const;
+
+export function portalLogin(db: Database, account: unknown, password: unknown) {
+  demand(
+    typeof account === "string" &&
+      account.trim().length > 0 &&
+      account.length <= 254,
+    "请填写登录账号。",
+  );
+  const identifier = account.trim().toLowerCase();
+  return transaction(db, () => {
+    const candidates = db
+      .prepare(
+        "SELECT login_kind FROM accounts WHERE (login_kind='ADMIN' AND login_name=?) OR (login_kind='PERSONAL' AND email=?)",
+      )
+      .all(identifier, identifier);
+    demand(
+      candidates.length <= 1,
+      "登录标识对应不同账号，请从伴学入口选择登录类型。",
+      409,
+    );
+    const management =
+      candidates[0]?.login_kind === "ADMIN" ||
+      (candidates.length === 0 && !identifier.includes("@"));
+    const session = management
+      ? loginAdministrator(db, identifier, password)
+      : login(db, identifier, password);
+    const security = portalSecurity(new Repository(db), session.account);
+    return {
+      token: session.token,
+      user: {
+        id: session.account.id,
+        role: security.adminKind ? ("ADMIN" as const) : ("TEACHER" as const),
+        version: security.version,
+        status: "ACTIVE",
+      },
+    };
+  });
+}
 
 function portalIdentity(repo: Repository, actor: Account) {
   demand(actor.status !== "banned", "账号已停用。", 403);

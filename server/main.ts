@@ -19,7 +19,7 @@ import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
-import { portalMe, portalSecurity } from "./sports/portal";
+import { portalLogin, portalMe, portalSecurity } from "./sports/portal";
 import { administratorSelf } from "./sports/administrator-deletion";
 import {
   adminEmailStatus,
@@ -335,6 +335,14 @@ export function createApiServer(
           return send(response, 200, { id: saved.id });
         }
         const input = await body(request);
+        if (pathname === "/api/v1/auth/password-login") {
+          const result = portalLogin(db, input.account, input.password);
+          response.setHeader(
+            "Set-Cookie",
+            `bnbu_session=${result.token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`,
+          );
+          return send(response, 200, { data: { user: result.user } });
+        }
         if (pathname === "/api/auth/verification-codes") {
           return send(
             response,
@@ -367,6 +375,34 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        if (pathname === "/api/v1/auth/own-password") {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          portalSecurity(new Repository(db), authenticate(db, token));
+          execute(
+            db,
+            token!,
+            "sports.password.change",
+            {
+              currentPassword: input.currentPassword,
+              newPassword: input.newPassword,
+              confirmPassword: input.confirmPassword,
+              version: input.expectedVersion,
+            },
+            key,
+          );
+          const security = portalSecurity(
+            new Repository(db),
+            authenticate(db, token),
+          );
+          return send(response, 200, {
+            data: {
+              userId: security.userId,
+              version: security.version,
+              mustChangePassword: security.mustChangePassword,
+            },
+          });
+        }
         if (pathname === "/api/sports/admin-email/request") {
           demand(
             Object.keys(input).length === 0,

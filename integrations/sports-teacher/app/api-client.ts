@@ -1168,8 +1168,17 @@ export function changeOwnPassword(
 export async function passwordLogin(
   account: string,
   password: string,
-): Promise<AuthSessionData> {
+): Promise<{ user: ApiUser }> {
   const expectedEpoch = authSessionEpoch;
+  if (usesCookieSession()) {
+    const session = await rawRequest<{ user: ApiUser }>("/auth/password-login", {
+      method: "POST", auth: false, body: { account, password },
+    });
+    if (authSessionEpoch !== expectedEpoch || apiRequestMode !== "real") throw new AuthSessionSupersededError();
+    authSessionEpoch += 1;
+    cookieSession = { userId: session.user.id, role: session.user.role };
+    return session;
+  }
   const session = await rawRequest<AuthSessionData>("/auth/password-login", {
     method: "POST",
     auth: false,
