@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { randomBytes } from "node:crypto";
 import { demand, type Account } from "../auth";
 import {
@@ -176,90 +177,7 @@ export function sportsCourseCommand(
   action: string,
   input: Fields,
 ): Entity | undefined {
-  if (
-    action === "sports.semester.create" ||
-    action === "sports.semester.update"
-  ) {
-    sportsRole(repo, actor, "admin");
-    requireSportsPermission(repo, actor, "SEMESTERS");
-    const old = action.endsWith("update")
-      ? repo.get(input.id, "sportsSemester")
-      : undefined;
-    if (old) {
-      version(old, input);
-      demand(old.data.status === "UPCOMING", "只有即将开始的学期可以编辑。");
-    }
-    const year = textField(input, "academicYear", 9),
-      type = enumField(input, "type", ["FIRST", "SECOND", "SUMMER"]);
-    demand(
-      /^\d{4}-\d{4}$/.test(year) &&
-        Number(year.slice(5)) === Number(year.slice(0, 4)) + 1,
-      "学年须为连续YYYY-YYYY。",
-    );
-    const startDate = dateField(input, "startDate"),
-      endDate = dateField(input, "endDate");
-    demand(endDate >= startDate, "学期结束不得早于开始。");
-    demand(
-      !repo
-        .all("sportsSemester")
-        .some(
-          (s) =>
-            s.id !== old?.id &&
-            s.data.academicYear === year &&
-            s.data.type === type,
-        ),
-      "该学年学期已经存在。",
-      409,
-    );
-    const data = {
-      name: textField(input, "name", 100),
-      academicYear: year,
-      type,
-      startDate,
-      endDate,
-      status: "UPCOMING",
-    };
-    return old
-      ? repo.save(old, data)
-      : repo.create("sportsSemester", actor.id, data);
-  }
-  if (action === "sports.semester.activate") {
-    sportsRole(repo, actor, "admin");
-    requireSportsPermission(repo, actor, "SEMESTERS");
-    const semester = repo.get(input.id, "sportsSemester");
-    version(semester, input);
-    demand(
-      semester.data.status === "UPCOMING" &&
-        instant(String(semester.data.startDate)) <= Date.now(),
-      "仅能切换已经开始的待启用学期。",
-    );
-    const old = repo
-      .all("sportsSemester")
-      .find((s) => s.data.status === "CURRENT");
-    if (old) {
-      demand(
-        !repo
-          .all("sportsCourse")
-          .some(
-            (c) =>
-              c.data.semesterId === old.id &&
-              (c.data.settlementStatus !== "SETTLED" ||
-                !repo
-                  .all("sportsSettlementReport")
-                  .some(
-                    (r) =>
-                      r.id === c.data.settlementReportId &&
-                      r.data.courseId === c.id &&
-                      r.data.semesterId === old.id,
-                  )),
-          ),
-        "旧学期存在未完成收尾结算的课程，不能切换。",
-        409,
-      );
-      repo.save(old, { status: "ARCHIVED" });
-    }
-    return repo.save(semester, { status: "CURRENT" });
-  }
+  if(action.startsWith("sports.semester.")) return runSync(sportsSemesterPolicy(repo,actor,action,input));
   if (action === "sports.template.publish") {
     sportsRole(repo, actor, "admin");
     requireSportsSuperAdmin(repo, actor);
@@ -705,4 +623,90 @@ export function projectSportsCourses(
             .filter((i) => courses.some((c) => c.id === i.data.courseId))
         : [],
   };
+}
+
+export function* sportsSemesterPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields):Generator<unknown,Entity|undefined,unknown> {
+  const entities:Entity[]=[];
+  for(const kind of ["sportsIdentity","sportsSemester","sportsCourse","sportsSettlementReport"]) entities.push(...(yield* effect(repo.all(kind))));
+  const reader:Pick<Repository,"all"|"get">={all:kind=>entities.filter(e=>e.kind===kind),get:(id,kind)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,"对象不存在。",404);return e;}};
+  if (
+    action === "sports.semester.create" ||
+    action === "sports.semester.update"
+  ) {
+    sportsRole(reader, actor, "admin");
+    requireSportsPermission(reader, actor, "SEMESTERS");
+    const old = action.endsWith("update")
+      ? reader.get(input.id, "sportsSemester")
+      : undefined;
+    if (old) {
+      version(old, input);
+      demand(old.data.status === "UPCOMING", "只有即将开始的学期可以编辑。");
+    }
+    const year = textField(input, "academicYear", 9),
+      type = enumField(input, "type", ["FIRST", "SECOND", "SUMMER"]);
+    demand(
+      /^\d{4}-\d{4}$/.test(year) &&
+        Number(year.slice(5)) === Number(year.slice(0, 4)) + 1,
+      "学年须为连续YYYY-YYYY。",
+    );
+    const startDate = dateField(input, "startDate"),
+      endDate = dateField(input, "endDate");
+    demand(endDate >= startDate, "学期结束不得早于开始。");
+    demand(
+      !reader.all("sportsSemester")
+        .some(
+          (s) =>
+            s.id !== old?.id &&
+            s.data.academicYear === year &&
+            s.data.type === type,
+        ),
+      "该学年学期已经存在。",
+      409,
+    );
+    const data = {
+      name: textField(input, "name", 100),
+      academicYear: year,
+      type,
+      startDate,
+      endDate,
+      status: "UPCOMING",
+    };
+    return old
+      ? (yield* effect(repo.save(old, data)))
+      : (yield* effect(repo.create("sportsSemester", actor.id, data)));
+  }
+  if (action === "sports.semester.activate") {
+    sportsRole(reader, actor, "admin");
+    requireSportsPermission(reader, actor, "SEMESTERS");
+    const semester = reader.get(input.id, "sportsSemester");
+    version(semester, input);
+    demand(
+      semester.data.status === "UPCOMING" &&
+        instant(String(semester.data.startDate)) <= Date.now(),
+      "仅能切换已经开始的待启用学期。",
+    );
+    const old = reader.all("sportsSemester")
+      .find((s) => s.data.status === "CURRENT");
+    if (old) {
+      demand(
+        !reader.all("sportsCourse")
+          .some(
+            (c) =>
+              c.data.semesterId === old.id &&
+              (c.data.settlementStatus !== "SETTLED" ||
+                !reader.all("sportsSettlementReport")
+                  .some(
+                    (r) =>
+                      r.id === c.data.settlementReportId &&
+                      r.data.courseId === c.id &&
+                      r.data.semesterId === old.id,
+                  )),
+          ),
+        "旧学期存在未完成收尾结算的课程，不能切换。",
+        409,
+      );
+      yield* effect(repo.save(old, { status: "ARCHIVED" }));
+    }
+    return yield* effect(repo.save(semester, { status: "CURRENT" }));
+  }
 }
