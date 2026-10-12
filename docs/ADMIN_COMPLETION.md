@@ -1418,3 +1418,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### 后端源码迁移与独立容器验证
 77 个 server 源文件已迁入 backend/src，测试、构建脚本、类型引用同步更新；仅修改前端类型导入路径，未改变页面布局或交互。独立 backend/Dockerfile 多阶段构建 API，运行镜像不启动 Vite，使用非 root 用户。API 地址和端口可配置，默认保持原本地端口。现有 SQLite 数据未移动或重置。
 验证：66 文件 396 项测试通过；前后端类型检查、全仓 ESLint 和 backend 构建通过。Docker 镜像 bnbu-backend:split-check 构建成功，在独立 4189 端口及临时数据库启动，/api/health 为 200（SQLite schema 7），匿名 /api/workspace 为 401；测试容器已停止删除。此证据只证明源码迁移和独立 API 容器，PostgreSQL、COS 与前后端完整 Compose 仍未完成。
+
+### 前后端共享规则分离
+将两端共用的模型、规则和类型及其依赖共 13 个模块移至 shared，所有消费者仅调整导入路径。backend/Dockerfile 改为只复制 backend 与 shared，不再复制前端 src。共享目录仍保留既有演示初始化数据供旧逻辑兼容；此迁移不构成移除演示逻辑或 PostgreSQL 完成的声明。
+验证：66 文件 396 项全套测试通过；前后端类型检查、ESLint、前端生产构建和独立后端构建通过；不复制前端源码的后端 Docker 镜像构建成功。Vite 仍报告现有较大分包提示。下一步继续数据访问异步化、PostgreSQL 和 COS，保持原 UI/UX。

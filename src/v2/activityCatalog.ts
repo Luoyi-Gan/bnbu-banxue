@@ -1,6 +1,6 @@
-import { events, hosts } from '../data/mockData'
+import { events, hosts } from '../../shared/data/mockData'
 import { recommendationPhoto } from '../data/recommendationPhoto'
-import { studentName, type LocalEvent, type V2State } from './model'
+import { studentName, type LocalEvent, type V2State } from '../../shared/v2/model'
 import type { ActivityItem } from './activityFilters'
 
 export const seededActivities: ActivityItem[] = events.map((event) => ({ id: event.id, title: event.title, subtitle: event.subtitle, description: event.description, category: event.category, startAt: event.startAt, endAt: event.endAt, location: event.location, capacity: event.capacity, host: hosts.find((host) => host.id === event.hostId)?.name ?? 'BNBU', image: recommendationPhoto(event) }))

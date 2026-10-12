@@ -15,7 +15,7 @@ import { coffeeCommand } from "./coffee";
 import { governanceCommand } from "./governance";
 import { activityCommand } from "./activities";
 import { alumniCommand, readAlumni } from "./alumni";
-import { bookingStatus } from "../../src/v2/alumniPolicy";
+import { bookingStatus } from "../../shared/v2/alumniPolicy";
 import { sportsCourseCommand } from "./sports/courses";
 import { sportsCompanion } from "./sports/companion";
 import { sportsCourseManagementCommand } from "./sports/course-management";

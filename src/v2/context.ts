@@ -1,5 +1,5 @@
 import { createContext, type Dispatch, type SetStateAction } from 'react'
-import type { V2State } from './model'
+import type { V2State } from '../../shared/v2/model'
 
 export interface V2ContextValue { persistenceError?: boolean; state: V2State; setState: Dispatch<SetStateAction<V2State>>; reset: () => void }
 export const V2Context = createContext<V2ContextValue | null>(null)

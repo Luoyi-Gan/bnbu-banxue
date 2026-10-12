@@ -1,4 +1,4 @@
-import type { RoomReview, V2State } from './model'
+import type { RoomReview, V2State } from '../../shared/v2/model'
 
 export function finishRoom(state: V2State, roomId: string, actor: string): V2State {
   const room = state.rooms.find((item) => item.id === roomId)

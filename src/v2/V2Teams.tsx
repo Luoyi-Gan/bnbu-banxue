@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, MapPin, Plus, Search, Star, UsersRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { roomTypeName, type Room, type RoomReview } from './model'
+import { roomTypeName, type Room, type RoomReview } from '../../shared/v2/model'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { roomReviewAverage } from './roomReviewPolicy'

@@ -1,6 +1,6 @@
 import { coffeeSlots as seedSlots, teachers } from '../data/mockData'
 import { makeId, studentName, type V2State } from './model'
-import type { CoffeeSlot } from '../types'
+import type { CoffeeSlot } from '../types/index'
 
 export interface TeacherAccount { id: string; sportsQualified: boolean }
 export interface ManagedSlot extends CoffeeSlot { location?: string; closed?: boolean }

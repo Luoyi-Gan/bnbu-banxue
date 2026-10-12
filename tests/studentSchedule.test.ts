@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initialV2State, studentName } from '../src/v2/model'
+import { initialV2State, studentName } from '../shared/v2/model'
 import { setActivityParticipation, studentSchedule } from '../src/v2/studentSchedule'
 
 const now = Date.parse('2026-10-09T10:00:00+08:00')

@@ -1,6 +1,6 @@
 import type {Database} from './database'
 import type {Entity} from './repository'
-import type {RelationshipHistory} from '../../src/v2/relationshipAdapter'
+import type {RelationshipHistory} from '../../shared/v2/relationshipAdapter'
 
 /** Returns only this account's own relationship actions; never historic private content. */
 export function relationshipHistory(db: Database, actorId: string, visible: Entity[]): RelationshipHistory[] {

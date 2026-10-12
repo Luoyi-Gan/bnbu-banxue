@@ -1,5 +1,5 @@
-import { alumniData } from './alumniPolicy'
-import { makeId, studentName, todayLabel, type Post, type V2State } from './model'
+import { alumniData } from '../../shared/v2/alumniPolicy'
+import { makeId, studentName, todayLabel, type Post, type V2State } from '../../shared/v2/model'
 
 export function canReadPost(state: V2State, post: Post) {
   return post.status === 'visible' || post.status === 'pending' && (post.author === studentName || alumniData(state).profiles.some(profile => profile.owner === studentName && profile.id === post.alumniId))

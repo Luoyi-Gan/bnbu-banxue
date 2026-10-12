@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initialV2State, studentName } from './model'
+import { initialV2State, studentName } from '../../shared/v2/model'
 import { updateStudentProfile } from './profilePolicy'
 
 describe('student display profile', () => {

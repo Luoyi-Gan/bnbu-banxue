@@ -1,5 +1,5 @@
-import { events } from '../data/mockData'
-import type { V2State } from './model'
+import { events } from '../../shared/data/mockData'
+import type { V2State } from '../../shared/v2/model'
 
 export type ActivityReaction = 'likedActivities' | 'savedActivities'
 

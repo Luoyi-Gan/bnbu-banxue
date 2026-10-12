@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { Mail } from 'lucide-react'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, PageHeading, SectionHeading } from './ui'
-import { mailFieldLabels, normalizeMailTime, type MailActivityFields, type MailSource } from './mailActivityAdapter'
-import type { MailActivityRecord } from './mailActivityPolicy'
+import { mailFieldLabels, normalizeMailTime, type MailActivityFields, type MailSource } from '../../shared/v2/mailActivityAdapter'
+import type { MailActivityRecord } from '../../shared/v2/mailActivityPolicy'
 
 
 const emptySource: MailSource = { messageId: '', subject: '', sender: '', body: '' }

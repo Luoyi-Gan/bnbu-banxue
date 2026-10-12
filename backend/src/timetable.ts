@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import { demand, ServiceError } from "./auth";
-import { parseTimetableResponse } from "../../src/v2/timetableModel";
+import { parseTimetableResponse } from "../../shared/v2/timetableModel";
 
 export async function recognize(request: IncomingMessage) {
   const endpoint = process.env.BNBU_TIMETABLE_UPSTREAM;

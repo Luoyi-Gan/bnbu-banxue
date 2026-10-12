@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { BookOpen, CalendarDays, Check, Clock3, ImagePlus, LoaderCircle, MapPin, Upload, UserRound } from 'lucide-react'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, Modal, SectionHeading } from './ui'
-import { campusWeekday, lessonsForDay, weekDays, type StudentTimetable as Timetable, type TimetableLesson } from './timetableModel'
+import { campusWeekday, lessonsForDay, weekDays, type StudentTimetable as Timetable, type TimetableLesson } from '../../shared/v2/timetableModel'
 import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, type RecognitionStage } from './timetableAdapter'
 import './timetable.css'
 

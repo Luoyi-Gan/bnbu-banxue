@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { buildLocalPreviewWorkspace } from '../public/student/js/local-preview.js'
 import { mapProgressTarget, mapStudentProgressProjection } from '../public/student/js/api.js'
-import { mapSportsProgress, type SportsWorkspace } from '../src/v2/sportsProgress'
+import { mapSportsProgress, type SportsWorkspace } from '../shared/v2/sportsProgress'
 import { readLiveSportsProgress, type SportsRuntime } from '../src/v2/sportsProgressAdapter'
 import { createSportsProgressResource } from '../src/v2/sportsProgressResource'
 

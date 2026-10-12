@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import cytoscape from 'cytoscape'
-import { initialV2State, studentName } from './model'
-import { events, organizations } from '../data/mockData'
-import { adaptRelationships, buildRelationshipGraph, relationshipSnapshot, trackRelationshipChanges } from './relationshipAdapter'
+import { initialV2State, studentName } from '../../shared/v2/model'
+import { events, organizations } from '../../shared/data/mockData'
+import { adaptRelationships, buildRelationshipGraph, relationshipSnapshot, trackRelationshipChanges } from '../../shared/v2/relationshipAdapter'
 import { relationshipDemo } from './relationshipMock'
 import { graphElements, layoutRelationships, relationshipStyles } from './relationshipEngine'
 

@@ -1,4 +1,4 @@
-import type { V2State } from './model'
+import type { V2State } from '../../shared/v2/model'
 
 export function hideRetiredContent(state: V2State): V2State {
   return {

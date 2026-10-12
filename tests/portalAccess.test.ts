@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { canAccessPortal, portalHome, resolvePortalRole } from '../src/v2/portalAccess'
-import type { Role } from '../src/v2/model'
+import type { Role } from '../shared/v2/model'
 
 describe('portal separation', () => {
   const paths = { student: ['/v2', '/v2/me', '/v2/sports', '/v2/activities/event'], teacher: ['/v2/teacher', '/v2/teacher/activities', '/v2/teacher/activities/event'], admin: ['/v2/admin', '/v2/admin/verifications', '/v2/admin/moderation'] }

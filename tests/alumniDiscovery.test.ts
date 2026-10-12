@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initialV2State, studentName, type Post } from '../src/v2/model'
+import { initialV2State, studentName, type Post } from '../shared/v2/model'
 import { alumniDiscoveryPosts } from '../src/v2/alumniDiscoveryPolicy'
 import { addPostComment, canReadPost, setPostReaction } from '../src/v2/postInteractions'
 import { coverRatio, discoveryColumns } from '../src/v2/discoveryLayout'

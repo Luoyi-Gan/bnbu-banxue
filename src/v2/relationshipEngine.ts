@@ -1,6 +1,6 @@
 import cytoscape, { type Core, type StylesheetStyle, type ElementDefinition } from 'cytoscape'
 import fcose from 'cytoscape-fcose'
-import type { GraphNode, GraphEdge } from './relationshipAdapter'
+import type { GraphNode, GraphEdge } from '../../shared/v2/relationshipAdapter'
 cytoscape.use(fcose)
 export const relationshipStyles: StylesheetStyle[] = [
   { selector: 'node', style: { width: 180, height: 68, shape: 'round-rectangle', 'background-color': '#E8F2FF', 'border-color': '#007AFF', 'border-width': 2, label: 'data(label)', color: '#003E7D', 'font-size': 18, 'font-family': 'Inter, "PingFang SC", "Microsoft YaHei", sans-serif', 'text-valign': 'center', 'text-halign': 'center', 'text-wrap': 'ellipsis', 'text-max-width': '158px', 'min-zoomed-font-size': 8, 'overlay-opacity': 0 } },

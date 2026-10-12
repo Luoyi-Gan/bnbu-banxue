@@ -1,8 +1,8 @@
 import { Activity, ArrowUpRight } from 'lucide-react'
 import { useId } from 'react'
 import { Link } from 'react-router-dom'
-import { sportsHours, sportsProgressLabel } from './sportsProgress'
-import type { SportsCompanion } from '../live/sportsCompanion'
+import { sportsHours, sportsProgressLabel } from '../../shared/v2/sportsProgress'
+import type { SportsCompanion } from '../../shared/live/sportsCompanion'
 import { rememberSportsEntryPosition } from './useSportsHomeScroll'
 import './sportsProgress.css'
 

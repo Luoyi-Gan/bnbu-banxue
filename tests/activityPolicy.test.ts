@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { canPublishActivity, changeActivityVisibility, createActivity, ownsActivity } from '../src/v2/activityPolicy'
-import { initialV2State, studentName, type Verification } from '../src/v2/model'
+import { canPublishActivity, changeActivityVisibility, createActivity, ownsActivity } from '../shared/v2/activityPolicy'
+import { initialV2State, studentName, type Verification } from '../shared/v2/model'
 import { hideRetiredContent } from '../src/v2/retiredContent'
 import { filterActivityItems, type ActivityItem } from '../src/v2/activityFilters'
 

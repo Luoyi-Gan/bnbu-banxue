@@ -1,6 +1,6 @@
-import type { RelationshipHistory } from '../v2/relationshipAdapter';
-import type { AlumniData } from "../v2/alumniModel";
-import type { SportsCompanion } from "./sportsCompanion";
+import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
+import type { AlumniData } from "../../shared/v2/alumniModel";
+import type { SportsCompanion } from "../../shared/live/sportsCompanion";
 export interface LiveAccount {
   studentNumber?: string | null;
   id: string;

@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY backend ./backend
-COPY src ./src
+COPY shared ./shared
 RUN node backend/build.mjs
 
 FROM node:24-bookworm-slim

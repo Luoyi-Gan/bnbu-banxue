@@ -1,7 +1,7 @@
 import type { Account } from "../auth";
 import { Repository } from "../repository";
-import type { SportsCompanion } from "../../../src/live/sportsCompanion";
-import { mapSportsProgress } from "../../../src/v2/sportsProgress";
+import type { SportsCompanion } from "../../../shared/live/sportsCompanion";
+import { mapSportsProgress } from "../../../shared/v2/sportsProgress";
 import { requiresPasswordChange } from "./account-gate";
 import { currentSystem } from "./system";
 

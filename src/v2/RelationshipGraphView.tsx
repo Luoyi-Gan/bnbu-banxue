@@ -4,9 +4,9 @@ import { ArrowRight, CalendarDays, Maximize, Minus, Network, Plus, RotateCcw, Se
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Link } from 'react-router-dom'
 import type { Core } from 'cytoscape'
-import type { V2State } from './model'
+import type { V2State } from '../../shared/v2/model'
 import { useV2 } from './useV2'
-import { adaptRelationships, buildRelationshipGraph, entityLabels, relationLabels, type EntityKind } from './relationshipAdapter'
+import { adaptRelationships, buildRelationshipGraph, entityLabels, relationLabels, type EntityKind } from '../../shared/v2/relationshipAdapter'
 import { relationshipDemo } from './relationshipMock'
 import './relationshipGraph.css'
 

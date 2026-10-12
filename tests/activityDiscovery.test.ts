@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initialV2State, type LocalEvent } from '../src/v2/model'
+import { initialV2State, type LocalEvent } from '../shared/v2/model'
 import { setActivityReaction } from '../src/v2/activityReactions'
 import { savedActivityItems, seededActivities } from '../src/v2/activityCatalog'
 import { discoveryColumns } from '../src/v2/discoveryLayout'

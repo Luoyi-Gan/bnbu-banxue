@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { command, type LiveEntity } from "./api";
 import { Modal } from "../v2/ui";
-import { mailFieldLabels, type MailActivityFields } from "../v2/mailActivityAdapter";
-import type { MailActivityRecord } from "../v2/mailActivityPolicy";
+import { mailFieldLabels, type MailActivityFields } from "../../shared/v2/mailActivityAdapter";
+import type { MailActivityRecord } from "../../shared/v2/mailActivityPolicy";
 
 const empty = (): MailActivityFields => ({title: "", description: "", startAt: "", endAt: "", location: "", host: "", conditions: ""});
 export function MailResolution({source, mails, onSaved}: {source: LiveEntity; mails: LiveEntity[]; onSaved: () => Promise<void>}) {

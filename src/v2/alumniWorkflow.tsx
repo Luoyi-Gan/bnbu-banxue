@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useV2 } from './useV2'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
-import { type V2State } from './model'
-import { alumniData, bookingStatus, reviewAlumni } from './alumniPolicy'
+import { type V2State } from '../../shared/v2/model'
+import { alumniData, bookingStatus, reviewAlumni } from '../../shared/v2/alumniPolicy'
 import { SectionHeading } from './ui'
 
 const time = (value: string) => new Date(value).toLocaleString('zh-CN')

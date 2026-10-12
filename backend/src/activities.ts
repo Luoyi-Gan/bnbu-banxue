@@ -1,16 +1,16 @@
 import { randomUUID } from "node:crypto";
-import { initialV2State } from "../../src/v2/model";
+import { initialV2State } from "../../shared/v2/model";
 import {
   correctActivityMail,
   importActivityMail,
   setMailActivityVisibility,
   type MailActivityRecord,
-} from "../../src/v2/mailActivityPolicy";
+} from "../../shared/v2/mailActivityPolicy";
 import {
   mailFieldLabels,
   normalizeMailTime,
   type MailActivityFields,
-} from "../../src/v2/mailActivityAdapter";
+} from "../../shared/v2/mailActivityAdapter";
 import { demand, type Account } from "./auth";
 import { operator, owner, student } from "./community";
 import {

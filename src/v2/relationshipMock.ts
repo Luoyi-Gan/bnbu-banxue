@@ -1,4 +1,4 @@
-import type { RelationshipEntity } from './relationshipAdapter'
+import type { RelationshipEntity } from '../../shared/v2/relationshipAdapter'
 /** Isolated fixture, never merged into business state. */
 export function relationshipDemo(count = 4): RelationshipEntity[] {
   return Array.from({ length: count }, (_, i) => ({

@@ -2,7 +2,7 @@ import campusServices from '../assets/campus/campus-services.jpg'
 import eveningCampus from '../assets/campus/evening-campus.jpg'
 import homeBackground from '../assets/campus/home-background.jpg'
 import nightWalkway from '../assets/campus/night-walkway.jpg'
-import type { Event } from '../types'
+import type { Event } from '../../shared/types/index'
 
 const photos: Record<string, string> = {
   'cover-ai': homeBackground,
