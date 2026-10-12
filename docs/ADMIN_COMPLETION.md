@@ -2244,3 +2244,6 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 
 ## 2026-10-12 PostgreSQL 路由核对
 对照 main.ts、postgres-api.ts 以及 src/live、src/v2 的请求入口，伴学账号、工作台、社区、学号搜索、命令、课表识别和身份核验路由均有 PostgreSQL 分派；存在分派不代表外部提供方已配置。体育源仍按部署依赖处理。修正未知 PostgreSQL 路径错误返回 503『迁移尚未完成』的问题，与 SQLite 一致返回 404 NOT_FOUND。新增真实 HTTP GET/POST/DELETE 未知路径回归，使用不可达数据库确保不依赖数据库连接，也不改写会话 cookie。针对测试 4/4 通过，服务端类型检查通过。本次尚未重建运行中 Docker 镜像；不将旧容器结果作为本次改动验收。
+
+## 2026-10-12 21:11 最新 Docker 实测
+源码 853d459 已通过 compose.postgres.yaml 重新构建并启动，前端、API、PostgreSQL 健康。运行 scripts/docker-postgres-smoke.mjs 成功，覆盖注册、重启后持久化、社区审核公开通知、点赞收藏、组队入队聊天结束互评及退出；没有执行体育写入。通过 4188 网页代理请求未知接口，实测 404 NOT_FOUND。此证据替代上一条『尚未重建』状态，外部服务依赖仍按部署计划保留。
