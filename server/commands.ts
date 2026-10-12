@@ -75,7 +75,6 @@ export function execute(
       "relation.set": "enabled",
       "coffee.answer": "accept",
       "coffee.slot.update": "closed",
-      "coffee.profile": "enabled",
       "alumni.review": "approve",
       "alumni.decide": "accept",
       "alumni.profile": "accepting",
