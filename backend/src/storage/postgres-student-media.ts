@@ -49,7 +49,7 @@ export async function mediaCommand(repo:PostgresRepository,actor:Account,operati
     demand((mediaType==='VIDEO')===(mimeType==='video/mp4'),'文件类型不一致。');
     const fileSizeBytes=integerField(input,'fileSizeBytes',1,mediaType==='VIDEO'?100*1024*1024:10*1024*1024);
     const hash=textField(input,'declaredContentSha256',64);demand(/^[a-f0-9]{64}$/.test(hash),'文件校验值无效。');
-    const captureSource=enumField(input,'captureSource',['FILE_PICKER','IN_APP_CAMERA'] as const);
+    const captureSource=enumField(input,'captureSource',['IN_APP_CAMERA'] as const);
     const durationSeconds=mediaType==='VIDEO'?Number(input.durationSeconds):null;
     demand(mediaType==='IMAGE' || (Number.isFinite(durationSeconds) && durationSeconds!>=1 && durationSeconds!<=15),'视频须为1–15秒。');
     const reserved=(await repo.all('sportsMediaUpload')).filter(m=>m.ownerId===actor.id && m.data.sessionId===session.id && (m.data.uploadStatus==='AVAILABLE' || Number(m.data.expiresAt)>Date.now()));

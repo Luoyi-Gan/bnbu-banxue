@@ -166,7 +166,7 @@ try {
   assert.equal(edited.description,'Docker edited draft');
   const bytes=await sharp({create:{width:3,height:3,channels:3,background:'#123456'}}).png().toBuffer();
   const hash=createHash('sha256').update(bytes).digest('hex');
-  const lease=await sessionWrite('/api/v1/media-uploads',{sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'FILE_PICKER',declaredContentSha256:hash,durationSeconds:null});
+  const lease=await sessionWrite('/api/v1/media-uploads',{sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'IN_APP_CAMERA',declaredContentSha256:hash,durationSeconds:null});
   const uploaded=await fetch(base+lease.uploadUrl,{method:'PUT',headers:{Cookie:cookie,Origin:base,...lease.requiredHeaders},body:bytes});
   assert.equal(uploaded.status,200,await uploaded.text());
   assert.equal(uploaded.headers.get('etag'), '"'+hash+'"');
@@ -336,7 +336,7 @@ try {
   assert.ok(todo);assert.equal(todo.reasonCode,'UNCLEAR_EVIDENCE');assert.equal(todo.publicComment,'Docker supplementary evidence');assert.equal(todo.expired,false);assert.equal(proofTodos.nextCursor,null);
   assert.ok(workflow.materials.some(m=>m.mediaId===lease.mediaId && m.materialVersion===1));
   const extraBytes=await sharp({create:{width:4,height:4,channels:3,background:'#654321'}}).png().toBuffer(),extraHash=createHash('sha256').update(extraBytes).digest('hex');
-  const extra=await sessionWrite('/api/v1/media-uploads',{sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:extraBytes.length,captureSource:'FILE_PICKER',declaredContentSha256:extraHash,durationSeconds:null});
+  const extra=await sessionWrite('/api/v1/media-uploads',{sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:extraBytes.length,captureSource:'IN_APP_CAMERA',declaredContentSha256:extraHash,durationSeconds:null});
   const extraPut=await fetch(base+extra.uploadUrl,{method:'PUT',headers:{Cookie:cookie,Origin:base,...extra.requiredHeaders},body:extraBytes});assert.equal(extraPut.status,200,await extraPut.text());
   const extraConfirmed=await sessionWrite('/api/v1/media-uploads/'+extra.uploadSessionId+'/confirm',{etag:extraHash});
   await sessionWrite('/api/v1/media/'+extra.mediaId+'/bind',{sessionId:session.id,expectedVersion:extraConfirmed.version});

@@ -297,7 +297,8 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(edited.description).toBe('核对后的说明');
     await expect(executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:draft.version,description:'旧版本'},randomUUID())).rejects.toMatchObject({status:409});
     const bytes=await sharp({create:{width:2,height:2,channels:3,background:'#00ff00'}}).png().toBuffer();
-    const mediaInput={sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'FILE_PICKER',declaredContentSha256:createHash('sha256').update(bytes).digest('hex'),durationSeconds:null};
+    const mediaInput={sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'IN_APP_CAMERA',declaredContentSha256:createHash('sha256').update(bytes).digest('hex'),durationSeconds:null};
+    await expect(executePostgres(db,login.token,'sports.media.initiate',{...mediaInput,captureSource:'FILE_PICKER'},randomUUID())).rejects.toMatchObject({status:400});
     const mediaKey=randomUUID(),lease=await executePostgres(db,login.token,'sports.media.initiate',mediaInput,mediaKey);
     expect(await executePostgres(db,login.token,'sports.media.initiate',mediaInput,mediaKey)).toEqual(lease);
     await expect(postgresMediaPut(db,login.token,String(lease.mediaId),Buffer.from('invalid'),'image/png')).rejects.toMatchObject({status:409});
@@ -768,7 +769,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       return repo.create('sportsRecord',session.ownerId,{sessionId:session.id,courseId:course.id,semesterId:semester.id,status:'SUPPLEMENT_REQUIRED',supplementStartedAt:Date.now(),supplementWindowMilliseconds:86400000});
     });
     const bytes=await sharp({create:{width:2,height:2,channels:3,background:'blue'}}).png().toBuffer();
-    const input={sessionId:record.data.sessionId,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'FILE_PICKER',declaredContentSha256:createHash('sha256').update(bytes).digest('hex')};
+    const input={sessionId:record.data.sessionId,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'IN_APP_CAMERA',declaredContentSha256:createHash('sha256').update(bytes).digest('hex')};
     const lease=await executePostgres(db,login.token,'sports.media.initiate',input,randomUUID());
     const pause=await db.transaction(client=>new PostgresRepository(client).create('sportsPause',null,{recordId:record.id,status:'CONFIRMED',startAt:Date.now()-1000,endAt:null}));
     await expect(postgresMediaPut(db,login.token,String(lease.mediaId),bytes,'image/png')).rejects.toMatchObject({status:409});
@@ -1567,4 +1568,3 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(application).toMatchObject({studentNumber:'20260001',studentNumberSource:'enrollment'});
   });
 });
-
