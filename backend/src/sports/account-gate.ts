@@ -1,7 +1,7 @@
 import { ServiceError, type Account } from "../auth";
 import { Repository, type Entity } from "../repository";
 
-export function requiresPasswordChange(repo: Repository, actor: Account) {
+export function requiresPasswordChange(repo: Pick<Repository, "all">, actor: Account) {
   return passwordChangeRequired(repo.all("sportsIdentity"),actor);
 }
 export function passwordChangeRequired(identities: Entity[], actor: Account) {
@@ -13,7 +13,7 @@ export function passwordChangeRequired(identities: Entity[], actor: Account) {
         i.data.mustChangePassword === true,
     );
 }
-export function sportsAccountGate(repo: Repository, actor: Account) {
+export function sportsAccountGate(repo: Pick<Repository, "all">, actor: Account) {
   if (requiresPasswordChange(repo, actor))
     throw new ServiceError(
       403,

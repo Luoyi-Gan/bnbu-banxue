@@ -12,7 +12,7 @@ export const sportsPermissions = [
   "AUDIT",
 ] as const;
 export type SportsPermission = (typeof sportsPermissions)[number];
-export function administratorAccess(repo: Repository, actor: Account) {
+export function administratorAccess(repo: Pick<Repository, "all">, actor: Account) {
   const identity = repo
     .all("sportsIdentity")
     .find(
@@ -33,7 +33,7 @@ export function administratorAccess(repo: Repository, actor: Account) {
   };
 }
 export function requireSportsPermission(
-  repo: Repository,
+  repo: Pick<Repository, "all">,
   actor: Account,
   permission: SportsPermission,
 ) {
@@ -43,7 +43,7 @@ export function requireSportsPermission(
     403,
   );
 }
-export function requireSportsSuperAdmin(repo: Repository, actor: Account) {
+export function requireSportsSuperAdmin(repo: Pick<Repository, "all">, actor: Account) {
   demand(
     administratorAccess(repo, actor).superAdmin,
     "仅体育总管理员可执行此治理操作。",

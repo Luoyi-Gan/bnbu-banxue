@@ -599,6 +599,18 @@ export function sportsCourseCommand(
 }
 
 export function sportsWorkspace(repo: Repository, actor: Account) {
+  return projectSportsCourses(repo, actor, id => {
+    const row = repo.db.prepare("SELECT name FROM accounts WHERE id=?").get(id);
+    return row?.name == null ? "历史学生" : String(row.name);
+  });
+}
+
+/** Shared read projection; account names are supplied by the storage adapter. */
+export function projectSportsCourses(
+  repo: Pick<Repository, "all" | "get">,
+  actor: Account,
+  studentName: (id: string) => string,
+) {
   sportsAccountGate(repo, actor);
   const identity = repo
     .all("sportsIdentity")
@@ -680,10 +692,7 @@ export function sportsWorkspace(repo: Repository, actor: Account) {
               ...e,
               data: {
                 ...e.data,
-                studentName:
-                  repo.db
-                    .prepare("SELECT name FROM accounts WHERE id=?")
-                    .get(e.ownerId!)?.name ?? "历史学生",
+                studentName: studentName(e.ownerId!),
               },
             }))
         : role === "student"

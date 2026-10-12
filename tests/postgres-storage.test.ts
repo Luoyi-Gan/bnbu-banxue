@@ -21,6 +21,7 @@ import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmail
 import { postgresAdministratorSelf } from '../backend/src/storage/postgres-admin-deletion';
 import { postgresCommunityView } from '../backend/src/storage/postgres-community-view';
 import { postgresAccountDirectory } from '../backend/src/storage/postgres-account-directory';
+import { postgresSportsCourses } from '../backend/src/storage/postgres-sports-courses';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -43,6 +44,36 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       try { await admin.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`); }
       finally { await admin.end(); }
     }
+  });
+  it('scopes sports courses to the teacher or enrolled student and preserves first-password gating', async () => {
+    for (const [id,role] of [['sports-reader-teacher','teacher'],['sports-reader-student','student'],['sports-reader-other','teacher']]) {
+      await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES($1,$2,$3,$1,$4,$5)',[id,`${id}@example.test`,hashPassword('Sports-read-123'),'now',JSON.stringify([role])]);
+      await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity',id,{role,status:'verified'}));
+    }
+    const [course,hidden]=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      const course=await repo.create('sportsCourse','sports-reader-teacher',{name:'本人课程',status:'PUBLISHED',semesterId:'sports-read-semester'});
+      const hidden=await repo.create('sportsCourse','sports-reader-other',{name:'其他课程',status:'PUBLISHED',semesterId:'sports-read-semester'});
+      await repo.create('sportsEnrollment','sports-reader-student',{courseId:course.id,semesterId:'sports-read-semester',status:'ACTIVE'});
+      await repo.create('sportsInvitation','sports-reader-teacher',{courseId:course.id,status:'ACTIVE'});
+      return [course,hidden];
+    });
+    const auth=new PostgresAuth(db);
+    const teacher=await auth.login('sports-reader-teacher@example.test','Sports-read-123');
+    const student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const view=await postgresSportsCourses(db,teacher.token);
+    expect(view.courses.map(c=>c.id)).toEqual([course.id]);
+    expect(view.enrollments[0].data.studentName).toBe('sports-reader-student');
+    const own=await postgresSportsCourses(db,student.token);
+    expect(own.courses.map(c=>c.id)).toEqual([course.id]);
+    expect(own.courses.some(c=>c.id===hidden.id)).toBe(false);
+    expect(own.invitations).toEqual([]);
+    await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      const identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-teacher')!;
+      await repo.save(identity,{...identity.data,mustChangePassword:true});
+    });
+    await expect(postgresSportsCourses(db,teacher.token)).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
   });
   it('changes an initial administrator password atomically and revokes other sessions', async () => {
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,login_kind,login_name) VALUES('password-admin','password@example.test',$1,'管理员','now','ADMIN','password-manager')",[hashPassword('Initial-test-123')]);
