@@ -55,7 +55,9 @@ export function portalSettlementPreview(
   actor: Account,
   courseId: string,
 ) {
-  const check = settlementCheck(repo, actor, courseId);
+  return portalSettlementPreviewData(settlementCheck(repo, actor, courseId));
+}
+export function portalSettlementPreviewData(check:ReturnType<typeof settlementCheck>) {
   const counts = new Map<string, number>();
   for (const blocker of check.blockers) {
     const code = codes[blocker.code] ?? blocker.code;

@@ -548,6 +548,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const url=`http://127.0.0.1:${(server.address() as AddressInfo).port}/api/sports/course-reports/${course.id}.csv`;
       const base=url.split('/api/')[0],teacherHeaders={Cookie:`bnbu_session=${teacher.token}`};
       const reportsUrl=base+'/api/v1/class-sections/'+course.id+'/settlement-reports';
+      const draftCourse=await db.transaction(async client=>{
+        const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',teacher.account.id,{status:'UPCOMING'});
+        return repo.create('sportsCourse',teacher.account.id,{name:'预检草稿',semesterId:semester.id,status:'DRAFT'});
+      });
+      const previewUrl=base+'/api/v1/class-sections/'+draftCourse.id+'/settlement-check';
+      const previewResponse=await fetch(previewUrl,{headers:teacherHeaders});expect(previewResponse.status).toBe(200);
+      const preview=(await previewResponse.json()).data;
+      expect(preview.canConfirm).toBe(false);expect(preview.checks).toEqual(expect.arrayContaining([expect.objectContaining({code:'PUBLISHED_COURSE_RULE',status:'BLOCKED'}),expect.objectContaining({code:'CONFIRMED_OFFICIAL_ROSTER'})]));
+      expect(preview.previewFingerprint).toMatch(/^[a-f0-9]{64}$/);
+      await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(draftCourse.id),{name:'预检资料已变化'});});
+      expect((await (await fetch(previewUrl,{headers:teacherHeaders})).json()).data.previewFingerprint).not.toBe(preview.previewFingerprint);
+      expect((await fetch(previewUrl,{headers:{Cookie:`bnbu_session=${student.token}`}})).status).toBe(403);
       expect((await (await fetch(reportsUrl,{headers:teacherHeaders})).json()).data).toEqual({items:[],nextBeforeVersion:null});
       const reports=await db.transaction(async client=>{
         const repo=new PostgresRepository(client);

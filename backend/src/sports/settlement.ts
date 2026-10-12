@@ -21,6 +21,10 @@ export function sourceManifest(repo: Repository, course: Entity) {
       version: number;
     }[]
   ).map((e) => ({ ...e, data: JSON.parse(e.data) as Fields }));
+  const accounts = repo.db.prepare("SELECT id,name,email,status,roles FROM accounts ORDER BY id").all();
+  return settlementManifestData(all,accounts,course);
+}
+export function settlementManifestData(all:{id:string;kind:string;owner_id:string|null;data:Fields;version:number}[],allAccounts:Fields[],course:Entity) {
   const excluded = new Set([
     "sportsSettlementPreparation",
     "sportsSettlementReport",
@@ -87,10 +91,7 @@ export function sourceManifest(repo: Repository, course: Entity) {
     }
   }
   const entities = all.filter((e) => selected.has(e.id));
-  const accounts = repo.db
-    .prepare("SELECT id,name,email,status,roles FROM accounts ORDER BY id")
-    .all()
-    .filter((a) => owners.has(String(a.id)));
+  const accounts = allAccounts.filter(a => owners.has(String(a.id)));
   return {
     hash: hash({ entities, accounts }),
     entityCount: entities.length,
@@ -106,6 +107,11 @@ export function settlementCheck(
   sportsWriteGate(repo, "sports.settlement.prepare");
   const course = ownedCourse(repo, actor, courseId),
     report = courseReport(repo, actor, courseId);
+  return settlementCheckData(repo,actor,courseId,report,sourceManifest(repo,course));
+}
+export function settlementCheckData(repo:Pick<Repository,'all'|'get'>,actor:Account,courseId:string,report:CourseReport,manifest:ReturnType<typeof settlementManifestData>) {
+  sportsWriteGate(repo,"sports.settlement.prepare");
+  const course=ownedCourse(repo,actor,courseId);
   const blockers: { code: string; objectId: string; count: number }[] = [];
   const add = (code: string, objectId: string, count = 1) =>
     blockers.push({ code, objectId, count });
@@ -175,7 +181,6 @@ export function settlementCheck(
     if (!["VALID", "INVALID"].includes(String(record.data.status)))
       add("MATERIAL_BATCH_PENDING", batch.id);
   }
-  const manifest = sourceManifest(repo, course);
   return { course, report, manifest, blockers, checkedAt: now };
 }
 export function sportsSettlementCommand(

@@ -2026,3 +2026,7 @@ Docker 四服务构建健康，完整冒烟新增原生建号、列表、权限�
 ### PostgreSQL原生结算报告列表
 接入GET /api/v1/class-sections/:id/settlement-reports，复用portalSettlementReports，在同一只读快照核验教师身份、课程归属和版本完整性。64项PostgreSQL测试通过，增加空列表、初版/更正版分页、学生拒绝和他人课程拒绝的HTTP断言；类型检查、lint通过。Docker体育API重建健康，经4186原代理实测本人草稿课程返回真实空报告列表。结算预检、最终结算与导出尚未据此宣称完成。
 历史补卡用户确认保留，已继续询问允许日期、次数及新建截止；该模块实现等待这些业务决定，不影响其他模块推进。
+
+### PostgreSQL结算预检
+抽出settlementManifestData、settlementCheckData及portalSettlementPreviewData，由SQLite与PostgreSQL共用，接入GET /api/v1/class-sections/:id/settlement-check。PostgreSQL在repeatable-read只读事务内完整读取来源，权限、原阻塞项及摘要保持一致。82项测试通过（64项PostgreSQL及18项结算），覆盖草稿/名单阻塞、来源变动摘要变化、学生权限拒绝；类型检查与lint通过。新增预检夹具使用UPCOMING，避免污染其他测试的当前学期。
+Docker重建健康，经4186原代理调用预检200，确认草稿课程返回规则未发布、仍可开始运动、无确认名单三个阻塞项；未执行或声称正式结算。下一步仍需将正式确认写入同一事务并重核摘要，接通导出及其他待迁移功能。

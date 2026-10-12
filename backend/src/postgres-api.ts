@@ -13,6 +13,7 @@ import { courseWindowInput, courseInviteInput, courseInviteProjection } from './
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
 import { postgresStudentProgress } from './storage/postgres-student-progress';
 import { postgresSettlementReports } from './storage/postgres-settlement-reports';
+import { postgresSettlementPreview } from './storage/postgres-settlement';
 import { postgresStudentRoster } from './storage/postgres-student-roster';
 import { postgresStudentPhysical } from './storage/postgres-student-physical';
 import { postgresTeacherHistory, postgresTeacherStudent } from './storage/postgres-teacher-history';
@@ -113,6 +114,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(request.method==='GET' && recognitionRead) return send(response,200,await postgresStudentRecognitionHistory(db,cookieToken(request) ?? '',decodeURIComponent(recognitionRead[1]),Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams)));
       const progressTarget=/^\/api\/v1\/class-sections\/([^/]+)\/progress-target$/.exec(pathname);
       const settlementReportsRead=/^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(pathname);
+      const settlementCheckRead=/^\/api\/v1\/class-sections\/([^/]+)\/settlement-check$/.exec(pathname);
+      if(request.method==='GET' && settlementCheckRead)return send(response,200,{data:await postgresSettlementPreview(db,cookieToken(request) ?? '',decodeURIComponent(settlementCheckRead[1]),Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
       if(request.method==='GET' && settlementReportsRead)return send(response,200,{data:await postgresSettlementReports(db,cookieToken(request) ?? '',decodeURIComponent(settlementReportsRead[1]),Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
       if(request.method==='GET' && (['/api/v1/student-progress','/api/v1/teacher-progress'].includes(pathname) || progressTarget)) return send(response,200,await postgresStudentProgress(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),progressTarget?decodeURIComponent(progressTarget[1]):undefined,pathname==='/api/v1/teacher-progress'));
       const reviewMaterial=/^\/api\/sports\/materials\/([^/]+)$/.exec(pathname);
