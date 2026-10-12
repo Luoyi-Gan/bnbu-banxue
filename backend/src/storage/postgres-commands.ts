@@ -13,6 +13,7 @@ import { runAsync } from './effects';
 import type { PostgresDatabase } from './postgres';
 import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
+import { postgresPassword } from './postgres-password';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -23,7 +24,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     const actor = await new PostgresAuth(db).authenticate(token,client);
     demand(actor.status!=='banned','账号已封禁，不能进行业务写入。',403);
     const repo = new PostgresRepository(client);
-    if(passwordChangeRequired(await repo.all('sportsIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
+    if(action!=='sports.password.change' && passwordChangeRequired(await repo.all('sportsIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
     for(const [name,key] of [['room.decide','accept'],['report.decide','upheld'],['coffee.answer','accept'],['coffee.slot.update','closed'],['certification.review','approve'],['organization.review','approve'],['activity.visibility','publish'],['mail.visibility','publish'],['alumni.review','approve'],['alumni.decide','accept'],['alumni.profile','accepting']] as const) {
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
@@ -34,7 +35,8 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       return JSON.parse(previous.result) as Fields;
     }
     let result:Fields|undefined;
-    if(action.startsWith('notification.')) result=await runAsync(notificationPolicy(repo,actor,action,input));
+    if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action.startsWith('notification.')) result=await runAsync(notificationPolicy(repo,actor,action,input));
     else {
       const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input)) ?? await runAsync(alumniPolicy(repo,actor,action,input));
       if(entity) result={id:entity.id};

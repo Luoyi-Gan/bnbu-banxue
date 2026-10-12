@@ -39,6 +39,28 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       finally { await admin.end(); }
     }
   });
+  it('changes an initial administrator password atomically and revokes other sessions', async () => {
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,login_kind,login_name) VALUES('password-admin','password@example.test',$1,'管理员','now','ADMIN','password-manager')",[hashPassword('Initial-test-123')]);
+    const identity=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','password-admin',{role:'admin',status:'verified',mustChangePassword:true}));
+    const auth=new PostgresAuth(db);
+    const first=await auth.login('password-manager','Initial-test-123');
+    const other=await auth.login('password-manager','Initial-test-123');
+    await expect(executePostgres(db,first.token,'preferences.preview',{enabled:false},randomUUID())).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
+    const input={version:identity.version,currentPassword:'wrong',newPassword:'Changed-test-123',confirmPassword:'Changed-test-123'};
+    await expect(executePostgres(db,first.token,'sports.password.change',input,randomUUID())).rejects.toMatchObject({status:403});
+    expect((await auth.authenticate(other.token)).id).toBe('password-admin');
+    input.currentPassword='Initial-test-123';
+    const key=randomUUID();
+    expect(await executePostgres(db,first.token,'sports.password.change',input,key)).toEqual({id:identity.id});
+    expect(await executePostgres(db,first.token,'sports.password.change',input,key)).toEqual({id:identity.id});
+    await expect(auth.authenticate(other.token)).rejects.toMatchObject({status:401});
+    expect((await auth.authenticate(first.token)).id).toBe('password-admin');
+    await expect(auth.login('password-manager','Initial-test-123')).rejects.toMatchObject({status:401});
+    expect((await auth.login('password-manager','Changed-test-123')).account.id).toBe('password-admin');
+    const saved=await db.transaction(client=>new PostgresRepository(client).get(identity.id));
+    expect(saved.data.mustChangePassword).toBe(false);
+    expect(saved.version).toBe(identity.version+1);
+  });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
     expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);
