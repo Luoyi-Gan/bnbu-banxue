@@ -6,6 +6,11 @@ import type { Entity } from "./repository";
 /** Original community UI shape, with identity-based visibility and real counts. */
 export function communityView(db: Database, token: string) {
   const workspace = snapshot(db, authenticate(db, token));
+  const likes = db.prepare("SELECT entity_id AS id,count(*) AS count FROM relations WHERE kind='like' GROUP BY entity_id").all();
+  return projectCommunity({...workspace, relations: workspace.relations as {entityId:string;kind:string}[]}, new Map(likes.map(row=>[String(row.id),Number(row.count)])));
+}
+
+export function projectCommunity(workspace: {account:{id:string;name:string};entities:Entity[];people:{id:string;name:string}[];relations:{entityId:string;kind:string}[];alumni:{profiles:{id:string;name:string;status:string}[]}}, likes: ReadonlyMap<string,number>) {
   const account = workspace.account;
   const content = workspace.entities.filter(
     (entity) => entity.kind === "post" || entity.kind === "comment",
@@ -29,13 +34,7 @@ export function communityView(db: Database, token: string) {
     author: name(post.ownerId),
     date: post.createdAt,
     status: post.data.status,
-    likes: Number(
-      db
-        .prepare(
-          "SELECT count(*) AS n FROM relations WHERE entity_id=? AND kind='like'",
-        )
-        .get(post.id)?.n ?? 0,
-    ),
+    likes: likes.get(post.id) ?? 0,
     comments: content
       .filter(
         (comment) =>

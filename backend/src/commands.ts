@@ -1,3 +1,5 @@
+import { runSync } from "./storage/effects";
+import { relationPolicy } from "./relation-policy";
 import { studentNumber } from './student-search';
 import { relationshipHistory } from './relationship-history';
 import { randomUUID } from "node:crypto";
@@ -8,8 +10,6 @@ import {
   communityCommand,
   has,
   operator,
-  publicEntity,
-  student,
 } from "./community";
 import { coffeeCommand } from "./coffee";
 import { governanceCommand } from "./governance";
@@ -139,33 +139,7 @@ export function execute(
       );
       result = { id: batch, recipients: [...new Set(recipients)].length };
     } else if (action === "relation.set") {
-      student(actor);
-      const entity = repo.get(input.id),
-        kind = textField(input, "kind", 40);
-      const allowed: Record<string, string[]> = {
-        post: ["like", "save"],
-        activity: ["like", "save", "participate"],
-        room: ["save"],
-        organization: ["follow"],
-      };
-      demand(allowed[entity.kind]?.includes(kind), "此对象不支持该操作。");
-      if (input.enabled === true) {
-        demand(
-          entity.kind === "organization"
-            ? entity.data.status === "approved" &&
-                entity.data.visibility === "visible"
-            : publicEntity(entity),
-          "对象当前未公开。",
-        );
-        if (kind === "participate")
-          demand(
-            Date.parse(String(entity.data.endAt || entity.data.startAt)) >
-              Date.now(),
-            "已结束活动不能标记参与。",
-          );
-      }
-      repo.relation(actor.id, entity.id, kind, input.enabled === true);
-      result = { id: entity.id };
+      result = runSync(relationPolicy(repo, actor, input));
     } else {
       result =
         sportsPasswordCommand(repo, actor, token, action, input) ??

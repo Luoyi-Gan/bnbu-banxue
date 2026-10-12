@@ -1447,3 +1447,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### PostgreSQL 社区命令接线与共用规则
 将 communityCommand 的业务规则提取为 communityPolicy，使用同步/异步 effect 驱动同一份规则，原 SQLite 调用仍走同步包装；消息已读改为复用仓储关系写入。PostgreSQL 命令入口复用全部社区/组队策略，写入审计与幂等回执同事务完成，跨实例业务命令暂用统一 advisory lock 保持原 SQLite 串行命令语义，外部 I/O 不进入该事务。初始改密门禁使用共用判断。
 真实 PostgreSQL HTTP 验证同请求并发发帖仅一条记录/审计，审核员通过后通知一份，学生越权审核拒绝，下架缺原因不写入，相同请求键不同参数返回 409。PostgreSQL 13 项通过；原 SQLite backend/backend-http/backend-concurrency 共 40 项通过；后端类型检查、修改文件 ESLint 通过。当前仅命令接线，PostgreSQL 社区展示与完整工作台投影仍需迁移，不能作为完整三端可用声明。
+
+### PostgreSQL 社区读取与关系操作
+社区输出提取为两数据库共用 projectCommunity；SQLite 点赞统计改为一次分组查询，PostgreSQL 在只读一致性事务内读取帖子、评论、当前账号关系及真实点赞数，保留原初始改密门禁与返回格式。关系操作抽取共用 relationPolicy，保留对象公开状态、学生权限与活动时间限制，PostgreSQL 审计保存关系种类及开关事实。
+45 项针对测试通过（PostgreSQL 13、原 HTTP 与并发 32）；新增 HTTP 断言覆盖作者看到待审帖、他人不可见、通过后可见、点赞统计和本人收藏/点赞隔离。服务端类型检查通过，清理重构后未使用导入后修改文件 ESLint 通过。PostgreSQL 完整 workspace、通知和其他业务仍待迁移，未切换原页面验收服务。
