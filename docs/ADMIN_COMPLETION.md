@@ -1539,3 +1539,9 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 
 ### 实际路由核对与邮件拆分原子性
 核对 App/V2App/ConnectedApp 后确认：旧 LiveSports 和 SportsPortalClassic 无实际导入，但当前 SportsPortal 使用 SportsDashboard，学生 V2Sports 仍嵌入 /student/index.html，其协议为 /api/v1。这与文档顶部最新仅快捷跳转决定及本轮不改 UI 要求存在冲突，已向用户以大白话询问；相关页面暂不自行更改。独立推进邮件拆分 PostgreSQL 验证：第二条活动无效时首条活动和子邮件全部回滚，修正后生成两条活动。32 项 PostgreSQL 测试通过。
+
+### 体育范围确认及课表持久化回归
+
+用户已解决上述冲突：以当前前端为准，按现有体育页面建设后端，不退回仅跳转方案。BUSINESS_RULES.md 已在顶部记录覆盖关系。实际调用包含教师摘要 `/api/sports/workspace`，以及学生 `/api/v1` 的身份、课程、通知、运动会话、材料上传、免测与反馈等接口；不能只迁移摘要后宣称体育完成。当前 PostgreSQL 仍缺这些体育主流程接线，原 SQLite 实现可作为复用基础。
+
+新增真实 PostgreSQL 课表用例，验证本人保存、他人不可见、幂等重试不增加版本、修正持久化及非法星期拒绝且不覆盖旧课表。PostgreSQL 测试现为 33 项通过；此结果不包含尚未迁移的体育接口。前端页面未修改。

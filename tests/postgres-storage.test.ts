@@ -308,6 +308,25 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect(Number((await db.pool.query("SELECT count(*) FROM entities WHERE kind='activity' AND data::jsonb->>'mailId'=ANY($1)",[parent.data.childMailIds])).rows[0].count)).toBe(2);
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
+  it('persists timetable corrections only for the owner and deduplicates retries', async () => {
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('table-owner','table@example.test',$1,'课表学生','now','[\"student\"]')",[hashPassword('Table-test-123')]);
+    const auth=new PostgresAuth(db),token=(await auth.login('table@example.test','Table-test-123')).token;
+    const other=(await auth.login('state@example.test','State-test-123')).token;
+    const input={fileName:'table.png',lessons:[{name:'数据库',weekday:1}]};
+    const key=randomUUID();
+    const result=await executePostgres(db,token,'timetable.save',input,key);
+    expect(await executePostgres(db,token,'timetable.save',input,key)).toEqual(result);
+    const original=await db.transaction(client=>new PostgresRepository(client).get(result.id));
+    expect(original.version).toBe(1);
+    expect((await postgresWorkspace(db,other)).entities.some(e=>e.id===result.id)).toBe(false);
+    const lesson=(original.data.lessons as {id:string;name:string}[])[0];
+    await executePostgres(db,token,'timetable.correct',{lessonId:lesson.id,name:'数据库实践',weekday:2},randomUUID());
+    const corrected=await db.transaction(client=>new PostgresRepository(client).get(result.id));
+    expect((corrected.data.lessons as {name:string}[])[0].name).toBe('数据库实践');
+    expect(corrected.version).toBe(2);
+    await expect(executePostgres(db,token,'timetable.save',{fileName:'bad.png',lessons:[{name:'错误',weekday:9}]},randomUUID())).rejects.toThrow();
+    expect((await db.transaction(client=>new PostgresRepository(client).get(result.id))).version).toBe(2);
+  });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
     expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);
