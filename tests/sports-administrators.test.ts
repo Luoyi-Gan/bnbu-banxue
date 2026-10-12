@@ -255,7 +255,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
     other = loginAdministrator(f.db, "staff.one", "x");
   expect(first.account.roles).toEqual(["admin"]);
   expect(() =>
-    f.cmd("sports.teachers.preview", { csv: "x" }, first.token),
+    f.cmd("profile.save", { nickname: "未改密账号" }, first.token),
   ).toThrow("初始密码");
   f.cmd(
     "sports.password.change",
