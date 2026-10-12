@@ -2335,3 +2335,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 组织与成员活动真实 PostgreSQL 容器补验：无认证学生发活动被拒；社团认证和组织申请由审核员通过（通过无需原因）；另一学生读取已公开组织及成员活动；认证撤销后禁止新建和恢复活动，但允许作者下架；运营下架已入驻组织后公开视图移除并通知申请人。扩展 scripts/docker-postgres-smoke.mjs 完整通过，不改 UI 或业务规则。
 
 组织关注边界补验：待审或下架组织不能新增关注；公开组织可以关注，重复请求不产生重复关系；下架后仍允许取消原有关注。扩展 Docker smoke 全部通过。学生 services.tsx 读取共享 entities/relations 并调用 relation.set，无本地模拟关注写入。
+
+2026-10-12 当前 API 协议清理：旧 BACKEND_API.md 完整存档为 archive/goal-scope-rollback-20261012/BACKEND_API-before-current-protocol.md；当前文档移除撤回的体育写入、OCR成绩单、建课结算等协议，保留伴学命令并补充统一登录、独立管理账号 /api/accounts、只读体育边界和 PostgreSQL 事务说明。依据当前路由和账号命令核对，未更改运行代码。
