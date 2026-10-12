@@ -97,6 +97,15 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     expect((await helpGet('/api/v1/admin/help-articles',sportsCookie)).status).toBe(403);
     expect((await helpGet('/api/v1/admin/help-articles?page=0')).status).toBe(400);
     const write=(path:string,input:unknown,key=randomUUID())=>fetch(urls[1]+path,{method:'POST',headers:{'Content-Type':'application/json',Cookie:governorCookie,'Idempotency-Key':key},body:JSON.stringify(input)});
+    const semesterInput={academicYear:'2090-2091',termCode:'FIRST',displayName:'Future',startDate:'2090-09-01',endDate:'2091-01-01'},semesterKey=randomUUID();
+    const semesterResponse=await write('/api/v1/admin/semesters',semesterInput,semesterKey);expect(semesterResponse.status).toBe(200);
+    const semester=(await semesterResponse.json()).data;expect(semester.status).toBe('UPCOMING');expect(semester.studentCount).toBe(0);
+    expect((await (await write('/api/v1/admin/semesters',semesterInput,semesterKey)).json()).data.id).toBe(semester.id);
+    expect((await write('/api/v1/admin/semesters',semesterInput)).status).toBe(409);
+    const semesterUpdated=await write('/api/v1/admin/semesters/'+semester.id,{...semesterInput,expectedVersion:semester.version,displayName:'Updated'});
+    expect(semesterUpdated.status).toBe(200);expect((await semesterUpdated.json()).data.displayName).toBe('Updated');
+    expect((await fetch(urls[1]+'/api/v1/admin/semesters',{headers:{Cookie:sportsCookie}})).status).toBe(403);
+    expect((await (await fetch(urls[1]+'/api/v1/admin/semesters?limit=1',{headers:{Cookie:governorCookie}})).json()).data.items).toHaveLength(1);
     await databases[1].transaction(client=>new PostgresRepository(client).create('sportsConversionTable','governor',{sex:'MALE',group:'JUNIOR',event:1000,rows:[{id:'initial',min:201,max:400,score:60,grade:'PASS',note:''}]}));
     const tableInput={gender:'male',gradeGroup:'freshman_sophomore',runType:'1000m',expectedVersion:1,minSeconds:0,maxSeconds:200,score:100,tier:'excellent',note:'Test'};
     const added=await write('/api/v1/admin/endurance-tables/rules',tableInput);expect(added.status).toBe(200);

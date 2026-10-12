@@ -226,8 +226,10 @@ try {
   assert.ok(!(await request('/api/v1/admin/subadmins')).data.items.some(item=>item.id===subadmin.id));
   const publishedTemplate=(await request('/api/commands',{action:'sports.template.publish',input:{name:'Docker fixed V8.1'},requestId:randomUUID()})).data;
   const futureYear=2100+Math.floor(Math.random()*7000),futureSemester={name:'Docker future semester',academicYear:futureYear+'-'+(futureYear+1),type:'SUMMER',startDate:futureYear+'-06-01',endDate:futureYear+'-08-31'};
-  const createdSemester=(await request('/api/commands',{action:'sports.semester.create',input:futureSemester,requestId:randomUUID()})).data;
-  await request('/api/commands',{action:'sports.semester.update',input:{...futureSemester,id:createdSemester.id,version:1,name:'Docker checked semester'},requestId:randomUUID()});
+  const semesterConfig={academicYear:futureSemester.academicYear,termCode:futureSemester.type,displayName:futureSemester.name,startDate:futureSemester.startDate,endDate:futureSemester.endDate};
+  const createdSemester=await sessionWrite('/api/v1/admin/semesters',semesterConfig);
+  await sessionWrite('/api/v1/admin/semesters/'+createdSemester.id,{...semesterConfig,expectedVersion:createdSemester.version,displayName:'Docker checked semester'});
+  assert.ok((await request('/api/v1/admin/semesters?limit=100')).data.items.some(s=>s.id===createdSemester.id));
   const semesterView=(await request('/api/sports/workspace')).semesters.find(s=>s.id===createdSemester.id);
   assert.equal(semesterView.data.status,'UPCOMING');assert.equal(semesterView.data.name,'Docker checked semester');
   docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdSemester.id}'`],{stdio:'pipe'});
