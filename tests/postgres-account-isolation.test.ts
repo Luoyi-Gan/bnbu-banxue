@@ -23,6 +23,21 @@ it('rejects legacy sports URLs with the default server configuration before data
  } finally {server.closeAllConnections();await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()));await db.close();}
 });
 
+it('unknown PostgreSQL routes return not found without requiring a database connection',async()=>{
+ const db=new PostgresDatabase({connectionString:'postgresql://unused:unused@127.0.0.1:1/unused'});
+ const server=createPostgresApiServer(db);
+ await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const base='http://127.0.0.1:'+(server.address() as {port:number}).port;
+ try {
+  for(const method of ['GET','POST','DELETE']) {
+   const response=await fetch(base+'/api/missing-route',{method,...(method==='POST'?{headers:{'Content-Type':'application/json'},body:'{}'}:{})});
+   expect(response.status).toBe(404);
+   expect(await response.json()).toEqual({code:'NOT_FOUND',message:'接口不存在。'});
+   expect(response.headers.get('set-cookie')).toBeNull();
+  }
+ } finally {server.closeAllConnections();await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()));await db.close();}
+});
+
 it('legacy sports logout cannot revoke a Banxue SQLite session',async()=>{
  const db=openDatabase(':memory:');
  createAccount(db,{email:'isolation@example.test',name:'学生',password:'Isolation-123',roles:['student']});

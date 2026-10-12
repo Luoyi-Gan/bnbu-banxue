@@ -89,8 +89,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,pathname.endsWith('/request') ? await mail.sendVerification(actor.email,options.localOutbox===true) : await mail.verifyOwnEmail(actor,input.code));
         }
       }
-      // No silent SQLite fallback or mock success for routes not migrated yet.
-      return send(response,503,{code:'POSTGRES_ROUTE_PENDING',message:'该接口的 PostgreSQL 迁移尚未完成。'});
+      return send(response,404,{code:'NOT_FOUND',message:'接口不存在。'});
     } catch (error) {
       if (error instanceof ServiceError) return send(response,error.status,{code:error.code,message:error.message});
       console.error('PostgreSQL API request failed');
