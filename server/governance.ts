@@ -1,4 +1,4 @@
-import { demand, type Account } from "./auth";
+import { demand, timestamp, type Account } from "./auth";
 import { has, operator, owner, reviewer, student } from "./community";
 import {
   enumField,
@@ -217,7 +217,7 @@ export function governanceCommand(
     student(actor);
     const table = repo.all("timetable").find((t) => t.ownerId === actor.id);
     const lessons = parseTimetableResponse({ lessons: input.lessons });
-    const data = { lessons, fileName: textField(input, "fileName", 255, true) };
+    const data = { lessons, fileName: textField(input, "fileName", 255, true), importedAt: timestamp() };
     return table
       ? repo.save(table, data)
       : repo.create("timetable", actor.id, data);
@@ -229,7 +229,7 @@ export function governanceCommand(
     const next = correctTimetableLesson(
       {
         ...table.data,
-        importedAt: table.createdAt,
+        importedAt: String(table.data.importedAt ?? table.createdAt),
         updatedAt: table.updatedAt,
       } as unknown as StudentTimetable,
       textField(input, "lessonId", 100),

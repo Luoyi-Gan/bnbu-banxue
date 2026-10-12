@@ -1,4 +1,4 @@
-import { afterEach, expect, it } from "vitest";
+import { afterEach, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
 import { openDatabase } from "../server/database";
 import { createAccount, login } from "../server/auth";
@@ -8,6 +8,7 @@ import { Repository } from "../server/repository";
 
 const cleanup: (() => Promise<void> | void)[] = [];
 afterEach(async () => {
+  vi.useRealTimers();
   for (const close of cleanup.splice(0).reverse()) await close();
 });
 function fixture() {
@@ -217,4 +218,25 @@ it("无效课表不能覆盖本人数据，也不能被其他账号读取", () =
   expect(
     snapshot(db, b.account).entities.some((e) => e.kind === "timetable"),
   ).toBe(false);
+});
+
+it("课表重导入记录新来源时间，手动修正及无效导入保留原来源", () => {
+  const { db, a, run } = fixture();
+  const repo = new Repository(db);
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-10-12T01:00:00Z"));
+  const input = { fileName: "first.png", lessons: [{name: "课程", weekday: 1}] };
+  const table = run(a, "timetable.save", input);
+  const first = repo.get(table.id);
+  expect(first.data.importedAt).toBe("2026-10-12T01:00:00.000Z");
+  vi.setSystemTime(new Date("2026-10-12T02:00:00Z"));
+  run(a, "timetable.correct", {lessonId: "lesson-0", name: "修正课程", weekday: 2});
+  expect(repo.get(table.id).data.importedAt).toBe(first.data.importedAt);
+  expect(repo.get(table.id).updatedAt).not.toBe(first.updatedAt);
+  run(a, "timetable.save", {...input, fileName: "second.png"});
+  const second = repo.get(table.id);
+  expect(second.data).toMatchObject({importedAt: "2026-10-12T02:00:00.000Z", fileName: "second.png"});
+  expect(second.createdAt).toBe(first.createdAt);
+  expect(() => run(a, "timetable.save", {fileName: "bad.png", lessons: []})).toThrow();
+  expect(repo.get(table.id)).toEqual(second);
 });
