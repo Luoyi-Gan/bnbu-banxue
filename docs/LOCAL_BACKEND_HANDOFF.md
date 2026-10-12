@@ -4,6 +4,19 @@
 
 最新部署决定：用户确认外部数据库有独立账号密码，走服务器内网；现在只预留接口，正式部署时手动配置。无需继续为数据库配置读取腾讯云浏览器，连接失败不再阻塞当前本地交付。此决定不表示真实体育数据已经接通，也不取消后续部署验证。
 
+### Docker 外部服务参数
+
+`compose.postgres.yaml` 支持从部署环境传入以下参数；空值保持未配置，不会自动启用真实服务。密钥只在部署环境保存，不提交仓库。
+
+| 服务 | 参数 | 部署检查 |
+| --- | --- | --- |
+| 邮件发送 | `BNBU_EMAIL_DELIVERY_URL`、`BNBU_EMAIL_DELIVERY_TOKEN` | 接口接收收件人、主题、正文、幂等标识；实际验证送达后再验收 |
+| 本地验证码收件箱 | `BNBU_LOCAL_OUTBOX` | 本地默认 1；正式部署明确设为 0，防止未接邮件时误用开发收件箱 |
+| 学校身份核验 | `BNBU_IDENTITY_VERIFICATION_URL`、`BNBU_IDENTITY_VERIFICATION_TOKEN` | 返回值须匹配请求标识和当前邮箱；核验不自动授予角色 |
+| 课表识别 | `BNBU_TIMETABLE_UPSTREAM`、`BNBU_TIMETABLE_TOKEN` | 接收 image 文件并返回结构化课程；不能直接填写腾讯云通用 OCR 地址冒充课表适配器 |
+
+已使用非真实占位值检查上述七个环境变量均进入 Compose 的 API 配置。本地默认行为保持原样；真实提供方调用仍待配置验证。
+
 部署时依次核对：服务器与源数据库内网路由和访问规则；独立只读账号及授权表；通过部署环境注入 `BNBU_SPORTS_SOURCE_DATABASE_URL`（不提交密码）；实际源表与伴学账号的授权映射；有课、无课、越权和连接失败四类结果。外部连接不得用作伴学 `DATABASE_URL`，不得对源库执行迁移或写入。配置模板见 `backend/sports-source.env.example`，连接器见 `backend/src/storage/sports-source-reader.ts`。源表未知时不猜测查询或按邮箱、年级自动关联账号。
 
 项目后端位于 backend/，前端由 frontend/Dockerfile 单独构建；本地 PostgreSQL 验证使用 compose.postgres.yaml，网页端口4188。原4174验收进程不等于当前Docker镜像，不能混用其验证结论。

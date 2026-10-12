@@ -2247,3 +2247,6 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 
 ## 2026-10-12 21:11 最新 Docker 实测
 源码 853d459 已通过 compose.postgres.yaml 重新构建并启动，前端、API、PostgreSQL 健康。运行 scripts/docker-postgres-smoke.mjs 成功，覆盖注册、重启后持久化、社区审核公开通知、点赞收藏、组队入队聊天结束互评及退出；没有执行体育写入。通过 4188 网页代理请求未知接口，实测 404 NOT_FOUND。此证据替代上一条『尚未重建』状态，外部服务依赖仍按部署计划保留。
+
+## 2026-10-12 外部接口 Docker 配置接线
+检查发现 compose.postgres.yaml 未传入现有邮件、身份核验、课表识别适配器的环境变量，且本地收件箱写死为开启。现已传入六个 URL/token 配置，并允许显式设置 BNBU_LOCAL_OUTBOX，默认仍为 1 保持本地验收。用无真实凭据的占位值解析 docker compose config --format json，逐项断言七个参数正确，检查通过，未向占位地址或真实云服务发送请求。交接补充正式部署关闭开发收件箱及接口协议边界。本次无 UI 或体育业务变更。
