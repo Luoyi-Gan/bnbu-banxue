@@ -1,3 +1,4 @@
+import { processPostgresSportsReview } from './src/storage/postgres-review-worker';
 import { PostgresDatabase } from './src/storage/postgres';
 import { postgresMigrations } from './src/storage/postgres-schema';
 import { createPostgresApiServer } from './src/postgres-api';
@@ -21,4 +22,7 @@ try {
   });
 } catch(error) { await db.close(); throw error; }
 console.log(`BNBU PostgreSQL API listening on port ${port}; business route migration in progress`);
-for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>server.close(()=>void db.close()));
+let reviewing=false;
+const reviewTimer=setInterval(()=>{if(reviewing)return;reviewing=true;void processPostgresSportsReview(db).catch(()=>console.error('Sports review pass failed; pending work retained')).finally(()=>{reviewing=false;});},10000);
+reviewTimer.unref();
+for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>{clearInterval(reviewTimer);server.close(()=>void db.close());});

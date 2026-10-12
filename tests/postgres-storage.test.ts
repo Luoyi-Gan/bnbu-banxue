@@ -1,3 +1,5 @@
+import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
+import { createServer } from 'node:http';
 import sharp from 'sharp';
 import { postgresMediaPut, postgresMediaRead, postgresMediaOriginal } from '../backend/src/storage/postgres-student-media';
 import { postgresStudentRecords } from '../backend/src/storage/postgres-student-records';
@@ -244,6 +246,17 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await client.query('SELECT id FROM notifications WHERE entity_id=$1',[record.id])).rows).toHaveLength(1);
       await client.query('DELETE FROM notifications WHERE entity_id=$1',[record.id]);
     });
+    await db.transaction(async client=>{const repo=new PostgresRepository(client),r=await repo.get(result.id);await repo.save(r,{status:'PENDING_AI'});await repo.save(await repo.get(r.data.batchId),{status:'COMPLETE'});for(const m of (await repo.all('sportsMaterial')).filter(m=>m.data.recordId===r.id)) await repo.save(m,{status:'COMPLETE'});});
+    await Promise.all([processPostgresSportsReview(db,{}),processPostgresSportsReview(db,{})]);
+    await db.transaction(async client=>{const repo=new PostgresRepository(client),r=await repo.get(result.id);expect(r.data).toMatchObject({status:'TECHNICAL',technicalCode:'AI_NOT_CONFIGURED'});await repo.save(r,{status:'PENDING_AI'});const c=await repo.get(r.data.courseId);await repo.save(c,{threshold:30,weeklyLimit:3,relatedTarget:600,otherTarget:600});});
+    const ai=createServer(async(req,res)=>{const chunks=[];for await(const chunk of req) chunks.push(chunk);const input=JSON.parse(Buffer.concat(chunks).toString());res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({...input,checksCompleted:true,outcome:'NORMAL',modelVersion:'local-fixture'}));});
+    await new Promise<void>(resolve=>ai.listen(0,'127.0.0.1',resolve));
+    try {
+      await db.transaction(async client=>{const repo=new PostgresRepository(client);for(const m of (await repo.all('sportsMaterial')).filter(m=>m.data.recordId===result.id)) await repo.save(m,{objectKey:mediaInput.declaredContentSha256});});
+      await processPostgresSportsReview(db,{url:'http://127.0.0.1:'+(ai.address() as AddressInfo).port,validationRef:'local-test-only'});
+      await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(result.id)).data.status).toBe('VALID');expect((await repo.all('sportsProgress')).some(p=>p.ownerId==='sports-reader-student' && p.data.courseId===session.data.courseId)).toBe(true);await client.query('DELETE FROM notifications WHERE entity_id=$1',[result.id]);});
+    } finally {await new Promise<void>(resolve=>ai.close(()=>resolve()));}
+
   });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

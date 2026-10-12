@@ -151,7 +151,13 @@ try {
   const submit=async()=>{const response=await fetch(base+'/api/v1/exercise-records/'+finalDraft.id+'/submit',{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':submitKey},body:JSON.stringify(submitInput)});const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;};
   const submitted=await submit();assert.equal(submitted.status,'SUBMITTED');assert.equal(submitted.id,finalDraft.id);
   assert.deepEqual(await submit(),submitted);
-  assert.equal((await request('/api/v1/exercise-records/'+finalDraft.id)).data.workflowStage,'PENDING_AI');
+  let reviewState;
+  for(let attempt=0;attempt<80;attempt++) {
+    reviewState=(await request('/api/v1/exercise-records/'+finalDraft.id)).data.workflowStage;
+    if(reviewState==='TECHNICAL') break;
+    await new Promise(resolve=>setTimeout(resolve,500));
+  }
+  assert.equal(reviewState,'TECHNICAL','Unconfigured AI should retain evidence in technical handling');
   assert.equal((await request('/api/v1/exercise-records?limit=50')).data.filter(r=>r.sessionId===session.id).length,1);
 
 

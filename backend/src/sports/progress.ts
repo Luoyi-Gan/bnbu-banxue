@@ -16,7 +16,7 @@ export function recalculateProgress(
 }
 /** Read-only calculation shares the exact selection policy with persisted progress. */
 export function calculateProgress(
-  repo: Repository,
+  repo: Pick<Repository, "all" | "get">,
   courseId: string,
   ownerId: string | null,
 ) {
