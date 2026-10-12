@@ -1631,7 +1631,7 @@ export function ConnectedApp() {
                               open(
                                 status === "visible" ? "公开内容" : "隐藏内容",
                                 "content.review",
-                                [reason],
+                                [{ ...reason, optional: status === "visible" && entity.data.status === "pending" }],
                                 { id: entity.id, status },
                               )
                             }
