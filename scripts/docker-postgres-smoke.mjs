@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 
 // Explicit local acceptance fixture, isolated from the original SQLite service.
 const base='http://127.0.0.1:4188';
+const companionOnly=process.argv.includes('--companion-only');
 const email=`smoke-${randomUUID()}@example.test`;
 const password=randomBytes(24).toString('base64url');
 let cookie='';
@@ -34,8 +35,10 @@ async function request(path,input) {
   return data;
 }
 assert.equal((await request('/api/health')).storage,'postgresql');
-assert.equal((await request('/api/v1/system-mode/announcement')).data.mode,'NORMAL');
-assert.equal((await fetch(base+'/api/v1/me')).status,401);
+if(!companionOnly) {
+  assert.equal((await request('/api/v1/system-mode/announcement')).data.mode,'NORMAL');
+  assert.equal((await fetch(base+'/api/v1/me')).status,401);
+}
 assert.equal((await fetch(base+'/v2/login')).status,200);
 assert.equal((await fetch(base+'/api/auth/me')).status,401);
 await request('/api/auth/verification-codes',{email});
@@ -67,6 +70,12 @@ assert.equal((await request('/api/auth/me')).account.id,actor.id);
 const stored=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data::jsonb->>'profilePreview' FROM entities WHERE kind='preferences' AND owner_id='${actor.id}'`],{encoding:'utf8'}).trim();
 assert.equal(stored,'false');
 assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Image did not survive restart');
+if(companionOnly) {
+  await request('/api/auth/logout',{});
+  assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
+  console.log('PASS companion-only Docker: registration, login, preferences, object persistence across restart, and logout. No sports writes executed.');
+  process.exit(0);
+}
 const companionCookie=cookie,companionId=actor.id;
 sportsMode=true;
 const independentId=randomUUID();
