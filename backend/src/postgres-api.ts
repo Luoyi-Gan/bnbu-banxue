@@ -21,19 +21,17 @@ import { postgresAccountDirectory } from './storage/postgres-account-directory';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'} = {}) {
+  demand(options.surface!=='sports','伴学不提供独立体育服务。',404);
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
   const origins = new Set(options.origins ?? ['http://127.0.0.1:4174','http://localhost:4174']);
-  const cookieName=options.surface==='sports'?'bnbu_sports_session':'bnbu_session';
+  const cookieName='bnbu_session';
   const cookieToken=(request:Parameters<typeof readCookieToken>[0])=>readCookieToken(request,cookieName);
   const cookie = (token: string, age: number) => `${cookieName}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${options.secureCookies ? '; Secure' : ''}`;
   return createServer(async (request,response) => {
     try {
-      let pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
       const sportsPath=pathname.startsWith('/api/v1/') || pathname.startsWith('/api/sports/');
-      if(options.surface==='sports')demand(sportsPath || pathname==='/api/health','接口不存在。',404);
       if(options.surface==='companion')demand(!sportsPath,'接口不存在。',404);
-      if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
-      if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const accountDirectory=/^\/api\/sports\/accounts\/(students|teachers)$/.exec(pathname);
       if(request.method==='GET' && accountDirectory) return send(response,200,await postgresAccountDirectory(db,cookieToken(request) ?? '',accountDirectory[1]==='students'?'student':'teacher',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && pathname==='/api/sports/administrator-self') return send(response,200,await postgresAdministratorSelf(db,cookieToken(request) ?? ''));
@@ -69,7 +67,6 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           const key = input.requestId;
           demand(typeof key==='string','缺少操作幂等标识。');
           demand(typeof input.action==='string' && input.input && typeof input.input==='object' && !Array.isArray(input.input),'请求格式无效。');
-          if(options.surface==='sports')demand(input.action.startsWith('sports.'),'该操作不属于体育系统。',403);
           if(options.surface==='companion')demand(!input.action.startsWith('sports.'),'该操作不属于伴学系统。',403);
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '',input.action,input.input as Record<string,unknown>,key)});
         }

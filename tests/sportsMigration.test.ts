@@ -7,11 +7,9 @@ import manifest from '../docs/SPORTS_STUDENT_SOURCE.json'
 
 describe('Sports student migration', () => {
   it('preserves original files except explicitly recorded integration changes', () => {
-    expect(manifest.integrationOverrides.map(file=>file.path).sort()).toEqual(['js/api.js','js/app.js'])
     for (const file of manifest.files) {
       const bytes = readFileSync(new URL(`../public/student/${file.path}`, import.meta.url))
-      const integration=manifest.integrationOverrides.find(item=>item.path===file.path)
-      expect(createHash('sha256').update(bytes).digest('hex'), file.path).toBe(integration?.sha256 ?? file.sha256)
+      expect(createHash('sha256').update(bytes).digest('hex'), file.path).toBe(file.sha256)
     }
   })
   it('opens the real student flow on both local and deployed hosts', () => {
