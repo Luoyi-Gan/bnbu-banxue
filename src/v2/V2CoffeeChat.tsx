@@ -1,3 +1,4 @@
+import { coffeeSlotStatus } from './coffeeSlotStatus'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 
 import { ArrowLeft, ArrowRight, CalendarDays, Check, ChevronRight, Clock3, Coffee, MapPin } from 'lucide-react'
@@ -82,11 +83,13 @@ export function V2CoffeeChat() {
       <div className="v2-coffee-schedule-heading"><div><span className="v2-eyebrow">AVAILABLE TIMES</span><h3>选择预约时间</h3><p>按老师开放的起止时间交流；预约符合条件即成立。</p></div><CalendarDays size={22}/></div>
       {slots.length ? <div className="v2-coffee-slot-list">{slots.map((item) => {
         const mine = state.coffeeBookings.includes(item.id)
+        const cancelled = !!live.data?.entities.some(e => e.kind === 'coffeeBooking' && e.ownerId === live.data?.account.id && e.data.slotId === item.id && e.data.status === 'cancelled')
+        const label = coffeeSlotStatus({mine,cancelled,closed:item.closed,enabled:teacher.enabled,started:Date.parse(item.startAt)<=Date.now(),full:occupied(state,item.id)>=item.capacity})
         const full = !mine && (!teacher.enabled || item.closed || Date.parse(item.startAt) <= Date.now() || occupied(state, item.id) >= item.capacity)
         return <button type="button" key={item.id} className={`v2-coffee-slot${slotId === item.id ? ' is-selected' : ''}${mine ? ' is-booked' : ''}`} aria-pressed={slotId === item.id} disabled={full} onClick={() => { setSlotId(item.id); setFeedback('') }}>
           <span className="v2-coffee-slot-date"><CalendarDays size={16}/>{slotDate(item.startAt)}</span>
           <strong><Clock3 size={16}/>{item.timeLabel} – {slotEnd(item.endAt)}</strong>
-          <span className="v2-coffee-slot-status">{mine ? <><Check size={13}/> 已预约</> : full ? '已约满' : '可预约'}</span>
+          <span className="v2-coffee-slot-status">{mine ? <><Check size={13}/> 已预约</> : label}</span>
         </button>
       })}</div> : <Empty icon={Coffee} title="暂时没有可查看的时段" description="稍后再来看看。"/>}
       {!isBooked && <label className="v2-form">想交流的问题<textarea maxLength={500} value={topic} onChange={event => setTopic(event.target.value)} placeholder="请填写交流主题或问题"/></label>}<div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{slot?.location ?? teacher.location}</span><small>{slot ? `${slotDate(slot.startAt)} · ${slot.timeLabel}` : '请先选择一个时段'}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} disabled={live.busy || !slot || (!isBooked && (!teacher.enabled || slot.closed || Date.parse(slot.startAt) <= Date.now() || occupied(state, slot.id) >= slot.capacity))} onClick={updateBooking}>{isBooked ? '取消预约' : '确认预约'} <ArrowRight size={15}/></button></div>
