@@ -25,6 +25,7 @@ import { postgresSportsCourses } from '../backend/src/storage/postgres-sports-co
 import { postgresSportsHelp } from '../backend/src/storage/postgres-sports-help';
 import { postgresSportsMe } from '../backend/src/storage/postgres-sports-me';
 import { postgresStudentCourses } from '../backend/src/storage/postgres-student-courses';
+import { postgresSportsNotifications } from '../backend/src/storage/postgres-sports-notifications';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -145,6 +146,19 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','sports-reader-student',{role:'student',status:'verified'}));
     await expect(postgresSportsMe(db,studentLogin.token)).rejects.toMatchObject({status:403});
     await db.pool.query('DELETE FROM entities WHERE id=$1',[duplicate.id]);
+  });
+  it('paginates only the current recipients sports notifications', async () => {
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const ids=[randomUUID(),randomUUID(),randomUUID(),randomUUID()];
+    for(const [index,id] of ids.entries()) await db.pool.query('INSERT INTO notifications(id,recipient_id,entity_id,event,body,created_at) VALUES($1,$2,NULL,$3,$4,$5)',[id,index===2?'sports-reader-other':'sports-reader-student',index===3?'community.published':'sports.record.review','通知',`2026-10-12T00:00:0${index}Z`]);
+    const first=await postgresSportsNotifications(db,login.token,{limit:'1'});
+    expect(first.data.map(n=>n.id)).toEqual([ids[1]]);
+    expect(first.meta.pagination).toMatchObject({hasMore:true,nextCursor:ids[1]});
+    const second=await postgresSportsNotifications(db,login.token,{limit:'1',cursor:ids[1]});
+    expect(second.data.map(n=>n.id)).toEqual([ids[0]]);
+    await expect(postgresSportsNotifications(db,login.token,{cursor:ids[2]})).rejects.toMatchObject({status:409});
+    await executePostgres(db,login.token,'notification.read',{id:ids[1]},randomUUID());
+    expect((await postgresSportsNotifications(db,login.token,{unreadOnly:'true'})).data.map(n=>n.id)).toEqual([ids[0]]);
   });
   it('returns the current semester without inventing one and rejects conflicting current semesters', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

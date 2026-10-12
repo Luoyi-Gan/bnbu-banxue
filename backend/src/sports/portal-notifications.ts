@@ -22,6 +22,9 @@ function project(repo: Repository, row: Fields) {
         .prepare("SELECT kind,owner_id FROM entities WHERE id=?")
         .get(String(row.entity_id))
     : undefined;
+  return projectSportsNotification(row,entity);
+}
+export function projectSportsNotification(row: Fields, entity?: Fields) {
   const kinds: Record<string, string> = {
     sportsCourse: "CLASS_SECTION",
     sportsRecord: "EXERCISE_RECORD",
