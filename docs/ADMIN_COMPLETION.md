@@ -1494,3 +1494,6 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 
 ### PostgreSQL 管理目录与分离构建修复
 接通独立管理账号目录读取，核对已验证总管理员身份、首次改密及维护门禁，只返回目录白名单字段。23 项 PostgreSQL 测试通过，覆盖拒绝普通管理员、维护期拒绝、固定八项权限及凭据不泄漏，类型检查与接口修改 lint 通过。Docker 首次构建因两个前端文件引用后端报告类型失败；已将完整报告响应类型提取 shared/live/courseReport.ts 并由后端返回类型约束，前端只改类型导入。重建中前端类型检查已通过，镜像整体构建仍待结束。
+
+### 三容器启动与重启持久化实测
+前端和 API 镜像已构建成功，compose up --wait 成功，PostgreSQL/API 健康检查通过。4188/v2/login 返回 200，同源 /api/health 返回 storage=postgresql、schemaVersion=3。新增并执行 docker-postgres-smoke.mjs：本地收件箱验证码注册、统一登录、明确授予测试学生职责后的设置保存、重启 PostgreSQL/API 后会话及设置仍保留、退出后匿名读取 401 均通过。首次脚本因未授予学生职责正确返回 403，修正测试夹具为显式授权后通过。无 UI 改动；此次验证仅覆盖所列链路，不代表管理写接口、COS 及全部业务完成。

@@ -1,0 +1,49 @@
+import assert from 'node:assert/strict';
+import { randomUUID, randomBytes } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+
+// Explicit local acceptance fixture, isolated from the original SQLite service.
+const base='http://127.0.0.1:4188';
+const email=`smoke-${randomUUID()}@example.test`;
+const password=randomBytes(24).toString('base64url');
+let cookie='';
+async function request(path,input) {
+  const response=await fetch(base+path,{
+    method:input===undefined?'GET':'POST',
+    headers:{...(cookie?{Cookie:cookie}:{}),...(input===undefined?{}:{'Content-Type':'application/json',Origin:base})},
+    ...(input===undefined?{}:{body:JSON.stringify(input)}),
+  });
+  const data=await response.json();
+  assert.equal(response.status, path==='/api/auth/register'?201:200,`${path}: ${JSON.stringify(data)}`);
+  if(response.headers.get('set-cookie')) cookie=response.headers.get('set-cookie').split(';')[0];
+  return data;
+}
+assert.equal((await request('/api/health')).storage,'postgresql');
+assert.equal((await fetch(base+'/v2/login')).status,200);
+assert.equal((await fetch(base+'/api/auth/me')).status,401);
+await request('/api/auth/verification-codes',{email});
+// email is generated above using UUID characters only, never supplied by a caller.
+const body=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${email}'`],{encoding:'utf8'});
+const code=/\d{6}/.exec(body)?.[0];
+assert.ok(code);
+await request('/api/auth/register',{email,password,code});
+await request('/api/auth/sign-in',{identifier:email,password});
+const actor=(await request('/api/auth/me')).account;
+assert.deepEqual(actor.roles,[]);
+assert.match(actor.id,/^[0-9a-f-]{36}$/);
+// Local fixture authorization is explicit; registration itself grants no school role.
+execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE accounts SET roles='["student"]' WHERE id='${actor.id}'`],{stdio:'pipe'});
+await request('/api/commands',{action:'preferences.preview',input:{enabled:false},requestId:randomUUID()});
+execFileSync('docker',['restart','bnbu-postgres-local-postgres-1','bnbu-postgres-local-api-1'],{stdio:'pipe'});
+let ready=false;
+for(let i=0;i<30;i++) {
+  try { if((await fetch(base+'/api/health')).ok) {ready=true;break;} } catch { /* startup */ }
+  await new Promise(resolve=>setTimeout(resolve,1000));
+}
+assert.ok(ready,'API did not recover after restart');
+assert.equal((await request('/api/auth/me')).account.id,actor.id);
+const stored=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data::jsonb->>'profilePreview' FROM entities WHERE kind='preferences' AND owner_id='${actor.id}'`],{encoding:'utf8'}).trim();
+assert.equal(stored,'false');
+await request('/api/auth/logout',{});
+assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
+console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, restart persistence and logout.');

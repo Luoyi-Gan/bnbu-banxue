@@ -23,3 +23,6 @@ docker compose -f compose.postgres.yaml down
 `down` 保留数据卷；不要加 `-v`，除非明确要删除整个独立测试数据库。该环境不会复制或覆盖原 `data/browser-acceptance.sqlite`，也不会自动创建有权限的账号。
 
 本配置启用本地邮件收件箱，不发送学校邮件。真实腾讯云部署还需要 HTTPS、正式邮件及身份服务、COS 配置，并将来源白名单和 Cookie Secure 配置切换为正式域名。本地启动成功不证明这些外部服务已联通。
+
+本地冒烟验证：运行 node scripts/docker-postgres-smoke.mjs。脚本创建随机测试账号、明确授予本地学生职责，验证注册与登录、设置保存、数据库/API 重启后的会话及数据保留、退出失效。它会重启本配置的数据库及 API 容器，请仅用于独立本地测试环境；不会读取或修改原 SQLite 验收服务。测试账号保留在独立测试库中，密码不输出。
+
