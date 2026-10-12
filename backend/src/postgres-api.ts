@@ -18,6 +18,7 @@ import { postgresAdministratorSelf } from './storage/postgres-admin-deletion';
 import { postgresAccountDirectory } from './storage/postgres-account-directory';
 import { postgresSportsHelp } from './storage/postgres-sports-help';
 import { portalAnnouncement } from './sports/portal-bootstrap';
+import { postgresSportsMe } from './storage/postgres-sports-me';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean} = {}) {
@@ -27,6 +28,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      if(request.method==='GET' && pathname==='/api/v1/me') return send(response,200,{data:await postgresSportsMe(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && pathname==='/api/v1/system-mode/announcement') {
         const systems=await db.transaction(client=>new PostgresRepository(client).all('sportsSystem'));
         return send(response,200,{data:portalAnnouncement({all:()=>systems})});

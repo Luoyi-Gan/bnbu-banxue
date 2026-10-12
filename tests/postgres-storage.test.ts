@@ -23,6 +23,7 @@ import { postgresCommunityView } from '../backend/src/storage/postgres-community
 import { postgresAccountDirectory } from '../backend/src/storage/postgres-account-directory';
 import { postgresSportsCourses } from '../backend/src/storage/postgres-sports-courses';
 import { postgresSportsHelp } from '../backend/src/storage/postgres-sports-help';
+import { postgresSportsMe } from '../backend/src/storage/postgres-sports-me';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -116,6 +117,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await postgresSportsHelp(db,manager.token,'zh')).articles.some(a=>a.id===saved.id)).toBe(true);
     await db.transaction(client=>new PostgresRepository(client).save(identity,{...identity.data,permissions:[]}));
     await expect(executePostgres(db,manager.token,'sports.help.save',input,key)).rejects.toMatchObject({status:403});
+  });
+  it('projects the student sports identity and rejects duplicate verified identities', async () => {
+    // The student protocol uses its own verified identity, never another account's data.
+    const studentAuth=new PostgresAuth(db);
+    const studentLogin=await studentAuth.login('sports-reader-student@example.test','Sports-read-123');
+    const studentMe=await postgresSportsMe(db,studentLogin.token);
+    expect(studentMe.user.role).toBe('STUDENT');
+    expect(studentMe.studentProfile).toMatchObject({userId:'sports-reader-student',studentNumber:null,gradeYear:null});
+    expect(studentMe.user).toMatchObject({emailVerified:false,primaryEmailMasked:null});
+    const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','sports-reader-student',{role:'student',status:'verified'}));
+    await expect(postgresSportsMe(db,studentLogin.token)).rejects.toMatchObject({status:403});
+    await db.pool.query('DELETE FROM entities WHERE id=$1',[duplicate.id]);
   });
   it('changes an initial administrator password atomically and revokes other sessions', async () => {
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,login_kind,login_name) VALUES('password-admin','password@example.test',$1,'管理员','now','ADMIN','password-manager')",[hashPassword('Initial-test-123')]);

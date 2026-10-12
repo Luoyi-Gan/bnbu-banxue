@@ -1561,3 +1561,7 @@ Compose 已重新构建并启动全部健康容器，Docker 冒烟新增管理�
 实际核对发现 SQLite 的 /api/v1/me 调用 portalMe，而其 portalIdentity 只接受教师/管理员；学生前端 loadApiStudentIdentity 明确要求 studentProfile。因此不能把旧 SQLite 体育协议视为学生主流程已完整实现；需要按现有学生协议补身份、入班及后续运动接口，而非仅机械迁移。
 
 本轮接通 PostgreSQL GET /api/v1/system-mode/announcement，复用原公告投影及 data 包装，不要求登录，且仅返回公开维护字段。真实 HTTP 测试覆盖默认正常模式、维护公告、恢复时间格式和内部字段不外泄；PostgreSQL 36 项测试、服务端类型检查和相关 lint 通过。此新启动接口尚未进入 Docker 镜像，身份主流程仍未完成，前端未改。
+
+### 学生本人身份协议第一步
+
+接通 PostgreSQL GET /api/v1/me：学生使用当前会话、个人账号和唯一已核验体育身份返回 studentProfile；教师和管理员继续共用原 portalMe 投影。学生资料只返回已有字段，缺少学号、入学年等为 null，不从邮箱或演示数据自动补齐体育资格；邮箱仅在体育身份已核验且与当前账号一致时返回掩码。保留封禁、首次改密及重复身份拒绝。PostgreSQL 37 项测试通过，包含未核验邮箱隐藏、缺失资料不伪造和重复身份拒绝；类型检查与相关 lint 通过。尚未完成学生邮箱挑战、入班、资料补全和运动协议，不能据此宣称学生登录到运动操作全链可用。尚未更新 Docker，UI 未改。

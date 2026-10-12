@@ -53,7 +53,7 @@ export function portalLogin(db: Database, account: unknown, password: unknown) {
   });
 }
 
-function portalIdentity(repo: Repository, actor: Account) {
+function portalIdentity(repo: Pick<Repository, 'all'>, actor: Account) {
   demand(actor.status !== "banned", "账号已停用。", 403);
   const identities = repo
     .all("sportsIdentity")
@@ -92,7 +92,7 @@ export function portalSecurity(repo: Repository, actor: Account) {
   };
 }
 
-export function portalMe(repo: Repository, actor: Account) {
+export function portalMe(repo: Pick<Repository, 'all'>, actor: Account) {
   sportsAccountGate(repo, actor);
   const identity = portalIdentity(repo, actor);
   const admin = identity.data.role === "admin";
