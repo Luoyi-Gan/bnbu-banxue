@@ -6,7 +6,7 @@ import { processPostgresSportsReview } from '../backend/src/storage/postgres-rev
 import { createServer } from 'node:http';
 import sharp from 'sharp';
 import { postgresMediaPut, postgresMediaRead, postgresMediaOriginal } from '../backend/src/storage/postgres-student-media';
-import { postgresStudentRecords } from '../backend/src/storage/postgres-student-records';
+import { postgresStudentRecords, postgresStudentWorkflow } from '../backend/src/storage/postgres-student-records';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { randomUUID, createHash } from 'node:crypto';
 import { Pool } from 'pg';
@@ -316,6 +316,25 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.transaction(client=>new PostgresRepository(client).create('sportsCertificationHistory','sports-reader-other',{applicationId:owned.id,creditVersion:2,category:'RELATED',minutes:20,status:'VALID',reason:'缺失另一类'}));
     await expect(postgresStudentRecognitionHistory(db,login.token,owned.id,{})).rejects.toMatchObject({status:409});
 
+  });
+  it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const record=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      const r=await repo.create('sportsRecord','sports-reader-student',{sourceDraftId:'workflow-public',status:'SUPPLEMENT_REQUIRED',supplementStartedAt:Date.now(),supplementWindowMilliseconds:86400000,publicReason:'UNCLEAR_EVIDENCE',privateNote:'secret-review'});
+      const batch=await repo.create('sportsMaterialBatch',r.ownerId,{recordId:r.id,sequence:1});
+      await repo.create('sportsMaterial',r.ownerId,{recordId:r.id,batchId:batch.id,status:'COMPLETE',mediaId:'workflow-media',objectKey:'private-key'});
+      return r;
+    });
+    const result=await postgresStudentWorkflow(db,login.token,'workflow-public');
+    expect(result.data).toMatchObject({recordId:'workflow-public',stage:'AWAITING_SUPPLEMENT',version:record.version,supplement:{paused:false,expired:false},materials:[{mediaId:'workflow-media',materialVersion:1}]});
+    expect(JSON.stringify(result)).not.toMatch(/secret-review|private-key/);
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{supplementStartedAt:Date.now()-172800000});});
+    expect((await postgresStudentWorkflow(db,login.token,record.id)).data.supplement?.expired).toBe(true);
+    const foreign=await db.transaction(client=>new PostgresRepository(client).create('sportsRecord','sports-reader-other',{status:'VALID'}));
+    await expect(postgresStudentWorkflow(db,login.token,foreign.id)).rejects.toMatchObject({status:404});
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{status:'TEACHER_PENDING'});});
+    expect((await postgresStudentRecords(db,login.token,{},'workflow-public')).data).toMatchObject({workflowStage:'PENDING_TEACHER'});
   });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

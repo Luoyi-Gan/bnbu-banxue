@@ -1707,3 +1707,7 @@ GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需�
 ### 认可历史读取与已结束会话时钟读取修复
 
 认可历史抽出共用投影，学生 recognition-allocation-revisions 只读本人组织认证，沿用成对分类版本检查、分钟转秒和游标；缺一类历史拒绝，不补零。58 项数据库／申请／协议测试通过。Docker 首轮再次触发已结束会话读取的时间回退保护，检查发现已结束时长本已固定，不应依赖读取时刻；现只对活动／暂停会话继续检查回退，已结束记录返回保存时长，不修改原时间事实。12 项计时测试通过（含回退后读取结束记录、活动操作仍拒绝）。Docker 再次重建后完整三端冒烟通过，增加已发布 V8.1 规则及本人暂无申请列表检查。类型和 lint 通过。真实计时中的宿主时钟稳定性仍是运行依赖；未声称修复宿主时钟。
+
+### PostgreSQL 学生审核阶段与补证期限读取
+
+接通 exercise-records/:id/workflow，兼容正式记录与原草稿公开标识，沿用本人身份和维护门禁；返回公开字段与已有媒体标识，隐藏内部备注及存储路径。修复 TEACHER_PENDING / SUPPLEMENT_REQUIRED 与学生现有页面协议不一致，分别投影 PENDING_TEACHER / AWAITING_SUPPLEMENT。期限使用共享 supplementClock，不因查询执行逾期裁决。真实 PostgreSQL 48 测试通过，覆盖本人、他人、期限、材料版本及状态映射；类型和 lint 通过。补证上传、正式提交及 Docker 新接口验证仍待完成，UI 未改。

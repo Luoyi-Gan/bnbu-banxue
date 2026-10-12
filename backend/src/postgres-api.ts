@@ -3,7 +3,7 @@ import { postgresStudentProgress } from './storage/postgres-student-progress';
 import { postgresReviewMaterial } from './storage/postgres-review-material';
 import { postgresSportsWorkspace } from './storage/postgres-sports-workspace';
 import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresMediaOriginal } from './storage/postgres-student-media';
-import { postgresStudentRecords } from './storage/postgres-student-records';
+import { postgresStudentRecords, postgresStudentWorkflow } from './storage/postgres-student-records';
 import { createServer } from 'node:http';
 import { demand, ServiceError } from './auth';
 import { body, cookieToken, send } from './http';
@@ -55,6 +55,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         response.writeHead(200,{'Content-Type':original.mime,'Content-Length':original.bytes.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Cross-Origin-Resource-Policy':'same-origin'});return response.end(original.bytes);
       }
       const evidenceRead=/^\/api\/v1\/exercise-records\/([^/]+)\/evidence-context$/.exec(pathname);
+      const workflowRead=/^\/api\/v1\/exercise-records\/([^/]+)\/workflow$/.exec(pathname);
+      if(request.method==='GET' && workflowRead) return send(response,200,await postgresStudentWorkflow(db,cookieToken(request) ?? '',decodeURIComponent(workflowRead[1])));
       if(request.method==='GET' && evidenceRead) return send(response,200,{data:await postgresEvidenceContext(db,cookieToken(request) ?? '',decodeURIComponent(evidenceRead[1]))});
       const mediaRead=/^\/api\/v1\/media\/([^/]+)$/.exec(pathname);
       if(request.method==='GET' && mediaRead) return send(response,200,{data:await postgresMediaRead(db,cookieToken(request) ?? '',decodeURIComponent(mediaRead[1]))});

@@ -4,6 +4,30 @@ import { PostgresAuth } from './postgres-auth';
 import type { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
 import { recordDraftGate, recordDraftProjection } from './postgres-record-drafts';
+import { supplementClock } from '../sports/supplements';
+
+export function studentWorkflowStage(status:unknown) {
+  return status==='TEACHER_PENDING'?'PENDING_TEACHER':status==='SUPPLEMENT_REQUIRED'?'AWAITING_SUPPLEMENT':status;
+}
+
+export async function postgresStudentWorkflow(db:PostgresDatabase,token:string,id:string) {
+  return db.transaction(async client=>{
+    await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
+    await recordDraftGate(repo,actor);
+    const record=(await repo.all('sportsRecord')).find(r=>r.ownerId===actor.id && (r.id===id || r.data.sourceDraftId===id));
+    demand(record,'运动记录不存在。',404);
+    const batches=(await repo.all('sportsMaterialBatch')).filter(b=>b.data.recordId===record.id);
+    const materials=(await repo.all('sportsMaterial')).filter(m=>m.ownerId===actor.id && m.data.recordId===record.id && m.data.status==='COMPLETE' && typeof m.data.mediaId==='string');
+    const pauses=await repo.all('sportsPause'),systems=await repo.all('sportsSystem');
+    const clock=record.data.status==='SUPPLEMENT_REQUIRED'?supplementClock({all:kind=>kind==='sportsPause'?pauses:systems},record):null;
+    if(clock) demand(Number.isFinite(clock.deadline) && Number.isFinite(clock.remaining),'补证期限资料不完整。',409);
+    return {data:{recordId:String(record.data.sourceDraftId ?? record.id),version:record.version,stage:studentWorkflowStage(record.data.status),
+      supplement:clock?{paused:clock.paused,expired:clock.remaining<=0,deadlineAt:new Date(clock.deadline).toISOString(),remainingMilliseconds:clock.remaining}:null,
+      materials:materials.map(m=>({mediaId:m.data.mediaId,materialVersion:batches.find(b=>b.id===m.data.batchId)?.data.sequence ?? null})),
+      reasonCode:record.data.publicReason ?? null,publicComment:record.data.publicExplanation ?? null}};
+  });
+}
 
 export async function postgresStudentRecords(db:PostgresDatabase,token:string,input:Fields,id?:string) {
   return db.transaction(async client=>{
@@ -30,7 +54,7 @@ export async function postgresStudentRecords(db:PostgresDatabase,token:string,in
         creditType:d.category==='RELATED'?'COURSE_RELATED':'GENERAL',sportType:d.sportType ?? (d.activityType==='SWIM'?'SWIMMING':null),sportName:d.sportName ?? null,
         description:d.description,businessDate:d.businessDate,version:r.version,createdAt:r.createdAt,updatedAt:r.updatedAt,
         actualDurationSeconds:typeof d.activeMilliseconds==='number'?Math.floor(d.activeMilliseconds/1000):null,
-        creditedDurationSeconds:typeof detail?.actual==='number'?detail.actual*60:null,eligibleMinutes:detail?.eligible ?? null,creditReason:detail?.reason ?? null,workflowStage:d.status,
+        creditedDurationSeconds:typeof detail?.actual==='number'?detail.actual*60:null,eligibleMinutes:detail?.eligible ?? null,creditReason:detail?.reason ?? null,workflowStage:studentWorkflowStage(d.status),
         currentReview:reviewed?{result:d.status,publicComment:d.publicExplanation ?? d.publicReason ?? null}:null};
     })].filter(r=>!enrollmentId || r.enrollmentId===enrollmentId);
     if(id) {const found=entries.find(r=>r.id===id);demand(found,'运动记录不存在。',404);return {data:found};}
