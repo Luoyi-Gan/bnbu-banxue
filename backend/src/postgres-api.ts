@@ -1,3 +1,4 @@
+import { postgresStudentRecords } from './storage/postgres-student-records';
 import { createServer } from 'node:http';
 import { demand, ServiceError } from './auth';
 import { body, cookieToken, send } from './http';
@@ -32,6 +33,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const recordRead=/^\/api\/v1\/exercise-records(?:\/([^/]+))?$/.exec(pathname);
+      if(request.method==='GET' && recordRead) return send(response,200,await postgresStudentRecords(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),recordRead[1]?decodeURIComponent(recordRead[1]):undefined));
       const sportsSessionRead=/^\/api\/v1\/exercise-sessions\/([^/]+)$/.exec(pathname);
       if(request.method==='GET' && sportsSessionRead) return send(response,200,{data:await postgresSportsSession(db,cookieToken(request) ?? '',decodeURIComponent(sportsSessionRead[1]))});
       if(request.method==='GET' && pathname==='/api/v1/me/preferences') return send(response,200,{data:await postgresSportsPreferences(db,cookieToken(request) ?? '')});

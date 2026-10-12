@@ -1651,3 +1651,7 @@ POST /api/v1/exercise-sessions 及 pause/resume/finish 接入共享命令事务�
 ### 学生运动草稿写接口
 
 新增 POST exercise-records、PATCH exercise-records/:id、POST exercise-records/:id/discard，接入独立草稿实体，复用事务／审计／幂等机制。核对本人已结束且未取消会话、首次受理窗口、结算归档、唯一有效草稿、运动项目及说明；修改和放弃须核对版本。PostgreSQL 44 项测试通过，覆盖创建重试、重复草稿拒绝、修改、旧版本拒绝和放弃后禁止修改；类型与 lint 检查通过。草稿集合读取、正式记录映射和媒体协议尚未接完，本轮未更新 Docker，现有界面未改。
+
+### 运动记录列表、详情及 Docker 草稿流程
+
+新增 GET exercise-records 和详情，合并本人草稿与已受理记录，正式记录存在时不重复展示同会话草稿；按业务日期、创建时间、ID 稳定分页，支持 enrollmentId 筛选，游标必须属于本人结果。只返回公开字段，计入分钟来自最新保存进度且须匹配记录版本，缺失为 null。PostgreSQL 44 项测试、类型检查和 lint 通过，覆盖草稿恢复、正式记录替代及无效游标。重建 Docker API 健康启动，扩展冒烟真实 HTTP 创建、列表／详情读回、PATCH 说明和放弃草稿，全部通过。尚未实现页面媒体上传、submit 以及完整 workflow 协议，本次不是材料闭环验收。

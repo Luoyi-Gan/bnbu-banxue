@@ -119,6 +119,16 @@ try {
     assert.equal(session.status,status);
   }
   assert.equal((await request(`/api/v1/exercise-sessions/${session.id}`)).data.status,'COMPLETED');
+  const draft=await sessionWrite('/api/v1/exercise-records',{sessionId:session.id,creditType:'GENERAL',sportType:'RUNNING',sportName:null,description:'Docker record draft',clientRequestId:randomUUID()});
+  assert.equal(draft.status,'DRAFT');
+  assert.equal((await request('/api/v1/exercise-records/'+draft.id)).data.description,'Docker record draft');
+  assert.ok((await request('/api/v1/exercise-records?limit=50&sort=-businessDate')).data.some(r=>r.id===draft.id));
+  const editResponse=await fetch(base+'/api/v1/exercise-records/'+draft.id,{method:'PATCH',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify({description:'Docker edited draft',expectedVersion:draft.version})});
+  assert.equal(editResponse.status,200);const edited=(await editResponse.json()).data;
+  assert.equal(edited.description,'Docker edited draft');
+  const discarded=await sessionWrite('/api/v1/exercise-records/'+draft.id+'/discard',{expectedVersion:edited.version,reason:'Docker test cleanup'});
+  assert.equal(discarded.status,'DISCARDED');
+
 } finally {
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${semesterId}','${courseId}','${enrollmentId}')`],{stdio:'pipe'});
 }

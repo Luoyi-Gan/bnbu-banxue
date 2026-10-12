@@ -1,3 +1,4 @@
+import { postgresStudentRecords } from '../backend/src/storage/postgres-student-records';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
@@ -192,6 +193,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     });
     const draftInput={sessionId:session.id,creditType:'GENERAL',sportType:'RUNNING',sportName:null,description:'草稿说明',clientRequestId:randomUUID()},draftKey=randomUUID();
     const draft=await executePostgres(db,login.token,'sports.recorddraft.create',draftInput,draftKey);
+    expect((await postgresStudentRecords(db,login.token,{},String(draft.id))).data).toMatchObject({id:draft.id,status:'DRAFT'});
+    const page=await postgresStudentRecords(db,login.token,{limit:'1',sort:'-businessDate'});
+    expect(Array.isArray(page.data)).toBe(true);
+    await expect(postgresStudentRecords(db,login.token,{cursor:'foreign-record'})).rejects.toMatchObject({status:409});
     expect(draft).toMatchObject({status:'DRAFT',sessionId:session.id,description:'草稿说明'});
     expect(await executePostgres(db,login.token,'sports.recorddraft.create',draftInput,draftKey)).toEqual(draft);
     await expect(executePostgres(db,login.token,'sports.recorddraft.create',draftInput,randomUUID())).rejects.toMatchObject({status:409});
@@ -204,6 +209,8 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const input={sessionId:session.id,version:session.version,category:'RELATED',description:'材料受理测试',activityType:'EXERCISE',files:[{clientId:'photo',mime:'image/jpeg',size:123,sha256:'a'.repeat(64)}]},key=randomUUID();
     const result=await executePostgres(db,login.token,'sports.record.accept',input,key);
     expect(await executePostgres(db,login.token,'sports.record.accept',input,key)).toEqual(result);
+    expect((await postgresStudentRecords(db,login.token,{},String(result.id))).data).toMatchObject({id:result.id,status:'SUBMITTED',creditedDurationSeconds:null});
+    await expect(postgresStudentRecords(db,login.token,{},String(draft.id))).rejects.toMatchObject({status:404});
     await expect(executePostgres(db,login.token,'sports.record.accept',input,randomUUID())).rejects.toMatchObject({status:409});
     await db.transaction(async client=>{
       const repo=new PostgresRepository(client),record=await repo.get(result.id);
