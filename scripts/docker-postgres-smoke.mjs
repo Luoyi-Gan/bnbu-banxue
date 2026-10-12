@@ -179,6 +179,13 @@ try {
      UPDATE entities SET owner_id='${teacherId}',data=(data::jsonb || '{"weeklyLimit":3,"relatedTarget":600,"otherTarget":600}'::jsonb)::text WHERE id='${courseId}';`],{stdio:'pipe'});
   const studentCookie=cookie;
   await request('/api/auth/sign-in',{identifier:adminLogin,password});
+  const conversionTables=(await request('/api/sports/workspace')).conversionTables;
+  assert.equal(conversionTables.length,4);assert.equal(conversionTables.reduce((n,t)=>n+t.data.rows.length,0),404);
+  const conversionTable=conversionTables[0],conversionRow=conversionTable.data.rows[0];
+  await request('/api/commands',{action:'sports.conversion.edit',input:{id:conversionTable.id,version:conversionTable.version,rowId:conversionRow.id,min:conversionRow.min,max:conversionRow.max,score:conversionRow.score,grade:conversionRow.grade,note:'Docker verification'},requestId:randomUUID()});
+  const changedConversion=(await request('/api/sports/workspace')).conversionTables.find(t=>t.id===conversionTable.id);
+  assert.equal(changedConversion.version,conversionTable.version+1);assert.equal(changedConversion.data.rows[0].note,'Docker verification');
+  await request('/api/commands',{action:'sports.conversion.edit',input:{id:conversionTable.id,version:changedConversion.version,rowId:conversionRow.id,min:conversionRow.min,max:conversionRow.max,score:conversionRow.score,grade:conversionRow.grade,note:conversionRow.note},requestId:randomUUID()});
   const mode=(await request('/api/commands',{action:'sports.ai.manual',input:{courseId,endAt:new Date(Date.now()+3600000).toISOString(),reason:'Docker manual review fixture'},requestId:randomUUID()})).data;
   await request('/api/auth/sign-in',{identifier:teacherEmail,password});
   const teacherWorkspace=await request('/api/sports/workspace');let reviewRecord=teacherWorkspace.records.find(r=>r.data.sourceDraftId===finalDraft.id);
