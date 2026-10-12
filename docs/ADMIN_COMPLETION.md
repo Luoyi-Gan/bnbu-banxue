@@ -2367,3 +2367,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 校园AI形象浏览器复验：4188学生账号在原形象窗口选择Hello Kitty，保存后窗口关闭；刷新并重新打开，Hello Kitty按钮仍为is-active。截图.runtime/ai-icon-browser-proof.png。结合此前PostgreSQL账号隔离测试，确认选择通过本人后端偏好保存。自定义文件上传本轮未做浏览器验证。
 
 2026-10-12 自定义AI形象PostgreSQL补验：保存内嵌PNG后切到默认形象，再切回自定义，图片内容仍保留；另一账号完整工作区响应不包含该图片。最新全量266/266、无失败无跳过，报告.runtime/current-tests.json。本次覆盖后端保存与隔离，不等同浏览器文件上传验证。
+
+2026-10-12 自定义AI形象浏览器上传完成：学生在4188原形象窗口通过文件选择器上传项目自带companion-yellow.png，窗口成功关闭且无错误；刷新后重新打开，我上传的图片按钮存在且为is-active。截图.runtime/ai-custom-icon-browser-proof.png。仅使用本地项目素材，无个人文件上传；结合PostgreSQL测试覆盖自定义图片保存、切换保留及账号隔离。
