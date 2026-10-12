@@ -133,10 +133,10 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'材料标识须使用路径。');
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.media.access',{...input,id:decodeURIComponent(mediaAccess[1])},key)});
         }
-        const recordSubmit=/^\/api\/v1\/exercise-records\/([^/]+)\/submit$/.exec(pathname);
+        const recordSubmit=/^\/api\/v1\/exercise-records\/([^/]+)\/(submit|supplements)$/.exec(pathname);
         if(recordSubmit) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'记录标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.record.submit',{...input,id:decodeURIComponent(recordSubmit[1])},key)});
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', recordSubmit[2]==='supplements'?'sports.record.supplement':'sports.record.submit',{...input,id:decodeURIComponent(recordSubmit[1])},key)});
         }
         const mediaWrite=/^\/api\/v1\/(media-uploads|media)(?:\/([^/]+)\/(confirm|bind))?$/.exec(pathname);
         if(mediaWrite) {

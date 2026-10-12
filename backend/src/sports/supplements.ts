@@ -136,6 +136,49 @@ export function sportsSupplementCommand(
     "已有补证包，请续传并提交原补证包。",
     409,
   );
+  const {files,reused,lockedOriginals}=supplementFiles(repo,actor,record,input);
+  const batch = repo.create("sportsMaterialBatch", actor.id, {
+    recordId: record.id,
+    sessionId: record.data.sessionId,
+    sequence: 2,
+    status: files.length === reused.length ? "READY" : "UPLOADING",
+    preparedAt: Date.now(),
+  });
+  for (const [index, file] of files.entries()) {
+    const source = reused[index];
+    repo.create("sportsMaterial", actor.id, {
+      ...file,
+      recordId: record.id,
+      batchId: batch.id,
+      sessionId: record.data.sessionId,
+      status: source ? "COMPLETE" : "PENDING",
+      ...(lockedOriginals
+        ? { lockedOriginalMaterialId: lockedOriginals[index].id }
+        : {}),
+      ...(record.data.activityType === "SWIM"
+        ? {
+            phase:
+              source?.data.phase ??
+              lockedOriginals?.[index].data.phase ??
+              "AUXILIARY",
+            beforeEvidenceId:
+              source?.data.beforeEvidenceId ??
+              lockedOriginals?.[index].data.beforeEvidenceId ??
+              null,
+          }
+        : {}),
+      ...(source
+        ? {
+            sourceMaterialId: source.id,
+            metadata: source.data.metadata,
+            completedAt: source.data.completedAt,
+          }
+        : {}),
+    });
+  }
+  return repo.save(record, { supplementBatchId: batch.id });
+}
+export function supplementFiles(repo:Pick<Repository,"all"|"get">,actor:Account,record:Entity,input:Fields) {
   demand(Array.isArray(input.reuseIds), "请选择需要沿用的原材料。");
   const reuseIds = input.reuseIds as unknown[];
   demand(new Set(reuseIds).size === reuseIds.length, "不能重复引用原材料。");
@@ -196,46 +239,7 @@ export function sportsSupplementCommand(
       "游泳补证须沿用原运动前、运动后照片，不能事后新拍替代。",
       409,
     );
-  const batch = repo.create("sportsMaterialBatch", actor.id, {
-    recordId: record.id,
-    sessionId: record.data.sessionId,
-    sequence: 2,
-    status: files.length === reused.length ? "READY" : "UPLOADING",
-    preparedAt: Date.now(),
-  });
-  for (const [index, file] of files.entries()) {
-    const source = reused[index];
-    repo.create("sportsMaterial", actor.id, {
-      ...file,
-      recordId: record.id,
-      batchId: batch.id,
-      sessionId: record.data.sessionId,
-      status: source ? "COMPLETE" : "PENDING",
-      ...(lockedOriginals
-        ? { lockedOriginalMaterialId: lockedOriginals[index].id }
-        : {}),
-      ...(record.data.activityType === "SWIM"
-        ? {
-            phase:
-              source?.data.phase ??
-              lockedOriginals?.[index].data.phase ??
-              "AUXILIARY",
-            beforeEvidenceId:
-              source?.data.beforeEvidenceId ??
-              lockedOriginals?.[index].data.beforeEvidenceId ??
-              null,
-          }
-        : {}),
-      ...(source
-        ? {
-            sourceMaterialId: source.id,
-            metadata: source.data.metadata,
-            completedAt: source.data.completedAt,
-          }
-        : {}),
-    });
-  }
-  return repo.save(record, { supplementBatchId: batch.id });
+  return {files,reused,lockedOriginals};
 }
 export function expireSupplements(repo: Repository) {
   for (const record of repo

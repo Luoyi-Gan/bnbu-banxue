@@ -1,6 +1,7 @@
 import { postgresAiGovernance, requireAiGovernor } from './postgres-ai-governance';
 import { sportsReviewDecisionPolicy } from '../sports/review';
 import { submitStudentRecord } from './postgres-record-submit';
+import { submitStudentSupplement } from './postgres-supplement-submit';
 import { mediaCommand } from './postgres-student-media';
 import { recordDraftGate, saveRecordDraft } from './postgres-record-drafts';
 import { sportsMaterialPolicy } from "../sports/materials";
@@ -46,7 +47,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     const hash = digest(JSON.stringify({action,input}));
     if(action.startsWith('sports.ai.')) await requireAiGovernor(repo,actor);
-    if(action==='sports.record.submit') await recordDraftGate(repo,actor);
+    if(['sports.record.submit','sports.record.supplement'].includes(action)) await recordDraftGate(repo,actor);
     if(action.startsWith('sports.media.')) await recordDraftGate(repo,actor);
     if(action.startsWith('sports.recorddraft.')) await recordDraftGate(repo,actor);
     if(action.startsWith('sports.exercise.')) {
@@ -96,6 +97,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       const record=await runAsync(sportsReviewDecisionPolicy(repo,actor,action,input));if(record)result={id:record.id};
     }
     else if(action==='sports.record.submit') result=await submitStudentRecord(repo,actor,input);
+    else if(action==='sports.record.supplement') result=await submitStudentSupplement(repo,actor,input);
     else if(action.startsWith('sports.media.')) result=await mediaCommand(repo,actor,action.split('.')[2],input);
     else if(action.startsWith('sports.recorddraft.')) result=await saveRecordDraft(repo,actor,action.split('.')[2],input);
     else if(action==='sports.record.accept') {

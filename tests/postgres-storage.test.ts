@@ -351,7 +351,15 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(postgresMediaPut(db,login.token,String(lease.mediaId),bytes,'image/png')).rejects.toMatchObject({status:409});
     await db.pool.query('DELETE FROM entities WHERE id=$1',[pause.id]);
     await expect(postgresMediaPut(db,login.token,String(lease.mediaId),bytes,'image/png')).resolves.toBe(input.declaredContentSha256);
-    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(record.id),{status:'TEACHER_PENDING'});});
+    const verified=await postgresMediaRead(db,login.token,String(lease.mediaId));
+    await executePostgres(db,login.token,'sports.media.bind',{id:lease.mediaId,sessionId:record.data.sessionId,expectedVersion:verified.version},randomUUID());
+    const submit={id:record.id,expectedVersion:record.version,mediaIds:[lease.mediaId]},key=randomUUID();
+    await expect(executePostgres(db,login.token,'sports.record.supplement',{...submit,expectedVersion:0},randomUUID())).rejects.toMatchObject({status:409});
+    const result=await executePostgres(db,login.token,'sports.record.supplement',submit,key);
+    expect(result).toMatchObject({workflowStage:'PENDING_TEACHER',materialVersion:2});
+    expect(await executePostgres(db,login.token,'sports.record.supplement',submit,key)).toEqual(result);
+    await expect(executePostgres(db,login.token,'sports.record.supplement',{...submit,expectedVersion:result.version},randomUUID())).rejects.toMatchObject({status:409});
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.all('sportsMaterialBatch')).filter(b=>b.data.recordId===record.id)).toHaveLength(1);expect((await repo.all('sportsReviewRound')).filter(r=>r.data.recordId===record.id && r.data.status==='OPEN')).toHaveLength(1);await client.query('DELETE FROM notifications WHERE entity_id=$1',[record.id]);});
     await expect(executePostgres(db,login.token,'sports.media.initiate',input,randomUUID())).rejects.toMatchObject({status:409});
   });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
