@@ -166,6 +166,42 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await db.pool.query('SELECT id FROM mail_outbox WHERE id=$1',[row.mail_id])).rows).toHaveLength(0);
     await expect(postgresAdminEmailConfirm(db,token,{challengeId:challenge.challengeId,code})).rejects.toMatchObject({code:'INVALID_CHALLENGE'});
   });
+  it('rejects stale admin challenges and rolls verification back when audit insertion fails', async () => {
+    const auth=new PostgresAuth(db),token=(await auth.login('new-manager','Changed-manager-123')).token;
+    const actor=await auth.authenticate(token);
+    const issue=async()=>{
+      await db.pool.query('UPDATE admin_security_challenges SET sent_at=0 WHERE account_id=$1',[actor.id]);
+      const challenge=await postgresAdminEmailRequest(db,token,true);
+      const row=(await db.pool.query('SELECT c.*,m.body FROM admin_security_challenges c JOIN mail_outbox m ON m.id=c.mail_id WHERE c.id=$1',[challenge.challengeId])).rows[0];
+      return {id:challenge.challengeId,code:/\d{6}/.exec(row.body)![0],mailId:row.mail_id};
+    };
+    const stale=await issue();
+    await db.transaction(async client=>{
+      const repo=new PostgresRepository(client),identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId===actor.id)!;
+      await repo.save(identity,{schoolEmailVerified:false});
+    });
+    await expect(postgresAdminEmailConfirm(db,token,{challengeId:stale.id,code:stale.code})).rejects.toMatchObject({code:'VERSION_CONFLICT'});
+    expect((await postgresAdminEmailStatus(db,token)).verified).toBe(false);
+    const challenge=await issue();
+    await db.pool.query("CREATE FUNCTION reject_email_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='sports.account.email.verify' THEN RAISE EXCEPTION 'injected audit failure'; END IF; RETURN NEW; END; $$");
+    await db.pool.query('CREATE TRIGGER reject_email_audit BEFORE INSERT ON audit FOR EACH ROW EXECUTE FUNCTION reject_email_audit()');
+    try {
+      await expect(postgresAdminEmailConfirm(db,token,{challengeId:challenge.id,code:challenge.code})).rejects.toThrow('injected audit failure');
+      expect((await postgresAdminEmailStatus(db,token)).verified).toBe(false);
+      const row=(await db.pool.query('SELECT * FROM admin_security_challenges WHERE id=$1',[challenge.id])).rows[0];
+      expect(row.consumed_at).toBeNull();
+      expect(row.code_hash).toBeTruthy();
+      expect(row.attempts).toBe(0);
+      expect((await db.pool.query('SELECT id FROM mail_outbox WHERE id=$1',[challenge.mailId])).rows).toHaveLength(1);
+    } finally {
+      await db.pool.query('DROP TRIGGER reject_email_audit ON audit');
+      await db.pool.query('DROP FUNCTION reject_email_audit()');
+    }
+    expect(await postgresAdminEmailConfirm(db,token,{challengeId:challenge.id,code:challenge.code})).toEqual({verified:true});
+    const exhausted=await issue();
+    for(let i=0;i<5;i++) await expect(postgresAdminEmailConfirm(db,token,{challengeId:exhausted.id,code:'wrong'})).rejects.toMatchObject({code:'INVALID_CHALLENGE'});
+    await expect(postgresAdminEmailConfirm(db,token,{challengeId:exhausted.id,code:exhausted.code})).rejects.toMatchObject({code:'INVALID_CHALLENGE'});
+  });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
     expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);
