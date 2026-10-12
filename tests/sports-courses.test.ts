@@ -92,6 +92,63 @@ function setup() {
     courseInput,
   };
 }
+it("原版分步建课只创建关闭入班的草稿，完整配置后才能发布", () => {
+  const { db, repo, teacher, student, run, courseInput, semester } = setup();
+  const key = randomUUID();
+  const result = execute(
+    db,
+    teacher.token,
+    "sports.course.create",
+    { name: "分步新课" },
+    key,
+  ) as { id: string };
+  expect(
+    execute(
+      db,
+      teacher.token,
+      "sports.course.create",
+      { name: "分步新课" },
+      key,
+    ),
+  ).toEqual(result);
+  let draft = repo.get(result.id);
+  expect(draft.data).toMatchObject({
+    semesterId: semester.id,
+    status: "DRAFT",
+    enrollmentOpen: false,
+  });
+  expect(draft.data.templateId).toBeUndefined();
+  expect(() =>
+    run(teacher, "sports.course.publish", {
+      id: draft.id,
+      version: draft.version,
+    }),
+  ).toThrow();
+  expect(() =>
+    run(teacher, "sports.invitation.create", { courseId: draft.id }),
+  ).toThrow("课程未开放入班");
+  expect(() => run(student, "sports.course.create", { name: "越权" })).toThrow(
+    "没有有效体育身份",
+  );
+  expect(() =>
+    run(teacher, "sports.course.create", { name: "注入", status: "PUBLISHED" }),
+  ).toThrow();
+  draft = run(teacher, "sports.course.save", {
+    ...courseInput,
+    id: draft.id,
+    version: draft.version,
+  });
+  const published = run(teacher, "sports.course.publish", {
+    id: draft.id,
+    version: draft.version,
+  });
+  expect(published.data).toMatchObject({
+    status: "PUBLISHED",
+    enrollmentOpen: true,
+  });
+  expect(repo.all("sportsCourse")).toHaveLength(1);
+});
+
 it("学期、模板、课程发布、邀请码、直接入班共享同一持久业务记录", () => {
   const f = setup();
   const draft = f.run(f.teacher, "sports.course.save", f.courseInput);

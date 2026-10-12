@@ -120,7 +120,34 @@ it("原版课程列表、目录、学期与目标读取本人真实课程，不�
       totalTargetSeconds: 72000,
       effectiveFrom: null,
     });
+    const createDraft = () =>
+      fetch(base + "/teacher/courses", {
+        method: "POST",
+        headers: {
+          Cookie: `bnbu_session=${own.token}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": "original-create-course",
+        },
+        body: JSON.stringify({ displayName: "原版新建草稿" }),
+      });
+    const createdResponse = await createDraft();
+    expect(createdResponse.status).toBe(200);
+    const created = await createdResponse.json();
+    expect(await (await createDraft()).json()).toEqual(created);
+    expect(
+      (await (await get("/class-sections/" + created.data.id)).json()).data,
+    ).toMatchObject({
+      displayName: "原版新建草稿",
+      isEnrollmentOpen: false,
+      checkInWindowMode: "UNAVAILABLE",
+    });
+    expect(
+      repo
+        .all("sportsCourse")
+        .filter((item) => item.data.name === "原版新建草稿"),
+    ).toHaveLength(1);
     repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
+    expect((await createDraft()).status).toBe(503);
     expect((await get("/class-sections")).status).toBe(503);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));

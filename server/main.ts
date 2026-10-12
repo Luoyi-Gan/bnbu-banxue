@@ -401,6 +401,23 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        if (pathname === "/api/v1/teacher/courses") {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          demand(
+            Object.keys(input).every((field) => field === "displayName"),
+            "新建课程参数无效。",
+          );
+          return send(response, 200, {
+            data: execute(
+              db,
+              token!,
+              "sports.course.create",
+              { name: input.displayName },
+              key,
+            ),
+          });
+        }
         const noticeRead = /^\/api\/v1\/notifications\/([^/]+)\/read$/.exec(
           pathname,
         );

@@ -268,6 +268,24 @@ export function sportsCourseCommand(
       dailyLimit: 1,
     });
   }
+  if (action === "sports.course.create") {
+    sportsRole(repo, actor, "teacher");
+    demand(
+      Object.keys(input).every((key) => key === "name"),
+      "新建课程仅接受课程名称，规则须另行配置。",
+    );
+    const semesters = repo
+      .all("sportsSemester")
+      .filter((item) => item.data.status === "CURRENT");
+    demand(semesters.length === 1, "请先确认唯一的当前体育学期。", 409);
+    return repo.create("sportsCourse", actor.id, {
+      name: textField(input, "name", 100),
+      semesterId: semesters[0].id,
+      status: "DRAFT",
+      settlementStatus: "PENDING",
+      enrollmentOpen: false,
+    });
+  }
   if (action === "sports.course.save") {
     sportsRole(repo, actor, "teacher");
     const old = input.id ? ownedCourse(repo, actor, input.id) : undefined;
@@ -292,6 +310,9 @@ export function sportsCourseCommand(
     version(course, input);
     currentSemester(repo, course.data.semesterId);
     demand(course.data.status === "DRAFT", "课程已发布，不能重复发布。", 409);
+    textField(course.data, "name", 100);
+    textField(course.data, "description", 1000);
+    courseRules(repo, course.data);
     checkFeasibility(course.data);
     const published = repo.save(course, {
       status: "PUBLISHED",
