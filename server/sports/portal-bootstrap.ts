@@ -1,9 +1,68 @@
-import { demand, type Account } from "../auth";
+import { authenticate, demand, type Account } from "../auth";
+import type { Database } from "../database";
+import { execute } from "../commands";
 import { Repository, type Fields } from "../repository";
 import { sportsAccountGate } from "./account-gate";
 import { requireSportsPermission } from "./permissions";
 import { currentSystem, sportsWriteGate } from "./system";
 import type { ConversionRow } from "./conversion-seed";
+
+export function portalEnduranceWrite(
+  db: Database,
+  token: string,
+  wireRowId: string | undefined,
+  deleting: boolean,
+  input: Fields,
+  key: string,
+) {
+  const repo = new Repository(db);
+  const tables = portalEnduranceTables(repo, authenticate(db, token));
+  const table = tables.find(
+    (t) =>
+      t.gender === input.gender &&
+      t.gradeGroup === input.gradeGroup &&
+      t.runType === input.runType,
+  );
+  demand(table, "换算表类型无效。", 404);
+  let rowId: string | undefined;
+  if (wireRowId !== undefined) {
+    demand(wireRowId.startsWith(table.id + ":"), "换算行不属于当前表。", 409);
+    rowId = wireRowId.slice(table.id.length + 1);
+    demand(rowId.length > 0, "换算行标识无效。");
+  }
+  demand(!deleting || rowId, "缺少删除行标识。");
+  const command: Fields = { id: table.id, version: input.expectedVersion };
+  if (rowId) command.rowId = rowId;
+  if (deleting) command.confirmed = true;
+  else {
+    demand(
+      typeof input.tier === "string" &&
+        ["excellent", "good", "pass", "fail"].includes(input.tier),
+      "等级无效。",
+    );
+    Object.assign(command, {
+      min: input.minSeconds,
+      max: input.maxSeconds,
+      score: input.score,
+      grade: input.tier.toUpperCase(),
+      note: input.note ?? "",
+    });
+  }
+  execute(
+    db,
+    token,
+    deleting
+      ? "sports.conversion.remove"
+      : rowId
+        ? "sports.conversion.edit"
+        : "sports.conversion.add",
+    command,
+    key,
+  );
+  return portalEnduranceTables(repo, authenticate(db, token)).find(
+    (t) => t.id === table.id,
+  )!;
+}
 
 export function portalAnnouncement(repo: Repository) {
   const system = currentSystem(repo);

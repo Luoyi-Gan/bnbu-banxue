@@ -30,6 +30,7 @@ import {
   portalAnnouncement,
   portalHealth,
   portalEnduranceTables,
+  portalEnduranceWrite,
 } from "./sports/portal-bootstrap";
 import { administratorSelf } from "./sports/administrator-deletion";
 import {
@@ -386,6 +387,26 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const enduranceWrite =
+          /^\/api\/v1\/admin\/endurance-tables\/rules(?:\/([^/]+)(\/delete)?)?$/.exec(
+            pathname,
+          );
+        if (enduranceWrite) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalEnduranceWrite(
+              db,
+              token!,
+              enduranceWrite[1]
+                ? decodeURIComponent(enduranceWrite[1])
+                : undefined,
+              !!enduranceWrite[2],
+              input,
+              key,
+            ),
+          });
+        }
         const subadminDelete =
           /^\/api\/v1\/admin\/subadmins\/([^/]+)\/delete$/.exec(pathname);
         if (subadminDelete) {
