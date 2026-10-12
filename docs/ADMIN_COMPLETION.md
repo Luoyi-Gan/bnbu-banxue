@@ -2110,3 +2110,9 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 - 从 PostgreSQL 混合测试中移除已删除体育平台实现对应的测试，保留33项伴学持久化、账号、社区、预约、通知、活动邮件、校友与隐私测试；在真实本地PostgreSQL上33/33通过。
 - 删除12个引用已删除体育模块的专用测试文件；这些用例仅验证越界体育业务，不将删去用例记作功能验证通过。原测试可从清理前bundle恢复。
 - 仍有其他体育协议/前端测试待逐项审查；本轮未声称完整测试集通过。
+
+### 2026-10-12 越界实现清理：未使用的前端体育操作组件
+- 从src生产导入关系核对，删除30个当前路由不引用的旧体育操作组件（LiveSports及其打卡、审核、成绩、结算、教学/管理表单等）。精确清单：`D:/伴学/archive/goal-scope-rollback-20261012/frontend-unused.json`。
+- 当前SportsPortal、SportsDashboard及学生SportsProgressCard均保留，未调整现用页面布局。
+- 前端TypeScript及Vite生产构建通过；仍有现存大chunk提示，不是本次删除引起的功能失败。
+- 发现V2Sports仍嵌入完整/student平台，尚待改为只读展示并清理public体育资源；未将该剩余项称为已完成。
