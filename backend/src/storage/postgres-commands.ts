@@ -15,6 +15,7 @@ import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
 import { postgresPassword } from './postgres-password';
 import { postgresAdministratorState, postgresAdministratorCreate, postgresAdministratorEdit, requirePostgresSuperAdmin } from './postgres-administrators';
+import { postgresAdministratorDelete } from './postgres-admin-deletion';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -41,6 +42,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     else if(action==='sports.admins.state') result=await postgresAdministratorState(repo,actor,input);
     else if(action==='sports.admins.create') result=await postgresAdministratorCreate(repo,actor,input);
     else if(action==='sports.admins.edit') result=await postgresAdministratorEdit(repo,actor,input);
+    else if(action==='sports.admins.delete' || action==='sports.account.close') result=await postgresAdministratorDelete(repo,actor,action,input);
     else if(action.startsWith('notification.')) result=await runAsync(notificationPolicy(repo,actor,action,input));
     else {
       const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input)) ?? await runAsync(alumniPolicy(repo,actor,action,input));

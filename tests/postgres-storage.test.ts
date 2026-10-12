@@ -18,6 +18,7 @@ import { postgresWorkspace } from '../backend/src/storage/postgres-workspace';
 import { postgresStudentSearch } from '../backend/src/storage/postgres-student-search';
 import { postgresAdministratorDirectory } from '../backend/src/storage/postgres-administrators';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from '../backend/src/storage/postgres-admin-email';
+import { postgresAdministratorSelf } from '../backend/src/storage/postgres-admin-deletion';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -201,6 +202,25 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const exhausted=await issue();
     for(let i=0;i<5;i++) await expect(postgresAdminEmailConfirm(db,token,{challengeId:exhausted.id,code:'wrong'})).rejects.toMatchObject({code:'INVALID_CHALLENGE'});
     await expect(postgresAdminEmailConfirm(db,token,{challengeId:exhausted.id,code:exhausted.code})).rejects.toMatchObject({code:'INVALID_CHALLENGE'});
+  });
+  it('closes an independent admin login while retaining history and the personal account', async () => {
+    const auth=new PostgresAuth(db),login=await auth.login('new-manager','Changed-manager-123');
+    const snapshot=await postgresAdministratorSelf(db,login.token);
+    await expect(executePostgres(db,login.token,'sports.account.close',{...snapshot,confirmed:true,handoverConfirmed:false},randomUUID())).rejects.toThrow('职责移交');
+    await expect(executePostgres(db,login.token,'sports.account.close',{...snapshot,email:'stale@bnbu.edu.cn',confirmed:true,handoverConfirmed:true},randomUUID())).rejects.toMatchObject({status:409});
+    const id=login.account.id;
+    await executePostgres(db,login.token,'sports.account.close',{...snapshot,confirmed:true,handoverConfirmed:true},randomUUID());
+    await expect(auth.authenticate(login.token)).rejects.toMatchObject({status:401});
+    await expect(auth.login('new-manager','Changed-manager-123')).rejects.toMatchObject({status:401});
+    const row=(await db.pool.query('SELECT * FROM accounts WHERE id=$1',[id])).rows[0];
+    expect(row.login_kind).toBe('HISTORY');
+    expect([row.name,row.email,row.login_name,row.password_hash,row.organization]).toEqual([null,null,null,null,null]);
+    expect((await db.pool.query('SELECT id FROM admin_security_challenges WHERE account_id=$1',[id])).rows).toHaveLength(0);
+    const history=(await db.pool.query("SELECT data FROM entities WHERE kind='sportsAdminHistory' AND data::jsonb->>'administratorId'=$1",[id])).rows;
+    expect(history.length).toBeGreaterThan(1);
+    expect(JSON.stringify(history)).not.toContain('changed-manager@bnbu.edu.cn');
+    expect((await auth.login('state@example.test','State-test-123')).account.id).toBe('state-person');
+    expect((await db.pool.query("SELECT email FROM email_challenges WHERE email='new-manager@bnbu.edu.cn'")).rows).toHaveLength(1);
   });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
