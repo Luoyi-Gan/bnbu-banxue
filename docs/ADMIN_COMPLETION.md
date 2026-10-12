@@ -2347,3 +2347,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 剩余项核对：原页面社区详情和校友发现均传入实时后端对象；校园组织从共享实体与关系读取，未发现这几处回退到本地演示写入。BUSINESS_RULES 的待确认表移除已确认且已实现的邮件拆分/更正问题，正式身份范围排除体育授权开发。教师资料交流主题是否允许留空仍待用户回答，不擅自决定。可选正式预约制度、超时、到场等扩展未获新授权，保持现行规则。
 
 2026-10-12 交付检查命令复核：eslint . 按当前 eslint.config.js 扫描199个文件，0错误、0警告；tsconfig.app.json与tsconfig.server.json两项noEmit类型检查通过。排除生成产物、.runtime/data、artifacts、public/student和integrations，不能据此宣称这些原独立体育前端已lint。报告保存在.runtime/lint-current.json。
+
+2026-10-12 邮件规则正文一致性复核：现有 backend-concurrency 测试已覆盖关联更正的版本冲突、活动标识与收藏保留、幂等通知及来源保密；ConnectedApp 使用 MailResolution 提供拆分与关联更正入口。清理 BUSINESS_RULES 正文残留的待确认说法和一封邮件只能对应一条活动的旧限制，统一为用户已确认的管理员核对拆分/关联更正规则。本次仅修正文档，不改页面或运行逻辑；这些证据不代替 PostgreSQL 更正流程的单独验证。
