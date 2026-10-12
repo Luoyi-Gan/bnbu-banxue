@@ -1,6 +1,7 @@
 import { postgresCourseReport } from './storage/postgres-course-report';
 import { postgresRuleTemplates } from './storage/postgres-rule-templates';
 import { postgresInvitationPreview } from './storage/postgres-invitation-preview';
+import { requestStudentJoinEmail, verifyStudentJoinEmail } from './storage/postgres-student-email';
 import { reportCsv } from './sports/report';
 import { courseWindowInput, courseInviteInput, courseInviteProjection } from './sports/portal-courses';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
@@ -162,6 +163,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        if(['/api/v1/auth/student-sign-in-codes','/api/v1/auth/student-sign-in-codes/verify'].includes(pathname) && input.joinInviteToken!==undefined) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          const result=pathname.endsWith('/verify')?await verifyStudentJoinEmail(db,input,key):await requestStudentJoinEmail(db,input,key,options.localOutbox);
+          return send(response,200,{data:result});
+        }
         const courseInvite=/^\/api\/v1\/class-sections\/([^/]+)\/course-invites(\/revocations)?$/.exec(pathname);
         if(courseInvite) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');

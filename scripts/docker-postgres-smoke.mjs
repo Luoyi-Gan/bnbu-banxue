@@ -215,6 +215,11 @@ try {
   const publishedInvite=await sessionWrite(invitePath,{expiresInMinutes:5});assert.equal(publishedInvite.status,'ACTIVE');
   assert.match(publishedInvite.inviteToken,/^v1\.[A-Za-z0-9_-]{16}$/);
   const publicPreview=await fetch(base+'/api/v1/course-invites/'+publishedInvite.inviteToken+'/preview');assert.equal(publicPreview.status,200);assert.equal((await publicPreview.json()).data.enrollmentOpen,true);
+  const joinEmail='y'+String(Math.floor(Math.random()*1000000000)).padStart(9,'0')+'@bnbu.edu.cn';
+  const emailChallenge=await sessionWrite('/api/v1/auth/student-sign-in-codes',{organizationCode:'BNBU',account:joinEmail,channel:'EMAIL',locale:'zh-CN',joinInviteToken:publishedInvite.inviteToken});assert.equal(emailChallenge.delivery,'local-outbox');
+  const joinMail=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${joinEmail}'`],{encoding:'utf8'});
+  const emailVerification={challengeId:emailChallenge.challengeId,code:/\d{6}/.exec(joinMail)[0],joinEmail,joinInviteToken:publishedInvite.inviteToken,deviceId:'docker-test'},emailVerifyKey=randomUUID();
+  const emailProof=await sessionWrite('/api/v1/auth/student-sign-in-codes/verify',emailVerification,emailVerifyKey);assert.ok(emailProof.joinEmailProof);assert.deepEqual(await sessionWrite('/api/v1/auth/student-sign-in-codes/verify',emailVerification,emailVerifyKey),emailProof);
   const joinStudentId=randomUUID(),joinStudentEmail='join-'+randomUUID()+'@example.test';
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind) SELECT '${joinStudentId}','${joinStudentEmail}',password_hash,'Docker joining student','["student"]','now','PERSONAL' FROM accounts WHERE id='${actor.id}'; INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES('${randomUUID()}','sportsIdentity','${joinStudentId}','{"role":"student","status":"verified"}','now','now')`],{stdio:'pipe'});
   await request('/api/auth/sign-in',{identifier:joinStudentEmail,password});
@@ -227,7 +232,7 @@ try {
   assert.equal((await sessionWrite(invitePath+'/revocations',{inviteToken:publishedInvite.inviteToken})).status,'REVOKED');
   assert.equal((await fetch(base+'/api/v1/course-invites/'+publishedInvite.inviteToken+'/preview')).status,410);
   await request('/api/commands',{action:'sports.course.close',input:{id:createdCourse.id,version:publishedView.version,reason:'Docker test completed'},requestId:randomUUID()});
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind IN ('sportsInvitation','sportsEnrollment','sportsEnrollmentFlow') AND data::jsonb->>'courseId'='${createdCourse.id}'); UPDATE accounts SET status='banned',roles='[]' WHERE id='${joinStudentId}'`],{stdio:'pipe'});
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM student_email_challenges WHERE invitation_id IN (SELECT id FROM entities WHERE kind='sportsInvitation' AND data::jsonb->>'courseId'='${createdCourse.id}'); DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind IN ('sportsInvitation','sportsEnrollment','sportsEnrollmentFlow') AND data::jsonb->>'courseId'='${createdCourse.id}'); UPDATE accounts SET status='banned',roles='[]' WHERE id='${joinStudentId}'`],{stdio:'pipe'});
   const teachingReport=await request('/api/sports/course-reports/'+courseId);
   assert.equal(teachingReport.reportType,'CURRENT_TEACHING_REPORT');
   assert.equal(teachingReport.rows.find(r=>r.enrollmentId===enrollmentId).facts.enduranceStatus,'NOT_RECORDED');

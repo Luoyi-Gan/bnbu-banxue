@@ -2,6 +2,7 @@ import { postgresCourseReport } from '../backend/src/storage/postgres-course-rep
 import { checkPostgresDeadlineReminders } from '../backend/src/storage/postgres-deadline-reminders';
 import { postgresRuleTemplates } from '../backend/src/storage/postgres-rule-templates';
 import { postgresInvitationPreview } from '../backend/src/storage/postgres-invitation-preview';
+import { requestStudentJoinEmail, verifyStudentJoinEmail, readStudentJoinEmailProof } from '../backend/src/storage/postgres-student-email';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
@@ -469,6 +470,28 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect(await response.text()).toContain('报表核对');
       expect((await fetch(url,{headers:{Cookie:`bnbu_session=${student.token}`}})).status).toBe(403);
     } finally {await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
+  });
+  it('binds school email challenges to invitations, limits attempts and retries proofs without granting roles', async()=>{
+    const invite=await db.transaction(async client=>{const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'CURRENT'}),course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,status:'PUBLISHED',enrollmentOpen:true});return repo.create('sportsInvitation',course.ownerId,{courseId:course.id,code:'v1.'+randomUUID(),status:'ACTIVE',expiresAt:Date.now()+600000});});
+    const input={organizationCode:'BNBU',account:'y123456789@bnbu.edu.cn',channel:'EMAIL',locale:'zh-CN',joinInviteToken:invite.data.code},key=randomUUID();
+    const sent=await requestStudentJoinEmail(db,input,key,true);expect(await requestStudentJoinEmail(db,input,key,true)).toEqual(sent);
+    await expect(requestStudentJoinEmail(db,input,randomUUID(),true)).rejects.toMatchObject({status:429});
+    const mail=(await db.pool.query('SELECT * FROM mail_outbox WHERE recipient=$1',[input.account])).rows;expect(mail).toHaveLength(1);
+    const otp=/\d{6}/.exec(mail[0].body)![0],verify={challengeId:sent.challengeId,code:otp,joinEmail:input.account,joinInviteToken:input.joinInviteToken,deviceId:'test-device'},verifyKey=randomUUID();
+    await expect(verifyStudentJoinEmail(db,{...verify,code:'wrong'},randomUUID())).rejects.toMatchObject({status:400});
+    const proved=await verifyStudentJoinEmail(db,verify,verifyKey);expect(await verifyStudentJoinEmail(db,verify,verifyKey)).toEqual(proved);
+    expect(await db.transaction(client=>readStudentJoinEmailProof(client,proved.joinEmailProof,invite.id))).toMatchObject({email:input.account});
+    await expect(db.transaction(client=>readStudentJoinEmailProof(client,proved.joinEmailProof+'x',invite.id))).rejects.toMatchObject({status:403});
+    await expect(db.transaction(client=>readStudentJoinEmailProof(client,proved.joinEmailProof,randomUUID()))).rejects.toMatchObject({status:403});
+    expect((await db.pool.query('SELECT * FROM accounts WHERE email=$1',[input.account])).rows).toHaveLength(0);
+    expect((await db.pool.query('SELECT * FROM mail_outbox WHERE recipient=$1',[input.account])).rows).toHaveLength(0);
+    expect((await db.pool.query('SELECT code_hash FROM student_email_challenges WHERE id=$1',[sent.challengeId])).rows[0].code_hash).toBeNull();
+    await db.pool.query('UPDATE student_email_challenges SET expires_at=0 WHERE id=$1',[sent.challengeId]);
+    await expect(db.transaction(client=>readStudentJoinEmailProof(client,proved.joinEmailProof,invite.id))).rejects.toMatchObject({status:403});
+    const locked=await requestStudentJoinEmail(db,{...input,account:'y123456788@bnbu.edu.cn'},randomUUID(),true);
+    for(let i=0;i<5;i++)await expect(verifyStudentJoinEmail(db,{...verify,challengeId:locked.challengeId,joinEmail:'y123456788@bnbu.edu.cn',code:'wrong'},randomUUID())).rejects.toMatchObject({status:400});
+    expect(Number((await db.pool.query('SELECT attempts FROM student_email_challenges WHERE id=$1',[locked.challengeId])).rows[0].attempts)).toBe(5);
+    const course=await db.transaction(client=>new PostgresRepository(client).get(invite.data.courseId));await db.pool.query('DELETE FROM entities WHERE id=$1',[course.data.semesterId]);
   });
   it('reads published template revisions with teacher access and denies students', async()=>{
     const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
