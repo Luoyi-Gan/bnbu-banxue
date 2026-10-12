@@ -2307,3 +2307,9 @@ Docker smoke 增加进程退出收尾：仅追踪本次创建的随机账号，�
 重新 fetch 后确认 origin/main 为 14fa16c，已合并 PR #11；本地核对起点 782e579 与远端存在分叉（远端独有 6、本地独有 195 个提交），不能称当前清理成果已推送。远端特有改动逐项检查后，保留通用 API AbortSignal、工作台身份响应校验和 BNBU_COMPANION_ORIGIN 开发代理配置，拒绝数组等非对象接口响应，并保留 HTTP 错误状态及业务 POST/幂等行为。没有重新引入独立体育账号、首次改密和维护门禁。既有 ConnectedApp/SportsPortal 页面布局不变；旧独立 WorkspaceSportsPage 不作为恢复业务理由。
 
 验证：src/live/api.test.ts 3 项通过；tsconfig.app.json 类型检查通过。此前 Docker 验证对应前一构建，本次接口保护尚未重新构建进容器。后续仍需处理交付分支并创建包含 backend/、PostgreSQL、Docker 分离与体育清理的新 PR；没有推送或合并远端主分支。
+
+### 2026-10-12 当前代码 Docker 复验（25ab7ca）
+
+已以 25ab7ca 工作树重新执行 docker compose -f compose.postgres.yaml up -d --build，前后端镜像构建成功并更新运行容器。真实 PostgreSQL 测试环境下 vitest 全量 260/260 通过，零失败、零跳过。scripts/docker-postgres-smoke.mjs 通过社区、组队、教师预约、校友认证与撤销、邮件活动、知识问答、重启持久化和退出登录验证；测试账号自动收尾，无外部体育写入。服务地址仍为 http://127.0.0.1:4188。
+
+构建有资源包超过 500kB 的提示，不影响构建通过。Compose 提示存在此前停止的 sports-api 孤立容器，本次未启动或删除该容器，保留历史数据。真实体育源、收件邮箱及外部服务配置边界不变。PR 尚未创建，不能将本地验证称为远端交付。
