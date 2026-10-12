@@ -21,6 +21,10 @@ import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
 import { portalLogin, portalMe, portalSecurity } from "./sports/portal";
 import {
+  portalNotifications,
+  portalNotificationRead,
+} from "./sports/portal-notifications";
+import {
   portalSystemRead,
   portalSystemHistory,
   portalSystemChange,
@@ -392,6 +396,16 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const noticeRead = /^\/api\/v1\/notifications\/([^/]+)\/read$/.exec(
+          pathname,
+        );
+        if (noticeRead) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalNotificationRead(db, token!, noticeRead[1], key),
+          });
+        }
         if (pathname === "/api/v1/me/account-deletion") {
           const key = request.headers["idempotency-key"];
           demand(typeof key === "string", "缺少操作幂等标识。");
@@ -690,6 +704,20 @@ export function createApiServer(
             authenticate(db, cookieToken(request)),
           ),
         });
+      if (request.method === "GET" && pathname === "/api/v1/notifications") {
+        const input = Object.fromEntries(
+          new URL(request.url!, "http://localhost").searchParams.entries(),
+        );
+        return send(
+          response,
+          200,
+          portalNotifications(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            input,
+          ),
+        );
+      }
       if (request.method === "GET" && pathname === "/api/auth/me")
         return send(response, 200, {
           account: authenticate(db, cookieToken(request)),
@@ -1036,7 +1064,7 @@ export function createApiServer(
       if (pathname.startsWith("/api/v1/"))
         return send(response, 503, {
           code: "SPORTS_SERVICE_REQUIRED",
-          message: "原体育后端未配置，请连接原服务后重试。",
+          message: "该原版页面接口尚未完成本地后端接线。",
         });
       send(response, 404, { code: "NOT_FOUND", message: "接口不存在。" });
     } catch (error) {
