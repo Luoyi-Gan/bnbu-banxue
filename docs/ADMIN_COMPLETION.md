@@ -1619,3 +1619,7 @@ Compose 重建并健康启动，扩展 Docker 冒烟：显式创建隔离学期/
 将 sportsSessionCommand 提取为同步/异步共用 sportsSessionPolicy，PostgreSQL 命令接通 sports.session.*，复用日期时间窗、有效成员、唯一未结束会话、游泳前凭证绑定及状态版本检查。真实 PostgreSQL 验证暂停、继续、结束持久化，旧版本拒绝、幂等暂停不重复事件；原 SQLite 普通/游泳会话测试继续通过，合计 50 项。服务端类型检查与 lint 通过。PostgreSQL 开始运动场景和学生 /api/v1 会话协议仍待测试接线，本轮未更新 Docker，UI 未改。
 
 用户已确认邮件及手机推送默认关闭，站内通知保留，接好发送服务后学生自行开启；规则已写入 BUSINESS_RULES.md，偏好接口实现仍待继续。
+
+### 体育偏好读取和语言保存
+
+接通 GET/PATCH /api/v1/me/preferences，保留学生页面的 locale/pushEnabled/emailEnabled/version 协议。复用本人 preferences 实体，新增体育字段而不覆盖资料预览、学号搜索或伴学提醒开关。语言默认 zh-CN，邮件/推送默认 false，尚未接通发送服务时开启请求明确 503；版本冲突返回前端识别的 CONFLICT_VERSION_MISMATCH。保存复用事务、审计、幂等回执，PATCH 保留同源检查。真实 PostgreSQL 验证默认值、语言保存、重试、旧版本拒绝、发送开关拒绝及原隐私字段保留，41 项数据库测试、类型检查及 lint 通过。HTTP/Docker 端到端偏好验证仍需补充，UI 未改。

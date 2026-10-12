@@ -21,6 +21,7 @@ import { requireSportsPermission } from '../sports/permissions';
 import { sportsAvailable } from '../sports/materials';
 import { projectSportsNotification } from '../sports/portal-notifications';
 import { sportsSessionPolicy } from '../sports/sessions';
+import { saveSportsPreferences, sportsPreferencesGate } from './postgres-sports-preferences';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -36,6 +37,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action==='sports.preferences.save') await sportsPreferencesGate(repo,actor);
     if(action==='sports.notification.read') {
       const identities=await repo.all('sportsIdentity');
       demand(identities.filter(i=>i.ownerId===actor.id && i.data.status==='verified' && ['student','teacher','admin'].includes(String(i.data.role))).length===1,'没有有效体育身份。',403);
@@ -56,6 +58,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     let result:Fields|undefined;
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action==='sports.preferences.save') result=await saveSportsPreferences(repo,actor,input);
     else if(action.startsWith('sports.session.')) {
       const session=await runAsync(sportsSessionPolicy(repo,actor,action,input));
       if(session) result={id:session.id};

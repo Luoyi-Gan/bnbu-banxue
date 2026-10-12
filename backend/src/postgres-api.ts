@@ -21,6 +21,7 @@ import { portalAnnouncement } from './sports/portal-bootstrap';
 import { postgresSportsMe } from './storage/postgres-sports-me';
 import { postgresStudentCourses } from './storage/postgres-student-courses';
 import { postgresSportsNotifications } from './storage/postgres-sports-notifications';
+import { postgresSportsPreferences } from './storage/postgres-sports-preferences';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean} = {}) {
@@ -30,6 +31,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      if(request.method==='GET' && pathname==='/api/v1/me/preferences') return send(response,200,{data:await postgresSportsPreferences(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && pathname==='/api/v1/notifications') return send(response,200,await postgresSportsNotifications(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && /^\/api\/v1\/teachers\/[^/]+$/.test(pathname)) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && (['/api/v1/semesters/current','/api/v1/enrollments'].includes(pathname) || /^\/api\/v1\/(courses|class-sections)(\/[^/]+)?$/.test(pathname))) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
@@ -52,9 +54,15 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         return send(response,200,{ok:true,storage:'postgresql',schemaVersion:result.rows[0].version});
       }
       if (request.method === 'GET' && pathname === '/api/auth/me') return send(response,200,{account:await auth.authenticate(cookieToken(request))});
-      if (request.method === 'POST') {
+      if (request.method === 'POST' || request.method==='PATCH') {
         demand(!request.headers.origin || origins.has(request.headers.origin),'来源不允许。',403);
         demand(request.headers['sec-fetch-site'] !== 'cross-site','跨站请求不允许。',403);
+        if(request.method==='PATCH') {
+          demand(pathname==='/api/v1/me/preferences','接口不存在。',404);
+          const key=request.headers['idempotency-key'];
+          demand(typeof key==='string','缺少操作幂等标识。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.preferences.save',await body(request),key)});
+        }
         if(pathname==='/api/timetable/recognize') {
           const actor=await auth.authenticate(cookieToken(request));
           student(actor);

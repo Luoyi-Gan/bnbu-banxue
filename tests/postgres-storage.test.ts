@@ -27,6 +27,7 @@ import { postgresSportsMe } from '../backend/src/storage/postgres-sports-me';
 import { postgresStudentCourses } from '../backend/src/storage/postgres-student-courses';
 import { postgresSportsNotifications } from '../backend/src/storage/postgres-sports-notifications';
 import { startClock } from '../backend/src/sports/session-clock';
+import { postgresSportsPreferences } from '../backend/src/storage/postgres-sports-preferences';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -147,6 +148,20 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','sports-reader-student',{role:'student',status:'verified'}));
     await expect(postgresSportsMe(db,studentLogin.token)).rejects.toMatchObject({status:403});
     await db.pool.query('DELETE FROM entities WHERE id=$1',[duplicate.id]);
+  });
+  it('stores sports language without enabling delivery or overwriting companion privacy settings', async () => {
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    expect(await postgresSportsPreferences(db,login.token)).toEqual({locale:'zh-CN',pushEnabled:false,emailEnabled:false,version:0});
+    await executePostgres(db,login.token,'preferences.preview',{enabled:false},randomUUID());
+    const current=await postgresSportsPreferences(db,login.token),key=randomUUID();
+    const input={locale:'en',pushEnabled:false,emailEnabled:false,expectedVersion:current.version};
+    const saved=await executePostgres(db,login.token,'sports.preferences.save',input,key);
+    expect(saved).toMatchObject({locale:'en',pushEnabled:false,emailEnabled:false});
+    expect(await executePostgres(db,login.token,'sports.preferences.save',input,key)).toEqual(saved);
+    await expect(executePostgres(db,login.token,'sports.preferences.save',input,randomUUID())).rejects.toMatchObject({code:'CONFLICT_VERSION_MISMATCH'});
+    await expect(executePostgres(db,login.token,'sports.preferences.save',{...input,expectedVersion:saved.version,pushEnabled:true},randomUUID())).rejects.toMatchObject({status:503});
+    const prefs=await db.transaction(client=>new PostgresRepository(client).all('preferences'));
+    expect(prefs.find(p=>p.ownerId==='sports-reader-student')?.data.profilePreview).toBe(false);
   });
   it('persists sports pause resume and end with ownership, versions and idempotency', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
