@@ -1485,3 +1485,6 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 
 ### PostgreSQL 首次改密门禁与会话撤销
 接通 sports.password.change 命令，保留有效教师/管理员、维护状态、身份版本与当前密码校验。首次改密账号仅该命令豁免门禁；密码更新、身份更新、其他会话撤销、通知及审计同事务提交，当前会话保留。真实 PostgreSQL 22 项测试通过，新增首次门禁、错密码不撤销会话、成功后旧密码失效及其他会话失效、重试只更新一次案例。服务端类型检查与修改文件 lint 通过。管理目录、邮箱挑战及独立账号建管仍待接通，不代表管理端全链完成。
+
+### 独立 PostgreSQL Compose 与导入命令
+新增 frontend/Dockerfile、Nginx 同源 API 代理及 compose.postgres.yaml，使用独立 4188 端口和 PostgreSQL 数据卷，原验收环境不变。Compose 配置校验通过；Docker 构建仍在 npm ci 阶段，尚未验证容器启动。新增离线 SQLite 导入 CLI，复用已有只读快照、空目标检查及事务导入实现；本地三入口构建、类型检查和修改文件 lint 通过。未对原验收数据库执行导入。操作说明见 docs/POSTGRES_DOCKER.md。
