@@ -32,7 +32,7 @@ export function SportsPortal() {
     return () => { active = false; window.removeEventListener("focus", refresh); };
   }, []);
   const url = import.meta.env.VITE_SPORTS_TEACHER_URL ||
-    (import.meta.env.DEV ? "http://127.0.0.1:4186/" : "");
+    "https://www.teacher.bnbusports.cn/#admin/accounts";
   const semester = data?.semesters?.find(item => item.data.status === "CURRENT");
   const courses = data?.courses?.filter(course => course.data.semesterId === semester?.id &&
     data.enrollments.some(item => item.ownerId === data.identity.ownerId && item.data.courseId === course.id && item.data.status === "ACTIVE")) ?? [];
@@ -43,7 +43,8 @@ export function SportsPortal() {
       <p>前往体育平台进行课程和运动操作。</p>
       {url ? <a className="v2-button v2-button-primary" href={url}>进入体育平台</a> : <p role="status">体育平台地址尚未配置。</p>}
       {error ? <p role="status">运动数据暂不可用：{error}</p> : !data ? <p role="status">正在读取运动数据…</p> : data.identity?.data.role === "student" ? <>
-        <h3>本学期运动数据</h3>
+        <h3>伴学本地已接入的运动数据</h3>
+        <p>此处数据尚未与线上体育平台同步。</p>
         {!courses.length && <p>暂无本学期有效课程。</p>}
         {courses.map(course => {
           const progress = data.progress?.find(item => item.ownerId === data.identity.ownerId && item.data.courseId === course.id);
