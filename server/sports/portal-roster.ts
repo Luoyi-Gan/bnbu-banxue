@@ -1,6 +1,13 @@
-import { demand } from "../auth";
+import { demand, ServiceError, type Account } from "../auth";
 import { execute } from "../commands";
-import { Repository } from "../repository";
+import {
+  Repository,
+  integerField,
+  type Entity,
+  type Fields,
+} from "../repository";
+import { ownedCourse } from "./courses";
+import { sportsWriteGate } from "./system";
 import { uploadRosterFile } from "./roster-files";
 import { workbookAccess, type WorkbookSheet } from "./workbook";
 
@@ -61,7 +68,14 @@ export async function portalRosterUpload(
     { id: source.id, sheet: sheet.index, fieldMapping: mapping },
     key,
   ) as { id: string };
-  const imported = repo.get(result.id, "sportsPortalRosterImport"),
+  return rosterImportView(
+    repo,
+    repo.get(result.id, "sportsPortalRosterImport"),
+  );
+}
+
+function rosterImportView(repo: Repository, imported: Entity) {
+  const courseId = String(imported.data.courseId),
     draft = repo.get(imported.data.draftId, "sportsRosterDraft");
   const rows = draft.data.rows as {
     studentNumber: string;
@@ -100,4 +114,137 @@ export async function portalRosterUpload(
     supersededAt: latest.id === imported.id ? null : latest.createdAt,
     failureCode: null,
   };
+}
+
+export function portalRosterRead(
+  repo: Repository,
+  actor: Account,
+  courseId: string,
+  current: boolean,
+  input: Fields,
+) {
+  ownedCourse(repo, actor, courseId);
+  sportsWriteGate(repo, "sports.roster.read");
+  const rows = repo
+    .all("sportsPortalRosterImport")
+    .filter((row) => row.data.courseId === courseId)
+    .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence));
+  if (current) {
+    if (!rows.length)
+      throw new ServiceError(
+        404,
+        "ROSTER_IMPORT_NOT_FOUND",
+        "本课程还没有导入名单。",
+      );
+    return { data: rosterImportView(repo, rows[0]) };
+  }
+  demand(
+    Object.keys(input).every((k) => ["limit", "cursor", "sort"].includes(k)) &&
+      (input.sort === undefined || input.sort === "-versionNumber"),
+    "名单版本查询参数无效。",
+  );
+  return rosterPage(
+    rows.map((row) => rosterImportView(repo, row)),
+    input,
+  );
+}
+
+function rosterPage<T extends { id: string }>(rows: T[], input: Fields) {
+  const limit =
+    input.limit === undefined
+      ? 100
+      : integerField({ value: Number(input.limit) }, "value", 1, 100);
+  const start =
+    input.cursor === undefined
+      ? 0
+      : rows.findIndex((row) => row.id === input.cursor) + 1;
+  demand(input.cursor === undefined || start > 0, "名单分页位置无效。");
+  const data = rows.slice(start, start + limit),
+    hasMore = start + limit < rows.length;
+  return {
+    data,
+    meta: {
+      pagination: {
+        total: rows.length,
+        limit,
+        hasMore,
+        nextCursor: hasMore ? data.at(-1)!.id : null,
+      },
+    },
+  };
+}
+
+export function portalRosterSource(
+  repo: Repository,
+  actor: Account,
+  id: string,
+) {
+  const imported = repo.get(id, "sportsPortalRosterImport");
+  ownedCourse(repo, actor, imported.data.courseId);
+  sportsWriteGate(repo, "sports.roster.read");
+  const source = repo.get(imported.data.sourceId, "sportsRosterSource");
+  const sheet = (source.data.sheets as WorkbookSheet[]).find(
+    (row) => row.index === imported.data.sheet,
+  );
+  demand(sheet, "名单原工作表缺失。", 409);
+  return {
+    sourceSha256: source.data.sha256,
+    sheetName: source.data.format === "CSV" ? null : sheet.name,
+  };
+}
+
+export function portalRosterEntries(
+  repo: Repository,
+  actor: Account,
+  id: string,
+  input: Fields,
+) {
+  const imported = repo.get(id, "sportsPortalRosterImport");
+  ownedCourse(repo, actor, imported.data.courseId);
+  sportsWriteGate(repo, "sports.roster.read");
+  demand(
+    Object.keys(input).every((k) => ["limit", "cursor", "sort"].includes(k)) &&
+      (input.sort === undefined || input.sort === "sourceRowNumber"),
+    "名单行查询参数无效。",
+  );
+  const draft = repo.get(imported.data.draftId, "sportsRosterDraft");
+  const rows = draft.data.rows as {
+    row: number;
+    sourceRow?: number;
+    studentNumber: string;
+    name: string;
+    columnError: boolean;
+    excluded: boolean;
+  }[];
+  return rosterPage(
+    rows
+      .map((row) => ({
+        id: `${imported.id}:${row.row}`,
+        rosterImportId: imported.id,
+        classSectionId: imported.data.courseId,
+        organizationId: null,
+        studentNumber: row.studentNumber || null,
+        fullName: row.name || null,
+        gender: null,
+        gradeYear: null,
+        collegeName: null,
+        majorName: null,
+        administrativeClassName: null,
+        sourceRowNumber: row.sourceRow ?? row.row,
+        rowValidationStatus:
+          row.columnError || !row.studentNumber || !row.name
+            ? "INVALID"
+            : rows.filter((other) => other.studentNumber === row.studentNumber)
+                  .length > 1
+              ? "DUPLICATED"
+              : "VALID",
+        rowErrorCodes: [
+          ...(row.columnError ? ["COLUMN_ERROR"] : []),
+          ...(!row.studentNumber ? ["MISSING_STUDENT_NUMBER"] : []),
+          ...(!row.name ? ["MISSING_FULL_NAME"] : []),
+        ],
+      }))
+      .sort((a, b) => a.sourceRowNumber - b.sourceRowNumber),
+    input,
+  );
 }

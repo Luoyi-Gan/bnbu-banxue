@@ -84,6 +84,49 @@ it("原版multipart名单上传保留原件与列选择，重试不重复且不�
       response = await post(key);
     expect(response.status).toBe(200);
     const saved = (await response.json()).data;
+    const read = (path: string, who = f.teacher) =>
+      fetch(path, { headers: { Cookie: `bnbu_session=${who.token}` } });
+    expect((await (await read(url + "/current")).json()).data.id).toBe(
+      saved.id,
+    );
+    const versions = await (
+      await read(url + "?limit=1&sort=-versionNumber")
+    ).json();
+    expect(versions.data).toHaveLength(1);
+    expect(versions.meta.pagination).toMatchObject({
+      hasMore: false,
+      nextCursor: null,
+    });
+    const root = url.slice(0, url.indexOf("/class-sections/"));
+    const entriesUrl = root + "/roster-imports/" + saved.id + "/entries";
+    const page = await (
+      await read(entriesUrl + "?limit=1&sort=sourceRowNumber")
+    ).json();
+    expect(page.data[0]).toMatchObject({
+      studentNumber: "0001",
+      fullName: "student",
+      sourceRowNumber: 2,
+    });
+    const next = await (
+      await read(
+        entriesUrl +
+          "?limit=1&cursor=" +
+          encodeURIComponent(page.meta.pagination.nextCursor),
+      )
+    ).json();
+    expect(next.data[0]).toMatchObject({
+      studentNumber: "0002",
+      fullName: "未注册",
+      sourceRowNumber: 3,
+    });
+    expect(next.meta.pagination.hasMore).toBe(false);
+    const sourceUrl = root + "/roster-imports/" + saved.id + "/source";
+    const source = (await (await read(sourceUrl)).json()).data;
+    expect(source.sourceSha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(source.sheetName).toBeNull();
+    for (const who of [f.student, f.other, f.admin])
+      for (const path of [url, url + "/current", entriesUrl, sourceUrl])
+        expect((await read(path, who)).status).toBe(403);
     expect(saved).toMatchObject({
       status: "VALIDATED",
       totalRowCount: 2,

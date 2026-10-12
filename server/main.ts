@@ -17,7 +17,12 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
-import { portalRosterUpload } from "./sports/portal-roster";
+import {
+  portalRosterUpload,
+  portalRosterRead,
+  portalRosterSource,
+  portalRosterEntries,
+} from "./sports/portal-roster";
 import {
   portalSettlementPreview,
   portalSettlementConfirm,
@@ -936,6 +941,49 @@ export function createApiServer(
           ),
         );
       }
+      const rosterImportsRead =
+        /^\/api\/v1\/class-sections\/([^/]+)\/roster-imports(\/current)?$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && rosterImportsRead)
+        return send(
+          response,
+          200,
+          portalRosterRead(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            rosterImportsRead[1],
+            !!rosterImportsRead[2],
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        );
+      const rosterSourceRead =
+        /^\/api\/v1\/roster-imports\/([^/]+)\/source$/.exec(pathname);
+      const rosterEntriesRead =
+        /^\/api\/v1\/roster-imports\/([^/]+)\/entries$/.exec(pathname);
+      if (request.method === "GET" && rosterEntriesRead)
+        return send(
+          response,
+          200,
+          portalRosterEntries(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            rosterEntriesRead[1],
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        );
+      if (request.method === "GET" && rosterSourceRead)
+        return send(response, 200, {
+          data: portalRosterSource(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            rosterSourceRead[1],
+          ),
+        });
       const settlementPreview =
         /^\/api\/v1\/class-sections\/([^/]+)\/settlement-(preview|check)$/.exec(
           pathname,
