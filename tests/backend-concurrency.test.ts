@@ -220,6 +220,45 @@ it("无效课表不能覆盖本人数据，也不能被其他账号读取", () =
   ).toBe(false);
 });
 
+it("管理员核对拆分和关联更正保持原来源、活动标识、订阅及事务", () => {
+  const { db, a, admin, run } = fixture();
+  const repo = new Repository(db);
+  const source = {messageId: "multi", subject: "两场活动", sender: "school@example.test",
+    body: "活动名称：上午讲座\n活动名称：下午比赛"};
+  const mail = run(admin, "mail.import", source);
+  const fields = {title: "上午讲座", description: "活动介绍", startAt: "2027-01-01T10:00:00+08:00",
+    endAt: "2027-01-01T11:00:00+08:00", location: "图书馆", host: "学院", conditions: ""};
+  const split = {id: mail.id, expectedVersion: 1, confirmed: true, reason: "核对两场活动",
+    activities: [fields, {...fields, title: "下午比赛", startAt: "2027-01-01T14:00:00+08:00", endAt: "2027-01-01T15:00:00+08:00"}]};
+  expect(() => run(a, "mail.split", split)).toThrow("运营");
+  expect(() => run(admin, "mail.split", {...split, activities: [fields, {...fields, location: ""}]})).toThrow();
+  expect(repo.all("activity")).toHaveLength(0);
+  expect(repo.all("mail")).toHaveLength(1);
+  run(admin, "mail.split", split);
+  expect(repo.all("activity")).toHaveLength(2);
+  expect(run(admin, "mail.import", source).id).toBe(mail.id);
+  expect(() => run(admin, "mail.split", {...split, expectedVersion: repo.get(mail.id).version})).toThrow("未处理");
+  const childId = (repo.get(mail.id).data.childMailIds as string[])[0];
+  const event = repo.all("activity").find(e => e.data.mailId === childId)!;
+  run(a, "relation.set", {id: event.id, kind: "save", enabled: true});
+  const revision = run(admin, "mail.import", {...source, messageId: "correction", subject: "地点更正",
+    body: "活动地点：T2", revision: true});
+  const update = {...fields, id: revision.id, targetMailId: childId, expectedVersion: 1,
+    targetVersion: repo.get(childId).version, confirmed: true, reason: "学校更正地点", location: "T2"};
+  expect(() => run(admin, "mail.revise", {...update, targetVersion: 0})).toThrow("已变化");
+  const key = randomUUID();
+  execute(db, admin.token, "mail.revise", update, key);
+  execute(db, admin.token, "mail.revise", update, key);
+  expect(repo.all("activity")).toHaveLength(2);
+  expect(repo.get(event.id).data.location).toBe("T2");
+  expect(repo.related(a.account.id, event.id, "save")).toBe(true);
+  expect(repo.all("mailRevision")).toHaveLength(1);
+  expect(db.prepare("SELECT * FROM notifications WHERE event='activity.changed'").all()).toHaveLength(1);
+  expect(repo.get(revision.id).data).toMatchObject({resolvedAs: "revision", targetMailId: childId});
+  expect((repo.get(revision.id).data.record as {source: {body: string}}).source.body).toBe("活动地点：T2");
+  expect(JSON.stringify(snapshot(db, a.account))).not.toContain("school@example.test");
+});
+
 it("课表重导入记录新来源时间，手动修正及无效导入保留原来源", () => {
   const { db, a, run } = fixture();
   const repo = new Repository(db);

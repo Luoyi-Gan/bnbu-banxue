@@ -35,6 +35,7 @@ import { prepareCommunityImage } from "../v2/communityImages";
 import { ManagementTools } from "./ManagementTools";
 import { LiveTimetable } from "./LiveTimetable";
 import { SportsPortal } from "./SportsPortal";
+import { MailResolution } from "./MailResolution";
 import { Modal, PageHeading } from "../v2/ui";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import "../v2/v2.css";
@@ -1533,6 +1534,7 @@ export function ConnectedApp() {
                             "textarea",
                           ),
                           f("cover", "活动相关附件封面", "image", true),
+                          f("revision", "这是更正邮件，先核对并关联原活动", "checkbox", true),
                         ])
                       }
                     >
@@ -1725,6 +1727,7 @@ export function ConnectedApp() {
                           维护封面
                         </button>
                         <p>{record.extraction.issues.join("；")}</p>
+                        <MailResolution source={entity} mails={all("mail")} onSaved={refresh} />
                         <div className="live-actions">
                           <button
                             className="v2-button v2-button-secondary"

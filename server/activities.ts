@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { initialV2State } from "../src/v2/model";
 import {
   correctActivityMail,
@@ -7,6 +8,7 @@ import {
 } from "../src/v2/mailActivityPolicy";
 import {
   mailFieldLabels,
+  normalizeMailTime,
   type MailActivityFields,
 } from "../src/v2/mailActivityAdapter";
 import { demand, type Account } from "./auth";
@@ -64,6 +66,39 @@ export function activityCommand(
   }
   if (!action.startsWith("mail.")) return undefined;
   operator(actor);
+  if (action === "mail.split" || action === "mail.revise") {
+    const source = repo.get(input.id, "mail");
+    const original = source.data.record as unknown as MailActivityRecord;
+    demand(input.confirmed === true, "请确认已核对原邮件及活动信息。");
+    demand(input.expectedVersion === source.version, "邮件已变化，请重新核对。", 409);
+    demand(original.status === "pending" && !source.data.resolvedAs && !source.data.parentMailId,
+      "仅未处理的待核实原邮件可以拆分或关联更正。", 409);
+    const reason = textField(input, "reason", 1000);
+    if (action === "mail.split") {
+      demand(Array.isArray(input.activities) && input.activities.length >= 2 && input.activities.length <= 50,
+        "请核对并提供 2–50 场活动。");
+      const children: string[] = [];
+      for (const fields of input.activities) {
+        demand(fields && typeof fields === "object" && !Array.isArray(fields), "活动信息格式无效。");
+        const record = { ...original, id: randomUUID(), eventId: randomUUID(), history: [...original.history] };
+        const child = repo.create("mail", actor.id, {record, parentMailId: source.id});
+        activityCommand(repo, actor, "mail.correct", {...fields as Fields, id: child.id, reason});
+        children.push(child.id);
+      }
+      return repo.save(source, {resolvedAs: "split", childMailIds: children, resolutionReason: reason, resolvedBy: actor.id});
+    }
+    const target = repo.get(input.targetMailId, "mail");
+    demand(target.id !== source.id && !target.data.resolvedAs, "请选择原活动对应的邮件。");
+    demand(input.targetVersion === target.version, "原活动已变化，请重新核对。", 409);
+    const targetRecord = target.data.record as unknown as MailActivityRecord;
+    demand(targetRecord.status !== "pending", "原活动须已核实发布或下架。");
+    activityCommand(repo, actor, "mail.correct", {...input, id: target.id, reason});
+    repo.create("mailRevision", actor.id, {
+      sourceMailId: source.id, targetMailId: target.id, sourceVersion: source.version,
+      targetVersion: target.version, resultingVersion: repo.get(target.id).version, reason,
+    });
+    return repo.save(source, {resolvedAs: "revision", targetMailId: target.id, resolutionReason: reason, resolvedBy: actor.id});
+  }
   const records = repo
     .all("mail")
     .map((e) => e.data.record as unknown as MailActivityRecord);
@@ -89,7 +124,8 @@ export function activityCommand(
           }
         : {}),
     };
-    const duplicate = records.find(
+    const duplicate = repo.all("mail").filter(e => !e.data.parentMailId)
+      .map(e => e.data.record as unknown as MailActivityRecord).find(
       (r) =>
         r.source.messageId === source.messageId ||
         (r.source.subject.trim() === source.subject &&
@@ -117,9 +153,18 @@ export function activityCommand(
         )!;
     }
     next = importActivityMail(state, source);
+    if (input.revision === true) {
+      const record = next.mailActivities![0];
+      record.status = "pending";
+      record.extraction.issues.push("更正邮件：等待管理员关联原活动并核对");
+      record.history[0].action = "更正邮件待核实";
+      record.history[0].reason = "管理员选择作为更正邮件导入";
+      next.localEvents = [];
+    }
   } else {
     const stored = repo.get(input.id, "mail"),
       record = stored.data.record as unknown as MailActivityRecord;
+    demand(!stored.data.resolvedAs, "该原邮件已完成拆分或关联，请操作对应活动。", 409);
     if (action === "mail.cover") {
       const cover = textField(input, "cover", 1500000),
         reason = textField(input, "reason", 1000);
@@ -162,6 +207,8 @@ export function activityCommand(
           ),
         ]),
       ) as unknown as MailActivityFields;
+      fields.startAt = normalizeMailTime(fields.startAt);
+      fields.endAt = normalizeMailTime(fields.endAt);
       next = correctActivityMail(
         state,
         record.id,
