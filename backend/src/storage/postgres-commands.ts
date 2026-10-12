@@ -19,6 +19,7 @@ import { postgresAdministratorDelete } from './postgres-admin-deletion';
 import { sportsHelpPolicy } from '../sports/help';
 import { requireSportsPermission } from '../sports/permissions';
 import { sportsAvailable } from '../sports/materials';
+import { projectSportsNotification } from '../sports/portal-notifications';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -34,6 +35,13 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action==='sports.notification.read') {
+      const identities=await repo.all('sportsIdentity');
+      demand(identities.filter(i=>i.ownerId===actor.id && i.data.status==='verified' && ['student','teacher','admin'].includes(String(i.data.role))).length===1,'没有有效体育身份。',403);
+      const systems=await repo.all('sportsSystem');
+      sportsAvailable({all:()=>systems});
+      demand(typeof input.id==='string' && (await client.query("SELECT 1 FROM notifications WHERE id=$1 AND recipient_id=$2 AND event LIKE 'sports.%'",[input.id,actor.id])).rows.length===1,'通知不存在。',404);
+    }
     if(action.startsWith('sports.admins.')) await requirePostgresSuperAdmin(repo,actor);
     if(action.startsWith('sports.help.')) {
       const identities=await repo.all('sportsIdentity'),system=await repo.all('sportsSystem');
@@ -47,6 +55,11 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     let result:Fields|undefined;
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action==='sports.notification.read') {
+      await runAsync(notificationPolicy(repo,actor,'notification.read',input));
+      const row=(await client.query<Fields>('SELECT n.*,e.kind AS target_kind,e.owner_id AS target_owner FROM notifications n LEFT JOIN entities e ON e.id=n.entity_id WHERE n.id=$1 AND n.recipient_id=$2',[input.id,actor.id])).rows[0];
+      result=projectSportsNotification(row,row.target_kind ? {kind:row.target_kind,owner_id:row.target_owner} : undefined);
+    }
     else if(action.startsWith('sports.help.')) {
       const article=await runAsync(sportsHelpPolicy(repo,actor,action,input));
       if(article) result={id:article.id};

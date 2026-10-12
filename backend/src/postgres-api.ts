@@ -63,6 +63,13 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
           return send(response,200,await recognize(request));
         }
+        const notificationRead=/^\/api\/v1\/notifications\/([^/]+)\/read$/.exec(pathname);
+        if(notificationRead) {
+          const key=request.headers['idempotency-key'];
+          demand(typeof key==='string','缺少操作幂等标识。');
+          if(request.headers['content-length'] && request.headers['content-length']!=='0' || request.headers['transfer-encoding']) demand(Object.keys(await body(request)).length===0,'已读操作不接受额外参数。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
+        }
         const input = await body(request);
         if(pathname==='/api/sports/admin-email/request') {
           demand(Object.keys(input).length===0,'邮箱验证只能使用本人当前邮箱。');

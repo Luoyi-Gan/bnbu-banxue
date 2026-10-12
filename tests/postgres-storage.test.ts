@@ -157,7 +157,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const second=await postgresSportsNotifications(db,login.token,{limit:'1',cursor:ids[1]});
     expect(second.data.map(n=>n.id)).toEqual([ids[0]]);
     await expect(postgresSportsNotifications(db,login.token,{cursor:ids[2]})).rejects.toMatchObject({status:409});
-    await executePostgres(db,login.token,'notification.read',{id:ids[1]},randomUUID());
+    const server=createPostgresApiServer(db);
+    await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+    const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    try {
+      const headers={Cookie:`bnbu_session=${login.token}`,'Idempotency-Key':randomUUID()};
+      const firstRead=await fetch(`${base}/api/v1/notifications/${ids[1]}/read`,{method:'POST',headers});
+      expect(firstRead.status).toBe(200);
+      const result=await firstRead.json();
+      expect(result.data.readAt).toEqual(expect.any(String));
+      expect(await (await fetch(`${base}/api/v1/notifications/${ids[1]}/read`,{method:'POST',headers})).json()).toEqual(result);
+      expect((await fetch(`${base}/api/v1/notifications/${ids[2]}/read`,{method:'POST',headers:{...headers,'Idempotency-Key':randomUUID()}})).status).toBe(404);
+    } finally {await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
     expect((await postgresSportsNotifications(db,login.token,{unreadOnly:'true'})).data.map(n=>n.id)).toEqual([ids[0]]);
   });
   it('returns the current semester without inventing one and rejects conflicting current semesters', async () => {

@@ -1605,3 +1605,7 @@ Compose 重建并健康启动，扩展 Docker 冒烟：显式创建隔离学期/
 ### 体育通知分页读取
 
 接通 PostgreSQL GET /api/v1/notifications，复用原通知字段投影，只查本人 sports.* 通知；游标归属重新验证，按时间/ID 稳定分页，支持未读筛选。学生、教师及管理员均须唯一有效体育身份，并保留首次改密和维护门禁。真实 PostgreSQL 验证其他收件人和非体育通知隐藏、翻页不重复、他人游标拒绝，以及复用 notification.read 后未读列表消失。数据库与原通知协议共 40 项通过，服务端类型检查和 lint 通过。学生网页 POST /notifications/:id/read 的协议适配尚未接通，不能宣称页面已读操作完成；本轮未更新 Docker，UI 未改。
+
+### 体育通知已读 HTTP 接线
+
+接通 POST /api/v1/notifications/:id/read，支持学生客户端无请求体形式并要求 Idempotency-Key。通过 sports.notification.read 事务包装复用 notificationPolicy，重试前检查当前身份、维护模式及本人 sports.* 通知归属，已读时间、审计、回执同事务提交。真实 HTTP 验证无请求体提交、重复请求结果一致、其他收件人 404，随后未读查询排除已读项。PostgreSQL 39 项测试、类型检查及 lint 通过；本轮未更新 Docker，UI 未改。
