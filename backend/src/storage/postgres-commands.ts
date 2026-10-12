@@ -49,7 +49,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input)) ?? await runAsync(alumniPolicy(repo,actor,action,input));
       if(entity) result={id:entity.id};
     }
-    demand(result,'该业务操作的 PostgreSQL 迁移尚未完成。',503);
+    demand(result,'不支持该业务操作。',404);
     const auditData = {result,...(action==='coffee.answer' ? {accepted:input.accept} : {}),...(action==='relation.set' ? {relation:{kind:input.kind,enabled:input.enabled===true}} : {}),...(['room.create','room.decide','room.finish','room.moderate'].includes(action) ? {teamResult:await repo.get(result.id)} : {})};
     await client.query('INSERT INTO audit(id,actor_id,role,action,entity_id,reason,data,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[randomUUID(),actor.id,actor.roles.join(','),action,typeof input.id==='string'?input.id:result.id ?? null,typeof input.reason==='string'?input.reason:'',JSON.stringify(auditData),timestamp()]);
     await client.query('INSERT INTO command_receipts(actor_id,request_id,request_hash,result,created_at) VALUES($1,$2,$3,$4,$5)',[actor.id,requestId,hash,JSON.stringify(result),timestamp()]);

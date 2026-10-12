@@ -56,6 +56,14 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       finally { await admin.end(); }
     }
   });
+  it('returns a permanent not-found error for unsupported commands without recording success', async () => {
+    const id=randomUUID(),token=randomUUID(),requestId=randomUUID();
+    await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',[id,id+'@example.test','unused','测试账号','["student"]','now']);
+    await db.pool.query('INSERT INTO sessions(token_hash,account_id,expires_at,created_at) VALUES($1,$2,$3,$4)',[digest(token),id,Date.now()+60000,'now']);
+    await expect(executePostgres(db,token,'unsupported.action',{},requestId)).rejects.toMatchObject({status:404,message:'不支持该业务操作。'});
+    expect((await db.pool.query('SELECT id FROM audit WHERE actor_id=$1',[id])).rows).toHaveLength(0);
+    expect((await db.pool.query('SELECT request_id FROM command_receipts WHERE actor_id=$1',[id])).rows).toHaveLength(0);
+  });
   it('rolls report decisions, notifications and receipts back when audit insertion fails', async () => {
     const owner=randomUUID(),reporter=randomUUID(),reviewer=randomUUID(),token=randomUUID(),key=randomUUID();
     for(const [id,role] of [[owner,'student'],[reporter,'student'],[reviewer,'reviewer']])
