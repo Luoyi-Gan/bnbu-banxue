@@ -20,6 +20,7 @@ import { postgresAdministratorDirectory } from '../backend/src/storage/postgres-
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from '../backend/src/storage/postgres-admin-email';
 import { postgresAdministratorSelf } from '../backend/src/storage/postgres-admin-deletion';
 import { postgresCommunityView } from '../backend/src/storage/postgres-community-view';
+import { postgresAccountDirectory } from '../backend/src/storage/postgres-account-directory';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -274,6 +275,20 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       if(previous===undefined) delete process.env.BNBU_OBJECT_DIRECTORY; else process.env.BNBU_OBJECT_DIRECTORY=previous;
       rmSync(root,{recursive:true,force:true});
     }
+  });
+  it('projects the student account directory without leaking login credentials', async () => {
+    const auth=new PostgresAuth(db),token=(await auth.login('password-manager','Changed-test-123')).token;
+    await expect(postgresAccountDirectory(db,token,'student',{})).rejects.toMatchObject({status:403});
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
+    try {
+      const data=await postgresAccountDirectory(db,token,'student',{id:'state-person'});
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].status).toBe('PENDING');
+      expect(data.items[0].verifiedEmail).toBeNull();
+      expect(JSON.stringify(data)).not.toContain('password_hash');
+      expect(JSON.stringify(data)).not.toContain('state@example.test');
+      await expect(postgresAccountDirectory(db,token,'student',{status:'DISABLED'})).rejects.toThrow('筛选状态');
+    } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);

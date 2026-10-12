@@ -15,6 +15,7 @@ import { passwordChangeRequired } from './sports/account-gate';
 import { PostgresRepository } from './storage/postgres-repository';
 import { postgresAdministratorDirectory } from './storage/postgres-administrators';
 import { postgresAdministratorSelf } from './storage/postgres-admin-deletion';
+import { postgresAccountDirectory } from './storage/postgres-account-directory';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean} = {}) {
@@ -24,6 +25,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const accountDirectory=/^\/api\/sports\/accounts\/(students|teachers)$/.exec(pathname);
+      if(request.method==='GET' && accountDirectory) return send(response,200,await postgresAccountDirectory(db,cookieToken(request) ?? '',accountDirectory[1]==='students'?'student':'teacher',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && pathname==='/api/sports/administrator-self') return send(response,200,await postgresAdministratorSelf(db,cookieToken(request) ?? ''));
       if(request.method==='GET' && pathname==='/api/sports/admin-email') return send(response,200,await postgresAdminEmailStatus(db,cookieToken(request) ?? ''));
       if(request.method==='GET' && pathname==='/api/sports/administrators') return send(response,200,await postgresAdministratorDirectory(db,cookieToken(request) ?? ''));

@@ -18,6 +18,11 @@ export function accountDirectory(
   sportsAccountGate(repo, actor);
   requireSportsPermission(repo, actor, "ACCOUNTS");
   sportsWriteGate(repo, "sports.accounts.read");
+  const accounts=repo.db.prepare('SELECT id,name,organization,status,email FROM accounts').all();
+  return projectAccountDirectory(repo,accounts,kind,input);
+}
+
+export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fields[],kind:'student'|'teacher',input:Fields) {
   demand(
     Object.keys(input).every((k) =>
       ["q", "status", "college", "cursor", "limit", "id"].includes(k),
@@ -51,11 +56,7 @@ export function accountDirectory(
       (i) => i.data.role === kind && i.ownerId && i.data.status === "verified",
     )
     .flatMap((i) => {
-      const row = repo.db
-        .prepare(
-          "SELECT id,name,organization,status,email FROM accounts WHERE id=?",
-        )
-        .get(i.ownerId!);
+      const row = accounts.find(a=>a.id===i.ownerId);
       if (!row) return [];
       const active =
         !!current &&

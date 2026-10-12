@@ -1533,3 +1533,6 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 
 ### Docker 图片持久化完成验证
 已等候原构建完成，再次构建纳入原子硬链接及 COS 启动预检修复。三容器健康启动，增强 docker-postgres-smoke.mjs 实测通过：头像提交成功、实体 JSON 仅存内部引用、重启 PostgreSQL 和 API 后工作台完整读回原头像；同时注册、登录、设置与退出链路通过。使用本地私有对象卷，非真实 COS 云联通。继续排查未迁移体育工作台/账号目录等页面调用；不将容器启动和此组冒烟测试当作三端全部功能完成。
+
+### PostgreSQL 学生教师只读账号目录
+提取 projectAccountDirectory 共用字段投影、学期成员状态推导、筛选和分页；PostgreSQL 接通 /api/sports/accounts/students 与 teachers，保留 ACCOUNTS 权限、首改及维护门禁。原账号目录 4 项与 PostgreSQL 30 项回归通过；补充实际 PostgreSQL 权限拒绝、未入班 PENDING、未核验邮箱隐藏及非法状态筛选场景后 PostgreSQL 31 项通过。服务端类型检查与接口 lint 通过，UI 未改。
