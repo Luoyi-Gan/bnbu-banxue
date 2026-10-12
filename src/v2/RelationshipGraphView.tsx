@@ -1,3 +1,5 @@
+import type { Workspace } from '../live/api'
+import { liveRelationships } from './liveRelationships'
 import { ArrowRight, CalendarDays, Maximize, Minus, Network, Plus, RotateCcw, Search, UsersRound, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Link } from 'react-router-dom'
@@ -11,10 +13,10 @@ import './relationshipGraph.css'
 type Engine = typeof import('./relationshipEngine')
 const dateLabel = (date: string | null) => date ? new Date(date).toLocaleString('zh-CN') : '未提供（不推测历史时间）'
 
-export function V2RelationshipGraph({ state }: { state: V2State }) {
+export function V2RelationshipGraph({ state, workspace }: { state: V2State; workspace?: Workspace | null }) {
   const { persistenceError } = useV2()
   const [demo, setDemo] = useState(false), [kind, setKind] = useState('all'), [relation, setRelation] = useState('all'), [query, setQuery] = useState(''), [history, setHistory] = useState(false), [page, setPage] = useState(0)
-  const real = useMemo(() => adaptRelationships(state), [state])
+  const real = useMemo(() => workspace !== undefined ? liveRelationships(workspace) : adaptRelationships(state), [state, workspace])
   const entities = useMemo(() => demo ? relationshipDemo() : real, [demo, real])
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(real.filter(e => e.members.length).slice(0, 2).map(e => e.id)))
   const [selectedId, setSelectedId] = useState('self'), [ready, setReady] = useState(false), [loadError, setLoadError] = useState(false), [retry, setRetry] = useState(0), [zoom, setZoom] = useState(100), [announcement, setAnnouncement] = useState('')
@@ -26,7 +28,7 @@ export function V2RelationshipGraph({ state }: { state: V2State }) {
   const selectedNode = graph.nodes.find(n => n.id === selectedId)
   const selected = entities.find(e => e.id === selectedNode?.entityId)
   const effectiveId = selectedNode ? selectedId : 'self'
-  const selectedChanges = !demo && selected ? state.relationshipHistory?.[selected.id]?.changes ?? [] : []
+  const selectedChanges = !demo && workspace === undefined && selected ? state.relationshipHistory?.[selected.id]?.changes ?? [] : []
 
   useEffect(() => {
     let disposed = false
