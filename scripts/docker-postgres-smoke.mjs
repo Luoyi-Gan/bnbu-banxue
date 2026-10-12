@@ -115,8 +115,18 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   await rejectCommand('room.review',reviewInput,409);
   await request('/api/auth/sign-in',{identifier:teacherId+'@example.test',password});
   const teacherCookie=cookie,start=Date.now()+86400000;
+  const teacherProfileInput={nickname:'容器交流教师',bio:'测试教师介绍',topics:'学习、实习',location:'初始默认地点'};
+  const teacherProfile=(await command('coffee.profile',teacherProfileInput)).data;
   const slots=[];
   for(const offset of [0,7200000]) slots.push((await command('coffee.slot.create',{startAt:new Date(start+offset).toISOString(),endAt:new Date(start+offset+3600000).toISOString(),capacity:1,location:'本地测试交流室'})).data);
+  cookie=authorCookie;
+  assert.equal((await request('/api/workspace')).entities.find(e=>e.id===teacherProfile.id).data.nickname,teacherProfileInput.nickname);
+  await rejectCommand('coffee.profile',{...teacherProfileInput,teacherId},403);
+  cookie=teacherCookie;
+  await command('coffee.profile',{...teacherProfileInput,location:'更新后的默认地点'});
+  const updatedTeacherView=await request('/api/workspace');
+  assert.equal(updatedTeacherView.entities.find(e=>e.id===teacherProfile.id).data.location,'更新后的默认地点');
+  assert.equal(updatedTeacherView.entities.find(e=>e.id===slots[0].id).data.location,'本地测试交流室');
   cookie=authorCookie;
   const booking=(await command('coffee.book',{slotId:slots[0].id,topic:'Docker交流预约'})).data;
   cookie=teacherCookie;

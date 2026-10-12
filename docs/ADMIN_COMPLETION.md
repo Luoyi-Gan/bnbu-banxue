@@ -2317,3 +2317,7 @@ Docker smoke 增加进程退出收尾：仅追踪本次创建的随机账号，�
 ### 2026-10-12 交付分支整合 origin/main 14fa16c
 
 新建 codex/banxue-postgres-readonly-delivery 合并远端已交付的 PR #10/#11 历史，保留当前验证版本。远端差异共 11 个路径已逐项核对：API 通用读取取消、身份响应校验和可配置代理已由 25ab7ca 纳入并测试；远端新增的独立 WorkspaceSportsPage、useSportsAccount、专用 CSS 与旧体育门禁测试并非当前 ConnectedApp 路由，不恢复已清理的替代入口。业务规则和交接采用最新只读源、部署时配置边界，不能恢复远端旧“先接本地体育库”和 server/ 路径说明。截图保留本地既有历史版本，不作为新整合验收。三个冲突文件（api.ts、api.test.ts、ADMIN_COMPLETION.md）保留已通过 260 项测试的当前实现与完整后续交接。
+
+### 2026-10-12 教师资料跨端补验及 PR
+
+PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分支 codex/banxue-postgres-readonly-delivery；未合并。教师资料页通过 useWorkspaceBackend.mutate 调用 coffee.profile，非本地 store 保存。Docker smoke 补验教师资料保存后学生共享读取、学生不能代改教师资料、修改默认地点不改写已开放时段地点，完整脚本通过。本次只扩展验收覆盖，无页面布局或业务规则变化。
