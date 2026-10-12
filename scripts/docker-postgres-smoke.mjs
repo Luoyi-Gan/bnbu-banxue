@@ -67,6 +67,16 @@ assert.equal(sportsMe.user.role,'STUDENT');
 assert.equal(sportsMe.user.emailVerified,false);
 assert.equal(sportsMe.studentProfile.studentNumber,null);
 assert.equal(sportsMe.studentProfile.fullName,actor.name);
+const notificationId=randomUUID();
+execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO notifications(id,recipient_id,event,body,created_at) VALUES('${notificationId}','${actor.id}','sports.fixture','Docker notification','2026-10-12T00:00:00Z')`],{stdio:'pipe'});
+assert.ok((await request('/api/v1/notifications?unreadOnly=true')).data.some(n=>n.id===notificationId));
+const readHeaders={Cookie:cookie,Origin:base,'Idempotency-Key':randomUUID()};
+const readResponse=await fetch(`${base}/api/v1/notifications/${notificationId}/read`,{method:'POST',headers:readHeaders});
+assert.equal(readResponse.status,200);
+const readResult=await readResponse.json();
+assert.ok(readResult.data.readAt);
+assert.deepEqual(await (await fetch(`${base}/api/v1/notifications/${notificationId}/read`,{method:'POST',headers:readHeaders})).json(),readResult);
+assert.ok(!(await request('/api/v1/notifications?unreadOnly=true')).data.some(n=>n.id===notificationId));
 const semesterId=randomUUID(),courseId=randomUUID(),enrollmentId=randomUUID();
 // Create isolated read fixtures; this does not claim the course creation flow is migrated.
 const fixtureRows=[

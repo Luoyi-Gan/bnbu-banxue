@@ -1609,3 +1609,7 @@ Compose 重建并健康启动，扩展 Docker 冒烟：显式创建隔离学期/
 ### 体育通知已读 HTTP 接线
 
 接通 POST /api/v1/notifications/:id/read，支持学生客户端无请求体形式并要求 Idempotency-Key。通过 sports.notification.read 事务包装复用 notificationPolicy，重试前检查当前身份、维护模式及本人 sports.* 通知归属，已读时间、审计、回执同事务提交。真实 HTTP 验证无请求体提交、重复请求结果一致、其他收件人 404，随后未读查询排除已读项。PostgreSQL 39 项测试、类型检查及 lint 通过；本轮未更新 Docker，UI 未改。
+
+### 体育通知 Docker 闭环验证
+
+初次整组构建遇到 Docker Hub nginx 认证 EOF；本轮前端无修改，改为只重建 API，成功健康启动。增强 Docker 冒烟验证体育未读通知列表、无请求体标已读、同幂等键重试结果一致、未读列表移除，全部通过，原课程/成员和持久化断言继续通过。当前镜像已包含通知及任课教师读取实现。学生偏好接口核对发现语言更新还回传 pushEnabled/emailEnabled，尚待对照既有规则接入，未擅自将其合并为伴学红点开关；其余体育主流程继续推进。
