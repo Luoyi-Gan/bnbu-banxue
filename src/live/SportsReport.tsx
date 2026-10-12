@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api, type LiveEntity } from "./api";
-import type { CourseReport } from "../../backend/src/sports/report";
+import type { CourseReport } from "../../shared/live/courseReport";
 const status: Record<string, string> = {
   EXEMPT: "已免测",
   COMPLETE: "注册匹配完成",

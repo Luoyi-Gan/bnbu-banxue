@@ -6,6 +6,8 @@ import { reconcileRoster } from "./roster";
 import { sportsWriteGate } from "./system";
 import type { SportsClock } from "./session-clock";
 import { approvedExemption } from "./applications";
+import type { CourseReport } from '../../../shared/live/courseReport';
+export type { CourseReport } from '../../../shared/live/courseReport';
 
 /** Current teaching report, never a settlement publication or student-facing grade export. */
 export function courseReport(
@@ -18,7 +20,7 @@ export function courseReport(
   return buildCourseReport(repo, course);
 }
 /** Shared read-only source projection for authorized readers and server reminders. */
-export function buildCourseReport(repo: Repository, course: Entity) {
+export function buildCourseReport(repo: Repository, course: Entity): CourseReport {
   const courseId = course.id;
   const now = Date.now();
   const cache = new Map<string, Entity[]>();
@@ -268,7 +270,6 @@ export function buildCourseReport(repo: Repository, course: Entity) {
     limitations: ["当前教学报告不是冻结结算版本"],
   };
 }
-export type CourseReport = ReturnType<typeof courseReport>;
 /** Formula-looking text is escaped for spreadsheet readers; source facts remain untouched. */
 export function reportRows(report: CourseReport) {
   const data: unknown[][] = [

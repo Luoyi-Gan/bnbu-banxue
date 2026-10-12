@@ -16,6 +16,7 @@ import { occupiedPolicy } from '../backend/src/coffee';
 import { runAsync } from '../backend/src/storage/effects';
 import { postgresWorkspace } from '../backend/src/storage/postgres-workspace';
 import { postgresStudentSearch } from '../backend/src/storage/postgres-student-search';
+import { postgresAdministratorDirectory } from '../backend/src/storage/postgres-administrators';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -60,6 +61,21 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const saved=await db.transaction(client=>new PostgresRepository(client).get(identity.id));
     expect(saved.data.mustChangePassword).toBe(false);
     expect(saved.version).toBe(identity.version+1);
+  });
+  it('restricts administrator directory to verified superadmins and excludes credentials', async () => {
+    const auth=new PostgresAuth(db);
+    const login=await auth.login('password-manager','Changed-test-123');
+    await expect(postgresAdministratorDirectory(db,login.token)).rejects.toMatchObject({status:403});
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
+    const directory=await postgresAdministratorDirectory(db,login.token);
+    expect(directory.items.find(i=>i.id==='password-admin')?.loginName).toBe('password-manager');
+    expect(JSON.stringify(directory)).not.toContain('password_hash');
+    expect(JSON.stringify(directory)).not.toContain('Changed-test-123');
+    expect(directory.permissions).toHaveLength(8);
+    const system=await db.transaction(client=>new PostgresRepository(client).create('sportsSystem','password-admin',{mode:'MAINTENANCE'}));
+    await expect(postgresAdministratorDirectory(db,login.token)).rejects.toMatchObject({status:503});
+    await db.transaction(client=>new PostgresRepository(client).save(system,{mode:'NORMAL'}));
+    await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'");
   });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
