@@ -105,7 +105,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
       if (mode === "login") {
         if (adminLogin) await authApi.adminLogin(normalizedEmail, password);
         else await authApi.login(normalizedEmail, password);
-        navigate("/workspace", { replace: true });
+        navigate(location.state?.returnTo === "/v2/community" ? "/v2/community" : "/workspace", { replace: true });
       } else {
         await authApi.register(normalizedEmail, code.trim(), password);
         navigate("/v2/login", { replace: true, state: { registered: true } });

@@ -50,7 +50,7 @@ export function mappedRosterCsv(csv: string, value: unknown) {
     .slice(0, 2)
     .map((name) => header.findIndex((cell) => cell.trim() === name));
   // Keep every source column and row shape, including malformed rows, for review.
-  const renamed = header.map((name, index) =>
+  const renamed = header.map((_, index) =>
     index === indexes[0]
       ? "student_number"
       : index === indexes[1]
