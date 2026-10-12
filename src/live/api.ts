@@ -1,3 +1,4 @@
+import type { RelationshipHistory } from '../v2/relationshipAdapter';
 import type { AlumniData } from "../v2/alumniModel";
 import type { SportsCompanion } from "./sportsCompanion";
 export interface LiveAccount {
@@ -47,6 +48,7 @@ export interface Workspace {
     roles?: string[];
   }[];
   relations: { entityId: string; kind: string; createdAt: string }[];
+  relationshipHistory?: RelationshipHistory[];
   audit: {
     id: string;
     actor_id: string;

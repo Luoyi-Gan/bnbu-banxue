@@ -28,9 +28,12 @@ export function liveRelationships(data: Workspace | null): RelationshipEntity[] 
     const own = person.owner === actor
     result.push({...base, id: 'coffee:alumni:' + b.id, sourceId: b.id, title: '与' + (own ? data.people.find(p => p.id === b.student)?.name ?? '同学' : person.name) + '交流', kind: 'coffee', relation: 'booked', active: b.status === 'confirmed', status: b.status === 'confirmed' ? '校友已确认 · 未核实到场' : '交流申请或预约已取消', path: own ? '/v2/alumni?view=manage' : '/v2/alumni?view=bookings'})
   }
+  for (const h of data.relationshipHistory ?? []) {
+    if (!result.some(e => e.id === h.entity.id)) result.push({...h.entity, members: [], memberAccess: '历史关系不展示其他成员。'})
+  }
   return result.map(item => {
     if (item.kind === 'activity' && item.relation === 'hosted')
-      return {...item, establishedAt: data.entities.find(e => e.id === item.sourceId)?.createdAt ?? null}
+      return {...item, establishedAt: data.entities.find(e => e.id === item.sourceId)?.createdAt ?? item.establishedAt}
     if (item.relation === 'marked' || item.relation === 'followed')
       return {...item, establishedAt: data.relations.find(r => r.entityId === item.sourceId && r.kind === (item.relation === 'marked' ? 'participate' : 'follow'))?.createdAt ?? null}
     if (item.id.startsWith('coffee:alumni:'))

@@ -28,7 +28,7 @@ export function V2RelationshipGraph({ state, workspace }: { state: V2State; work
   const selectedNode = graph.nodes.find(n => n.id === selectedId)
   const selected = entities.find(e => e.id === selectedNode?.entityId)
   const effectiveId = selectedNode ? selectedId : 'self'
-  const selectedChanges = !demo && workspace === undefined && selected ? state.relationshipHistory?.[selected.id]?.changes ?? [] : []
+  const selectedChanges = !demo && selected ? (workspace !== undefined ? workspace?.relationshipHistory?.find(h => h.entity.id === selected.id)?.changes ?? [] : state.relationshipHistory?.[selected.id]?.changes ?? []) : []
 
   useEffect(() => {
     let disposed = false

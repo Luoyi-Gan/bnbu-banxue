@@ -42,6 +42,20 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("关系历史只返回本人操作，下架对象不泄露旧标题", () => {
+    const {a,b,run,repo,db} = setup();
+    const event = repo.create("activity", b.id, {title:"私有后续标题",status:"published",startAt:new Date(Date.now()+86400000).toISOString()});
+    run(a,"relation.set",{id:event.id,kind:"participate",enabled:true});
+    run(a,"relation.set",{id:event.id,kind:"participate",enabled:true});
+    run(a,"relation.set",{id:event.id,kind:"participate",enabled:false});
+    const history = snapshot(db,a.account).relationshipHistory;
+    expect(history).toHaveLength(1);
+    expect(history[0].changes.map(c=>c.active)).toEqual([true,false]);
+    expect(history[0].entity).toMatchObject({active:false,title:"私有后续标题"});
+    expect(snapshot(db,b.account).relationshipHistory).toEqual([]);
+    repo.save(repo.get(event.id),{status:"hidden"});
+    expect(snapshot(db,a.account).relationshipHistory[0].entity).toMatchObject({title:"原对象当前不可见",active:false,path:"/v2/me"});
+  });
   it("校友方向只接受升学或就业，非法输入不创建或覆盖业务记录", () => {
     const { a, admin, run, db, repo } = setup();
     const input = { major: "计算机", graduationYear: 2024, city: "珠海",

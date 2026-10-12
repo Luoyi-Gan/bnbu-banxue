@@ -1,3 +1,4 @@
+import { relationshipHistory } from './relationship-history';
 import { randomUUID } from "node:crypto";
 import { authenticate, demand, digest, timestamp, type Account } from "./auth";
 import { transaction, type Database } from "./database";
@@ -439,6 +440,7 @@ export function snapshot(db: Database, actor: Account) {
     sports: sportsCompanion(repo, actor),
     entities,
     alumni: scopedAlumni,
+    relationshipHistory: relationshipHistory(db, actor.id, entities),
     notifications,
     people,
     notificationBatches: operate
