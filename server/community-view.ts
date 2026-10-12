@@ -21,6 +21,7 @@ export function communityView(db: Database, token: string) {
   const posts = visible.map((post) => ({
     id: post.id,
     ownerId: post.ownerId,
+    alumniId: typeof post.data.alumniId === "string" ? post.data.alumniId : undefined,
     title: String(post.data.title),
     body: String(post.data.body),
     board: String(post.data.board),

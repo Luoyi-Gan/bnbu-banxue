@@ -8,6 +8,7 @@ import { createAccount, login } from "../server/auth";
 import { createApiServer } from "../server/main";
 import { execute, snapshot } from "../server/commands";
 import { Repository } from "../server/repository";
+import { communityView } from "../server/community-view";
 
 const resources: (() => Promise<void> | void)[] = [];
 afterEach(async () => {
@@ -64,6 +65,9 @@ describe("API、持久化和跨角色联动", () => {
     for (const direction of ["升学", "就业"]) {
       const post = run(a, "alumni.post", { direction, title: "经验", body: "分享内容" });
       expect(repo.get(post.id).data.board).toBe(`校友${direction}`);
+      expect(communityView(db, a.token).posts.find(p => p.id === post.id))
+        .toMatchObject({ alumniId: profile.id, status: "pending" });
+      expect(communityView(db, admin.token).posts.find(p => p.id === post.id)).toBeUndefined();
     }
   });
   it("举报队伍不向非成员泄露历史成员名单，审核证据保持完整", () => {

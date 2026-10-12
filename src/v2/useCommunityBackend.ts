@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api, ApiError, command } from '../live/api'
+import { api, ApiError, command, workspaceChangedEvent } from '../live/api'
 import type { Post } from './model'
 
 type CommunityData = { account: { id: string; name: string }; posts: Post[]; likedPosts: string[]; savedPosts: string[] }
@@ -28,7 +28,8 @@ export function useCommunityBackend() {
     void refresh()
     const focus = () => { void refresh() }
     window.addEventListener('focus', focus)
-    return () => { active.current = false; invalidate(); window.removeEventListener('focus', focus) }
+    window.addEventListener(workspaceChangedEvent, focus)
+    return () => { active.current = false; invalidate(); window.removeEventListener('focus', focus); window.removeEventListener(workspaceChangedEvent, focus) }
   }, [refresh, invalidate])
   const mutate = async (action: string, input: Record<string, unknown>) => {
     if (locked.current) return null
