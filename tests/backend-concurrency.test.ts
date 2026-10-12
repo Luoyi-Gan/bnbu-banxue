@@ -172,7 +172,19 @@ it("无海报邮件用默认封面，修改时间地点通知参与或收藏者�
   const correction = {id: mail.id, title: "公开讲座", description: "核实说明",
     startAt: "2027-01-01T10:00:00+08:00", endAt: "2027-01-01T11:00:00+08:00",
     location: "T2", host: "学院", conditions: "", reason: "地点调整"};
-  run(admin, "mail.correct", correction);
+  const beforeMail = repo.get(mail.id);
+  const beforeEvent = repo.get(event.id);
+  const retryKey = randomUUID();
+  db.exec("CREATE TRIGGER fail_activity_notice BEFORE INSERT ON notifications WHEN NEW.event='activity.changed' BEGIN SELECT RAISE(ABORT,'notice failed'); END;");
+  expect(() => execute(db, admin.token, "mail.correct", correction, retryKey)).toThrow("notice failed");
+  expect(repo.get(mail.id)).toEqual(beforeMail);
+  expect(repo.get(event.id)).toEqual(beforeEvent);
+  expect(db.prepare("SELECT * FROM command_receipts WHERE request_id=?").get(retryKey)).toBeUndefined();
+  db.exec("DROP TRIGGER fail_activity_notice");
+  execute(db, admin.token, "mail.correct", correction, retryKey);
+  const corrected = repo.get(mail.id);
+  execute(db, admin.token, "mail.correct", correction, retryKey);
+  expect(repo.get(mail.id)).toEqual(corrected);
   const notices = () => db.prepare("SELECT recipient_id FROM notifications WHERE event='activity.changed'").all();
   expect(notices()).toEqual([{recipient_id: a.account.id}]);
   run(admin, "mail.correct", {...correction, description: "仅更新介绍"});
