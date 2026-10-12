@@ -178,10 +178,16 @@ export function portalFinalGradeWrite(
   enrollmentId: string,
   input: Fields,
   key: string,
+  correction = false,
 ) {
   demand(
     Object.keys(input).every((field) =>
-      ["finalGrade", "published", "expectedVersion"].includes(field),
+      [
+        "finalGrade",
+        "published",
+        "expectedVersion",
+        ...(correction ? ["correctionReason"] : []),
+      ].includes(field),
     ),
     "最终成绩不接受备注或其他附加字段。",
   );
@@ -192,17 +198,26 @@ export function portalFinalGradeWrite(
   const result = execute(
     db,
     token,
-    "sports.grade.append",
-    {
-      enrollmentId,
-      version: input.expectedVersion,
-      score: input.finalGrade,
-      published: input.published,
-    },
+    correction ? "sports.grade.correct" : "sports.grade.append",
+    correction
+      ? { ...input, enrollmentId }
+      : {
+          enrollmentId,
+          version: input.expectedVersion,
+          score: input.finalGrade,
+          published: input.published,
+        },
     key,
   ) as { id: string };
-  const saved = repo.get(result.id),
-    published = saved.kind === "sportsGradePublication";
+  let saved = repo.get(result.id);
+  if (saved.kind === "sportsSettlementReport") {
+    const change = repo.get(
+      saved.data.correctionId,
+      "sportsHistoricalCorrection",
+    );
+    saved = repo.get(change.data.resultId, "sportsGradePublication");
+  }
+  const published = saved.kind === "sportsGradePublication";
   demand(
     published || saved.kind === "sportsGradeHistory",
     "成绩提交回执无效。",

@@ -23,6 +23,45 @@ export function sportsCorrectionCommand(
   action: string,
   input: Fields,
 ): Entity | undefined {
+  if (action === "sports.grade.correct") {
+    demand(
+      Object.keys(input).every((k) =>
+        [
+          "enrollmentId",
+          "expectedVersion",
+          "finalGrade",
+          "published",
+          "correctionReason",
+        ].includes(k),
+      ),
+      "成绩更正参数无效。",
+    );
+    demand(typeof input.published === "boolean", "请明确选择是否发布更正。");
+    const member = repo.get(input.enrollmentId, "sportsEnrollment");
+    const course = ownedCourse(repo, actor, member.data.courseId);
+    const original = repo
+      .all("sportsGradePublication")
+      .filter((row) => row.data.enrollmentId === member.id)
+      .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence))[0];
+    demand(original, "结算后只能更正原已发布成绩。", 409);
+    demand(
+      Number.isSafeInteger(input.expectedVersion) &&
+        Number(input.expectedVersion) > 0,
+      "缺少原成绩版本。",
+      409,
+    );
+    return sportsCorrectionCommand(repo, actor, "sports.correction.apply", {
+      kind: "GRADE",
+      id: original.id,
+      version: original.version,
+      previousReportId: course.data.settlementReportId,
+      reason: input.correctionReason,
+      confirmed: true,
+      score: input.finalGrade,
+      published: input.published,
+      expectedDraftVersion: input.expectedVersion,
+    });
+  }
   if (action === "sports.physical.correct") {
     demand(
       Object.keys(input).every((k) =>
@@ -86,7 +125,7 @@ export function sportsCorrectionCommand(
         "reason",
         "confirmed",
         ...(kind === "GRADE"
-          ? ["score"]
+          ? ["score", "published", "expectedDraftVersion"]
           : kind === "ENDURANCE"
             ? ["event", "seconds", "testDate"]
             : kind === "REVIEW"
@@ -173,21 +212,59 @@ export function sportsCorrectionCommand(
       .all("sportsGradeDraft")
       .find((d) => d.data.enrollmentId === original.data.enrollmentId);
     demand(
-      !draft || draft.data.status !== "DRAFT",
+      input.published === undefined || typeof input.published === "boolean",
+      "请明确选择是否发布更正。",
+    );
+    if (input.expectedDraftVersion !== undefined)
+      demand(
+        draft && input.expectedDraftVersion === draft.version,
+        "成绩已变化，请刷新后重新核对。",
+        409,
+      );
+    demand(
+      input.expectedDraftVersion !== undefined ||
+        !draft ||
+        draft.data.status !== "DRAFT",
       "已有未发布成绩更正，须先处理冲突。",
       409,
     );
-    const saved = sportsGradeCommand(
-      repo,
-      actor,
-      "sports.grade.save",
-      {
-        enrollmentId: original.data.enrollmentId,
-        version: draft?.version ?? 0,
-        score,
-      },
-      true,
-    )!;
+    const saved =
+      input.published === true &&
+      draft?.data.status === "DRAFT" &&
+      draft.data.score === score
+        ? draft
+        : sportsGradeCommand(
+            repo,
+            actor,
+            "sports.grade.save",
+            {
+              enrollmentId: original.data.enrollmentId,
+              version: draft?.version ?? 0,
+              score,
+            },
+            true,
+          )!;
+    if (input.published === false) {
+      const history = repo
+        .all("sportsGradeHistory")
+        .find(
+          (row) =>
+            row.data.draftId === saved.id &&
+            row.data.resultVersion === saved.version,
+        );
+      demand(history, "成绩草稿保存历史不完整。", 409);
+      repo.create("sportsGradeCorrectionDraft", actor.id, {
+        courseId: course.id,
+        enrollmentId,
+        originalPublicationId: original.id,
+        previousReportId: previous.id,
+        draftId: saved.id,
+        draftVersion: saved.version,
+        historyId: history.id,
+        reason,
+      });
+      return history;
+    }
     result = sportsGradeCommand(
       repo,
       actor,

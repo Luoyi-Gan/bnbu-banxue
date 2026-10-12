@@ -583,6 +583,85 @@ it("归档后原内部成绩更正追加报告，保留旧版及冻结身份，�
     }),
   ).toThrow("附加字段");
 });
+it("结算后成绩先存草稿不出报告，发布才追加更正版且重试保留回执", async () => {
+  const f = setup();
+  const saved = f.run(f.teacher, "sports.grade.append", {
+    enrollmentId: f.member.id,
+    version: 0,
+    score: 70,
+    published: true,
+  });
+  const prep = f.prepare(),
+    first = f.run(f.teacher, "sports.settlement.confirm", {
+      id: prep.id,
+      version: prep.version,
+      confirmed: true,
+    });
+  const original = JSON.stringify(first);
+  const server = createApiServer(f.db);
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/v1/enrollments/${f.member.id}/final-grades/corrections`;
+  const post = (body: unknown, key = randomUUID(), who = f.teacher) =>
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Cookie: `bnbu_session=${who.token}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": key,
+      },
+      body: JSON.stringify(body),
+    });
+  try {
+    const body = {
+      expectedVersion: Number(saved.data.draftVersion) + 1,
+      finalGrade: 80,
+      published: false,
+      correctionReason: "核对原评分表",
+    };
+    const key = randomUUID(),
+      response = await post(body, key);
+    expect(response.status).toBe(200);
+    const draft = (await response.json()).data;
+    expect(draft).toMatchObject({
+      version: 3,
+      finalGrade: 80,
+      published: false,
+    });
+    expect(f.repo.all("sportsSettlementReport")).toHaveLength(1);
+    expect(f.repo.get(f.course.id).data.settlementReportId).toBe(first.id);
+    expect(f.repo.all("sportsGradeCorrectionDraft")).toHaveLength(1);
+    for (const who of [f.student, f.other, f.admin])
+      expect(
+        (
+          await post(
+            { ...body, expectedVersion: 3, published: true },
+            randomUUID(),
+            who,
+          )
+        ).status,
+      ).toBe(403);
+    const publishKey = randomUUID(),
+      publishBody = { ...body, expectedVersion: 3, published: true };
+    const published = await post(publishBody, publishKey);
+    expect(published.status).toBe(200);
+    const final = (await published.json()).data;
+    expect(final).toMatchObject({
+      version: 4,
+      finalGrade: 80,
+      published: true,
+    });
+    expect(f.repo.all("sportsSettlementReport")).toHaveLength(2);
+    expect(JSON.stringify(f.repo.get(first.id))).toBe(original);
+    expect((await (await post(body, key)).json()).data).toEqual(draft);
+    expect((await (await post(publishBody, publishKey)).json()).data).toEqual(
+      final,
+    );
+    expect((await post(publishBody)).status).toBe(409);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
 it("原版体测历史更正保留旧报告，重放返回旧修订，缺测不可补造", async () => {
   const f = setup();
   f.repo.save(f.repo.all("sportsExemption")[0], { status: "REVOKED" });

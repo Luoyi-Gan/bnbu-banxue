@@ -539,7 +539,9 @@ export function createApiServer(
           });
         }
         const finalGradeWrite =
-          /^\/api\/v1\/enrollments\/([^/]+)\/final-grades$/.exec(pathname);
+          /^\/api\/v1\/enrollments\/([^/]+)\/final-grades(\/corrections)?$/.exec(
+            pathname,
+          );
         if (finalGradeWrite) {
           const key = request.headers["idempotency-key"];
           demand(typeof key === "string", "缺少操作幂等标识。");
@@ -550,6 +552,7 @@ export function createApiServer(
               finalGradeWrite[1],
               input,
               key,
+              !!finalGradeWrite[2],
             ),
           });
         }
