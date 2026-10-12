@@ -53,6 +53,63 @@ async function workbook(formula = false) {
   book.addWorksheet("说明").getCell("A1").value = "不是成绩单";
   return Buffer.from(await book.xlsx.writeBuffer());
 }
+it("原版multipart名单上传保留原件与列选择，重试不重复且不建立成员", async () => {
+  const f = setup(),
+    server = createApiServer(f.db);
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/v1/class-sections/${f.course.id}/roster-imports`;
+  const form = () => {
+    const value = new FormData();
+    value.set("source", "FILE");
+    value.set("fileFormat", "CSV");
+    value.set(
+      "fieldMappingSnapshot",
+      JSON.stringify({ studentNumber: "注册号", fullName: "学生姓名" }),
+    );
+    value.set(
+      "file",
+      new Blob(["注册号,学生姓名\n0001,student\n0002,未注册"]),
+      "名单.csv",
+    );
+    return value;
+  };
+  const post = (key: string, who = f.teacher) =>
+    fetch(url, {
+      method: "POST",
+      headers: { Cookie: `bnbu_session=${who.token}`, "Idempotency-Key": key },
+      body: form(),
+    });
+  try {
+    const key = randomUUID(),
+      response = await post(key);
+    expect(response.status).toBe(200);
+    const saved = (await response.json()).data;
+    expect(saved).toMatchObject({
+      status: "VALIDATED",
+      totalRowCount: 2,
+      validRowCount: 2,
+      versionNumber: 1,
+      isCurrent: true,
+    });
+    expect((await (await post(key)).json()).data).toEqual(saved);
+    expect(f.repo.all("sportsPortalRosterImport")).toHaveLength(1);
+    expect(f.repo.all("sportsRosterDraft")).toHaveLength(1);
+    expect(f.repo.all("sportsRosterSnapshot")).toHaveLength(0);
+    expect(f.repo.all("sportsEnrollment")).toHaveLength(1);
+    expect(f.repo.all("sportsRosterDraft")[0].data.fieldMapping).toMatchObject({
+      studentNumber: "注册号",
+      fullName: "学生姓名",
+    });
+    expect(
+      f.db.prepare("SELECT count(*) AS n FROM sports_media_blobs").get()?.n,
+    ).toBe(1);
+    for (const who of [f.student, f.other, f.admin])
+      expect((await post(randomUUID(), who)).status).toBe(403);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
 function setup() {
   const db = openDatabase(":memory:");
   databases.push(db);

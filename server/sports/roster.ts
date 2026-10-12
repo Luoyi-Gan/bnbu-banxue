@@ -81,6 +81,35 @@ export function sportsRosterCommand(
   input: Fields,
   source?: { entity: Entity; sheet: WorkbookSheet },
 ): Entity | undefined {
+  if (action === "sports.roster.portal.import") {
+    demand(
+      Object.keys(input).every((k) =>
+        ["id", "sheet", "fieldMapping"].includes(k),
+      ),
+      "名单导入参数无效。",
+    );
+    const draft = sportsRosterCommand(
+      repo,
+      actor,
+      "sports.roster.source.import",
+      input,
+    )!;
+    const existing = repo
+      .all("sportsPortalRosterImport")
+      .find((row) => row.data.draftId === draft.id);
+    if (existing) return existing;
+    const previous = repo
+      .all("sportsPortalRosterImport")
+      .filter((row) => row.data.courseId === draft.data.courseId);
+    return repo.create("sportsPortalRosterImport", actor.id, {
+      courseId: draft.data.courseId,
+      draftId: draft.id,
+      sourceId: input.id,
+      sheet: input.sheet,
+      sequence:
+        Math.max(0, ...previous.map((row) => Number(row.data.sequence))) + 1,
+    });
+  }
   if (action === "sports.roster.source.import") {
     const entity = repo.get(input.id, "sportsRosterSource");
     usable(repo, actor, entity.data.courseId);

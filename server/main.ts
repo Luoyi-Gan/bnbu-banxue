@@ -17,6 +17,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { portalRosterUpload } from "./sports/portal-roster";
 import {
   portalSettlementPreview,
   portalSettlementConfirm,
@@ -355,6 +356,41 @@ export function createApiServer(
             id: source.id,
             status: source.data.status,
             error: source.data.error,
+          });
+        }
+        const portalRoster =
+          /^\/api\/v1\/class-sections\/([^/]+)\/roster-imports$/.exec(pathname);
+        if (portalRoster) {
+          const repo = new Repository(db),
+            token = cookieToken(request) ?? "";
+          workbookAccess(repo, token, portalRoster[1]);
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          demand(
+            request.headers["content-type"]?.startsWith("multipart/form-data"),
+            "请上传名单文件表单。",
+            415,
+          );
+          const chunks: Buffer[] = [];
+          let size = 0;
+          for await (const chunk of request) {
+            size += chunk.length;
+            demand(size <= 101 * 1024 * 1024, "名单文件超过100MB。", 413);
+            chunks.push(chunk);
+          }
+          const form = await new Request("http://localhost/upload", {
+            method: "POST",
+            headers: { "Content-Type": request.headers["content-type"]! },
+            body: new Blob([Uint8Array.from(Buffer.concat(chunks))]),
+          }).formData();
+          return send(response, 200, {
+            data: await portalRosterUpload(
+              repo,
+              token,
+              portalRoster[1],
+              form,
+              key,
+            ),
           });
         }
         const rosterUpload =

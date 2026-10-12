@@ -10,6 +10,7 @@ export async function uploadRosterFile(
   courseId: string,
   format: string,
   bytes: Buffer,
+  mappedColumns = false,
 ) {
   workbookAccess(repo, token, courseId);
   demand(["CSV", "XLSX"].includes(format), "只接受CSV或XLSX名单。");
@@ -19,7 +20,8 @@ export async function uploadRosterFile(
     413,
   );
   let sheets: WorkbookSheet[];
-  if (format === "XLSX") sheets = await parseWorkbook(bytes, 2);
+  if (format === "XLSX")
+    sheets = await parseWorkbook(bytes, mappedColumns ? "ROSTER_MAPPING" : 2);
   else {
     let text: string;
     try {
@@ -59,6 +61,7 @@ export async function uploadRosterFile(
         (s) =>
           s.ownerId === actor.id &&
           s.data.courseId === courseId &&
+          !!s.data.mappedColumns === mappedColumns &&
           s.data.sha256 === sha256,
       );
     if (prior) return prior;
@@ -73,6 +76,7 @@ export async function uploadRosterFile(
       sha256,
       size: bytes.length,
       sheets,
+      mappedColumns,
     });
     repo.create("sportsRosterSourceHistory", actor.id, {
       sourceId: source.id,
