@@ -106,6 +106,19 @@ try {
   assert.equal(members.data[0].studentId,actor.id);
   assert.equal(members.data[0].id,enrollmentId);
   assert.equal(members.meta.pagination.hasMore,false);
+  const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'});
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data=(data::jsonb || '{"status":"CURRENT"}'::jsonb)::text WHERE id='${semesterId}'; UPDATE entities SET data=(data::jsonb || '{"startDate":"${today}","deadlineDate":"${today}","startTime":"00:00","endTime":"23:59","threshold":30}'::jsonb)::text WHERE id='${courseId}'`],{stdio:'pipe'});
+  const sessionWrite=async(path,input)=>{
+    const response=await fetch(base+path,{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify(input)});
+    const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;
+  };
+  let session=await sessionWrite('/api/v1/exercise-sessions',{enrollmentId,clientObservedAt:new Date().toISOString()});
+  assert.equal((await request('/api/v1/exercise-sessions/active')).data.id,session.id);
+  for(const [action,status] of [['pause','PAUSED'],['resume','IN_PROGRESS'],['finish','COMPLETED']]) {
+    session=await sessionWrite(`/api/v1/exercise-sessions/${session.id}/${action}`,{expectedVersion:session.version,clientObservedAt:new Date().toISOString()});
+    assert.equal(session.status,status);
+  }
+  assert.equal((await request(`/api/v1/exercise-sessions/${session.id}`)).data.status,'COMPLETED');
 } finally {
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${semesterId}','${courseId}','${enrollmentId}')`],{stdio:'pipe'});
 }
