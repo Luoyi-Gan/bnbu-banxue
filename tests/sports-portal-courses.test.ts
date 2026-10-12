@@ -109,6 +109,15 @@ it("原版课程列表、目录、学期与目标读取本人真实课程，不�
       (await get("/class-sections/" + draft.id + "/progress-target")).status,
     ).toBe(404);
     expect(
+      (await get("/class-sections/" + draft.id + "/v81-rules")).status,
+    ).toBe(404);
+    expect(
+      (await get("/class-sections/" + foreign.id + "/v81-rules")).status,
+    ).toBe(403);
+    expect(
+      (await get("/class-sections/" + course.id + "/v81-rules")).status,
+    ).toBe(409);
+    expect(
       (
         await (
           await get("/class-sections/" + course.id + "/progress-target")
@@ -119,6 +128,36 @@ it("原版课程列表、目录、学期与目标读取本人真实课程，不�
       generalTargetSeconds: 36000,
       totalTargetSeconds: 72000,
       effectiveFrom: null,
+    });
+    repo.save(course, {
+      templateId: "frozen-template",
+      threshold: 45,
+      weeklyLimit: 2,
+      deadlineDate: "2026-12-01",
+      closingDate: "2026-12-08",
+      settlementDate: "2026-12-09",
+      publishedAt: "2026-10-01T00:00:00.000Z",
+      rulesVersion: 1,
+    });
+    const rules = (
+      await (await get("/class-sections/" + course.id + "/v81-rules")).json()
+    ).data;
+    expect(rules).toEqual({
+      version: 1,
+      template_id: "frozen-template",
+      published_at: "2026-10-01T00:00:00.000Z",
+      minimum_minutes: 45,
+      maximum_minutes: 60,
+      global_target_minutes: 1200,
+      global_target_version: 1,
+      allocation_pending: false,
+      weekly_limit: 2,
+      daily_limit: 1,
+      course_target: 600,
+      general_target: 600,
+      regular_deadline: "2026-12-01T15:59:59.000Z",
+      closing_deadline: "2026-12-08T15:59:59.000Z",
+      settlement_planned_at: "2026-12-08T16:00:00.000Z",
     });
     const createDraft = () =>
       fetch(base + "/teacher/courses", {

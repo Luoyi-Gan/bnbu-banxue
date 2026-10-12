@@ -813,7 +813,7 @@ export function createApiServer(
         });
       }
       const teacherCourse =
-        /^\/api\/v1\/(courses|class-sections)\/([^/]+)(\/progress-target)?$/.exec(
+        /^\/api\/v1\/(courses|class-sections)\/([^/]+)(\/(?:progress-target|v81-rules))?$/.exec(
           pathname,
         );
       if (request.method === "GET" && teacherCourse) {
@@ -828,7 +828,7 @@ export function createApiServer(
             authenticate(db, cookieToken(request)),
             teacherCourse[2],
             teacherCourse[3]
-              ? "progress-target"
+              ? (teacherCourse[3].slice(1) as "progress-target" | "v81-rules")
               : (teacherCourse[1] as "courses" | "class-sections"),
           ),
         });

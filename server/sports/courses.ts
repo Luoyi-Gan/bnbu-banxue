@@ -355,6 +355,8 @@ export function sportsCourseCommand(
     const published = repo.save(course, {
       status: "PUBLISHED",
       enrollmentOpen: true,
+      publishedAt: new Date().toISOString(),
+      rulesVersion: 1,
     });
     checkDeadlineReminders(repo, Date.now(), published);
     return published;
