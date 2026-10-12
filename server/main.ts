@@ -21,6 +21,11 @@ import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
 import { portalLogin, portalMe, portalSecurity } from "./sports/portal";
 import {
+  portalTeacherCourses,
+  portalTeacherCourse,
+  portalTeacherSemesters,
+} from "./sports/portal-courses";
+import {
   portalNotifications,
   portalNotificationRead,
 } from "./sports/portal-notifications";
@@ -717,6 +722,70 @@ export function createApiServer(
             input,
           ),
         );
+      }
+      if (
+        request.method === "GET" &&
+        ["/api/v1/courses", "/api/v1/class-sections"].includes(pathname)
+      ) {
+        const input = Object.fromEntries(
+          new URL(request.url!, "http://localhost").searchParams.entries(),
+        );
+        const page = portalTeacherCourses(
+          new Repository(db),
+          authenticate(db, cookieToken(request)),
+          pathname.endsWith("/courses") ? "courses" : "class-sections",
+          input,
+        );
+        return send(response, 200, {
+          data: page.items,
+          meta: {
+            pagination: {
+              total: page.total,
+              limit: page.limit,
+              nextCursor: page.nextCursor,
+              hasMore: page.nextCursor !== null,
+            },
+          },
+        });
+      }
+      const teacherCourse =
+        /^\/api\/v1\/(courses|class-sections)\/([^/]+)(\/progress-target)?$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && teacherCourse) {
+        demand(
+          !teacherCourse[3] || teacherCourse[1] === "class-sections",
+          "接口不存在。",
+          404,
+        );
+        return send(response, 200, {
+          data: portalTeacherCourse(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            teacherCourse[2],
+            teacherCourse[3]
+              ? "progress-target"
+              : (teacherCourse[1] as "courses" | "class-sections"),
+          ),
+        });
+      }
+      if (
+        request.method === "GET" &&
+        ["/api/v1/semesters/current", "/api/v1/teacher/semesters"].includes(
+          pathname,
+        )
+      ) {
+        const input = Object.fromEntries(
+          new URL(request.url!, "http://localhost").searchParams.entries(),
+        );
+        return send(response, 200, {
+          data: portalTeacherSemesters(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            pathname.endsWith("/current"),
+            input,
+          ),
+        });
       }
       if (request.method === "GET" && pathname === "/api/auth/me")
         return send(response, 200, {
