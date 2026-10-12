@@ -17,6 +17,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { portalSettlementPreview } from "./sports/portal-settlement";
 import { portalFrozenReportExport } from "./sports/portal-report-export";
 import {
   portalGradeHistory,
@@ -857,6 +858,23 @@ export function createApiServer(
             ),
           ),
         );
+      }
+      const settlementPreview =
+        /^\/api\/v1\/class-sections\/([^/]+)\/settlement-(preview|check)$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && settlementPreview) {
+        const preview = portalSettlementPreview(
+          new Repository(db),
+          authenticate(db, cookieToken(request)),
+          settlementPreview[1],
+        );
+        return send(response, 200, {
+          data:
+            settlementPreview[2] === "preview"
+              ? preview
+              : { checks: preview.checks },
+        });
       }
       const frozenExport =
         /^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports\/(\d+)\/export$/.exec(

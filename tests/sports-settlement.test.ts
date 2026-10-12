@@ -110,6 +110,86 @@ function setup() {
     prepare,
   };
 }
+it("原版结算预检只读，保留阻塞和未知分母，按课程隔离", async () => {
+  const f = setup();
+  const server = createApiServer(f.db);
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/v1/class-sections/${f.course.id}/settlement-`;
+  const get = (suffix: string, who = f.teacher) =>
+    fetch(url + suffix, { headers: { Cookie: `bnbu_session=${who.token}` } });
+  try {
+    const first = await get("preview");
+    expect(first.status).toBe(200);
+    const ready = (await first.json()).data;
+    expect(ready).toMatchObject({
+      canConfirm: true,
+      expectedVersion: 0,
+      checks: [],
+      preview: { denominator: 1, registrationComplete: true, extras: [] },
+    });
+    expect(ready.preview.rows[0]).toMatchObject({
+      studentNumber: "S001",
+      status: "MATCHED",
+      pendingCount: 0,
+    });
+    expect(ready.previewFingerprint).toMatch(/^[a-f0-9]{64}$/);
+    expect((await (await get("preview")).json()).data.previewFingerprint).toBe(
+      ready.previewFingerprint,
+    );
+    expect(f.repo.all("sportsSettlementPreparation")).toHaveLength(0);
+    expect(f.repo.all("sportsSettlementReport")).toHaveLength(0);
+    f.repo.create("sportsGradeDraft", f.teacher.account.id, {
+      courseId: f.course.id,
+      enrollmentId: f.member.id,
+      status: "DRAFT",
+    });
+    const blocked = (await (await get("preview")).json()).data;
+    expect(blocked.canConfirm).toBe(false);
+    expect(blocked.previewFingerprint).not.toBe(ready.previewFingerprint);
+    expect(blocked.checks).toContainEqual({
+      code: "FINAL_GRADE_DRAFT",
+      status: "BLOCKED",
+      count: 1,
+    });
+    expect(blocked.preview.rows[0].pendingCount).toBeNull();
+    expect((await (await get("check")).json()).data).toEqual({
+      checks: blocked.checks,
+    });
+    f.repo.save(f.snapshot, {
+      rows: [
+        {
+          row: 2,
+          studentNumber: "S001",
+          name: "student",
+          columnError: false,
+          excluded: false,
+        },
+        {
+          row: 3,
+          studentNumber: "S001",
+          name: "student",
+          columnError: false,
+          excluded: false,
+        },
+      ],
+    });
+    const conflict = (await (await get("preview")).json()).data;
+    expect(conflict.preview.denominator).toBeNull();
+    expect(conflict.preview.registrationComplete).toBe(false);
+    expect(
+      conflict.preview.rows.map((row: { status: string }) => row.status),
+    ).toEqual(["IDENTITY_CONFLICT", "IDENTITY_CONFLICT"]);
+    expect(conflict.preview.extras).toHaveLength(1);
+    for (const who of [f.student, f.other, f.admin])
+      for (const suffix of ["preview", "check"])
+        expect((await get(suffix, who)).status).toBe(403);
+    f.repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
+    expect((await get("preview")).status).toBe(503);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
 it("低于目标不阻止合法结算，冻结内容与来源同事务保存，重放不另建报告", () => {
   const f = setup(),
     prep = f.prepare();
