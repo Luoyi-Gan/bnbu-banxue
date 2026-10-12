@@ -1,6 +1,6 @@
 import type { PostgresDatabase } from './postgres';
 import { PostgresAuth } from './postgres-auth';
-import { PostgresRepository } from './postgres-repository';
+import { PostgresRepository, decodePostgresEntity } from './postgres-repository';
 import { demand } from '../auth';
 import type { Entity, Fields, Repository } from '../repository';
 import { projectWorkspace } from '../snapshot-projection';
@@ -15,7 +15,7 @@ export async function postgresWorkspace(db: PostgresDatabase, token: string) {
     const actor=await new PostgresAuth(db).authenticate(token,client);
     // Build an immutable read model from one database snapshot; writes never use it.
     const rows=(await client.query<{id:string;kind:string;owner_id:string|null;data:string;version:number;created_at:string;updated_at:string}>('SELECT * FROM entities ORDER BY created_at DESC,id')).rows;
-    const entities:Entity[]=rows.map(row=>({id:row.id,kind:row.kind,ownerId:row.owner_id,data:JSON.parse(row.data),version:row.version,createdAt:row.created_at,updatedAt:row.updated_at}));
+    const entities:Entity[]=await Promise.all(rows.map(decodePostgresEntity));
     const people=await new PostgresRepository(client).people();
     const repo:Pick<Repository,'all'|'get'|'people'>={
       all:kind=>entities.filter(entity=>entity.kind===kind),

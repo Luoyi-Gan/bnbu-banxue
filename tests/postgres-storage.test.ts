@@ -19,6 +19,7 @@ import { postgresStudentSearch } from '../backend/src/storage/postgres-student-s
 import { postgresAdministratorDirectory } from '../backend/src/storage/postgres-administrators';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from '../backend/src/storage/postgres-admin-email';
 import { postgresAdministratorSelf } from '../backend/src/storage/postgres-admin-deletion';
+import { postgresCommunityView } from '../backend/src/storage/postgres-community-view';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -247,6 +248,32 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'");
       await expect(executePostgres(db,root,'sports.admins.delete',input,key)).rejects.toMatchObject({status:403});
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
+  });
+  it('stores image bytes outside PostgreSQL and rolls the entity back on object write failure', async () => {
+    const root=mkdtempSync(join(tmpdir(),'bnbu-pg-objects-'));
+    const previous=process.env.BNBU_OBJECT_DIRECTORY;
+    process.env.BNBU_OBJECT_DIRECTORY=root;
+    try {
+      const image='data:image/png;base64,'+Buffer.from([137,80,78,71,1,2,3]).toString('base64');
+      const post=await db.transaction(client=>new PostgresRepository(client).create('post','state-person',{title:'私有待审图片',body:'test',board:'test',images:[image],status:'pending'}));
+      const raw=(await db.pool.query('SELECT data FROM entities WHERE id=$1',[post.id])).rows[0].data;
+      expect(raw).not.toContain('data:image');
+      expect(raw).toContain('$bnbuStoredImage');
+      expect((await db.transaction(client=>new PostgresRepository(client).get(post.id))).data.images).toEqual([image]);
+      const auth=new PostgresAuth(db),own=(await auth.login('state@example.test','State-test-123')).token;
+      const other=(await auth.login('password-manager','Changed-test-123')).token;
+      expect(JSON.stringify(await postgresCommunityView(db,other))).not.toContain(image);
+      expect(JSON.stringify(await postgresCommunityView(db,own))).toContain(image);
+      await expect(db.transaction(client=>new PostgresRepository(client).create('post','state-person',{images:[{$bnbuStoredImage:'f'.repeat(64),contentType:'image/png'}]}))).rejects.toThrow('内部存储标识');
+      const before=Number((await db.pool.query('SELECT count(*) FROM entities')).rows[0].count);
+      process.env.BNBU_OBJECT_DIRECTORY=join(root,JSON.parse(raw).images[0].$bnbuStoredImage);
+      await expect(db.transaction(client=>new PostgresRepository(client).create('post','state-person',{images:[image]}))).rejects.toThrow();
+      expect(Number((await db.pool.query('SELECT count(*) FROM entities')).rows[0].count)).toBe(before);
+      await db.pool.query('DELETE FROM entities WHERE id=$1',[post.id]);
+    } finally {
+      if(previous===undefined) delete process.env.BNBU_OBJECT_DIRECTORY; else process.env.BNBU_OBJECT_DIRECTORY=previous;
+      rmSync(root,{recursive:true,force:true});
+    }
   });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);

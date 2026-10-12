@@ -2,9 +2,10 @@ import { randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { demand, timestamp, type Account } from '../auth';
 import type { Entity, Fields } from '../repository';
+import { storeImages, restoreImages } from './stored-images';
 
 type EntityRow = { id: string; kind: string; owner_id: string | null; data: string; version: number; created_at: string; updated_at: string };
-const decode = (row: EntityRow): Entity => ({ id: row.id, kind: row.kind, ownerId: row.owner_id, data: JSON.parse(row.data), version: row.version, createdAt: row.created_at, updatedAt: row.updated_at });
+export const decodePostgresEntity = async (row: EntityRow): Promise<Entity> => ({ id: row.id, kind: row.kind, ownerId: row.owner_id, data: await restoreImages(JSON.parse(row.data)) as Fields, version: row.version, createdAt: row.created_at, updatedAt: row.updated_at });
 
 /** Construct inside PostgresDatabase.transaction; every operation shares its client. */
 export class PostgresRepository {
@@ -24,7 +25,7 @@ export class PostgresRepository {
 
   async all(kind: string): Promise<Entity[]> {
     const result = await this.client.query<EntityRow>('SELECT * FROM entities WHERE kind=$1 ORDER BY created_at DESC,id', [kind]);
-    return result.rows.map(decode);
+    return Promise.all(result.rows.map(decodePostgresEntity));
   }
 
   async get(id: unknown, kind?: string): Promise<Entity> {
@@ -32,19 +33,21 @@ export class PostgresRepository {
     const {rows} = await this.client.query<EntityRow>('SELECT * FROM entities WHERE id=$1', [id]);
     const row = rows[0];
     demand(row && (!kind || row.kind === kind), '对象不存在。', 404);
-    return decode(row);
+    return decodePostgresEntity(row);
   }
 
   async create(kind: string, ownerId: string | null, data: Fields): Promise<Entity> {
     const now = timestamp();
-    const {rows} = await this.client.query<EntityRow>('INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$5) RETURNING *', [randomUUID(),kind,ownerId,JSON.stringify(data),now]);
-    return decode(rows[0]);
+    const stored=await storeImages(data);
+    const {rows} = await this.client.query<EntityRow>('INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$5) RETURNING *', [randomUUID(),kind,ownerId,JSON.stringify(stored),now]);
+    return decodePostgresEntity(rows[0]);
   }
 
   async save(entity: Entity, patch: Fields): Promise<Entity> {
-    const {rows} = await this.client.query<EntityRow>('UPDATE entities SET data=$1,version=version+1,updated_at=$2 WHERE id=$3 AND version=$4 RETURNING *', [JSON.stringify({...entity.data,...patch}),timestamp(),entity.id,entity.version]);
+    const stored=await storeImages({...entity.data,...patch});
+    const {rows} = await this.client.query<EntityRow>('UPDATE entities SET data=$1,version=version+1,updated_at=$2 WHERE id=$3 AND version=$4 RETURNING *', [JSON.stringify(stored),timestamp(),entity.id,entity.version]);
     demand(rows[0], '内容已更新，请刷新后重试。', 409);
-    return decode(rows[0]);
+    return decodePostgresEntity(rows[0]);
   }
 
   async people(): Promise<Omit<Account,'email'>[]> {

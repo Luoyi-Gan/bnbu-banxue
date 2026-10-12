@@ -25,6 +25,9 @@ services:
       BNBU_API_PORT: 4175
       BNBU_ALLOWED_ORIGINS: http://127.0.0.1:4188,http://localhost:4188
       BNBU_LOCAL_OUTBOX: "1"
+      BNBU_OBJECT_DIRECTORY: /app/data/objects
+    volumes:
+      - object-data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -44,3 +47,4 @@ services:
         condition: service_healthy
 volumes:
   postgres-data:
+  object-data:

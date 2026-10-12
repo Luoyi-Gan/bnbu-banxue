@@ -1521,3 +1521,6 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 
 ### 对象存储基础适配
 新增 ObjectStore 接口、原子文件写入的本地实现与腾讯云官方 cos-nodejs-sdk-v5 适配，固定私有 ACL、内容摘要对象键、读取校验摘要，不向客户端暴露密钥。COS 配置缺失明确失败，不自动回退本地。已验证本地二进制写读、并发相同内容、跨实例读取、路径穿越拒绝及损坏检测，类型检查和 lint 通过。此基础能力尚未接入业务图片读写，也未验证真实 COS；后续必须完成接线及权限验证才能作为交付。参考 https://cloud.tencent.com/document/product/436/64981 与官方 SDK 仓库 https://github.com/tencentyun/cos-nodejs-sdk-v5 。
+
+### PostgreSQL 业务图片对象存储接线
+实体仓储写入时将 PNG/JPEG/WebP data URL 图片提取到可配置对象存储，PostgreSQL 只保存内部摘要引用；读取恢复原前端协议后继续原权限投影，不新增公开对象 URL。拒绝客户端注入内部引用。Compose 增加独立持久对象卷，COS SDK 作为后端运行依赖。31 项针对测试通过（PostgreSQL 30、存储 1），新增数据库不含图片字节、读取还原、待审图片他人不可见、伪造引用拒绝及存储写失败业务记录不提交。类型检查和 lint 通过。事务回滚可能留下无引用的私有摘要对象，暂不自动清理以免误删共享内容；真实 COS、Docker 图片重启以及旧库图片迁移仍需验证。
