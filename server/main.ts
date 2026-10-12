@@ -20,6 +20,11 @@ import { sportsWorkspace } from "./sports/courses";
 import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
 import { portalLogin, portalMe, portalSecurity } from "./sports/portal";
+import {
+  portalAnnouncement,
+  portalHealth,
+  portalEnduranceTables,
+} from "./sports/portal-bootstrap";
 import { administratorSelf } from "./sports/administrator-deletion";
 import {
   adminEmailStatus,
@@ -485,6 +490,28 @@ export function createApiServer(
             pathname === "/api/v1/me"
               ? portalMe(repo, actor)
               : portalSecurity(repo, actor),
+        });
+      }
+      if (
+        request.method === "GET" &&
+        pathname === "/api/v1/system-mode/announcement"
+      )
+        return send(response, 200, {
+          data: portalAnnouncement(new Repository(db)),
+        });
+      if (
+        request.method === "GET" &&
+        ["/api/v1/health/admin", "/api/v1/admin/endurance-tables"].includes(
+          pathname,
+        )
+      ) {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request));
+        return send(response, 200, {
+          data:
+            pathname === "/api/v1/health/admin"
+              ? portalHealth(repo, actor)
+              : portalEnduranceTables(repo, actor),
         });
       }
       if (request.method === "GET" && pathname === "/api/auth/me")
