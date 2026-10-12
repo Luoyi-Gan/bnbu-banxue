@@ -67,6 +67,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(run({choice:'custom',image:'https://example.test/icon.svg'})).rejects.toThrow('图片');
     await run({choice:'kitty'});
     expect((await postgresWorkspace(db,tokens[0])).entities.find(e=>e.kind==='preferences')?.data.aiIconChoice).toBe('kitty');
+    const image='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aOuoAAAAASUVORK5CYII=';
+    await run({choice:'custom',image});
+    await run({choice:'yellow'});
+    await run({choice:'custom'});
+    expect((await postgresWorkspace(db,tokens[0])).entities.find(e=>e.kind==='preferences')?.data).toMatchObject({aiIconChoice:'custom',aiCustomIcon:image});
+    expect(JSON.stringify(await postgresWorkspace(db,tokens[1]))).not.toContain(image);
+    await run({choice:'kitty'});
     expect((await postgresWorkspace(db,tokens[1])).entities.some(e=>e.kind==='preferences')).toBe(false);
     await expect(run({choice:'invalid'})).rejects.toThrow();
     expect((await postgresWorkspace(db,tokens[0])).entities.find(e=>e.kind==='preferences')?.data.aiIconChoice).toBe('kitty');
