@@ -1488,3 +1488,6 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 
 ### 独立 PostgreSQL Compose 与导入命令
 新增 frontend/Dockerfile、Nginx 同源 API 代理及 compose.postgres.yaml，使用独立 4188 端口和 PostgreSQL 数据卷，原验收环境不变。Compose 配置校验通过；Docker 构建仍在 npm ci 阶段，尚未验证容器启动。新增离线 SQLite 导入 CLI，复用已有只读快照、空目标检查及事务导入实现；本地三入口构建、类型检查和修改文件 lint 通过。未对原验收数据库执行导入。操作说明见 docs/POSTGRES_DOCKER.md。
+
+### 迁移后全量回归
+2026-10-12 再次启用真实 PostgreSQL 测试运行全量 Vitest：67 文件、418 项全部通过，包含 PostgreSQL 22 项。该结果覆盖现有测试集合，不替代尚未接通的管理接口、COS 和 Docker 业务联调。构建会话仍在依赖安装阶段；额外容器访问 registry.npmjs.org 返回 200，未据此宣称构建完成。
