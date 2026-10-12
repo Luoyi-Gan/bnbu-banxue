@@ -1,14 +1,24 @@
 import { Repository, type Entity, type Fields } from "../repository";
 import { buildCourseReport } from "./report";
+import type { CourseReport } from "./report";
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 /** Called under the shared write transaction: reminder marker and notification commit together. */
 export function checkDeadlineReminders(
   repo: Repository,
   now = Date.now(),
   onlyCourse?: Entity,
 ) {
-  if (repo.all("sportsSystem").some((s) => s.data.mode !== "NORMAL")) return;
-  const markers = repo.all("sportsDeadlineReminder");
-  for (const course of onlyCourse ? [onlyCourse] : repo.all("sportsCourse")) {
+  return runSync(deadlineReminderPolicy(repo, course => buildCourseReport(repo, course), now, onlyCourse));
+}
+export function* deadlineReminderPolicy(
+  repo: BusinessRepository,
+  reportFor: (course: Entity) => CourseReport | Promise<CourseReport>,
+  now = Date.now(),
+  onlyCourse?: Entity,
+) {
+  if ((yield* effect(repo.all("sportsSystem"))).some((s) => s.data.mode !== "NORMAL")) return;
+  const markers = yield* effect(repo.all("sportsDeadlineReminder"));
+  for (const course of onlyCourse ? [onlyCourse] : yield* effect(repo.all("sportsCourse"))) {
     if (
       !["PUBLISHED", "CLOSED"].includes(String(course.data.status)) ||
       course.data.settlementStatus === "SETTLED"
@@ -19,17 +29,19 @@ export function checkDeadlineReminders(
       ),
       dueAt = deadline - 14 * 86400000;
     if (!Number.isFinite(deadline) || now < dueAt) continue;
-    const semester = repo.get(course.data.semesterId, "sportsSemester");
+    const semester = yield* effect(repo.get(course.data.semesterId, "sportsSemester"));
     if (semester.data.status !== "CURRENT") continue;
-    const report = buildCourseReport(repo, course),
-      members = repo
-        .all("sportsEnrollment")
+    const report = yield* effect(reportFor(course)),
+      members = (yield* effect(repo.all("sportsEnrollment")))
         .filter(
           (m) => m.data.courseId === course.id && m.data.status === "ACTIVE",
         );
+    const sources: Entity[] = [];
+    for (const kind of ["sportsApplication", "sportsGradeDraft", "sportsGradePublication"])
+      sources.push(...yield* effect(repo.all(kind)));
     const inCourse = (kind: string) =>
-      repo.all(kind).filter((e) => e.data.courseId === course.id);
-    function send(
+      sources.filter((e) => e.kind === kind && e.data.courseId === course.id);
+    function* send(
       recipient: string | null,
       role: string,
       evidence: Fields,
@@ -46,16 +58,16 @@ export function checkDeadlineReminders(
         )
       )
         return;
-      const marker = repo.create("sportsDeadlineReminder", recipient, {
+      const marker = yield* effect(repo.create("sportsDeadlineReminder", recipient, {
         courseId: course.id,
         deadlineDate: course.data.deadlineDate,
         dueAt,
         sentAt: now,
         recipientRole: role,
         evidence,
-      });
+      }));
       markers.push(marker);
-      repo.notify([recipient], course.id, "sports.course.deadline", body);
+      yield* effect(repo.notify([recipient], course.id, "sports.course.deadline", body));
     }
     for (const member of members) {
       const row = report.rows.find((r) => r.enrollmentId === member.id),
@@ -77,7 +89,7 @@ export function checkDeadlineReminders(
         facts.enduranceStatus !== "NOT_RECORDED"
       )
         continue;
-      send(
+      yield* send(
         member.ownerId,
         "student",
         {
@@ -119,7 +131,7 @@ export function checkDeadlineReminders(
         : []),
     ];
     if (blockers.length)
-      send(
+      yield* send(
         course.ownerId,
         "teacher",
         { pending: blockers },

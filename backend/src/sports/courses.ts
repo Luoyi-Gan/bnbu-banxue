@@ -190,104 +190,7 @@ export function sportsCourseCommand(
     return template;
   }
   if(["sports.course.window","sports.course.create","sports.course.save"].includes(action)) return runSync(sportsCourseDraftPolicy(repo,actor,action,input));
-  if (action === "sports.course.configurepublish") {
-    const course = ownedCourse(repo, actor, input.id);
-    demand(
-      input.expectedCourseVersion === course.version &&
-        input.expectedVersion === 0,
-      "课程已变化，请刷新后重新核对。",
-      409,
-    );
-    demand(course.data.status === "DRAFT", "已发布课程规则已锁定。", 409);
-    demand(
-      input.publish === true &&
-        input.maximumMinutes === 60 &&
-        input.dailyLimit === 1 &&
-        input.globalTargetVersion === 1,
-      "请使用现行规则：单次最多60分钟，每天最多1条，总目标1200分钟。",
-    );
-    demand(
-      Object.keys(input).every((key) =>
-        [
-          "id",
-          "expectedCourseVersion",
-          "expectedVersion",
-          "publish",
-          "maximumMinutes",
-          "dailyLimit",
-          "globalTargetVersion",
-          "templateId",
-          "minimumMinutes",
-          "weeklyLimit",
-          "courseTarget",
-          "generalTarget",
-          "description",
-          "regularDeadline",
-          "closingDeadline",
-          "settlementPlannedAt",
-        ].includes(key),
-      ),
-      "课程发布参数无效。",
-    );
-    const regular = Date.parse(`${course.data.deadlineDate}T23:59:59+08:00`);
-    const readInstant = (key: string) => {
-      const value = textField(input, key, 40);
-      demand(
-        /(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
-          Number.isFinite(Date.parse(value)),
-        "课程时间须包含有效时区。",
-      );
-      return Date.parse(value);
-    };
-    demand(
-      readInstant("regularDeadline") === regular &&
-        readInstant("closingDeadline") === regular + 7 * 86400000,
-      "常规截止和七天收尾日期须与已保存时间窗一致。",
-    );
-    const settlement = readInstant("settlementPlannedAt");
-    const settlementDate = new Date(settlement).toLocaleDateString("en-CA", {
-      timeZone: "Asia/Shanghai",
-    });
-    demand(
-      settlement === instant(settlementDate),
-      "请选择结算日期，时间使用上海时间零点。",
-    );
-    const saved = sportsCourseCommand(repo, actor, "sports.course.save", {
-      ...course.data,
-      id: course.id,
-      version: course.version,
-      templateId: input.templateId,
-      threshold: input.minimumMinutes,
-      weeklyLimit: input.weeklyLimit,
-      relatedTarget: input.courseTarget,
-      otherTarget: input.generalTarget,
-      description: input.description,
-      settlementDate,
-    })!;
-    return sportsCourseCommand(repo, actor, "sports.course.publish", {
-      id: saved.id,
-      version: saved.version,
-    });
-  }
-  if (action === "sports.course.publish") {
-    const course = ownedCourse(repo, actor, input.id);
-    version(course, input);
-    currentSemester(repo, course.data.semesterId);
-    demand(course.data.status === "DRAFT", "课程已发布，不能重复发布。", 409);
-    textField(course.data, "name", 100);
-    textField(course.data, "description", 1000);
-    courseRules(repo, course.data);
-    demand(course.data.checkInAvailable !== false, "发布前须允许打卡。");
-    checkFeasibility(course.data);
-    const published = repo.save(course, {
-      status: "PUBLISHED",
-      enrollmentOpen: true,
-      publishedAt: new Date().toISOString(),
-      rulesVersion: 1,
-    });
-    checkDeadlineReminders(repo, Date.now(), published);
-    return published;
-  }
+  if(["sports.course.configurepublish","sports.course.publish"].includes(action)) return runSync(sportsCoursePublishPolicy(repo,actor,action,input,course=>checkDeadlineReminders(repo,Date.now(),course)));
   if(["sports.course.close","sports.invitation.create","sports.invitation.revoke"].includes(action)) return runSync(sportsInvitationPolicy(repo,actor,action,input));
   if (
     action === "sports.enrollment.join" ||
@@ -724,5 +627,109 @@ export function* sportsInvitationPolicy(repo:BusinessRepository,actor:Account,ac
     ownedCourse(reader, actor, invite.data.courseId);
     version(invite, input);
     return yield* effect(repo.save(invite, { status: "REVOKED" }));
+  }
+}
+
+export function* sportsCoursePublishPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields,remind:(course:Entity)=>void|Promise<void>):Generator<unknown,Entity|undefined,unknown> {
+ const entities:Entity[]=[];
+ for(const kind of ["sportsIdentity","sportsSemester","sportsCourse","sportsTemplate"]) entities.push(...(yield* effect(repo.all(kind))));
+ const reader:Pick<Repository,"all"|"get">={all:kind=>entities.filter(e=>e.kind===kind),get:(id,kind)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,"对象不存在。",404);return e;}};
+  if (action === "sports.course.configurepublish") {
+    const course = ownedCourse(reader, actor, input.id);
+    demand(
+      input.expectedCourseVersion === course.version &&
+        input.expectedVersion === 0,
+      "课程已变化，请刷新后重新核对。",
+      409,
+    );
+    demand(course.data.status === "DRAFT", "已发布课程规则已锁定。", 409);
+    demand(
+      input.publish === true &&
+        input.maximumMinutes === 60 &&
+        input.dailyLimit === 1 &&
+        input.globalTargetVersion === 1,
+      "请使用现行规则：单次最多60分钟，每天最多1条，总目标1200分钟。",
+    );
+    demand(
+      Object.keys(input).every((key) =>
+        [
+          "id",
+          "expectedCourseVersion",
+          "expectedVersion",
+          "publish",
+          "maximumMinutes",
+          "dailyLimit",
+          "globalTargetVersion",
+          "templateId",
+          "minimumMinutes",
+          "weeklyLimit",
+          "courseTarget",
+          "generalTarget",
+          "description",
+          "regularDeadline",
+          "closingDeadline",
+          "settlementPlannedAt",
+        ].includes(key),
+      ),
+      "课程发布参数无效。",
+    );
+    const regular = Date.parse(`${course.data.deadlineDate}T23:59:59+08:00`);
+    const readInstant = (key: string) => {
+      const value = textField(input, key, 40);
+      demand(
+        /(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
+          Number.isFinite(Date.parse(value)),
+        "课程时间须包含有效时区。",
+      );
+      return Date.parse(value);
+    };
+    demand(
+      readInstant("regularDeadline") === regular &&
+        readInstant("closingDeadline") === regular + 7 * 86400000,
+      "常规截止和七天收尾日期须与已保存时间窗一致。",
+    );
+    const settlement = readInstant("settlementPlannedAt");
+    const settlementDate = new Date(settlement).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Shanghai",
+    });
+    demand(
+      settlement === instant(settlementDate),
+      "请选择结算日期，时间使用上海时间零点。",
+    );
+    const saved = (yield* sportsCourseDraftPolicy(repo, actor, "sports.course.save", {
+      ...course.data,
+      id: course.id,
+      version: course.version,
+      templateId: input.templateId,
+      threshold: input.minimumMinutes,
+      weeklyLimit: input.weeklyLimit,
+      relatedTarget: input.courseTarget,
+      otherTarget: input.generalTarget,
+      description: input.description,
+      settlementDate,
+    }))!;
+    return yield* sportsCoursePublishPolicy(repo, actor, "sports.course.publish", {
+      id: saved.id,
+      version: saved.version,
+    }, remind);
+  }
+  if (action === "sports.course.publish") {
+    const course = ownedCourse(reader, actor, input.id);
+    version(course, input);
+    currentSemester(reader, course.data.semesterId);
+    demand(course.data.status === "DRAFT", "课程已发布，不能重复发布。", 409);
+    textField(course.data, "name", 100);
+    textField(course.data, "description", 1000);
+    courseRules(reader, course.data);
+    demand(course.data.checkInAvailable !== false, "发布前须允许打卡。");
+    checkFeasibility(course.data);
+    const published = yield* effect(repo.save(course, {
+      status: "PUBLISHED",
+      enrollmentOpen: true,
+      publishedAt: new Date().toISOString(),
+      rulesVersion: 1,
+    }));
+    yield* effect(remind(published));
+    return published;
   }
 }

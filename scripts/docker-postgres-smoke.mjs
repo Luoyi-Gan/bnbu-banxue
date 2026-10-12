@@ -179,6 +179,7 @@ try {
      UPDATE entities SET owner_id='${teacherId}',data=(data::jsonb || '{"weeklyLimit":3,"relatedTarget":600,"otherTarget":600}'::jsonb)::text WHERE id='${courseId}';`],{stdio:'pipe'});
   const studentCookie=cookie;
   await request('/api/auth/sign-in',{identifier:adminLogin,password});
+  const publishedTemplate=(await request('/api/commands',{action:'sports.template.publish',input:{name:'Docker fixed V8.1'},requestId:randomUUID()})).data;
   const futureYear=2100+Math.floor(Math.random()*7000),futureSemester={name:'Docker future semester',academicYear:futureYear+'-'+(futureYear+1),type:'SUMMER',startDate:futureYear+'-06-01',endDate:futureYear+'-08-31'};
   const createdSemester=(await request('/api/commands',{action:'sports.semester.create',input:futureSemester,requestId:randomUUID()})).data;
   await request('/api/commands',{action:'sports.semester.update',input:{...futureSemester,id:createdSemester.id,version:1,name:'Docker checked semester'},requestId:randomUUID()});
@@ -198,6 +199,15 @@ try {
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
   const teacherCookie=cookie;
+  const createdCourse=(await request('/api/commands',{action:'sports.course.create',input:{name:'Docker real publication'},requestId:randomUUID()})).data;
+  await request('/api/commands',{action:'sports.course.window',input:{id:createdCourse.id,version:1,startDate:'2026-09-01',deadlineDate:'2027-01-20',startTime:'08:00',endTime:'22:00',excludedDates:[],checkInAvailable:true},requestId:randomUUID()});
+  const publishCommand={action:'sports.course.configurepublish',input:{id:createdCourse.id,expectedCourseVersion:2,expectedVersion:0,publish:true,maximumMinutes:60,dailyLimit:1,globalTargetVersion:1,templateId:publishedTemplate.id,minimumMinutes:30,weeklyLimit:3,courseTarget:600,generalTarget:600,description:'Docker publication verification',regularDeadline:'2027-01-20T23:59:59+08:00',closingDeadline:'2027-01-27T23:59:59+08:00',settlementPlannedAt:'2027-01-28T00:00:00+08:00'},requestId:randomUUID()};
+  const publishedCourse=await request('/api/commands',publishCommand);assert.deepEqual(await request('/api/commands',publishCommand),publishedCourse);
+  const publishedView=(await request('/api/sports/workspace')).courses.find(c=>c.id===createdCourse.id);assert.equal(publishedView.data.status,'PUBLISHED');assert.equal(publishedView.data.enrollmentOpen,true);
+  const publishedInvite=(await request('/api/commands',{action:'sports.invitation.create',input:{courseId:createdCourse.id,minutes:5},requestId:randomUUID()})).data;
+  await request('/api/commands',{action:'sports.invitation.revoke',input:{id:publishedInvite.id,version:1},requestId:randomUUID()});
+  await request('/api/commands',{action:'sports.course.close',input:{id:createdCourse.id,version:publishedView.version,reason:'Docker test completed'},requestId:randomUUID()});
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${createdCourse.id}','${publishedInvite.id}')`],{stdio:'pipe'});
   const teachingReport=await request('/api/sports/course-reports/'+courseId);
   assert.equal(teachingReport.reportType,'CURRENT_TEACHING_REPORT');
   assert.equal(teachingReport.rows.find(r=>r.enrollmentId===enrollmentId).facts.enduranceStatus,'NOT_RECORDED');

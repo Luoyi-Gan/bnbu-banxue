@@ -33,7 +33,8 @@ import { projectSportsNotification } from '../sports/portal-notifications';
 import { sportsSessionPolicy } from '../sports/sessions';
 import { saveSportsPreferences, sportsPreferencesGate } from './postgres-sports-preferences';
 import { studentSessionProjection } from './postgres-sports-session';
-import { sportsRole, sportsSemesterPolicy, sportsCourseDraftPolicy, sportsInvitationPolicy, publishedTemplateFields } from '../sports/courses';
+import { sportsRole, sportsSemesterPolicy, sportsCourseDraftPolicy, sportsCoursePublishPolicy, sportsInvitationPolicy, publishedTemplateFields } from '../sports/courses';
+import { checkPostgresDeadlineReminders } from './postgres-deadline-reminders';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -49,7 +50,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
-    if(['sports.course.create','sports.course.window','sports.course.save','sports.course.close','sports.invitation.create','sports.invitation.revoke'].includes(action)) {
+    if(['sports.course.create','sports.course.window','sports.course.save','sports.course.configurepublish','sports.course.publish','sports.course.close','sports.invitation.create','sports.invitation.revoke'].includes(action)) {
       const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
       sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
     }
@@ -118,6 +119,9 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
     else if(['sports.course.close','sports.invitation.create','sports.invitation.revoke'].includes(action)) {
       const saved=await runAsync(sportsInvitationPolicy(repo,actor,action,input));if(saved)result={id:saved.id};
+    }
+    else if(['sports.course.configurepublish','sports.course.publish'].includes(action)) {
+      const saved=await runAsync(sportsCoursePublishPolicy(repo,actor,action,input,course=>checkPostgresDeadlineReminders(repo,Date.now(),course)));if(saved)result={id:saved.id};
     }
     else if(['sports.course.create','sports.course.window','sports.course.save'].includes(action)) {
       const saved=await runAsync(sportsCourseDraftPolicy(repo,actor,action,input));if(saved)result={id:saved.id};

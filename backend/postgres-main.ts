@@ -1,4 +1,5 @@
 import { processPostgresSportsReview } from './src/storage/postgres-review-worker';
+import { processPostgresDeadlineReminders } from './src/storage/postgres-deadline-reminders';
 import { seedPostgresConversions } from './src/storage/postgres-conversion-seed';
 import { PostgresDatabase } from './src/storage/postgres';
 import { postgresMigrations } from './src/storage/postgres-schema';
@@ -27,4 +28,7 @@ console.log(`BNBU PostgreSQL API listening on port ${port}; business route migra
 let reviewing=false;
 const reviewTimer=setInterval(()=>{if(reviewing)return;reviewing=true;void processPostgresSportsReview(db).catch(()=>console.error('Sports review pass failed; pending work retained')).finally(()=>{reviewing=false;});},10000);
 reviewTimer.unref();
-for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>{clearInterval(reviewTimer);server.close(()=>void db.close());});
+let reminding=false;
+const reminderTimer=setInterval(()=>{if(reminding)return;reminding=true;void processPostgresDeadlineReminders(db).catch(()=>console.error('Sports deadline reminders failed; pending work retained')).finally(()=>{reminding=false;});},60000);
+reminderTimer.unref();
+for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>{clearInterval(reviewTimer);clearInterval(reminderTimer);server.close(()=>void db.close());});

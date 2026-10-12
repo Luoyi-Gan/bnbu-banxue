@@ -1,4 +1,5 @@
 import { postgresCourseReport } from '../backend/src/storage/postgres-course-report';
+import { checkPostgresDeadlineReminders } from '../backend/src/storage/postgres-deadline-reminders';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
@@ -467,7 +468,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   });
   it('creates teacher course drafts without inventing rules or opening enrollment', async()=>{
     const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
-    const semester=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{status:'CURRENT',startDate:'2026-09-01',endDate:'2027-01-31'}));
+    const semester=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{status:'CURRENT',startDate:'2035-01-01',endDate:'2035-07-31'}));
     try {
       const input={name:'Draft course'},key=randomUUID();
       await expect(executePostgres(db,student.token,'sports.course.create',input,randomUUID())).rejects.toMatchObject({status:403});
@@ -475,7 +476,19 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const course=await db.transaction(client=>new PostgresRepository(client).get(saved.id));
       expect(course.data).toEqual({name:'Draft course',semesterId:semester.id,status:'DRAFT',settlementStatus:'PENDING',enrollmentOpen:false});
       await expect(executePostgres(db,teacher.token,'sports.invitation.create',{courseId:course.id},randomUUID())).rejects.toMatchObject({status:400});
-      const published=await db.transaction(client=>new PostgresRepository(client).save(course,{status:'PUBLISHED',enrollmentOpen:true}));
+      const template=await db.transaction(client=>new PostgresRepository(client).create('sportsTemplate',null,{status:'published'}));
+      await executePostgres(db,teacher.token,'sports.course.window',{id:course.id,version:course.version,startDate:'2035-01-01',deadlineDate:'2035-05-31',startTime:'08:00',endTime:'22:00',excludedDates:[],checkInAvailable:true},randomUUID());
+      const draft=await db.transaction(client=>new PostgresRepository(client).get(course.id));
+      const publishInput={id:course.id,expectedCourseVersion:draft.version,expectedVersion:0,publish:true,maximumMinutes:60,dailyLimit:1,globalTargetVersion:1,templateId:template.id,minimumMinutes:30,weeklyLimit:3,courseTarget:600,generalTarget:600,description:'完整课程',regularDeadline:'2035-05-31T23:59:59+08:00',closingDeadline:'2035-06-07T23:59:59+08:00',settlementPlannedAt:'2035-06-08T00:00:00+08:00'};
+      await expect(executePostgres(db,teacher.token,'sports.course.configurepublish',{...publishInput,courseTarget:601},randomUUID())).rejects.toMatchObject({status:400});
+      expect(await db.transaction(client=>new PostgresRepository(client).get(course.id))).toEqual(draft);
+      const impossible=await db.transaction(client=>new PostgresRepository(client).create('sportsCourse',draft.ownerId,{...draft.data,startDate:'2035-05-31'}));
+      await expect(executePostgres(db,teacher.token,'sports.course.configurepublish',{...publishInput,id:impossible.id,expectedCourseVersion:impossible.version},randomUUID())).rejects.toMatchObject({status:400});
+      expect(await db.transaction(client=>new PostgresRepository(client).get(impossible.id))).toEqual(impossible);
+      const publishKey=randomUUID(),publication=await executePostgres(db,teacher.token,'sports.course.configurepublish',publishInput,publishKey);
+      expect(await executePostgres(db,teacher.token,'sports.course.configurepublish',publishInput,publishKey)).toEqual(publication);
+      const published=await db.transaction(client=>new PostgresRepository(client).get(course.id));
+      expect(published.data).toMatchObject({status:'PUBLISHED',enrollmentOpen:true,rulesVersion:1,relatedTarget:600,otherTarget:600});
       const invite=await executePostgres(db,teacher.token,'sports.invitation.create',{courseId:course.id,minutes:5},randomUUID());
       const row=await db.transaction(client=>new PostgresRepository(client).get(invite.id));expect(row.data.status).toBe('ACTIVE');expect(typeof row.data.code).toBe('string');
       await executePostgres(db,teacher.token,'sports.invitation.revoke',{courseId:course.id,code:row.data.code},randomUUID());
@@ -484,6 +497,24 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await db.transaction(client=>new PostgresRepository(client).get(course.id))).data.enrollmentOpen).toBe(false);
       await expect(executePostgres(db,teacher.token,'sports.course.create',{...input,threshold:30},randomUUID())).rejects.toMatchObject({status:400});
     } finally {await db.pool.query('DELETE FROM entities WHERE id=$1',[semester.id]);}
+  });
+  it('commits deadline markers and notices together, deduplicates concurrent checks and pauses during maintenance', async()=>{
+    const course=await db.transaction(async client=>{const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'CURRENT'}),course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,name:'提醒测试',status:'PUBLISHED',deadlineDate:'2035-01-31',threshold:30,weeklyLimit:3,relatedTarget:600,otherTarget:600});await repo.create('sportsEnrollment','sports-reader-student',{courseId:course.id,status:'ACTIVE'});return course;});
+    const due=Date.parse('2035-01-17T00:00:00+08:00');
+    const check=(now:number,fail=false)=>db.transaction(async client=>{await client.query('SELECT pg_advisory_xact_lock(18422, 2)');const repo=new PostgresRepository(client);if(fail)repo.notify=async()=>{throw new Error('notification unavailable');};await checkPostgresDeadlineReminders(repo,now,await repo.get(course.id));});
+    const notices=async()=>(await db.pool.query('SELECT * FROM notifications WHERE entity_id=$1',[course.id])).rows;
+    await check(due-1);expect(await notices()).toHaveLength(0);
+    await expect(check(due,true)).rejects.toThrow('notification unavailable');
+    expect((await db.transaction(client=>new PostgresRepository(client).all('sportsDeadlineReminder'))).filter(m=>m.data.courseId===course.id)).toHaveLength(0);
+    const mode=await db.transaction(client=>new PostgresRepository(client).create('sportsSystem',null,{mode:'MAINTENANCE'}));
+    try {await check(due);expect(await notices()).toHaveLength(0);} finally {await db.pool.query('DELETE FROM entities WHERE id=$1',[mode.id]);}
+    await Promise.all([check(due+1000),check(due+1000)]);
+    expect(await notices()).toHaveLength(2);
+    const studentNotice=(await notices()).find(n=>n.recipient_id==='sports-reader-student');expect(studentNotice.body).toContain('课程相关还差600分钟');expect(studentNotice.body).not.toContain('成绩');
+    const markers=(await db.transaction(client=>new PostgresRepository(client).all('sportsDeadlineReminder'))).filter(m=>m.data.courseId===course.id);
+    expect(markers).toHaveLength(2);expect(markers.every(m=>m.data.sentAt===due+1000)).toBe(true);
+    await db.pool.query('DELETE FROM notifications WHERE entity_id=$1',[course.id]);
+    await db.pool.query('DELETE FROM entities WHERE id=$1',[course.data.semesterId]);
   });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
