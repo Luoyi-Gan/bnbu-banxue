@@ -11,6 +11,8 @@ export interface AlumniProfile {
   experience: string
   topics: string
   bio: string
+  studentNumber?: string
+  studentNumberSource?: 'verified-email' | 'applicant'
   evidence: string
   status: 'pending' | 'approved' | 'rejected'
   reviewNote: string

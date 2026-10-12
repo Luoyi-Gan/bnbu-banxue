@@ -69,7 +69,7 @@ export function cancelAlumniBooking(state: V2State, actor: AlumniActor, id: stri
   return { ...state, alumni: record(next, actor, id, status === 'pending' ? '校友交流申请已撤回' : '校友交流预约已取消', reason.trim(), [booking!.student, person!.owner], now) }
 }
 
-export function submitAlumniCertification(state: V2State, actor: AlumniActor, input: Pick<AlumniProfile, 'name' | 'major' | 'graduationYear' | 'city' | 'direction' | 'experience' | 'topics' | 'bio' | 'evidence'>, now = Date.now()): V2State {
+export function submitAlumniCertification(state: V2State, actor: AlumniActor, input: Pick<AlumniProfile, 'name' | 'major' | 'graduationYear' | 'city' | 'direction' | 'experience' | 'topics' | 'bio' | 'evidence' | 'studentNumber' | 'studentNumberSource'>, now = Date.now()): V2State {
   const data = alumniData(state), previous = data.profiles.find(p => p.owner === actor.id)
   demand(actor.role === 'student' && (!previous || previous.status === 'rejected'), '已有待审或通过的校友认证。')
   demand(input.name.trim() && input.major.trim() && input.evidence.trim() && input.city.trim() && input.experience.trim() && input.topics.trim(), '请补充必填资料与核验说明。')

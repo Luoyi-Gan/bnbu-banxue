@@ -101,16 +101,20 @@ describe("API、持久化和跨角色联动", () => {
     expect(snapshot(db,a.account).relationshipHistory[0].entity).toMatchObject({title:"原对象当前不可见",active:false,path:"/v2/me"});
   });
   it("校友方向只接受升学或就业，非法输入不创建或覆盖业务记录", () => {
-    const { a, admin, run, db, repo } = setup();
+    const { a, b, admin, run, db, repo } = setup();
     const input = { major: "计算机", graduationYear: 2024, city: "珠海",
       direction: "就业", experience: "工作", topics: "实习", bio: "介绍", evidence: "测试核验说明" };
     for (const direction of [undefined, "其他", "", 1]) {
-      expect(() => run(a, "alumni.apply", { ...input, direction })).toThrow();
+      expect(() => run(a, "alumni.apply", {studentNumber:"TEST-2020", ...input, direction })).toThrow();
       expect(snapshot(db, admin.account).alumni.profiles).toHaveLength(0);
     }
-    run(a, "alumni.apply", input);
+    expect(() => run(a,"alumni.apply",input)).toThrow();
+    run(a, "alumni.apply", {...input,studentNumber:"TEST-2020"});
     const profile = snapshot(db, admin.account).alumni.profiles[0];
     run(admin, "alumni.review", { id: profile.id, approve: true });
+    expect(profile.studentNumber).toBe("TEST-2020");
+    expect(profile.studentNumberSource).toBe("applicant");
+    expect(snapshot(db,b.account).alumni.profiles[0].studentNumber).toBeUndefined();
     const before = snapshot(db, a.account).alumni;
     expect(communityView(db, a.token).alumniProfiles).toEqual([{id:profile.id,name:a.account.name}]);
     for (const direction of [undefined, "其他", "", 1]) {
@@ -196,7 +200,7 @@ describe("API、持久化和跨角色联动", () => {
   });
   it("申请人被封禁后校友仍可拒绝，但不能确认新预约", () => {
     const { a, b, c, admin, db, run } = setup();
-    run(a, "alumni.apply", {
+    run(a, "alumni.apply", {studentNumber:"TEST-2020",
       major: "计算机", graduationYear: 2024, city: "珠海",
       direction: "就业", experience: "工作", topics: "实习",
       bio: "", evidence: "本地验收说明",
@@ -486,7 +490,7 @@ describe("API、持久化和跨角色联动", () => {
   });
   it("校友竞争确认、跨教师交流冲突及撤销认证联动", () => {
     const { a, b, c, teacher, admin, db, run } = setup();
-    run(a, "alumni.apply", {
+    run(a, "alumni.apply", {studentNumber:"TEST-2020",
       major: "计算机",
       graduationYear: 2024,
       city: "珠海",

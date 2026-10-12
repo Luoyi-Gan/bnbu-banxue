@@ -293,7 +293,7 @@ export function snapshot(db: Database, actor: Account) {
       .map((p) =>
         p.owner === actor.id || review
           ? p
-          : { ...p, evidence: "", reviewNote: "" },
+          : { ...p, studentNumber: undefined, studentNumberSource: undefined, evidence: "", reviewNote: "" },
       ),
     slots: alumni.slots.filter((s) => bookings.some(b => b.slotId === s.id) ||
       alumni.profiles.some(

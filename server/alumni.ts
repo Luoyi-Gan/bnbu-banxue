@@ -1,3 +1,4 @@
+import { studentNumber } from './student-search';
 import { initialV2State, type V2State } from "../src/v2/model";
 import type { AlumniData } from "../src/v2/alumniModel";
 import {
@@ -114,6 +115,8 @@ export function alumniCommand(
       next = submitAlumniCertification(state, policyActor, {
         ...profileInput(),
         name: actor.name,
+        studentNumber: studentNumber(repo.db, actor) ?? textField(input, "studentNumber", 100),
+        studentNumberSource: studentNumber(repo.db, actor) ? "verified-email" : "applicant",
         major: textField(input, "major", 80),
         graduationYear: integerField(
           input,

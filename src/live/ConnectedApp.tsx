@@ -1203,6 +1203,7 @@ export function ConnectedApp() {
                   className="v2-button v2-button-primary"
                   onClick={() =>
                     open("申请校友认证", "alumni.apply", [
+                      f("studentNumber", "学号"),
                       f("major", "原专业"),
                       f("graduationYear", "毕业年份", "number"),
                       ...alumniProfileFields,
@@ -1594,7 +1595,7 @@ export function ConnectedApp() {
                         <p>
                           {p.major} · {p.graduationYear}
                         </p>
-                        <p>{p.evidence}</p>
+                        <p>学号：{p.studentNumber || "旧申请未提供"}（{p.studentNumberSource === "verified-email" ? "已验证邮箱" : "申请人填写，待核对"}）</p><p>{p.evidence}</p>
                         <div className="live-actions">
                           {button("通过", "alumni.review", {
                             id: p.id,
