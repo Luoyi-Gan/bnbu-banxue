@@ -441,7 +441,7 @@ export function snapshot(db: Database, actor: Account) {
         : { id: p.id, name: p.name, organization: p.id !== actor.id && hiddenProfiles.has(p.id) && !has(actor, "teacher", "reviewer", "operator") ? "" : p.organization },
     );
   return {
-    account: actor,
+    account: {...actor, studentNumber:studentNumber(db,actor)},
     sports: sportsCompanion(repo, actor),
     entities,
     alumni: scopedAlumni,

@@ -1,3 +1,5 @@
+import {createApiServer} from '../server/main';
+import {randomUUID} from 'node:crypto';
 import {it,expect} from 'vitest';
 import {openDatabase} from '../server/database';
 import {createAccount,login,issueCode,register,verifyOwnEmail} from '../server/auth';
@@ -32,4 +34,27 @@ it('学校邮箱验证码绑定前缀，搜索尊重角色与隐私',()=>{
  expect(searchStudents(db,viewer,'654321').students[0].id).toBe(existing.id);
  expect(()=>verifyOwnEmail(db,existing,code)).toThrow();
  } finally {db.close()}
+});
+
+it('HTTP 本人邮箱验证、学号搜索和隐私设置贯通',async()=>{
+ const db=openDatabase(':memory:'); const server=createApiServer(db,{localOutbox:true});
+ try {
+  createAccount(db,{email:'2026123@bnbu.edu.cn',name:'测试学生',password:'Acceptance-123',roles:['student']});
+  const actor=login(db,'2026123@bnbu.edu.cn','Acceptance-123');
+  await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+  const base='http://127.0.0.1:'+(server.address() as {port:number}).port;
+  const headers={'Content-Type':'application/json',Cookie:'bnbu_session='+actor.token};
+  const post=(path:string,body:unknown)=>fetch(base+path,{method:'POST',headers,body:JSON.stringify(body)});
+  expect((await fetch(base+'/api/students/search?number=2026123')).status).toBe(401);
+  expect((await post('/api/auth/email/request',{})).status).toBe(200);
+  const mail=db.prepare('SELECT body FROM mail_outbox WHERE recipient=?').get(actor.account.email) as {body:string};
+  const code=mail.body.match(/\d{6}/)![0];
+  expect((await post('/api/auth/email/confirm',{code})).status).toBe(200);
+  const workspace=await fetch(base+'/api/workspace',{headers});expect((await workspace.json()).account.studentNumber).toBe('2026123');
+  const search=()=>fetch(base+'/api/students/search?number=2026123',{headers}).then(r=>r.json());
+  expect((await search()).students).toHaveLength(1);
+  const response=await post('/api/commands',{action:'preferences.searchable',input:{enabled:false},requestId:randomUUID()});
+  expect(response.status).toBe(200);expect((await search()).students).toHaveLength(0);
+  expect((await post('/api/auth/email/confirm',{code})).status).toBe(400);
+ } finally {server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));db.close()}
 });
