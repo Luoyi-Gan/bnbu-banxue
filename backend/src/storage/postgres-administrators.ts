@@ -1,5 +1,6 @@
-import { demand, ServiceError, type Account } from '../auth';
-import type { Fields } from '../repository';
+import { randomUUID } from 'node:crypto';
+import { demand, ServiceError, encodePassword, normalizeEmail, timestamp, type Account } from '../auth';
+import { textField, type Fields } from '../repository';
 import { version } from '../sports/courses';
 import { sportsPermissions } from '../sports/permissions';
 import { passwordChangeRequired } from '../sports/account-gate';
@@ -31,6 +32,28 @@ export async function postgresAdministratorState(repo:PostgresRepository,actor:A
   if(next==='banned') await repo.client.query('DELETE FROM sessions WHERE account_id=$1',[identity.ownerId]);
   await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action:'sports.admins.state',before:row.status,after:next});
   const saved=await repo.save(identity,{accountState:input.status});
+  return {id:saved.id};
+}
+
+export async function postgresAdministratorCreate(repo:PostgresRepository,actor:Account,input:Fields) {
+  await requirePostgresSuperAdmin(repo,actor);
+  demand(Object.keys(input).every(k=>['personId','loginName','name','email','department','permissions','initialPassword','confirmPassword','confirmed'].includes(k)),'管理账号操作包含不允许的字段。');
+  demand(input.confirmed===true,'须核对账号资料、全部权限及高风险权限后确认。');
+  const name=textField(input,'name',40),email=normalizeEmail(input.email),department=textField(input,'department',200,true);
+  const domains=(process.env.BNBU_SCHOOL_EMAIL_DOMAINS ?? 'bnbu.edu.cn').split(',').map(d=>d.trim().toLowerCase()).filter(Boolean);
+  demand(domains.includes(email.split('@')[1]),'请填写已配置学校域名的邮箱。');
+  demand(Array.isArray(input.permissions) && input.permissions.length>0 && input.permissions.every(p=>sportsPermissions.includes(p)) && new Set(input.permissions).size===input.permissions.length,'须选择至少一项固定业务权限，不得授予管理账号或教师权限。');
+  demand(!(await repo.client.query("SELECT id FROM accounts WHERE email=$1 AND login_kind='ADMIN'",[email])).rows.length,'学校邮箱已被另一分管理员使用。',409);
+  const personId=textField(input,'personId',100);
+  const person=(await repo.client.query('SELECT status,login_kind FROM accounts WHERE id=$1',[personId])).rows[0];
+  demand(person?.status==='active' && person.login_kind==='PERSONAL' && (await repo.all('sportsIdentity')).some(i=>i.ownerId===personId && i.data.status==='verified'),'请选择当前已完成身份核验的人员。',409);
+  const loginName=textField(input,'loginName',100).toLowerCase();
+  demand(!(await repo.client.query('SELECT id FROM accounts WHERE login_name=$1',[loginName])).rows.length,'管理登录账号已存在。',409);
+  demand(typeof input.initialPassword==='string' && input.initialPassword.length>0 && input.initialPassword===input.confirmPassword,'须填写初始密码且两次输入一致。');
+  const id=randomUUID();
+  await repo.client.query("INSERT INTO accounts(id,email,password_hash,name,organization,roles,created_at,login_kind,login_name) VALUES($1,$2,$3,$4,$5,$6,$7,'ADMIN',$8)",[id,email,encodePassword(input.initialPassword),name,department,JSON.stringify(['admin']),timestamp(),loginName]);
+  const saved=await repo.create('sportsIdentity',id,{role:'admin',status:'verified',permissions:input.permissions,mustChangePassword:true,accountState:'ACTIVE',source:'SUPERADMIN_CONFIRMED_PERSON',verifiedPersonId:personId});
+  await repo.create('sportsAdminHistory',actor.id,{administratorId:id,action:'sports.admins.create',permissions:input.permissions});
   return {id:saved.id};
 }
 

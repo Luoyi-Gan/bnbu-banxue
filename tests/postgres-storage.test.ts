@@ -104,6 +104,33 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await auth.login('state-manager','State-test-123')).account.id).toBe('state-admin');
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
+  it('creates an isolated management login only for a verified person with fixed permissions', async () => {
+    const auth=new PostgresAuth(db);
+    const root=(await auth.login('password-manager','Changed-test-123')).token;
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
+    const input={personId:'state-person',loginName:' NEW-MANAGER ',name:'新管理员',email:'new-manager@bnbu.edu.cn',department:'测试',permissions:['ACCOUNTS'],initialPassword:'New-manager-123',confirmPassword:'New-manager-123',confirmed:true};
+    try {
+      await expect(executePostgres(db,root,'sports.admins.create',input,randomUUID())).rejects.toThrow('身份核验');
+      await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','state-person',{role:'student',status:'verified'}));
+      await expect(executePostgres(db,root,'sports.admins.create',{...input,permissions:['SUPERADMIN']},randomUUID())).rejects.toThrow('固定业务权限');
+      await expect(executePostgres(db,root,'sports.admins.create',{...input,email:'bad@example.test'},randomUUID())).rejects.toThrow('学校域名');
+      const key=randomUUID();
+      const result=await executePostgres(db,root,'sports.admins.create',input,key);
+      expect(await executePostgres(db,root,'sports.admins.create',input,key)).toEqual(result);
+      const identity=await db.transaction(client=>new PostgresRepository(client).get(result.id));
+      expect(identity.ownerId).not.toBe('state-person');
+      expect(identity.data.mustChangePassword).toBe(true);
+      expect(identity.data.schoolEmailVerified).not.toBe(true);
+      const login=await auth.login('new-manager','New-manager-123');
+      expect(login.account.roles).toEqual(['admin']);
+      await expect(executePostgres(db,login.token,'preferences.preview',{enabled:false},randomUUID())).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
+      await expect(executePostgres(db,root,'sports.admins.create',{...input,loginName:'another-manager'},randomUUID())).rejects.toMatchObject({status:409});
+      expect((await auth.login('state@example.test','State-test-123')).account.id).toBe('state-person');
+      const history=(await db.pool.query("SELECT data FROM entities WHERE kind='sportsAdminHistory' AND data::jsonb->>'administratorId'=$1",[identity.ownerId])).rows;
+      expect(history).toHaveLength(1);
+      expect(JSON.stringify(history)).not.toContain('New-manager-123');
+    } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
+  });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
     expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);
