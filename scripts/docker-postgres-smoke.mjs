@@ -1,3 +1,5 @@
+import sharp from 'sharp';
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { randomUUID, randomBytes } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -126,6 +128,16 @@ try {
   const editResponse=await fetch(base+'/api/v1/exercise-records/'+draft.id,{method:'PATCH',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify({description:'Docker edited draft',expectedVersion:draft.version})});
   assert.equal(editResponse.status,200);const edited=(await editResponse.json()).data;
   assert.equal(edited.description,'Docker edited draft');
+  const bytes=await sharp({create:{width:3,height:3,channels:3,background:'#123456'}}).png().toBuffer();
+  const hash=createHash('sha256').update(bytes).digest('hex');
+  const lease=await sessionWrite('/api/v1/media-uploads',{sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'FILE_PICKER',declaredContentSha256:hash,durationSeconds:null});
+  const uploaded=await fetch(base+lease.uploadUrl,{method:'PUT',headers:{Cookie:cookie,Origin:base,...lease.requiredHeaders},body:bytes});
+  assert.equal(uploaded.status,200,await uploaded.text());
+  assert.equal(uploaded.headers.get('etag'), '"'+hash+'"');
+  const confirmed=await sessionWrite('/api/v1/media-uploads/'+lease.uploadSessionId+'/confirm',{etag:hash});
+  await sessionWrite('/api/v1/media/'+lease.mediaId+'/bind',{sessionId:session.id,expectedVersion:confirmed.version});
+  assert.equal((await request('/api/v1/media/'+lease.mediaId)).data.uploadStatus,'AVAILABLE');
+  assert.ok((await request('/api/v1/exercise-records/'+draft.id+'/evidence-context')).data.mediaIds.includes(lease.mediaId));
   const discarded=await sessionWrite('/api/v1/exercise-records/'+draft.id+'/discard',{expectedVersion:edited.version,reason:'Docker test cleanup'});
   assert.equal(discarded.status,'DISCARDED');
 

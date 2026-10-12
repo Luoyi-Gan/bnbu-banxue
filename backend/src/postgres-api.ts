@@ -1,3 +1,4 @@
+import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext } from './storage/postgres-student-media';
 import { postgresStudentRecords } from './storage/postgres-student-records';
 import { createServer } from 'node:http';
 import { demand, ServiceError } from './auth';
@@ -33,6 +34,20 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const evidenceRead=/^\/api\/v1\/exercise-records\/([^/]+)\/evidence-context$/.exec(pathname);
+      if(request.method==='GET' && evidenceRead) return send(response,200,{data:await postgresEvidenceContext(db,cookieToken(request) ?? '',decodeURIComponent(evidenceRead[1]))});
+      const mediaRead=/^\/api\/v1\/media\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && mediaRead) return send(response,200,{data:await postgresMediaRead(db,cookieToken(request) ?? '',decodeURIComponent(mediaRead[1]))});
+      const mediaPut=/^\/api\/v1\/media-uploads\/([^/]+)\/object$/.exec(pathname);
+      if(request.method==='PUT' && mediaPut) {
+        demand(!request.headers.origin || origins.has(request.headers.origin),'来源不允许。',403);
+        demand(request.headers['sec-fetch-site']!=='cross-site','跨站请求不允许。',403);
+        await auth.authenticate(cookieToken(request));
+        let size=0;const chunks:Buffer[]=[];
+        for await(const chunk of request) {size+=chunk.length;demand(size<=100*1024*1024,'文件过大。',413);chunks.push(chunk);}
+        const etag=await postgresMediaPut(db,cookieToken(request) ?? '',decodeURIComponent(mediaPut[1]),Buffer.concat(chunks),request.headers['content-type'] ?? '');
+        response.writeHead(200,{ETag:'"'+etag+'"','Cache-Control':'no-store'});return response.end();
+      }
       const recordRead=/^\/api\/v1\/exercise-records(?:\/([^/]+))?$/.exec(pathname);
       if(request.method==='GET' && recordRead) return send(response,200,await postgresStudentRecords(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),recordRead[1]?decodeURIComponent(recordRead[1]):undefined));
       const sportsSessionRead=/^\/api\/v1\/exercise-sessions\/([^/]+)$/.exec(pathname);
@@ -91,6 +106,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const mediaWrite=/^\/api\/v1\/(media-uploads|media)(?:\/([^/]+)\/(confirm|bind))?$/.exec(pathname);
+        if(mediaWrite) {
+          demand((mediaWrite[1]==='media-uploads' && (!mediaWrite[3] || mediaWrite[3]==='confirm')) || (mediaWrite[1]==='media' && mediaWrite[3]==='bind'),'接口不存在。',404);
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'材料标识须使用路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.media.'+(mediaWrite[3] ?? 'initiate'),mediaWrite[2]?{...input,id:decodeURIComponent(mediaWrite[2])}:input,key)});
+        }
         const draftWrite=/^\/api\/v1\/exercise-records(?:\/([^/]+)\/(discard))?$/.exec(pathname);
         if(draftWrite) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');

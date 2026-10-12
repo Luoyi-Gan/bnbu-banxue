@@ -1,6 +1,8 @@
+import sharp from 'sharp';
+import { postgresMediaPut, postgresMediaRead } from '../backend/src/storage/postgres-student-media';
 import { postgresStudentRecords } from '../backend/src/storage/postgres-student-records';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { Pool } from 'pg';
 import { PostgresDatabase } from '../backend/src/storage/postgres';
 import { postgresMigrations } from '../backend/src/storage/postgres-schema';
@@ -203,6 +205,17 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const edited=await executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:draft.version,description:'核对后的说明'},randomUUID());
     expect(edited.description).toBe('核对后的说明');
     await expect(executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:draft.version,description:'旧版本'},randomUUID())).rejects.toMatchObject({status:409});
+    const bytes=await sharp({create:{width:2,height:2,channels:3,background:'#00ff00'}}).png().toBuffer();
+    const mediaInput={sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:bytes.length,captureSource:'FILE_PICKER',declaredContentSha256:createHash('sha256').update(bytes).digest('hex'),durationSeconds:null};
+    const mediaKey=randomUUID(),lease=await executePostgres(db,login.token,'sports.media.initiate',mediaInput,mediaKey);
+    expect(await executePostgres(db,login.token,'sports.media.initiate',mediaInput,mediaKey)).toEqual(lease);
+    await expect(postgresMediaPut(db,login.token,String(lease.mediaId),Buffer.from('invalid'),'image/png')).rejects.toMatchObject({status:409});
+    expect(await postgresMediaPut(db,login.token,String(lease.mediaId),bytes,'image/png')).toBe(createHash('sha256').update(bytes).digest('hex'));
+    expect(await postgresMediaPut(db,login.token,String(lease.mediaId),bytes,'image/png')).toBe(createHash('sha256').update(bytes).digest('hex'));
+    const verified=await executePostgres(db,login.token,'sports.media.confirm',{id:lease.mediaId,etag:createHash('sha256').update(bytes).digest('hex')},randomUUID());
+    const bound=await executePostgres(db,login.token,'sports.media.bind',{id:lease.mediaId,sessionId:session.id,expectedVersion:verified.version},randomUUID());
+    expect(bound.uploadStatus).toBe('AVAILABLE');
+    expect(await postgresMediaRead(db,login.token,String(lease.mediaId))).toMatchObject({verifiedFileSizeBytes:bytes.length,verificationStatus:'VERIFIED'});
     const discarded=await executePostgres(db,login.token,'sports.recorddraft.discard',{id:draft.id,expectedVersion:edited.version,reason:'测试放弃'},randomUUID());
     expect(discarded.status).toBe('DISCARDED');
     await expect(executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:discarded.version,description:'不能修改'},randomUUID())).rejects.toMatchObject({status:409});
