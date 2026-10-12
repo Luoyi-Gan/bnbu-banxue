@@ -7,6 +7,42 @@ import { administratorDirectory } from "./administrators";
 import { permissionNames } from "./portal";
 import type { SportsPermission } from "./permissions";
 
+export function portalSubadminDelete(
+  db: Database,
+  token: string,
+  accountId: string,
+  input: Fields,
+  key: string,
+) {
+  demand(input.handoverCompleted === true, "删除前须确认已完成职责移交。");
+  execute(
+    db,
+    token,
+    "sports.admins.delete",
+    {
+      accountId,
+      version: input.expectedVersion,
+      confirmed: true,
+      handoverConfirmed: true,
+    },
+    key,
+  );
+  const history = new Repository(db)
+    .all("sportsAdminHistory")
+    .find(
+      (h) =>
+        h.data.administratorId === accountId &&
+        h.data.action === "sports.admins.delete",
+    );
+  demand(history, "无法确认账号删除结果。", 500);
+  return {
+    id: accountId,
+    deleted: true,
+    deletedAt: new Date(Number(history.data.deletedAt)).toISOString(),
+    version: history.data.deletedVersion,
+  };
+}
+
 export function portalSubadminWrite(
   db: Database,
   token: string,

@@ -24,6 +24,7 @@ import {
   portalAccountPage,
   portalSubadmins,
   portalSubadminWrite,
+  portalSubadminDelete,
 } from "./sports/portal-accounts";
 import {
   portalAnnouncement,
@@ -385,6 +386,21 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const subadminDelete =
+          /^\/api\/v1\/admin\/subadmins\/([^/]+)\/delete$/.exec(pathname);
+        if (subadminDelete) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalSubadminDelete(
+              db,
+              token!,
+              subadminDelete[1],
+              input,
+              key,
+            ),
+          });
+        }
         const subadminWrite =
           /^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(
             pathname,

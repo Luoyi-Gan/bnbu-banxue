@@ -7,7 +7,82 @@ import {
   portalAccountPage,
   portalSubadmins,
   portalSubadminWrite,
+  portalSubadminDelete,
 } from "../server/sports/portal-accounts";
+
+it("原版删除核对版本并支持重试，保留个人账号和业务历史，重新检查操作者权限", () => {
+  const db = openDatabase(":memory:"),
+    repo = new Repository(db);
+  try {
+    const owner = createAccount(db, {
+      name: "owner",
+      email: "delete-owner@example.test",
+      password: "Password-123",
+      roles: ["superadmin"],
+    });
+    const ownerIdentity = repo.create("sportsIdentity", owner, {
+      role: "admin",
+      status: "verified",
+    });
+    const token = login(db, "delete-owner@example.test", "Password-123").token;
+    const person = createAccount(db, {
+      name: "person",
+      email: "delete-person@example.test",
+      password: "Password-123",
+      roles: [],
+    });
+    const target = createAccount(db, {
+      name: "target",
+      email: "delete-target@example.test",
+      password: "Password-123",
+      roles: [],
+    });
+    db.prepare(
+      "UPDATE accounts SET login_kind='ADMIN',login_name='delete.target',email='delete-person@example.test' WHERE id=?",
+    ).run(target);
+    const identity = repo.create("sportsIdentity", target, {
+      role: "admin",
+      status: "verified",
+    });
+    const fact = repo.create("sportsAuditFact", target, { retained: true });
+    const remove = (version: number, key: string, handoverCompleted = true) =>
+      portalSubadminDelete(
+        db,
+        token,
+        target,
+        { expectedVersion: version, handoverCompleted },
+        key,
+      );
+    expect(() => remove(identity.version, "delete-no-handover", false)).toThrow(
+      /移交/,
+    );
+    expect(() => remove(identity.version + 1, "delete-stale-version")).toThrow(
+      /变化/,
+    );
+    const result = remove(identity.version, "delete-idempotent");
+    expect(result).toMatchObject({ id: target, deleted: true, version: 2 });
+    expect(remove(identity.version, "delete-idempotent")).toEqual(result);
+    expect(
+      db
+        .prepare(
+          "SELECT login_kind,email,password_hash FROM accounts WHERE id=?",
+        )
+        .get(target),
+    ).toMatchObject({
+      login_kind: "HISTORY",
+      email: null,
+      password_hash: null,
+    });
+    expect(repo.get(fact.id, "sportsAuditFact").data.retained).toBe(true);
+    expect(
+      login(db, "delete-person@example.test", "Password-123").account.id,
+    ).toBe(person);
+    repo.save(ownerIdentity, { status: "revoked" });
+    expect(() => remove(identity.version, "delete-idempotent")).toThrow();
+  } finally {
+    db.close();
+  }
+});
 
 it("原版建号、编辑和启停复用独立管理命令，身份声明不能替代实际核验", () => {
   vi.stubEnv("BNBU_SCHOOL_EMAIL_DOMAINS", "example.test");

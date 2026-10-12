@@ -46,6 +46,36 @@ export function sportsAdministratorDeletion(
     return undefined;
   const self = action === "sports.account.close";
   if (!self) requireSportsSuperAdmin(repo, actor);
+  // The original portal confirms the displayed account and immutable version.
+  // Resolve that snapshot inside execute's transaction; the receipt hashes the
+  // original account ID/version so retries still work after identity removal.
+  if (!self && input.accountId !== undefined) {
+    demand(
+      Object.keys(input).every((key) =>
+        ["accountId", "version", "confirmed", "handoverConfirmed"].includes(
+          key,
+        ),
+      ),
+      "账号删除参数无效。",
+    );
+    const identities = repo
+      .all("sportsIdentity")
+      .filter((i) => i.ownerId === input.accountId && i.data.role === "admin");
+    demand(identities.length === 1, "管理账号不存在或身份资料需核对。", 404);
+    const snapshot = repo.db
+      .prepare("SELECT login_name,name,email FROM accounts WHERE id=?")
+      .get(String(input.accountId));
+    demand(snapshot, "管理账号不存在。", 404);
+    input = {
+      id: identities[0].id,
+      version: input.version,
+      confirmed: input.confirmed,
+      handoverConfirmed: input.handoverConfirmed,
+      loginName: snapshot.login_name,
+      name: snapshot.name,
+      email: snapshot.email,
+    };
+  }
   demand(
     Object.keys(input).every((k) =>
       [
@@ -143,6 +173,7 @@ export function sportsAdministratorDeletion(
     action,
     handoverConfirmed: true,
     deletedAt: Date.now(),
+    deletedVersion: identity.version + 1,
   });
   return { id: identity.ownerId };
 }
