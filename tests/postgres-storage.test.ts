@@ -6,7 +6,8 @@ import { postgresMigrations } from '../backend/src/storage/postgres-schema';
 import { PostgresRepository } from '../backend/src/storage/postgres-repository';
 import { importSqlite } from '../backend/src/storage/import-sqlite';
 import { openDatabase } from '../backend/src/database';
-import { createAccount } from '../backend/src/auth';
+import { createAccount, hashPassword, digest } from '../backend/src/auth';
+import { PostgresAuth } from '../backend/src/storage/postgres-auth';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -30,7 +31,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
-    expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(1);
+    expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);
     await expect(db.migrate([{version:1,sql:'SELECT 1'}])).rejects.toThrow('checksum mismatch');
   });
   it('rolls back all changes on the same connection and releases it afterwards', async () => {
@@ -124,5 +125,34 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await admin.query(`DROP SCHEMA ${importSchema} CASCADE`);
       rmSync(directory,{recursive:true,force:true});
     }
+  });
+  it('authenticates both account namespaces, hashes sessions and rejects disabled administrators', async () => {
+    const auth = new PostgresAuth(db);
+    const password = 'Postgres-test-123';
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('login-student','login@example.test',$1,'学生','now','[\"student\"]')",[hashPassword(password)]);
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles,login_kind,login_name) VALUES('login-admin','login@example.test',$1,'管理员','now','[\"reviewer\"]','ADMIN','login-manager')",[hashPassword(password)]);
+    await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','login-admin',{role:'admin',status:'verified'}));
+    const student = await auth.login(' LOGIN@example.test ',password);
+    expect(student.account.id).toBe('login-student');
+    expect(student.account).not.toHaveProperty('password_hash');
+    expect((await auth.authenticate(student.token)).roles).toEqual(['student']);
+    const session = (await db.pool.query('SELECT token_hash FROM sessions WHERE account_id=$1',['login-student'])).rows[0];
+    expect(session.token_hash).toBe(digest(student.token));
+    await auth.logout(student.token);
+    await expect(auth.authenticate(student.token)).rejects.toMatchObject({status:401});
+    const manager = await auth.login('login-manager',password);
+    expect(manager.account.id).toBe('login-admin');
+    await db.pool.query("UPDATE accounts SET status='banned' WHERE id='login-admin'");
+    await expect(auth.authenticate(manager.token)).rejects.toMatchObject({status:403});
+    await expect(auth.login('login-manager',password)).rejects.toMatchObject({status:403});
+    const expired = await auth.login('login@example.test',password);
+    await db.pool.query('UPDATE sessions SET expires_at=0 WHERE token_hash=$1',[digest(expired.token)]);
+    await expect(auth.authenticate(expired.token)).rejects.toMatchObject({status:401});
+  });
+  it('persists failed attempts across auth instances and never creates a session on failure', async () => {
+    const auth = new PostgresAuth(db);
+    for (let i=0;i<10;i++) await expect(auth.login('missing@example.test','wrong-password')).rejects.toMatchObject({status:401});
+    await expect(new PostgresAuth(db).login('missing@example.test','wrong-password')).rejects.toMatchObject({status:429});
+    expect((await db.pool.query('SELECT failures FROM login_attempts WHERE identifier=$1',['missing@example.test'])).rows[0].failures).toBe(10);
   });
 });

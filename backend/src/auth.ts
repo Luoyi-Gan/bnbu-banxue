@@ -40,12 +40,12 @@ export interface Account {
   status: "active" | "muted" | "banned";
   roles: string[];
 }
-type AccountRow = Omit<Account, "roles"> & {
+export type AccountRow = Omit<Account, "roles"> & {
   roles: string;
   password_hash: string;
   login_kind: "PERSONAL" | "ADMIN" | "HISTORY";
 };
-const account = (row: AccountRow): Account => ({
+export const account = (row: AccountRow): Account => ({
   id: row.id,
   email: row.email,
   name: row.name,
