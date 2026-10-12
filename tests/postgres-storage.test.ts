@@ -77,6 +77,33 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.transaction(client=>new PostgresRepository(client).save(system,{mode:'NORMAL'}));
     await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'");
   });
+  it('disables only the independent admin account and never revives old sessions', async () => {
+    const auth=new PostgresAuth(db);
+    const root=(await auth.login('password-manager','Changed-test-123')).token;
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
+    try {
+      await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,login_kind,login_name) VALUES('state-admin','state@example.test',$1,'分管理员','now','ADMIN','state-manager')",[hashPassword('State-test-123')]);
+      await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at) VALUES('state-person','state@example.test',$1,'个人','now')",[hashPassword('State-test-123')]);
+      const identity=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','state-admin',{role:'admin',status:'verified',permissions:['ACCOUNTS']}));
+      const management=(await auth.login('state-manager','State-test-123')).token;
+      const personal=(await auth.login('state@example.test','State-test-123')).token;
+      const input={id:identity.id,version:identity.version,status:'DISABLED',confirmed:true,handoverConfirmed:false};
+      await expect(executePostgres(db,management,'sports.admins.state',input,randomUUID())).rejects.toMatchObject({status:403});
+      await expect(executePostgres(db,root,'sports.admins.state',input,randomUUID())).rejects.toThrow('职责移交');
+      expect((await auth.authenticate(management)).id).toBe('state-admin');
+      input.handoverConfirmed=true;
+      const key=randomUUID();
+      await executePostgres(db,root,'sports.admins.state',input,key);
+      await executePostgres(db,root,'sports.admins.state',input,key);
+      await expect(auth.authenticate(management)).rejects.toMatchObject({status:401});
+      await expect(auth.login('state-manager','State-test-123')).rejects.toMatchObject({code:'ACCOUNT_DISABLED'});
+      expect((await auth.authenticate(personal)).id).toBe('state-person');
+      await expect(executePostgres(db,root,'sports.admins.state',{...input,status:'ACTIVE'},randomUUID())).rejects.toMatchObject({status:409});
+      await executePostgres(db,root,'sports.admins.state',{...input,version:identity.version+1,status:'ACTIVE'},randomUUID());
+      await expect(auth.authenticate(management)).rejects.toMatchObject({status:401});
+      expect((await auth.login('state-manager','State-test-123')).account.id).toBe('state-admin');
+    } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
+  });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
     expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);

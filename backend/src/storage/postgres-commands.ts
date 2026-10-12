@@ -14,6 +14,7 @@ import type { PostgresDatabase } from './postgres';
 import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
 import { postgresPassword } from './postgres-password';
+import { postgresAdministratorState, requirePostgresSuperAdmin } from './postgres-administrators';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -29,6 +30,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action.startsWith('sports.admins.')) await requirePostgresSuperAdmin(repo,actor);
     const previous = (await client.query<{request_hash:string;result:string}>('SELECT request_hash,result FROM command_receipts WHERE actor_id=$1 AND request_id=$2',[actor.id,requestId])).rows[0];
     if(previous) {
       demand(previous.request_hash===hash,'该请求标识已用于不同操作。',409);
@@ -36,6 +38,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     let result:Fields|undefined;
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action==='sports.admins.state') result=await postgresAdministratorState(repo,actor,input);
     else if(action.startsWith('notification.')) result=await runAsync(notificationPolicy(repo,actor,action,input));
     else {
       const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input)) ?? await runAsync(alumniPolicy(repo,actor,action,input));
