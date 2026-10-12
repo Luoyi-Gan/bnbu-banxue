@@ -1046,7 +1046,9 @@ export async function joinWithInvite(inviteToken, profile) {
   });
   if (flow.epoch !== authSessionEpoch) throw new Error('AUTH_SESSION_CHANGED');
   pendingInviteJoin = null;
-  storeAuthSession(joined.authSession);
+  if (joined.authSession?.kind === 'COMPANION') {
+    if (!companionSession || joined.authSession.user?.id !== companionSession.userId) throw new Error('AUTH_SESSION_CHANGED');
+  } else storeAuthSession(joined.authSession);
   return joined;
 }
 

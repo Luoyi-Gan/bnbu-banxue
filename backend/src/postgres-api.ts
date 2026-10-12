@@ -16,6 +16,7 @@ import { postgresStudentRecords, postgresStudentWorkflow, postgresProofTodos } f
 import { createServer } from 'node:http';
 import { demand, ServiceError } from './auth';
 import { body, cookieToken, send } from './http';
+import { issueMemberJoin, consumeMemberJoin } from './storage/postgres-member-join';
 import { PostgresAuth } from './storage/postgres-auth';
 import { PostgresEmail } from './storage/postgres-email';
 import type { PostgresDatabase } from './storage/postgres';
@@ -168,6 +169,15 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const memberJoin=/^\/api\/v1\/course-invites\/([^/]+)\/(join-capabilities\/member|join)$/.exec(pathname);
+        if(memberJoin) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          const code=decodeURIComponent(memberJoin[1]),session=cookieToken(request) ?? '';
+          if(memberJoin[2]==='join-capabilities/member')return send(response,200,{data:await issueMemberJoin(db,session,code,input,key)});
+          demand(Object.keys(input).length===0,'入班确认不接受额外资料。');
+          const capability=request.headers['x-join-capability'];demand(typeof capability==='string','缺少入班凭证。',403);
+          return send(response,200,{data:await consumeMemberJoin(db,session,code,capability,key)});
+        }
         if(['/api/v1/auth/student-sign-in-codes','/api/v1/auth/student-sign-in-codes/verify'].includes(pathname) && input.joinInviteToken!==undefined) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
           const result=pathname.endsWith('/verify')?await verifyStudentJoinEmail(db,input,key):await requestStudentJoinEmail(db,input,key,options.localOutbox);

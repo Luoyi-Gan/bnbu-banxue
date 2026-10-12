@@ -34,6 +34,18 @@ it('restores a real cookie identity without manufacturing browser tokens and rev
   expect(hasApiSession()).toBe(false);
   expect(fetcher.mock.calls.at(-1)[0]).toBe('/api/auth/logout');
 });
+it('keeps the existing cookie session after a successful member join',async()=>{
+  const response=data=>new Response(JSON.stringify({data}),{status:200});
+  const fetcher=vi.fn().mockImplementationOnce(async()=>response(identity.data))
+    .mockImplementationOnce(async()=>response({joinCapability:'one-time'}))
+    .mockImplementationOnce(async()=>response({authSession:{kind:'COMPANION',user:{id:'student-one'}},enrollment:{id:'member-one'}}));
+  vi.stubGlobal('fetch',fetcher);
+  await restoreCompanionSession();
+  expect((await joinWithInvite('v1.test',{})).enrollment.id).toBe('member-one');
+  expect(currentApiUserId()).toBe('student-one');
+  expect(hasApiSession()).toBe(true);
+  expect(fetcher.mock.calls.at(-1)[1].headers['X-Join-Capability']).toBe('one-time');
+});
 it('rejects nonstudents and ignores a restore response that arrives after logout', async () => {
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({data:{user:{role:'TEACHER'}}}),{status:200})));
   expect(await restoreCompanionSession()).toBe(false);

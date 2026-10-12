@@ -45,4 +45,11 @@ CREATE TABLE student_email_challenges (
  UNIQUE(email,request_id)
 );
 CREATE INDEX student_email_challenge_email ON student_email_challenges(email,sent_at);
-`}];
+`},{version:5,sql:`
+CREATE TABLE member_join_capabilities (
+ token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),session_hash TEXT NOT NULL,
+ invitation_id TEXT NOT NULL REFERENCES entities(id),flow_id TEXT NOT NULL REFERENCES entities(id),
+ issue_key TEXT NOT NULL,profile_hash TEXT NOT NULL,expires_at BIGINT NOT NULL,
+ consume_key TEXT,result TEXT,UNIQUE(account_id,session_hash,issue_key)
+);
+`},{version:6,sql:`ALTER TABLE member_join_capabilities ADD COLUMN source_hash TEXT NOT NULL DEFAULT '';`}];

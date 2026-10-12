@@ -43,6 +43,7 @@ import { postgresAccountDirectory } from '../backend/src/storage/postgres-accoun
 import { postgresSportsCourses } from '../backend/src/storage/postgres-sports-courses';
 import { postgresSportsHelp } from '../backend/src/storage/postgres-sports-help';
 import { postgresSportsMe } from '../backend/src/storage/postgres-sports-me';
+import { issueMemberJoin, consumeMemberJoin } from '../backend/src/storage/postgres-member-join';
 import { postgresStudentCourses } from '../backend/src/storage/postgres-student-courses';
 import { postgresSportsNotifications } from '../backend/src/storage/postgres-sports-notifications';
 import { startClock } from '../backend/src/sports/session-clock';
@@ -175,6 +176,44 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','sports-reader-student',{role:'student',status:'verified'}));
     await expect(postgresSportsMe(db,studentLogin.token)).rejects.toMatchObject({status:403});
     await db.pool.query('DELETE FROM entities WHERE id=$1',[duplicate.id]);
+  });
+  it('consumes member invitation capability once and rejects mismatched sessions and profiles', async()=>{
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const profile={fullName:'sports-reader-student',studentNumber:'2030123456',gender:'MALE',gradeYear:2030,collegeName:'FST',majorName:'CST',dateOfBirth:'2010-01-01',regionCode:'GD'};
+    const fixtures=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client),identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-student')!;
+      await repo.save(identity,{studentNumber:profile.studentNumber,sex:profile.gender,year:profile.gradeYear,collegeName:profile.collegeName,majorName:profile.majorName,dateOfBirth:profile.dateOfBirth,regionCode:profile.regionCode,schoolEmailVerified:true,schoolEmail:'sports-reader-student@example.test'});
+      const semester=await repo.create('sportsSemester',null,{status:'CURRENT'}),course=await repo.create('sportsCourse','sports-reader-teacher',{semesterId:semester.id,status:'PUBLISHED',enrollmentOpen:true});
+      const invite=await repo.create('sportsInvitation','sports-reader-teacher',{code:'v1.member-test',courseId:course.id,status:'ACTIVE',expiresAt:Date.now()+600000});
+      return {identity,semester,course,invite};
+    });
+    try {
+      const key=randomUUID(),issued=await issueMemberJoin(db,login.token,'v1.member-test',profile,key);
+      expect(await issueMemberJoin(db,login.token,'v1.member-test',profile,key)).toEqual(issued);
+      await expect(issueMemberJoin(db,login.token,'v1.member-test',{...profile,studentNumber:'other'},key)).rejects.toMatchObject({status:409});
+      const otherSession=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+      await expect(consumeMemberJoin(db,otherSession.token,'v1.member-test',issued.joinCapability,randomUUID())).rejects.toMatchObject({status:403});
+      await expect(consumeMemberJoin(db,login.token,'v1.wrong',issued.joinCapability,randomUUID())).rejects.toMatchObject({status:403});
+      await db.pool.query('UPDATE member_join_capabilities SET expires_at=0 WHERE token_hash=$1',[digest(issued.joinCapability)]);
+      await expect(consumeMemberJoin(db,login.token,'v1.member-test',issued.joinCapability,randomUUID())).rejects.toMatchObject({status:410});
+      await db.pool.query('UPDATE member_join_capabilities SET expires_at=$1 WHERE token_hash=$2',[Date.parse(issued.expiresAt),digest(issued.joinCapability)]);
+      await db.pool.query("UPDATE entities SET data=(data::jsonb || '{\"status\":\"REVOKED\"}')::text WHERE id=$1",[fixtures.invite.id]);
+      await expect(consumeMemberJoin(db,login.token,'v1.member-test',issued.joinCapability,randomUUID())).rejects.toMatchObject({status:400});
+      await db.pool.query("UPDATE entities SET data=(data::jsonb || '{\"status\":\"ACTIVE\"}')::text WHERE id=$1",[fixtures.invite.id]);
+      await db.pool.query('UPDATE entities SET version=version+1 WHERE id=$1',[fixtures.identity.id]);
+      await expect(consumeMemberJoin(db,login.token,'v1.member-test',issued.joinCapability,randomUUID())).rejects.toMatchObject({status:409});
+      await db.pool.query('UPDATE entities SET version=version-1 WHERE id=$1',[fixtures.identity.id]);
+      const consumeKey=randomUUID(),result=await consumeMemberJoin(db,login.token,'v1.member-test',issued.joinCapability,consumeKey);
+      expect(await consumeMemberJoin(db,login.token,'v1.member-test',issued.joinCapability,consumeKey)).toEqual(result);
+      await expect(consumeMemberJoin(db,login.token,'v1.member-test',issued.joinCapability,randomUUID())).rejects.toMatchObject({status:409});
+      expect(result).toMatchObject({authSession:{kind:'COMPANION',user:{id:'sports-reader-student'}}});
+      expect((await db.pool.query('SELECT * FROM member_join_capabilities WHERE token_hash=$1',[digest(issued.joinCapability)])).rows).toHaveLength(1);
+    } finally {
+      await db.pool.query('DELETE FROM member_join_capabilities WHERE invitation_id=$1',[fixtures.invite.id]);
+      await db.pool.query("DELETE FROM notifications WHERE entity_id IN (SELECT id FROM entities WHERE data::jsonb->>'invitationId'=$1)",[fixtures.invite.id]);
+      await db.pool.query("DELETE FROM entities WHERE data::jsonb->>'invitationId'=$1 OR id=ANY($2::text[])",[fixtures.invite.id,[fixtures.invite.id,fixtures.course.id,fixtures.semester.id]]);
+      await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(fixtures.identity.id),{...fixtures.identity.data,schoolEmailVerified:false});});
+    }
   });
   it('stores sports language without enabling delivery or overwriting companion privacy settings', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
