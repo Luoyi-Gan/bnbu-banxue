@@ -49,7 +49,7 @@ export function latestCalendar(repo: Repository) {
     .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence))[0];
 }
 export function reviewClock(
-  repo: Repository,
+  repo: Pick<Repository,"all"|"get">,
   round: Entity,
   now = Date.now(),
 ): SlaClock {

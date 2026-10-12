@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { demand, type Account } from "../auth";
 import {
   Repository,
@@ -8,7 +9,7 @@ import {
 } from "../repository";
 import { ownedCourse, sportsRole, version } from "./courses";
 import { sportsAvailable, visibleRecords } from "./materials";
-import { recalculateProgress } from "./progress";
+import { calculateProgress } from "./progress";
 import { latestCalendar, reviewClock } from "./calendar";
 
 export const reviewReasons = [
@@ -49,7 +50,7 @@ export const reviewReasons = [
     actions: ["INVALID"],
   },
 ] as const;
-export function completeBatch(repo: Repository, record: Entity) {
+export function completeBatch(repo: Pick<Repository,"all"|"get">, record: Entity) {
   const batch = repo.get(record.data.batchId, "sportsMaterialBatch");
   const materials = repo
     .all("sportsMaterial")
@@ -191,6 +192,13 @@ export function sportsReviewCommand(
     completeBatch(repo, record);
     return repo.save(record, { status: "PENDING_AI", technicalCode: null });
   }
+  return runSync(sportsReviewDecisionPolicy(repo,actor,action,input,historicalCorrection));
+}
+export function* sportsReviewDecisionPolicy(repo: BusinessRepository,actor:Account,action:string,input:Fields,historicalCorrection=false):Generator<unknown,Entity|undefined,unknown> {
+  if(!['sports.review.decide','sports.review.correct','sports.transfer.decide'].includes(action)) return undefined;
+  const entities:Entity[]=[];
+  for(const kind of ['sportsIdentity','sportsSystem','sportsCourse','sportsRecord','sportsMaterialBatch','sportsMaterial','sportsSemester','sportsPause','sportsReviewRound','sportsCalendar','sportsProgress','sportsCertification','sportsSession']) entities.push(...(yield* effect(repo.all(kind))));
+  const reader={all:(kind:string)=>entities.filter(e=>e.kind===kind),get:(id:unknown,kind?:string)=>{const entity=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(entity,'对象不存在。',404);return entity;}};
   if (
     action !== "sports.review.decide" &&
     action !== "sports.review.correct" &&
@@ -199,9 +207,9 @@ export function sportsReviewCommand(
     return undefined;
   const correction = action === "sports.review.correct";
   const transfer = action === "sports.transfer.decide";
-  sportsAvailable(repo);
-  const record = repo.get(input.id, "sportsRecord");
-  const course = ownedCourse(repo, actor, record.data.courseId);
+  sportsAvailable(reader);
+  const record = reader.get(input.id, "sportsRecord");
+  const course = ownedCourse(reader, actor, record.data.courseId);
   version(record, input);
   demand(
     correction
@@ -217,18 +225,18 @@ export function sportsReviewCommand(
     demand(
       historicalCorrection ||
         (course.data.settlementStatus !== "SETTLED" &&
-          repo.get(record.data.semesterId, "sportsSemester").data.status !==
+          reader.get(record.data.semesterId, "sportsSemester").data.status !==
             "ARCHIVED"),
       "结算或归档记录需由历史报告更正入口同步产生新版报告；请从历史更正入口操作。",
       409,
     );
   const batch = transfer
-    ? repo.get(record.data.batchId, "sportsMaterialBatch")
-    : completeBatch(repo, record);
+    ? reader.get(record.data.batchId, "sportsMaterialBatch")
+    : completeBatch(reader, record);
   if (transfer) {
     demand(
       course.data.settlementStatus !== "SETTLED" &&
-        repo.get(record.data.semesterId, "sportsSemester").data.status !==
+        reader.get(record.data.semesterId, "sportsSemester").data.status !==
           "ARCHIVED",
       "已结算记录须历史复核。",
       409,
@@ -240,8 +248,7 @@ export function sportsReviewCommand(
       409,
     );
     demand(
-      !repo
-        .all("sportsPause")
+      !reader.all("sportsPause")
         .some(
           (p) =>
             p.data.recordId === record.id &&
@@ -302,7 +309,7 @@ export function sportsReviewCommand(
     );
   }
   const now = Date.now();
-  const saved = repo.save(record, {
+  const saved = (yield* effect(repo.save(record, {
     status:
       decision === "PASS"
         ? "VALID"
@@ -320,21 +327,20 @@ export function sportsReviewCommand(
           supplementWindowMilliseconds: Number(input.hours) * 3600000,
         }
       : {}),
-  });
-  for (const round of repo
-    .all("sportsReviewRound")
+  })));
+  for (const round of reader.all("sportsReviewRound")
     .filter((r) => r.data.recordId === record.id && r.data.status === "OPEN"))
-    repo.save(round, {
+    (yield* effect(repo.save(round, {
       status: "CLOSED",
       endedAt: now,
       decision,
       finalClock: reviewClock(
-        repo,
+        reader,
         { ...round, data: { ...round.data, status: "CLOSED", endedAt: now } },
         now,
       ),
-    });
-  repo.create("sportsReviewEvent", actor.id, {
+    })));
+  (yield* effect(repo.create("sportsReviewEvent", actor.id, {
     recordId: record.id,
     batchId: batch.id,
     action: correction ? "CORRECTION" : decision,
@@ -355,20 +361,18 @@ export function sportsReviewCommand(
     at: now,
     previousRecordVersion: record.version,
     resultRecordVersion: saved.version,
-  });
-  recalculateProgress(
-    repo,
-    saved,
-    `TEACHER_${correction ? "CORRECTION_" : ""}${decision}`,
-  );
-  repo.notify(
+  })));
+  const index=entities.findIndex(e=>e.id===saved.id);entities[index]=saved;
+  yield* effect(repo.create("sportsProgress",saved.ownerId,{...calculateProgress(reader,String(saved.data.courseId),saved.ownerId),cause: 'TEACHER_'+(correction?'CORRECTION_':'')+decision,at:now}));
+  (yield* effect(repo.notify(
     [record.ownerId!],
     record.id,
     action,
     `${correction ? "原审核结果已更正：" : ""}${decision === "PASS" ? "运动记录审核通过" : decision === "RETURN" ? "运动记录需一次补证" : "运动记录无效"}${reason ? `：${reason.zh}` : ""}${publicExplanation ? `；${publicExplanation}` : ""}`,
-  );
+  )));
   return saved;
 }
+
 export function reviewWorkspace(repo: Repository, actor: Account) {
   const records = visibleRecords(repo, actor),
     ids = new Set(records.map((r) => r.id));

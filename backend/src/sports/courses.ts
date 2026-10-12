@@ -41,7 +41,7 @@ export function sportsRole(
 export function version(entity: Entity, input: Fields) {
   demand(input.version === entity.version, "记录已变化，请刷新后重试。", 409);
 }
-export function ownedCourse(repo: Repository, actor: Account, id: unknown) {
+export function ownedCourse(repo: Pick<Repository,"all"|"get">, actor: Account, id: unknown) {
   sportsRole(repo, actor, "teacher");
   const course = repo.get(id, "sportsCourse");
   demand(course.ownerId === actor.id, "只能处理本人负责的体育课程。", 403);

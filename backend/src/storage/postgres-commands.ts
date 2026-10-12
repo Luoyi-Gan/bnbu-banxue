@@ -1,3 +1,4 @@
+import { sportsReviewDecisionPolicy } from '../sports/review';
 import { submitStudentRecord } from './postgres-record-submit';
 import { mediaCommand } from './postgres-student-media';
 import { recordDraftGate, saveRecordDraft } from './postgres-record-drafts';
@@ -87,6 +88,9 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       const session=await runAsync(sportsSessionPolicy(repo,actor,`sports.session.${operation==='finish'?'end':operation}`,fields));
       demand(session,'运动会话操作失败。',500);
       result=studentSessionProjection(session);
+    }
+    else if(['sports.review.decide','sports.review.correct','sports.transfer.decide'].includes(action)) {
+      const record=await runAsync(sportsReviewDecisionPolicy(repo,actor,action,input));if(record)result={id:record.id};
     }
     else if(action==='sports.record.submit') result=await submitStudentRecord(repo,actor,input);
     else if(action.startsWith('sports.media.')) result=await mediaCommand(repo,actor,action.split('.')[2],input);

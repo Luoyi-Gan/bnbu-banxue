@@ -258,6 +258,15 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     } finally {await new Promise<void>(resolve=>ai.close(()=>resolve()));}
 
   });
+  it('uses the shared teacher decision policy with PostgreSQL ownership and atomic progress', async()=>{
+    const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),other=await auth.login('sports-reader-teacher@example.test','Sports-read-123');
+    const record=await db.transaction(async client=>{const repo=new PostgresRepository(client);const semester=await repo.create('sportsSemester',null,{status:'DRAFT'});const course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,threshold:30,weeklyLimit:3,relatedTarget:600,otherTarget:600});const session=await repo.create('sportsSession','sports-reader-student',{clock:{...startClock(Date.now()-1800000),state:'ENDED',endedAt:Date.now(),activeMilliseconds:1800000}});const r=await repo.create('sportsRecord','sports-reader-student',{courseId:course.id,semesterId:semester.id,sessionId:session.id,status:'TEACHER_PENDING',category:'RELATED',activeMilliseconds:1800000});const batch=await repo.create('sportsMaterialBatch',r.ownerId,{recordId:r.id,status:'COMPLETE'});await repo.create('sportsMaterial',r.ownerId,{batchId:batch.id,status:'COMPLETE'});return repo.save(r,{batchId:batch.id});});
+    const input={id:record.id,version:record.version,batchId:record.data.batchId,checksCompleted:true,decision:'PASS'},key=randomUUID();
+    await expect(executePostgres(db,other.token,'sports.review.decide',input,randomUUID())).rejects.toMatchObject({status:403});
+    const result=await executePostgres(db,teacher.token,'sports.review.decide',input,key);expect(result.id).toBe(record.id);
+    expect(await executePostgres(db,teacher.token,'sports.review.decide',input,key)).toEqual(result);
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(record.id)).data.status).toBe('VALID');const progress=(await repo.all('sportsProgress')).find(p=>p.data.courseId===record.data.courseId)!;expect((progress.data.details as {recordId:string;actual:number}[]).find(d=>d.recordId===record.id)?.actual).toBe(30);await client.query('DELETE FROM notifications WHERE entity_id=$1',[record.id]);});
+  });
   it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const session=await db.transaction(client=>new PostgresRepository(client).create('sportsSession','sports-reader-student',{enrollmentId:'cancel-fixture',clock:startClock(Date.now()-2000)}));
