@@ -23,7 +23,7 @@
 
 项目后端位于 backend/，前端由 frontend/Dockerfile 单独构建；本地 PostgreSQL 验证使用 compose.postgres.yaml，网页端口4188。原4174验收进程不等于当前Docker镜像，不能混用其验证结论。
 
-用户最新范围：只开发伴学三端。体育平台完全独立，伴学只读可视化；不按年级推断资格或强制入班。已确认无课/未入班保留空板块，读取失败不当作无课。体育重建源码、写入接口、启动及写入验收脚本已清理。原体育前端两目录与origin/main一致。
+用户最新范围：只开发伴学三端。体育平台完全独立，伴学只读可视化；不按年级推断资格或强制入班。已确认无课/未入班保留空板块，读取失败不当作无课。体育重建源码、写入接口、启动及写入验收脚本已清理。原体育前端按 SPORTS_STUDENT_SOURCE.json、SPORTS_TEACHER_SOURCE.json 清单校验通过。与当前 origin/main 比较，public/student 无差异；integrations/sports-teacher 有5个文件差异，涉及此前撤回的伴学体育账号、Cookie会话和课程设置写入接线，不能表述为两个目录均与当前主分支一致。
 
 伴学账号改用companionIdentity，升级保持原有职责、密码和实体关联；旧体育身份不再作为运行时伴学授权来源。账号API使用/api/accounts，账号命令使用accounts.*。学号支持字母或数字开头，与邮箱前缀可以不同，不能靠邮箱证明学校核验。学生邮箱域名bnbu.edu.cn、前缀字母开头；已知u/v对应2024/2025。
 
