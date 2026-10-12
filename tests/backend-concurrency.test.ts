@@ -214,6 +214,24 @@ it("教师仅编辑介绍不恢复已停用服务，不改写既有时段地点"
   expect(() => run(teacher, "coffee.profile", {...profile, enabled: "false"})).toThrow();
 });
 
+it("预约历史保留多次处理原因和学生回应，不向无关学生开放", () => {
+  const {db, a, b, teacher, run} = fixture();
+  const slot = (hours: number) => run(teacher, "coffee.slot.create", {startAt: new Date(Date.now()+hours*3600000).toISOString(), endAt: new Date(Date.now()+(hours+1)*3600000).toISOString(), location: "办公室", capacity: 1});
+  const old = slot(24), next = slot(26);
+  const booking = run(a, "coffee.book", {slotId: old.id, topic: "咨询"});
+  run(teacher, "coffee.move", {id: booking.id, slotId: next.id, reason: "调整时间"});
+  run(a, "coffee.answer", {id: booking.id, accept: false});
+  run(teacher, "coffee.cancel", {id: booking.id, reason: "无法出席"});
+  const entity = snapshot(db, teacher.account).entities.find(e => e.id === booking.id)!;
+  const history = entity.data.history as {action: string; reason: string; accepted?: boolean}[];
+  expect(history.map(h => h.action)).toEqual(["coffee.book", "coffee.move", "coffee.answer", "coffee.cancel"]);
+  expect(history[1].reason).toBe("调整时间");
+  expect(history[2].accepted).toBe(false);
+  expect(history[3].reason).toBe("无法出席");
+  expect(snapshot(db, a.account).entities.find(e => e.id === booking.id)!.data.history).toEqual(history);
+  expect(snapshot(db, b.account).entities.some(e => e.id === booking.id)).toBe(false);
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {

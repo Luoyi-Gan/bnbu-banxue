@@ -214,6 +214,7 @@ export function execute(
         ...(action === "relation.set"
           ? { relation: { kind: input.kind, enabled: input.enabled === true } }
           : {}),
+        ...(action === "coffee.answer" ? {accepted: input.accept} : {}),
       }),
       timestamp(),
     );
@@ -399,7 +400,13 @@ export function snapshot(db: Database, actor: Account) {
           own(b.ownerId) ||
           (b.data.teacherId === actor.id && has(actor, "teacher")) ||
           operate,
-      ),
+      ).map((booking) => ({...booking, data: {...booking.data, history: db.prepare(
+        "SELECT id, action, reason, data, created_at AS at FROM audit WHERE entity_id=? AND action IN ('coffee.book','coffee.move','coffee.answer','coffee.cancel') ORDER BY created_at, rowid",
+      ).all(booking.id).map(row => {
+        const detail = JSON.parse(String(row.data)) as {accepted?: boolean};
+        return {id: row.id, action: row.action, reason: row.reason, at: row.at,
+          ...(row.action === "coffee.answer" && typeof detail.accepted === "boolean" ? {accepted: detail.accepted} : {})};
+      })}})),
     ...repo
       .all("activity")
       .filter(
