@@ -57,6 +57,26 @@ it('restores server identity after email-code login without storing a fake beare
   expect(fetcher.mock.calls.at(-1)[0]).toContain('/me');
   expect(fetcher.mock.calls.at(-1)[1].headers.Authorization).toBeUndefined();
 });
+it('reuses the verification key after a lost login response',async()=>{
+  const fetcher=vi.fn().mockRejectedValueOnce(new TypeError('connection lost'))
+    .mockImplementationOnce(async()=>new Response(JSON.stringify({data:{kind:'COMPANION',user:{id:'student-one'}}}),{status:200}))
+    .mockImplementationOnce(async()=>new Response(JSON.stringify(identity),{status:200}));
+  vi.stubGlobal('fetch',fetcher);
+  await expect(verifyStudentSignInCode('same-challenge','123456')).rejects.toThrow();
+  await verifyStudentSignInCode('same-challenge','123456');
+  expect(fetcher.mock.calls[0][1].headers['Idempotency-Key']).toBe(fetcher.mock.calls[1][1].headers['Idempotency-Key']);
+  expect(fetcher.mock.calls[0][1].body).toBe(fetcher.mock.calls[1][1].body);
+  expect(currentApiUserId()).toBe('student-one');
+});
+it('starts a fresh verification attempt when the code changes or the user logs out',async()=>{
+  const fetcher=vi.fn().mockRejectedValue(new TypeError('connection lost'));
+  vi.stubGlobal('fetch',fetcher);
+  await expect(verifyStudentSignInCode('challenge','123456')).rejects.toThrow();
+  await expect(verifyStudentSignInCode('challenge','654321')).rejects.toThrow();
+  clearApiSession();
+  await expect(verifyStudentSignInCode('challenge','654321')).rejects.toThrow();
+  expect(new Set(fetcher.mock.calls.map(c=>c[1].headers['Idempotency-Key'])).size).toBe(3);
+});
 it('rejects nonstudents and ignores a restore response that arrives after logout', async () => {
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({data:{user:{role:'TEACHER'}}}),{status:200})));
   expect(await restoreCompanionSession()).toBe(false);

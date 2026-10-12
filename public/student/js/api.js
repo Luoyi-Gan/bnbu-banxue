@@ -168,6 +168,7 @@ function writeRefreshIntent(intent) {
 // results without confusing a normal refresh with a different signed-in user.
 let authSessionEpoch = 0;
 let pendingInviteJoin = null;
+let pendingStudentSignIn = null;
 let companionSession = null;
 
 export function hasApiSession() { return !!readTokens() || !!companionSession; }
@@ -187,6 +188,7 @@ export async function restoreCompanionSession() {
 export function clearApiSession() {
   authSessionEpoch += 1;
   pendingInviteJoin = null;
+  pendingStudentSignIn = null;
   companionSession = null;
   writeTokens(null);
   writeRefreshIntent(null);
@@ -253,12 +255,14 @@ function organizationCode() {
   return (readRaw("organizationCode") || "BNBU").toUpperCase();
 }
 
+let volatileDeviceId = null;
 function stableDeviceId() {
-  let value = readRaw("deviceId");
+  let value = readRaw("deviceId") || volatileDeviceId;
   if (!value) {
     value = `web-${uuid()}`.slice(0, 128);
     writeRaw("deviceId", value);
   }
+  volatileDeviceId = value;
   return value;
 }
 
@@ -1837,10 +1841,17 @@ export const verifyJoinEmail = (challengeId, code, joinEmail, joinInviteToken) =
     body: { challengeId, code, joinEmail, joinInviteToken, deviceId: stableDeviceId() } });
 
 export async function verifyStudentSignInCode(challengeId, code) {
+  const deviceId=stableDeviceId();
+  const identity=JSON.stringify([challengeId,code,deviceId]);
+  if(!pendingStudentSignIn || pendingStudentSignIn.identity!==identity || pendingStudentSignIn.epoch!==authSessionEpoch) {
+    pendingStudentSignIn={identity,epoch:authSessionEpoch,key:uuid()};
+  }
+  const attempt=pendingStudentSignIn;
   const authSession = await request("/auth/student-sign-in-codes/verify", {
-    method: "POST", auth: false, idempotent: true,
-    body: { challengeId, code, deviceId: stableDeviceId() },
+    method: "POST", auth: false, headers:{'Idempotency-Key':attempt.key},
+    body: { challengeId, code, deviceId },
   });
+  if(attempt.epoch!==authSessionEpoch)throw new Error('AUTH_SESSION_CHANGED');
   if(authSession?.kind==='COMPANION') {
     clearApiSession();
     if(!await restoreCompanionSession() || currentApiUserId()!==authSession.user?.id) {
@@ -1848,6 +1859,7 @@ export async function verifyStudentSignInCode(challengeId, code) {
       throw new Error('AUTH_SESSION_CHANGED');
     }
   } else storeAuthSession(authSession);
+  pendingStudentSignIn=null;
   return authSession;
 }
 
