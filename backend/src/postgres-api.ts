@@ -36,7 +36,7 @@ import { PostgresRepository } from './storage/postgres-repository';
 import { postgresAdministratorDirectory } from './storage/postgres-administrators';
 import { postgresAdministratorSelf } from './storage/postgres-admin-deletion';
 import { postgresAccountDirectory } from './storage/postgres-account-directory';
-import { postgresSportsHelp } from './storage/postgres-sports-help';
+import { postgresSportsHelp,postgresAdminHelp } from './storage/postgres-sports-help';
 import { portalAnnouncement } from './sports/portal-bootstrap';
 import { postgresSportsMe } from './storage/postgres-sports-me';
 import { postgresStudentCourses } from './storage/postgres-student-courses';
@@ -60,6 +60,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
       if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
+      const adminHelp=/^\/api\/v1\/admin\/help-articles(?:\/([^/]+))?$/.exec(pathname);
+      if(request.method==='GET' && adminHelp)return send(response,200,{data:await postgresAdminHelp(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams),adminHelp[1]?decodeURIComponent(adminHelp[1]):undefined)});
       if(request.method==='GET' && pathname==='/api/v1/admin/subadmins') {
         const query=new URL(request.url ?? '/','http://localhost').searchParams;
         demand([...query.keys()].every(k=>k==='after'),'管理账号查询参数无效。');

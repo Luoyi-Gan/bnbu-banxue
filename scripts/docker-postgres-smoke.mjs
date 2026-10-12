@@ -76,6 +76,9 @@ docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','
 const helpInput={titleZh:'容器帮助验证',titleEn:'Container help',bodyZh:'本地验收内容',bodyEn:'Local acceptance fixture',category:'EXERCISE',keywords:'test',weight:1,publish:true};
 const help=(await request('/api/commands',{action:'sports.help.save',input:helpInput,requestId:randomUUID()})).data;
 assert.ok((await request('/api/sports/help?lang=zh')).articles.some(article=>article.id===help.id));
+const adminHelpPage=(await request('/api/v1/admin/help-articles?status=published&page=1')).data;
+assert.equal(adminHelpPage.pageSize,5);assert.ok(adminHelpPage.total>=1);
+assert.equal((await request('/api/v1/admin/help-articles/'+help.id)).data.titleEn,helpInput.titleEn);
 docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data='{"role":"student","status":"verified"}' WHERE id='${sportsIdentity}'`],{stdio:'pipe'});
 const studentArticle=(await request('/api/sports/help?lang=en')).articles.find(article=>article.id===help.id);
 assert.equal(studentArticle.data.body,'Local acceptance fixture');

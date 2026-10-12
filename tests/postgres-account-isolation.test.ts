@@ -76,6 +76,15 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     await databases[1].transaction(client=>new PostgresRepository(client).create('sportsIdentity','governor',{role:'admin',status:'verified'}));
     const governorLogin=await post(1,'/api/v1/auth/password-login',{account:'governor@bnbu.edu.cn',password});
     const governorCookie=governorLogin.headers.get('set-cookie')!.split(';')[0];
+    for(let i=0;i<6;i++)await databases[1].transaction(client=>new PostgresRepository(client).create('sportsHelp','governor',{status:i===0?'published':'draft',titleZh:'帮助'+i,titleEn:'Help '+i,bodyZh:'内容',bodyEn:'Content',keywords:['help'],category:'LOGIN',weight:i}));
+    const helpGet=(path:string,cookie=governorCookie)=>fetch(urls[1]+path,{headers:{Cookie:cookie}});
+    const helpPage=(await (await helpGet('/api/v1/admin/help-articles?page=1')).json()).data;
+    expect(helpPage.total).toBe(6);expect(helpPage.pageSize).toBe(5);expect(helpPage.items).toHaveLength(5);
+    expect((await (await helpGet('/api/v1/admin/help-articles?page=2')).json()).data.items).toHaveLength(1);
+    expect((await (await helpGet('/api/v1/admin/help-articles?status=published')).json()).data.total).toBe(1);
+    expect((await (await helpGet('/api/v1/admin/help-articles/'+helpPage.items[0].id)).json()).data.titleEn).toBe('Help 5');
+    expect((await helpGet('/api/v1/admin/help-articles',sportsCookie)).status).toBe(403);
+    expect((await helpGet('/api/v1/admin/help-articles?page=0')).status).toBe(400);
     const write=(path:string,input:unknown,key=randomUUID())=>fetch(urls[1]+path,{method:'POST',headers:{'Content-Type':'application/json',Cookie:governorCookie,'Idempotency-Key':key},body:JSON.stringify(input)});
     const createInput={identityVerifiedByAdmin:true,email,account:'independent-manager',name:'Manager',department:'Testing',permissions:['HELP_CENTER'],initialPassword:password,confirmPassword:password};
     const createKey=randomUUID(),created=await write('/api/v1/admin/subadmins',createInput,createKey);
