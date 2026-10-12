@@ -61,4 +61,11 @@ CREATE TABLE student_login_challenges (
  UNIQUE(account_id,request_id)
 );
 CREATE INDEX student_login_challenge_account ON student_login_challenges(account_id,sent_at);
+`},{version:8,sql:`
+CREATE TABLE new_student_join_capabilities (
+ token_hash TEXT PRIMARY KEY,challenge_id TEXT NOT NULL UNIQUE REFERENCES student_email_challenges(id),
+ invitation_id TEXT NOT NULL REFERENCES entities(id),email TEXT NOT NULL,profile TEXT NOT NULL,
+ issue_key TEXT NOT NULL,request_hash TEXT NOT NULL,started_at BIGINT NOT NULL,expires_at BIGINT NOT NULL,
+ session_secret TEXT NOT NULL,consume_key TEXT,result TEXT,account_id TEXT REFERENCES accounts(id)
+);
 `}];

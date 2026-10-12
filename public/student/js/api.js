@@ -1051,6 +1051,7 @@ export async function joinWithInvite(inviteToken, profile) {
   if (flow.epoch !== authSessionEpoch) throw new Error('AUTH_SESSION_CHANGED');
   pendingInviteJoin = null;
   if (joined.authSession?.kind === 'COMPANION') {
+    if(!companionSession)await restoreCompanionSession();
     if (!companionSession || joined.authSession.user?.id !== companionSession.userId) throw new Error('AUTH_SESSION_CHANGED');
   } else storeAuthSession(joined.authSession);
   return joined;
@@ -1064,7 +1065,7 @@ export async function logoutApi() {
   clearApiSession();
   try {
     if (companion) {
-      await fetch('/api/auth/logout', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'});
+      await fetch('/api/sports/auth/logout', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'});
       return;
     }
     if (tokens?.refreshToken && tokens.accessToken) {

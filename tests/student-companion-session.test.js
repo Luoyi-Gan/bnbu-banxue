@@ -32,7 +32,7 @@ it('restores a real cookie identity without manufacturing browser tokens and rev
   fetcher.mockResolvedValue(new Response('{}',{status:200}));
   await logoutApi();
   expect(hasApiSession()).toBe(false);
-  expect(fetcher.mock.calls.at(-1)[0]).toBe('/api/auth/logout');
+  expect(fetcher.mock.calls.at(-1)[0]).toBe('/api/sports/auth/logout');
 });
 it('keeps the existing cookie session after a successful member join',async()=>{
   const response=data=>new Response(JSON.stringify({data}),{status:200});

@@ -3,6 +3,7 @@ import { postgresRuleTemplates } from './storage/postgres-rule-templates';
 import { postgresInvitationPreview } from './storage/postgres-invitation-preview';
 import { requestStudentJoinEmail, verifyStudentJoinEmail } from './storage/postgres-student-email';
 import { requestStudentLogin, verifyStudentLogin } from './storage/postgres-student-login';
+import {issueNewStudentJoin,consumeNewStudentJoin} from './storage/postgres-new-student-join';
 import { reportCsv } from './sports/report';
 import { courseWindowInput, courseInviteInput, courseInviteProjection } from './sports/portal-courses';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
@@ -16,7 +17,7 @@ import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresM
 import { postgresStudentRecords, postgresStudentWorkflow, postgresProofTodos } from './storage/postgres-student-records';
 import { createServer } from 'node:http';
 import { demand, ServiceError } from './auth';
-import { body, cookieToken, send } from './http';
+import { body, cookieToken as readCookieToken, send } from './http';
 import { issueMemberJoin, consumeMemberJoin } from './storage/postgres-member-join';
 import { PostgresAuth } from './storage/postgres-auth';
 import { PostgresEmail } from './storage/postgres-email';
@@ -42,13 +43,20 @@ import { postgresSportsPreferences } from './storage/postgres-sports-preferences
 import { postgresSportsSession } from './storage/postgres-sports-session';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 
-export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean} = {}) {
+export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'} = {}) {
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
   const origins = new Set(options.origins ?? ['http://127.0.0.1:4174','http://localhost:4174']);
-  const cookie = (token: string, age: number) => `bnbu_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${options.secureCookies ? '; Secure' : ''}`;
+  const cookieName=options.surface==='sports'?'bnbu_sports_session':'bnbu_session';
+  const cookieToken=(request:Parameters<typeof readCookieToken>[0])=>readCookieToken(request,cookieName);
+  const cookie = (token: string, age: number) => `${cookieName}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${options.secureCookies ? '; Secure' : ''}`;
   return createServer(async (request,response) => {
     try {
-      const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      let pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const sportsPath=pathname.startsWith('/api/v1/') || pathname.startsWith('/api/sports/');
+      if(options.surface==='sports')demand(sportsPath || pathname==='/api/health','接口不存在。',404);
+      if(options.surface==='companion')demand(!sportsPath,'接口不存在。',404);
+      if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
+      if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
       if(request.method==='GET' && teacherStudent) {
         demand([...new URL(request.url ?? '/', 'http://localhost').searchParams.keys()].length===0,'学生资料查询参数无效。');
@@ -170,6 +178,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const newStudentJoin=/^\/api\/v1\/course-invites\/([^/]+)\/join-capabilities$/.exec(pathname);
+        if(newStudentJoin){
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          return send(response,200,{data:await issueNewStudentJoin(db,decodeURIComponent(newStudentJoin[1]),input,key)});
+        }
         const memberJoin=/^\/api\/v1\/course-invites\/([^/]+)\/(join-capabilities\/member|join)$/.exec(pathname);
         if(memberJoin) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
@@ -177,6 +190,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           if(memberJoin[2]==='join-capabilities/member')return send(response,200,{data:await issueMemberJoin(db,session,code,input,key)});
           demand(Object.keys(input).length===0,'入班确认不接受额外资料。');
           const capability=request.headers['x-join-capability'];demand(typeof capability==='string','缺少入班凭证。',403);
+          const bootstrap=await consumeNewStudentJoin(db,code,capability,key);
+          if(bootstrap){response.setHeader('Set-Cookie',cookie(bootstrap.token,43200));return send(response,200,{data:bootstrap.result});}
           return send(response,200,{data:await consumeMemberJoin(db,session,code,capability,key)});
         }
         if(['/api/v1/auth/student-sign-in-codes','/api/v1/auth/student-sign-in-codes/verify'].includes(pathname) && input.joinInviteToken!==undefined) {
@@ -264,6 +279,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           const key = input.requestId;
           demand(typeof key==='string','缺少操作幂等标识。');
           demand(typeof input.action==='string' && input.input && typeof input.input==='object' && !Array.isArray(input.input),'请求格式无效。');
+          if(options.surface==='sports')demand(input.action.startsWith('sports.'),'该操作不属于体育系统。',403);
+          if(options.surface==='companion')demand(!input.action.startsWith('sports.'),'该操作不属于伴学系统。',403);
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '',input.action,input.input as Record<string,unknown>,key)});
         }
         if (pathname === '/api/auth/sign-in' || pathname === '/api/auth/login' || pathname === '/api/auth/admin-login') {

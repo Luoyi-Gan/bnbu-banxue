@@ -1,0 +1,54 @@
+import {it,expect} from 'vitest';
+import {randomUUID} from 'node:crypto';
+import {Pool} from 'pg';
+import type {AddressInfo} from 'node:net';
+import {PostgresDatabase} from '../backend/src/storage/postgres';
+import {postgresMigrations} from '../backend/src/storage/postgres-schema';
+import {PostgresRepository} from '../backend/src/storage/postgres-repository';
+import {hashPassword} from '../backend/src/auth';
+import {createPostgresApiServer} from '../backend/src/postgres-api';
+
+it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, cookies, commands and logout between the two systems',async()=>{
+  const admin=new Pool({connectionString:process.env.BNBU_TEST_POSTGRES_URL});
+  const prefix='isolation_'+randomUUID().replaceAll('-','');
+  const schemas=[prefix+'_companion',prefix+'_sports'];
+  const databases:PostgresDatabase[]=[],servers:ReturnType<typeof createPostgresApiServer>[]=[];
+  try {
+    for(const schema of schemas){
+      await admin.query(`CREATE SCHEMA ${schema}`);
+      const db=new PostgresDatabase({connectionString:process.env.BNBU_TEST_POSTGRES_URL,options:`-c search_path=${schema}`});databases.push(db);await db.migrate(postgresMigrations);
+    }
+    const email='same@bnbu.edu.cn',password='Isolation-test-123';
+    for(const [i,db] of databases.entries())await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',['account-'+i,email,hashPassword(password),'Person '+i,'["student"]','now']);
+    await databases[1].transaction(client=>new PostgresRepository(client).create('sportsIdentity','account-1',{role:'student',status:'verified'}));
+    const urls:string[]=[];
+    for(const [i,db] of databases.entries()){
+      const server=createPostgresApiServer(db,{surface:i===0?'companion':'sports'});servers.push(server);
+      await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));urls.push('http://127.0.0.1:'+(server.address() as AddressInfo).port);
+    }
+    const post=(index:number,path:string,input:unknown,cookie='')=>fetch(urls[index]+path,{method:'POST',headers:{'Content-Type':'application/json',Cookie:cookie},body:JSON.stringify(input)});
+    const companion=await post(0,'/api/auth/sign-in',{identifier:email,password}),sports=await post(1,'/api/sports/auth/sign-in',{identifier:email,password});
+    expect(companion.status).toBe(200);expect(sports.status).toBe(200);
+    const companionCookie=companion.headers.get('set-cookie')!.split(';')[0],sportsCookie=sports.headers.get('set-cookie')!.split(';')[0];
+    expect(companionCookie).toMatch(/^bnbu_session=/);expect(sportsCookie).toMatch(/^bnbu_sports_session=/);
+    const combined=companionCookie+'; '+sportsCookie;
+    expect((await (await fetch(urls[0]+'/api/auth/me',{headers:{Cookie:combined}})).json()).account.id).toBe('account-0');
+    expect((await (await fetch(urls[1]+'/api/v1/me',{headers:{Cookie:combined}})).json()).data.user.id).toBe('account-1');
+    expect((await fetch(urls[1]+'/api/v1/me',{headers:{Cookie:companionCookie}})).status).toBe(401);
+    expect((await fetch(urls[1]+'/api/v1/me',{headers:{Cookie:companionCookie.replace('bnbu_session','bnbu_sports_session')}})).status).toBe(401);
+    expect((await fetch(urls[0]+'/api/auth/me',{headers:{Cookie:sportsCookie}})).status).toBe(401);
+    expect((await fetch(urls[0]+'/api/v1/me',{headers:{Cookie:combined}})).status).toBe(404);
+    expect((await fetch(urls[1]+'/api/workspace',{headers:{Cookie:combined}})).status).toBe(404);
+    expect((await post(0,'/api/commands',{action:'sports.preferences.save',input:{},requestId:randomUUID()},combined)).status).toBe(403);
+    expect((await post(1,'/api/sports/commands',{action:'post.create',input:{},requestId:randomUUID()},combined)).status).toBe(403);
+    const logout=await post(1,'/api/sports/auth/logout',{},combined);expect(logout.status).toBe(200);
+    expect(logout.headers.get('set-cookie')).toMatch(/^bnbu_sports_session=;/);
+    expect((await fetch(urls[0]+'/api/auth/me',{headers:{Cookie:combined}})).status).toBe(200);
+    expect((await fetch(urls[1]+'/api/v1/me',{headers:{Cookie:combined}})).status).toBe(401);
+  } finally {
+    for(const server of servers){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));}
+    for(const db of databases)await db.close();
+    for(const schema of schemas)await admin.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`);
+    await admin.end();
+  }
+});

@@ -2,12 +2,12 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { demand, ServiceError } from "./auth";
 import type { Fields } from "./repository";
 
-export const cookieToken = (request: IncomingMessage) =>
+export const cookieToken = (request: IncomingMessage, name='bnbu_session') =>
   request.headers.cookie
     ?.split(";")
     .map((s) => s.trim())
-    .find((s) => s.startsWith("bnbu_session="))
-    ?.slice("bnbu_session=".length);
+    .find((s) => s.startsWith(name+'='))
+    ?.slice(name.length+1);
 export function send(response: ServerResponse, status: number, data: unknown) {
   response.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
