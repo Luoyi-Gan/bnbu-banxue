@@ -179,6 +179,12 @@ try {
      UPDATE entities SET owner_id='${teacherId}',data=(data::jsonb || '{"weeklyLimit":3,"relatedTarget":600,"otherTarget":600}'::jsonb)::text WHERE id='${courseId}';`],{stdio:'pipe'});
   const studentCookie=cookie;
   await request('/api/auth/sign-in',{identifier:adminLogin,password});
+  const futureYear=2100+Math.floor(Math.random()*7000),futureSemester={name:'Docker future semester',academicYear:futureYear+'-'+(futureYear+1),type:'SUMMER',startDate:futureYear+'-06-01',endDate:futureYear+'-08-31'};
+  const createdSemester=(await request('/api/commands',{action:'sports.semester.create',input:futureSemester,requestId:randomUUID()})).data;
+  await request('/api/commands',{action:'sports.semester.update',input:{...futureSemester,id:createdSemester.id,version:1,name:'Docker checked semester'},requestId:randomUUID()});
+  const semesterView=(await request('/api/sports/workspace')).semesters.find(s=>s.id===createdSemester.id);
+  assert.equal(semesterView.data.status,'UPCOMING');assert.equal(semesterView.data.name,'Docker checked semester');
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdSemester.id}'`],{stdio:'pipe'});
   const conversionTables=(await request('/api/sports/workspace')).conversionTables;
   assert.equal(conversionTables.length,4);assert.equal(conversionTables.reduce((n,t)=>n+t.data.rows.length,0),404);
   const conversionTable=conversionTables[0],conversionRow=conversionTable.data.rows[0];
