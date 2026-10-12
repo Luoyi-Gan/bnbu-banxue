@@ -114,8 +114,8 @@ try {
   assert.equal(members.meta.pagination.hasMore,false);
   const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'});
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data=(data::jsonb || '{"status":"CURRENT"}'::jsonb)::text WHERE id='${semesterId}'; UPDATE entities SET data=(data::jsonb || '{"startDate":"${today}","deadlineDate":"${today}","startTime":"00:00","endTime":"23:59","threshold":30}'::jsonb)::text WHERE id='${courseId}'`],{stdio:'pipe'});
-  const sessionWrite=async(path,input)=>{
-    const response=await fetch(base+path,{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify(input)});
+  const sessionWrite=async(path,input,key=randomUUID())=>{
+    const response=await fetch(base+path,{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(input)});
     const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;
   };
   let session=await sessionWrite('/api/v1/exercise-sessions',{enrollmentId,clientObservedAt:new Date().toISOString()});
@@ -199,15 +199,21 @@ try {
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
   const teacherCookie=cookie;
-  const createdCourse=(await request('/api/commands',{action:'sports.course.create',input:{name:'Docker real publication'},requestId:randomUUID()})).data;
-  await request('/api/commands',{action:'sports.course.window',input:{id:createdCourse.id,version:1,startDate:'2026-09-01',deadlineDate:'2027-01-20',startTime:'08:00',endTime:'22:00',excludedDates:[],checkInAvailable:true},requestId:randomUUID()});
+  const createdCourse=await sessionWrite('/api/v1/teacher/courses',{displayName:'Docker real publication'});
+  const windowResponse=await fetch(base+'/api/v1/class-sections/'+createdCourse.id,{method:'PATCH',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify({expectedVersion:1,checkInStartDate:'2026-09-01',checkInEndDate:'2027-01-20',dailyStartTime:'08:00',dailyEndTime:'22:00',excludedDates:[],checkInWindowMode:'AVAILABLE',submissionDeadlineAt:'2027-01-20T23:59:59+08:00'})});
+  const savedWindow=await windowResponse.json();assert.equal(windowResponse.status,200,JSON.stringify(savedWindow));assert.equal(savedWindow.data.version,2);
   const publishCommand={action:'sports.course.configurepublish',input:{id:createdCourse.id,expectedCourseVersion:2,expectedVersion:0,publish:true,maximumMinutes:60,dailyLimit:1,globalTargetVersion:1,templateId:publishedTemplate.id,minimumMinutes:30,weeklyLimit:3,courseTarget:600,generalTarget:600,description:'Docker publication verification',regularDeadline:'2027-01-20T23:59:59+08:00',closingDeadline:'2027-01-27T23:59:59+08:00',settlementPlannedAt:'2027-01-28T00:00:00+08:00'},requestId:randomUUID()};
-  const publishedCourse=await request('/api/commands',publishCommand);assert.deepEqual(await request('/api/commands',publishCommand),publishedCourse);
+  const {id:publishedId,...publishFields}=publishCommand.input;
+  const publishPath='/api/v1/class-sections/'+publishedId+'/v81-rules';
+  const publishedCourse=await sessionWrite(publishPath,publishFields,publishCommand.requestId);assert.deepEqual(await sessionWrite(publishPath,publishFields,publishCommand.requestId),publishedCourse);assert.equal(publishedCourse.global_target_minutes,1200);
+  assert.ok((await request('/api/v1/teacher/semesters')).data.items.some(s=>s.id===semesterId));
   const publishedView=(await request('/api/sports/workspace')).courses.find(c=>c.id===createdCourse.id);assert.equal(publishedView.data.status,'PUBLISHED');assert.equal(publishedView.data.enrollmentOpen,true);
-  const publishedInvite=(await request('/api/commands',{action:'sports.invitation.create',input:{courseId:createdCourse.id,minutes:5},requestId:randomUUID()})).data;
-  await request('/api/commands',{action:'sports.invitation.revoke',input:{id:publishedInvite.id,version:1},requestId:randomUUID()});
+  assert.equal((await request('/api/v1/class-sections/'+createdCourse.id+'/progress-target')).data.totalTargetSeconds,72000);
+  const invitePath='/api/v1/class-sections/'+createdCourse.id+'/course-invites';
+  const publishedInvite=await sessionWrite(invitePath,{expiresInMinutes:5});assert.equal(publishedInvite.status,'ACTIVE');
+  assert.equal((await sessionWrite(invitePath+'/revocations',{inviteToken:publishedInvite.inviteToken})).status,'REVOKED');
   await request('/api/commands',{action:'sports.course.close',input:{id:createdCourse.id,version:publishedView.version,reason:'Docker test completed'},requestId:randomUUID()});
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${createdCourse.id}','${publishedInvite.id}')`],{stdio:'pipe'});
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind='sportsInvitation' AND data::jsonb->>'courseId'='${createdCourse.id}')`],{stdio:'pipe'});
   const teachingReport=await request('/api/sports/course-reports/'+courseId);
   assert.equal(teachingReport.reportType,'CURRENT_TEACHING_REPORT');
   assert.equal(teachingReport.rows.find(r=>r.enrollmentId===enrollmentId).facts.enduranceStatus,'NOT_RECORDED');

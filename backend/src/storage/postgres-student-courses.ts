@@ -26,6 +26,11 @@ export async function postgresStudentCourses(db:PostgresDatabase,token:string,pa
     }
     const enrollments=await source.all('sportsEnrollment');
     const courses=(await source.all('sportsCourse')).filter(c=>teacher ? c.ownerId===actor.id : enrollments.some(e=>e.ownerId===actor.id && e.data.courseId===c.id));
+    if(path==='/api/v1/teacher/semesters') {
+      demand(teacher,'仅教师可读取教学学期。',403);
+      const ids=new Set(courses.map(c=>c.data.semesterId));
+      return {data:page(semesters.filter(s=>s.data.status==='CURRENT' || ids.has(s.id)).map(semesterRow),input)};
+    }
     const teacherDetail=/^\/api\/v1\/teachers\/([^/]+)$/.exec(path);
     if(teacherDetail) {
       demand(!teacher && Object.keys(input).length===0,'仅学生可通过此入口查看任课老师。',403);

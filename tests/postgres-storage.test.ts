@@ -449,6 +449,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       return course;
     });
     const report=await postgresCourseReport(db,teacher.token,course.id);
+    expect((await postgresStudentProgress(db,teacher.token,{},course.id)).data).toMatchObject({totalTargetSeconds:72000});
     expect(report.denominator).toBeNull();
     expect(report.rows).toHaveLength(1);
     expect(report.rows[0]).toMatchObject({studentId:'sports-reader-student',registration:'NO_ROSTER',facts:{total:60,remaining:[540,600],enduranceStatus:'NOT_RECORDED'}});
@@ -457,6 +458,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(postgresCourseReport(db,student.token,course.id)).rejects.toMatchObject({status:403});
     const foreign=await db.transaction(client=>new PostgresRepository(client).create('sportsCourse','sports-reader-teacher',{}));
     await expect(postgresCourseReport(db,teacher.token,foreign.id)).rejects.toMatchObject({status:403});
+    await expect(postgresStudentProgress(db,teacher.token,{},foreign.id)).rejects.toMatchObject({status:404});
     const server=createPostgresApiServer(db);await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
     try {
       const url=`http://127.0.0.1:${(server.address() as AddressInfo).port}/api/sports/course-reports/${course.id}.csv`;

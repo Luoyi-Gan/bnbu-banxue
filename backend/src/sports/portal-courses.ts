@@ -27,22 +27,21 @@ export function portalCourseInvite(
     actor = authenticate(db, token);
   teacherGate(repo, actor);
   ownedCourse(repo, actor, id);
-  demand(
-    Object.keys(input).every(
-      (field) => field === (revoke ? "inviteToken" : "expiresInMinutes"),
-    ),
-    "邀请参数无效。",
-  );
   const result = execute(
     db,
     token,
     revoke ? "sports.invitation.revoke" : "sports.invitation.create",
-    revoke
-      ? { courseId: id, code: input.inviteToken }
-      : { courseId: id, minutes: input.expiresInMinutes ?? 30 },
+    courseInviteInput(id,revoke,input),
     key,
   ) as { id: string };
   const invite = repo.get(result.id, "sportsInvitation");
+  return courseInviteProjection(invite);
+}
+export function courseInviteInput(id:string,revoke:boolean,input:Fields) {
+  demand(Object.keys(input).every(field=>field===(revoke?'inviteToken':'expiresInMinutes')),'邀请参数无效。');
+  return revoke?{courseId:id,code:input.inviteToken}:{courseId:id,minutes:input.expiresInMinutes ?? 30};
+}
+export function courseInviteProjection(invite:Entity) {
   return {
     inviteToken: invite.data.code,
     classSectionId: invite.data.courseId,
@@ -57,6 +56,10 @@ export function portalCourseWindow(
   input: Fields,
   key: string,
 ) {
+  execute(db, token, "sports.course.window", courseWindowInput(id,input), key);
+  return portalTeacherCourse(new Repository(db),authenticate(db, token),id,"class-sections");
+}
+export function courseWindowInput(id:string,input:Fields) {
   const mapping: Record<string, string> = {
     expectedVersion: "version",
     checkInStartDate: "startDate",
@@ -92,13 +95,7 @@ export function portalCourseWindow(
       "提交截止须为常规运动截止日的上海时间23:59:59。",
     );
   }
-  execute(db, token, "sports.course.window", fields, key);
-  return portalTeacherCourse(
-    new Repository(db),
-    authenticate(db, token),
-    id,
-    "class-sections",
-  );
+  return fields;
 }
 export function semesterRow(semester: Entity) {
   return {

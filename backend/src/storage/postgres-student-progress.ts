@@ -2,6 +2,8 @@ import { demand } from '../auth';
 import type { Fields } from '../repository';
 import { page } from '../sports/portal-courses';
 import { recordDraftGate } from './postgres-record-drafts';
+import { sportsRole } from '../sports/courses';
+import { sportsAvailable } from '../sports/materials';
 import { PostgresAuth } from './postgres-auth';
 import { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
@@ -9,7 +11,13 @@ import { PostgresRepository } from './postgres-repository';
 export async function postgresStudentProgress(db:PostgresDatabase,token:string,input:Fields,courseId?:string) {
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
-    const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);await recordDraftGate(repo,actor);
+    const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
+    const identities=await repo.all('sportsIdentity');
+    const teacher=!!courseId && identities.some(i=>i.ownerId===actor.id && i.data.status==='verified' && i.data.role==='teacher');
+    if(teacher) {
+      sportsRole({all:()=>identities},actor,'teacher');
+      const systems=await repo.all('sportsSystem');sportsAvailable({all:()=>systems});
+    } else await recordDraftGate(repo,actor);
     demand(Object.keys(input).every(k=>['limit','cursor','enrollmentId'].includes(k)),'进度查询参数无效。');
     const memberships=(await repo.all('sportsEnrollment')).filter(e=>e.ownerId===actor.id);
     const courses=await repo.all('sportsCourse');
@@ -20,7 +28,7 @@ export async function postgresStudentProgress(db:PostgresDatabase,token:string,i
       return {course,related,other};
     };
     if(courseId) {
-      demand(memberships.some(e=>e.data.courseId===courseId),'课程不存在。',404);
+      demand(teacher?courses.some(c=>c.id===courseId && c.ownerId===actor.id):memberships.some(e=>e.data.courseId===courseId),'课程不存在。',404);
       const {course,related,other}=targets(courseId);
       return {data:{id:course.id,classSectionId:course.id,courseTargetSeconds:related*60,generalTargetSeconds:other*60,totalTargetSeconds:(related+other)*60,effectiveFrom:course.data.publishedAt ?? null,version:course.version}};
     }

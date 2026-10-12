@@ -1,5 +1,6 @@
 import { postgresCourseReport } from './storage/postgres-course-report';
 import { reportCsv } from './sports/report';
+import { courseWindowInput, courseInviteInput, courseInviteProjection } from './sports/portal-courses';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
 import { postgresStudentProgress } from './storage/postgres-student-progress';
 import { postgresStudentRoster } from './storage/postgres-student-roster';
@@ -97,7 +98,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(request.method==='GET' && pathname==='/api/v1/me/preferences') return send(response,200,{data:await postgresSportsPreferences(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && pathname==='/api/v1/notifications') return send(response,200,await postgresSportsNotifications(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && /^\/api\/v1\/teachers\/[^/]+$/.test(pathname)) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
-      if(request.method==='GET' && (['/api/v1/semesters/current','/api/v1/enrollments'].includes(pathname) || /^\/api\/v1\/class-sections\/[^/]+\/v81-rules$/.test(pathname) || /^\/api\/v1\/(courses|class-sections)(\/[^/]+)?$/.test(pathname))) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
+      if(request.method==='GET' && (['/api/v1/teacher/semesters','/api/v1/semesters/current','/api/v1/enrollments'].includes(pathname) || /^\/api\/v1\/class-sections\/[^/]+\/v81-rules$/.test(pathname) || /^\/api\/v1\/(courses|class-sections)(\/[^/]+)?$/.test(pathname))) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && pathname==='/api/v1/me') return send(response,200,{data:await postgresSportsMe(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && pathname==='/api/v1/system-mode/announcement') {
         const systems=await db.transaction(client=>new PostgresRepository(client).all('sportsSystem'));
@@ -121,6 +122,13 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         demand(!request.headers.origin || origins.has(request.headers.origin),'来源不允许。',403);
         demand(request.headers['sec-fetch-site'] !== 'cross-site','跨站请求不允许。',403);
         if(request.method==='PATCH') {
+          const courseWindow=/^\/api\/v1\/class-sections\/([^/]+)$/.exec(pathname);
+          if(courseWindow) {
+            const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+            const id=decodeURIComponent(courseWindow[1]),token=cookieToken(request) ?? '';
+            await executePostgres(db,token,'sports.course.window',courseWindowInput(id,await body(request)),key);
+            return send(response,200,await postgresStudentCourses(db,token,'/api/v1/class-sections/'+id,{}));
+          }
           const draftEdit=/^\/api\/v1\/exercise-records\/([^/]+)$/.exec(pathname);
           if(draftEdit) {
             const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
@@ -148,6 +156,27 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const courseInvite=/^\/api\/v1\/class-sections\/([^/]+)\/course-invites(\/revocations)?$/.exec(pathname);
+        if(courseInvite) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          const id=decodeURIComponent(courseInvite[1]),token=cookieToken(request) ?? '',revoke=!!courseInvite[2];
+          await postgresStudentCourses(db,token,'/api/v1/class-sections/'+id,{});
+          const result=await executePostgres(db,token,revoke?'sports.invitation.revoke':'sports.invitation.create',courseInviteInput(id,revoke,input),key);
+          const invite=await db.transaction(client=>new PostgresRepository(client).get(result.id,'sportsInvitation'));
+          return send(response,200,{data:courseInviteProjection(invite)});
+        }
+        if(pathname==='/api/v1/teacher/courses') {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          demand(Object.keys(input).every(field=>field==='displayName'),'新建课程参数无效。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.course.create',{name:input.displayName},key)});
+        }
+        const courseRulesPublish=/^\/api\/v1\/class-sections\/([^/]+)\/v81-rules$/.exec(pathname);
+        if(courseRulesPublish) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'课程标识须来自请求路径。');
+          const id=decodeURIComponent(courseRulesPublish[1]),token=cookieToken(request) ?? '';
+          await executePostgres(db,token,'sports.course.configurepublish',{...input,id},key);
+          return send(response,200,await postgresStudentCourses(db,token,'/api/v1/class-sections/'+id+'/v81-rules',{}));
+        }
         const gradeWrite=/^\/api\/v1\/enrollments\/([^/]+)\/final-grades$/.exec(pathname);
         if(gradeWrite) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('enrollmentId' in input),'成员标识须使用路径。');
