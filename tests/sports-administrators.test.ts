@@ -209,14 +209,14 @@ function setup() {
     password: "Password123",
     roles: ["superadmin"],
   });
-  repo.create("sportsIdentity", rootId, { role: "admin", status: "verified" });
+  repo.create("companionIdentity", rootId, { role: "admin", status: "verified" });
   const personId = createAccount(db, {
     email: "teacher@example.test",
     name: "teacher",
     password: "Personal123",
     roles: ["teacher"],
   });
-  repo.create("sportsIdentity", personId, {
+  repo.create("companionIdentity", personId, {
     role: "teacher",
     status: "verified",
   });

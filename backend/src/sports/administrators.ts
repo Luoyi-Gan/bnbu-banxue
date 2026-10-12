@@ -24,7 +24,7 @@ export function administratorDirectory(repo: Repository, actor: Account) {
     permissions: sportsPermissions,
     items: accounts.map((a) => {
       const identity = repo
-        .all("sportsIdentity")
+        .all("companionIdentity")
         .find((i) => i.ownerId === a.id && i.data.role === "admin");
       return {
         id: a.id,
@@ -41,7 +41,7 @@ export function administratorDirectory(repo: Repository, actor: Account) {
     }),
     candidates: repo.db
       .prepare(
-        "SELECT DISTINCT a.id,a.name,a.email FROM accounts a JOIN entities i ON i.owner_id=a.id WHERE a.login_kind='PERSONAL' AND a.status='active' AND i.kind='sportsIdentity' AND json_extract(i.data,'$.status')='verified' ORDER BY a.name",
+        "SELECT DISTINCT a.id,a.name,a.email FROM accounts a JOIN entities i ON i.owner_id=a.id WHERE a.login_kind='PERSONAL' AND a.status='active' AND i.kind='companionIdentity' AND json_extract(i.data,'$.status')='verified' ORDER BY a.name",
       )
       .all(),
   };
@@ -94,7 +94,7 @@ export function sportsAdministratorCommand(
     input.confirmed === true,
     "须核对账号资料、全部权限及高风险权限后确认。",
   );
-  const identity = create ? undefined : repo.get(input.id, "sportsIdentity");
+  const identity = create ? undefined : repo.get(input.id, "companionIdentity");
   if (identity) {
     demand(
       identity.data.role === "admin" && identity.ownerId !== actor.id,
@@ -172,7 +172,7 @@ export function sportsAdministratorCommand(
       person?.status === "active" &&
         person.login_kind === "PERSONAL" &&
         repo
-          .all("sportsIdentity")
+          .all("companionIdentity")
           .some((i) => i.ownerId === personId && i.data.status === "verified"),
       "请选择当前已完成身份核验的人员。",
       409,
@@ -206,7 +206,7 @@ export function sportsAdministratorCommand(
         timestamp(),
         loginName,
       );
-    const saved = repo.create("sportsIdentity", id, {
+    const saved = repo.create("companionIdentity", id, {
       role: "admin",
       status: "verified",
       permissions: input.permissions,

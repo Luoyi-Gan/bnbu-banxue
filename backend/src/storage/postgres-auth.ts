@@ -28,7 +28,7 @@ export class PostgresAuth {
       const row = matching[0];
       if (row.login_kind === 'ADMIN') {
         if (row.status !== 'active') throw new ServiceError(403,'ACCOUNT_DISABLED','管理账号已停用。');
-        const identity = await client.query("SELECT 1 FROM entities WHERE kind='sportsIdentity' AND owner_id=$1 AND data::jsonb->>'role'='admin' AND data::jsonb->>'status'='verified'", [row.id]);
+        const identity = await client.query("SELECT 1 FROM entities WHERE kind='companionIdentity' AND owner_id=$1 AND data::jsonb->>'role'='admin' AND data::jsonb->>'status'='verified'", [row.id]);
         demand(identity.rows.length,'管理账号身份不可用。',403);
       }
       await client.query('DELETE FROM login_attempts WHERE identifier=$1',[identifier]);

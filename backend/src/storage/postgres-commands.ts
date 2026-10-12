@@ -29,7 +29,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     const actor = await new PostgresAuth(db).authenticate(token,client);
     demand(actor.status!=='banned','账号已封禁，不能进行业务写入。',403);
     const repo = new PostgresRepository(client);
-    if(action!=='sports.password.change' && passwordChangeRequired(await repo.all('sportsIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
+    if(action!=='sports.password.change' && passwordChangeRequired(await repo.all('companionIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
     for(const [name,key] of [['room.decide','accept'],['report.decide','upheld'],['coffee.answer','accept'],['coffee.slot.update','closed'],['certification.review','approve'],['organization.review','approve'],['activity.visibility','publish'],['mail.visibility','publish'],['alumni.review','approve'],['alumni.decide','accept'],['alumni.profile','accepting']] as const) {
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }

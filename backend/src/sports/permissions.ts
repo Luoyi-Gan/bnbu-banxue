@@ -14,7 +14,7 @@ export const sportsPermissions = [
 export type SportsPermission = (typeof sportsPermissions)[number];
 export function administratorAccess(repo: Pick<Repository, "all">, actor: Account) {
   const identity = repo
-    .all("sportsIdentity")
+    .all("companionIdentity")
     .find(
       (i) =>
         i.ownerId === actor.id &&

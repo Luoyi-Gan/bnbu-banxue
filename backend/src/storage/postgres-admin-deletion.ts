@@ -10,7 +10,7 @@ import { requirePostgresSuperAdmin } from './postgres-administrators';
 export async function postgresAdministratorSelf(db:PostgresDatabase,token:string) {
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
-    const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client),identities=await repo.all('sportsIdentity');
+    const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client),identities=await repo.all('companionIdentity');
     if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
 
     const row=(await client.query("SELECT login_name,name,email FROM accounts WHERE id=$1 AND login_kind='ADMIN'",[actor.id])).rows[0];
@@ -26,14 +26,14 @@ export async function postgresAdministratorDelete(repo:PostgresRepository,actor:
 
   if(!self && input.accountId!==undefined) {
     demand(Object.keys(input).every(k=>['accountId','version','confirmed','handoverConfirmed'].includes(k)),'账号删除参数无效。');
-    const identities=(await repo.all('sportsIdentity')).filter(i=>i.ownerId===input.accountId && i.data.role==='admin');
+    const identities=(await repo.all('companionIdentity')).filter(i=>i.ownerId===input.accountId && i.data.role==='admin');
     demand(identities.length===1,'管理账号不存在或身份资料需核对。',404);
     const snapshot=(await repo.client.query('SELECT login_name,name,email FROM accounts WHERE id=$1',[input.accountId])).rows[0];
     demand(snapshot,'管理账号不存在。',404);
     input={id:identities[0].id,version:input.version,confirmed:input.confirmed,handoverConfirmed:input.handoverConfirmed,loginName:snapshot.login_name,name:snapshot.name,email:snapshot.email};
   }
   demand(Object.keys(input).every(k=>['id','version','confirmed','handoverConfirmed','loginName','name','email'].includes(k)),'账号删除参数无效。');
-  const identity=await repo.get(input.id,'sportsIdentity');
+  const identity=await repo.get(input.id,'companionIdentity');
   version(identity,input);
   demand(identity.data.role==='admin' && identity.ownerId,'只能删除独立分管理员。');
   demand(self?identity.ownerId===actor.id:identity.ownerId!==actor.id,'无权删除此账号。',403);
@@ -55,7 +55,7 @@ export async function postgresAdministratorDelete(repo:PostgresRepository,actor:
   for(const [table,column] of [['sessions','account_id'],['notifications','recipient_id'],['relations','account_id'],['command_receipts','actor_id']] as const) await repo.client.query(`DELETE FROM ${table} WHERE ${column}=$1`,[identity.ownerId]);
   await repo.client.query('DELETE FROM mail_outbox WHERE id IN (SELECT mail_id FROM admin_security_challenges WHERE account_id=$1)',[identity.ownerId]);
   await repo.client.query('DELETE FROM admin_security_challenges WHERE account_id=$1',[identity.ownerId]);
-  await repo.client.query("DELETE FROM entities WHERE owner_id=$1 AND kind='sportsIdentity'",[identity.ownerId]);
+  await repo.client.query("DELETE FROM entities WHERE owner_id=$1 AND kind='companionIdentity'",[identity.ownerId]);
   await repo.client.query("UPDATE accounts SET email=NULL,password_hash=NULL,name=NULL,organization=NULL,roles='[]',status='banned',login_name=NULL,login_kind='HISTORY' WHERE id=$1",[identity.ownerId]);
   const deletedAt=Date.now(),deletedVersion=identity.version+1;
   await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action,handoverConfirmed:true,deletedAt,deletedVersion});

@@ -25,9 +25,9 @@ export async function postgresWorkspace(db: PostgresDatabase, token: string) {
     const allNotifications=(await client.query<Fields>('SELECT id,recipient_id,entity_id AS "entityId",event,body,created_at AS "createdAt",read_at AS "readAt" FROM notifications ORDER BY created_at DESC')).rows;
     const notifications=allNotifications.filter(row=>row.recipient_id===actor.id).map(row=>({id:row.id,entityId:row.entityId,event:row.event,body:row.body,createdAt:row.createdAt,readAt:row.readAt}));
     const relations=(await client.query<Fields>('SELECT entity_id AS "entityId",kind,created_at AS "createdAt" FROM relations WHERE account_id=$1',[actor.id])).rows;
-    const number=recordedStudentNumber(actor,repo.all('sportsIdentity'));
+    const number=recordedStudentNumber(actor,repo.all('companionIdentity'));
     return projectWorkspace({
-      repo,firstLoginOnly:passwordChangeRequired(repo.all('sportsIdentity'),actor),studentNumber:number,
+      repo,firstLoginOnly:passwordChangeRequired(repo.all('companionIdentity'),actor),studentNumber:number,
       sports:null,notifications,relations,
       audit:[...audit].reverse().slice(0,200),
       coffeeHistory:id=>audit.filter(row=>row.entity_id===id && ['coffee.book','coffee.move','coffee.answer','coffee.cancel'].includes(String(row.action))).map(row=>{

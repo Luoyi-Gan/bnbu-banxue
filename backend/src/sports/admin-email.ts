@@ -8,7 +8,7 @@ import { sportsAccountGate } from "./account-gate";
 function current(repo: Repository, actor: Account) {
   sportsAccountGate(repo, actor);
   const identity = repo
-    .all("sportsIdentity")
+    .all("companionIdentity")
     .find(
       (i) =>
         i.ownerId === actor.id &&

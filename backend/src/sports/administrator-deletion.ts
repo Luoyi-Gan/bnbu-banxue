@@ -13,7 +13,7 @@ export function administratorSelf(repo: Repository, actor: Account) {
     )
     .get(actor.id);
   const identity = repo
-    .all("sportsIdentity")
+    .all("companionIdentity")
     .find(
       (i) =>
         i.ownerId === actor.id &&
@@ -57,7 +57,7 @@ export function sportsAdministratorDeletion(
       "账号删除参数无效。",
     );
     const identities = repo
-      .all("sportsIdentity")
+      .all("companionIdentity")
       .filter((i) => i.ownerId === input.accountId && i.data.role === "admin");
     demand(identities.length === 1, "管理账号不存在或身份资料需核对。", 404);
     const snapshot = repo.db
@@ -88,7 +88,7 @@ export function sportsAdministratorDeletion(
     ),
     "账号删除参数无效。",
   );
-  const identity = repo.get(input.id, "sportsIdentity");
+  const identity = repo.get(input.id, "companionIdentity");
   version(identity, input);
   demand(
     identity.data.role === "admin" && identity.ownerId,
@@ -159,7 +159,7 @@ export function sportsAdministratorDeletion(
   clearAdminChallenges(repo, identity.ownerId);
   // PERSONAL registration challenges sharing this email are intentionally retained.
   repo.db
-    .prepare("DELETE FROM entities WHERE owner_id=? AND kind='sportsIdentity'")
+    .prepare("DELETE FROM entities WHERE owner_id=? AND kind='companionIdentity'")
     .run(identity.ownerId);
   repo.db
     .prepare(

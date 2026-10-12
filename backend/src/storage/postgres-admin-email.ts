@@ -10,7 +10,7 @@ import type { PoolClient } from 'pg';
 
 async function current(db:PostgresDatabase,client:PoolClient,token:string) {
   const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
-  const identities=await repo.all('sportsIdentity');
+  const identities=await repo.all('companionIdentity');
   if(passwordChangeRequired(identities,actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
 
   const identity=identities.find(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified');

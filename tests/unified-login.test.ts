@@ -7,7 +7,7 @@ it('自动识别个人邮箱和独立管理账号，保留密码、停用及角�
  const personal=createAccount(db,{email:'auto@example.test',name:'学生',password:'Acceptance-123',roles:['student']});
  const admin=createAccount(db,{email:'management@example.test',name:'管理',password:'Management-123',roles:['reviewer']});
  db.prepare("UPDATE accounts SET login_kind='ADMIN',login_name=? WHERE id=?").run('review-manager',admin);
- new Repository(db).create('sportsIdentity',admin,{role:'admin',status:'verified'});
+ new Repository(db).create('companionIdentity',admin,{role:'admin',status:'verified'});
  expect(loginUnified(db,' AUTO@EXAMPLE.TEST ','Acceptance-123').account.id).toBe(personal);
  expect(loginUnified(db,'review-manager','Management-123').account.id).toBe(admin);
  expect(()=>loginUnified(db,'review-manager','wrong')).toThrow();

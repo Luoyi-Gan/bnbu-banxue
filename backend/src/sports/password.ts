@@ -17,7 +17,7 @@ export function sportsPasswordCommand(
 ) {
   if (action !== "sports.password.change") return undefined;
   const identity = repo
-    .all("sportsIdentity")
+    .all("companionIdentity")
     .find(
       (i) =>
         i.ownerId === actor.id &&

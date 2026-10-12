@@ -10,7 +10,7 @@ export async function postgresCommunityView(db: PostgresDatabase, token: string)
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const account = await new PostgresAuth(db).authenticate(token,client);
     const repo = new PostgresRepository(client);
-    if(passwordChangeRequired(await repo.all('sportsIdentity'),account)) return projectCommunity({account,entities:[],people:[],relations:[],alumni:{profiles:[]}},new Map());
+    if(passwordChangeRequired(await repo.all('companionIdentity'),account)) return projectCommunity({account,entities:[],people:[],relations:[],alumni:{profiles:[]}},new Map());
     const entities = [...await repo.all('post'),...await repo.all('comment')];
     const people = await repo.people();
     const relations = (await client.query<{entityId:string;kind:string}>('SELECT entity_id AS "entityId",kind FROM relations WHERE account_id=$1',[account.id])).rows;

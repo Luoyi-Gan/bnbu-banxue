@@ -1,3 +1,4 @@
+import { companionIdentityMigrationSql } from './postgres-schema';
 import { DatabaseSync } from 'node:sqlite';
 import type { PostgresDatabase } from './postgres';
 
@@ -41,6 +42,7 @@ export async function importSqlite(sourcePath: string, target: PostgresDatabase)
       if (count !== rows.length) throw new Error(`Imported ${table} count mismatch`);
       counts[table] = count;
     }
+    await client.query(companionIdentityMigrationSql);
     return counts;
   });
 }

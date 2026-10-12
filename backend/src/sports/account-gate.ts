@@ -2,7 +2,7 @@ import { ServiceError, type Account } from "../auth";
 import { Repository, type Entity } from "../repository";
 
 export function requiresPasswordChange(repo: Pick<Repository, "all">, actor: Account) {
-  return passwordChangeRequired(repo.all("sportsIdentity"),actor);
+  return passwordChangeRequired(repo.all("companionIdentity"),actor);
 }
 export function passwordChangeRequired(identities: Entity[], actor: Account) {
   return identities.some(

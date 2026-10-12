@@ -48,7 +48,7 @@ export function* alumniPolicy(
   if (action === "alumni.review") reviewer(actor);
   else student(actor);
   const before = ((yield* effect(repo.all("alumniState")))[0]?.data.value as AlumniData | undefined) ?? emptyAlumni();
-  const enrolledNumber=recordedStudentNumber(actor,(yield* effect(repo.all("sportsIdentity"))));
+  const enrolledNumber=recordedStudentNumber(actor,(yield* effect(repo.all("companionIdentity"))));
   if (action === "alumni.post") {
     canSpeak(actor);
     const profile = before.profiles.find(

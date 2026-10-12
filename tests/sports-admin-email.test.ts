@@ -27,7 +27,7 @@ function setup() {
       password: "Password123",
       roles: role === "admin" ? ["superadmin"] : ["student"],
     });
-    const identity = repo.create("sportsIdentity", id, {
+    const identity = repo.create("companionIdentity", id, {
       role,
       status: "verified",
     });

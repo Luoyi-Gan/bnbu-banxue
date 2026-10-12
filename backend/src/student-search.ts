@@ -2,7 +2,7 @@ import {demand, type Account} from './auth';
 import type {Database} from './database';
 import {Repository, type Entity, type Fields} from './repository';
 export function studentNumber(db: Database, actor: Account): string | null {
-  return recordedStudentNumber(actor,new Repository(db).all('sportsIdentity'));
+  return recordedStudentNumber(actor,new Repository(db).all('companionIdentity'));
 }
 export function recordedStudentNumber(actor: Account, records: Entity[]): string|null {
   if (!actor.roles.includes('student') || actor.status === 'banned') return null;
@@ -14,7 +14,7 @@ export function recordedStudentNumber(actor: Account, records: Entity[]): string
 export function searchStudents(db: Database, actor: Account, query: string) {
   validateStudentSearch(actor,query);
   const repo = new Repository(db);
-  const identities=repo.all('sportsIdentity'),preferences=repo.all('preferences');
+  const identities=repo.all('companionIdentity'),preferences=repo.all('preferences');
   const ids=new Set(identities.filter(i=>i.data.studentNumber===query.trim()).map(i=>i.ownerId));
   return {students:[...ids].flatMap(id=>{
     const row=db.prepare("SELECT id,email,name,organization,status,roles FROM accounts WHERE id=? AND login_kind='PERSONAL'").get(id) as (Omit<Account,'roles'>&{roles:string})|undefined;

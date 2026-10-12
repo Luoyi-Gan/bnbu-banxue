@@ -17,7 +17,7 @@ it('入班独立学号用于搜索，邮箱验证不推导学号，尊重角色�
  db.prepare('UPDATE accounts SET roles=?,organization=? WHERE id=?').run('["student"]','学院',person.id);
  person=login(db,'123456@bnbu.edu.cn','Acceptance-123').account;
  expect(studentNumber(db,person)).toBeNull();
- new Repository(db).create('sportsIdentity',person.id,{role:'student',status:'verified',studentNumber:'2030123456'});
+ new Repository(db).create('companionIdentity',person.id,{role:'student',status:'verified',studentNumber:'2030123456'});
  expect(studentNumber(db,person)).toBe('2030123456');
  expect(searchStudents(db,viewer,'123456')).toEqual({students:[]});
  expect(searchStudents(db,viewer,'123')).toEqual({students:[]});
@@ -35,7 +35,7 @@ it('入班独立学号用于搜索，邮箱验证不推导学号，尊重角色�
  expect(()=>verifyOwnEmail(db,viewer,code)).toThrow();
  verifyOwnEmail(db,existing,code);
  expect(searchStudents(db,viewer,'654321').students).toEqual([]);
- repo.create('sportsIdentity',existing.id,{role:'student',status:'verified',studentNumber:'654321'});
+ repo.create('companionIdentity',existing.id,{role:'student',status:'verified',studentNumber:'654321'});
  expect(searchStudents(db,viewer,'654321').students[0].id).toBe(existing.id);
  expect(()=>verifyOwnEmail(db,existing,code)).toThrow();
  } finally {db.close()}
@@ -46,7 +46,7 @@ it('HTTP 本人邮箱验证、学号搜索和隐私设置贯通',async()=>{
  try {
   createAccount(db,{email:'y123456789@bnbu.edu.cn',name:'测试学生',password:'Acceptance-123',roles:['student']});
   const actor=login(db,'y123456789@bnbu.edu.cn','Acceptance-123');
-  new Repository(db).create('sportsIdentity',actor.account.id,{role:'student',status:'verified',studentNumber:'2026123'});
+  new Repository(db).create('companionIdentity',actor.account.id,{role:'student',status:'verified',studentNumber:'2026123'});
   await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base='http://127.0.0.1:'+(server.address() as {port:number}).port;
   const headers={'Content-Type':'application/json',Cookie:'bnbu_session='+actor.token};

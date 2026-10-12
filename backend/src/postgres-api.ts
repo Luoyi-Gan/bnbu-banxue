@@ -52,7 +52,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           const actor=await auth.authenticate(cookieToken(request));
           student(actor);
           demand(actor.status!=='banned','账号已封禁。',403);
-          const mustChange=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('sportsIdentity'),actor));
+          const mustChange=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
           if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
           return send(response,200,await recognize(request));
         }

@@ -252,7 +252,7 @@ function credentialLogin(
     demand(
       db
         .prepare(
-          "SELECT 1 FROM entities WHERE kind='sportsIdentity' AND owner_id=? AND json_extract(data,'$.role')='admin' AND json_extract(data,'$.status')='verified'",
+          "SELECT 1 FROM entities WHERE kind='companionIdentity' AND owner_id=? AND json_extract(data,'$.role')='admin' AND json_extract(data,'$.status')='verified'",
         )
         .get(row.id),
       "管理账号身份不可用。",

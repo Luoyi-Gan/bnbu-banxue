@@ -45,7 +45,7 @@ export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fie
       ? 20
       : integerField({ limit: Number(input.limit) }, "limit", 1, 100);
   const fields = repo
-    .all("sportsIdentity")
+    .all("companionIdentity")
     .filter(
       (i) => i.data.role === kind && i.ownerId && i.data.status === "verified",
     )

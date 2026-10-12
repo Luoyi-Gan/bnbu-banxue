@@ -1,3 +1,12 @@
+export const companionIdentityMigrationSql = `
+UPDATE entities SET kind='companionIdentity'
+WHERE kind='sportsIdentity' AND EXISTS (
+  SELECT 1 FROM accounts a WHERE a.id=entities.owner_id AND (
+    (entities.data::jsonb->>'role'='admin' AND (a.login_kind='ADMIN' OR a.roles::jsonb ? 'superadmin'))
+    OR (entities.data::jsonb->>'role' IN ('student','teacher') AND a.roles::jsonb ? (entities.data::jsonb->>'role'))
+  )
+);
+`;
 // Preserve the existing wire representations while moving persistence to PostgreSQL.
 // Millisecond timestamps require BIGINT; SQLite's INTEGER was 64-bit.
 export const postgresMigrations = [{ version: 1, sql: `
@@ -68,4 +77,4 @@ CREATE TABLE new_student_join_capabilities (
  issue_key TEXT NOT NULL,request_hash TEXT NOT NULL,started_at BIGINT NOT NULL,expires_at BIGINT NOT NULL,
  session_secret TEXT NOT NULL,consume_key TEXT,result TEXT,account_id TEXT REFERENCES accounts(id)
 );
-`}];
+`},{version:9,sql:companionIdentityMigrationSql}];

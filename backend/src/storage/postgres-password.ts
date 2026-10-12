@@ -5,7 +5,7 @@ import { version } from "../version-check";
 import { PostgresRepository } from './postgres-repository';
 
 export async function postgresPassword(client: PoolClient, repo: PostgresRepository, actor: Account, token: string, input: Fields) {
-  const identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId===actor.id && i.data.status==='verified' && ['teacher','admin'].includes(String(i.data.role)));
+  const identity=(await repo.all('companionIdentity')).find(i=>i.ownerId===actor.id && i.data.status==='verified' && ['teacher','admin'].includes(String(i.data.role)));
   demand(identity && actor.status==='active','仅有效教师或管理员可修改本人密码。',403);
   version(identity,input);
   demand(typeof input.currentPassword==='string' && typeof input.newPassword==='string' && input.newPassword.length>0,'请填写当前密码和非空新密码。');

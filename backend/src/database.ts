@@ -1,3 +1,4 @@
+import { migrateCompanionIdentity } from "./companion-identity-migration";
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
@@ -78,6 +79,7 @@ export function openDatabase(filename: string) {
   db.exec(
     "INSERT OR IGNORE INTO schema_migrations VALUES(6,strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
   );
+  migrateCompanionIdentity(db);
   return db;
 }
 

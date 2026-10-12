@@ -18,7 +18,7 @@ function setup() {
       password: "Test-password-123",
       roles: [],
     });
-    const identity = repo.create("sportsIdentity", id, {
+    const identity = repo.create("companionIdentity", id, {
       role,
       status: "verified",
       permissions: role === "admin" ? ["ACCOUNTS"] : [],
@@ -120,7 +120,7 @@ it("搜索筛选分页可组合，过期游标、重复身份和非法学生状�
   expect(() => read({ status: "DISABLED" })).toThrow("筛选状态");
   expect(() => read({ limit: 101 })).toThrow();
   expect(() => read({ password: "x" })).toThrow();
-  f.repo.create("sportsIdentity", f.student.account.id, {
+  f.repo.create("companionIdentity", f.student.account.id, {
     role: "student",
     status: "verified",
   });
