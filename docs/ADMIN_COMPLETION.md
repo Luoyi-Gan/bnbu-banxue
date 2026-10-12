@@ -1755,3 +1755,7 @@ API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入�
 ### 教师体测页面协议及Docker联动
 
 接通 POST enrollments/:id/physical-results，保留原页面expectedVersion/runType/elapsedSeconds/testedOn协议，事务内调用共享确认规则并返回对应不可变历史版本。参数白名单不接受分数或额外字段，权限／维护检查在幂等回执读取前。类型、lint、diff检查通过；API重建健康后Docker通过教师录入1000米245秒、学生原样读取项目用时日期及既有三端补证审核整链。体测历史列表、结算后更正专用协议及真实换算规则配置仍需继续，不宣称全目标完成。
+
+### PostgreSQL 教师体测／最终成绩历史读取
+
+抽出gradeHistoryProjection共用原版历史版本检查、降序及beforeVersion分页，接通GET enrollments/:id/physical-results与final-grades。读取前检查教师身份、维护和原责任课程，仅返回原版公开给教师的字段，不授予学生历史成绩权限。53项PostgreSQL／原版成绩协议测试通过，覆盖体测两版分页和学生拒绝，类型与lint通过。最终成绩写入、更正及本轮接口Docker验证仍待完成，UI未改。

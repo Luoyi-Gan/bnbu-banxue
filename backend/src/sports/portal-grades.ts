@@ -244,6 +244,9 @@ export function portalGradeHistory(
   const member = repo.get(enrollmentId, "sportsEnrollment");
   ownedCourse(repo, actor, member.data.courseId);
   sportsWriteGate(repo, "sports.course.read");
+  return gradeHistoryProjection(repo,enrollmentId,kind,input);
+}
+export function gradeHistoryProjection(repo:Pick<Repository,"all">,enrollmentId:string,kind:"physical-results"|"final-grades",input:Fields) {
   demand(
     Object.keys(input).every((key) => ["limit", "beforeVersion"].includes(key)),
     "成绩历史查询参数无效。",
@@ -262,7 +265,7 @@ export function portalGradeHistory(
           Number.MAX_SAFE_INTEGER,
         );
   const select = (entityKind: string) =>
-    repo.all(entityKind).filter((row) => row.data.enrollmentId === member.id);
+    repo.all(entityKind).filter((row) => row.data.enrollmentId === enrollmentId);
   const rows =
     kind === "physical-results"
       ? select("sportsEnduranceRevision").map((row) => ({

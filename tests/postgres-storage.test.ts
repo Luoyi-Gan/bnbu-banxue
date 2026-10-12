@@ -2,6 +2,7 @@ import { postgresStudentApplications, postgresStudentRecognitionHistory } from '
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
 import { postgresStudentPhysical } from '../backend/src/storage/postgres-student-physical';
+import { postgresTeacherHistory } from '../backend/src/storage/postgres-teacher-history';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
 import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
@@ -365,6 +366,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await postgresStudentPhysical(db,student.token,member.id)).data).toEqual({status:'RECORDED',result:{runType:'1000m',elapsedSeconds:250,testedOn:'2026-10-01'}});
     await expect(executePostgres(db,teacher.token,'sports.endurance.confirm',{...input,seconds:251},randomUUID())).rejects.toMatchObject({status:409});
     await executePostgres(db,teacher.token,'sports.endurance.confirm',{...input,version:1,seconds:251},randomUUID());
+    const history=(await postgresTeacherHistory(db,teacher.token,member.id,'physical-results',{limit:1})).data;
+    expect(history).toMatchObject({items:[{version:2,elapsedSeconds:251}],nextBeforeVersion:2});
+    expect((await postgresTeacherHistory(db,teacher.token,member.id,'physical-results',{beforeVersion:2})).data).toMatchObject({items:[{version:1,elapsedSeconds:250}],nextBeforeVersion:null});
+    await expect(postgresTeacherHistory(db,student.token,member.id,'physical-results',{})).rejects.toMatchObject({status:403});
     await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.all('sportsEnduranceRevision')).filter(r=>r.data.recordId===saved.id)).toHaveLength(2);const course=await repo.get(member.data.courseId);await repo.save(course,{settlementStatus:'SETTLED'});await client.query('DELETE FROM notifications WHERE entity_id=$1',[saved.id]);});
     await expect(executePostgres(db,teacher.token,'sports.endurance.confirm',{...input,version:2,seconds:252},randomUUID())).rejects.toMatchObject({status:409});
   });
