@@ -190,6 +190,17 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const course=await repo.create('sportsCourse',null,{semesterId:semester.id});
       return repo.create('sportsSession','sports-reader-student',{courseId:course.id,semesterId:semester.id,activityType:'EXERCISE',ruleSnapshot:{threshold:30},clock:{...startClock(Date.now()-1800000),state:'ENDED',endedAt:Date.now(),activeMilliseconds:1800000}});
     });
+    const draftInput={sessionId:session.id,creditType:'GENERAL',sportType:'RUNNING',sportName:null,description:'草稿说明',clientRequestId:randomUUID()},draftKey=randomUUID();
+    const draft=await executePostgres(db,login.token,'sports.recorddraft.create',draftInput,draftKey);
+    expect(draft).toMatchObject({status:'DRAFT',sessionId:session.id,description:'草稿说明'});
+    expect(await executePostgres(db,login.token,'sports.recorddraft.create',draftInput,draftKey)).toEqual(draft);
+    await expect(executePostgres(db,login.token,'sports.recorddraft.create',draftInput,randomUUID())).rejects.toMatchObject({status:409});
+    const edited=await executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:draft.version,description:'核对后的说明'},randomUUID());
+    expect(edited.description).toBe('核对后的说明');
+    await expect(executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:draft.version,description:'旧版本'},randomUUID())).rejects.toMatchObject({status:409});
+    const discarded=await executePostgres(db,login.token,'sports.recorddraft.discard',{id:draft.id,expectedVersion:edited.version,reason:'测试放弃'},randomUUID());
+    expect(discarded.status).toBe('DISCARDED');
+    await expect(executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:discarded.version,description:'不能修改'},randomUUID())).rejects.toMatchObject({status:409});
     const input={sessionId:session.id,version:session.version,category:'RELATED',description:'材料受理测试',activityType:'EXERCISE',files:[{clientId:'photo',mime:'image/jpeg',size:123,sha256:'a'.repeat(64)}]},key=randomUUID();
     const result=await executePostgres(db,login.token,'sports.record.accept',input,key);
     expect(await executePostgres(db,login.token,'sports.record.accept',input,key)).toEqual(result);

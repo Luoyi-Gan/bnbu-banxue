@@ -61,6 +61,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         demand(!request.headers.origin || origins.has(request.headers.origin),'来源不允许。',403);
         demand(request.headers['sec-fetch-site'] !== 'cross-site','跨站请求不允许。',403);
         if(request.method==='PATCH') {
+          const draftEdit=/^\/api\/v1\/exercise-records\/([^/]+)$/.exec(pathname);
+          if(draftEdit) {
+            const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+            const input=await body(request);demand(!('id' in input),'记录标识须使用路径。');
+            return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.recorddraft.edit',{...input,id:decodeURIComponent(draftEdit[1])},key)});
+          }
           demand(pathname==='/api/v1/me/preferences','接口不存在。',404);
           const key=request.headers['idempotency-key'];
           demand(typeof key==='string','缺少操作幂等标识。');
@@ -82,6 +88,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const draftWrite=/^\/api\/v1\/exercise-records(?:\/([^/]+)\/(discard))?$/.exec(pathname);
+        if(draftWrite) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          demand(!('id' in input),'记录标识须使用路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.recorddraft.'+(draftWrite[1]?'discard':'create'),draftWrite[1]?{...input,id:decodeURIComponent(draftWrite[1])}:input,key)});
+        }
         const exerciseWrite=/^\/api\/v1\/exercise-sessions(?:\/([^/]+)\/(pause|resume|finish|cancel))?$/.exec(pathname);
         if(exerciseWrite) {
           const key=request.headers['idempotency-key'];

@@ -1647,3 +1647,7 @@ POST /api/v1/exercise-sessions 及 pause/resume/finish 接入共享命令事务�
 ### PostgreSQL 首批运动材料受理复用
 
 将现有 sports.record.accept 提取为同步／异步共用业务策略，PostgreSQL 命令事务现在可原子保存运动记录、锁定材料清单、30 分钟上传批次及通知。保留原 SQLite 调用、24 小时首次受理边界、结算归档限制、游泳前后凭证核对和取消会话禁止提交规则；没有改变 UI 或放宽规则。真实 PostgreSQL 新增受理、同键重试、重复受理拒绝与单份通知验证；材料、游泳、会话回归共 61 项通过，类型检查及 lint 通过。Docker API 重建健康启动，已有容器冒烟（含运动计时）通过。当前页面的记录草稿、媒体上传、submit 分步协议尚未对接，不将内部受理命令通过表述为页面材料全流程完成。
+
+### 学生运动草稿写接口
+
+新增 POST exercise-records、PATCH exercise-records/:id、POST exercise-records/:id/discard，接入独立草稿实体，复用事务／审计／幂等机制。核对本人已结束且未取消会话、首次受理窗口、结算归档、唯一有效草稿、运动项目及说明；修改和放弃须核对版本。PostgreSQL 44 项测试通过，覆盖创建重试、重复草稿拒绝、修改、旧版本拒绝和放弃后禁止修改；类型与 lint 检查通过。草稿集合读取、正式记录映射和媒体协议尚未接完，本轮未更新 Docker，现有界面未改。

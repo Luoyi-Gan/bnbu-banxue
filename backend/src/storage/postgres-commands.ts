@@ -1,3 +1,4 @@
+import { recordDraftGate, saveRecordDraft } from './postgres-record-drafts';
 import { sportsMaterialPolicy } from "../sports/materials";
 import { randomUUID } from 'node:crypto';
 import { demand, digest, ServiceError, timestamp } from '../auth';
@@ -40,6 +41,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action.startsWith('sports.recorddraft.')) await recordDraftGate(repo,actor);
     if(action.startsWith('sports.exercise.')) {
       const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
       sportsRole({all:()=>identities},actor,'student');
@@ -82,6 +84,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       demand(session,'运动会话操作失败。',500);
       result=studentSessionProjection(session);
     }
+    else if(action.startsWith('sports.recorddraft.')) result=await saveRecordDraft(repo,actor,action.split('.')[2],input);
     else if(action==='sports.record.accept') {
       const record=await runAsync(sportsMaterialPolicy(repo,actor,action,input));
       if(record) result={id:record.id};
