@@ -93,10 +93,35 @@ if(companionOnly) {
   const view=await request('/api/community');assert.ok(view.likedPosts.includes(postId));assert.ok(view.savedPosts.includes(postId));
   cookie=authorCookie;
   assert.ok((await request('/api/workspace')).notifications.some(n=>n.entityId===postId));
+  const room=(await command('room.create',{type:'study',title:'Docker组队验收',body:'本地测试',time:'周末',place:'图书馆',capacity:2})).data;
+  const rejectCommand=async(action,input,status)=>{
+    const response=await fetch(base+'/api/commands',{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json'},body:JSON.stringify({action,input,requestId:randomUUID()})});
+    assert.equal(response.status,status,await response.text());
+  };
+  await request('/api/auth/sign-in',{identifier:viewerId+'@example.test',password});
+  const memberCookie=cookie;
+  const application=(await command('room.apply',{id:room.id})).data;
+  await rejectCommand('message.send',{roomId:room.id,body:'未入队不能发言'},403);
+  cookie=authorCookie;
+  await command('room.decide',{id:application.id,accept:true});
+  const first=(await command('message.send',{roomId:room.id,body:'队长消息'})).data;
+  cookie=memberCookie;
+  assert.ok((await request('/api/workspace')).entities.some(e=>e.id===first.id));
+  const reply=(await command('message.send',{roomId:room.id,body:'成员回复'})).data;
+  cookie=authorCookie;
+  assert.ok((await request('/api/workspace')).entities.some(e=>e.id===reply.id));
+  await command('room.finish',{id:room.id});
+  await command('room.review',{id:room.id,targetId:viewerId,stars:5,comment:'合作愉快'});
+  cookie=memberCookie;
+  await rejectCommand('message.send',{roomId:room.id,body:'结束后不能发送'},403);
+  const reviewInput={id:room.id,targetId:actor.id,stars:5,comment:'合作愉快'};
+  await command('room.review',reviewInput);
+  await rejectCommand('room.review',reviewInput,409);
+  cookie=authorCookie;
   await request('/api/auth/logout',{});
   assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
   docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`DELETE FROM sessions WHERE account_id IN ('${actor.id}','${viewerId}','${reviewerId}'); UPDATE accounts SET status='banned',roles='[]' WHERE id IN ('${actor.id}','${viewerId}','${reviewerId}')`],{stdio:'pipe'});
-  console.log('PASS companion-only Docker: registration, persistence across restart, community moderation/visibility/notification, likes, saves and logout. No sports writes executed.');
+  console.log('PASS companion-only Docker: registration, persistence across restart, community moderation/visibility/notification, likes, saves, team admission/chat/finish/reviews and logout. No sports writes executed.');
   process.exit(0);
 }
 const companionCookie=cookie,companionId=actor.id;
