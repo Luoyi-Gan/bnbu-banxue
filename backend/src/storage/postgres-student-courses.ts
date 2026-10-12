@@ -26,6 +26,26 @@ export async function postgresStudentCourses(db:PostgresDatabase,token:string,pa
     }
     const enrollments=await source.all('sportsEnrollment');
     const courses=(await source.all('sportsCourse')).filter(c=>teacher ? c.ownerId===actor.id : enrollments.some(e=>e.ownerId===actor.id && e.data.courseId===c.id));
+    if(path==='/api/v1/enrollments') {
+      demand(Object.keys(input).every(key=>['classSectionId','limit','cursor'].includes(key)),'班级成员查询参数无效。');
+      demand(input.classSectionId===undefined || typeof input.classSectionId==='string','班级标识无效。');
+      const courseId=String(input.classSectionId ?? '');
+      if(courseId) demand(courses.some(c=>c.id===courseId),'课程不存在或无权读取。',404);
+      const members=enrollments.filter(e=>(teacher ? courses.some(c=>c.id===e.data.courseId) : e.ownerId===actor.id) && (!courseId || e.data.courseId===courseId));
+      const result=page(members,{limit:input.limit ?? 100,cursor:input.cursor});
+      const joins=result.items.length ? (await client.query<{entity_id:string;actor_id:string}>("SELECT DISTINCT ON (entity_id) entity_id,actor_id FROM audit WHERE entity_id=ANY($1::text[]) AND action='sports.enrollment.join' ORDER BY entity_id,created_at,sequence",[result.items.map(e=>e.id)])).rows : [];
+      return {data:result.items.map(member=>{
+        const course=courses.find(c=>c.id===member.data.courseId);
+        demand(course,'成员关联课程不存在。',409);
+        const join=joins.find(j=>j.entity_id===member.id);
+        return {id:member.id,organizationId:'BNBU',semesterId:course.data.semesterId,classSectionId:course.id,studentId:member.ownerId,
+          source:member.data.source ?? (join ? 'INVITE' : 'UNKNOWN'),sourceReferenceId:member.data.invitationId ?? null,
+          status:member.data.status,joinedAt:member.createdAt,
+          endedAt:member.data.status==='ACTIVE' || typeof member.data.changedAt!=='number' ? null : new Date(member.data.changedAt).toISOString(),
+          endReason:member.data.status==='ACTIVE' ? null : member.data.reason ?? null,createdBy:join?.actor_id ?? null,
+          createdAt:member.createdAt,updatedAt:member.updatedAt,version:member.version};
+      }),meta:{pagination:{total:result.total,limit:result.limit,nextCursor:result.nextCursor,hasMore:result.nextCursor!==null}}};
+    }
     const projectSection=(course:typeof courses[number])=>section({get:(id,kind)=>{
       const semester=semesters.find(s=>s.id===id && (!kind || s.kind===kind));
       demand(semester,'课程学期不存在。',404);return semester;

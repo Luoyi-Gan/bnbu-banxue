@@ -98,6 +98,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(teacherListing.data).toEqual([expect.objectContaining({id:course.id})]);
     expect(teacherListing).toMatchObject({meta:{pagination:{hasMore:false,nextCursor:null}}});
     await expect(postgresStudentCourses(db,teacher.token,`/api/v1/courses/${hidden.id}`,{})).rejects.toMatchObject({status:404});
+    await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-other',{courseId:hidden.id,semesterId:'sports-read-semester',status:'ACTIVE'}));
+    const ownMembers=await postgresStudentCourses(db,student.token,'/api/v1/enrollments',{});
+    expect(ownMembers.data).toEqual([expect.objectContaining({studentId:'sports-reader-student',classSectionId:course.id,source:'UNKNOWN'})]);
+    const teachingMembers=await postgresStudentCourses(db,teacher.token,'/api/v1/enrollments',{classSectionId:course.id});
+    expect(teachingMembers.data).toEqual(ownMembers.data);
+    await expect(postgresStudentCourses(db,student.token,'/api/v1/enrollments',{classSectionId:hidden.id})).rejects.toMatchObject({status:404});
+    await expect(postgresStudentCourses(db,teacher.token,'/api/v1/enrollments',{classSectionId:hidden.id})).rejects.toMatchObject({status:404});
     await db.transaction(async client=>{
       const repo=new PostgresRepository(client);
       const identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-teacher')!;
