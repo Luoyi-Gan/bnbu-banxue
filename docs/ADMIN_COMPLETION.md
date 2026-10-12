@@ -2301,3 +2301,9 @@ Docker smoke 增加进程退出收尾：仅追踪本次创建的随机账号，�
 
 ## 2026-10-12 原页面校友撤销跨角色联动
 审核员填写测试撤销原因后点击撤销，管理端变为未通过/已撤销并保留原因。通过统一登录切回原学生，校友认证页面同样显示撤销及完全一致的原因，原申请学号等信息保留供重新申请；同时出现两条新通知角标（通过与撤销）。未对真实学生认证做操作。截图.runtime/alumni-revoked-browser-proof.png。
+
+### 2026-10-12 远端交付核对与接口兼容
+
+重新 fetch 后确认 origin/main 为 14fa16c，已合并 PR #11；本地核对起点 782e579 与远端存在分叉（远端独有 6、本地独有 195 个提交），不能称当前清理成果已推送。远端特有改动逐项检查后，保留通用 API AbortSignal、工作台身份响应校验和 BNBU_COMPANION_ORIGIN 开发代理配置，拒绝数组等非对象接口响应，并保留 HTTP 错误状态及业务 POST/幂等行为。没有重新引入独立体育账号、首次改密和维护门禁。既有 ConnectedApp/SportsPortal 页面布局不变；旧独立 WorkspaceSportsPage 不作为恢复业务理由。
+
+验证：src/live/api.test.ts 3 项通过；tsconfig.app.json 类型检查通过。此前 Docker 验证对应前一构建，本次接口保护尚未重新构建进容器。后续仍需处理交付分支并创建包含 backend/、PostgreSQL、Docker 分离与体育清理的新 PR；没有推送或合并远端主分支。
