@@ -1,3 +1,4 @@
+import { conversionWorkspace } from "../sports/conversion";
 import { gradeWorkspace } from "../sports/grades";
 import { enduranceWorkspace } from "../sports/endurance";
 import { demand } from '../auth';
@@ -16,7 +17,7 @@ export async function postgresSportsWorkspace(db:PostgresDatabase,token:string) 
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),source=new PostgresRepository(client);
-    const kinds=['sportsIdentity','sportsSemester','sportsCourse','sportsEnrollment','sportsEnrollmentFlow','sportsMakeup','sportsTemplate','sportsInvitation','sportsSystem','sportsSystemHistory','sportsRecord','sportsSession','sportsPause','sportsMaterialBatch','sportsMaterial','sportsDeadlineAdjustment','sportsProgress','sportsReviewEvent','sportsReviewRound','sportsCalendar','sportsManualMode','sportsEndurance','sportsEnduranceRevision','sportsExemption','sportsGradeDraft','sportsGradePublication'];
+    const kinds=['sportsIdentity','sportsSemester','sportsCourse','sportsEnrollment','sportsEnrollmentFlow','sportsMakeup','sportsTemplate','sportsInvitation','sportsSystem','sportsSystemHistory','sportsRecord','sportsSession','sportsPause','sportsMaterialBatch','sportsMaterial','sportsDeadlineAdjustment','sportsProgress','sportsReviewEvent','sportsReviewRound','sportsCalendar','sportsManualMode','sportsEndurance','sportsEnduranceRevision','sportsExemption','sportsGradeDraft','sportsGradePublication','sportsConversionTable'];
     const entities:Entity[]=[];for(const kind of kinds)entities.push(...await source.all(kind));
     const repo:Pick<Repository,'all'|'get'>={all:kind=>entities.filter(e=>e.kind===kind),get:(id,kind)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,'对象不存在。',404);return e;}};
     const system=systemWorkspace(repo,actor),serverNow=Date.now();
@@ -27,6 +28,6 @@ export async function postgresSportsWorkspace(db:PostgresDatabase,token:string) 
       return {...system,serverNow,semesters:[],templates:[],courses:[],enrollments:[],invitations:[],sessions:[],records:[],materialBatches:[],materials:[],reviewReasons:[],reviewEvents:[],reviewRounds:[],progress:[],manualModes:recovery?.manualModes ?? [],canGovernAi,technicalTasks:recovery?.technicalTasks ?? [],recoveryCourses:canGovernAi?repo.all('sportsCourse').filter(c=>c.data.status!=='DRAFT' && c.data.settlementStatus!=='SETTLED').map(c=>({...c,data:{name:c.data.name}})):[]};
     }
     const names=new Map((await client.query<{id:string;name:string}>('SELECT id,name FROM accounts')).rows.map(a=>[a.id,a.name]));
-    return {...system,...projectSportsCourses(repo,actor,id=>names.get(id) ?? '历史学生'),...materialWorkspace(repo,actor),...reviewWorkspace(repo,actor),...enduranceWorkspace(repo,actor),...gradeWorkspace(repo,actor),serverNow,sessions:repo.all('sportsSession').filter(s=>s.ownerId===actor.id).map(s=>sessionProjection(s,serverNow))};
+    return {...system,...projectSportsCourses(repo,actor,id=>names.get(id) ?? '历史学生'),...materialWorkspace(repo,actor),...reviewWorkspace(repo,actor),...enduranceWorkspace(repo,actor),...gradeWorkspace(repo,actor),...conversionWorkspace(repo,actor),serverNow,sessions:repo.all('sportsSession').filter(s=>s.ownerId===actor.id).map(s=>sessionProjection(s,serverNow))};
   });
 }

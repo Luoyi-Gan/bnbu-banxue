@@ -389,6 +389,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const history=(await postgresTeacherHistory(db,teacher.token,member.id,'final-grades',{})).data;
     expect(history.items).toMatchObject([{version:3,published:false,finalGrade:91},{version:2,published:true,finalGrade:82},{version:1,published:false,finalGrade:82}]);
   });
+  it('edits conversion rules transactionally with permission and interval checks', async()=>{
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='ai-governor'");
+    try {
+      const auth=new PostgresAuth(db),admin=await auth.login('ai-governor@example.test','Ai-govern-123'),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123');
+      const table=await db.transaction(client=>new PostgresRepository(client).create('sportsConversionTable',null,{sex:'MALE',group:'JUNIOR',event:1000,rows:[{id:'row-one',min:0,max:100,score:80,grade:'PASS',note:''}]}));
+      const input={id:table.id,version:table.version,rowId:'row-one',min:0,max:200,score:80,grade:'PASS',note:'checked'},key=randomUUID();
+      await expect(executePostgres(db,teacher.token,'sports.conversion.edit',input,randomUUID())).rejects.toMatchObject({status:403});
+      await expect(executePostgres(db,admin.token,'sports.conversion.edit',{...input,min:1},randomUUID())).rejects.toMatchObject({status:400});
+      const saved=await executePostgres(db,admin.token,'sports.conversion.edit',input,key);expect(await executePostgres(db,admin.token,'sports.conversion.edit',input,key)).toEqual(saved);
+      await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(table.id)).version).toBe(2);expect((await repo.all('sportsConversionHistory')).filter(h=>h.data.tableId===table.id)).toHaveLength(1);});
+    } finally {await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='ai-governor'");}
+  });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const record=await db.transaction(async client=>{

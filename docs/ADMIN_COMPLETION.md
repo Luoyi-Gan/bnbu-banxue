@@ -1771,3 +1771,7 @@ API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入�
 ### 教师最终成绩页面写入及Docker验证
 
 接通POST enrollments/:id/final-grades，适配现有expectedVersion/finalGrade/published，事务内复用append规则，回执与版本按原版协议返回，白名单拒绝备注。类型和lint通过，API重建健康，Docker真实HTTP验证先草稿、发布82、再存91草稿，教师发布快照仍82、历史最新为未发布91；学生workspace成绩草稿与发布数组均为空。体测及补证审核整链继续通过。结算后更正协议仍待迁移，UI未改。
+
+### PostgreSQL 管理员换算表命令
+
+抽出sportsConversionPolicy共享原规则，接通add/edit/remove及管理员workspace换算表；GLOBAL_RULES与维护门禁在幂等回执前检查，保存版本与before/after历史同事务。新增教师拒绝、非零起点拒绝、有效修改及重试不重复历史测试。首轮测试将80分误写GOOD，被原规则拒绝，按conversionGrade改为PASS；完整70文件459测试通过，类型与lint通过。数据库初始化换算表及Docker管理修改验证仍待完成，UI未改。

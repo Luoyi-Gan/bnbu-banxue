@@ -2,6 +2,7 @@ import { postgresAiGovernance, requireAiGovernor } from './postgres-ai-governanc
 import { sportsReviewDecisionPolicy } from '../sports/review';
 import { sportsEndurancePolicy } from '../sports/endurance';
 import { sportsGradePolicy } from '../sports/grades';
+import { sportsConversionPolicy } from '../sports/conversion';
 import { submitStudentRecord } from './postgres-record-submit';
 import { submitStudentSupplement } from './postgres-supplement-submit';
 import { mediaCommand } from './postgres-student-media';
@@ -48,6 +49,10 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action.startsWith('sports.conversion.')) {
+      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
+      requireSportsPermission({all:()=>identities},actor,'GLOBAL_RULES');sportsAvailable({all:()=>systems});
+    }
     if(['sports.endurance.confirm','sports.physical.confirm','sports.grade.save','sports.grade.publish','sports.grade.append','sports.grade.portal'].includes(action)) {
       const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
       sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
@@ -99,6 +104,9 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       result=studentSessionProjection(session);
     }
     else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
+    else if(action.startsWith('sports.conversion.')) {
+      const saved=await runAsync(sportsConversionPolicy(repo,actor,action,input));if(saved) result={id:saved.id};
+    }
     else if(action==='sports.endurance.confirm') {
       const record=await runAsync(sportsEndurancePolicy(repo,actor,action,input));if(record) result={id:record.id};
     }

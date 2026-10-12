@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { randomUUID } from "node:crypto";
 import { demand, type Account } from "../auth";
 import {
@@ -6,6 +7,7 @@ import {
   enumField,
   textField,
   type Fields,
+  type Entity,
 } from "../repository";
 import { version } from "./courses";
 import { administratorAccess, requireSportsPermission } from "./permissions";
@@ -40,6 +42,9 @@ export function sportsConversionCommand(
   action: string,
   input: Fields,
 ) {
+  return runSync(sportsConversionPolicy(repo,actor,action,input));
+}
+export function* sportsConversionPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields):Generator<unknown,Entity|undefined,unknown> {
   if (
     ![
       "sports.conversion.add",
@@ -48,8 +53,9 @@ export function sportsConversionCommand(
     ].includes(action)
   )
     return undefined;
-  requireSportsPermission(repo, actor, "GLOBAL_RULES");
-  const table = repo.get(input.id, "sportsConversionTable");
+  const identities=yield* effect(repo.all("sportsIdentity"));
+  requireSportsPermission({all:()=>identities}, actor, "GLOBAL_RULES");
+  const table = yield* effect(repo.get(input.id, "sportsConversionTable"));
   version(table, input);
   const old = table.data.rows as ConversionRow[];
   let rows = old;
@@ -82,8 +88,8 @@ export function sportsConversionCommand(
         ? [...old, row]
         : old.map((r) => (r.id === input.rowId ? row : r));
   }
-  const saved = repo.save(table, { rows: validateConversion(rows) });
-  repo.create("sportsConversionHistory", actor.id, {
+  const saved = yield* effect(repo.save(table, { rows: validateConversion(rows) }));
+  yield* effect(repo.create("sportsConversionHistory", actor.id, {
     tableId: table.id,
     action,
     at: Date.now(),
@@ -91,10 +97,10 @@ export function sportsConversionCommand(
     resultVersion: saved.version,
     before: old,
     after: saved.data.rows,
-  });
+  }));
   return saved;
 }
-export function conversionWorkspace(repo: Repository, actor: Account) {
+export function conversionWorkspace(repo: Pick<Repository,"all">, actor: Account) {
   return {
     conversionTables: administratorAccess(repo, actor).permissions.includes(
       "GLOBAL_RULES",
