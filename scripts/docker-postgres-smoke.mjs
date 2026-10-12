@@ -52,8 +52,8 @@ const stored=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu',
 assert.equal(stored,'false');
 assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Image did not survive restart');
 {
-  const authorCookie=cookie,viewerId=randomUUID(),reviewerId=randomUUID();
-  for(const [id,role] of [[viewerId,'student'],[reviewerId,'reviewer']]) {
+  const authorCookie=cookie,viewerId=randomUUID(),reviewerId=randomUUID(),operatorId=randomUUID();
+  for(const [id,role] of [[viewerId,'student'],[reviewerId,'reviewer'],[operatorId,'operator']]) {
     docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at) SELECT '${id}','${id}@example.test',password_hash,'Docker ${role}','["${role}"]','now' FROM accounts WHERE id='${actor.id}'`],{stdio:'pipe'});
   }
   const command=(action,input,requestId=randomUUID())=>request('/api/commands',{action,input,requestId});
@@ -98,6 +98,29 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   const reviewInput={id:room.id,targetId:actor.id,stars:5,comment:'合作愉快'};
   await command('room.review',reviewInput);
   await rejectCommand('room.review',reviewInput,409);
+  await request('/api/auth/sign-in',{identifier:operatorId+'@example.test',password});
+  const keyword=randomUUID();
+  const knowledgeInput={title:'容器知识验证',body:'测试资料第一版',keywords:keyword,source:'本地验收资料',status:'published'};
+  const knowledge=(await command('knowledge.save',knowledgeInput)).data;
+  cookie=authorCookie;
+  await rejectCommand('knowledge.save',knowledgeInput,403);
+  const answer=(await command('knowledge.ask',{question:keyword})).data;
+  const original=(await request('/api/workspace')).entities.find(e=>e.id===answer.id);
+  assert.ok(original.data.body.includes('测试资料第一版'));
+  assert.equal(original.data.sources[0].id,knowledge.id);
+  cookie=memberCookie;
+  assert.ok(!(await request('/api/workspace')).entities.some(e=>e.id===answer.id));
+  await request('/api/auth/sign-in',{identifier:operatorId+'@example.test',password});
+  await command('knowledge.save',{...knowledgeInput,id:knowledge.id,body:'测试资料第二版',status:'draft'});
+  cookie=authorCookie;
+  assert.deepEqual((await request('/api/workspace')).entities.find(e=>e.id===answer.id).data,original.data);
+  const unmatched=(await command('knowledge.ask',{question:keyword})).data;
+  const unmatchedData=(await request('/api/workspace')).entities.find(e=>e.id===unmatched.id).data;
+  assert.deepEqual(unmatchedData.sources,[]);
+  assert.equal(unmatchedData.body,'暂无已发布知识能够回答这个问题。');
+  // Disable the local operator fixture and its sessions after its writes are complete.
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`DELETE FROM sessions WHERE account_id='${operatorId}'; UPDATE accounts SET status='banned',roles='[]' WHERE id='${operatorId}'`],{stdio:'pipe'});
+  console.log('PASS Docker knowledge: operator publication, student permission, source citation, private answer snapshot, unpublication and no-match result.');
   cookie=authorCookie;
   await request('/api/auth/logout',{});
   assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
