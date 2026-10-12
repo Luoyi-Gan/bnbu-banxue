@@ -2371,3 +2371,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 自定义AI形象浏览器上传完成：学生在4188原形象窗口通过文件选择器上传项目自带companion-yellow.png，窗口成功关闭且无错误；刷新后重新打开，我上传的图片按钮存在且为is-active。截图.runtime/ai-custom-icon-browser-proof.png。仅使用本地项目素材，无个人文件上传；结合PostgreSQL测试覆盖自定义图片保存、切换保留及账号隔离。
 
 2026-10-12 最新Docker跨角色回归：邮件入口和AI形象接线部署后，scripts/docker-postgres-smoke.mjs完整通过；覆盖注册和重启持久化、社区举报与审核、组队聊天结束评价、教师预约改期取消、校友认证预约撤销、邮件更正通知、组织及成员活动、知识和退出，无体育写入。
+
+2026-10-12 用户确认教师交流主题不允许留空。原教师资料表单 topics 添加 required，后端原有 textField 必填校验保持，UI布局不变。前端类型检查和文件ESLint通过，Docker前端重新构建部署；此前待确认记录以本条决定为准。
