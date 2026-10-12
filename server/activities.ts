@@ -28,8 +28,10 @@ export function activityCommand(
   const certified = () =>
     repo
       .all("certification")
-      .find((c) => c.ownerId === actor.id && c.data.kind === "club")?.data
-      .status === "approved";
+      .some(
+        (c) => c.ownerId === actor.id && c.data.kind === "club" &&
+          c.data.status === "approved",
+      );
   if (action === "activity.create") {
     student(actor);
     demand(certified(), "仅已认证的学生社团成员可以发起活动。", 403);

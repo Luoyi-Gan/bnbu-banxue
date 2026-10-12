@@ -41,6 +41,43 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("活动资格检查所有本人认证，旧驳回和撤销记录不遮挡有效认证", () => {
+    const { a, b, admin, run, repo } = setup();
+    const rejected = run(a, "certification.apply", {
+      kind: "club", organization: "旧社团", note: "申请",
+    });
+    run(admin, "certification.review", {
+      id: rejected.id, approve: false, reason: "材料不符",
+    });
+    const valid = run(a, "certification.apply", {
+      kind: "club", organization: "有效社团", note: "申请",
+    });
+    run(admin, "certification.review", { id: valid.id, approve: true });
+    const input = {
+      title: "社团活动", description: "活动说明", location: "图书馆",
+      startAt: new Date(Date.now() + 86400000).toISOString(), capacity: 20,
+    };
+    expect(() => run(b, "activity.create", input)).toThrow("已认证");
+    const event = run(a, "activity.create", input);
+    run(a, "activity.visibility", { id: event.id, publish: false });
+    run(a, "activity.visibility", { id: event.id, publish: true });
+    expect(repo.get(event.id).data.status).toBe("published");
+    run(admin, "certification.review", {
+      id: valid.id, approve: false, reason: "资格撤销",
+    });
+    expect(() => run(a, "activity.create", input)).toThrow("已认证");
+    run(a, "activity.visibility", { id: event.id, publish: false });
+    expect(() => run(a, "activity.visibility", { id: event.id, publish: true }))
+      .toThrow("恢复活动");
+    expect(repo.get(event.id).data.status).toBe("draft");
+    const renewed = run(a, "certification.apply", {
+      kind: "club", organization: "有效社团", note: "重新核验",
+    });
+    run(admin, "certification.review", { id: renewed.id, approve: true });
+    run(a, "activity.visibility", { id: event.id, publish: true });
+    expect(repo.get(event.id).data.status).toBe("published");
+    expect(repo.get(valid.id).data.status).toBe("rejected");
+  });
   it("申请人被封禁后校友仍可拒绝，但不能确认新预约", () => {
     const { a, b, c, admin, db, run } = setup();
     run(a, "alumni.apply", {
