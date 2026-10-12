@@ -26,7 +26,7 @@ export function V2Home() {
   const now = new Date()
   const today = `${new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(now)}，${new Intl.DateTimeFormat('zh-CN', { weekday: 'long' }).format(now)}`
   return <div className="v2-page v2-home">
-    <header className="v2-a-home-heading"><span className="v2-eyebrow">CAMPUS / TODAY</span><h1>今天，先做好下一件事</h1><p>你好，{live.data?.account.name ?? '同学'}。你的校园安排和需要处理的事项都在这里。</p><div className="v2-a-home-date"><strong>{today}</strong><span>·</span><span>{schedule.length} 项近期安排</span></div></header>
+    <header className="v2-a-home-heading"><span className="v2-eyebrow">CAMPUS / TODAY</span><h1>今天，先做好下一件事</h1><p>你好，{String(live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data.nickname ?? live.data?.account.name ?? '同学')}。你的校园安排和需要处理的事项都在这里。</p><div className="v2-a-home-date"><strong>{today}</strong><span>·</span><span>{schedule.length} 项近期安排</span></div></header>
     {live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人安排…</p>}
     <div className="v2-a-home-primary">
       <section className="v2-panel v2-a-task-card"><SectionHeading title="待处理" detail="与你有关的新进展"/><div className="v2-a-task-list"><Link to="/v2/partners/teams"><span className="v2-a-task-count">{roomRequests}</span><span><strong>{roomRequests ? '组队申请等待答复' : '组队申请'}</strong><small>{roomRequests ? '前往我的队伍处理' : '目前无需答复'}</small></span><ArrowRight size={15}/></Link></div></section>
