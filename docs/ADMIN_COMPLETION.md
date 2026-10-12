@@ -2353,4 +2353,7 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 邮件关联更正真实 PostgreSQL 补验：新增独立运营/学生夹具，验证原活动版本冲突拒绝、更正后沿用原活动 ID、保留收藏、原活动没有重复创建、更正来源标记保留、相同幂等键重试仅一条 activity.changed 通知。tests/postgres-storage.test.ts 在 Docker PostgreSQL 55432 独立随机 schema 中 36/36 通过，测试后清理 schema；未改 UI、真实邮箱或外部体育数据库。
 
 2026-10-12 原版邮件入口范围核对：src/v2/AdminMailActivities.tsx（/v2/admin/mail-activities）只有导入、单条修正和上下架，不包含拆分/关联更正入口；src/live/ConnectedApp.tsx 的 /workspace/admin 已通过 MailResolution 提供这两项操作。后端通过不代表原版入口齐全。已向用户询问是否允许仅在原邮件详情添加两个入口，或保留从已有工作台操作；在答复前不改 UI/UX。
-`n2026-10-12 审核员浏览器权限补验（4188）：独立 reviewer 账号登录进入 /v2/admin。原版邮件页仍展示导入表单，但不返回内部邮件；填入示例并提交，服务端拒绝：需要运营职责，页面记录仍为0。截图 .runtime/reviewer-mail-denied-browser-proof.png。这证明服务端拒绝越权，不代表邮件页入口权限展示已完善。
+
+2026-10-12 审核员浏览器权限补验（4188）：独立 reviewer 账号登录进入 /v2/admin。原版邮件页仍展示导入表单，但不返回内部邮件；填入示例并提交，服务端拒绝：需要运营职责，页面记录仍为0。截图 .runtime/reviewer-mail-denied-browser-proof.png。这证明服务端拒绝越权，不代表邮件页入口权限展示已完善。
+
+2026-10-12 邮件页面职责接线修复：保持原表单和布局，按后端 account.roles 仅允许 operator/superadmin 操作；无运营职责时禁用示例、输入、附件及导入，并在现有提示框说明原因，动作函数同步拦截。后端权限不变。前端类型检查、文件 ESLint、Docker 前端重建通过；4188 浏览器审核员复验全部导入控件禁用，截图 .runtime/reviewer-mail-disabled-browser-proof.png。
