@@ -1,3 +1,4 @@
+import { Repository } from "../backend/src/repository";
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
@@ -414,6 +415,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       let accountId: string;
       try {
         accountId = createAccount(source,{email:'import@example.test',name:'导入账号',password:'Test-import-123',roles:['student']});
+        new Repository(source).create('post', accountId, { title: '导入验证', body: '伴学社区数据', status: 'pending' });
         source.prepare('INSERT INTO sports_media_blobs VALUES(?,?,?)').run('blob-test',Buffer.from([0,1,255]),'now');
         // Force a failure after accounts have been inserted; the whole import must roll back.
         source.exec('ALTER TABLE entities ADD COLUMN unexpected_column TEXT');

@@ -1,7 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { seedConversions } from "./sports/conversion-seed";
 import {
   migrateAccountNamespaces,
   migrateHistoricalSubjects,
@@ -82,7 +81,6 @@ export function openDatabase(filename: string) {
   db.exec(
     "INSERT OR IGNORE INTO schema_migrations VALUES(6,strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
   );
-  seedConversions(db);
   transaction(db, () => {
     db.exec(`
       CREATE TABLE IF NOT EXISTS sports_template_publications (

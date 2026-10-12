@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { demand, ServiceError, encodePassword, normalizeEmail, timestamp, type Account } from '../auth';
 import { textField, type Fields } from '../repository';
-import { version } from '../sports/courses';
+import { version } from "../version-check";
 import { sportsPermissions } from '../sports/permissions';
 import { passwordChangeRequired } from '../sports/account-gate';
 import { PostgresAuth } from './postgres-auth';

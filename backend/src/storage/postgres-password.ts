@@ -1,7 +1,7 @@
 import type { PoolClient } from 'pg';
 import { demand, digest, encodePassword, matchesPassword, type Account } from '../auth';
 import type { Fields } from '../repository';
-import { version } from '../sports/courses';
+import { version } from "../version-check";
 import { PostgresRepository } from './postgres-repository';
 
 export async function postgresPassword(client: PoolClient, repo: PostgresRepository, actor: Account, token: string, input: Fields) {

@@ -1,7 +1,7 @@
 import { demand, type Account } from "../auth";
 import { Repository, type Fields } from "../repository";
 import { requireSportsSuperAdmin } from "./permissions";
-import { version } from "./courses";
+import { version } from "../version-check";
 import { sportsAccountGate } from "./account-gate";
 import { sportsWriteGate } from "./system";
 import { clearAdminChallenges } from "./admin-email";

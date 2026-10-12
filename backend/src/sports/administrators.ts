@@ -10,7 +10,7 @@ import { Repository, textField, type Fields } from "../repository";
 import { sportsPermissions, requireSportsSuperAdmin } from "./permissions";
 import { sportsAccountGate } from "./account-gate";
 import { sportsWriteGate } from "./system";
-import { version } from "./courses";
+import { version } from "../version-check";
 import { clearAdminChallenges } from "./admin-email";
 
 export function administratorDirectory(repo: Repository, actor: Account) {

@@ -6,7 +6,7 @@ import {
   type Account,
 } from "../auth";
 import { Repository, type Fields } from "../repository";
-import { version } from "./courses";
+import { version } from "../version-check";
 
 export function sportsPasswordCommand(
   repo: Repository,
