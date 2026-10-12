@@ -201,6 +201,19 @@ it("下架队伍保留申请结果和受限摘要，不向申请人开放隐藏�
   expect(Object.keys(view.entities.find(e => e.id === application.id)!.data.roomSummary as object).sort()).toEqual(["id", "status", "title", "visibility"]);
 });
 
+it("教师仅编辑介绍不恢复已停用服务，不改写既有时段地点", () => {
+  const {db, teacher, admin, run} = fixture();
+  const profile = {nickname: "老师", bio: "介绍", topics: "学习", location: "原地点"};
+  run(teacher, "coffee.profile", profile);
+  const slot = run(teacher, "coffee.slot.create", {startAt: new Date(Date.now()+86400000).toISOString(), endAt: new Date(Date.now()+90000000).toISOString(), location: "原地点", capacity: 1});
+  run(admin, "coffee.profile", {...profile, teacherId: teacher.account.id, enabled: false});
+  run(teacher, "coffee.profile", {...profile, location: "新地点"});
+  const repo = new Repository(db);
+  expect(repo.all("teacherProfile")[0].data).toMatchObject({enabled: false, location: "新地点"});
+  expect(repo.get(slot.id).data.location).toBe("原地点");
+  expect(() => run(teacher, "coffee.profile", {...profile, enabled: "false"})).toThrow();
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {

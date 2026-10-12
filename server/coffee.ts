@@ -96,12 +96,14 @@ export function coffeeCommand(
       typeof input.teacherId === "string" ? input.teacherId : actor.id;
     manageTeacher(actor, teacherId);
     demand(has(repo.person(teacherId), "teacher"), "目标账号没有教师身份。");
+    const old = repo.all("teacherProfile").find((p) => p.ownerId === teacherId);
+    demand(input.enabled === undefined || typeof input.enabled === "boolean", "服务状态必须为是或否。");
     const patch = {
       nickname: textField(input, "nickname", 20),
       bio: textField(input, "bio", 1000, true),
       topics: textField(input, "topics", 500),
       location: textField(input, "location", 120),
-      enabled: input.enabled !== false,
+      enabled: input.enabled === undefined ? old?.data.enabled !== false : input.enabled,
     };
     if (!patch.enabled)
       demand(
@@ -113,7 +115,6 @@ export function coffeeCommand(
           ),
         "仍有有效预约，不能停止交流服务。",
       );
-    const old = repo.all("teacherProfile").find((p) => p.ownerId === teacherId);
     return old
       ? repo.save(old, patch)
       : repo.create("teacherProfile", teacherId, patch);
