@@ -2,17 +2,17 @@ import { ArrowRight, CalendarDays, LocateFixed, MapPin, RotateCcw, X } from 'luc
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { events } from '../data/mockData'
+import { liveActivities } from './liveActivities'
 import { fallbackCampusBuildings, resolveCampusLocation, type CampusBuilding } from './campusLocations'
 import type { createCampusScene } from './campusScene'
-import { useV2 } from './useV2'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { PageHeading } from './ui'
 import './campus-explorer.css'
 
 type Scene = ReturnType<typeof createCampusScene>
 
 function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'; onPick?: (building: CampusBuilding) => void; onClose?: () => void }) {
-  const { state } = useV2()
+  const live = useWorkspaceBackend()
   const canvas = useRef<HTMLDivElement>(null)
   const scene = useRef<Scene | null>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
@@ -22,9 +22,8 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
   const [selected, setSelected] = useState<CampusBuilding | null>(null)
   const selectedId = selected?.id
   const scheduled = [
-    ...events.filter((event) => resolveCampusLocation(event.location) === selectedId && Date.parse(event.endAt) >= Date.now()).map((event) => ({ id: event.id, title: event.title, when: event.dateLabel, place: event.location, kind: '校园活动', path: `/v2/activities/${event.id}` })),
-    ...state.localEvents.filter((event) => event.status === 'published' && resolveCampusLocation(event.location) === selectedId && Date.parse(event.startAt) >= Date.now()).map((event) => ({ id: event.id, title: event.title, when: new Date(event.startAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }), place: event.location, kind: '成员发起', path: `/v2/activities/${event.id}` })),
-    ...state.rooms.filter((room) => room.status === 'open' && (room.buildingId ?? resolveCampusLocation(room.place)) === selectedId).map((room) => ({ id: room.id, title: room.title, when: room.time, place: room.place, kind: '正在组队', path: `/v2/partners?item=${encodeURIComponent(room.id)}` })),
+    ...liveActivities(live.data).filter(event => event.local?.status === 'published' && resolveCampusLocation(event.location) === selectedId && Date.parse(event.endAt || event.startAt) >= Date.now()).map(event => ({id: event.id, title: event.title, when: new Date(event.startAt).toLocaleString('zh-CN'), place: event.location, kind: '校园活动', path: '/v2/activities/' + event.id})),
+    ...(live.data?.entities ?? []).filter(room => room.kind === 'room' && room.data.status === 'open' && room.data.visibility === 'visible' && resolveCampusLocation(String(room.data.place)) === selectedId).map(room => ({id: room.id, title: String(room.data.title), when: String(room.data.time), place: String(room.data.place), kind: '正在组队', path: '/v2/partners?item=' + encodeURIComponent(room.id)})),
   ]
 
   useEffect(() => {
@@ -60,7 +59,7 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
     <aside className={`v2-explorer-panel${selected ? ' has-selection' : ''}`}>
       <div className="v2-explorer-panel-head"><div><span className="v2-eyebrow">{mode === 'pick' ? 'SELECT A BUILDING' : 'EXPLORE BNBU'}</span><h2>{mode === 'pick' ? '选择校内地点' : '校园探索'}</h2><p>{mode === 'pick' ? '点击地图上的楼栋，确认后带入地点。' : '点击楼栋，查看这里计划中的活动与组队。'}</p></div>{mode === 'pick' && <button ref={closeButton} type="button" className="v2-explorer-close" aria-label="关闭地图" onClick={onClose}><X size={20}/></button>}</div>
       <label className="v2-explorer-select">楼栋列表<select value={selected?.id ?? ''} onChange={(event) => { if (status === 'ready') scene.current?.focus(event.target.value); else setSelected(buildings.find((item) => item.id === event.target.value) ?? null) }} disabled={status === 'loading'}><option value="">选择楼栋</option>{buildings.filter((item) => !item.name.startsWith('未命名')).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-      {selected ? <div className="v2-explorer-selection" key={selected.id}><div className="v2-explorer-building"><span><LocateFixed size={21}/></span><div><small>当前楼栋</small><strong>{selected.name}</strong></div></div>{mode === 'pick' ? <p>楼栋级定位。具体入口与集合点可在详细说明中补充。</p> : <><div className="v2-explorer-section-title"><strong>这里的计划</strong><small>{scheduled.length} 项</small></div>{scheduled.length ? <div className="v2-explorer-events">{scheduled.map((item) => <Link key={`${item.kind}-${item.id}`} to={item.path}><span>{item.kind}</span><strong>{item.title}</strong><small><CalendarDays size={13}/>{item.when} · {item.place}</small><ArrowRight size={16}/></Link>)}</div> : <p className="v2-explorer-empty">当前没有计划中的活动或组队。可以看看其他楼栋。</p>}</>}</div> : <div className="v2-explorer-intro"><MapPin size={27}/><strong>从一栋楼开始探索</strong><p>在地图上点选楼栋，或从列表中选择。</p></div>}
+      {selected ? <div className="v2-explorer-selection" key={selected.id}><div className="v2-explorer-building"><span><LocateFixed size={21}/></span><div><small>当前楼栋</small><strong>{selected.name}</strong></div></div>{mode === 'pick' ? <p>楼栋级定位。具体入口与集合点可在详细说明中补充。</p> : <><div className="v2-explorer-section-title"><strong>这里的计划</strong><small>{scheduled.length} 项</small></div>{live.error ? <p role="alert" className="v2-explorer-empty">{live.error}</p> : !live.data ? <p role="status">正在读取活动与组队…</p> : scheduled.length ? <div className="v2-explorer-events">{scheduled.map((item) => <Link key={`${item.kind}-${item.id}`} to={item.path}><span>{item.kind}</span><strong>{item.title}</strong><small><CalendarDays size={13}/>{item.when} · {item.place}</small><ArrowRight size={16}/></Link>)}</div> : <p className="v2-explorer-empty">当前没有计划中的活动或组队。可以看看其他楼栋。</p>}</>}</div> : <div className="v2-explorer-intro"><MapPin size={27}/><strong>从一栋楼开始探索</strong><p>在地图上点选楼栋，或从列表中选择。</p></div>}
       {mode === 'pick' && <div className="v2-explorer-actions"><button type="button" className="v2-button v2-button-secondary" onClick={onClose}>取消</button><button type="button" className="v2-button v2-button-primary" disabled={!selected} onClick={() => selected && onPick?.(selected)}>确认这栋楼 <ArrowRight size={15}/></button></div>}
       <small className="v2-explorer-source">BNBU 3D Model · S1.214 · 建筑体量含估算，位置以现场为准</small>
     </aside>
@@ -74,3 +73,4 @@ export function V2CampusExplore() {
 export function CampusBuildingPicker({ onPick, onClose }: { onPick: (building: CampusBuilding) => void; onClose: () => void }) {
   return createPortal(<div className="v2-map-picker-layer" role="presentation"><button type="button" className="v2-map-picker-scrim" aria-label="关闭地图" onClick={onClose}/><div role="dialog" aria-modal="true" aria-label="选择校内楼栋" className="v2-map-picker-dialog"><InteractiveCampus mode="pick" onPick={onPick} onClose={onClose}/></div></div>, document.body)
 }
+
