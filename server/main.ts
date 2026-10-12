@@ -29,6 +29,7 @@ import {
   portalTeacherCourse,
   portalTeacherSemesters,
   portalCourseWindow,
+  portalCourseInvite,
 } from "./sports/portal-courses";
 import {
   portalNotifications,
@@ -438,6 +439,24 @@ export function createApiServer(
               token!,
               "sports.course.create",
               { name: input.displayName },
+              key,
+            ),
+          });
+        }
+        const courseInvite =
+          /^\/api\/v1\/class-sections\/([^/]+)\/course-invites(\/revocations)?$/.exec(
+            pathname,
+          );
+        if (courseInvite) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalCourseInvite(
+              db,
+              token!,
+              courseInvite[1],
+              !!courseInvite[2],
+              input,
               key,
             ),
           });

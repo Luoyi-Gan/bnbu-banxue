@@ -15,6 +15,41 @@ function teacherGate(repo: Repository, actor: Account) {
   sportsRole(repo, actor, "teacher");
   sportsWriteGate(repo, "sports.course.read");
 }
+export function portalCourseInvite(
+  db: Database,
+  token: string,
+  id: string,
+  revoke: boolean,
+  input: Fields,
+  key: string,
+) {
+  const repo = new Repository(db),
+    actor = authenticate(db, token);
+  teacherGate(repo, actor);
+  ownedCourse(repo, actor, id);
+  demand(
+    Object.keys(input).every(
+      (field) => field === (revoke ? "inviteToken" : "expiresInMinutes"),
+    ),
+    "邀请参数无效。",
+  );
+  const result = execute(
+    db,
+    token,
+    revoke ? "sports.invitation.revoke" : "sports.invitation.create",
+    revoke
+      ? { courseId: id, code: input.inviteToken }
+      : { courseId: id, minutes: input.expiresInMinutes ?? 30 },
+    key,
+  ) as { id: string };
+  const invite = repo.get(result.id, "sportsInvitation");
+  return {
+    inviteToken: invite.data.code,
+    classSectionId: invite.data.courseId,
+    expiresAt: new Date(Number(invite.data.expiresAt)).toISOString(),
+    status: invite.data.status,
+  };
+}
 export function portalCourseWindow(
   db: Database,
   token: string,

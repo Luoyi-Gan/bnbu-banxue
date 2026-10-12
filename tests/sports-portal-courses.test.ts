@@ -3,6 +3,7 @@ import { createAccount, login } from "../server/auth";
 import { openDatabase } from "../server/database";
 import { Repository } from "../server/repository";
 import { createApiServer } from "../server/main";
+import { execute } from "../server/commands";
 
 it("原版课程列表、目录、学期与目标读取本人真实课程，不泄露其他教师数据", async () => {
   const db = openDatabase(":memory:"),
@@ -247,6 +248,131 @@ it("原版课程列表、目录、学期与目标读取本人真实课程，不�
       ).status,
     ).toBe(400);
     expect(repo.get(created.data.id).version).toBe(2);
+    const invitation = (
+      id: string,
+      revoke: boolean,
+      input: object,
+      key: string,
+    ) =>
+      fetch(
+        base +
+          "/class-sections/" +
+          id +
+          "/course-invites" +
+          (revoke ? "/revocations" : ""),
+        {
+          method: "POST",
+          headers: {
+            Cookie: `bnbu_session=${own.token}`,
+            "Content-Type": "application/json",
+            "Idempotency-Key": key,
+          },
+          body: JSON.stringify(input),
+        },
+      );
+    expect(
+      (
+        await invitation(
+          draft.id,
+          false,
+          { expiresInMinutes: 30 },
+          "draft-invite",
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (await invitation(foreign.id, false, {}, "foreign-invite")).status,
+    ).toBe(403);
+    expect(
+      (
+        await invitation(
+          course.id,
+          false,
+          { expiresInMinutes: 121 },
+          "long-invite",
+        )
+      ).status,
+    ).toBe(400);
+    const invited = await invitation(
+      course.id,
+      false,
+      { expiresInMinutes: 30 },
+      "create-invite",
+    );
+    expect(invited.status).toBe(200);
+    const invite = (await invited.json()).data;
+    expect(invite.classSectionId).toBe(course.id);
+    expect(
+      (
+        await (
+          await invitation(
+            course.id,
+            false,
+            { expiresInMinutes: 30 },
+            "create-invite",
+          )
+        ).json()
+      ).data,
+    ).toEqual(invite);
+    expect(repo.all("sportsInvitation")).toHaveLength(1);
+    const studentId = createAccount(db, {
+      name: "邀请码学生",
+      email: "invite-student@example.test",
+      password: "Password-123",
+      roles: [],
+    });
+    repo.create("sportsIdentity", studentId, {
+      role: "student",
+      status: "verified",
+    });
+    const student = login(db, "invite-student@example.test", "Password-123");
+    const flow = execute(
+      db,
+      student.token,
+      "sports.enrollment.begin",
+      { code: invite.inviteToken },
+      "begin-invite-flow",
+    ) as { id: string };
+    expect(
+      (
+        await invitation(
+          draft.id,
+          true,
+          { inviteToken: invite.inviteToken },
+          "wrong-course-token",
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await invitation(
+          course.id,
+          true,
+          { inviteToken: invite.inviteToken },
+          "revoke-invite",
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await invitation(
+          course.id,
+          true,
+          { inviteToken: invite.inviteToken },
+          "revoke-invite",
+        )
+      ).status,
+    ).toBe(200);
+    expect(() =>
+      execute(
+        db,
+        student.token,
+        "sports.enrollment.join",
+        { flowId: flow.id },
+        "join-revoked-flow",
+      ),
+    ).toThrow("邀请无效或已过期");
+    expect(repo.all("sportsEnrollment")).toHaveLength(0);
     repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
     expect(
       (await patch(created.data.id, windowInput, "draft-window")).status,

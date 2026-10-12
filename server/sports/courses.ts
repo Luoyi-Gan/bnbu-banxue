@@ -388,6 +388,22 @@ export function sportsCourseCommand(
     });
   }
   if (action === "sports.invitation.revoke") {
+    if (input.code !== undefined) {
+      demand(
+        Object.keys(input).every((key) => ["courseId", "code"].includes(key)),
+        "撤销邀请参数无效。",
+      );
+      const course = ownedCourse(repo, actor, input.courseId);
+      const code = textField(input, "code", 100);
+      const invite = repo
+        .all("sportsInvitation")
+        .find(
+          (item) => item.data.courseId === course.id && item.data.code === code,
+        );
+      demand(invite, "本课程邀请不存在。", 404);
+      demand(invite.data.status === "ACTIVE", "邀请已撤销。", 409);
+      return repo.save(invite, { status: "REVOKED" });
+    }
     const invite = repo.get(input.id, "sportsInvitation");
     ownedCourse(repo, actor, invite.data.courseId);
     version(invite, input);
