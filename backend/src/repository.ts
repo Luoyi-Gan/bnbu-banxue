@@ -75,6 +75,9 @@ export function enumField<T extends string>(
 }
 export class Repository {
   constructor(public db: Database) {}
+  activitySubscribers(id: string): string[] {
+    return this.db.prepare("SELECT DISTINCT account_id FROM relations WHERE entity_id=? AND kind IN ('participate','save')").all(id).map(row=>String(row.account_id));
+  }
   updateAccount(id: string, status: Account['status'], roles: string[]) {
     this.db.prepare('UPDATE accounts SET status=?,roles=? WHERE id=?').run(status,JSON.stringify([...new Set(roles)]),id);
   }

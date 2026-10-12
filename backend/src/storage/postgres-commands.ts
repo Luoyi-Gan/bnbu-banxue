@@ -3,6 +3,7 @@ import { demand, digest, ServiceError, timestamp } from '../auth';
 import { communityPolicy } from '../community';
 import { coffeePolicy } from '../coffee';
 import { governancePolicy } from '../governance';
+import { activityPolicy } from '../activities';
 import { relationPolicy } from '../relation-policy';
 import { notificationPolicy } from '../notification-policy';
 import type { Fields } from '../repository';
@@ -22,7 +23,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     demand(actor.status!=='banned','账号已封禁，不能进行业务写入。',403);
     const repo = new PostgresRepository(client);
     if(passwordChangeRequired(await repo.all('sportsIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
-    for(const [name,key] of [['room.decide','accept'],['report.decide','upheld'],['coffee.answer','accept'],['coffee.slot.update','closed'],['certification.review','approve'],['organization.review','approve']] as const) {
+    for(const [name,key] of [['room.decide','accept'],['report.decide','upheld'],['coffee.answer','accept'],['coffee.slot.update','closed'],['certification.review','approve'],['organization.review','approve'],['activity.visibility','publish'],['mail.visibility','publish']] as const) {
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
@@ -34,7 +35,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     let result:Fields|undefined;
     if(action.startsWith('notification.')) result=await runAsync(notificationPolicy(repo,actor,action,input));
     else {
-      const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input));
+      const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input));
       if(entity) result={id:entity.id};
     }
     demand(result,'该业务操作的 PostgreSQL 迁移尚未完成。',503);

@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "./storage/effects";
 import { randomUUID } from "node:crypto";
 import { initialV2State } from "../../shared/v2/model";
 import {
@@ -21,28 +22,28 @@ import {
   type Fields,
 } from "./repository";
 
-export function activityCommand(
-  repo: Repository,
+export function* activityPolicy(
+  repo: BusinessRepository,
   actor: Account,
   action: string,
   input: Fields,
-): Entity | undefined {
-  const certified = () =>
-    repo
-      .all("certification")
+): Generator<unknown,Entity | undefined,unknown> {
+  const certified = function* (): Generator<unknown,boolean,unknown> {
+    return (yield* effect(repo
+      .all("certification")))
       .some(
         (c) => c.ownerId === actor.id && c.data.kind === "club" &&
           c.data.status === "approved",
-      );
+      ); };
   if (action === "activity.create") {
     student(actor);
-    demand(certified(), "仅已认证的学生社团成员可以发起活动。", 403);
+    demand((yield* certified()), "仅已认证的学生社团成员可以发起活动。", 403);
     const startAt = textField(input, "startAt", 40);
     demand(
       Number.isFinite(Date.parse(startAt)) && Date.parse(startAt) > Date.now(),
       "活动开始时间须为未来有效时间。",
     );
-    return repo.create("activity", actor.id, {
+    return (yield* effect(repo.create("activity", actor.id, {
       title: textField(input, "title", 80),
       description: textField(input, "description", 5000),
       startAt,
@@ -51,23 +52,23 @@ export function activityCommand(
       host: actor.name,
       status: "published",
       source: "member",
-    });
+    })));
   }
   if (action === "activity.visibility") {
     student(actor);
-    const event = repo.get(input.id, "activity");
+    const event = (yield* effect(repo.get(input.id, "activity")));
     owner(actor, event);
     demand(event.data.source === "member", "不能处理学校邮件活动。");
     if (input.publish === true)
-      demand(certified(), "当前身份没有恢复活动的资格。", 403);
-    return repo.save(event, {
+      demand((yield* certified()), "当前身份没有恢复活动的资格。", 403);
+    return (yield* effect(repo.save(event, {
       status: input.publish === true ? "published" : "draft",
-    });
+    })));
   }
   if (!action.startsWith("mail.")) return undefined;
   operator(actor);
   if (action === "mail.split" || action === "mail.revise") {
-    const source = repo.get(input.id, "mail");
+    const source = (yield* effect(repo.get(input.id, "mail")));
     const original = source.data.record as unknown as MailActivityRecord;
     demand(input.confirmed === true, "请确认已核对原邮件及活动信息。");
     demand(input.expectedVersion === source.version, "邮件已变化，请重新核对。", 409);
@@ -82,26 +83,26 @@ export function activityCommand(
       for (const fields of input.activities) {
         demand(fields && typeof fields === "object" && !Array.isArray(fields), "活动信息格式无效。");
         const record = { ...original, id: randomUUID(), eventId: randomUUID(), history: [...original.history] };
-        const child = repo.create("mail", actor.id, {record, parentMailId: source.id});
-        activityCommand(repo, actor, "mail.correct", {...fields as Fields, id: child.id, reason});
+        const child = (yield* effect(repo.create("mail", actor.id, {record, parentMailId: source.id})));
+        (yield* activityPolicy(repo, actor, "mail.correct", {...fields as Fields, id: child.id, reason}));
         children.push(child.id);
       }
-      return repo.save(source, {resolvedAs: "split", childMailIds: children, resolutionReason: reason, resolvedBy: actor.id});
+      return (yield* effect(repo.save(source, {resolvedAs: "split", childMailIds: children, resolutionReason: reason, resolvedBy: actor.id})));
     }
-    const target = repo.get(input.targetMailId, "mail");
+    const target = (yield* effect(repo.get(input.targetMailId, "mail")));
     demand(target.id !== source.id && !target.data.resolvedAs, "请选择原活动对应的邮件。");
     demand(input.targetVersion === target.version, "原活动已变化，请重新核对。", 409);
     const targetRecord = target.data.record as unknown as MailActivityRecord;
     demand(targetRecord.status !== "pending", "原活动须已核实发布或下架。");
-    activityCommand(repo, actor, "mail.correct", {...input, id: target.id, reason});
-    repo.create("mailRevision", actor.id, {
+    (yield* activityPolicy(repo, actor, "mail.correct", {...input, id: target.id, reason}));
+    (yield* effect(repo.create("mailRevision", actor.id, {
       sourceMailId: source.id, targetMailId: target.id, sourceVersion: source.version,
-      targetVersion: target.version, resultingVersion: repo.get(target.id).version, reason,
-    });
-    return repo.save(source, {resolvedAs: "revision", targetMailId: target.id, resolutionReason: reason, resolvedBy: actor.id});
+      targetVersion: target.version, resultingVersion: (yield* effect(repo.get(target.id))).version, reason,
+    })));
+    return (yield* effect(repo.save(source, {resolvedAs: "revision", targetMailId: target.id, resolutionReason: reason, resolvedBy: actor.id})));
   }
-  const records = repo
-    .all("mail")
+  const records = (yield* effect(repo
+    .all("mail")))
     .map((e) => e.data.record as unknown as MailActivityRecord);
   const state = {
     ...initialV2State,
@@ -125,7 +126,7 @@ export function activityCommand(
           }
         : {}),
     };
-    const duplicate = repo.all("mail").filter(e => !e.data.parentMailId)
+    const duplicate = (yield* effect(repo.all("mail"))).filter(e => !e.data.parentMailId)
       .map(e => e.data.record as unknown as MailActivityRecord).find(
       (r) =>
         r.source.messageId === source.messageId ||
@@ -145,8 +146,8 @@ export function activityCommand(
         "附件发生变化，修订关联规则待确认，请核实原记录。",
         409,
       );
-      return repo
-        .all("mail")
+      return (yield* effect(repo
+        .all("mail")))
         .find(
           (e) =>
             (e.data.record as unknown as MailActivityRecord).id ===
@@ -163,7 +164,7 @@ export function activityCommand(
       next.localEvents = [];
     }
   } else {
-    const stored = repo.get(input.id, "mail"),
+    const stored = (yield* effect(repo.get(input.id, "mail"))),
       record = stored.data.record as unknown as MailActivityRecord;
     demand(!stored.data.resolvedAs, "该原邮件已完成拆分或关联，请操作对应活动。", 409);
     if (action === "mail.cover") {
@@ -191,11 +192,11 @@ export function activityCommand(
           },
         ],
       };
-      const event = repo
-        .all("activity")
+      const event = (yield* effect(repo
+        .all("activity")))
         .find((e) => e.data.mailId === stored.id);
-      if (event) repo.save(event, { image: cover });
-      return repo.save(stored, { record: changed });
+      if (event) (yield* effect(repo.save(event, { image: cover })));
+      return (yield* effect(repo.save(stored, { record: changed })));
     } else if (action === "mail.correct") {
       demand(stored.data.purpose !== "revision", "更正邮件请关联原活动，不能另行发布。", 409);
       const fields = Object.fromEntries(
@@ -233,32 +234,32 @@ export function activityCommand(
   record.history = record.history.map((h) =>
     h.actor.startsWith("管理员") ? { ...h, actor: actor.id } : h,
   );
-  let stored = repo
-    .all("mail")
+  let stored = (yield* effect(repo
+    .all("mail")))
     .find(
       (e) => (e.data.record as unknown as MailActivityRecord).id === record.id,
     );
   stored = stored
-    ? repo.save(stored, { record })
-    : repo.create("mail", actor.id, { record, purpose: input.revision === true ? "revision" : "activity" });
+    ? (yield* effect(repo.save(stored, { record })))
+    : (yield* effect(repo.create("mail", actor.id, { record, purpose: input.revision === true ? "revision" : "activity" })));
   const projected = next.localEvents.find((e) => e.id === record.eventId);
   if (projected) {
-    const old = repo.all("activity").find((e) => e.data.mailId === stored.id);
+    const old = (yield* effect(repo.all("activity"))).find((e) => e.data.mailId === stored.id);
     const data = { ...projected, image: projected.image || "/activity-default-cover.svg", source: "mail", mailId: stored.id };
     if (old) {
-      repo.save(old, data);
+      (yield* effect(repo.save(old, data)));
       if (action === "mail.correct" && old.data.status === "published" &&
         (Date.parse(String(old.data.startAt)) !== Date.parse(data.startAt) ||
          Date.parse(String(old.data.endAt)) !== Date.parse(data.endAt!) ||
          old.data.location !== data.location)) {
-        const recipients = repo.db.prepare(
-          "SELECT DISTINCT account_id FROM relations WHERE entity_id=? AND kind IN ('participate','save')",
-        ).all(old.id).map(row => String(row.account_id));
-        repo.notify(recipients, old.id, "activity.changed",
-          `活动“${data.title}”的时间或地点已更新，请查看最新安排。`);
+        const recipients = (yield* effect(repo.activitySubscribers(old.id)));
+        (yield* effect(repo.notify(recipients, old.id, "activity.changed",
+          `活动“${data.title}”的时间或地点已更新，请查看最新安排。`)));
       }
     }
-    else repo.create("activity", null, data);
+    else (yield* effect(repo.create("activity", null, data)));
   }
   return stored;
 }
+
+export function activityCommand(repo:Repository,actor:Account,action:string,input:Fields) { return runSync(activityPolicy(repo,actor,action,input)); }

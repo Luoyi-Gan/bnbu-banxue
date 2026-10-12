@@ -378,4 +378,26 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(executePostgres(db,student,'post.create',{title:'不应发布',body:'测试',board:'校园'},randomUUID())).rejects.toMatchObject({status:403});
     expect((await db.pool.query("SELECT status FROM accounts WHERE id='govern-super'")).rows[0].status).toBe('active');
   });
+  it('publishes mail with a default cover and notifies only current saved or participating students on correction', async () => {
+    const auth=new PostgresAuth(db);
+    const operator=(await auth.login('notify@example.test','Notify-test-123')).token;
+    const a=(await auth.login('coffee-a@example.test','Coffee-test-123')).token;
+    const b=(await auth.login('coffee-b@example.test','Coffee-test-123')).token;
+    const command=(token:string,action:string,input:Record<string,unknown>)=>executePostgres(db,token,action,input,randomUUID());
+    const source={messageId:'pg-school-mail',subject:'校园讲座',sender:'school@example.test',body:'活动名称：公开讲座\n活动介绍：介绍\n活动开始时间：2027-01-01 10:00\n活动结束时间：2027-01-01 11:00\n活动地点：图书馆\n主办方：学院'};
+    const mail=await command(operator,'mail.import',source);
+    const original=(await postgresWorkspace(db,a)).entities.find(e=>e.kind==='activity' && e.data.mailId===mail.id)!;
+    expect(original.data.image).toBe('/activity-default-cover.svg');
+    await command(a,'relation.set',{id:original.id,kind:'save',enabled:true});
+    await command(a,'relation.set',{id:original.id,kind:'participate',enabled:true});
+    await command(b,'relation.set',{id:original.id,kind:'like',enabled:true});
+    await command(operator,'mail.correct',{id:mail.id,title:'公开讲座',description:'介绍',startAt:'2027-01-01T10:00:00+08:00',endAt:'2027-01-01T11:00:00+08:00',location:'T2',host:'学院',conditions:'',reason:'学校更正地点'});
+    const notices=(await db.pool.query("SELECT recipient_id FROM notifications WHERE entity_id=$1 AND event='activity.changed'",[original.id])).rows;
+    expect(notices).toEqual([{recipient_id:'coffee-a'}]);
+    expect(JSON.stringify(await postgresWorkspace(db,a))).not.toContain('school@example.test');
+    await command(operator,'mail.import',source);
+    const activities=(await postgresWorkspace(db,a)).entities.filter(e=>e.kind==='activity' && e.data.mailId===mail.id);
+    expect(activities).toHaveLength(1);
+    expect(activities[0].data.location).toBe('T2');
+  });
 });

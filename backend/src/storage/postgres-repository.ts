@@ -9,6 +9,9 @@ const decode = (row: EntityRow): Entity => ({ id: row.id, kind: row.kind, ownerI
 /** Construct inside PostgresDatabase.transaction; every operation shares its client. */
 export class PostgresRepository {
   constructor(readonly client: PoolClient) {}
+  async activitySubscribers(id: string): Promise<string[]> {
+    return (await this.client.query<{account_id:string}>("SELECT DISTINCT account_id FROM relations WHERE entity_id=$1 AND kind IN ('participate','save')",[id])).rows.map(row=>row.account_id);
+  }
   async updateAccount(id: string, status: Account['status'], roles: string[]) {
     await this.client.query('UPDATE accounts SET status=$1,roles=$2 WHERE id=$3',[status,JSON.stringify([...new Set(roles)]),id]);
   }
