@@ -18,6 +18,11 @@ import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import {
+  portalEnrollments,
+  portalTeacherStudent,
+} from "./sports/portal-enrollments";
+import { administratorAccess } from "./sports/permissions";
+import {
   portalExerciseGoal,
   portalRuleTemplates,
 } from "./sports/portal-rule-templates";
@@ -727,6 +732,19 @@ export function createApiServer(
           ),
         });
       }
+      if (request.method === "GET" && pathname === "/api/v1/enrollments") {
+        return send(
+          response,
+          200,
+          portalEnrollments(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        );
+      }
       const portalDirectory =
         /^\/api\/v1\/(students|teachers)(?:\/([^/]+))?$/.exec(pathname);
       if (
@@ -735,6 +753,22 @@ export function createApiServer(
       ) {
         const query = new URL(request.url!, "http://localhost").searchParams;
         const teacher = !portalDirectory || portalDirectory[1] === "teachers";
+        if (!teacher && portalDirectory?.[2]) {
+          const repo = new Repository(db),
+            actor = authenticate(db, cookieToken(request));
+          if (
+            !administratorAccess(repo, actor).permissions.includes("ACCOUNTS")
+          ) {
+            demand([...query.keys()].length === 0, "学生资料查询参数无效。");
+            return send(response, 200, {
+              data: portalTeacherStudent(
+                repo,
+                actor,
+                decodeURIComponent(portalDirectory[2]),
+              ),
+            });
+          }
+        }
         const input = Object.fromEntries(query.entries());
         if (input.after !== undefined) {
           input.cursor = input.after;

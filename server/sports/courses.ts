@@ -578,6 +578,8 @@ export function sportsCourseCommand(
       courseId: course.id,
       semesterId: course.data.semesterId,
       status: "ACTIVE",
+      source: "INVITE",
+      invitationId: invite.id,
     });
     if (flow)
       repo.save(flow, {
