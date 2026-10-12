@@ -2206,3 +2206,8 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 - 用户确认：无课/未入班保留空体育板块；不按年级推断、不强制参与、不自动创建体育账号。高年级补修以真实入班关系展示。规则已记录，源库未接通时不能判断某个账号是否确实无课。
 - 删除 docker-teacher-proxy-smoke.mjs 和 docker-independent-accounts-smoke.mjs：它们仍写入旧 sports schema 并调用废弃体育登录/入班接口，不属于伴学验收范围。
 - 配置文件路径已向用户询问；未收到前继续独立清理，不假设 GitHub 仓库地址就是数据库配置。
+
+### 2026-10-12 体育清理：依赖包与完整Docker构建
+- 删除无生产/测试调用的 exceljs、ffprobe-static、sharp 及其专用覆盖设置，使用官方 Node 镜像中的 npm 离线更新依赖锁。
+- 前端和API在Docker中从当前锁文件重新安装并构建通过；容器启动通过；伴学 smoke（注册、重启保留、社区审核/通知/点赞收藏、组队加入/聊天/结束/互评、退出）通过。
+- 用户授权从已登录Chrome查腾讯云配置。Chrome扩展被识别，但两次读取均报 nodeRepl.fetch request failed，未读取任何云凭据或改动云资源；已请用户重连扩展。内置浏览器腾讯云页仍为登录页，不代表Chrome未登录。
