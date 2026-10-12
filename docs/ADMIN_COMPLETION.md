@@ -1410,3 +1410,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 
 ### 统一登录入口（2026-10-12）
 移除原登录身份下拉框，新增 /api/auth/sign-in 接受 identifier/password，自动识别个人邮箱与独立管理登录账号；旧接口兼容保留。登录成功沿用真实职责跳转与整页刷新。13 项统一登录及返回路径测试通过，前后端类型检查通过。
+
+### 2026-10-12 新目标：前后端分离与 PostgreSQL/COS
+用户恢复工作并要求独立 backend 目录、三端后端全流程、保持原 UI/UX，以及本地 Docker 验证；腾讯云 CVM、PostgreSQL、COS 为目标基础设施。已新增 backend 的独立构建/运行入口，API 监听地址和端口可配置；构建和服务端类型检查通过，Docker 引擎已启动（29.8.2）。当前入口仍复用 server 及 SQLite，尚未完成源码迁移、PostgreSQL 和 COS 接入，不能称为最终分离交付。
+下一步：提取共享业务规则并迁移服务端源码；引入 PostgreSQL 数据访问与事务、迁移脚本及现有数据迁移校验；媒体存储适配 COS；独立前端/API/数据库 Compose 联调；复核三端接口与权限覆盖；归档最终证据。保持现有验收 SQLite 库，不原地覆盖。

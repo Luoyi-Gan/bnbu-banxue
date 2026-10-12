@@ -1687,6 +1687,10 @@ export function createApiServer(
   });
 }
 export async function startBackend() {
+  const host = process.env.BNBU_API_HOST ?? "127.0.0.1";
+  const port = Number(process.env.BNBU_API_PORT ?? "4175");
+  if (!Number.isInteger(port) || port < 1 || port > 65535)
+    throw new Error("BNBU_API_PORT must be an integer between 1 and 65535");
   const db = openDatabase(
     process.env.BNBU_DATABASE ?? resolve("data/bnbu.sqlite"),
   );
@@ -1695,9 +1699,9 @@ export async function startBackend() {
   });
   await new Promise<void>((done, reject) => {
     server.once("error", reject);
-    server.listen(4175, "127.0.0.1", done);
+    server.listen(port, host, done);
   });
-  console.log("BNBU API: http://127.0.0.1:4175 (SQLite)");
+  console.log(`BNBU API: http://${host}:${port} (SQLite)`);
   const worker = setInterval(() => {
     void processSportsReview(db).catch(() =>
       console.error(
