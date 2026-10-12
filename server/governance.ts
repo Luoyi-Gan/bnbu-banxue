@@ -198,6 +198,13 @@ export function governanceCommand(
     );
     return repo.save(feedback, { status: "resolved", resolution: reason });
   }
+  if (action === "preferences.reminders") {
+    student(actor);
+    const key = enumField(input, "key", ["messages", "teams"]);
+    demand(typeof input.enabled === "boolean", "提醒开关必须为布尔值。");
+    const previous = repo.all("preferences").find(p => p.ownerId === actor.id);
+    return previous ? repo.save(previous, {[key]: input.enabled}) : repo.create("preferences", actor.id, {[key]: input.enabled});
+  }
   if (action === "preferences.preview") {
     student(actor);
     demand(typeof input.enabled === "boolean", "资料预览开关必须为布尔值。");

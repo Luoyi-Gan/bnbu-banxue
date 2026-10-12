@@ -42,6 +42,21 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("关闭提醒只保存本人偏好，不删通知或改阅读状态", () => {
+    const {a,b,run,repo,db} = setup();
+    repo.notify([a.id],null,"room.apply","有人申请加入队伍");
+    const before = snapshot(db,a.account).notifications;
+    run(a,"preferences.reminders",{key:"teams",enabled:false,id:b.id});
+    run(a,"preferences.reminders",{key:"messages",enabled:false});
+    expect(snapshot(db,a.account).notifications).toEqual(before);
+    expect(repo.all("preferences").find(p=>p.ownerId===a.id)?.data).toMatchObject({teams:false,messages:false});
+    expect(snapshot(db,b.account).entities.some(e=>e.kind==="preferences" && e.ownerId===a.id)).toBe(false);
+    expect(() => run(a,"preferences.reminders",{key:"teams",enabled:"false"})).toThrow();
+    expect(() => run(a,"preferences.reminders",{key:"roles",enabled:true})).toThrow();
+    run(a,"preferences.reminders",{key:"teams",enabled:true});
+    expect(repo.all("preferences").find(p=>p.ownerId===a.id)?.data).toMatchObject({teams:true,messages:false});
+    expect(snapshot(db,a.account).notifications).toEqual(before);
+  });
   it("资料预览由本人保存，向其他学生隐藏学院而保留业务人员权限", () => {
     const {a,b,teacher,admin,run,db} = setup();
     db.prepare("UPDATE accounts SET organization=? WHERE id=?").run("计算机学院",a.id);

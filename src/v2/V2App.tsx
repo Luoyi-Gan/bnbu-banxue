@@ -22,6 +22,7 @@ import { V2CampusExplore } from './V2CampusExplorer'
 import { V2Auth } from './V2Auth'
 import { useOriginalSession } from './useOriginalSession'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
+import { notificationPreferences, showNoticeBadge } from './notificationPreferences'
 import { liveConversations } from './liveConversations'
 import './v2.css'
 import './aRedesign.css'
@@ -71,8 +72,8 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     ...(live.data?.sports?.role === 'teacher' ? [{ path: '/v2/teacher/sports', label: '体育管理', icon: GraduationCap }] : []),
   ]
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
-  const unread = liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0)
-  const unreadNotices = live.data?.notifications.filter((item) => !item.readAt).length ?? 0
+  const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
+  const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
   useEffect(() => { setMobileMenu(false); setRoleMenu(false) }, [location.pathname, location.search])
   useEffect(() => {

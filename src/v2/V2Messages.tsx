@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { liveConversations, type LiveConversation } from './liveConversations'
 import { Empty, PageHeading, SectionHeading } from './ui'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
+import { notificationPreferences, showNoticeBadge } from './notificationPreferences'
 import './messages.css'
 
 function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened }: {
@@ -66,10 +67,12 @@ export function V2Messages() {
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const active = conversations.find(item => item.id === selected)
   const opened = Boolean(selected && active && view === 'conversations')
-  const unreadMessages = conversations.reduce((sum, item) => sum + item.unread, 0)
+  const reminders = notificationPreferences(live.data)
+  const unreadMessages = reminders.messages ? conversations.reduce((sum, item) => sum + item.unread, 0) : 0
 
   const notices = live.data?.notifications ?? []
   const unreadNotices = notices.filter(item => !item.readAt).length
+  const badgeNotices = notices.filter(item => showNoticeBadge(live.data, item)).length
   const open = (id: string) => {
     setParams({ conversation: id })
     const ids = conversations.find(item => item.id === id)?.messages.filter(m => m.unread).map(m => m.id) ?? []
@@ -86,14 +89,14 @@ export function V2Messages() {
     <PageHeading eyebrow="MESSAGES" title="消息" description="每一次交流，都让校园里的连接更近一点。"/>
     <nav className="inbox-tabs" aria-label="消息分类">
       <button type="button" aria-pressed={view === 'conversations'} onClick={() => setParams({})}><MessageCircle size={17}/>会话{unreadMessages > 0 && <b>{unreadMessages}</b>}</button>
-      <button type="button" aria-pressed={view === 'notifications'} onClick={() => setParams({ view: 'notifications' })}><Bell size={17}/>通知{unreadNotices > 0 && <b>{unreadNotices}</b>}</button>
+      <button type="button" aria-pressed={view === 'notifications'} onClick={() => setParams({ view: 'notifications' })}><Bell size={17}/>通知{badgeNotices > 0 && <b>{badgeNotices}</b>}</button>
     </nav>
     {view === 'notifications' ? <section className="inbox-notices">
       <SectionHeading title="校园通知" detail={live.data ? `${notices.length} 条通知` : '正在读取'} action={<button type="button" className="v2-text-button" disabled={!unreadNotices || live.busy} onClick={() => void live.mutate('notification.readmany', {ids: notices.filter(item => !item.readAt).map(item => item.id)})}>全部标为已读</button>}/>
       {live.error && <p role="alert">{live.error}</p>}
       {!live.data && !live.error && <p role="status">正在读取本人通知…</p>}
-      {notices.map(item => <Link className={`inbox-notice${item.readAt ? '' : ' is-unread'}`} to="?view=notifications" key={item.id} onClick={event => {event.preventDefault(); if (!item.readAt) void live.mutate('notification.read', {id: item.id})}}>
-        <span className="inbox-avatar"><Bell size={20}/></span><div><strong>校园通知{!item.readAt && <i aria-label="未读"/>}</strong><p>{item.body}</p><time>{new Date(item.createdAt).toLocaleString('zh-CN')}</time></div><ChevronRight size={17}/>
+      {notices.map(item => <Link className={`inbox-notice${showNoticeBadge(live.data, item) ? ' is-unread' : ''}`} to="?view=notifications" key={item.id} onClick={event => {event.preventDefault(); if (!item.readAt) void live.mutate('notification.read', {id: item.id})}}>
+        <span className="inbox-avatar"><Bell size={20}/></span><div><strong>校园通知{showNoticeBadge(live.data, item) && <i aria-label="未读"/>}</strong><p>{item.body}</p><time>{new Date(item.createdAt).toLocaleString('zh-CN')}</time></div><ChevronRight size={17}/>
       </Link>)}
       {live.data && !notices.length && <Empty icon={Bell} title="暂无通知"/>}
     </section> : <div className="inbox-workspace">
@@ -103,7 +106,7 @@ export function V2Messages() {
         {conversations.map(conversation => <button type="button" className={`inbox-conversation${active?.id === conversation.id ? ' is-active' : ''}`} aria-label={`打开会话：${conversation.title}`} aria-current={active?.id === conversation.id ? 'true' : undefined} key={conversation.id} onClick={() => open(conversation.id)}>
           <span className="inbox-avatar"><UsersRound size={22}/></span>
           <span className="inbox-conversation-copy"><strong>{conversation.title}</strong><small>{conversation.messages.at(-1)?.body ?? '开始一段新对话'}</small></span>
-          <span className="inbox-conversation-meta"><time>{conversation.messages.at(-1)?.time}</time>{conversation.unread > 0 && <b aria-label={`${conversation.unread} 条未读`}>{conversation.unread}</b>}</span>
+          <span className="inbox-conversation-meta"><time>{conversation.messages.at(-1)?.time}</time>{reminders.messages && conversation.unread > 0 && <b aria-label={`${conversation.unread} 条未读`}>{conversation.unread}</b>}</span>
         </button>)}
         {live.data && !conversations.length && <Empty icon={MessageCircle} title="还没有会话" description="加入队伍后，可以在这里继续交流。"/>}
         <p className="inbox-list-note">与一起参与的同学，保持联系。</p>
