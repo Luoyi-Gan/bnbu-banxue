@@ -1358,3 +1358,6 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 
 ### 2026-10-12 学号 HTTP 收尾与完整回归（13:12）
 真实 HTTP 回归发现并修复普通 workspace 响应漏回学号的问题；验证获取验证码、本人确认、资料读取、精确搜索、关闭搜索及验证码重放拒绝。当前完整回归 64 文件 392 项通过，Vite 构建、前后端类型检查、全仓 ESLint 通过；构建保留已有 >500kB 分包警告。测试使用隔离数据库，不向学校邮箱发信。仍不能用上述证据替代浏览器逐步验收，整体目标未完成。
+
+### 最新 Docker 运行复核（2026-10-12）
+源码 533061f 镜像重建通过，镜像 sha256:467b8b9e60f7a05fd157be39297a854203a93e81863c361dd080ad79365dcf3a。独立临时容器使用 /tmp 数据库与本机 4188 端口，健康检查及 /v2 均返回 200；容器中 student-search、notification-preferences、backend-http 共 19 项通过。临时容器已停止并自动删除，原 4174 验收服务与数据库保留。结果另存 archive/2026-10-12-backend-checkpoint-1312/docker-verification.json；HTTP 200 不等于浏览器交互验收。
