@@ -1715,6 +1715,7 @@ export function ConnectedApp() {
                         </h3>
                         <button
                           className="v2-button v2-button-secondary"
+                          disabled={!!entity.data.resolvedAs}
                           onClick={() =>
                             open(
                               "补充或替换活动封面",
@@ -1731,6 +1732,7 @@ export function ConnectedApp() {
                         <div className="live-actions">
                           <button
                             className="v2-button v2-button-secondary"
+                            disabled={!!entity.data.resolvedAs || entity.data.purpose === "revision"}
                             onClick={() =>
                               open(
                                 "修正邮件活动",
@@ -1765,6 +1767,7 @@ export function ConnectedApp() {
                           </button>
                           <button
                             className="v2-button v2-button-secondary"
+                            disabled={!!entity.data.resolvedAs || record.status === "pending"}
                             onClick={() =>
                               open(
                                 "变更公开状态",

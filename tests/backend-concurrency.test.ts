@@ -245,6 +245,10 @@ it("管理员核对拆分和关联更正保持原来源、活动标识、订阅�
     body: "活动地点：T2", revision: true});
   const update = {...fields, id: revision.id, targetMailId: childId, expectedVersion: 1,
     targetVersion: repo.get(childId).version, confirmed: true, reason: "学校更正地点", location: "T2"};
+  expect(repo.get(revision.id).data.purpose).toBe("revision");
+  expect(() => run(admin, "mail.correct", {...fields, id: revision.id, reason: "直接发布"})).toThrow("关联原活动");
+  expect(() => run(admin, "mail.split", {...split, id: revision.id})).toThrow("关联原活动");
+  expect(repo.all("activity")).toHaveLength(2);
   expect(() => run(admin, "mail.revise", {...update, targetVersion: 0})).toThrow("已变化");
   const key = randomUUID();
   execute(db, admin.token, "mail.revise", update, key);

@@ -35,7 +35,7 @@ export function MailResolution({source, mails, onSaved}: {source: LiveEntity; ma
   if (source.data.resolvedAs) return <p>已{source.data.resolvedAs === "split" ? "拆分为多场活动" : "关联更正原活动"}，原邮件保留。</p>;
   if (record.status !== "pending" || source.data.parentMailId) return null;
   return <>
-    <button className="v2-button v2-button-secondary" onClick={() => open("split")}>拆分多场活动</button>
+    {source.data.purpose !== "revision" && <button className="v2-button v2-button-secondary" onClick={() => open("split")}>拆分多场活动</button>}
     <button className="v2-button v2-button-secondary" onClick={() => open("revise")}>关联更正原活动</button>
     {mode && <Modal title={mode === "split" ? "核对并拆分活动" : "核对更正邮件"} onClose={() => {if (!busy) setMode(null);}}>
       <form className="live-form" onSubmit={submit}>

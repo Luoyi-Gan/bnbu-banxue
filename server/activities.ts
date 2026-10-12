@@ -75,6 +75,7 @@ export function activityCommand(
       "仅未处理的待核实原邮件可以拆分或关联更正。", 409);
     const reason = textField(input, "reason", 1000);
     if (action === "mail.split") {
+      demand(source.data.purpose !== "revision", "更正邮件请关联原活动，不能另行发布。", 409);
       demand(Array.isArray(input.activities) && input.activities.length >= 2 && input.activities.length <= 50,
         "请核对并提供 2–50 场活动。");
       const children: string[] = [];
@@ -196,6 +197,7 @@ export function activityCommand(
       if (event) repo.save(event, { image: cover });
       return repo.save(stored, { record: changed });
     } else if (action === "mail.correct") {
+      demand(stored.data.purpose !== "revision", "更正邮件请关联原活动，不能另行发布。", 409);
       const fields = Object.fromEntries(
         Object.keys(mailFieldLabels).map((key) => [
           key,
@@ -238,7 +240,7 @@ export function activityCommand(
     );
   stored = stored
     ? repo.save(stored, { record })
-    : repo.create("mail", actor.id, { record });
+    : repo.create("mail", actor.id, { record, purpose: input.revision === true ? "revision" : "activity" });
   const projected = next.localEvents.find((e) => e.id === record.eventId);
   if (projected) {
     const old = repo.all("activity").find((e) => e.data.mailId === stored.id);
