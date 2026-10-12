@@ -1,4 +1,5 @@
 import { processPostgresSportsReview } from './src/storage/postgres-review-worker';
+import { seedPostgresConversions } from './src/storage/postgres-conversion-seed';
 import { PostgresDatabase } from './src/storage/postgres';
 import { postgresMigrations } from './src/storage/postgres-schema';
 import { createPostgresApiServer } from './src/postgres-api';
@@ -10,6 +11,7 @@ const port = Number(process.env.BNBU_API_PORT ?? '4180');
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid BNBU_API_PORT');
 const db = new PostgresDatabase({connectionString:process.env.DATABASE_URL});
 await db.migrate(postgresMigrations);
+await seedPostgresConversions(db);
 const server = createPostgresApiServer(db,{
   localOutbox:process.env.BNBU_LOCAL_OUTBOX==='1',
   secureCookies:process.env.BNBU_SECURE_COOKIES==='1',

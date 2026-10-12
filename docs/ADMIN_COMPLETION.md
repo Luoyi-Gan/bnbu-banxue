@@ -1775,3 +1775,7 @@ API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入�
 ### PostgreSQL 管理员换算表命令
 
 抽出sportsConversionPolicy共享原规则，接通add/edit/remove及管理员workspace换算表；GLOBAL_RULES与维护门禁在幂等回执前检查，保存版本与before/after历史同事务。新增教师拒绝、非零起点拒绝、有效修改及重试不重复历史测试。首轮测试将80分误写GOOD，被原规则拒绝，按conversionGrade改为PASS；完整70文件459测试通过，类型与lint通过。数据库初始化换算表及Docker管理修改验证仍待完成，UI未改。
+
+### PostgreSQL 换算表初始化
+
+将SQLite现有V8.1四表404行生成逻辑抽为defaultConversions共用源；PostgreSQL启动在业务锁事务中仅对无表、无初始化标记的库预置，保留导入／修改后的表，不追溯改旧体测。测试验证四表404行及重复启动不覆盖修改；完整70文件459测试、类型与lint通过。新初始化尚未重建Docker验证，管理员修改Docker验证仍待完成，UI未改。

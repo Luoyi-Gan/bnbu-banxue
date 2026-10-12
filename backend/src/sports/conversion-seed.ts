@@ -21,6 +21,21 @@ export function seedConversions(db: DatabaseSync) {
   db.exec("BEGIN IMMEDIATE");
   try {
     if(db.prepare("SELECT 1 FROM schema_migrations WHERE version=3").get()){db.exec("COMMIT");return;}
+    for (const table of defaultConversions()) {
+      const now=new Date().toISOString();
+      db.prepare("INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES(?,'sportsConversionTable',NULL,?,?,?)").run(`conversion-${table.key}`,JSON.stringify(table),now,now);
+    }
+    db.prepare("INSERT INTO schema_migrations VALUES(3,?)").run(
+      new Date().toISOString(),
+    );
+    db.exec("COMMIT");
+  } catch (e) {
+    db.exec("ROLLBACK");
+    throw e;
+  }
+}
+
+export function* defaultConversions() {
     for (const [key, sex, group, event, top] of [
       ["MALE_JUNIOR", "MALE", "JUNIOR", 1000, 239],
       ["MALE_SENIOR", "MALE", "SENIOR", 1000, 249],
@@ -54,29 +69,6 @@ export function seedConversions(db: DatabaseSync) {
         grade: "FAIL",
         note: "",
       });
-      const now = new Date().toISOString();
-      db.prepare(
-        "INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES(?, 'sportsConversionTable',NULL,?,?,?)",
-      ).run(
-        `conversion-${key}`,
-        JSON.stringify({
-          key,
-          sex,
-          group,
-          event,
-          rows,
-          source: "V8.1_CONFIRMED_DEFAULTS",
-        }),
-        now,
-        now,
-      );
+      yield {key,sex,group,event,rows,source:"V8.1_CONFIRMED_DEFAULTS"};
     }
-    db.prepare("INSERT INTO schema_migrations VALUES(3,?)").run(
-      new Date().toISOString(),
-    );
-    db.exec("COMMIT");
-  } catch (e) {
-    db.exec("ROLLBACK");
-    throw e;
-  }
 }

@@ -4,6 +4,7 @@ import { postgresStudentRoster } from '../backend/src/storage/postgres-student-r
 import { postgresStudentPhysical } from '../backend/src/storage/postgres-student-physical';
 import { postgresTeacherHistory } from '../backend/src/storage/postgres-teacher-history';
 import { gradeWorkspace } from '../backend/src/sports/grades';
+import { seedPostgresConversions } from '../backend/src/storage/postgres-conversion-seed';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
 import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
@@ -390,6 +391,12 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(history.items).toMatchObject([{version:3,published:false,finalGrade:91},{version:2,published:true,finalGrade:82},{version:1,published:false,finalGrade:82}]);
   });
   it('edits conversion rules transactionally with permission and interval checks', async()=>{
+    await seedPostgresConversions(db);
+    const seeded=await db.transaction(client=>new PostgresRepository(client).all('sportsConversionTable'));
+    expect(seeded).toHaveLength(4);expect(seeded.reduce((n,t)=>n+(t.data.rows as unknown[]).length,0)).toBe(404);
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(seeded[0],{seedVerificationNote:'retain edit'});});
+    await seedPostgresConversions(db);
+    expect((await db.transaction(client=>new PostgresRepository(client).get(seeded[0].id))).data.seedVerificationNote).toBe('retain edit');
     await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='ai-governor'");
     try {
       const auth=new PostgresAuth(db),admin=await auth.login('ai-governor@example.test','Ai-govern-123'),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123');
