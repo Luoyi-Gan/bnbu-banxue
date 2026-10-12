@@ -348,7 +348,8 @@ export function materialWorkspace(repo: Pick<Repository,"all"|"get">, actor: Acc
       .filter((m) => ids.has(String(m.data.recordId))),
   };
 }
-export function readMaterial(repo: Repository, actor: Account, id: string) {
+export function authorizedMaterial(repo: Pick<Repository,"all"|"get">, actor: Account, id: string) {
+  demand(actor.status !== "banned", "账号已封禁。", 403);
   sportsAvailable(repo);
   const material = repo.get(id, "sportsMaterial");
   demand(
@@ -357,6 +358,10 @@ export function readMaterial(repo: Repository, actor: Account, id: string) {
     403,
   );
   demand(material.data.status === "COMPLETE", "材料尚未完整到账。", 409);
+  return material;
+}
+export function readMaterial(repo: Repository, actor: Account, id: string) {
+  const material=authorizedMaterial(repo,actor,id);
   const row = repo.db
     .prepare("SELECT bytes FROM sports_media_blobs WHERE sha256=?")
     .get(String(material.data.sha256));

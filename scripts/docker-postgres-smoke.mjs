@@ -161,6 +161,9 @@ try {
   const sportsWorkspace=await request('/api/sports/workspace');
   assert.ok(sportsWorkspace.records.some(r=>r.data.sourceDraftId===finalDraft.id));
   assert.ok(sportsWorkspace.courses.some(c=>c.id===courseId));
+  const submittedMaterial=sportsWorkspace.materials.find(m=>m.data.mediaId===lease.mediaId);assert.ok(submittedMaterial);
+  const materialResponse=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});
+  assert.equal(materialResponse.status,200);assert.deepEqual(Buffer.from(await materialResponse.arrayBuffer()),bytes);
   assert.equal((await request('/api/v1/exercise-records?limit=50')).data.filter(r=>r.sessionId===session.id).length,1);
 
 

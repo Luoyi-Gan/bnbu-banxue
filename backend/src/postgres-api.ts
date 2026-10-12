@@ -1,3 +1,4 @@
+import { postgresReviewMaterial } from './storage/postgres-review-material';
 import { postgresSportsWorkspace } from './storage/postgres-sports-workspace';
 import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresMediaOriginal } from './storage/postgres-student-media';
 import { postgresStudentRecords } from './storage/postgres-student-records';
@@ -36,6 +37,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
       if(request.method==='GET' && pathname==='/api/sports/workspace') return send(response,200,await postgresSportsWorkspace(db,cookieToken(request) ?? ''));
+      const reviewMaterial=/^\/api\/sports\/materials\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && reviewMaterial) {
+        const original=await postgresReviewMaterial(db,cookieToken(request) ?? '',decodeURIComponent(reviewMaterial[1]));
+        response.writeHead(200,{'Content-Type':original.mime,'Content-Length':original.bytes.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Cross-Origin-Resource-Policy':'same-origin'});return response.end(original.bytes);
+      }
       const originalRead=/^\/api\/v1\/media-access\/([^/]+)$/.exec(pathname);
       if(request.method==='GET' && originalRead) {
         const original=await postgresMediaOriginal(db,cookieToken(request) ?? '',decodeURIComponent(originalRead[1]));

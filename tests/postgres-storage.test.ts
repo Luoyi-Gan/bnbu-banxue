@@ -1,3 +1,4 @@
+import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
 import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
 import { createServer } from 'node:http';
@@ -261,9 +262,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   });
   it('uses the shared teacher decision policy with PostgreSQL ownership and atomic progress', async()=>{
     const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),other=await auth.login('sports-reader-teacher@example.test','Sports-read-123');
-    const record=await db.transaction(async client=>{const repo=new PostgresRepository(client);const semester=await repo.create('sportsSemester',null,{status:'DRAFT'});const course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,threshold:30,weeklyLimit:3,relatedTarget:600,otherTarget:600});const session=await repo.create('sportsSession','sports-reader-student',{clock:{...startClock(Date.now()-1800000),state:'ENDED',endedAt:Date.now(),activeMilliseconds:1800000}});const r=await repo.create('sportsRecord','sports-reader-student',{courseId:course.id,semesterId:semester.id,sessionId:session.id,status:'TEACHER_PENDING',category:'RELATED',activeMilliseconds:1800000});const batch=await repo.create('sportsMaterialBatch',r.ownerId,{recordId:r.id,status:'COMPLETE'});await repo.create('sportsMaterial',r.ownerId,{batchId:batch.id,status:'COMPLETE'});return repo.save(r,{batchId:batch.id});});
+    const proof=await sharp({create:{width:4,height:4,channels:3,background:'#102030'}}).png().toBuffer(),proofHash=createHash('sha256').update(proof).digest('hex');
+    const record=await db.transaction(async client=>{const repo=new PostgresRepository(client);const semester=await repo.create('sportsSemester',null,{status:'DRAFT'});const course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,threshold:30,weeklyLimit:3,relatedTarget:600,otherTarget:600});const session=await repo.create('sportsSession','sports-reader-student',{clock:{...startClock(Date.now()-1800000),state:'ENDED',endedAt:Date.now(),activeMilliseconds:1800000}});const r=await repo.create('sportsRecord','sports-reader-student',{courseId:course.id,semesterId:semester.id,sessionId:session.id,status:'TEACHER_PENDING',category:'RELATED',activeMilliseconds:1800000});const batch=await repo.create('sportsMaterialBatch',r.ownerId,{recordId:r.id,status:'COMPLETE'});await client.query('INSERT INTO sports_media_blobs(sha256,bytes,created_at) VALUES($1,$2,$3)',[proofHash,proof,new Date().toISOString()]);await repo.create('sportsMaterial',r.ownerId,{recordId:r.id,batchId:batch.id,status:'COMPLETE',mime:'image/png',sha256:proofHash});return repo.save(r,{batchId:batch.id});});
     const input={id:record.id,version:record.version,batchId:record.data.batchId,checksCompleted:true,decision:'PASS'},key=randomUUID();
     await expect(executePostgres(db,other.token,'sports.review.decide',input,randomUUID())).rejects.toMatchObject({status:403});
+    const material=await db.transaction(async client=>(await new PostgresRepository(client).all('sportsMaterial')).find(m=>m.data.recordId===record.id)!);
+    expect((await postgresReviewMaterial(db,teacher.token,material.id)).bytes).toEqual(proof);
+    await expect(postgresReviewMaterial(db,other.token,material.id)).rejects.toMatchObject({status:403});
     const before=await postgresSportsWorkspace(db,teacher.token);
     expect('records' in before && before.records.some(r=>r.id===record.id)).toBe(true);
     const locked=await postgresSportsWorkspace(db,other.token);expect(locked).toMatchObject({firstLoginOnly:true});expect('records' in locked).toBe(false);
