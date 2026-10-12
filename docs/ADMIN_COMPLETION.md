@@ -2122,3 +2122,9 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 - SQLite和PostgreSQL的伴学workspace停止从本地sports实体生成体育摘要；真实只读源未接通前返回null，不将历史体育测试数据伪装成来源数据。真实只读可视化仍待源配置及映射，不宣称已完成。
 - 后端类型检查、前端类型检查通过；PostgreSQL与伴学HTTP共50项通过。前端初查发现残留Navigate，已删除并重跑前端类型检查通过。
 - public/student静态资源、旧预览适配器和其他残留依赖仍待清理。
+
+### 2026-10-12 越界实现清理：还原原仓库体育客户端
+- 核对 origin/main（Goal起点f8f4ca6）确认 public/student 和 integrations/sports-teacher 本来就存在。将本轮改动的学生API/拍摄/入班及教师API/账号/课程设置接线还原到该基线，原有资源不整目录删除。
+- 删除本轮新增的 scripts/sports-teacher.mjs 和 dev:sports-teacher 启动命令，停止把教师客户端导向自建4188体育服务的项目配置。
+- 前端类型检查与生产构建通过。本轮是源文件还原；未操作独立线上体育平台，也未声称已停止所有先前启动的宿主机进程。
+- 伴学体育页已在前一批改成已有只读组件；源接入仍待真实配置。

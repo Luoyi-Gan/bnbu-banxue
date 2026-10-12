@@ -168,35 +168,18 @@ function writeRefreshIntent(intent) {
 // results without confusing a normal refresh with a different signed-in user.
 let authSessionEpoch = 0;
 let pendingInviteJoin = null;
-let pendingStudentSignIn = null;
-let companionSession = null;
 
-export function hasApiSession() { return !!readTokens() || !!companionSession; }
-/** Same-origin companion cookies remain HttpOnly; never copy them into token storage. */
-export async function restoreCompanionSession() {
-  if (hasApiSession()) return true;
-  const epoch = authSessionEpoch;
-  const location = globalThis.location;
-  if (!location || new URL(apiBaseUrl(), location.href).origin !== location.origin) return false;
-  try {
-    const identity = await rawRequest('/me');
-    if (epoch !== authSessionEpoch || !identity?.studentProfile || identity.user?.role !== 'STUDENT') return false;
-    companionSession = { userId: identity.user.id };
-    return true;
-  } catch { return false; }
-}
+export function hasApiSession() { return !!readTokens(); }
 export function clearApiSession() {
   authSessionEpoch += 1;
   pendingInviteJoin = null;
-  pendingStudentSignIn = null;
-  companionSession = null;
   writeTokens(null);
   writeRefreshIntent(null);
   writeRaw("apiJoinContext", null);
 }
 
 export function currentApiSessionEpoch() { return authSessionEpoch; }
-export function currentApiUserId() { return readTokens()?.userId ?? companionSession?.userId ?? null; }
+export function currentApiUserId() { return readTokens()?.userId ?? null; }
 export function isCurrentApiSessionEpoch(epoch) { return epoch === authSessionEpoch; }
 
 export function storeAuthSession(authSession) {
@@ -255,14 +238,12 @@ function organizationCode() {
   return (readRaw("organizationCode") || "BNBU").toUpperCase();
 }
 
-let volatileDeviceId = null;
 function stableDeviceId() {
-  let value = readRaw("deviceId") || volatileDeviceId;
+  let value = readRaw("deviceId");
   if (!value) {
     value = `web-${uuid()}`.slice(0, 128);
     writeRaw("deviceId", value);
   }
-  volatileDeviceId = value;
   return value;
 }
 
@@ -875,7 +856,6 @@ export async function request(path, options = {}) {
   try {
     return await rawRequest(path, stableOptions);
   } catch (error) {
-    if (companionSession && error.status === 401 && authSessionEpoch === requestEpoch) { clearApiSession(); throw error; }
     if (authSessionEpoch !== requestEpoch || (requestSessionId && requestSessionId !== readTokens()?.sessionId)) throw new Error("API_SESSION_EPOCH_CHANGED");
     const authenticated = stableOptions.auth !== false && readTokens();
     if (authenticated && isTerminalAccessFailure(error)) {
@@ -919,7 +899,6 @@ export async function contractRequest(path, options = {}) {
   try {
     return await rawContractRequest(path, stableOptions);
   } catch (error) {
-    if (companionSession && error.status === 401 && authSessionEpoch === requestEpoch) { clearApiSession(); throw error; }
     if (authSessionEpoch !== requestEpoch || (requestSessionId && requestSessionId !== readTokens()?.sessionId)) throw new Error("API_SESSION_EPOCH_CHANGED");
     const authenticated = stableOptions.auth !== false && readTokens();
     if (authenticated && isTerminalAccessFailure(error)) {
@@ -1031,7 +1010,7 @@ export async function getOwnCurrentCourseContract(classSectionId) {
 }
 
 export async function joinWithInvite(inviteToken, profile) {
-  const member = hasApiSession();
+  const member = Boolean(readTokens()?.accessToken);
   const identity = JSON.stringify(Object.fromEntries(Object.entries(profile).sort(([a],[b])=>a.localeCompare(b))));
   // Retain one in-memory registration across transport retries. Never mint a replacement
   // capability or a different consumption key for an uncertain result in this flow.
@@ -1045,29 +1024,21 @@ export async function joinWithInvite(inviteToken, profile) {
   });
   if (flow.epoch !== authSessionEpoch) throw new Error('AUTH_SESSION_CHANGED');
   const joined = await rawRequest(`/course-invites/${encodeURIComponent(inviteToken)}/join`, {
-    method: "POST", auth: false, body: {},
+    method: "POST", auth: false,
     headers: { "X-Join-Capability": flow.capability.joinCapability, "Idempotency-Key":flow.joinKey },
   });
   if (flow.epoch !== authSessionEpoch) throw new Error('AUTH_SESSION_CHANGED');
   pendingInviteJoin = null;
-  if (joined.authSession?.kind === 'COMPANION') {
-    if(!companionSession)await restoreCompanionSession();
-    if (!companionSession || joined.authSession.user?.id !== companionSession.userId) throw new Error('AUTH_SESSION_CHANGED');
-  } else storeAuthSession(joined.authSession);
+  storeAuthSession(joined.authSession);
   return joined;
 }
 
 export async function logoutApi() {
   const tokens = readTokens();
-  const companion = companionSession;
   // Invalidate the local session synchronously. The best-effort server revoke
   // uses the captured bearer token and can no longer clear a later login.
   clearApiSession();
   try {
-    if (companion) {
-      await fetch('/api/sports/auth/logout', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'});
-      return;
-    }
     if (tokens?.refreshToken && tokens.accessToken) {
       await rawRequest("/auth/logout", {
         method: "POST",
@@ -1842,25 +1813,11 @@ export const verifyJoinEmail = (challengeId, code, joinEmail, joinInviteToken) =
     body: { challengeId, code, joinEmail, joinInviteToken, deviceId: stableDeviceId() } });
 
 export async function verifyStudentSignInCode(challengeId, code) {
-  const deviceId=stableDeviceId();
-  const identity=JSON.stringify([challengeId,code,deviceId]);
-  if(!pendingStudentSignIn || pendingStudentSignIn.identity!==identity || pendingStudentSignIn.epoch!==authSessionEpoch) {
-    pendingStudentSignIn={identity,epoch:authSessionEpoch,key:uuid()};
-  }
-  const attempt=pendingStudentSignIn;
   const authSession = await request("/auth/student-sign-in-codes/verify", {
-    method: "POST", auth: false, headers:{'Idempotency-Key':attempt.key},
-    body: { challengeId, code, deviceId },
+    method: "POST", auth: false, idempotent: true,
+    body: { challengeId, code, deviceId: stableDeviceId() },
   });
-  if(attempt.epoch!==authSessionEpoch)throw new Error('AUTH_SESSION_CHANGED');
-  if(authSession?.kind==='COMPANION') {
-    clearApiSession();
-    if(!await restoreCompanionSession() || currentApiUserId()!==authSession.user?.id) {
-      clearApiSession();
-      throw new Error('AUTH_SESSION_CHANGED');
-    }
-  } else storeAuthSession(authSession);
-  pendingStudentSignIn=null;
+  storeAuthSession(authSession);
   return authSession;
 }
 

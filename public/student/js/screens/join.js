@@ -519,7 +519,7 @@ export function renderCourseJoinConfirm(app, params) {
   const emailStep = !params.correctionRequest && params.course?.real && !ui.emailVerified;
   const emailContent = `<div class="col" style="gap:16px">
     <p>${tx('先验证学校邮箱，再填写或确认学生信息，最后正式入班。', 'Verify your school email, confirm your student details, then join the course.')}</p>
-    <label>${tx('学校邮箱', 'School email')}<input class="text-field" type="email" autocomplete="email" value="${esc(ui.email)}" data-input="joinConfirm.field" data-field="email" ${ui.verifyingEmail ? 'disabled' : ''} placeholder="y123456789@bnbu.edu.cn"></label>
+    <label>${tx('学校邮箱', 'School email')}<input class="text-field" type="email" autocomplete="email" value="${esc(ui.email)}" data-input="joinConfirm.field" data-field="email" ${ui.verifyingEmail ? 'disabled' : ''} placeholder="y123456789@mail.bnbu.edu.cn"></label>
     <button class="tonal-btn" data-action="joinConfirm.sendEmail" ${ui.verifyingEmail ? 'disabled' : ''}>${tx('发送验证码', 'Send code')}</button>
     ${ui.challengeId ? `<label>${tx('验证码', 'Verification code')}<input class="text-field" inputmode="numeric" autocomplete="one-time-code" value="${esc(ui.emailCode)}" data-input="joinConfirm.field" data-field="emailCode"></label>
     <button class="primary-btn" data-action="joinConfirm.verifyEmail" ${ui.verifyingEmail ? 'disabled' : ''}>${tx('验证邮箱并继续', 'Verify email and continue')}</button>` : ''}
@@ -538,7 +538,7 @@ export function renderCourseJoinConfirm(app, params) {
         ${course && course.real
           ? joinSelect({ id: "gender", label: tx("性别（必填）", "Gender (required)"), value: ui.gender, options: GENDER_OPTIONS(), disabled: ui.submitting || !writeEnabled, error: ui.invalidField === "gender" ? tx("请选择性别。", "Select your gender.") : null })
             + joinSelect({ id: "gradeYear", label: tx("入学年份（必填）", "Admission year (required)"), value: ui.gradeYear, options: GRADE_YEAR_OPTIONS(), disabled: ui.submitting || !writeEnabled, error: ui.invalidField === "gradeYear" ? tx("请选择入学年份。", "Select your admission year.") : null })
-          : joinField({ id: "email", label: tx("邮箱（选填）", "Email (optional)"), value: ui.email, disabled: ui.submitting || !writeEnabled, inputMode: "email", required: false, error: ui.invalidField === "email" ? tx("请输入以 @bnbu.edu.cn 结尾的完整学校邮箱。", "Enter your complete school email ending in @bnbu.edu.cn.") : null })}
+          : joinField({ id: "email", label: tx("邮箱（选填）", "Email (optional)"), value: ui.email, disabled: ui.submitting || !writeEnabled, inputMode: "email", required: false, error: ui.invalidField === "email" ? tx("请输入以 @mail.bnbu.edu.cn 结尾的完整学校邮箱。", "Enter your complete school email ending in @mail.bnbu.edu.cn.") : null })}
         ${course?.real ? joinSelect({id:'collegeName',label:tx('学院','College'),value:ui.collegeName,options:STUDENT_COLLEGES.map(item=>({value:item.code,label:`${item.code} ${item.name}`})),disabled:!formEnabled})
         + (allowsCustomMajor(ui.collegeName) ? joinField({id:'majorName',label:tx('专业（大写字母或未分流）','Major (uppercase letters or 未分流)'),value:ui.majorName,disabled:!formEnabled,maxlength:200}) + `<button type="button" data-action="joinConfirm.undeclaredMajor" ${!formEnabled?'disabled':''}>${tx('选择未分流','Choose undeclared')}</button>`
         : joinSelect({id:'majorName',label:tx('专业','Major'),value:ui.majorName,options:academicMajorOptions(ui.collegeName).map(value=>({value,label:value==='未分流'?tx('未分流','Undeclared'):value})),disabled:!formEnabled || !ui.collegeName}))
@@ -804,7 +804,7 @@ export const joinActions = {
     const ui = app.ui.joinConfirm;
     if (!ui || ui.verifyingEmail || !app.isWriteAllowed()) return;
     if (!isNewStudentSchoolEmail(ui.email)) {
-      ui.error = tx('邮箱格式不正确，请输入 1 个小写字母 + 9 位数字的学生邮箱前缀，并使用 @bnbu.edu.cn。', 'Use one lowercase letter and nine digits before @bnbu.edu.cn.'); app.render(); return;
+      ui.error = tx('邮箱格式不正确，请输入 1 个小写字母 + 9 位数字的学生邮箱前缀，并使用 @mail.bnbu.edu.cn。', 'Use one lowercase letter and nine digits before @mail.bnbu.edu.cn.'); app.render(); return;
     }
     ui.verifyingEmail = true; ui.error = null; app.render();
     const invite = app.state.authenticated ? app.state.subParams?.inviteCode : app.state.pendingInvite?.code;

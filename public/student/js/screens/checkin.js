@@ -1381,9 +1381,16 @@ export function prefersDeviceCamera(userAgent = navigator.userAgent) {
 }
 
 function openCapture(app, mode) {
-  // A capture attribute is only a browser hint and can expose the photo library.
-  // Use the existing live camera so this action never opens a file picker.
-  void openLiveCamera(app, mode);
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = mode === 'video' ? 'video/*' : 'image/*';
+  input.setAttribute('capture', 'environment'); input.style.display = 'none';
+  input.oncancel = () => input.remove();
+  input.onchange = () => {
+    const file = input.files?.[0]; input.remove();
+    if (file) void addDraftFromFile(app, file, mode === 'video' ? 'video' : 'image', null, null, mode === 'video');
+  };
+  document.body.append(input);
+  input.click();
 }
 
 function preferredRecorderMimeType() {
