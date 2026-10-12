@@ -58,6 +58,7 @@ export function communityView(db: Database, token: string) {
   const relations = workspace.relations as { entityId: string; kind: string }[];
   return {
     account: { id: account.id, name: account.name },
+    alumniProfiles: workspace.alumni.profiles.filter(p => p.status === "approved").map(p => ({id:p.id,name:p.name})),
     posts,
     likedPosts: relations
       .filter((row) => row.kind === "like" && ids.has(row.entityId))

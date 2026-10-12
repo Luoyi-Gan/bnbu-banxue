@@ -68,6 +68,7 @@ describe("API、持久化和跨角色联动", () => {
     const profile = snapshot(db, admin.account).alumni.profiles[0];
     run(admin, "alumni.review", { id: profile.id, approve: true });
     const before = snapshot(db, a.account).alumni;
+    expect(communityView(db, a.token).alumniProfiles).toEqual([{id:profile.id,name:a.account.name}]);
     for (const direction of [undefined, "其他", "", 1]) {
       expect(() => run(a, "alumni.profile", { ...input, direction, accepting: true })).toThrow();
       expect(() => run(a, "alumni.post", { direction, title: "经验", body: "分享内容" })).toThrow();

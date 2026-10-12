@@ -30,7 +30,7 @@ export function CommunityPostDetail({ id, onClose, live }: { id: string; onClose
   if (!post) return <Drawer title="内容暂不可见" onClose={onClose}><p>该内容已下架或暂无查看权限。</p></Drawer>
   const liked = state.likedPosts.includes(id), saved = state.savedPosts.includes(id)
   const publicPost = post.status === 'visible'
-  const alumnus = alumniData(state).profiles.find(profile => profile.id === post.alumniId && profile.status === 'approved')
+  const alumnus = live ? live.alumniProfiles?.find(profile => profile.id === post.alumniId) : alumniData(state).profiles.find(profile => profile.id === post.alumniId && profile.status === 'approved')
   const toggle = (kind: 'likedPosts' | 'savedPosts') => { if (live) { void live.mutate('relation.set', { id, kind: kind === 'likedPosts' ? 'like' : 'save', enabled: !state[kind].includes(id) }); return } setState(value => setPostReaction(value, id, kind, !value[kind].includes(id))) }
   const comment = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); if (live) { if (await live.mutate('comment.create', { postId: id, body: text })) setText(''); return } setState(value => addPostComment(value, id, text)); setText('') }
   return <Drawer title={post.title} eyebrow={`${post.board} · ${post.author}`} onClose={onClose}>
