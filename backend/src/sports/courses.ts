@@ -355,18 +355,23 @@ export function* sportsSemesterPolicy(repo:BusinessRepository,actor:Account,acti
       ? (yield* effect(repo.save(old, data)))
       : (yield* effect(repo.create("sportsSemester", actor.id, data)));
   }
-  if (action === "sports.semester.activate") {
+  if (action === "sports.semester.activate" || action==='sports.semester.switch') {
     sportsRole(reader, actor, "admin");
     requireSportsPermission(reader, actor, "SEMESTERS");
     const semester = reader.get(input.id, "sportsSemester");
     version(semester, input);
     demand(
       semester.data.status === "UPCOMING" &&
-        instant(String(semester.data.startDate)) <= Date.now(),
+        String(semester.data.startDate) <= new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'}),
       "仅能切换已经开始的待启用学期。",
     );
-    const old = reader.all("sportsSemester")
-      .find((s) => s.data.status === "CURRENT");
+    const current=reader.all('sportsSemester').filter(s=>s.data.status==='CURRENT');
+    demand(current.length<=1,'当前学期不唯一，请核对数据。',409);
+    const old=current[0];
+    if(action==='sports.semester.switch') {
+      demand(Object.keys(input).every(k=>['id','version','currentSemesterId','currentSemesterVersion'].includes(k)),'学期切换参数无效。');
+      demand(input.currentSemesterId===(old?.id ?? null) && input.currentSemesterVersion===(old?.version ?? null),'当前学期已变化，请重新核对切换预览。',409);
+    }
     if (old) {
       demand(
         !reader.all("sportsCourse")

@@ -215,6 +215,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         }
         const subadminWrite=/^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(pathname);
         const semesterSave=/^\/api\/v1\/admin\/semesters(?:\/([^/]+))?$/.exec(pathname);
+        const semesterSwitch=/^\/api\/v1\/admin\/semesters\/([^/]+)\/switch$/.exec(pathname);
+        if(semesterSwitch) {
+          demand(Object.keys(input).every(k=>['expectedVersion','currentSemesterId','currentSemesterVersion'].includes(k)),'学期切换参数无效。');
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.semester.switch',{id:decodeURIComponent(semesterSwitch[1]),version:input.expectedVersion,currentSemesterId:input.currentSemesterId,currentSemesterVersion:input.currentSemesterVersion},key)});
+        }
         if(semesterSave) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
           return send(response,200,{data:await postgresAdminSemesterSave(db,cookieToken(request) ?? '',semesterSave[1]?decodeURIComponent(semesterSave[1]):undefined,input,key)});

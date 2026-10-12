@@ -36,6 +36,7 @@ import { saveSportsPreferences, sportsPreferencesGate } from './postgres-sports-
 import { studentSessionProjection } from './postgres-sports-session';
 import { sportsRole, sportsSemesterPolicy, sportsCourseDraftPolicy, sportsCoursePublishPolicy, sportsInvitationPolicy, sportsEnrollmentPolicy, publishedTemplateFields } from '../sports/courses';
 import { checkPostgresDeadlineReminders } from './postgres-deadline-reminders';
+import {semesterRow} from '../sports/portal-courses';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -137,7 +138,8 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       result={id:template.id};
     }
     else if(action.startsWith('sports.semester.')) {
-      const saved=await runAsync(sportsSemesterPolicy(repo,actor,action,input));if(saved)result={id:saved.id};
+      const saved=await runAsync(sportsSemesterPolicy(repo,actor,action,input));
+      if(saved)result=action==='sports.semester.switch'?{switchedAt:saved.updatedAt,current:semesterRow(saved),archived:input.currentSemesterId?semesterRow(await repo.get(input.currentSemesterId,'sportsSemester')):null}:{id:saved.id};
     }
     else if(action.startsWith('sports.conversion.')) {
       const saved=await runAsync(sportsConversionPolicy(repo,actor,action,input));if(saved) result={id:saved.id};

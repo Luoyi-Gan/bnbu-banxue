@@ -117,6 +117,19 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     });
     const blocked=await (await fetch(switchUrl,{headers:{Cookie:governorCookie}})).json();
     expect(blocked.data.totalCourseCount).toBe(1);expect(blocked.data.courses[0].ready).toBe(false);
+    const switchTarget=(await (await write('/api/v1/admin/semesters',{...semesterInput,academicYear:'2001-2002',startDate:'2001-09-01',endDate:'2002-01-01'})).json()).data;
+    const switchBody={expectedVersion:switchTarget.version,currentSemesterId:blocked.data.current.id,currentSemesterVersion:blocked.data.current.version};
+    const switchPath='/api/v1/admin/semesters/'+switchTarget.id+'/switch',switchKey=randomUUID();
+    expect((await write(switchPath,switchBody,switchKey)).status).toBe(409);
+    await databases[1].transaction(async client=>{
+      const repo=new PostgresRepository(client),course=(await repo.all('sportsCourse'))[0];
+      const report=await repo.create('sportsSettlementReport','governor',{courseId:course.id,semesterId:blocked.data.current.id});
+      await repo.save(course,{settlementReportId:report.id});
+    });
+    expect((await write(switchPath,{...switchBody,currentSemesterVersion:999})).status).toBe(409);
+    const switched=await write(switchPath,switchBody,switchKey);expect(switched.status).toBe(200);
+    const switchedData=await switched.json();expect(switchedData.data.current.status).toBe('CURRENT');expect(switchedData.data.archived.status).toBe('ARCHIVED');
+    expect(await (await write(switchPath,switchBody,switchKey)).json()).toEqual(switchedData);
     expect((await fetch(switchUrl,{headers:{Cookie:sportsCookie}})).status).toBe(403);
     await databases[1].transaction(client=>new PostgresRepository(client).create('sportsConversionTable','governor',{sex:'MALE',group:'JUNIOR',event:1000,rows:[{id:'initial',min:201,max:400,score:60,grade:'PASS',note:''}]}));
     const tableInput={gender:'male',gradeGroup:'freshman_sophomore',runType:'1000m',expectedVersion:1,minSeconds:0,maxSeconds:200,score:100,tier:'excellent',note:'Test'};
