@@ -2345,3 +2345,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 未知命令错误语义：executePostgres 未匹配命令原返回503迁移未完成，现与SQLite及现行协议一致返回404不支持操作，避免客户端按临时故障保留重试。新增真实PostgreSQL断言无成功审计或回执。全量264/264、零跳过，API重建及扩展Docker smoke通过。
 
 2026-10-12 剩余项核对：原页面社区详情和校友发现均传入实时后端对象；校园组织从共享实体与关系读取，未发现这几处回退到本地演示写入。BUSINESS_RULES 的待确认表移除已确认且已实现的邮件拆分/更正问题，正式身份范围排除体育授权开发。教师资料交流主题是否允许留空仍待用户回答，不擅自决定。可选正式预约制度、超时、到场等扩展未获新授权，保持现行规则。
+
+2026-10-12 交付检查命令复核：eslint . 按当前 eslint.config.js 扫描199个文件，0错误、0警告；tsconfig.app.json与tsconfig.server.json两项noEmit类型检查通过。排除生成产物、.runtime/data、artifacts、public/student和integrations，不能据此宣称这些原独立体育前端已lint。报告保存在.runtime/lint-current.json。
