@@ -2,16 +2,15 @@ import { ArrowRight, CalendarDays, MessageCircle, Search, UsersRound, X } from '
 import { gsap } from 'gsap'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { events, hosts } from '../data/mockData'
-import { recommendationPhoto } from '../data/recommendationPhoto'
-import { useV2 } from './useV2'
+import { liveSearch } from './liveSearch'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 
-type SearchResult = { id: string; title: string; meta: string; path: string; keywords?: string; image?: string; kind: 'event' | 'post' | 'room' }
+
 
 const resultIcons = { event: CalendarDays, post: MessageCircle, room: UsersRound }
 
 export function StudentSearch() {
-  const { state } = useV2()
+  const live = useWorkspaceBackend()
   const navigate = useNavigate()
   const location = useLocation()
   const [open, setOpen] = useState(false)
@@ -23,12 +22,7 @@ export function StudentSearch() {
   const previousPath = useRef(location.pathname)
   const previousOpen = useRef(false)
 
-  const allResults = useMemo<SearchResult[]>(() => [
-    ...state.localEvents.filter((event) => event.status === 'published').map((event) => ({ id: event.id, title: event.title, meta: `活动 · ${event.location}`, keywords: event.description, path: `/v2/activities/${event.id}`, kind: 'event' as const })),
-    ...events.map((event) => ({ id: event.id, title: event.title, meta: `${event.category} · ${event.location} · ${hosts.find((host) => host.id === event.hostId)?.name ?? 'BNBU'}`, keywords: `${event.subtitle} ${event.description} ${event.tags.join(' ')}`, path: `/v2/activities/${event.id}`, image: recommendationPhoto(event), kind: 'event' as const })),
-    ...state.posts.filter((item) => item.status === 'visible' || item.status === 'pending' && item.author === '陈雨晴').map((item) => ({ id: item.id, title: item.title, meta: `社区 · ${item.board} · ${item.author}`, keywords: item.body, path: `/v2/community?item=${encodeURIComponent(item.id)}`, kind: 'post' as const })),
-    ...state.rooms.filter((item) => item.status === 'open').map((item) => ({ id: item.id, title: item.title, meta: `找搭子 · ${item.place} · ${item.owner}`, keywords: item.body, path: `/v2/partners?item=${encodeURIComponent(item.id)}`, kind: 'room' as const })),
-  ], [state.localEvents, state.posts, state.rooms])
+  const allResults = useMemo(() => liveSearch(live.data), [live.data])
 
   const normalized = query.trim().toLocaleLowerCase()
   const matched = normalized ? allResults.filter((item) => `${item.title} ${item.meta} ${item.keywords ?? ''}`.toLocaleLowerCase().includes(normalized)) : []
@@ -97,7 +91,7 @@ export function StudentSearch() {
             <span className="v2-student-search-result-copy"><strong>{item.title}</strong><small>{item.meta}</small></span>
             <ArrowRight size={16} aria-hidden="true"/>
           </Link>
-        }) : <div className="v2-student-search-empty">没有找到相关内容。试试更短的关键词。</div>}
+        }) : <div className="v2-student-search-empty">{live.error || (!live.data ? '正在读取校园内容…' : '没有找到相关内容。试试更短的关键词。')}</div>}
         <div className="v2-student-search-footer"><span>按 Enter 打开首条结果 · Esc 关闭</span><button type="button" onClick={() => choose('/v2/activities')}>浏览全部活动 <ArrowRight size={14}/></button></div>
       </div>
     </div>
