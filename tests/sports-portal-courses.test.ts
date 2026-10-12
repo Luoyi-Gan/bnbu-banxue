@@ -248,6 +248,73 @@ it("原版课程列表、目录、学期与目标读取本人真实课程，不�
       ).status,
     ).toBe(400);
     expect(repo.get(created.data.id).version).toBe(2);
+    const publication = {
+      expectedCourseVersion: 2,
+      expectedVersion: 0,
+      publish: true,
+      templateId: repo.create("sportsTemplate", null, { status: "published" })
+        .id,
+      minimumMinutes: 30,
+      maximumMinutes: 60,
+      globalTargetVersion: 1,
+      weeklyLimit: 3,
+      dailyLimit: 1,
+      courseTarget: 600,
+      generalTarget: 600,
+      description: "教师确认的课程说明",
+      regularDeadline: windowInput.submissionDeadlineAt,
+      closingDeadline: "2026-12-08T15:59:59.000Z",
+      settlementPlannedAt: "2026-12-08T16:00:00.000Z",
+    };
+    const publish = (input: object, key: string) =>
+      fetch(base + "/class-sections/" + created.data.id + "/v81-rules", {
+        method: "POST",
+        headers: {
+          Cookie: `bnbu_session=${own.token}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": key,
+        },
+        body: JSON.stringify(input),
+      });
+    expect(
+      (
+        await publish(
+          { ...publication, settlementPlannedAt: publication.closingDeadline },
+          "bad-settlement",
+        )
+      ).status,
+    ).toBe(400);
+    expect(repo.get(created.data.id).version).toBe(2);
+    expect(
+      (await publish({ ...publication, maximumMinutes: 90 }, "bad-cap-publish"))
+        .status,
+    ).toBe(400);
+    expect(
+      (
+        await publish(
+          { ...publication, expectedCourseVersion: 1 },
+          "stale-publish",
+        )
+      ).status,
+    ).toBe(409);
+    const publishedResponse = await publish(publication, "atomic-publish");
+    expect(publishedResponse.status).toBe(200);
+    const publishedRules = (await publishedResponse.json()).data;
+    expect(publishedRules).toMatchObject({
+      description: publication.description,
+      version: 1,
+      course_target: 600,
+      general_target: 600,
+    });
+    expect(repo.get(created.data.id).data).toMatchObject({
+      status: "PUBLISHED",
+      enrollmentOpen: true,
+      excludedDates: ["2026-11-01"],
+    });
+    expect(
+      (await (await publish(publication, "atomic-publish")).json()).data,
+    ).toEqual(publishedRules);
+    expect((await publish(publication, "repeat-publication")).status).toBe(409);
     const invitation = (
       id: string,
       revoke: boolean,

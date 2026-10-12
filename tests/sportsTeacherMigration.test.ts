@@ -5,7 +5,7 @@ import manifest from '../docs/SPORTS_TEACHER_SOURCE.json'
 import adaptations from '../docs/SPORTS_TEACHER_ADAPTATIONS.json'
 
 it('preserves original portal sources and assets except recorded transport and user-approved closure integration', () => {
-  expect(adaptations.files.map(file => file.path).sort()).toEqual(['app/api-client.ts', 'app/portal-app.tsx'])
+  expect(adaptations.files.map(file => file.path).sort()).toEqual(['app/api-client.ts', 'app/course-rules-api.ts', 'app/portal-app.tsx', 'app/teacher-workspace.tsx'])
   for (const file of manifest.files) {
     const adaptation = adaptations.files.find(item => item.path === file.path)
     if (adaptation) expect(adaptation.originalSha256).toBe(file.sha256)

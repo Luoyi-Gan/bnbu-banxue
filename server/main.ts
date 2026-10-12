@@ -443,6 +443,28 @@ export function createApiServer(
             ),
           });
         }
+        const courseRulesPublish =
+          /^\/api\/v1\/class-sections\/([^/]+)\/v81-rules$/.exec(pathname);
+        if (courseRulesPublish) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          demand(!("id" in input), "课程标识须来自请求路径。");
+          execute(
+            db,
+            token!,
+            "sports.course.configurepublish",
+            { ...input, id: courseRulesPublish[1] },
+            key,
+          );
+          return send(response, 200, {
+            data: portalTeacherCourse(
+              new Repository(db),
+              authenticate(db, token),
+              courseRulesPublish[1],
+              "v81-rules",
+            ),
+          });
+        }
         const courseInvite =
           /^\/api\/v1\/class-sections\/([^/]+)\/course-invites(\/revocations)?$/.exec(
             pathname,

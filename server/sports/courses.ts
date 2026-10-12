@@ -342,6 +342,85 @@ export function sportsCourseCommand(
       ? repo.save(old, data)
       : repo.create("sportsCourse", actor.id, data);
   }
+  if (action === "sports.course.configurepublish") {
+    const course = ownedCourse(repo, actor, input.id);
+    demand(
+      input.expectedCourseVersion === course.version &&
+        input.expectedVersion === 0,
+      "课程已变化，请刷新后重新核对。",
+      409,
+    );
+    demand(course.data.status === "DRAFT", "已发布课程规则已锁定。", 409);
+    demand(
+      input.publish === true &&
+        input.maximumMinutes === 60 &&
+        input.dailyLimit === 1 &&
+        input.globalTargetVersion === 1,
+      "请使用现行规则：单次最多60分钟，每天最多1条，总目标1200分钟。",
+    );
+    demand(
+      Object.keys(input).every((key) =>
+        [
+          "id",
+          "expectedCourseVersion",
+          "expectedVersion",
+          "publish",
+          "maximumMinutes",
+          "dailyLimit",
+          "globalTargetVersion",
+          "templateId",
+          "minimumMinutes",
+          "weeklyLimit",
+          "courseTarget",
+          "generalTarget",
+          "description",
+          "regularDeadline",
+          "closingDeadline",
+          "settlementPlannedAt",
+        ].includes(key),
+      ),
+      "课程发布参数无效。",
+    );
+    const regular = Date.parse(`${course.data.deadlineDate}T23:59:59+08:00`);
+    const readInstant = (key: string) => {
+      const value = textField(input, key, 40);
+      demand(
+        /(?:Z|[+-]\d{2}:\d{2})$/.test(value) &&
+          Number.isFinite(Date.parse(value)),
+        "课程时间须包含有效时区。",
+      );
+      return Date.parse(value);
+    };
+    demand(
+      readInstant("regularDeadline") === regular &&
+        readInstant("closingDeadline") === regular + 7 * 86400000,
+      "常规截止和七天收尾日期须与已保存时间窗一致。",
+    );
+    const settlement = readInstant("settlementPlannedAt");
+    const settlementDate = new Date(settlement).toLocaleDateString("en-CA", {
+      timeZone: "Asia/Shanghai",
+    });
+    demand(
+      settlement === instant(settlementDate),
+      "请选择结算日期，时间使用上海时间零点。",
+    );
+    const saved = sportsCourseCommand(repo, actor, "sports.course.save", {
+      ...course.data,
+      id: course.id,
+      version: course.version,
+      templateId: input.templateId,
+      threshold: input.minimumMinutes,
+      weeklyLimit: input.weeklyLimit,
+      relatedTarget: input.courseTarget,
+      otherTarget: input.generalTarget,
+      description: input.description,
+      settlementDate,
+    })!;
+    return sportsCourseCommand(repo, actor, "sports.course.publish", {
+      id: saved.id,
+      version: saved.version,
+    });
+  }
   if (action === "sports.course.publish") {
     const course = ownedCourse(repo, actor, input.id);
     version(course, input);

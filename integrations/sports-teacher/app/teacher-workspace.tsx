@@ -1502,7 +1502,7 @@ export function TeacherWorkspace({
     void loadCourseRuleSettings(dialog.courseId).then(settings=>{
       if(cancelled)return;
       setCourseRuleSettings(settings);
-      setForm(current=>({...current,templateId:settings.rules?.template_id??'',minimumMinutes:String(settings.rules?.minimum_minutes??30),maximumMinutes:String(settings.rules?.maximum_minutes??60),weeklyLimit:String(settings.rules?.weekly_limit??3),dailyLimit:String(settings.rules?.daily_limit??1),...(settings.rules?{courseTarget:String(settings.rules.course_target/60),otherTarget:String(settings.rules.general_target/60)}:{courseTarget:'0',otherTarget:String(settings.goal.totalTargetMinutes/60)})}));
+      setForm(current=>({...current,courseDescription:settings.rules?.description??'',settlementDate:settings.rules?.settlement_planned_at?new Date(settings.rules.settlement_planned_at).toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'}):'',templateId:settings.rules?.template_id??'',minimumMinutes:String(settings.rules?.minimum_minutes??30),maximumMinutes:String(settings.rules?.maximum_minutes??60),weeklyLimit:String(settings.rules?.weekly_limit??3),dailyLimit:String(settings.rules?.daily_limit??1),...(settings.rules?{courseTarget:String(settings.rules.course_target/60),otherTarget:String(settings.rules.general_target/60)}:{courseTarget:'0',otherTarget:String(settings.goal.totalTargetMinutes/60)})}));
     }).catch(error=>{if(!cancelled)setFormError(toUserFacingError(error));});
     return()=>{cancelled=true;};
   },[mode,dialog]);
@@ -2522,7 +2522,12 @@ export function TeacherWorkspace({
       return;
     }
     try {
-      const fingerprint=JSON.stringify({courseId,checkinWindow,templateId:selectedTemplate!.id,minimumMinutes,maximumMinutes,globalTargetVersion,weeklyLimit,dailyLimit,courseTargetSeconds,generalTargetSeconds});
+      const description=form.courseDescription?.trim()??'';
+      const settlementPlannedAt=new Date(`${form.settlementDate}T00:00:00+08:00`).getTime();
+      const lastClosingInstant=Date.parse(`${semesterDeadline}T23:59:59+08:00`)+7*86400000;
+      if(!description||description.length>1000){setFormError('请填写课程说明，最多1000字。');return;}
+      if(!Number.isFinite(settlementPlannedAt)||settlementPlannedAt<=lastClosingInstant){setFormError('结算日期必须在最晚补练日期之后。');return;}
+      const fingerprint=JSON.stringify({courseId,checkinWindow,templateId:selectedTemplate!.id,minimumMinutes,maximumMinutes,globalTargetVersion,weeklyLimit,dailyLimit,courseTargetSeconds,generalTargetSeconds,description,settlementPlannedAt});
       if(coursePublicationRef.current&&coursePublicationRef.current.fingerprint!==fingerprint){
         setFormError('上次发布结果尚未确认，请先按原内容重试并核对结果。');return;
       }
@@ -2543,20 +2548,21 @@ export function TeacherWorkspace({
         // Only the dates are API fields; the local reason text is kept for display.
         excludedDates: excludedDates.map((item) => item.date),
         expectedVersion: target.version!,
-      },key),async key=>{
+      },key),async (key,savedWindow)=>{
       const regularDeadline=new Date(`${semesterDeadline}T23:59:59+08:00`).toISOString();
       const closingDeadline=new Date(Date.parse(regularDeadline)+7*86400000).toISOString();
       await publishCourseRules(courseId,{
         dailyLimit,
         templateId:selectedTemplate!.id,minimumMinutes,maximumMinutes,globalTargetVersion,
         weeklyLimit,courseTarget:courseTargetSeconds/60,generalTarget:generalTargetSeconds/60,
-        regularDeadline,closingDeadline,settlementPlannedAt:closingDeadline,expectedVersion:courseRuleSettings?.rules?.version??0,
+        regularDeadline,closingDeadline,settlementPlannedAt:new Date(settlementPlannedAt).toISOString(),expectedVersion:courseRuleSettings?.rules?.version??0,
+        description,expectedCourseVersion:savedWindow.version,
       },key);
       });
       await coursePublicationRef.current.run();
       coursePublicationRef.current=null;
     } catch (error) {
-      if (error instanceof ApiError && error.status === 422) {
+      if (error instanceof ApiError && [400,409,422].includes(error.status)) {
         // Validation is a definite rejection; allow corrected input against a fresh section version.
         coursePublicationRef.current = null;
         await refreshTeacherData();
@@ -5128,6 +5134,15 @@ export function TeacherWorkspace({
               课程规则以服务端已发布版本为准。调整分类目标将更新本课程学生的进度与成绩，已有运动记录保留原计时规则。
             </aside>
             <div className="course-target-setting-list">
+              <div className="course-target-setting">
+                <label htmlFor="course-description">课程说明</label>
+                <textarea id="course-description" maxLength={1000} value={form.courseDescription??''} disabled={courseSettingsReadOnly||!!courseRuleSettings?.rules?.published_at} onChange={event=>updateForm('courseDescription',event.target.value)} />
+              </div>
+              <div className="course-target-setting">
+                <label htmlFor="course-settlement-date">准备哪天结算成绩</label>
+                <input id="course-settlement-date" type="date" value={form.settlementDate??''} disabled={courseSettingsReadOnly||!!courseRuleSettings?.rules?.published_at} onChange={event=>updateForm('settlementDate',event.target.value)} />
+                <p>最晚补练日期：{form.dateRangeEnd&&Number.isFinite(Date.parse(`${form.dateRangeEnd}T00:00:00+08:00`))?new Date(Date.parse(`${form.dateRangeEnd}T00:00:00+08:00`)+7*86400000).toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'}):'请先填写打卡结束日期'}。补练须由老师安排，结算日期请选在这一天之后。</p>
+              </div>
               <div className="course-target-setting">
                 <label htmlFor="course-published-template">选择已发布模板</label>
                 <select id="course-published-template" disabled={courseSettingsReadOnly||mode==='demo'||!!courseRuleSettings?.rules?.published_at} value={form.templateId??''} onChange={event=>{const template=courseRuleSettings?.templates.find(item=>item.id===event.target.value);setForm(current=>({...current,templateId:event.target.value,minimumMinutes:String(template?.rules.defaultMinimumMinutes??30),weeklyLimit:String(template?.rules.defaultWeeklyLimit??3)}));}} aria-describedby="course-published-template-help">

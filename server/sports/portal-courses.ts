@@ -245,6 +245,7 @@ export function portalTeacherCourse(
     return {
       version: course.data.rulesVersion ?? 1,
       template_id: course.data.templateId,
+      description: course.data.description,
       published_at: publishedAt,
       minimum_minutes: course.data.threshold,
       maximum_minutes: 60,

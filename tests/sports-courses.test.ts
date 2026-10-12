@@ -169,6 +169,35 @@ it("排除日期参与发布可完成性检查，不能用禁止运动的日期�
     }),
   ).toThrow("无法完成1200分钟");
 });
+it("一次发布在可完成性失败时回滚已配置内容和版本", () => {
+  const { teacher, run, repo, courseInput } = setup();
+  const draft = run(teacher, "sports.course.save", {
+    ...courseInput,
+    deadlineDate: "2026-10-13",
+    settlementDate: "2026-10-21",
+  });
+  expect(() =>
+    run(teacher, "sports.course.configurepublish", {
+      id: draft.id,
+      expectedCourseVersion: draft.version,
+      expectedVersion: 0,
+      publish: true,
+      maximumMinutes: 60,
+      dailyLimit: 1,
+      globalTargetVersion: 1,
+      templateId: courseInput.templateId,
+      minimumMinutes: 30,
+      weeklyLimit: 3,
+      courseTarget: 600,
+      generalTarget: 600,
+      description: "不能留下的新说明",
+      regularDeadline: "2026-10-13T15:59:59.000Z",
+      closingDeadline: "2026-10-20T15:59:59.000Z",
+      settlementPlannedAt: "2026-10-20T16:00:00.000Z",
+    }),
+  ).toThrow("无法完成1200分钟");
+  expect(repo.get(draft.id)).toEqual(draft);
+});
 it("学期、模板、课程发布、邀请码、直接入班共享同一持久业务记录", () => {
   const f = setup();
   const draft = f.run(f.teacher, "sports.course.save", f.courseInput);
