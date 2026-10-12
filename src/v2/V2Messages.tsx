@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { makeId, studentName, timeLabel, type Conversation } from './model'
 import { Empty, PageHeading, SectionHeading } from './ui'
 import { useV2 } from './useV2'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 import './messages.css'
 
 function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened }: {
@@ -66,7 +67,9 @@ export function V2Messages() {
   const active = state.conversations.find(item => item.id === selected) ?? state.conversations[0]
   const opened = Boolean(selected && active && view === 'conversations')
   const unreadMessages = state.conversations.reduce((sum, item) => sum + item.unread, 0)
-  const unreadNotices = state.notifications.filter(item => !item.read).length
+  const live = useWorkspaceBackend()
+  const notices = live.data?.notifications ?? []
+  const unreadNotices = notices.filter(item => !item.readAt).length
   const open = (id: string) => {
     setParams({ conversation: id })
     setState(value => ({ ...value, conversations: value.conversations.map(item => item.id === id ? { ...item, unread: 0 } : item) }))
@@ -86,11 +89,13 @@ export function V2Messages() {
       <button type="button" aria-pressed={view === 'notifications'} onClick={() => setParams({ view: 'notifications' })}><Bell size={17}/>通知{unreadNotices > 0 && <b>{unreadNotices}</b>}</button>
     </nav>
     {view === 'notifications' ? <section className="inbox-notices">
-      <SectionHeading title="校园通知" detail={`${state.notifications.length} 条通知`} action={<button type="button" className="v2-text-button" disabled={!unreadNotices} onClick={() => setState(value => ({ ...value, notifications: value.notifications.map(item => ({ ...item, read: true })) }))}>全部标为已读</button>}/>
-      {state.notifications.map(item => <Link className={`inbox-notice${item.read ? '' : ' is-unread'}`} to={item.path} key={item.id} onClick={() => setState(value => ({ ...value, notifications: value.notifications.map(notice => notice.id === item.id ? { ...notice, read: true } : notice) }))}>
-        <span className="inbox-avatar"><Bell size={20}/></span><div><strong>{item.title}{!item.read && <i aria-label="未读"/>}</strong><p>{item.body}</p><time>{item.date}</time></div><ChevronRight size={17}/>
+      <SectionHeading title="校园通知" detail={live.data ? `${notices.length} 条通知` : '正在读取'} action={<button type="button" className="v2-text-button" disabled={!unreadNotices || live.busy} onClick={() => void live.mutate('notification.readmany', {ids: notices.filter(item => !item.readAt).map(item => item.id)})}>全部标为已读</button>}/>
+      {live.error && <p role="alert">{live.error}</p>}
+      {!live.data && !live.error && <p role="status">正在读取本人通知…</p>}
+      {notices.map(item => <Link className={`inbox-notice${item.readAt ? '' : ' is-unread'}`} to="?view=notifications" key={item.id} onClick={event => {event.preventDefault(); if (!item.readAt) void live.mutate('notification.read', {id: item.id})}}>
+        <span className="inbox-avatar"><Bell size={20}/></span><div><strong>校园通知{!item.readAt && <i aria-label="未读"/>}</strong><p>{item.body}</p><time>{new Date(item.createdAt).toLocaleString('zh-CN')}</time></div><ChevronRight size={17}/>
       </Link>)}
-      {!state.notifications.length && <Empty icon={Bell} title="暂无通知"/>}
+      {live.data && !notices.length && <Empty icon={Bell} title="暂无通知"/>}
     </section> : <div className="inbox-workspace">
       <aside className="inbox-list" aria-label="会话列表">
         <div className="inbox-list-heading"><h2>最近会话</h2><span>{state.conversations.length} 个会话</span></div>

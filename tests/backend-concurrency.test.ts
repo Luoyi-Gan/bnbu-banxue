@@ -105,6 +105,26 @@ it("邮件拆分与更正通过真实 HTTP 事务接通学生公开视图", asyn
   expect(JSON.stringify(view)).not.toContain("internal@example.test");
 });
 
+it("批量已读仅处理本人选中的通知，混入他人通知整批失败，重试不覆盖时间", () => {
+  const {db, a, b, admin, run} = fixture();
+  run(admin, "notification.send", {recipients: [a.account.id, b.account.id], body: "第一批"});
+  const first = snapshot(db, a.account).notifications[0];
+  const other = snapshot(db, b.account).notifications[0];
+  expect(() => run(a, "notification.readmany", {ids: [first.id, other.id]})).toThrow("通知不存在");
+  expect(snapshot(db, a.account).notifications[0].readAt).toBeNull();
+  run(admin, "notification.send", {recipients: [a.account.id], body: "后来通知"});
+  const key = randomUUID();
+  const result = execute(db, a.token, "notification.readmany", {ids: [first.id, first.id]}, key);
+  const readAt = snapshot(db, a.account).notifications.find(n => n.id === first.id)!.readAt;
+  expect(readAt).toBeTruthy();
+  expect(execute(db, a.token, "notification.readmany", {ids: [first.id, first.id]}, key)).toEqual(result);
+  run(a, "notification.readmany", {ids: [first.id]});
+  expect(snapshot(db, a.account).notifications.find(n => n.id === first.id)!.readAt).toBe(readAt);
+  expect(snapshot(db, a.account).notifications.find(n => n.id !== first.id)!.readAt).toBeNull();
+  expect(snapshot(db, b.account).notifications[0].readAt).toBeNull();
+  expect(() => run(a, "notification.readmany", {ids: []})).toThrow();
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {

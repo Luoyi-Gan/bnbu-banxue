@@ -111,6 +111,15 @@ export function execute(
         "UPDATE notifications SET read_at=COALESCE(read_at,?) WHERE id=? AND recipient_id=?",
       ).run(timestamp(), id, actor.id);
       result = { id };
+    } else if (action === "notification.readmany") {
+      demand(Array.isArray(input.ids) && input.ids.length > 0 && input.ids.every(id => typeof id === "string" && id.length > 0 && id.length <= 100), "请选择要标为已读的通知。");
+      const ids = [...new Set(input.ids as string[])];
+      const owned = db.prepare("SELECT 1 FROM notifications WHERE id=? AND recipient_id=?");
+      for (const id of ids) demand(owned.get(id, actor.id), "通知不存在。", 404);
+      const update = db.prepare("UPDATE notifications SET read_at=COALESCE(read_at,?) WHERE id=? AND recipient_id=?");
+      const at = timestamp();
+      for (const id of ids) update.run(at, id, actor.id);
+      result = { ids };
     } else if (action === "notification.send") {
       operator(actor);
       const recipients = strings(input.recipients);
