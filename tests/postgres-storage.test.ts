@@ -17,6 +17,7 @@ import { runAsync } from '../backend/src/storage/effects';
 import { postgresWorkspace } from '../backend/src/storage/postgres-workspace';
 import { postgresStudentSearch } from '../backend/src/storage/postgres-student-search';
 import { postgresAdministratorDirectory } from '../backend/src/storage/postgres-administrators';
+import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from '../backend/src/storage/postgres-admin-email';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -145,6 +146,25 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await db.pool.query('SELECT email FROM email_challenges WHERE email=$1',[input.email])).rows).toHaveLength(1);
       expect((await auth.login('new-manager','New-manager-123')).account.email).toBe(edit.email);
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
+  });
+  it('verifies only the current management email and consumes its private challenge', async () => {
+    const auth=new PostgresAuth(db),token=(await auth.login('new-manager','New-manager-123')).token;
+    await expect(postgresAdminEmailRequest(db,token,true)).rejects.toMatchObject({code:'PASSWORD_CHANGE_REQUIRED'});
+    const account=await auth.authenticate(token);
+    const identity=await db.transaction(async client=>(await new PostgresRepository(client).all('sportsIdentity')).find(i=>i.ownerId===account.id)!);
+    await executePostgres(db,token,'sports.password.change',{version:identity.version,currentPassword:'New-manager-123',newPassword:'Changed-manager-123',confirmPassword:'Changed-manager-123'},randomUUID());
+    expect((await postgresAdminEmailStatus(db,token)).verified).toBe(false);
+    const challenge=await postgresAdminEmailRequest(db,token,true);
+    await expect(postgresAdminEmailRequest(db,token,true)).rejects.toMatchObject({status:429});
+    const row=(await db.pool.query('SELECT * FROM admin_security_challenges WHERE id=$1',[challenge.challengeId])).rows[0];
+    const code=/\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE id=$1',[row.mail_id])).rows[0].body)![0];
+    await expect(postgresAdminEmailConfirm(db,token,{challengeId:challenge.challengeId,code:'wrong'})).rejects.toMatchObject({code:'INVALID_CHALLENGE'});
+    expect(Number((await db.pool.query('SELECT attempts FROM admin_security_challenges WHERE id=$1',[challenge.challengeId])).rows[0].attempts)).toBe(1);
+    expect(await postgresAdminEmailConfirm(db,token,{challengeId:challenge.challengeId,code})).toEqual({verified:true});
+    expect((await postgresAdminEmailStatus(db,token)).verified).toBe(true);
+    expect((await db.pool.query('SELECT code_hash FROM admin_security_challenges WHERE id=$1',[challenge.challengeId])).rows[0].code_hash).toBeNull();
+    expect((await db.pool.query('SELECT id FROM mail_outbox WHERE id=$1',[row.mail_id])).rows).toHaveLength(0);
+    await expect(postgresAdminEmailConfirm(db,token,{challengeId:challenge.challengeId,code})).rejects.toMatchObject({code:'INVALID_CHALLENGE'});
   });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
