@@ -135,6 +135,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const physicalWrite=/^\/api\/v1\/enrollments\/([^/]+)\/physical-results$/.exec(pathname);
+        if(physicalWrite) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('enrollmentId' in input),'成员标识须使用路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.physical.confirm',{...input,enrollmentId:decodeURIComponent(physicalWrite[1])},key)});
+        }
         const mediaAccess=/^\/api\/v1\/media\/([^/]+)\/access-url$/.exec(pathname);
         if(mediaAccess) {
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'材料标识须使用路径。');

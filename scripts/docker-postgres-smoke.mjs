@@ -185,6 +185,11 @@ try {
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
   const teacherCookie=cookie;
+  const physical=await sessionWrite('/api/v1/enrollments/'+enrollmentId+'/physical-results',{expectedVersion:0,runType:'1000m',elapsedSeconds:245,testedOn:'2026-10-01'});
+  assert.equal(physical.version,1);assert.equal(physical.elapsedSeconds,245);
+  cookie=studentCookie;
+  assert.deepEqual((await request('/api/v1/student/enrollments/'+enrollmentId+'/physical-result')).data,{status:'RECORDED',result:{runType:'1000m',elapsedSeconds:245,testedOn:'2026-10-01'}});
+  cookie=teacherCookie;
   await request('/api/commands',{action:'sports.review.decide',input:{id:reviewRecord.id,version:reviewRecord.version,batchId:reviewRecord.data.batchId,checksCompleted:true,decision:'RETURN',reason:'UNCLEAR',publicExplanation:'Docker supplementary evidence',hours:24,canSupplementOriginal:true},requestId:randomUUID()});
   cookie=studentCookie;
   const workflow=(await request('/api/v1/exercise-records/'+finalDraft.id+'/workflow')).data;

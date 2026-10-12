@@ -1751,3 +1751,7 @@ API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入�
 ### PostgreSQL 教师体测确认命令
 
 将sportsEnduranceCommand规则抽为同步／异步共用policy，PostgreSQL sports.endurance.confirm使用既有事务、角色／维护门禁及幂等回执；保留原责任教师、原始项目用时日期、版本、免测、结算归档限制、换算快照、历史与通知规则。workspace增加既有enduranceWorkspace投影，学生仍不见换算分。新增教师录入、学生拒绝、重试、旧版本拒绝、历史追加及结算拒绝测试；完整70文件457测试、类型与lint通过。新命令Docker验证及教师physical-results协议适配仍待完成，UI未改。
+
+### 教师体测页面协议及Docker联动
+
+接通 POST enrollments/:id/physical-results，保留原页面expectedVersion/runType/elapsedSeconds/testedOn协议，事务内调用共享确认规则并返回对应不可变历史版本。参数白名单不接受分数或额外字段，权限／维护检查在幂等回执读取前。类型、lint、diff检查通过；API重建健康后Docker通过教师录入1000米245秒、学生原样读取项目用时日期及既有三端补证审核整链。体测历史列表、结算后更正专用协议及真实换算规则配置仍需继续，不宣称全目标完成。

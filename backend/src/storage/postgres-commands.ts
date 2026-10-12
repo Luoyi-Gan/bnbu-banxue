@@ -47,7 +47,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
-    if(action==='sports.endurance.confirm') {
+    if(['sports.endurance.confirm','sports.physical.confirm'].includes(action)) {
       const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
       sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
     }
@@ -100,6 +100,15 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
     else if(action==='sports.endurance.confirm') {
       const record=await runAsync(sportsEndurancePolicy(repo,actor,action,input));if(record) result={id:record.id};
+    }
+    else if(action==='sports.physical.confirm') {
+      demand(Object.keys(input).every(k=>['enrollmentId','expectedVersion','runType','elapsedSeconds','testedOn'].includes(k)),'体测录入只接受实际项目、用时和测试日期。');
+      demand(input.runType==='800m' || input.runType==='1000m','体测项目无效。');
+      const record=await runAsync(sportsEndurancePolicy(repo,actor,'sports.endurance.confirm',{enrollmentId:input.enrollmentId,version:input.expectedVersion,event:input.runType==='800m'?800:1000,seconds:input.elapsedSeconds,testDate:input.testedOn,confirmed:true}));
+      demand(record,'体测保存失败。',500);
+      const revision=(await repo.all('sportsEnduranceRevision')).find(r=>r.data.recordId===record.id && r.data.recordVersion===record.version);
+      demand(revision,'原始体测保存历史不完整。',409);
+      result={version:revision.data.recordVersion,runType:revision.data.event===800?'800m':'1000m',elapsedSeconds:revision.data.seconds,testedOn:revision.data.testDate,createdAt:revision.createdAt};
     }
     else if(['sports.review.decide','sports.review.correct','sports.transfer.decide'].includes(action)) {
       const record=await runAsync(sportsReviewDecisionPolicy(repo,actor,action,input));if(record)result={id:record.id};
