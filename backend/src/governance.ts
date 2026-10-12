@@ -199,6 +199,16 @@ export function* governancePolicy(
     )));
     return (yield* effect(repo.save(feedback, { status: "resolved", resolution: reason })));
   }
+  if (action === "preferences.aiicon") {
+    student(actor);
+    const aiIconChoice = enumField(input, "choice", ["yellow", "kitty", "custom"]);
+    const previous = (yield* effect(repo.all("preferences"))).find(p => p.ownerId === actor.id);
+    const aiCustomIcon = input.image === undefined ? String(previous?.data.aiCustomIcon ?? "") : textField(input, "image", 1_500_000, true);
+    demand(!aiCustomIcon || /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(aiCustomIcon), "请上传 JPG、PNG 或 WebP 图片。");
+    demand(aiIconChoice !== "custom" || !!aiCustomIcon, "请先上传自己的图片。");
+    const data = {aiIconChoice, aiCustomIcon};
+    return previous ? (yield* effect(repo.save(previous, data))) : (yield* effect(repo.create("preferences", actor.id, data)));
+  }
   if (action === "preferences.searchable") {
     student(actor);
     demand(typeof input.enabled === "boolean", "搜索开关必须为布尔值。");

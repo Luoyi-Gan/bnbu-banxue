@@ -127,3 +127,5 @@ JSON 写请求必须发送 `Content-Type: application/json`，上限 12MB。浏�
 `/api/workspace` 仅返回当前账号可见内容。封禁或失去教师职责的账号不进入无关用户的教师发现列表；当事人预约历史保留。未接通体育源返回 `sports:null` 和不可用状态，不能冒充确认无课。
 
 外部邮件投递、学校核验、课表识别和 COS 参数见 `docs/LOCAL_BACKEND_HANDOFF.md`；体育只读源和活动收件邮箱由用户确认留到部署时配置。腾讯云 OCR 已开通不代表结构化课表适配已经联通。当前返回路径与错误边界以 `backend/src/postgres-api.ts` 和测试为准。
+
+校园 AI 形象偏好：preferences.aiicon，学生本人提交 choice（yellow/kitty/custom），可选 image 为 JPG/PNG/WebP data URL。custom 要求已有或本次上传图片；保存到本人的 preferences，不向其他账号投影。

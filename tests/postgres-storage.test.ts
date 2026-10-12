@@ -56,6 +56,21 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       finally { await admin.end(); }
     }
   });
+  it('persists AI icon preferences per student without exposing them to another account', async () => {
+    const tokens=[randomUUID(),randomUUID()], ids=[randomUUID(),randomUUID()];
+    for(let i=0;i<2;i++) {
+      await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',[ids[i],ids[i]+'@example.test','unused','图标测试','["student"]','now']);
+      await db.pool.query('INSERT INTO sessions(token_hash,account_id,expires_at,created_at) VALUES($1,$2,$3,$4)',[digest(tokens[i]),ids[i],Date.now()+60000,'now']);
+    }
+    const run=(input:Record<string,unknown>)=>executePostgres(db,tokens[0],'preferences.aiicon',input,randomUUID());
+    await expect(run({choice:'custom'})).rejects.toThrow('先上传');
+    await expect(run({choice:'custom',image:'https://example.test/icon.svg'})).rejects.toThrow('图片');
+    await run({choice:'kitty'});
+    expect((await postgresWorkspace(db,tokens[0])).entities.find(e=>e.kind==='preferences')?.data.aiIconChoice).toBe('kitty');
+    expect((await postgresWorkspace(db,tokens[1])).entities.some(e=>e.kind==='preferences')).toBe(false);
+    await expect(run({choice:'invalid'})).rejects.toThrow();
+    expect((await postgresWorkspace(db,tokens[0])).entities.find(e=>e.kind==='preferences')?.data.aiIconChoice).toBe('kitty');
+  });
   it('returns a permanent not-found error for unsupported commands without recording success', async () => {
     const id=randomUUID(),token=randomUUID(),requestId=randomUUID();
     await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',[id,id+'@example.test','unused','测试账号','["student"]','now']);
