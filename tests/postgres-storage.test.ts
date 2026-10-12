@@ -24,6 +24,7 @@ import { postgresAccountDirectory } from '../backend/src/storage/postgres-accoun
 import { postgresSportsCourses } from '../backend/src/storage/postgres-sports-courses';
 import { postgresSportsHelp } from '../backend/src/storage/postgres-sports-help';
 import { postgresSportsMe } from '../backend/src/storage/postgres-sports-me';
+import { postgresStudentCourses } from '../backend/src/storage/postgres-student-courses';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -89,6 +90,11 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(own.courses.map(c=>c.id)).toEqual([course.id]);
     expect(own.courses.some(c=>c.id===hidden.id)).toBe(false);
     expect(own.invitations).toEqual([]);
+    const listing=await postgresStudentCourses(db,student.token,'/api/v1/courses',{});
+    expect(listing.data).toEqual([expect.objectContaining({id:course.id,courseName:'本人课程'})]);
+    await expect(postgresStudentCourses(db,student.token,`/api/v1/courses/${hidden.id}`,{})).rejects.toMatchObject({status:404});
+    await expect(postgresStudentCourses(db,student.token,'/api/v1/courses',{cursor:'not-visible'})).rejects.toMatchObject({status:409});
+    await expect(postgresStudentCourses(db,teacher.token,'/api/v1/courses',{})).rejects.toMatchObject({status:403});
     await db.transaction(async client=>{
       const repo=new PostgresRepository(client);
       const identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-teacher')!;

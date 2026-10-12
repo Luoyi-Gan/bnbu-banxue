@@ -100,7 +100,7 @@ export function portalCourseWindow(
     "class-sections",
   );
 }
-function semesterRow(semester: Entity) {
+export function semesterRow(semester: Entity) {
   return {
     id: semester.id,
     organizationId: "BNBU",
@@ -113,7 +113,7 @@ function semesterRow(semester: Entity) {
     version: semester.version,
   };
 }
-function section(repo: Repository, course: Entity) {
+export function section(repo: Pick<Repository, 'get'>, course: Entity) {
   const semester = repo.get(course.data.semesterId, "sportsSemester");
   const today = new Date().toLocaleDateString("en-CA", {
     timeZone: "Asia/Shanghai",
@@ -154,7 +154,7 @@ function section(repo: Repository, course: Entity) {
     version: course.version,
   };
 }
-function catalog(course: Entity) {
+export function catalog(course: Entity) {
   return {
     id: course.id,
     organizationId: "BNBU",
@@ -165,7 +165,7 @@ function catalog(course: Entity) {
     version: course.version,
   };
 }
-function page<T extends { id: string }>(rows: T[], input: Fields) {
+export function page<T extends { id: string }>(rows: T[], input: Fields) {
   demand(
     Object.keys(input).every((key) =>
       ["limit", "cursor", "after"].includes(key),
