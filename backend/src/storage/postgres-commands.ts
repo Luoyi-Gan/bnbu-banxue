@@ -22,6 +22,8 @@ import { sportsAvailable } from '../sports/materials';
 import { projectSportsNotification } from '../sports/portal-notifications';
 import { sportsSessionPolicy } from '../sports/sessions';
 import { saveSportsPreferences, sportsPreferencesGate } from './postgres-sports-preferences';
+import { studentSessionProjection } from './postgres-sports-session';
+import { sportsRole } from '../sports/courses';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -37,6 +39,11 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action.startsWith('sports.exercise.')) {
+      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
+      sportsRole({all:()=>identities},actor,'student');
+      sportsAvailable({all:()=>systems});
+    }
     if(action==='sports.preferences.save') await sportsPreferencesGate(repo,actor);
     if(action==='sports.notification.read') {
       const identities=await repo.all('sportsIdentity');
@@ -58,6 +65,22 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     let result:Fields|undefined;
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action.startsWith('sports.exercise.')) {
+      const operation=action.split('.')[2];
+      demand(['start','pause','resume','finish'].includes(operation),'未知运动动作。');
+      const allowed=operation==='start'?['enrollmentId','clientObservedAt']:['id','expectedVersion','clientObservedAt'];
+      demand(Object.keys(input).every(k=>allowed.includes(k)),'运动请求参数无效。');
+      demand(typeof input.clientObservedAt==='string' && Number.isFinite(Date.parse(input.clientObservedAt)),'客户端时间格式无效。');
+      let fields:Fields;
+      if(operation==='start') {
+        const enrollment=await repo.get(input.enrollmentId,'sportsEnrollment');
+        demand(enrollment.ownerId===actor.id && enrollment.data.status==='ACTIVE','须使用本人有效成员关系。',403);
+        fields={courseId:enrollment.data.courseId};
+      } else fields={id:input.id,version:input.expectedVersion};
+      const session=await runAsync(sportsSessionPolicy(repo,actor,`sports.session.${operation==='finish'?'end':operation}`,fields));
+      demand(session,'运动会话操作失败。',500);
+      result=studentSessionProjection(session);
+    }
     else if(action==='sports.preferences.save') result=await saveSportsPreferences(repo,actor,input);
     else if(action.startsWith('sports.session.')) {
       const session=await runAsync(sportsSessionPolicy(repo,actor,action,input));

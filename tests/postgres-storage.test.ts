@@ -190,10 +190,25 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const course=await db.transaction(client=>new PostgresRepository(client).create('sportsCourse','sports-reader-other',{semesterId:semester.id,status:'PUBLISHED',startDate:day,deadlineDate:day,startTime:'00:00',endTime:'23:59',threshold:30}));ids.push(course.id);
       await expect(executePostgres(db,login.token,'sports.session.start',{courseId:course.id},randomUUID())).rejects.toMatchObject({status:403});
       const member=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-student',{courseId:course.id,status:'ACTIVE'}));ids.push(member.id);
-      const started=await executePostgres(db,login.token,'sports.session.start',{courseId:course.id},randomUUID());ids.push(String(started.id));
+      const started=await executePostgres(db,login.token,'sports.exercise.start',{enrollmentId:member.id,clientObservedAt:'2000-01-01T00:00:00Z'},randomUUID());ids.push(String(started.id));
+      expect(started.status).toBe('IN_PROGRESS');
+      expect(started.startedAt).not.toBe('2000-01-01T00:00:00.000Z');
       const session=await db.transaction(client=>new PostgresRepository(client).get(started.id));
       expect(session.data).toMatchObject({enrollmentId:member.id,courseId:course.id,semesterId:semester.id});
       await expect(executePostgres(db,login.token,'sports.session.start',{courseId:course.id},randomUUID())).rejects.toMatchObject({status:409});
+      const server=createPostgresApiServer(db);
+      await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+      const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+      try {
+        let version=started.version;
+        for(const [action,status] of [['pause','PAUSED'],['resume','IN_PROGRESS'],['finish','COMPLETED']]) {
+          const response=await fetch(`${base}/api/v1/exercise-sessions/${started.id}/${action}`,{method:'POST',headers:{Cookie:`bnbu_session=${login.token}`,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify({expectedVersion:version,clientObservedAt:'2099-01-01T00:00:00Z'})});
+          expect(response.status).toBe(200);
+          const body=await response.json();expect(body.data.status).toBe(status);
+          expect(body.data.actualDurationSeconds).toBeLessThan(30);
+          version=body.data.version;
+        }
+      } finally {await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
     } finally {await db.pool.query('DELETE FROM entities WHERE id=ANY($1::text[])',[ids]);}
   });
   it('paginates only the current recipients sports notifications', async () => {

@@ -1631,3 +1631,7 @@ Compose 重建并健康启动，扩展 Docker 冒烟：显式创建隔离学期/
 ### 学生运动会话读取适配
 
 新增 GET /api/v1/exercise-sessions/:id 与 active，限定本人体育学生会话、首次改密和维护门禁，活动会话重复时拒绝。按现有页面字段返回 IN_PROGRESS/PAUSED/COMPLETED、服务器计算秒数、startedAt/completedAt/endedAt 与版本；无活动会话返回 404。PostgreSQL 42 项测试通过，新增结束会话读取及活动查询不返回结束记录；类型检查通过。开始/暂停/继续/结束 POST 协议、取消语义及恢复计时其他字段仍待继续核对，本轮未更新 Docker，UI 未改。
+
+### 学生运动按钮协议接线
+
+POST /api/v1/exercise-sessions 及 pause/resume/finish 接入共享命令事务，开始按本人有效 enrollmentId 解析课程，后续映射 expectedVersion，限制字段白名单并保存原请求幂等摘要。clientObservedAt 只校验格式，计时完全使用服务器时间。返回页面使用的会话投影，同事务保存事件、会话、审计及回执。真实 PostgreSQL 开始测试传入旧客户端日期，HTTP 暂停/继续/结束传入未来日期，确认不会以客户端日期增加时长；42 项数据库测试、类型检查及 lint 通过。取消、恢复计时字段、材料/记录写入仍待补齐，本轮未更新 Docker，UI 未改。

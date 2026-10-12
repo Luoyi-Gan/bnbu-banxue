@@ -82,6 +82,13 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        const exerciseWrite=/^\/api\/v1\/exercise-sessions(?:\/([^/]+)\/(pause|resume|finish))?$/.exec(pathname);
+        if(exerciseWrite) {
+          const key=request.headers['idempotency-key'];
+          demand(typeof key==='string','缺少操作幂等标识。');
+          demand(!('id' in input),'运动会话标识须使用路径。');
+          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '',`sports.exercise.${exerciseWrite[2] ?? 'start'}`,exerciseWrite[1]?{...input,id:decodeURIComponent(exerciseWrite[1])}:input,key)});
+        }
         if(pathname==='/api/sports/admin-email/request') {
           demand(Object.keys(input).length===0,'邮箱验证只能使用本人当前邮箱。');
           return send(response,200,await postgresAdminEmailRequest(db,cookieToken(request) ?? '',options.localOutbox===true));
