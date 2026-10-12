@@ -159,9 +159,16 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   console.log('PASS Docker teacher appointments: shared booking, reschedule reservation and consent, privacy, cancellation and released capacity.');
   cookie=authorCookie;
   const privateNumber='TEST-'+randomUUID(),privateEvidence='验收核验说明-'+randomUUID();
+  const historicalTeacherView=await request('/api/workspace');
+  assert.equal(historicalTeacherView.entities.find(e=>e.id===booking.id).data.status,'cancelled');
+  assert.equal(historicalTeacherView.entities.find(e=>e.id===teacherProfile.id).data.enabled,false);
+  assert.equal(historicalTeacherView.entities.find(e=>e.id===slots[0].id).data.closed,true);
   await command('alumni.apply',{studentNumber:privateNumber,major:'计算机',graduationYear:2024,city:'珠海',direction:'就业',experience:'工作',topics:'实习',bio:'',evidence:privateEvidence});
   await request('/api/auth/sign-in',{identifier:reviewerId+'@example.test',password});
   const reviewerCookie=cookie;
+  const unrelatedReviewerView=await request('/api/workspace');
+  assert.ok(!unrelatedReviewerView.entities.some(e=>e.ownerId===teacherId && ['teacherProfile','coffeeSlot'].includes(e.kind)));
+  assert.ok(!unrelatedReviewerView.people.some(p=>p.id===teacherId));
   const alumniProfile=(await request('/api/workspace')).alumni.profiles.find(p=>p.owner===actor.id);
   assert.equal(alumniProfile.studentNumber,privateNumber);
   await command('alumni.review',{id:alumniProfile.id,approve:true});
