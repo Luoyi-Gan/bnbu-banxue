@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --pretty false",
     "test": "vitest run",
-    "dev:sports-teacher": "npm --prefix integrations/sports-teacher run dev -- --port 4186"
+    "dev:sports-teacher": "node scripts/sports-teacher.mjs"
   },
   "dependencies": {
     "cytoscape": "^3.34.3",
