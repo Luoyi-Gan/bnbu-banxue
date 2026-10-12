@@ -1,30 +1,7 @@
-import { postgresCourseReport } from './storage/postgres-course-report';
-import {postgresAdminSemesters,postgresAdminSemesterSave,postgresSemesterSwitchCheck} from './storage/postgres-admin-semesters';
-import {postgresEnduranceTables,postgresEnduranceWrite} from './storage/postgres-endurance-tables';
-import { postgresRuleTemplates } from './storage/postgres-rule-templates';
-import { postgresInvitationPreview } from './storage/postgres-invitation-preview';
-import { requestStudentJoinEmail, verifyStudentJoinEmail } from './storage/postgres-student-email';
-import { requestStudentLogin, verifyStudentLogin } from './storage/postgres-student-login';
-import {issueNewStudentJoin,consumeNewStudentJoin} from './storage/postgres-new-student-join';
-import {postgresPortalLogin,postgresPortalSecurity} from './storage/postgres-portal-auth';
-import {postgresPortalSubadmins,postgresPortalSubadminWrite} from './storage/postgres-portal-subadmins';
-import { reportCsv } from './sports/report';
-import { courseWindowInput, courseInviteInput, courseInviteProjection } from './sports/portal-courses';
-import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
-import { postgresStudentProgress } from './storage/postgres-student-progress';
-import { postgresSettlementReports } from './storage/postgres-settlement-reports';
-import { postgresSettlementPreview } from './storage/postgres-settlement';
-import { postgresStudentRoster } from './storage/postgres-student-roster';
-import { postgresStudentPhysical } from './storage/postgres-student-physical';
-import { postgresTeacherHistory, postgresTeacherStudent } from './storage/postgres-teacher-history';
-import { postgresReviewMaterial } from './storage/postgres-review-material';
-import { postgresSportsWorkspace } from './storage/postgres-sports-workspace';
-import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresMediaOriginal } from './storage/postgres-student-media';
-import { postgresStudentRecords, postgresStudentWorkflow, postgresProofTodos } from './storage/postgres-student-records';
 import { createServer } from 'node:http';
 import { demand, ServiceError } from './auth';
 import { body, cookieToken as readCookieToken, send } from './http';
-import { issueMemberJoin, consumeMemberJoin } from './storage/postgres-member-join';
+
 import { PostgresAuth } from './storage/postgres-auth';
 import { PostgresEmail } from './storage/postgres-email';
 import type { PostgresDatabase } from './storage/postgres';
@@ -39,14 +16,8 @@ import { passwordChangeRequired } from './sports/account-gate';
 import { PostgresRepository } from './storage/postgres-repository';
 import { postgresAdministratorDirectory } from './storage/postgres-administrators';
 import { postgresAdministratorSelf } from './storage/postgres-admin-deletion';
-import { postgresAccountDirectory,postgresAdminAccountDetail } from './storage/postgres-account-directory';
-import { postgresSportsHelp,postgresAdminHelp,postgresStudentHelp } from './storage/postgres-sports-help';
-import { portalAnnouncement } from './sports/portal-bootstrap';
-import { postgresSportsMe } from './storage/postgres-sports-me';
-import { postgresStudentCourses } from './storage/postgres-student-courses';
-import { postgresSportsNotifications } from './storage/postgres-sports-notifications';
-import { postgresSportsPreferences } from './storage/postgres-sports-preferences';
-import { postgresSportsSession } from './storage/postgres-sports-session';
+import { postgresAccountDirectory } from './storage/postgres-account-directory';
+
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'} = {}) {
@@ -63,105 +34,6 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(options.surface==='companion')demand(!sportsPath,'接口不存在。',404);
       if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
       if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
-      const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
-      const semesterCheck=/^\/api\/v1\/admin\/semesters\/([^/]+)\/switch-check$/.exec(pathname);
-      if(request.method==='GET' && semesterCheck)return send(response,200,{data:await postgresSemesterSwitchCheck(db,cookieToken(request) ?? '',decodeURIComponent(semesterCheck[1]),Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
-      if(request.method==='GET' && pathname==='/api/v1/admin/semesters')return send(response,200,{data:await postgresAdminSemesters(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
-      if(request.method==='GET' && pathname==='/api/v1/admin/endurance-tables')return send(response,200,{data:await postgresEnduranceTables(db,cookieToken(request) ?? '')});
-      if(request.method==='GET' && ['/api/v1/students','/api/v1/teachers','/api/v1/admin/teacher-accounts'].includes(pathname)) {
-        const input=Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams);
-        if(input.after!==undefined){demand(input.cursor===undefined,'分页参数重复。');input.cursor=input.after;delete input.after;}
-        const page=await postgresAccountDirectory(db,cookieToken(request) ?? '',pathname==='/api/v1/students'?'student':'teacher',input,true);
-        return send(response,200,pathname==='/api/v1/admin/teacher-accounts'?{data:{items:page.items,nextCursor:page.nextCursor}}:{data:page.items,meta:{pagination:{total:page.total,hasMore:page.nextCursor!==null,nextCursor:page.nextCursor,limit:Number(input.limit ?? 20)}}});
-      }
-      const adminHelp=/^\/api\/v1\/admin\/help-articles(?:\/([^/]+))?$/.exec(pathname);
-      if(request.method==='GET' && pathname==='/api/v1/student/help-articles')return send(response,200,{data:await postgresStudentHelp(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
-      if(request.method==='GET' && adminHelp)return send(response,200,{data:await postgresAdminHelp(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams),adminHelp[1]?decodeURIComponent(adminHelp[1]):undefined)});
-      if(request.method==='GET' && pathname==='/api/v1/admin/subadmins') {
-        const query=new URL(request.url ?? '/','http://localhost').searchParams;
-        demand([...query.keys()].every(k=>k==='after'),'管理账号查询参数无效。');
-        return send(response,200,{data:await postgresPortalSubadmins(db,cookieToken(request) ?? '',query.get('after') ?? '')});
-      }
-      if(request.method==='GET' && pathname==='/api/v1/auth/account-security')return send(response,200,{data:await postgresPortalSecurity(db,cookieToken(request) ?? '')});
-      if(request.method==='GET' && teacherStudent) {
-        demand([...new URL(request.url ?? '/', 'http://localhost').searchParams.keys()].length===0,'学生资料查询参数无效。');
-        const detail=await postgresAdminAccountDetail(db,cookieToken(request) ?? '','student',decodeURIComponent(teacherStudent[1]));
-        if(detail)return send(response,200,detail);
-        return send(response,200,await postgresTeacherStudent(db,cookieToken(request) ?? '',decodeURIComponent(teacherStudent[1])));
-      }
-      const invitePreview=/^\/api\/v1\/course-invites\/([^/]+)\/preview$/.exec(pathname);
-      const contractInvite=/^\/api\/v1\/course-invitations\/([^/]+)$/.exec(pathname);
-      if(request.method==='GET' && (invitePreview || contractInvite)) return send(response,200,await postgresInvitationPreview(db,decodeURIComponent((invitePreview ?? contractInvite)![1])));
-      if(request.method==='GET' && ['/api/v1/rule-templates','/api/v1/admin/exercise-goal'].includes(pathname)) return send(response,200,await postgresRuleTemplates(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),pathname.endsWith('/exercise-goal')));
-      const reportRead=/^\/api\/sports\/course-reports\/([a-f0-9-]+)(\.csv)?$/.exec(pathname);
-      if(request.method==='GET' && reportRead) {
-        const report=await postgresCourseReport(db,cookieToken(request) ?? '',reportRead[1]);
-        if(!reportRead[2]) return send(response,200,report);
-        const bytes=Buffer.from(reportCsv(report),'utf8');
-        response.writeHead(200,{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="course-report.csv"','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Length':bytes.length});
-        return response.end(bytes);
-      }
-      const gradeHistory=/^\/api\/v1\/enrollments\/([^/]+)\/(physical-results|final-grades)$/.exec(pathname);
-      if(request.method==='GET' && gradeHistory) return send(response,200,await postgresTeacherHistory(db,cookieToken(request) ?? '',decodeURIComponent(gradeHistory[1]),gradeHistory[2] as 'physical-results'|'final-grades',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams)));
-      const physicalResult=/^\/api\/v1\/student\/enrollments\/([^/]+)\/physical-result$/.exec(pathname);
-      if(request.method==='GET' && physicalResult) return send(response,200,await postgresStudentPhysical(db,cookieToken(request) ?? '',decodeURIComponent(physicalResult[1])));
-      const rosterStatus=/^\/api\/v1\/enrollments\/([^/]+)\/roster-status$/.exec(pathname);
-      if(request.method==='GET' && rosterStatus) return send(response,200,await postgresStudentRoster(db,cookieToken(request) ?? '',decodeURIComponent(rosterStatus[1])));
-      if(request.method==='GET' && pathname==='/api/v1/student/proof-todos') return send(response,200,await postgresProofTodos(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams)));
-      if(request.method==='GET' && pathname==='/api/sports/workspace') return send(response,200,await postgresSportsWorkspace(db,cookieToken(request) ?? ''));
-      if(request.method==='GET' && ['/api/v1/exemption-application-details','/api/v1/activity-certification-applications'].includes(pathname)) return send(response,200,await postgresStudentApplications(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),pathname.includes('activity-certification')));
-      const recognitionRead=/^\/api\/v1\/activity-certification-applications\/([^/]+)\/recognition-allocation-revisions$/.exec(pathname);
-      if(request.method==='GET' && recognitionRead) return send(response,200,await postgresStudentRecognitionHistory(db,cookieToken(request) ?? '',decodeURIComponent(recognitionRead[1]),Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams)));
-      const progressTarget=/^\/api\/v1\/class-sections\/([^/]+)\/progress-target$/.exec(pathname);
-      const settlementReportsRead=/^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(pathname);
-      const settlementCheckRead=/^\/api\/v1\/class-sections\/([^/]+)\/settlement-check$/.exec(pathname);
-      if(request.method==='GET' && settlementCheckRead)return send(response,200,{data:await postgresSettlementPreview(db,cookieToken(request) ?? '',decodeURIComponent(settlementCheckRead[1]),Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
-      if(request.method==='GET' && settlementReportsRead)return send(response,200,{data:await postgresSettlementReports(db,cookieToken(request) ?? '',decodeURIComponent(settlementReportsRead[1]),Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
-      if(request.method==='GET' && (['/api/v1/student-progress','/api/v1/teacher-progress'].includes(pathname) || progressTarget)) return send(response,200,await postgresStudentProgress(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),progressTarget?decodeURIComponent(progressTarget[1]):undefined,pathname==='/api/v1/teacher-progress'));
-      const reviewMaterial=/^\/api\/sports\/materials\/([^/]+)$/.exec(pathname);
-      if(request.method==='GET' && reviewMaterial) {
-        const original=await postgresReviewMaterial(db,cookieToken(request) ?? '',decodeURIComponent(reviewMaterial[1]));
-        response.writeHead(200,{'Content-Type':original.mime,'Content-Length':original.bytes.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Cross-Origin-Resource-Policy':'same-origin'});return response.end(original.bytes);
-      }
-      const originalRead=/^\/api\/v1\/media-access\/([^/]+)$/.exec(pathname);
-      if(request.method==='GET' && originalRead) {
-        const original=await postgresMediaOriginal(db,cookieToken(request) ?? '',decodeURIComponent(originalRead[1]));
-        response.writeHead(200,{'Content-Type':original.mime,'Content-Length':original.bytes.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Cross-Origin-Resource-Policy':'same-origin'});return response.end(original.bytes);
-      }
-      const evidenceRead=/^\/api\/v1\/exercise-records\/([^/]+)\/evidence-context$/.exec(pathname);
-      const workflowRead=/^\/api\/v1\/exercise-records\/([^/]+)\/workflow$/.exec(pathname);
-      if(request.method==='GET' && workflowRead) return send(response,200,await postgresStudentWorkflow(db,cookieToken(request) ?? '',decodeURIComponent(workflowRead[1])));
-      if(request.method==='GET' && evidenceRead) return send(response,200,{data:await postgresEvidenceContext(db,cookieToken(request) ?? '',decodeURIComponent(evidenceRead[1]))});
-      const mediaRead=/^\/api\/v1\/media\/([^/]+)$/.exec(pathname);
-      if(request.method==='GET' && mediaRead) return send(response,200,{data:await postgresMediaRead(db,cookieToken(request) ?? '',decodeURIComponent(mediaRead[1]))});
-      const mediaPut=/^\/api\/v1\/media-uploads\/([^/]+)\/object$/.exec(pathname);
-      if(request.method==='PUT' && mediaPut) {
-        demand(!request.headers.origin || origins.has(request.headers.origin),'来源不允许。',403);
-        demand(request.headers['sec-fetch-site']!=='cross-site','跨站请求不允许。',403);
-        await auth.authenticate(cookieToken(request));
-        let size=0;const chunks:Buffer[]=[];
-        for await(const chunk of request) {size+=chunk.length;demand(size<=100*1024*1024,'文件过大。',413);chunks.push(chunk);}
-        const etag=await postgresMediaPut(db,cookieToken(request) ?? '',decodeURIComponent(mediaPut[1]),Buffer.concat(chunks),request.headers['content-type'] ?? '');
-        response.writeHead(200,{ETag:'"'+etag+'"','Cache-Control':'no-store'});return response.end();
-      }
-      const recordRead=/^\/api\/v1\/exercise-records(?:\/([^/]+))?$/.exec(pathname);
-      if(request.method==='GET' && recordRead) return send(response,200,await postgresStudentRecords(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),recordRead[1]?decodeURIComponent(recordRead[1]):undefined));
-      const sportsSessionRead=/^\/api\/v1\/exercise-sessions\/([^/]+)$/.exec(pathname);
-      if(request.method==='GET' && sportsSessionRead) return send(response,200,{data:await postgresSportsSession(db,cookieToken(request) ?? '',decodeURIComponent(sportsSessionRead[1]))});
-      if(request.method==='GET' && pathname==='/api/v1/me/preferences') return send(response,200,{data:await postgresSportsPreferences(db,cookieToken(request) ?? '')});
-      if(request.method==='GET' && pathname==='/api/v1/notifications') return send(response,200,await postgresSportsNotifications(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
-      if(request.method==='GET' && /^\/api\/v1\/teachers\/[^/]+$/.test(pathname)) {
-        demand([...new URL(request.url ?? '/','http://localhost').searchParams.keys()].length===0,'教师资料查询参数无效。');
-        const detail=await postgresAdminAccountDetail(db,cookieToken(request) ?? '','teacher',decodeURIComponent(pathname.split('/').at(-1)!));
-        return send(response,200,detail ?? await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,{}));
-      }
-      if(request.method==='GET' && (['/api/v1/teacher/semesters','/api/v1/semesters/current','/api/v1/enrollments'].includes(pathname) || /^\/api\/v1\/class-sections\/[^/]+\/v81-rules$/.test(pathname) || /^\/api\/v1\/(courses|class-sections)(\/[^/]+)?$/.test(pathname))) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
-      if(request.method==='GET' && pathname==='/api/v1/me') return send(response,200,{data:await postgresSportsMe(db,cookieToken(request) ?? '')});
-      if(request.method==='GET' && pathname==='/api/v1/system-mode/announcement') {
-        const systems=await db.transaction(client=>new PostgresRepository(client).all('sportsSystem'));
-        return send(response,200,{data:portalAnnouncement({all:()=>systems})});
-      }
-      if(request.method==='GET' && pathname==='/api/sports/help') return send(response,200,await postgresSportsHelp(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('lang') ?? 'zh'));
       const accountDirectory=/^\/api\/sports\/accounts\/(students|teachers)$/.exec(pathname);
       if(request.method==='GET' && accountDirectory) return send(response,200,await postgresAccountDirectory(db,cookieToken(request) ?? '',accountDirectory[1]==='students'?'student':'teacher',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && pathname==='/api/sports/administrator-self') return send(response,200,await postgresAdministratorSelf(db,cookieToken(request) ?? ''));
@@ -175,28 +47,9 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         return send(response,200,{ok:true,storage:'postgresql',schemaVersion:result.rows[0].version});
       }
       if (request.method === 'GET' && pathname === '/api/auth/me') return send(response,200,{account:await auth.authenticate(cookieToken(request))});
-      if (request.method === 'POST' || request.method==='PATCH') {
+      if (request.method === 'POST') {
         demand(!request.headers.origin || origins.has(request.headers.origin),'来源不允许。',403);
         demand(request.headers['sec-fetch-site'] !== 'cross-site','跨站请求不允许。',403);
-        if(request.method==='PATCH') {
-          const courseWindow=/^\/api\/v1\/class-sections\/([^/]+)$/.exec(pathname);
-          if(courseWindow) {
-            const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-            const id=decodeURIComponent(courseWindow[1]),token=cookieToken(request) ?? '';
-            await executePostgres(db,token,'sports.course.window',courseWindowInput(id,await body(request)),key);
-            return send(response,200,await postgresStudentCourses(db,token,'/api/v1/class-sections/'+id,{}));
-          }
-          const draftEdit=/^\/api\/v1\/exercise-records\/([^/]+)$/.exec(pathname);
-          if(draftEdit) {
-            const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-            const input=await body(request);demand(!('id' in input),'记录标识须使用路径。');
-            return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.recorddraft.edit',{...input,id:decodeURIComponent(draftEdit[1])},key)});
-          }
-          demand(pathname==='/api/v1/me/preferences','接口不存在。',404);
-          const key=request.headers['idempotency-key'];
-          demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.preferences.save',await body(request),key)});
-        }
         if(pathname==='/api/timetable/recognize') {
           const actor=await auth.authenticate(cookieToken(request));
           student(actor);
@@ -205,178 +58,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再进入体育业务。');
           return send(response,200,await recognize(request));
         }
-        const notificationRead=/^\/api\/v1\/notifications\/([^/]+)\/read$/.exec(pathname);
-        if(notificationRead) {
-          const key=request.headers['idempotency-key'];
-          demand(typeof key==='string','缺少操作幂等标识。');
-          if(request.headers['content-length'] && request.headers['content-length']!=='0' || request.headers['transfer-encoding']) demand(Object.keys(await body(request)).length===0,'已读操作不接受额外参数。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
-        }
         const input = await body(request);
-        if(pathname==='/api/v1/auth/password-login') {
-          demand(Object.keys(input).every(k=>['account','password'].includes(k)),'登录参数无效。');
-          const result=await postgresPortalLogin(db,input.account,input.password);
-          response.setHeader('Set-Cookie',cookie(result.token,43200));
-          return send(response,200,{data:{user:result.user}});
-        }
-        const subadminWrite=/^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(pathname);
-        const semesterSave=/^\/api\/v1\/admin\/semesters(?:\/([^/]+))?$/.exec(pathname);
-        const semesterSwitch=/^\/api\/v1\/admin\/semesters\/([^/]+)\/switch$/.exec(pathname);
-        if(semesterSwitch) {
-          demand(Object.keys(input).every(k=>['expectedVersion','currentSemesterId','currentSemesterVersion'].includes(k)),'学期切换参数无效。');
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.semester.switch',{id:decodeURIComponent(semesterSwitch[1]),version:input.expectedVersion,currentSemesterId:input.currentSemesterId,currentSemesterVersion:input.currentSemesterVersion},key)});
-        }
-        if(semesterSave) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await postgresAdminSemesterSave(db,cookieToken(request) ?? '',semesterSave[1]?decodeURIComponent(semesterSave[1]):undefined,input,key)});
-        }
-        const enduranceWrite=/^\/api\/v1\/admin\/endurance-tables\/rules(?:\/([^/]+)(\/delete)?)?$/.exec(pathname);
-        if(enduranceWrite) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await postgresEnduranceWrite(db,cookieToken(request) ?? '',enduranceWrite[1]?decodeURIComponent(enduranceWrite[1]):undefined,!!enduranceWrite[2],input,key)});
-        }
-        if(adminHelp) {
-          demand(!Object.hasOwn(input,'id'),'文章标识只能来自路径。');
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.help.portal',{...input,...(adminHelp[1]?{id:decodeURIComponent(adminHelp[1])}:{})},key)});
-        }
-        const subadminDelete=/^\/api\/v1\/admin\/subadmins\/([^/]+)\/delete$/.exec(pathname);
-        if(pathname==='/api/v1/me/account-deletion') {
-          demand(Object.keys(input).every(k=>['expectedVersion','account','name','email','confirmed','handoverCompleted'].includes(k)),'注销账号参数无效。');
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          const token=cookieToken(request) ?? '',own=await postgresAdministratorSelf(db,token);
-          const result=await executePostgres(db,token,'sports.account.close',{id:own.id,version:input.expectedVersion,loginName:input.account,name:input.name,email:input.email,confirmed:input.confirmed,handoverConfirmed:input.handoverCompleted},key);
-          response.setHeader('Set-Cookie',cookie('',0));
-          return send(response,200,{data:{userId:result.id,deleted:true}});
-        }
-        if(subadminDelete) {
-          demand(Object.keys(input).every(k=>['expectedVersion','handoverCompleted'].includes(k)),'删除账号参数无效。');
-          demand(input.handoverCompleted===true,'删除前须确认已完成职责移交。');
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          const result=await executePostgres(db,cookieToken(request) ?? '','sports.admins.delete',{accountId:decodeURIComponent(subadminDelete[1]),version:input.expectedVersion,confirmed:true,handoverConfirmed:true},key);
-          return send(response,200,{data:result});
-        }
-        if(subadminWrite) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await postgresPortalSubadminWrite(db,cookieToken(request) ?? '',subadminWrite[1]?decodeURIComponent(subadminWrite[1]):undefined,(subadminWrite[2] ?? 'create') as 'create'|'profile'|'status',input,key)});
-        }
-        if(pathname==='/api/v1/auth/own-password') {
-          demand(Object.keys(input).every(k=>['currentPassword','newPassword','confirmPassword','expectedVersion'].includes(k)),'修改密码参数无效。');
-          const key=request.headers['idempotency-key'];
-          demand(typeof key==='string','缺少操作幂等标识。');
-          const token=cookieToken(request) ?? '';
-          await postgresPortalSecurity(db,token);
-          await executePostgres(db,token,'sports.password.change',{currentPassword:input.currentPassword,newPassword:input.newPassword,confirmPassword:input.confirmPassword,version:input.expectedVersion},key);
-          const security=await postgresPortalSecurity(db,token);
-          return send(response,200,{data:{userId:security.userId,version:security.version,mustChangePassword:security.mustChangePassword}});
-        }
-        if(pathname==='/api/v1/auth/logout') {
-          demand(Object.keys(input).length===0,'退出参数无效。');
-          await auth.logout(cookieToken(request));response.setHeader('Set-Cookie',cookie('',0));
-          return send(response,200,{data:null});
-        }
-        const newStudentJoin=/^\/api\/v1\/course-invites\/([^/]+)\/join-capabilities$/.exec(pathname);
-        if(newStudentJoin){
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await issueNewStudentJoin(db,decodeURIComponent(newStudentJoin[1]),input,key)});
-        }
-        const memberJoin=/^\/api\/v1\/course-invites\/([^/]+)\/(join-capabilities\/member|join)$/.exec(pathname);
-        if(memberJoin) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          const code=decodeURIComponent(memberJoin[1]),session=cookieToken(request) ?? '';
-          if(memberJoin[2]==='join-capabilities/member')return send(response,200,{data:await issueMemberJoin(db,session,code,input,key)});
-          demand(Object.keys(input).length===0,'入班确认不接受额外资料。');
-          const capability=request.headers['x-join-capability'];demand(typeof capability==='string','缺少入班凭证。',403);
-          const bootstrap=await consumeNewStudentJoin(db,code,capability,key);
-          if(bootstrap){response.setHeader('Set-Cookie',cookie(bootstrap.token,43200));return send(response,200,{data:bootstrap.result});}
-          return send(response,200,{data:await consumeMemberJoin(db,session,code,capability,key)});
-        }
-        if(['/api/v1/auth/student-sign-in-codes','/api/v1/auth/student-sign-in-codes/verify'].includes(pathname) && input.joinInviteToken!==undefined) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          const result=pathname.endsWith('/verify')?await verifyStudentJoinEmail(db,input,key):await requestStudentJoinEmail(db,input,key,options.localOutbox);
-          return send(response,200,{data:result});
-        }
-        if(pathname==='/api/v1/auth/student-sign-in-codes') {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          return send(response,200,{data:await requestStudentLogin(db,input,key,options.localOutbox)});
-        }
-        if(pathname==='/api/v1/auth/student-sign-in-codes/verify') {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          const result=await verifyStudentLogin(db,input,key);
-          response.setHeader('Set-Cookie',cookie(result.token,43200));
-          return send(response,200,{data:result.authSession});
-        }
-        const courseInvite=/^\/api\/v1\/class-sections\/([^/]+)\/course-invites(\/revocations)?$/.exec(pathname);
-        if(courseInvite) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          const id=decodeURIComponent(courseInvite[1]),token=cookieToken(request) ?? '',revoke=!!courseInvite[2];
-          await postgresStudentCourses(db,token,'/api/v1/class-sections/'+id,{});
-          const result=await executePostgres(db,token,revoke?'sports.invitation.revoke':'sports.invitation.create',courseInviteInput(id,revoke,input),key);
-          const invite=await db.transaction(client=>new PostgresRepository(client).get(result.id,'sportsInvitation'));
-          return send(response,200,{data:courseInviteProjection(invite)});
-        }
-        if(pathname==='/api/v1/teacher/courses') {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          demand(Object.keys(input).every(field=>field==='displayName'),'新建课程参数无效。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.course.create',{name:input.displayName},key)});
-        }
-        const settlementConfirm=/^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(pathname);
-        if(settlementConfirm) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'课程标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.settlement.finalize',{...input,id:decodeURIComponent(settlementConfirm[1])},key)});
-        }
-        const courseRulesPublish=/^\/api\/v1\/class-sections\/([^/]+)\/v81-rules$/.exec(pathname);
-        if(courseRulesPublish) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'课程标识须来自请求路径。');
-          const id=decodeURIComponent(courseRulesPublish[1]),token=cookieToken(request) ?? '';
-          await executePostgres(db,token,'sports.course.configurepublish',{...input,id},key);
-          return send(response,200,await postgresStudentCourses(db,token,'/api/v1/class-sections/'+id+'/v81-rules',{}));
-        }
-        const gradeWrite=/^\/api\/v1\/enrollments\/([^/]+)\/final-grades$/.exec(pathname);
-        if(gradeWrite) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('enrollmentId' in input),'成员标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.grade.portal',{...input,enrollmentId:decodeURIComponent(gradeWrite[1])},key)});
-        }
-        const physicalWrite=/^\/api\/v1\/enrollments\/([^/]+)\/physical-results$/.exec(pathname);
-        if(physicalWrite) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('enrollmentId' in input),'成员标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.physical.confirm',{...input,enrollmentId:decodeURIComponent(physicalWrite[1])},key)});
-        }
-        const mediaAccess=/^\/api\/v1\/media\/([^/]+)\/access-url$/.exec(pathname);
-        if(mediaAccess) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'材料标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.media.access',{...input,id:decodeURIComponent(mediaAccess[1])},key)});
-        }
-        const recordSubmit=/^\/api\/v1\/exercise-records\/([^/]+)\/(submit|supplements)$/.exec(pathname);
-        if(recordSubmit) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'记录标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', recordSubmit[2]==='supplements'?'sports.record.supplement':'sports.record.submit',{...input,id:decodeURIComponent(recordSubmit[1])},key)});
-        }
-        const mediaWrite=/^\/api\/v1\/(media-uploads|media)(?:\/([^/]+)\/(confirm|bind))?$/.exec(pathname);
-        const captureWrite=/^\/api\/v1\/exercise-sessions\/([^/]+)\/photo-captures$/.exec(pathname);
-        if(captureWrite) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('sessionId' in input),'运动标识须来自路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.media.capture',{...input,sessionId:decodeURIComponent(captureWrite[1])},key)});
-        }
-        if(mediaWrite) {
-          demand((mediaWrite[1]==='media-uploads' && (!mediaWrite[3] || mediaWrite[3]==='confirm')) || (mediaWrite[1]==='media' && mediaWrite[3]==='bind'),'接口不存在。',404);
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');demand(!('id' in input),'材料标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.media.'+(mediaWrite[3] ?? 'initiate'),mediaWrite[2]?{...input,id:decodeURIComponent(mediaWrite[2])}:input,key)});
-        }
-        const draftWrite=/^\/api\/v1\/exercise-records(?:\/([^/]+)\/(discard))?$/.exec(pathname);
-        if(draftWrite) {
-          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
-          demand(!('id' in input),'记录标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '', 'sports.recorddraft.'+(draftWrite[1]?'discard':'create'),draftWrite[1]?{...input,id:decodeURIComponent(draftWrite[1])}:input,key)});
-        }
-        const exerciseWrite=/^\/api\/v1\/exercise-sessions(?:\/([^/]+)\/(pause|resume|finish|cancel))?$/.exec(pathname);
-        if(exerciseWrite) {
-          const key=request.headers['idempotency-key'];
-          demand(typeof key==='string','缺少操作幂等标识。');
-          demand(!('id' in input),'运动会话标识须使用路径。');
-          return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '',`sports.exercise.${exerciseWrite[2] ?? 'start'}`,exerciseWrite[1]?{...input,id:decodeURIComponent(exerciseWrite[1])}:input,key)});
-        }
         if(pathname==='/api/sports/admin-email/request') {
           demand(Object.keys(input).length===0,'邮箱验证只能使用本人当前邮箱。');
           return send(response,200,await postgresAdminEmailRequest(db,cookieToken(request) ?? '',options.localOutbox===true));
