@@ -5,7 +5,6 @@ import { demand } from '../auth';
 import type { Entity, Fields, Repository } from '../repository';
 import { projectWorkspace } from '../snapshot-projection';
 import { projectRelationshipHistory } from '../relationship-history';
-import { projectSportsCompanion } from '../sports/companion';
 import { passwordChangeRequired } from '../sports/account-gate';
 import { recordedStudentNumber } from '../student-search';
 
@@ -26,11 +25,10 @@ export async function postgresWorkspace(db: PostgresDatabase, token: string) {
     const allNotifications=(await client.query<Fields>('SELECT id,recipient_id,entity_id AS "entityId",event,body,created_at AS "createdAt",read_at AS "readAt" FROM notifications ORDER BY created_at DESC')).rows;
     const notifications=allNotifications.filter(row=>row.recipient_id===actor.id).map(row=>({id:row.id,entityId:row.entityId,event:row.event,body:row.body,createdAt:row.createdAt,readAt:row.readAt}));
     const relations=(await client.query<Fields>('SELECT entity_id AS "entityId",kind,created_at AS "createdAt" FROM relations WHERE account_id=$1',[actor.id])).rows;
-    const personal=(await client.query("SELECT 1 FROM accounts WHERE id=$1 AND lower(trim(email))=$2 AND login_kind='PERSONAL'",[actor.id,actor.email.trim().toLowerCase()])).rows.length>0;
     const number=recordedStudentNumber(actor,repo.all('sportsIdentity'));
     return projectWorkspace({
       repo,firstLoginOnly:passwordChangeRequired(repo.all('sportsIdentity'),actor),studentNumber:number,
-      sports:projectSportsCompanion(repo,actor,personal),notifications,relations,
+      sports:null,notifications,relations,
       audit:[...audit].reverse().slice(0,200),
       coffeeHistory:id=>audit.filter(row=>row.entity_id===id && ['coffee.book','coffee.move','coffee.answer','coffee.cancel'].includes(String(row.action))).map(row=>{
         const data=JSON.parse(String(row.data)) as {accepted?:boolean};

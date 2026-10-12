@@ -2116,3 +2116,9 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 - 当前SportsPortal、SportsDashboard及学生SportsProgressCard均保留，未调整现用页面布局。
 - 前端TypeScript及Vite生产构建通过；仍有现存大chunk提示，不是本次删除引起的功能失败。
 - 发现V2Sports仍嵌入完整/student平台，尚待改为只读展示并清理public体育资源；未将该剩余项称为已完成。
+
+### 2026-10-12 越界实现清理：学生体育入口与数据来源
+- V2Sports移除完整体育平台iframe及相机/麦克风授权，复用已有SportsPortal只读展示组件，页面外框及返回入口保留。这是按用户最新范围移除越界嵌入，不新增UI设计。
+- SQLite和PostgreSQL的伴学workspace停止从本地sports实体生成体育摘要；真实只读源未接通前返回null，不将历史体育测试数据伪装成来源数据。真实只读可视化仍待源配置及映射，不宣称已完成。
+- 后端类型检查、前端类型检查通过；PostgreSQL与伴学HTTP共50项通过。前端初查发现残留Navigate，已删除并重跑前端类型检查通过。
+- public/student静态资源、旧预览适配器和其他残留依赖仍待清理。

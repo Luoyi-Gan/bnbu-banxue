@@ -17,7 +17,6 @@ import { governanceCommand } from "./governance";
 import { activityCommand } from "./activities";
 import { alumniCommand } from "./alumni";
 
-import { sportsCompanion } from "./sports/companion";
 import { sportsPasswordCommand } from "./sports/password";
 import { sportsAdministratorCommand } from "./sports/administrators";
 import { sportsAdministratorDeletion } from "./sports/administrator-deletion";
@@ -141,7 +140,7 @@ export function snapshot(db: Database, actor: Account) {
     )
     .all(actor.id);
 
- return projectWorkspace({repo, firstLoginOnly:requiresPasswordChange(repo,actor),studentNumber:studentNumber(db,actor),sports:sportsCompanion(repo,actor),notifications,
+ return projectWorkspace({repo, firstLoginOnly:requiresPasswordChange(repo,actor),studentNumber:studentNumber(db,actor),sports:null,notifications,
  coffeeHistory:(id:string)=>db.prepare(
         "SELECT id, action, reason, data, created_at AS at FROM audit WHERE entity_id=? AND action IN ('coffee.book','coffee.move','coffee.answer','coffee.cancel') ORDER BY created_at, rowid",
       ).all(id).map(row => {
