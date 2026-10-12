@@ -1288,3 +1288,6 @@ Vite 生产构建通过，仍有超过 500 kB 的既有分包提示。4174／417
 ### 2026-10-12 Docker 最新镜像验证
 Docker Desktop 启动后，使用现有代理环境 docker compose build 成功。镜像 bnbu-work-bnbu:latest，manifest 27cc8eca6c542438c2a7f7588046f696c228f9cfd98d30159f5e15d8989deb62。独立临时容器映射 4188，临时 SQLite；health 200、schemaVersion 7。容器内 backend-http、backend-concurrency 和 live-relationships 共 31 项测试通过。验证后停止并自动移除临时容器；没有占用 4174 或修改验收数据库。此项为容器启动与选定业务回归，不宣称整个容器测试集或浏览器验收完成。
 
+
+Docker 健康检查补充：首次 PowerShell Invoke-RestMethod 返回 502，该请求不算成功。重新启动同镜像临时容器后，用宿主 Node fetch 访问 4188/api/health，以及容器内 Node fetch 访问 4175/api/health，均实际返回 200 和 schemaVersion 7；随后停止临时容器。健康通过结论以这两次实测为依据。
+
