@@ -8,6 +8,19 @@ const email=`smoke-${randomUUID()}@example.test`;
 const password=randomBytes(24).toString('base64url');
 let cookie='';
 function docker(args,options) { return execFileSync('docker',args,options); }
+const fixtureAccounts=[];
+// Also revoke fixtures on an assertion failure; never leave a test operator logged in.
+process.on('exit',()=>{
+  if(!fixtureAccounts.length)return;
+  assert.ok(fixtureAccounts.every(id=>/^[0-9a-f-]{36}$/.test(id)));
+  const ids=fixtureAccounts.map(id=>`'${id}'`).join(',');
+  try {
+    docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`BEGIN; DELETE FROM sessions WHERE account_id IN (${ids}); UPDATE accounts SET status='banned',roles='[]' WHERE id IN (${ids}); COMMIT;`],{stdio:'pipe'});
+  } catch {
+    console.error('Local smoke fixture cleanup failed; test account sessions require cleanup before sharing this database.');
+    process.exitCode=1;
+  }
+});
 async function request(path,input) {
   const response=await fetch(base+path,{
     method:input===undefined?'GET':'POST',
@@ -32,6 +45,7 @@ await request('/api/auth/sign-in',{identifier:email,password});
 let actor=(await request('/api/auth/me')).account;
 assert.deepEqual(actor.roles,[]);
 assert.match(actor.id,/^[0-9a-f-]{36}$/);
+fixtureAccounts.push(actor.id);
 // Local fixture authorization is explicit; registration itself grants no school role.
 docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE accounts SET roles='["student"]' WHERE id='${actor.id}'`],{stdio:'pipe'});
 await request('/api/commands',{action:'preferences.preview',input:{enabled:false},requestId:randomUUID()});
@@ -54,6 +68,7 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
 {
   const authorCookie=cookie,viewerId=randomUUID(),reviewerId=randomUUID(),operatorId=randomUUID(),teacherId=randomUUID();
   for(const [id,role] of [[viewerId,'student'],[reviewerId,'reviewer'],[operatorId,'operator'],[teacherId,'teacher']]) {
+    fixtureAccounts.push(id);
     docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at) SELECT '${id}','${id}@example.test',password_hash,'Docker ${role}','["${role}"]','now' FROM accounts WHERE id='${actor.id}'`],{stdio:'pipe'});
   }
   const command=(action,input,requestId=randomUUID())=>request('/api/commands',{action,input,requestId});
