@@ -70,6 +70,41 @@ it("两位学生同时从 HTTP 竞争最后一个名额只成功一笔", async (
   expect(new Repository(db).all("coffeeBooking")).toHaveLength(1);
 });
 
+it("邮件拆分与更正通过真实 HTTP 事务接通学生公开视图", async () => {
+  const { db, a, admin } = fixture();
+  const repo = new Repository(db);
+  const server = createApiServer(db);
+  await new Promise<void>(done => server.listen(0, "127.0.0.1", done));
+  cleanup.push(() => new Promise<void>(done => {server.closeAllConnections(); server.close(() => done());}));
+  const base = `http://127.0.0.1:${(server.address() as {port: number}).port}`;
+  async function post(who: typeof a, action: string, input: Record<string, unknown>) {
+    const response = await fetch(base + "/api/commands", {method: "POST", headers: {
+      Cookie: `bnbu_session=${who.token}`, "Content-Type": "application/json",
+    }, body: JSON.stringify({action, input, requestId: randomUUID()})});
+    return {status: response.status, body: await response.json()};
+  }
+  const source = await post(admin, "mail.import", {messageId: "http-multi", subject: "两场活动", sender: "internal@example.test", body: "活动名称：讲座\n活动名称：比赛"});
+  expect(source.status).toBe(200);
+  const id = repo.all("mail")[0].id;
+  const fields = {title: "讲座", description: "介绍", startAt: "2027-01-01 10:00", endAt: "2027-01-01 11:00", location: "图书馆", host: "学院", conditions: ""};
+  const input = {id, expectedVersion: 1, confirmed: true, reason: "人工核实", activities: [fields, {...fields, title: "比赛"}]};
+  expect((await post(a, "mail.split", input)).status).toBe(403);
+  expect((await post(admin, "mail.split", input)).status).toBe(200);
+  const event = repo.all("activity")[0];
+  expect((await post(a, "relation.set", {id: event.id, kind: "save", enabled: true})).status).toBe(200);
+  expect((await post(admin, "mail.import", {messageId: "http-revision", subject: "地点更正", sender: "internal@example.test", body: "改在T2", revision: true})).status).toBe(200);
+  const revision = repo.all("mail").find(item => item.data.purpose === "revision")!;
+  const target = repo.get(event.data.mailId);
+  expect((await post(admin, "mail.revise", {...fields, title: event.data.title, location: "T2", id: revision.id, expectedVersion: revision.version, targetMailId: target.id, targetVersion: target.version, confirmed: true, reason: "学校更正"})).status).toBe(200);
+  const response = await fetch(base + "/api/workspace", {headers: {Cookie: `bnbu_session=${a.token}`}});
+  expect(response.status).toBe(200);
+  const view = await response.json();
+  expect(view.entities.find((item: {id: string}) => item.id === event.id).data.location).toBe("T2");
+  expect(view.entities.filter((item: {kind: string}) => item.kind === "activity")).toHaveLength(2);
+  expect(view.notifications.filter((item: {event: string}) => item.event === "activity.changed")).toHaveLength(1);
+  expect(JSON.stringify(view)).not.toContain("internal@example.test");
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {
