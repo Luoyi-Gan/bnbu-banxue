@@ -359,6 +359,37 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect(Number((await db.pool.query("SELECT count(*) FROM entities WHERE kind='activity' AND data::jsonb->>'mailId'=ANY($1)",[parent.data.childMailIds])).rows[0].count)).toBe(2);
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
+  it('revises the original mail activity while preserving subscriptions and deduplicating notifications', async () => {
+    const operator=randomUUID(),student=randomUUID(),token=randomUUID(),studentToken=randomUUID();
+    for(const [id,role,session] of [[operator,'operator',token],[student,'student',studentToken]]) {
+      await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',[id,id+'@example.test','unused','邮件测试',JSON.stringify([role]),'now']);
+      await db.pool.query('INSERT INTO sessions(token_hash,account_id,expires_at,created_at) VALUES($1,$2,$3,$4)',[digest(session),id,Date.now()+60000,'now']);
+    }
+    const command=(action:string,input:Record<string,unknown>)=>executePostgres(db,token,action,input,randomUUID());
+    const fields={title:'原活动',description:'活动介绍',startAt:'2027-01-01T10:00:00+08:00',endAt:'2027-01-01T11:00:00+08:00',location:'图书馆',host:'学院',conditions:''};
+    const source={messageId:randomUUID(),subject:'活动',sender:'school@example.test',body:'待核对活动'};
+    const mail=await command('mail.import',source);
+    await command('mail.correct',{...fields,id:mail.id,reason:'核实原邮件'});
+    const {target,event}=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      return {target:await repo.get(mail.id),event:(await repo.all('activity')).find(e=>e.data.mailId===mail.id)!};
+    });
+    await executePostgres(db,studentToken,'relation.set',{id:event.id,kind:'save',enabled:true},randomUUID());
+    const revision=await command('mail.import',{...source,messageId:randomUUID(),subject:'地点更正',body:'活动地点：T2',revision:true});
+    const input={...fields,id:revision.id,expectedVersion:1,targetMailId:mail.id,targetVersion:target.version,confirmed:true,reason:'学校更正地点',location:'T2'};
+    await expect(command('mail.revise',{...input,targetVersion:0})).rejects.toThrow('已变化');
+    const key=randomUUID();
+    const result=await executePostgres(db,token,'mail.revise',input,key);
+    expect(await executePostgres(db,token,'mail.revise',input,key)).toEqual(result);
+    await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      expect((await repo.get(event.id)).data.location).toBe('T2');
+      expect(await repo.related(student,event.id,'save')).toBe(true);
+      expect((await repo.all('activity')).filter(e=>e.data.mailId===mail.id)).toHaveLength(1);
+      expect((await repo.get(revision.id)).data).toMatchObject({resolvedAs:'revision',targetMailId:mail.id});
+    });
+    expect((await db.pool.query("SELECT id FROM notifications WHERE entity_id=$1 AND event='activity.changed'",[event.id])).rows).toHaveLength(1);
+  });
   it('persists timetable corrections only for the owner and deduplicates retries', async () => {
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('table-owner','table@example.test',$1,'课表学生','now','[\"student\"]')",[hashPassword('Table-test-123')]);
     const auth=new PostgresAuth(db),token=(await auth.login('table@example.test','Table-test-123')).token;
