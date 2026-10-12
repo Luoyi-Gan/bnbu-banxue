@@ -44,5 +44,9 @@ export async function recognize(request: IncomingMessage) {
     );
   });
   demand(result.ok, "识别失败，原课表保留。", 502);
-  return { lessons: parseTimetableResponse(await result.json()) };
+  try {
+    return { lessons: parseTimetableResponse(await result.json()) };
+  } catch {
+    throw new ServiceError(502, "RECOGNITION_INVALID_RESPONSE", "识别服务返回的课表无效，原课表保留。");
+  }
 }
