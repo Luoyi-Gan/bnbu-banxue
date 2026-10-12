@@ -2,6 +2,7 @@ import type { RelationshipHistory } from '../v2/relationshipAdapter';
 import type { AlumniData } from "../v2/alumniModel";
 import type { SportsCompanion } from "./sportsCompanion";
 export interface LiveAccount {
+  studentNumber?: string | null;
   id: string;
   email: string;
   name: string;

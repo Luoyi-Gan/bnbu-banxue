@@ -1,3 +1,4 @@
+import { studentNumber } from './student-search';
 import { relationshipHistory } from './relationship-history';
 import { randomUUID } from "node:crypto";
 import { authenticate, demand, digest, timestamp, type Account } from "./auth";
@@ -237,7 +238,7 @@ export function snapshot(db: Database, actor: Account) {
   if (requiresPasswordChange(new Repository(db), actor))
     return {
       firstLoginOnly: true,
-      account: actor,
+      account: {...actor, studentNumber:studentNumber(db,actor)},
       entities: [],
       people: [],
       notifications: [],

@@ -1,3 +1,4 @@
+import { searchStudents } from './student-search';
 import {
   createServer,
   type IncomingMessage,
@@ -6,6 +7,7 @@ import {
 import { resolve } from "node:path";
 import {
   authenticate,
+  verifyOwnEmail,
   demand,
   digest,
   login,
@@ -482,6 +484,12 @@ export function createApiServer(
               options.localOutbox === true,
             ),
           );
+        }
+        if (pathname === "/api/auth/email/confirm") return send(response,200,verifyOwnEmail(db,authenticate(db,cookieToken(request)),input.code));
+        if (pathname === "/api/auth/email/request") {
+          const actor=authenticate(db,cookieToken(request));
+          demand(actor.status!=="banned","账号已封禁。",403);
+          return send(response,200,await sendVerification(db,actor.email,options.localOutbox===true));
         }
         if (pathname === "/api/auth/register")
           return send(response, 201, register(db, input));
@@ -1642,6 +1650,7 @@ export function createApiServer(
         });
         return response.end(bytes);
       }
+      if (request.method === "GET" && pathname === "/api/students/search") return send(response,200,searchStudents(db,authenticate(db,cookieToken(request)),new URL(request.url!,"http://localhost").searchParams.get("number") ?? ""));
       if (request.method === "GET" && pathname === "/api/workspace")
         return send(
           response,

@@ -173,16 +173,18 @@ export function register(
     409,
   );
   const passwordHash = hashPassword(input.password);
+  const registeredId = randomUUID();
   transaction(db, () => {
     db.prepare(
       "INSERT INTO accounts(id,email,password_hash,name,created_at) VALUES(?,?,?,?,?)",
     ).run(
-      randomUUID(),
+      registeredId,
       email,
       passwordHash,
       email.split("@")[0].slice(0, 20),
       timestamp(),
     );
+    db.prepare("INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES(?,?,?,?,?,?)").run(randomUUID(), "verifiedEmail", registeredId, JSON.stringify({email, source:"registration-code"}), timestamp(), timestamp());
     db.prepare("DELETE FROM email_challenges WHERE email=?").run(email);
   });
   return { registered: true };
@@ -280,4 +282,17 @@ export function authenticate(db: Database, token: string | undefined) {
   if (row.login_kind === "ADMIN" && row.status !== "active")
     throw new ServiceError(403, "ACCOUNT_DISABLED", "管理账号已停用。");
   return account(row);
+}
+
+export function verifyOwnEmail(db: Database, actor: Account, code: unknown) {
+  demand(actor.status !== 'banned', '账号已封禁。',403);
+  const row=db.prepare('SELECT * FROM email_challenges WHERE email=?').get(actor.email) as {code_hash:string;expires_at:number;attempts:number}|undefined;
+  demand(row && row.expires_at>Date.now() && row.attempts<5,'验证码已失效，请重新获取。');
+  db.prepare('UPDATE email_challenges SET attempts=attempts+1 WHERE email=?').run(actor.email);
+  demand(typeof code==='string' && digest(actor.email+':'+code)===row.code_hash,'验证码不正确。');
+  transaction(db,()=>{
+    db.prepare("INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES(?,?,?,?,?,?)").run(randomUUID(),'verifiedEmail',actor.id,JSON.stringify({email:actor.email,source:'own-email-code'}),timestamp(),timestamp());
+    db.prepare('DELETE FROM email_challenges WHERE email=?').run(actor.email);
+  });
+  return {verified:true};
 }

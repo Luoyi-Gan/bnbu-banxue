@@ -198,6 +198,12 @@ export function governanceCommand(
     );
     return repo.save(feedback, { status: "resolved", resolution: reason });
   }
+  if (action === "preferences.searchable") {
+    student(actor);
+    demand(typeof input.enabled === "boolean", "搜索开关必须为布尔值。");
+    const previous = repo.all("preferences").find(p => p.ownerId === actor.id);
+    return previous ? repo.save(previous, {searchable:input.enabled}) : repo.create("preferences", actor.id, {searchable:input.enabled});
+  }
   if (action === "preferences.reminders") {
     student(actor);
     const key = enumField(input, "key", ["messages", "teams"]);
