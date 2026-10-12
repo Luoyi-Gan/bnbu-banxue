@@ -6,3 +6,6 @@ export interface SportsCompanion {
   role: "student" | "teacher";
   progress: SportsProgress | null;
 }
+
+/** Not enrolled is a verified source result, never a fallback for a failed query. */
+export type SportsSourceStatus = "available" | "not-enrolled" | "unavailable";

@@ -4,11 +4,11 @@ import { strings } from './repository';
 import { has } from './community';
 import { readAlumni } from './alumni';
 import { bookingStatus } from '../../shared/v2/alumniPolicy';
-import type { SportsCompanion } from '../../shared/live/sportsCompanion';
+import type { SportsCompanion, SportsSourceStatus } from '../../shared/live/sportsCompanion';
 import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
 export interface SnapshotSource {
  repo: Pick<Repository,'all'|'get'|'people'>;
- firstLoginOnly:boolean;studentNumber:string|null;sports:SportsCompanion|null;
+ firstLoginOnly:boolean;studentNumber:string|null;sports:SportsCompanion|null;sportsStatus?:SportsSourceStatus;
  notifications:Fields[];relations:Fields[];audit:Fields[];notificationBatches:Fields[];
  coffeeHistory:(id:string)=>Fields[];
  relationshipHistory:(visible:Entity[])=>RelationshipHistory[];
@@ -212,6 +212,7 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
   return {
     account: {...actor, studentNumber:source.studentNumber},
     sports: source.sports,
+    sportsStatus: source.sportsStatus ?? "unavailable",
     entities,
     alumni: scopedAlumni,
     relationshipHistory: source.relationshipHistory(entities),
@@ -224,9 +225,8 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
       schoolIdentity: process.env.BNBU_IDENTITY_VERIFICATION_URL
         ? "configured"
         : "external-service-required",
-      sports: process.env.BNBU_SPORTS_ORIGIN
-        ? "configured"
-        : "external-service-required",
+      sports: source.sportsStatus === "available" || source.sportsStatus === "not-enrolled"
+        ? "configured" : "external-service-required",
       mail: "explicit-field-extraction",
       email: process.env.BNBU_EMAIL_DELIVERY_URL
         ? "configured"

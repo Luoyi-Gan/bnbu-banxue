@@ -1,6 +1,6 @@
 import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
 import type { AlumniData } from "../../shared/v2/alumniModel";
-import type { SportsCompanion } from "../../shared/live/sportsCompanion";
+import type { SportsCompanion, SportsSourceStatus } from "../../shared/live/sportsCompanion";
 export interface LiveAccount {
   studentNumber?: string | null;
   id: string;
@@ -21,6 +21,7 @@ export interface LiveEntity {
 }
 export interface Workspace {
   sports?: SportsCompanion | null;
+  sportsStatus?: SportsSourceStatus;
   firstLoginOnly?: boolean;
   notificationBatches?: {
     id: string;

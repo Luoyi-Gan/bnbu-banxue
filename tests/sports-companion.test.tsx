@@ -1,3 +1,5 @@
+import { SportsPortal } from '../src/live/SportsPortal';
+import type { Workspace } from '../src/live/api';
 import { expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
@@ -22,4 +24,12 @@ it('未配置真实体育源时不会展示伴学库残留的测试身份和运�
 });
 it('未接入的体育摘要不生成零进度卡片',()=>{
   expect(renderToStaticMarkup(<MemoryRouter><SportsProgressCard sports={null}/></MemoryRouter>)).toBe('');
+});
+
+it('确认无课保持空内容，读取失败不伪装无课，不按年级或管理员角色开放体育面板',()=>{
+ const workspace={account:{roles:['student']},sports:null,sportsStatus:'not-enrolled'} as Workspace;
+ const render=(value:Workspace)=>renderToStaticMarkup(<MemoryRouter><SportsPortal workspace={value}/></MemoryRouter>);
+ expect(render(workspace)).toBe('');
+ expect(render({...workspace,sportsStatus:'unavailable'})).toContain('无法确认课程情况');
+ expect(render({...workspace,sportsStatus:'unavailable',account:{...workspace.account,roles:['superadmin']}})).toContain('无法确认课程情况');
 });

@@ -9,11 +9,10 @@ import './sportsProgress.css'
 export function SportsProgressCard({ sports, href = '/v2/sports' }: { sports?: SportsCompanion | null; href?: string }) {
   const descriptionId = useId()
   const data = sports?.role === 'student' ? sports.progress : null
-  if (!data) return null
+  if (!data || data.status === 'not-enrolled') return null
   const status = sportsProgressLabel(data)
   const percent = data?.percent ?? null
-  const message = data?.status === 'not-enrolled' ? '加入本学期体育班级后，即可查看运动进度。'
-    : data?.status === 'sign-in' ? '进入体育平台完成登录与身份验证。'
+  const message = data?.status === 'sign-in' ? '进入体育平台完成登录与身份验证。'
     : data?.status === 'unavailable' ? '有效运动时长暂不可用，请进入体育平台查看。'
     : data?.status === 'no-target' ? '目标尚未提供，暂不计算完成率。'
     : data?.status === 'completed' ? '本学期已达标，继续保持运动习惯。'
