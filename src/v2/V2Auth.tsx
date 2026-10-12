@@ -12,6 +12,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import { authApi, AuthServiceError } from "./authApi";
+import { authReturnPath } from "./authReturnPath";
 import "./auth.css";
 
 type AuthMode = "login" | "register";
@@ -105,7 +106,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
       if (mode === "login") {
         if (adminLogin) await authApi.adminLogin(normalizedEmail, password);
         else await authApi.login(normalizedEmail, password);
-        navigate(location.state?.returnTo === "/v2/community" ? "/v2/community" : "/workspace", { replace: true });
+        navigate(authReturnPath(location.state?.returnTo), { replace: true });
       } else {
         await authApi.register(normalizedEmail, code.trim(), password);
         navigate("/v2/login", { replace: true, state: { registered: true } });

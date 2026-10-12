@@ -123,7 +123,7 @@ function V2Routes() {
   if (location.pathname === '/v2/login') return <V2Auth mode="login"/>
   if (location.pathname === '/v2/register') return <V2Auth mode="register"/>
   if (!session) return <p role="status">正在核对登录状态…</p>
-  if (session.anonymous) return <Navigate to="/v2/login" state={{returnTo: location.pathname}} replace/>
+  if (session.anonymous) return <Navigate to="/v2/login" state={{returnTo: location.pathname + location.search + location.hash}} replace/>
   if (session.error) return <p role="alert">{session.error}</p>
   if (!authorized) return <Navigate to="/workspace" replace/>
   if (state.role !== requestedRole) return <p role="status">正在切换本人已授权身份…</p>
