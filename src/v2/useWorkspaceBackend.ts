@@ -29,5 +29,5 @@ export function useWorkspaceBackend(pollMs = 0) {
     catch (failure) {if (active.current) setError(failure instanceof Error ? failure.message : '保存失败'); return false}
     finally {locked.current = false; if (active.current) setBusy(false)}
   }
-  return {data, error, busy, mutate}
+  return {data, error, busy, mutate, refresh}
 }

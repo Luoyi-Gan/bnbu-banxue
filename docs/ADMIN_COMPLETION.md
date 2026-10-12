@@ -2357,3 +2357,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 审核员浏览器权限补验（4188）：独立 reviewer 账号登录进入 /v2/admin。原版邮件页仍展示导入表单，但不返回内部邮件；填入示例并提交，服务端拒绝：需要运营职责，页面记录仍为0。截图 .runtime/reviewer-mail-denied-browser-proof.png。这证明服务端拒绝越权，不代表邮件页入口权限展示已完善。
 
 2026-10-12 邮件页面职责接线修复：保持原表单和布局，按后端 account.roles 仅允许 operator/superadmin 操作；无运营职责时禁用示例、输入、附件及导入，并在现有提示框说明原因，动作函数同步拦截。后端权限不变。前端类型检查、文件 ESLint、Docker 前端重建通过；4188 浏览器审核员复验全部导入控件禁用，截图 .runtime/reviewer-mail-disabled-browser-proof.png。
+
+2026-10-12 用户批准后，原版邮件详情复用 MailResolution 新增拆分多场活动、关联更正原活动两个入口；仅运营职责可见，成功后关闭原详情并刷新共享数据。未修改 CSS 或其他布局。类型检查、ESLint、Docker 前端构建通过；4188 已看到待核实邮件的两个入口，截图 .runtime/mail-resolution-entry-browser-proof.png。运营浏览器另已验证示例导入自动发布、修改地点并成功保存；新增入口的浏览器提交全链仍需补验，后端对应 PostgreSQL 测试已通过。

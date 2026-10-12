@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Mail } from 'lucide-react'
+import { MailResolution } from '../live/MailResolution'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, PageHeading, SectionHeading } from './ui'
 import { mailFieldLabels, normalizeMailTime, type MailActivityFields, type MailSource } from '../../shared/v2/mailActivityAdapter'
@@ -77,6 +78,7 @@ export function AdminMailActivities() {
     </section>
     {current && <Drawer title={current.fields.title || current.source.subject} eyebrow={labels[current.status]} onClose={() => setSelected('')} wide>
       {notice}
+      {canOperate && <MailResolution source={live.data.entities.find(e => e.id === current.entityId)!} mails={live.data.entities.filter(e => e.kind === 'mail')} onSaved={async () => {setSelected(''); await live.refresh()}} />}
       {current.status === 'pending' && <div className="v2-info-box">待核实：{current.extraction.issues.join('；')}。核实补全并保存后自动发布。</div>}
       <details><summary>邮件原文与识别依据</summary><p>标识：{current.source.messageId}</p><p>发件人：{current.source.sender || '未提供'}</p><p>主题：{current.source.subject}</p><pre className="v2-mail-original">{current.source.body}</pre>{entries.map(([key, label]) => <p key={key}>{label}：{current.extraction.evidence[key] || '未识别到明确依据'}</p>)}</details>
       {current.source.cover && <figure><img className="v2-mail-cover" src={current.source.cover.data} alt="活动封面"/><figcaption>邮件附件：{current.source.cover.name}</figcaption></figure>}
