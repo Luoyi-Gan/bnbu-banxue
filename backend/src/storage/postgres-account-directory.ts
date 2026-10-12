@@ -5,8 +5,9 @@ import { projectAccountDirectory } from '../sports/account-directory';
 import { PostgresAuth } from './postgres-auth';
 import type { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
+import {portalAccountProjection} from '../sports/portal-accounts';
 
-export async function postgresAccountDirectory(db:PostgresDatabase,token:string,kind:'student'|'teacher',input:Fields) {
+export async function postgresAccountDirectory(db:PostgresDatabase,token:string,kind:'student'|'teacher',input:Fields,native=false) {
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
@@ -18,6 +19,7 @@ export async function postgresAccountDirectory(db:PostgresDatabase,token:string,
     demand(!system || system.data.mode==='NORMAL','体育服务维护中，普通业务暂停。',503);
     const entities=[...identities,...await repo.all('sportsSemester'),...await repo.all('sportsEnrollment'),...await repo.all('sportsCourse')];
     const accounts=(await client.query<Fields>('SELECT id,name,organization,status,email FROM accounts')).rows;
-    return projectAccountDirectory({all:type=>entities.filter(e=>e.kind===type)},accounts,kind,input);
+    const page=projectAccountDirectory({all:type=>entities.filter(e=>e.kind===type)},accounts,kind,input);
+    return native?portalAccountProjection(page,kind,id=>identities.find(i=>i.id===id)!.createdAt):page;
   });
 }

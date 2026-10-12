@@ -20,7 +20,7 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     }
     const email='same@bnbu.edu.cn',password='Isolation-test-123';
     for(const [i,db] of databases.entries())await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',['account-'+i,email,hashPassword(password),'Person '+i,'["student"]','now']);
-    await databases[1].transaction(client=>new PostgresRepository(client).create('sportsIdentity','account-1',{role:'student',status:'verified'}));
+    await databases[1].transaction(client=>new PostgresRepository(client).create('sportsIdentity','account-1',{role:'student',status:'verified',collegeName:'Test college',majorName:'Test major',studentNumber:'2030123456'}));
     const urls:string[]=[];
     for(const [i,db] of databases.entries()){
       const server=createPostgresApiServer(db,{surface:i===0?'companion':'sports'});servers.push(server);
@@ -76,6 +76,13 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     await databases[1].transaction(client=>new PostgresRepository(client).create('sportsIdentity','governor',{role:'admin',status:'verified'}));
     const governorLogin=await post(1,'/api/v1/auth/password-login',{account:'governor@bnbu.edu.cn',password});
     const governorCookie=governorLogin.headers.get('set-cookie')!.split(';')[0];
+    const directoryResponse=await fetch(urls[1]+'/api/v1/students?limit=1',{headers:{Cookie:governorCookie}});
+    expect(directoryResponse.status).toBe(200);const directory=await directoryResponse.json();
+    expect(directory.meta.pagination.limit).toBe(1);
+    expect(directory.data[0]).toMatchObject({id:'account-1',studentNumber:'2030123456',collegeName:'Test college',majorName:'Test major'});
+    expect(directory.data[0]).not.toHaveProperty('identityId');
+    expect((await fetch(urls[1]+'/api/v1/students',{headers:{Cookie:sportsCookie}})).status).toBe(403);
+    expect((await fetch(urls[1]+'/api/v1/admin/teacher-accounts',{headers:{Cookie:governorCookie}})).status).toBe(200);
     for(let i=0;i<6;i++)await databases[1].transaction(client=>new PostgresRepository(client).create('sportsHelp','governor',{status:i===0?'published':'draft',firstPublishedAt:Date.now(),titleZh:'帮助'+i,titleEn:'Help '+i,bodyZh:'内容',bodyEn:'Content',keywords:['help'],category:'LOGIN',weight:i}));
     const helpGet=(path:string,cookie=governorCookie)=>fetch(urls[1]+path,{headers:{Cookie:cookie}});
     const helpPage=(await (await helpGet('/api/v1/admin/help-articles?page=1')).json()).data;

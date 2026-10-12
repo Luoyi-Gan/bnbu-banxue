@@ -60,6 +60,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
       if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && ['/api/v1/students','/api/v1/teachers','/api/v1/admin/teacher-accounts'].includes(pathname)) {
+        const input=Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams);
+        if(input.after!==undefined){demand(input.cursor===undefined,'分页参数重复。');input.cursor=input.after;delete input.after;}
+        const page=await postgresAccountDirectory(db,cookieToken(request) ?? '',pathname==='/api/v1/students'?'student':'teacher',input,true);
+        return send(response,200,pathname==='/api/v1/admin/teacher-accounts'?{data:{items:page.items,nextCursor:page.nextCursor}}:{data:page.items,meta:{pagination:{total:page.total,hasMore:page.nextCursor!==null,nextCursor:page.nextCursor,limit:Number(input.limit ?? 20)}}});
+      }
       const adminHelp=/^\/api\/v1\/admin\/help-articles(?:\/([^/]+))?$/.exec(pathname);
       if(request.method==='GET' && pathname==='/api/v1/student/help-articles')return send(response,200,{data:await postgresStudentHelp(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
       if(request.method==='GET' && adminHelp)return send(response,200,{data:await postgresAdminHelp(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams),adminHelp[1]?decodeURIComponent(adminHelp[1]):undefined)});

@@ -147,8 +147,10 @@ export function portalAccountPage(
   input: Fields,
 ) {
   const page = accountDirectory(repo, actor, kind, input);
+  return portalAccountProjection(page,kind,id=>repo.get(id,'sportsIdentity').createdAt);
+}
+export function portalAccountProjection(page:ReturnType<typeof accountDirectory>,kind:'student'|'teacher',createdAt:(id:string)=>string) {
   const items = page.items.map((row) => {
-    const identity = repo.get(row.identityId, "sportsIdentity");
     const common = {
       id: row.id,
       userId: row.id,
@@ -157,7 +159,7 @@ export function portalAccountPage(
       collegeName: row.college,
       email: row.verifiedEmail,
       status: row.status,
-      createdAt: identity.createdAt,
+      createdAt: createdAt(row.identityId),
       updatedAt: row.updatedAt,
       deletedAt: null,
       version: row.version,

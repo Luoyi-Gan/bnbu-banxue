@@ -211,6 +211,8 @@ try {
      UPDATE entities SET owner_id='${teacherId}',data=(data::jsonb || '{"weeklyLimit":3,"relatedTarget":600,"otherTarget":600}'::jsonb)::text WHERE id='${courseId}';`],{stdio:'pipe'});
   const studentCookie=cookie;
   assert.equal((await request('/api/v1/auth/password-login',{account:adminLogin,password})).data.user.role,'ADMIN');
+  assert.ok((await request('/api/v1/teachers?id='+teacherId)).data.some(item=>item.id===teacherId));
+  assert.ok((await request('/api/v1/students?id='+actor.id)).data.some(item=>item.id===actor.id));
   const subadmin=await sessionWrite('/api/v1/admin/subadmins',{identityVerifiedByAdmin:true,email:teacherEmail,account:'sub-'+randomUUID(),name:'Docker subadmin',department:'Local test',permissions:['HELP_CENTER'],initialPassword:password,confirmPassword:password});
   assert.ok((await request('/api/v1/admin/subadmins')).data.items.some(item=>item.id===subadmin.id));
   const editedSubadmin=await sessionWrite('/api/v1/admin/subadmins/'+subadmin.id+'/profile',{expectedVersion:subadmin.version,name:'Docker edited subadmin',email:teacherEmail,department:'Local test',permissions:['AUDIT_QUERY']});

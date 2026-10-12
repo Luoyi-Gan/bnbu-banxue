@@ -68,12 +68,12 @@ export function projectAccountDirectory(repo:Pick<Repository,'all'>,accounts:Fie
             typeof i.data.organizationId === "string"
               ? i.data.organizationId
               : null,
-          college: String(i.data.college ?? row.organization ?? ""),
+          college: String(i.data.collegeName ?? i.data.college ?? row.organization ?? ""),
           department: String(i.data.department ?? ""),
-          major: kind === "student" ? String(i.data.major ?? "") : null,
+          major: kind === "student" ? String(i.data.majorName ?? i.data.major ?? "") : null,
           administrativeClass:
             kind === "student"
-              ? String(i.data.administrativeClass ?? "")
+              ? String(i.data.administrativeClassName ?? i.data.administrativeClass ?? "")
               : null,
           sex:
             kind === "student" &&
