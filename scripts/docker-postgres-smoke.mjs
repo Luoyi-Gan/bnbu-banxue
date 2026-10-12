@@ -71,9 +71,32 @@ const stored=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu',
 assert.equal(stored,'false');
 assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Image did not survive restart');
 if(companionOnly) {
+  const authorCookie=cookie,viewerId=randomUUID(),reviewerId=randomUUID();
+  for(const [id,role] of [[viewerId,'student'],[reviewerId,'reviewer']]) {
+    docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at) SELECT '${id}','${id}@example.test',password_hash,'Docker ${role}','["${role}"]','now' FROM accounts WHERE id='${actor.id}'`],{stdio:'pipe'});
+  }
+  const command=(action,input,requestId=randomUUID())=>request('/api/commands',{action,input,requestId});
+  const postInput={title:'Docker社区审核验收',body:'独立本地夹具',board:'校园'},postKey=randomUUID();
+  const post=await command('post.create',postInput,postKey);
+  assert.deepEqual(await command('post.create',postInput,postKey),post);
+  const postId=post.data.id;
+  const denied=await fetch(base+'/api/commands',{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json'},body:JSON.stringify({action:'content.review',input:{id:postId,status:'visible'},requestId:randomUUID()})});
+  assert.equal(denied.status,403);
+  await request('/api/auth/sign-in',{identifier:viewerId+'@example.test',password});
+  assert.ok(!(await request('/api/community')).posts.some(p=>p.id===postId));
+  await request('/api/auth/sign-in',{identifier:reviewerId+'@example.test',password});
+  await command('content.review',{id:postId,status:'visible'});
+  await request('/api/auth/sign-in',{identifier:viewerId+'@example.test',password});
+  assert.ok((await request('/api/community')).posts.some(p=>p.id===postId));
+  await command('relation.set',{id:postId,kind:'like',enabled:true});
+  await command('relation.set',{id:postId,kind:'save',enabled:true});
+  const view=await request('/api/community');assert.ok(view.likedPosts.includes(postId));assert.ok(view.savedPosts.includes(postId));
+  cookie=authorCookie;
+  assert.ok((await request('/api/workspace')).notifications.some(n=>n.entityId===postId));
   await request('/api/auth/logout',{});
   assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
-  console.log('PASS companion-only Docker: registration, login, preferences, object persistence across restart, and logout. No sports writes executed.');
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`DELETE FROM sessions WHERE account_id IN ('${actor.id}','${viewerId}','${reviewerId}'); UPDATE accounts SET status='banned',roles='[]' WHERE id IN ('${actor.id}','${viewerId}','${reviewerId}')`],{stdio:'pipe'});
+  console.log('PASS companion-only Docker: registration, persistence across restart, community moderation/visibility/notification, likes, saves and logout. No sports writes executed.');
   process.exit(0);
 }
 const companionCookie=cookie,companionId=actor.id;
