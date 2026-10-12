@@ -41,6 +41,31 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("校友方向只接受升学或就业，非法输入不创建或覆盖业务记录", () => {
+    const { a, admin, run, db, repo } = setup();
+    const input = { major: "计算机", graduationYear: 2024, city: "珠海",
+      direction: "就业", experience: "工作", topics: "实习", bio: "介绍", evidence: "测试核验说明" };
+    for (const direction of [undefined, "其他", "", 1]) {
+      expect(() => run(a, "alumni.apply", { ...input, direction })).toThrow();
+      expect(snapshot(db, admin.account).alumni.profiles).toHaveLength(0);
+    }
+    run(a, "alumni.apply", input);
+    const profile = snapshot(db, admin.account).alumni.profiles[0];
+    run(admin, "alumni.review", { id: profile.id, approve: true });
+    const before = snapshot(db, a.account).alumni;
+    for (const direction of [undefined, "其他", "", 1]) {
+      expect(() => run(a, "alumni.profile", { ...input, direction, accepting: true })).toThrow();
+      expect(() => run(a, "alumni.post", { direction, title: "经验", body: "分享内容" })).toThrow();
+      expect(snapshot(db, a.account).alumni).toEqual(before);
+      expect(repo.all("post")).toHaveLength(0);
+    }
+    run(a, "alumni.profile", { ...input, direction: "升学", accepting: true });
+    expect(snapshot(db, a.account).alumni.profiles[0].direction).toBe("升学");
+    for (const direction of ["升学", "就业"]) {
+      const post = run(a, "alumni.post", { direction, title: "经验", body: "分享内容" });
+      expect(repo.get(post.id).data.board).toBe(`校友${direction}`);
+    }
+  });
   it("举报队伍不向非成员泄露历史成员名单，审核证据保持完整", () => {
     const { a, b, c, reviewer, operator, run, db, repo } = setup();
     const room = run(a, "room.create", {

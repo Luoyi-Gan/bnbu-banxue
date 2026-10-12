@@ -15,6 +15,7 @@ import { demand, type Account } from "./auth";
 import { canSpeak, reviewer, student } from "./community";
 import {
   integerField,
+  enumField,
   Repository,
   textField,
   type Entity,
@@ -51,7 +52,7 @@ export function alumniCommand(
       (p) => p.owner === actor.id && p.status === "approved",
     );
     demand(profile, "需要本人已通过校友认证。", 403);
-    const direction = input.direction === "升学" ? "升学" : "就业";
+    const direction = enumField(input, "direction", ["升学", "就业"]);
     return repo.create("post", actor.id, {
       alumniId: profile.id,
       title: textField(input, "title", 80),
@@ -102,8 +103,7 @@ export function alumniCommand(
   let next: V2State;
   const profileInput = () => ({
     city: textField(input, "city", 40),
-    direction:
-      input.direction === "升学" ? ("升学" as const) : ("就业" as const),
+    direction: enumField(input, "direction", ["升学", "就业"]),
     experience: textField(input, "experience", 120),
     topics: textField(input, "topics", 120),
     bio: textField(input, "bio", 500, true),
