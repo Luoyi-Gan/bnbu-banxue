@@ -11,6 +11,9 @@ import { PostgresAuth } from '../backend/src/storage/postgres-auth';
 import { PostgresEmail } from '../backend/src/storage/postgres-email';
 import { createPostgresApiServer } from '../backend/src/postgres-api';
 import type { AddressInfo } from 'node:net';
+import { executePostgres } from '../backend/src/storage/postgres-commands';
+import { occupiedPolicy } from '../backend/src/coffee';
+import { runAsync } from '../backend/src/storage/effects';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -255,5 +258,40 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await db.pool.query('SELECT * FROM audit WHERE entity_id=$1',[id])).rows).toHaveLength(4);
       expect((await command(student.token,'post.create',{title:'不同操作',body:'正文',board:'校园'},requestId)).status).toBe(409);
     } finally { await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve())); }
+  });
+  it('preserves coffee capacity under concurrent booking, reserves both times until acceptance and releases cancellation', async () => {
+    const auth = new PostgresAuth(db);
+    const tokens: Record<string,string> = {};
+    for(const [id,role] of [['coffee-teacher','teacher'],['coffee-a','student'],['coffee-b','student']]) {
+      await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES($1,$2,$3,$1,$4,$5)',[id,`${id}@example.test`,hashPassword('Coffee-test-123'),new Date().toISOString(),JSON.stringify([role])]);
+      tokens[id]=(await auth.login(`${id}@example.test`,'Coffee-test-123')).token;
+    }
+    const command=(who:string,action:string,input:Record<string,unknown>)=>executePostgres(db,tokens[who],action,input,randomUUID());
+    const start=Date.now()+86400_000;
+    const first=await command('coffee-teacher','coffee.slot.create',{startAt:new Date(start).toISOString(),endAt:new Date(start+3600_000).toISOString(),capacity:1,location:'图书馆'});
+    const second=await command('coffee-teacher','coffee.slot.create',{startAt:new Date(start+7200_000).toISOString(),endAt:new Date(start+10800_000).toISOString(),capacity:1,location:'图书馆'});
+    const races=await Promise.allSettled(['coffee-a','coffee-b'].map(who=>command(who,'coffee.book',{slotId:first.id,topic:'学习交流'})));
+    expect(races.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+    const winnerIndex=races.findIndex(r=>r.status==='fulfilled');
+    const winner=['coffee-a','coffee-b'][winnerIndex],loser=['coffee-a','coffee-b'][1-winnerIndex];
+    const result=races[winnerIndex];
+    if(result.status!=='fulfilled') throw new Error('Expected confirmed booking');
+    const bookingId=result.value.id;
+    await command('coffee-teacher','coffee.move',{id:bookingId,slotId:second.id,reason:'老师改期'});
+    await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      expect((await repo.get(bookingId)).data.slotId).toBe(first.id);
+      expect(await runAsync(occupiedPolicy(repo,first.id))).toBe(1);
+      expect(await runAsync(occupiedPolicy(repo,second.id))).toBe(1);
+    });
+    await expect(command(loser,'coffee.book',{slotId:second.id,topic:'不能占用预留'})).rejects.toMatchObject({status:409});
+    await command(winner,'coffee.answer',{id:bookingId,accept:true});
+    await db.transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      expect((await repo.get(bookingId)).data.slotId).toBe(second.id);
+      expect(await runAsync(occupiedPolicy(repo,first.id))).toBe(0);
+    });
+    await command(winner,'coffee.cancel',{id:bookingId,reason:'取消测试'});
+    expect(await command(loser,'coffee.book',{slotId:second.id,topic:'名额已释放'})).toHaveProperty('id');
   });
 });

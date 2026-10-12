@@ -1451,3 +1451,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### PostgreSQL 社区读取与关系操作
 社区输出提取为两数据库共用 projectCommunity；SQLite 点赞统计改为一次分组查询，PostgreSQL 在只读一致性事务内读取帖子、评论、当前账号关系及真实点赞数，保留原初始改密门禁与返回格式。关系操作抽取共用 relationPolicy，保留对象公开状态、学生权限与活动时间限制，PostgreSQL 审计保存关系种类及开关事实。
 45 项针对测试通过（PostgreSQL 13、原 HTTP 与并发 32）；新增 HTTP 断言覆盖作者看到待审帖、他人不可见、通过后可见、点赞统计和本人收藏/点赞隔离。服务端类型检查通过，清理重构后未使用导入后修改文件 ESLint 通过。PostgreSQL 完整 workspace、通知和其他业务仍待迁移，未切换原页面验收服务。
+
+### PostgreSQL 教师预约共用规则及并发验证
+将 coffeeCommand、占用与冲突判断提取为同一份可同步/异步驱动策略，SQLite 包装保留原接口；包括教师资料、时段创建/修改、预约、取消、改期及回应，继续核对校友交流冲突。PostgreSQL 命令入口接入 coffeePolicy，回应审计保留 accepted 字段，布尔参数仍明确校验。
+54 项测试通过（PostgreSQL 14 加原后端主链 40）。真实 PostgreSQL 场景覆盖两学生抢容量 1、改期待确认保留原预约且双占用、第三方不能抢改期预留、接受释放旧时段、取消后另一学生可预约。服务端类型检查及修改文件 lint 通过。预约页面读取仍待完整 workspace 投影迁移，不将命令测试视为页面全链已切换。
