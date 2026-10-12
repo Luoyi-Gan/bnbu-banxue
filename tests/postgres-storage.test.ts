@@ -129,6 +129,21 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const history=(await db.pool.query("SELECT data FROM entities WHERE kind='sportsAdminHistory' AND data::jsonb->>'administratorId'=$1",[identity.ownerId])).rows;
       expect(history).toHaveLength(1);
       expect(JSON.stringify(history)).not.toContain('New-manager-123');
+      await db.pool.query("INSERT INTO mail_outbox VALUES('admin-edit-mail',$1,'test','code','now',NULL)",[input.email]);
+      await db.pool.query("INSERT INTO admin_security_challenges(id,account_id,purpose,email,code_hash,expires_at,sent_at,identity_version,mail_id) VALUES('admin-edit-challenge',$1,'EMAIL_VERIFY',$2,'hash',9999999999999,1,1,'admin-edit-mail')",[identity.ownerId,input.email]);
+      await db.pool.query("INSERT INTO email_challenges VALUES($1,'personal-proof',9999999999999,0,1)",[input.email]);
+      const edit={id:identity.id,version:identity.version,name:'修改后',email:'changed-manager@bnbu.edu.cn',department:'新部门',permissions:['HELP'],confirmed:true};
+      await expect(executePostgres(db,root,'sports.admins.edit',{...edit,loginName:'forbidden'},randomUUID())).rejects.toThrow('不允许的字段');
+      await expect(executePostgres(db,root,'sports.admins.edit',{...edit,version:0},randomUUID())).rejects.toMatchObject({status:409});
+      expect((await db.pool.query("SELECT id FROM admin_security_challenges WHERE id='admin-edit-challenge'")).rows).toHaveLength(1);
+      await executePostgres(db,root,'sports.admins.edit',edit,randomUUID());
+      const changed=await db.transaction(client=>new PostgresRepository(client).get(identity.id));
+      expect(changed.data.permissions).toEqual(['HELP']);
+      expect(changed.data.schoolEmailVerified).toBe(false);
+      expect((await db.pool.query("SELECT id FROM admin_security_challenges WHERE id='admin-edit-challenge'")).rows).toHaveLength(0);
+      expect((await db.pool.query("SELECT id FROM mail_outbox WHERE id='admin-edit-mail'")).rows).toHaveLength(0);
+      expect((await db.pool.query('SELECT email FROM email_challenges WHERE email=$1',[input.email])).rows).toHaveLength(1);
+      expect((await auth.login('new-manager','New-manager-123')).account.email).toBe(edit.email);
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {

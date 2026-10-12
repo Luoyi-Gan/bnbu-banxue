@@ -57,6 +57,30 @@ export async function postgresAdministratorCreate(repo:PostgresRepository,actor:
   return {id:saved.id};
 }
 
+export async function postgresAdministratorEdit(repo:PostgresRepository,actor:Account,input:Fields) {
+  await requirePostgresSuperAdmin(repo,actor);
+  demand(Object.keys(input).every(k=>['id','version','name','email','department','permissions','confirmed'].includes(k)),'管理账号操作包含不允许的字段。');
+  demand(input.confirmed===true,'须核对账号资料、全部权限及高风险权限后确认。');
+  const identity=await repo.get(input.id,'sportsIdentity');
+  demand(identity.data.role==='admin' && identity.ownerId!==actor.id,'不能修改本人或非分管理员账号。',403);
+  const row=(await repo.client.query('SELECT login_kind,roles,name,email,organization FROM accounts WHERE id=$1 FOR UPDATE',[identity.ownerId])).rows[0];
+  demand(row?.login_kind==='ADMIN' && !JSON.parse(row.roles).includes('superadmin'),'仅可管理独立分管理员账号。',403);
+  version(identity,input);
+  const name=textField(input,'name',40),email=normalizeEmail(input.email),department=textField(input,'department',200,true);
+  const domains=(process.env.BNBU_SCHOOL_EMAIL_DOMAINS ?? 'bnbu.edu.cn').split(',').map(d=>d.trim().toLowerCase()).filter(Boolean);
+  demand(domains.includes(email.split('@')[1]),'请填写已配置学校域名的邮箱。');
+  demand(Array.isArray(input.permissions) && input.permissions.length>0 && input.permissions.every(p=>sportsPermissions.includes(p)) && new Set(input.permissions).size===input.permissions.length,'须选择至少一项固定业务权限，不得授予管理账号或教师权限。');
+  demand(!(await repo.client.query("SELECT id FROM accounts WHERE email=$1 AND login_kind='ADMIN' AND id<>$2",[email,identity.ownerId])).rows.length,'学校邮箱已被另一分管理员使用。',409);
+  if(row.email!==email) {
+    await repo.client.query('DELETE FROM mail_outbox WHERE id IN (SELECT mail_id FROM admin_security_challenges WHERE account_id=$1)',[identity.ownerId]);
+    await repo.client.query('DELETE FROM admin_security_challenges WHERE account_id=$1',[identity.ownerId]);
+  }
+  await repo.client.query('UPDATE accounts SET name=$1,email=$2,organization=$3 WHERE id=$4',[name,email,department,identity.ownerId]);
+  await repo.create('sportsAdminHistory',actor.id,{administratorId:identity.ownerId,action:'sports.admins.edit',before:{name:row.name,email:row.email,organization:row.organization,permissions:identity.data.permissions},after:{name,email,organization:department,permissions:input.permissions}});
+  const saved=await repo.save(identity,{permissions:input.permissions,...(row.email!==email?{schoolEmailVerified:false,schoolEmail:null}:{})});
+  return {id:saved.id};
+}
+
 export async function postgresAdministratorDirectory(db:PostgresDatabase, token:string) {
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
