@@ -97,6 +97,18 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     expect((await helpGet('/api/v1/admin/help-articles',sportsCookie)).status).toBe(403);
     expect((await helpGet('/api/v1/admin/help-articles?page=0')).status).toBe(400);
     const write=(path:string,input:unknown,key=randomUUID())=>fetch(urls[1]+path,{method:'POST',headers:{'Content-Type':'application/json',Cookie:governorCookie,'Idempotency-Key':key},body:JSON.stringify(input)});
+    await databases[1].transaction(client=>new PostgresRepository(client).create('sportsConversionTable','governor',{sex:'MALE',group:'JUNIOR',event:1000,rows:[{id:'initial',min:201,max:400,score:60,grade:'PASS',note:''}]}));
+    const tableInput={gender:'male',gradeGroup:'freshman_sophomore',runType:'1000m',expectedVersion:1,minSeconds:0,maxSeconds:200,score:100,tier:'excellent',note:'Test'};
+    const added=await write('/api/v1/admin/endurance-tables/rules',tableInput);expect(added.status).toBe(200);
+    const table=(await added.json()).data;expect(table.bands).toHaveLength(2);
+    const bandPath='/api/v1/admin/endurance-tables/rules/'+encodeURIComponent(table.bands[0].id);
+    const editInput={...tableInput,expectedVersion:table.version,note:'Updated'},editKey=randomUUID();
+    const editedTable=(await (await write(bandPath,editInput,editKey)).json()).data;
+    expect(editedTable.bands[0].note).toBe('Updated');
+    expect((await (await write(bandPath,editInput,editKey)).json()).data.version).toBe(editedTable.version);
+    expect((await write(bandPath,editInput)).status).toBe(409);
+    expect((await fetch(urls[1]+'/api/v1/admin/endurance-tables',{headers:{Cookie:sportsCookie}})).status).toBe(403);
+    expect((await write('/api/v1/admin/endurance-tables/rules/'+encodeURIComponent(table.id+':initial')+'/delete',{gender:tableInput.gender,gradeGroup:tableInput.gradeGroup,runType:tableInput.runType,expectedVersion:editedTable.version})).status).toBe(200);
     const articleInput={expectedVersion:0,titleZh:'新增帮助',titleEn:'New help',bodyZh:'说明',bodyEn:'Instructions',keywords:['new'],category:'checkin',sortWeight:20,status:'draft'};
     const article=(await (await write('/api/v1/admin/help-articles',articleInput)).json()).data;
     expect(article.category).toBe('checkin');expect(article.status).toBe('draft');

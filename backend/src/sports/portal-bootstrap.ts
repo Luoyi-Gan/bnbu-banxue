@@ -133,7 +133,7 @@ export function portalHealth(repo: Repository, actor: Account) {
   };
 }
 
-export function portalEnduranceTables(repo: Repository, actor: Account) {
+export function portalEnduranceTables(repo: Pick<Repository,'all'>, actor: Account) {
   sportsAccountGate(repo, actor);
   requireSportsPermission(repo, actor, "GLOBAL_RULES");
   sportsWriteGate(repo, "sports.conversion.read");

@@ -234,7 +234,8 @@ try {
   const conversionTables=(await request('/api/sports/workspace')).conversionTables;
   assert.equal(conversionTables.length,4);assert.equal(conversionTables.reduce((n,t)=>n+t.data.rows.length,0),404);
   const conversionTable=conversionTables[0],conversionRow=conversionTable.data.rows[0];
-  await request('/api/commands',{action:'sports.conversion.edit',input:{id:conversionTable.id,version:conversionTable.version,rowId:conversionRow.id,min:conversionRow.min,max:conversionRow.max,score:conversionRow.score,grade:conversionRow.grade,note:'Docker verification'},requestId:randomUUID()});
+  const nativeTable=(await request('/api/v1/admin/endurance-tables')).data.find(table=>table.id===conversionTable.id);
+  await sessionWrite('/api/v1/admin/endurance-tables/rules/'+encodeURIComponent(conversionTable.id+':'+conversionRow.id),{gender:nativeTable.gender,gradeGroup:nativeTable.gradeGroup,runType:nativeTable.runType,expectedVersion:conversionTable.version,minSeconds:conversionRow.min,maxSeconds:conversionRow.max,score:conversionRow.score,tier:conversionRow.grade.toLowerCase(),note:'Docker verification'});
   const changedConversion=(await request('/api/sports/workspace')).conversionTables.find(t=>t.id===conversionTable.id);
   assert.equal(changedConversion.version,conversionTable.version+1);assert.equal(changedConversion.data.rows[0].note,'Docker verification');
   await request('/api/commands',{action:'sports.conversion.edit',input:{id:conversionTable.id,version:changedConversion.version,rowId:conversionRow.id,min:conversionRow.min,max:conversionRow.max,score:conversionRow.score,grade:conversionRow.grade,note:conversionRow.note},requestId:randomUUID()});

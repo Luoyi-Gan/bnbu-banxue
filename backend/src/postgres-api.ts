@@ -1,4 +1,5 @@
 import { postgresCourseReport } from './storage/postgres-course-report';
+import {postgresEnduranceTables,postgresEnduranceWrite} from './storage/postgres-endurance-tables';
 import { postgresRuleTemplates } from './storage/postgres-rule-templates';
 import { postgresInvitationPreview } from './storage/postgres-invitation-preview';
 import { requestStudentJoinEmail, verifyStudentJoinEmail } from './storage/postgres-student-email';
@@ -60,6 +61,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
       if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && pathname==='/api/v1/admin/endurance-tables')return send(response,200,{data:await postgresEnduranceTables(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && ['/api/v1/students','/api/v1/teachers','/api/v1/admin/teacher-accounts'].includes(pathname)) {
         const input=Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams);
         if(input.after!==undefined){demand(input.cursor===undefined,'分页参数重复。');input.cursor=input.after;delete input.after;}
@@ -208,6 +210,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:{user:result.user}});
         }
         const subadminWrite=/^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(pathname);
+        const enduranceWrite=/^\/api\/v1\/admin\/endurance-tables\/rules(?:\/([^/]+)(\/delete)?)?$/.exec(pathname);
+        if(enduranceWrite) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          return send(response,200,{data:await postgresEnduranceWrite(db,cookieToken(request) ?? '',enduranceWrite[1]?decodeURIComponent(enduranceWrite[1]):undefined,!!enduranceWrite[2],input,key)});
+        }
         if(adminHelp) {
           demand(!Object.hasOwn(input,'id'),'文章标识只能来自路径。');
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
