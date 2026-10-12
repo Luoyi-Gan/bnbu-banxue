@@ -2394,3 +2394,11 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 浏览器证据：.runtime/sports-ui-restored-browser-proof.png、teacher-sports-ui-restored-browser-proof.png、relationship-no-overlap-browser-proof.png、activity-photo-restored-browser-proof.png。测试和lint报告为.runtime/ui-repair-tests.json和ui-repair-lint.json。本轮存档 D:/伴学/archive/goal-scope-rollback-20261012/ui-repair-20261012，包括新的源码bundle、报告与截图；早前final-local-delivery不作为本轮修复版本。
 
 体育真实源仍待服务器部署配置与授权映射，Workspace.sportsDashboard只是预留投影，不表示已接真实数据。活动图片修复未改写活动或邮件数据库，也未重加旧模拟活动。先前“保留原布局/本地构建通过”的总体结论不足以覆盖这些回归和干净检出，已在交接开头更正。
+
+## 2026-10-12 本批最终核对
+
+用户已确认原体育 UI 指蓝色横幅、统计卡、图表的伴学看板；该套界面恢复符合本次要求。额外修复了初始加载和网络失败时看板消失，以及学生跳入教师管理页的问题。学生入口由部署参数独立配置，尚无地址时明确不可点击；教师沿用用户提供地址。体育数据仍未接入，未运行或修改独立体育业务。
+
+最终唯一测试集277/277通过、零失败零跳过，201文件ESLint零错误零警告；前端类型检查随Docker构建通过，服务端类型检查通过。临时干净导出已移到仓库之外，避免测试工具把备份测试重复计数。从Git已跟踪文件独立导出的源码完成前端与后端Docker构建，遗漏mockData.ts的问题不再依赖本机隐含文件。前端镜像已部署4188，浏览器实测完整看板和刷新，学生三个跳转按钮均无错误教师链接；截图.runtime/batch-final-sports-browser-proof.png。
+
+完成核对：体育界面（含用户确认的版本）、关系图遮挡、活动封面、共享源码漏带四项均有代码、测试或浏览器证据；源码已推送PR #12并附本地完整bundle。PR仍为草稿，未合并。真实体育数据库及入口、腾讯云服务、学校收件等按既有决定留到部署配置。本批最终存档位于 D:/伴学/archive/goal-scope-rollback-20261012/batch-complete-20261012。

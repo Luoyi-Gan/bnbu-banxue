@@ -1,6 +1,6 @@
 import { SportsPortal } from '../src/live/SportsPortal';
 import type { Workspace } from '../src/live/api';
-import { expect, it } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { openDatabase } from '../backend/src/database';
@@ -8,6 +8,11 @@ import { createAccount, login } from '../backend/src/auth';
 import { Repository } from '../backend/src/repository';
 import { snapshot } from '../backend/src/commands';
 import { SportsProgressCard } from '../src/v2/SportsProgressCard';
+import { V2Sports } from '../src/v2/V2Sports';
+import { TeacherSports } from '../src/v2/TeacherPortal';
+import * as workspaceBackend from '../src/v2/useWorkspaceBackend';
+
+afterEach(() => vi.restoreAllMocks());
 
 it('未配置真实体育源时不会展示伴学库残留的测试身份和运动数据', () => {
   const db=openDatabase(':memory:');
@@ -56,4 +61,44 @@ it('学生完整看板只使用可用源的授权投影，源失败时隐藏旧�
  expect(failed).toContain('运动提交趋势');
  expect(failed).not.toContain('授权课程样例');
  expect(failed).not.toContain('>630<');
+});
+
+it.each([
+  ['学生', V2Sports, '我的有效课程'],
+  ['教师', TeacherSports, '我的教学课程'],
+] as const)('%s体育页面加载和读取失败时保留看板，失败后可以重试', (_name, Page, scopeLabel) => {
+  const refresh = vi.fn<() => Promise<void>>().mockResolvedValue();
+  const backend = {data: null, error: '', busy: false, mutate: vi.fn().mockResolvedValue(false), refresh};
+  const hook = vi.spyOn(workspaceBackend, 'useWorkspaceBackend').mockReturnValue(backend);
+  const render = () => renderToStaticMarkup(<MemoryRouter><Page/></MemoryRouter>);
+  const loading = render();
+  expect(loading).toContain('sports-hero');
+  expect(loading).toContain('正在读取体育数据');
+  expect(loading).toContain('aria-busy="true"');
+  expect(loading).toContain('disabled="" aria-label="刷新体育数据"');
+  hook.mockReturnValue({...backend, error: '读取失败，请重试。'});
+  const failed = render();
+  for (const text of ['sports-hero', '运动提交趋势', 'sports-course-panel', scopeLabel, '读取失败，请重试。']) expect(failed).toContain(text);
+  expect(failed).toContain('aria-busy="false"');
+  expect(failed).toContain('aria-label="刷新体育数据"');
+  expect(failed).not.toContain('disabled="" aria-label="刷新体育数据"');
+  expect(failed).not.toContain('体育平台只读数据');
+});
+
+it('明确为非教师的工作区不能通过教师体育页面访问看板', () => {
+  vi.spyOn(workspaceBackend, 'useWorkspaceBackend').mockReturnValue({
+    data: {account: {roles: ['student']}, sports: null, sportsStatus: 'unavailable'} as Workspace,
+    error: '', busy: false, mutate: vi.fn().mockResolvedValue(false), refresh: vi.fn().mockResolvedValue(),
+  });
+  expect(renderToStaticMarkup(<MemoryRouter><TeacherSports/></MemoryRouter>)).not.toContain('sports-hero');
+});
+
+it('没有体育源身份的多角色账号按当前页面展示，不将学生入口改为教师入口', () => {
+  const workspace={account:{roles:['student','teacher']},sports:null,sportsStatus:'unavailable'} as Workspace;
+  const student=renderToStaticMarkup(<SportsPortal workspace={workspace}/>);
+  const teacher=renderToStaticMarkup(<SportsPortal workspace={workspace} role="teacher"/>);
+  expect(student).toContain('我的有效课程');
+  expect(student).not.toContain('#admin/accounts');
+  expect(teacher).toContain('我的教学课程');
+  expect(teacher).toContain('#admin/accounts');
 });

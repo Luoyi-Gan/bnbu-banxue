@@ -6,6 +6,8 @@ COPY src ./src
 COPY shared ./shared
 COPY public ./public
 COPY index.html vite.config.ts tsconfig.app.json ./
+ARG VITE_SPORTS_STUDENT_URL
+ARG VITE_SPORTS_TEACHER_URL
 RUN npm run build
 
 FROM nginx:stable-alpine

@@ -72,7 +72,6 @@ export function TeacherProfile() {
 
 export function TeacherSports() {
   const live = useWorkspaceBackend(30000)
-  if (!live.data) return <p role="status">{live.error || '正在读取体育账号…'}</p>
-  if (!live.data.account.roles.includes('teacher')) return <Navigate to="/v2" replace/>
-  return <section className="v2-sports-embedded" aria-label="体育课程只读看板"><div className="v2-sports-content"><SportsPortal workspace={live.data} onRefresh={live.refresh}/></div></section>
+  if (live.data && !live.data.account.roles.includes('teacher')) return <Navigate to="/v2" replace/>
+  return <section className="v2-sports-embedded" aria-label="体育课程只读看板"><div className="v2-sports-content"><SportsPortal workspace={live.data} onRefresh={live.refresh} loading={!live.data && !live.error} error={live.error} role="teacher"/></div></section>
 }

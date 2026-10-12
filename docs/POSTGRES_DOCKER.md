@@ -26,6 +26,8 @@ docker compose -f compose.postgres.yaml down
 
 ## 图片存储
 
+体育平台跳转入口与数据源分别配置。教师入口默认沿用用户提供的教师地址；学生入口尚未提供时按钮不可跳转，不会跳进教师管理页。部署时可设置 `BNBU_SPORTS_STUDENT_URL`、`BNBU_SPORTS_TEACHER_URL` 为对应独立平台的完整 HTTP(S) 地址，再重新构建 frontend。这两个值作为 `VITE_SPORTS_STUDENT_URL` / `VITE_SPORTS_TEACHER_URL` 构建参数注入，不含凭据，不表示只读数据已经接通。
+
 默认 `BNBU_OBJECT_STORE=local`，图片字节保存在独立 `object-data` 数据卷，PostgreSQL 保存摘要引用。备份和恢复必须同时包含数据库与对象卷，不能只复制 PostgreSQL。前端仍沿用原图片协议，读取由后端权限投影控制，不公开对象桶。
 
 使用 COS 时在启动环境设置 `BNBU_OBJECT_STORE=cos`、`BNBU_COS_BUCKET`、`BNBU_COS_REGION`、`BNBU_COS_SECRET_ID`、`BNBU_COS_SECRET_KEY`；临时凭据还需 `BNBU_COS_SESSION_TOKEN`。凭据仅传给 API。当前使用固定配置凭据，临时凭据到期需要更新配置并重启 API，尚无自动续期。权限限制为目标桶 `bnbu/` 前缀所需的对象上传与读取。应用创建私有对象，不配置匿名桶访问。

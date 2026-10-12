@@ -55,6 +55,9 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        VITE_SPORTS_STUDENT_URL: ${BNBU_SPORTS_STUDENT_URL:-}
+        VITE_SPORTS_TEACHER_URL: ${BNBU_SPORTS_TEACHER_URL:-}
     ports:
       - "127.0.0.1:4188:8080"
     volumes:
