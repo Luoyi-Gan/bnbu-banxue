@@ -1536,3 +1536,6 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 
 ### PostgreSQL 学生教师只读账号目录
 提取 projectAccountDirectory 共用字段投影、学期成员状态推导、筛选和分页；PostgreSQL 接通 /api/sports/accounts/students 与 teachers，保留 ACCOUNTS 权限、首改及维护门禁。原账号目录 4 项与 PostgreSQL 30 项回归通过；补充实际 PostgreSQL 权限拒绝、未入班 PENDING、未核验邮箱隐藏及非法状态筛选场景后 PostgreSQL 31 项通过。服务端类型检查与接口 lint 通过，UI 未改。
+
+### 实际路由核对与邮件拆分原子性
+核对 App/V2App/ConnectedApp 后确认：旧 LiveSports 和 SportsPortalClassic 无实际导入，但当前 SportsPortal 使用 SportsDashboard，学生 V2Sports 仍嵌入 /student/index.html，其协议为 /api/v1。这与文档顶部最新仅快捷跳转决定及本轮不改 UI 要求存在冲突，已向用户以大白话询问；相关页面暂不自行更改。独立推进邮件拆分 PostgreSQL 验证：第二条活动无效时首条活动和子邮件全部回滚，修正后生成两条活动。32 项 PostgreSQL 测试通过。

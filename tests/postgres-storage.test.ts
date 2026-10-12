@@ -290,6 +290,24 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await expect(postgresAccountDirectory(db,token,'student',{status:'DISABLED'})).rejects.toThrow('筛选状态');
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
+  it('keeps a multi-activity split atomic when a later activity is invalid', async () => {
+    const auth=new PostgresAuth(db),token=(await auth.login('password-manager','Changed-test-123')).token;
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
+    const command=(action:string,input:Record<string,unknown>)=>executePostgres(db,token,action,input,randomUUID());
+    try {
+      const mail=await command('mail.import',{messageId:'pg-split-atomic',subject:'两场活动',sender:'school@example.test',body:'活动名称：上午讲座\n活动名称：下午比赛'});
+      const fields={title:'上午讲座',description:'介绍',startAt:'2027-01-01T10:00:00+08:00',endAt:'2027-01-01T11:00:00+08:00',location:'图书馆',host:'学院',conditions:''};
+      const input={id:mail.id,expectedVersion:1,confirmed:true,reason:'核对两场',activities:[fields,{...fields,title:'下午比赛',location:''}]};
+      const before=Number((await db.pool.query("SELECT count(*) FROM entities WHERE kind IN ('activity','mail')")).rows[0].count);
+      await expect(command('mail.split',input)).rejects.toThrow();
+      expect(Number((await db.pool.query("SELECT count(*) FROM entities WHERE kind IN ('activity','mail')")).rows[0].count)).toBe(before);
+      input.activities[1].location='体育馆';
+      await command('mail.split',input);
+      const parent=await db.transaction(client=>new PostgresRepository(client).get(mail.id));
+      expect(parent.data.childMailIds).toHaveLength(2);
+      expect(Number((await db.pool.query("SELECT count(*) FROM entities WHERE kind='activity' AND data::jsonb->>'mailId'=ANY($1)",[parent.data.childMailIds])).rows[0].count)).toBe(2);
+    } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
+  });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
     expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);
