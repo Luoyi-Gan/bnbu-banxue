@@ -4,6 +4,25 @@ import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
 import {demand} from '../auth';
 import type {Entity} from '../repository';
+import {sportsRole} from '../sports/courses';
+
+export async function postgresStudentHelp(db:PostgresDatabase,token:string,query:Record<string,string>) {
+  demand(Object.keys(query).every(k=>k==='locale') && ['zh-CN','en'].includes(query.locale),'帮助语言参数无效。');
+  return db.transaction(async client=>{
+    await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
+    const entities=[...await repo.all('sportsIdentity'),...await repo.all('sportsSystem'),...await repo.all('sportsHelp')];
+    const view={all:(kind:string)=>entities.filter(item=>item.kind===kind)};
+    sportsRole(view,actor,'student');
+    const source=helpRead(view,actor,query.locale==='en'?'en':'zh');
+    return source.articles.filter(a=>entities.find(e=>e.id===a.id)?.data.status==='published').map(article=>{
+      const original=entities.find(e=>e.id===article.id)!;
+      const publishedAt=Number(original.data.firstPublishedAt);
+      demand(Number.isFinite(publishedAt) && publishedAt>0,'帮助文章缺少正式发布时间。',409);
+      return {id:article.id,category:Object.keys(portalHelpCategories).find(k=>portalHelpCategories[k]===original.data.category),locale:query.locale,title:query.locale==='en'?original.data.titleEn:original.data.titleZh,bodyMarkdown:query.locale==='en'?original.data.bodyEn:original.data.bodyZh,publishedAt:new Date(publishedAt).toISOString(),version:article.version};
+    });
+  });
+}
 
 export function portalHelpArticle(article:Entity) {
   return {id:article.id,version:article.version,status:article.data.status,titleZh:article.data.titleZh,titleEn:article.data.titleEn,bodyZh:article.data.bodyZh,bodyEn:article.data.bodyEn,keywords:article.data.keywords,category:Object.keys(portalHelpCategories).find(k=>portalHelpCategories[k]===article.data.category),sortWeight:article.data.weight,updatedAt:article.updatedAt};

@@ -91,6 +91,9 @@ const nativeArchived=await sessionWrite('/api/v1/admin/help-articles/'+nativeHel
 assert.equal(nativeArchived.status,'archived');
 docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data='{"role":"student","status":"verified"}' WHERE id='${sportsIdentity}'`],{stdio:'pipe'});
 const studentArticle=(await request('/api/sports/help?lang=en')).articles.find(article=>article.id===help.id);
+const nativeStudentHelp=(await request('/api/v1/student/help-articles?locale=en')).data;
+assert.equal(nativeStudentHelp.find(article=>article.id===help.id).bodyMarkdown,helpInput.bodyEn);
+assert.ok(!nativeStudentHelp.some(article=>article.id===nativeHelp.id));
 assert.equal(studentArticle.data.body,'Local acceptance fixture');
 assert.equal(studentArticle.ownerId,null);
 const sportsMe=(await request('/api/v1/me')).data;

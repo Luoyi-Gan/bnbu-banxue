@@ -76,7 +76,7 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     await databases[1].transaction(client=>new PostgresRepository(client).create('sportsIdentity','governor',{role:'admin',status:'verified'}));
     const governorLogin=await post(1,'/api/v1/auth/password-login',{account:'governor@bnbu.edu.cn',password});
     const governorCookie=governorLogin.headers.get('set-cookie')!.split(';')[0];
-    for(let i=0;i<6;i++)await databases[1].transaction(client=>new PostgresRepository(client).create('sportsHelp','governor',{status:i===0?'published':'draft',titleZh:'帮助'+i,titleEn:'Help '+i,bodyZh:'内容',bodyEn:'Content',keywords:['help'],category:'LOGIN',weight:i}));
+    for(let i=0;i<6;i++)await databases[1].transaction(client=>new PostgresRepository(client).create('sportsHelp','governor',{status:i===0?'published':'draft',firstPublishedAt:Date.now(),titleZh:'帮助'+i,titleEn:'Help '+i,bodyZh:'内容',bodyEn:'Content',keywords:['help'],category:'LOGIN',weight:i}));
     const helpGet=(path:string,cookie=governorCookie)=>fetch(urls[1]+path,{headers:{Cookie:cookie}});
     const helpPage=(await (await helpGet('/api/v1/admin/help-articles?page=1')).json()).data;
     expect(helpPage.total).toBe(6);expect(helpPage.pageSize).toBe(5);expect(helpPage.items).toHaveLength(5);
@@ -94,10 +94,17 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     const publishKey=randomUUID(),publishInput={...articleInput,expectedVersion:article.version,status:'published'};
     const publishedResponse=await write(articlePath,publishInput,publishKey);expect(publishedResponse.status).toBe(200);
     const published=(await publishedResponse.json()).data;
+    const studentArticles=await helpGet('/api/v1/student/help-articles?locale=en',sportsCookie);
+    expect(studentArticles.status).toBe(200);
+    const studentArticle=(await studentArticles.json()).data.find((item:{id:string})=>item.id===article.id);
+    expect(studentArticle).toEqual({id:article.id,category:'checkin',locale:'en',title:'New help',bodyMarkdown:'Instructions',publishedAt:expect.any(String),version:published.version});
+    expect(Number.isFinite(Date.parse(studentArticle.publishedAt))).toBe(true);
+    expect((await helpGet('/api/v1/student/help-articles?locale=fr',sportsCookie)).status).toBe(400);
     expect((await (await write(articlePath,publishInput,publishKey)).json()).data).toEqual(published);
     expect((await write(articlePath,{...articleInput,expectedVersion:published.version,status:'draft'})).status).toBe(409);
     const archived=(await (await write(articlePath,{...articleInput,expectedVersion:published.version,status:'archived'})).json()).data;
     expect(archived.status).toBe('archived');
+    expect((await (await helpGet('/api/v1/student/help-articles?locale=zh-CN',sportsCookie)).json()).data.some((item:{id:string})=>item.id===article.id)).toBe(false);
     const studentHelp=await helpGet('/api/sports/help?lang=zh',sportsCookie);
     expect((await studentHelp.json()).articles.some((item:{id:string})=>item.id===article.id)).toBe(false);
     expect((await write(articlePath,{...articleInput,expectedVersion:archived.version,status:'published'})).status).toBe(200);
