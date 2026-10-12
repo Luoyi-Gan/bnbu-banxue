@@ -1743,3 +1743,7 @@ API重建并健康启动，真实HTTP冒烟新增退回后GET student/proof-todo
 ### PostgreSQL 学生原始体测结果读取
 
 新增 GET student/enrollments/:id/physical-result，仅本人学生成员关系可读，复用approvedExemption判断：有效免测优先，无原事实返回NOT_RECORDED，已有事实仅投影项目、整数秒和测试日期；不返回换算分、成绩或内部备注，重复／错误课程事实拒绝。51项真实PostgreSQL测试通过，覆盖未录入、免测、撤销免测后无记录、原用时投影及身份限制；类型与lint通过。教师体测写入及此接口Docker验证仍待迁移／验证，UI未改。
+
+### Docker 本人体测读取验证
+
+API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入状态断言，返回NOT_RECORDED及null结果，不补造分数；整链通过。已核对教师侧sportsEnduranceCommand包含结课、归档、免测、版本和换算历史约束，后续迁移需复用原规则。教师写入尚未接通PostgreSQL，不能将此次读取验证表述为体测全流程完成。
