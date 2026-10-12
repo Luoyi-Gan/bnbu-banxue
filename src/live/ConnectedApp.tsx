@@ -34,7 +34,7 @@ import {
 import { prepareCommunityImage } from "../v2/communityImages";
 import { ManagementTools } from "./ManagementTools";
 import { LiveTimetable } from "./LiveTimetable";
-import { LiveSports } from "./LiveSports";
+import { SportsPortal } from "./SportsPortal";
 import { Modal, PageHeading } from "../v2/ui";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import "../v2/v2.css";
@@ -651,7 +651,7 @@ export function ConnectedApp() {
             </p>
           )}
           {module === "sports" && (
-            <LiveSports open={open} run={run} busy={busy} />
+            <SportsPortal />
           )}
           {module === "home" && (
             <>

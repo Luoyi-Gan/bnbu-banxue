@@ -2,6 +2,17 @@
   --live-ink: #19352d;
   --live-green: #315f4f;
 }
+.live-sports-portal iframe {
+  display: block;
+  width: 100%;
+  height: max(720px, calc(100dvh - 220px));
+  border: 0;
+  background: #fff;
+}
+.live-sports-portal > a {
+  display: inline-block;
+  margin-top: 12px;
+}
 .live-main {
   max-width: 1360px;
   margin: auto;
