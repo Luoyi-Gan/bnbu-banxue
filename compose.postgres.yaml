@@ -26,6 +26,12 @@ services:
       BNBU_ALLOWED_ORIGINS: http://127.0.0.1:4188,http://localhost:4188
       BNBU_LOCAL_OUTBOX: "1"
       BNBU_OBJECT_DIRECTORY: /app/data/objects
+      BNBU_OBJECT_STORE: ${BNBU_OBJECT_STORE:-local}
+      BNBU_COS_BUCKET: ${BNBU_COS_BUCKET:-}
+      BNBU_COS_REGION: ${BNBU_COS_REGION:-}
+      BNBU_COS_SECRET_ID: ${BNBU_COS_SECRET_ID:-}
+      BNBU_COS_SECRET_KEY: ${BNBU_COS_SECRET_KEY:-}
+      BNBU_COS_SESSION_TOKEN: ${BNBU_COS_SESSION_TOKEN:-}
     volumes:
       - object-data:/app/data
     depends_on:

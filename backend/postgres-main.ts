@@ -1,8 +1,10 @@
 import { PostgresDatabase } from './src/storage/postgres';
 import { postgresMigrations } from './src/storage/postgres-schema';
 import { createPostgresApiServer } from './src/postgres-api';
+import { configuredObjectStore } from './src/storage/cos-object-store';
 
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required for PostgreSQL');
+configuredObjectStore();
 const port = Number(process.env.BNBU_API_PORT ?? '4180');
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid BNBU_API_PORT');
 const db = new PostgresDatabase({connectionString:process.env.DATABASE_URL});

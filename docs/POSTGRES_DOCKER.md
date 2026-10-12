@@ -24,5 +24,13 @@ docker compose -f compose.postgres.yaml down
 
 本配置启用本地邮件收件箱，不发送学校邮件。真实腾讯云部署还需要 HTTPS、正式邮件及身份服务、COS 配置，并将来源白名单和 Cookie Secure 配置切换为正式域名。本地启动成功不证明这些外部服务已联通。
 
+## 图片存储
+
+默认 `BNBU_OBJECT_STORE=local`，图片字节保存在独立 `object-data` 数据卷，PostgreSQL 保存摘要引用。备份和恢复必须同时包含数据库与对象卷，不能只复制 PostgreSQL。前端仍沿用原图片协议，读取由后端权限投影控制，不公开对象桶。
+
+使用 COS 时在启动环境设置 `BNBU_OBJECT_STORE=cos`、`BNBU_COS_BUCKET`、`BNBU_COS_REGION`、`BNBU_COS_SECRET_ID`、`BNBU_COS_SECRET_KEY`；临时凭据还需 `BNBU_COS_SESSION_TOKEN`。凭据仅传给 API。当前使用固定配置凭据，临时凭据到期需要更新配置并重启 API，尚无自动续期。权限限制为目标桶 `bnbu/` 前缀所需的对象上传与读取。应用创建私有对象，不配置匿名桶访问。
+
+不要在已有本地图片的环境直接切换到空 COS 桶：数据库中的摘要引用不会自动搬迁字节。旧 SQLite 导入保留原图片形式，后续编辑才会提取；批量对象迁移尚未提供。失败业务事务可能留下无引用私有对象，目前保留这些对象，不执行自动清理。
+
 本地冒烟验证：运行 node scripts/docker-postgres-smoke.mjs。脚本创建随机测试账号、明确授予本地学生职责，验证注册与登录、设置保存、数据库/API 重启后的会话及数据保留、退出失效。它会重启本配置的数据库及 API 容器，请仅用于独立本地测试环境；不会读取或修改原 SQLite 验收服务。测试账号保留在独立测试库中，密码不输出。
 
