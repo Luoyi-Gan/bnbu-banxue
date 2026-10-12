@@ -1731,3 +1731,7 @@ GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需�
 ### Docker 学生补证待办验证
 
 API重建并健康启动，真实HTTP冒烟新增退回后GET student/proof-todos：核对公开ID、UNCLEAR_EVIDENCE原因、教师说明、未逾期及分页结束；补交后再次GET确认该项移除。连同原件读取、教师审核、进度及登录持久化整链通过。未修改UI。
+
+### PostgreSQL 学生名单核对状态
+
+接通 GET enrollments/:id/roster-status，严格本人成员范围，仅返回现有学生页面要求的七字段。抽出reconcileRosterData共用原名单核对规则，未确认名单available=false；有基准时按当前身份、学校邮箱、姓名和有效成员事实投影，不返回同学名单。跨课程快照及重复基准拒绝。62项数据库／名单测试通过，类型与lint通过。教师名单上传确认写入尚待PostgreSQL接通，新增状态接口Docker验证待补；未改UI。

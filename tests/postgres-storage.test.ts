@@ -1,5 +1,6 @@
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
+import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
 import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
@@ -316,6 +317,23 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.transaction(client=>new PostgresRepository(client).create('sportsCertificationHistory','sports-reader-other',{applicationId:owned.id,creditVersion:2,category:'RELATED',minutes:20,status:'VALID',reason:'缺失另一类'}));
     await expect(postgresStudentRecognitionHistory(db,login.token,owned.id,{})).rejects.toMatchObject({status:409});
 
+  });
+  it('reads only own roster reconciliation without exposing classmates', async()=>{
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const member=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-student',{courseId:'roster-read-fixture',status:'ACTIVE'}));
+    expect((await postgresStudentRoster(db,login.token,member.id)).data).toMatchObject({available:false,status:null,registrationComplete:false});
+    const foreign=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-other',{courseId:'roster-read-fixture',status:'ACTIVE'}));
+    await expect(postgresStudentRoster(db,login.token,foreign.id)).rejects.toMatchObject({status:404});
+    const snapshot=await db.transaction(async client=>{
+      const repo=new PostgresRepository(client),identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-student')!;
+      const s=await repo.create('sportsRosterSnapshot',null,{courseId:'roster-read-fixture',rows:[{studentNumber:identity.data.studentNumber ?? 'unmatched',name:'private classmate',excluded:false,columnError:false}]});
+      await repo.create('sportsRosterBasis',null,{courseId:'roster-read-fixture',snapshotId:s.id});return s;
+    });
+    const result=await postgresStudentRoster(db,login.token,member.id);
+    expect(result.data).toMatchObject({available:true,rosterVersion:1,registrationComplete:false});
+    expect(Object.keys(result.data)).toHaveLength(7);expect(JSON.stringify(result)).not.toContain('private classmate');
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(snapshot,{courseId:'wrong-course'});});
+    await expect(postgresStudentRoster(db,login.token,member.id)).rejects.toMatchObject({status:409});
   });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

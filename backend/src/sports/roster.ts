@@ -326,6 +326,9 @@ export function sportsRosterCommand(
   return snapshot;
 }
 export function reconcileRoster(repo: Repository, snapshot: Entity) {
+  return reconcileRosterData(repo,snapshot,id=>repo.db.prepare("SELECT name,email FROM accounts WHERE id=?").get(id));
+}
+export function reconcileRosterData(repo:Pick<Repository,"all">,snapshot:Entity,personById:(id:string)=>Fields|undefined) {
   const rows = snapshot.data.rows as RosterRow[],
     active = rows.filter((r) => !r.excluded),
     identities = repo
@@ -361,9 +364,7 @@ export function reconcileRoster(repo: Repository, snapshot: Entity) {
         status: "INCOMPLETE",
         reason: "尚未注册或没有可核对的学生身份",
       };
-    const person = repo.db
-      .prepare("SELECT name,email FROM accounts WHERE id=?")
-      .get(identity.ownerId!);
+    const person = personById(identity.ownerId!);
     if (!person)
       return { ...row, status: "INCOMPLETE", reason: "当前账号不存在" };
     if (person.name !== row.name)
@@ -398,7 +399,7 @@ export function reconcileRoster(repo: Repository, snapshot: Entity) {
     .map((m) => ({
       enrollmentId: m.id,
       studentName:
-        repo.db.prepare("SELECT name FROM accounts WHERE id=?").get(m.ownerId!)
+        personById(m.ownerId!)
           ?.name ?? "已注销学生",
       studentNumber:
         identities.find((i) => i.ownerId === m.ownerId)?.data.studentNumber ??
