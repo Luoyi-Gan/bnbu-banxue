@@ -33,7 +33,7 @@ import { projectSportsNotification } from '../sports/portal-notifications';
 import { sportsSessionPolicy } from '../sports/sessions';
 import { saveSportsPreferences, sportsPreferencesGate } from './postgres-sports-preferences';
 import { studentSessionProjection } from './postgres-sports-session';
-import { sportsRole, sportsSemesterPolicy } from '../sports/courses';
+import { sportsRole, sportsSemesterPolicy, publishedTemplateFields } from '../sports/courses';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -49,6 +49,10 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action==='sports.template.publish') {
+      await requirePostgresSuperAdmin(repo,actor);
+      const systems=await repo.all('sportsSystem');sportsAvailable({all:()=>systems});
+    }
     if(action.startsWith('sports.semester.')) {
       const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
       sportsRole({all:()=>identities},actor,'admin');requireSportsPermission({all:()=>identities},actor,'SEMESTERS');sportsAvailable({all:()=>systems});
@@ -108,6 +112,11 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       result=studentSessionProjection(session);
     }
     else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
+    else if(action==='sports.template.publish') {
+      const template=await repo.create('sportsTemplate',actor.id,publishedTemplateFields(input));
+      await client.query('INSERT INTO sports_template_publications(template_id) VALUES($1)',[template.id]);
+      result={id:template.id};
+    }
     else if(action.startsWith('sports.semester.')) {
       const saved=await runAsync(sportsSemesterPolicy(repo,actor,action,input));if(saved)result={id:saved.id};
     }

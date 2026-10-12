@@ -421,6 +421,20 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await db.transaction(client=>new PostgresRepository(client).get(saved.id))).data.status).toBe('UPCOMING');
     } finally {await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='ai-governor'");}
   });
+  it('publishes fixed templates and preserves one ordered publication per retry', async()=>{
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='ai-governor'");
+    try {
+      const auth=new PostgresAuth(db),admin=await auth.login('ai-governor@example.test','Ai-govern-123'),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123');
+      const input={name:'V8.1 test template'},key=randomUUID();
+      await expect(executePostgres(db,teacher.token,'sports.template.publish',input,randomUUID())).rejects.toMatchObject({status:403});
+      const first=await executePostgres(db,admin.token,'sports.template.publish',input,key);
+      expect(await executePostgres(db,admin.token,'sports.template.publish',input,key)).toEqual(first);
+      const second=await executePostgres(db,admin.token,'sports.template.publish',input,randomUUID());
+      const rows=(await db.pool.query('SELECT template_id,sequence FROM sports_template_publications WHERE template_id=ANY($1::text[]) ORDER BY sequence',[[first.id,second.id]])).rows;
+      expect(rows.map(r=>r.template_id)).toEqual([first.id,second.id]);
+      expect((await db.transaction(client=>new PostgresRepository(client).get(first.id))).data).toMatchObject({status:'published',thresholds:[30,45,60],weeklyLimits:[2,3,4],totalTarget:1200,singleCap:60,dailyLimit:1});
+    } finally {await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='ai-governor'");}
+  });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const record=await db.transaction(async client=>{

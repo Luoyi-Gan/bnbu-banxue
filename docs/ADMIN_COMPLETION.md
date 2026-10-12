@@ -1791,3 +1791,7 @@ API重建健康后验证四表404行初始化；独立管理员经真实HTTP修�
 ### Docker 管理员学期创建编辑
 
 API重建健康后，通过管理员真实HTTP创建未来学期、按版本修改名称、workspace读回UPCOMING和新名称；验证后清理该测试学期，审计保留。完整三端HTTP冒烟及lint通过。当前学期切换和教师建课仍未在此Docker脚本走真实操作，模板发布的SQLite专用顺序写入是下一迁移依赖。
+
+### PostgreSQL 固定规则模板发布
+
+SQLite与PostgreSQL共用publishedTemplateFields，模板仍为V8.1固定门槛／周限／1200目标／单次60／每日1规则。PostgreSQL仅总管理员可发布，维护门禁先于幂等回执；模板实体与sports_template_publications顺序行同事务。新增教师拒绝、幂等单次发布、两次发布顺序及固定字段测试，56项真实PostgreSQL测试、类型与lint通过。Docker模板发布及教师建课写入尚待验证／接通，UI未改。

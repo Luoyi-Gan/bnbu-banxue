@@ -181,16 +181,7 @@ export function sportsCourseCommand(
   if (action === "sports.template.publish") {
     sportsRole(repo, actor, "admin");
     requireSportsSuperAdmin(repo, actor);
-    const template = repo.create("sportsTemplate", actor.id, {
-      name: textField(input, "name", 100),
-      status: "published",
-      policy: "V8.1",
-      thresholds: [30, 45, 60],
-      weeklyLimits: [2, 3, 4],
-      totalTarget: 1200,
-      singleCap: 60,
-      dailyLimit: 1,
-    });
+    const template = repo.create("sportsTemplate", actor.id, publishedTemplateFields(input));
     repo.db
       .prepare(
         "INSERT INTO sports_template_publications(template_id) VALUES(?)",
@@ -709,4 +700,17 @@ export function* sportsSemesterPolicy(repo:BusinessRepository,actor:Account,acti
     }
     return yield* effect(repo.save(semester, { status: "CURRENT" }));
   }
+}
+
+export function publishedTemplateFields(input:Fields) {
+  return {
+      name: textField(input, "name", 100),
+      status: "published",
+      policy: "V8.1",
+      thresholds: [30, 45, 60],
+      weeklyLimits: [2, 3, 4],
+      totalTarget: 1200,
+      singleCap: 60,
+      dailyLimit: 1,
+      };
 }
