@@ -158,6 +158,36 @@ it("结束队伍后成员仍能读取互评名单，外人不获得名单且会�
   expect(() => run(b, "room.review", {id: room.id, targetId: a.account.id, stars: 5})).toThrow();
 });
 
+it("HTTP 组队从收藏申请到审批聊天结束互评保持同一成员关系", async () => {
+  const {db, a, b} = fixture();
+  const server = createApiServer(db);
+  await new Promise<void>(done => server.listen(0, "127.0.0.1", done));
+  cleanup.push(() => new Promise<void>(done => {server.closeAllConnections(); server.close(() => done());}));
+  const base = `http://127.0.0.1:${(server.address() as {port: number}).port}`;
+  async function post(who: typeof a, action: string, input: Record<string, unknown>) {
+    const response = await fetch(base + "/api/commands", {method: "POST", headers: {Cookie: `bnbu_session=${who.token}`, "Content-Type": "application/json"}, body: JSON.stringify({action, input, requestId: randomUUID()})});
+    return {status: response.status, body: await response.json()};
+  }
+  const created = await post(a, "room.create", {type: "study", title: "HTTP学习组", body: "一起学习", time: "周末", place: "图书馆", capacity: 2});
+  expect(created.status).toBe(200);
+  const repo = new Repository(db), room = repo.all("room")[0];
+  expect((await post(b, "relation.set", {id: room.id, kind: "save", enabled: true})).status).toBe(200);
+  expect(repo.get(room.id).data.members).toEqual([a.account.id]);
+  expect(repo.all("roomApplication")).toHaveLength(0);
+  expect((await post(b, "room.apply", {id: room.id})).status).toBe(200);
+  expect((await post(b, "message.send", {roomId: room.id, body: "还未批准"})).status).toBe(403);
+  const application = repo.all("roomApplication")[0];
+  expect((await post(a, "room.decide", {id: application.id, accept: true})).status).toBe(200);
+  expect((await post(b, "message.send", {roomId: room.id, body: "已加入"})).status).toBe(200);
+  const response = await fetch(base + "/api/workspace", {headers: {Cookie: `bnbu_session=${a.token}`}});
+  const view = await response.json();
+  expect(view.entities.find((e: {kind: string}) => e.kind === "message").data.body).toBe("已加入");
+  expect((await post(a, "room.finish", {id: room.id})).status).toBe(200);
+  expect((await post(b, "message.send", {roomId: room.id, body: "结束了"})).status).toBe(403);
+  expect((await post(b, "room.review", {id: room.id, targetId: a.account.id, stars: 5, comment: "合作愉快"})).status).toBe(200);
+  expect(repo.all("roomReview")).toHaveLength(1);
+});
+
 it("群体通知按实际接收记录计算阅读率，不能代他人已读", () => {
   const { db, a, b, admin, run } = fixture();
   run(admin, "notification.send", {
