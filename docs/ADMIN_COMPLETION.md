@@ -1675,3 +1675,7 @@ POST exercise-records/:id/submit 现在校验草稿版本、本人已验证且�
 ### PostgreSQL 共享教师审核决定
 
 将教师决定／普通更正／上传超时处理抽成同步异步共享策略，保留 SQLite 入口，PostgreSQL sports.review.decide/correct 与 sports.transfer.decide 使用相同权限、记录及材料版本、固定原因、一次补证、结算归档及审核时钟规则。保存结果、进度、事件和通知均在原命令事务内，进度复用既有计算器。85 项数据库、审核和结算测试通过；新增 PostgreSQL 教师通过、重试一致和按规则计入 30 分钟，服务端类型和 lint 通过。教师工作台读取及现有页面协议仍待接线，本轮未重建 Docker API，不将内部命令验证称为教师页面验收。
+
+### 当前体育概览共享数据入口
+
+GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需的身份、系统状态、课程、成员、本人会话、可见记录／材料、审核与进度投影；复用原读取策略，同一可重复读快照计算。首次改密返回 firstLoginOnly，不泄露业务记录；维护门禁沿用原限制。67 项 PostgreSQL／审核测试通过，包含获授权教师工作台读取及首次改密门禁；类型与 lint 通过。Docker 重建后，HTTP 提交记录可从 workspace 读回并找到所属课程，完整现有冒烟通过。端点尚未合并体测、名单、申请、结算、反馈等其余 workspace 扩展字段，不能将概览可读称作体育管理全功能已完成。页面未改。

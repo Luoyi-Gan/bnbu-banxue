@@ -1,3 +1,4 @@
+import { postgresSportsWorkspace } from './storage/postgres-sports-workspace';
 import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresMediaOriginal } from './storage/postgres-student-media';
 import { postgresStudentRecords } from './storage/postgres-student-records';
 import { createServer } from 'node:http';
@@ -34,6 +35,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      if(request.method==='GET' && pathname==='/api/sports/workspace') return send(response,200,await postgresSportsWorkspace(db,cookieToken(request) ?? ''));
       const originalRead=/^\/api\/v1\/media-access\/([^/]+)$/.exec(pathname);
       if(request.method==='GET' && originalRead) {
         const original=await postgresMediaOriginal(db,cookieToken(request) ?? '',decodeURIComponent(originalRead[1]));

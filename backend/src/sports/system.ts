@@ -10,7 +10,7 @@ import { sportsRole } from "./courses";
 import { administratorAccess } from "./permissions";
 import { expireSupplements, supplementClock } from "./supplements";
 
-export function canManageMode(repo: Repository, actor: Account) {
+export function canManageMode(repo: Pick<Repository,"all"|"get">, actor: Account) {
   return administratorAccess(repo, actor).permissions.includes("SYSTEM_MODE");
 }
 export function currentSystem(repo: Pick<Repository, 'all'>) {
@@ -127,7 +127,7 @@ export function sportsSystemCommand(
   );
   return repo.get(saved.id);
 }
-export function systemWorkspace(repo: Repository, actor: Account) {
+export function systemWorkspace(repo: Pick<Repository,"all"|"get">, actor: Account) {
   const current = currentSystem(repo),
     canManage = canManageMode(repo, actor);
   const identity = repo

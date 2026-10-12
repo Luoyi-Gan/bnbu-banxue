@@ -373,7 +373,7 @@ export function* sportsReviewDecisionPolicy(repo: BusinessRepository,actor:Accou
   return saved;
 }
 
-export function reviewWorkspace(repo: Repository, actor: Account) {
+export function reviewWorkspace(repo: Pick<Repository,"all"|"get">, actor: Account) {
   const records = visibleRecords(repo, actor),
     ids = new Set(records.map((r) => r.id));
   const admin = repo

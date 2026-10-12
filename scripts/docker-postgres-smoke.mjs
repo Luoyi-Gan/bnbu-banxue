@@ -158,6 +158,9 @@ try {
     await new Promise(resolve=>setTimeout(resolve,500));
   }
   assert.equal(reviewState,'TECHNICAL','Unconfigured AI should retain evidence in technical handling');
+  const sportsWorkspace=await request('/api/sports/workspace');
+  assert.ok(sportsWorkspace.records.some(r=>r.data.sourceDraftId===finalDraft.id));
+  assert.ok(sportsWorkspace.courses.some(c=>c.id===courseId));
   assert.equal((await request('/api/v1/exercise-records?limit=50')).data.filter(r=>r.sessionId===session.id).length,1);
 
 

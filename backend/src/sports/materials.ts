@@ -295,7 +295,7 @@ export async function uploadMaterial(
     return saved;
   });
 }
-export function visibleRecords(repo: Repository, actor: Account) {
+export function visibleRecords(repo: Pick<Repository,"all"|"get">, actor: Account) {
   sportsAccountGate(repo, actor);
   const identity = repo
     .all("sportsIdentity")
@@ -310,7 +310,7 @@ export function visibleRecords(repo: Repository, actor: Account) {
           repo.get(r.data.courseId, "sportsCourse").ownerId === actor.id,
     );
 }
-export function materialWorkspace(repo: Repository, actor: Account) {
+export function materialWorkspace(repo: Pick<Repository,"all"|"get">, actor: Account) {
   const records = visibleRecords(repo, actor),
     ids = new Set(records.map((r) => r.id));
   return {

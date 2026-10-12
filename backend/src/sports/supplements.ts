@@ -7,7 +7,7 @@ import { recalculateProgress } from "./progress";
 
 /** Confirmed exclusions use interval union, never additive overlapping compensation. */
 export function supplementClock(
-  repo: Repository,
+  repo: Pick<Repository,"all">,
   record: Entity,
   now = Date.now(),
 ) {
