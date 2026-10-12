@@ -1422,3 +1422,8 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### 前后端共享规则分离
 将两端共用的模型、规则和类型及其依赖共 13 个模块移至 shared，所有消费者仅调整导入路径。backend/Dockerfile 改为只复制 backend 与 shared，不再复制前端 src。共享目录仍保留既有演示初始化数据供旧逻辑兼容；此迁移不构成移除演示逻辑或 PostgreSQL 完成的声明。
 验证：66 文件 396 项全套测试通过；前后端类型检查、ESLint、前端生产构建和独立后端构建通过；不复制前端源码的后端 Docker 镜像构建成功。Vite 仍报告现有较大分包提示。下一步继续数据访问异步化、PostgreSQL 和 COS，保持原 UI/UX。
+
+### PostgreSQL 数据层基础及真实容器验证
+新增 pg 连接池、同连接事务封装、并发迁移锁和迁移内容校验；初始 PostgreSQL 表结构对应现有账号命名空间、历史主体、会话、实体、关系、通知、审计、幂等回执和媒体表。毫秒时间字段使用 BIGINT，媒体为 BYTEA，保留历史主体不能恢复登录的数据库触发器。未将数据库密码写入代码。
+本地 postgres:17-bookworm 容器 bnbu-postgres-dev 绑定 127.0.0.1:55432，仅用于隔离测试。第一次测试在容器初始化期间连接重置；pg_isready 确认就绪后重新执行，4 项真实 PostgreSQL 测试全部通过，覆盖并发重复迁移、迁移校验、事务回滚及提交、同邮箱独立账号、唯一键、外键、毫秒时间及历史主体禁恢复。服务端类型检查和修改文件 ESLint 通过。测试为每次随机 schema，结束移除；没有改动验收 SQLite 库。
+当前业务 API 仍使用 SQLite，PostgreSQL 数据层尚未接入服务端命令；接下来需完成异步数据访问迁移、接口与并发回归、COS 和分离部署。事务实现遵循 https://node-postgres.com/features/transactions 同一 client 要求；数据库约束参考 PostgreSQL 官方约束文档。
