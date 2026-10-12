@@ -1,10 +1,11 @@
 import { ServiceError, type Account } from "../auth";
-import { Repository } from "../repository";
+import { Repository, type Entity } from "../repository";
 
 export function requiresPasswordChange(repo: Repository, actor: Account) {
-  return repo
-    .all("sportsIdentity")
-    .some(
+  return passwordChangeRequired(repo.all("sportsIdentity"),actor);
+}
+export function passwordChangeRequired(identities: Entity[], actor: Account) {
+  return identities.some(
       (i) =>
         i.ownerId === actor.id &&
         i.data.status === "verified" &&

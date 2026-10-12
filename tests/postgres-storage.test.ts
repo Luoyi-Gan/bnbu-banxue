@@ -216,4 +216,30 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));
     }
   });
+  it('executes shared community policy over HTTP with atomic audit, notification and retry receipts', async () => {
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('pg-reviewer','review-pg@example.test',$1,'审核员','now','[\"reviewer\"]')",[hashPassword('Review-postgres-123')]);
+    const auth = new PostgresAuth(db);
+    const student = await auth.login('login@example.test','Postgres-test-123');
+    const reviewer = await auth.login('review-pg@example.test','Review-postgres-123');
+    const server=createPostgresApiServer(db);
+    await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
+    const base=`http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+    const command=(token:string,action:string,input:unknown,requestId=randomUUID())=>fetch(base+'/api/commands',{method:'POST',headers:{'Content-Type':'application/json',Cookie:`bnbu_session=${token}`},body:JSON.stringify({action,input,requestId})});
+    try {
+      const requestId=randomUUID();
+      const attempts=await Promise.all([command(student.token,'post.create',{title:'PG 帖子',body:'正文',board:'校园'},requestId),command(student.token,'post.create',{title:'PG 帖子',body:'正文',board:'校园'},requestId)]);
+      expect(attempts.map(r=>r.status)).toEqual([200,200]);
+      const responses=await Promise.all(attempts.map(r=>r.json()));
+      expect(responses[0]).toEqual(responses[1]);
+      const id=responses[0].data.id;
+      expect((await db.pool.query('SELECT * FROM audit WHERE entity_id=$1',[id])).rows).toHaveLength(1);
+      expect((await command(student.token,'content.review',{id,status:'visible'})).status).toBe(403);
+      expect((await command(reviewer.token,'content.review',{id,status:'visible'})).status).toBe(200);
+      expect((await db.pool.query('SELECT * FROM notifications WHERE entity_id=$1',[id])).rows).toHaveLength(1);
+      expect((await command(reviewer.token,'content.review',{id,status:'hidden'})).status).toBe(400);
+      expect((await db.transaction(client=>new PostgresRepository(client).get(id))).data.status).toBe('visible');
+      expect((await db.pool.query('SELECT * FROM audit WHERE entity_id=$1',[id])).rows).toHaveLength(2);
+      expect((await command(student.token,'post.create',{title:'不同操作',body:'正文',board:'校园'},requestId)).status).toBe(409);
+    } finally { await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve())); }
+  });
 });

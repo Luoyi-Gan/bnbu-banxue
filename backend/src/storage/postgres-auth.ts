@@ -1,4 +1,5 @@
 import { randomBytes } from 'node:crypto';
+import type { PoolClient } from 'pg';
 import { account, demand, digest, matchesPassword, normalizeEmail, ServiceError, timestamp, type AccountRow } from '../auth';
 import type { PostgresDatabase } from './postgres';
 
@@ -39,9 +40,9 @@ export class PostgresAuth {
     return result;
   }
 
-  async authenticate(token: string | undefined) {
+  async authenticate(token: string | undefined, client: Pick<PoolClient,'query'> = this.db.pool) {
     if (!token) throw new ServiceError(401,'UNAUTHENTICATED','请先登录。');
-    const row = (await this.db.pool.query<AccountRow>('SELECT a.* FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=$1 AND s.expires_at>$2',[digest(token),Date.now()])).rows[0];
+    const row = (await client.query<AccountRow>('SELECT a.* FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=$1 AND s.expires_at>$2',[digest(token),Date.now()])).rows[0];
     if (!row || row.login_kind === 'HISTORY') throw new ServiceError(401,'UNAUTHENTICATED','登录已过期，请重新登录。');
     if (row.login_kind === 'ADMIN' && row.status !== 'active') throw new ServiceError(403,'ACCOUNT_DISABLED','管理账号已停用。');
     return account(row);
