@@ -17,6 +17,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { portalApplications } from "./sports/portal-applications";
 import {
   portalEnrollments,
   portalTeacherStudent,
@@ -732,6 +733,22 @@ export function createApiServer(
             query.get("after") ?? "",
           ),
         });
+      }
+      if (
+        request.method === "GET" &&
+        pathname === "/api/v1/exemption-application-details"
+      ) {
+        return send(
+          response,
+          200,
+          portalApplications(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        );
       }
       if (request.method === "GET" && pathname === "/api/v1/teacher-progress") {
         return send(

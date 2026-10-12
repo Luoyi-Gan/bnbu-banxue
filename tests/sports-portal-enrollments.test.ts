@@ -134,7 +134,83 @@ it("原版名单只含本人课程，移出成员保留关系但不再开放当�
       status: "REMOVED",
       endReason: "已移出",
     });
+    const exemption = repo.create("sportsApplication", student.account.id, {
+      courseId: course.id,
+      enrollmentId: member.id,
+      applicationType: "EXEMPTION",
+      status: "APPROVED",
+      submittedAt: Date.now(),
+      assetIds: ["proof-one"],
+      publicReason: "已核对",
+      privateNote: "SECRET",
+    });
+    repo.create("sportsApplicationHistory", teacher.account.id, {
+      applicationId: exemption.id,
+      version: 1,
+      action: "APPROVE",
+      at: Date.now(),
+    });
+    const applicationCertification = repo.create("sportsApplication", student.account.id, {
+      courseId: course.id,
+      enrollmentId: member.id,
+      applicationType: "CERTIFICATION",
+      certification: {
+        certificationKind: "SCHOOL_TEAM",
+        organizationOrTeamName: "校队",
+      },
+      status: "SUPPLEMENT_REQUIRED",
+      submittedAt: Date.now(),
+      assetIds: [],
+      publicReason: "补交证明",
+    });
+    repo.create("sportsApplication", student.account.id, {
+      courseId: foreign.id,
+      applicationType: "EXEMPTION",
+      status: "SUBMITTED",
+      privateNote: "SECRET",
+    });
+    const firstApplications = await (
+      await get("/exemption-application-details?limit=1")
+    ).json();
+    expect(firstApplications.data).toHaveLength(1);
+    expect(firstApplications.meta.pagination.total).toBe(2);
+    const secondApplications = await (
+      await get(
+        "/exemption-application-details?limit=1&cursor=" +
+          firstApplications.meta.pagination.nextCursor,
+      )
+    ).json();
+    const applications = [
+      ...firstApplications.data,
+      ...secondApplications.data,
+    ];
+    expect(applications.find((item) => item.id === exemption.id)).toMatchObject(
+      {
+        applicationType: "PHYSICAL_TEST",
+        applicationSubtype: null,
+        status: "APPROVED",
+        mediaIds: ["proof-one"],
+        publicComment: "已核对",
+      },
+    );
+    expect(
+      applications.find((item) => item.id === applicationCertification.id),
+    ).toMatchObject({
+      applicationType: "EXERCISE_CHECK_IN",
+      applicationSubtype: "SCHOOL_TEAM",
+      organizationName: "校队",
+      status: "SUPPLEMENT_REQUIRED",
+    });
+    expect(JSON.stringify(applications)).not.toContain("SECRET");
+    expect(
+      (await get("/exemption-application-details", student.token)).status,
+    ).toBe(403);
+    expect(
+      (await get("/exemption-application-details?classSectionId=" + foreign.id))
+        .status,
+    ).toBe(403);
     repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
+    expect((await get("/exemption-application-details")).status).toBe(503);
     expect((await get("/enrollments")).status).toBe(503);
     expect((await get("/teacher-progress")).status).toBe(503);
   } finally {
