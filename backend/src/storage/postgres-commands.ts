@@ -1,3 +1,4 @@
+import { submitStudentRecord } from './postgres-record-submit';
 import { mediaCommand } from './postgres-student-media';
 import { recordDraftGate, saveRecordDraft } from './postgres-record-drafts';
 import { sportsMaterialPolicy } from "../sports/materials";
@@ -42,6 +43,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(action==='sports.record.submit') await recordDraftGate(repo,actor);
     if(action.startsWith('sports.media.')) await recordDraftGate(repo,actor);
     if(action.startsWith('sports.recorddraft.')) await recordDraftGate(repo,actor);
     if(action.startsWith('sports.exercise.')) {
@@ -86,6 +88,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       demand(session,'运动会话操作失败。',500);
       result=studentSessionProjection(session);
     }
+    else if(action==='sports.record.submit') result=await submitStudentRecord(repo,actor,input);
     else if(action.startsWith('sports.media.')) result=await mediaCommand(repo,actor,action.split('.')[2],input);
     else if(action.startsWith('sports.recorddraft.')) result=await saveRecordDraft(repo,actor,action.split('.')[2],input);
     else if(action==='sports.record.accept') {

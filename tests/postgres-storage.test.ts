@@ -216,6 +216,9 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const bound=await executePostgres(db,login.token,'sports.media.bind',{id:lease.mediaId,sessionId:session.id,expectedVersion:verified.version},randomUUID());
     expect(bound.uploadStatus).toBe('AVAILABLE');
     expect(await postgresMediaRead(db,login.token,String(lease.mediaId))).toMatchObject({verifiedFileSizeBytes:bytes.length,verificationStatus:'VERIFIED'});
+    await expect(executePostgres(db,login.token,'sports.record.submit',{id:draft.id,expectedVersion:edited.version,mediaIds:[lease.mediaId,lease.mediaId]},randomUUID())).rejects.toMatchObject({status:400});
+    await expect(executePostgres(db,login.token,'sports.record.submit',{id:draft.id,expectedVersion:draft.version,mediaIds:[lease.mediaId]},randomUUID())).rejects.toMatchObject({status:409});
+    expect((await postgresStudentRecords(db,login.token,{},String(draft.id))).data).toMatchObject({status:'DRAFT'});
     const discarded=await executePostgres(db,login.token,'sports.recorddraft.discard',{id:draft.id,expectedVersion:edited.version,reason:'测试放弃'},randomUUID());
     expect(discarded.status).toBe('DISCARDED');
     await expect(executePostgres(db,login.token,'sports.recorddraft.edit',{id:draft.id,expectedVersion:discarded.version,description:'不能修改'},randomUUID())).rejects.toMatchObject({status:409});

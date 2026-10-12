@@ -1659,3 +1659,7 @@ POST /api/v1/exercise-sessions 及 pause/resume/finish 接入共享命令事务�
 ### 学生运动媒体上传与恢复接口
 
 新增 media-uploads 创建、私有 PUT object、confirm、media/:id/bind、media 读取及 record evidence-context。复用本地／COS ObjectStore，服务器验证声明大小／SHA-256／实际媒体格式并完整解析，成功才标记 AVAILABLE；不可用客户端声明直接判成功。本人权限、数量限制、过期凭据、重复原文件 PUT 与事务绑定已实现；没有修改学生页面。Docker 重建后，真实 HTTP 上传 PNG、确认 ETag、绑定会话、读取及恢复材料列表通过；61 项相关测试、类型检查及 lint 通过。当前使用本地私有存储，未验证真实 COS；游泳预受理、正式 submit、查看原件下载及失败状态细分仍需继续完成，未声称上传等于正式提交或审核通过。
+
+### 普通运动正式提交与 Docker 验证
+
+POST exercise-records/:id/submit 现在校验草稿版本、本人已验证且绑定原会话的材料、对象存储实际可读性，复用原受理策略核对时限并锁定材料清单；同事务保存完整材料批次、PENDING_AI 记录、事件、通知和原草稿关联。公开 ID 维持草稿 ID，读取不重复展示同会话草稿。幂等重试返回原提交；不自动有效、不计入。Docker 真实 HTTP 从计时结束、草稿、PNG 上传、绑定到 submit、重试、详情和唯一列表已通过。61 项相关测试通过，新增重复材料、过期版本拒绝且草稿保留验证；类型和 lint 通过。游泳明确要求专门预受理，不走普通提交。后续 AI、教师审核 PostgreSQL 适配、证据下载与完整 workflow 仍需继续，三端整体目标未完成。

@@ -25,7 +25,7 @@ export async function postgresStudentRecords(db:PostgresDatabase,token:string,in
       const latest=progress.find(p=>p.data.courseId===d.courseId);
       const detail=Array.isArray(latest?.data.details)?(latest.data.details as Fields[]).find(v=>v.recordId===r.id && v.version===r.version):undefined;
       const reviewed=['VALID','INVALID'].includes(String(d.status));
-      return {id:r.id,studentId:r.ownerId,sessionId:d.sessionId,enrollmentId:session?.data.enrollmentId,
+      return {id:String(d.sourceDraftId ?? r.id),studentId:r.ownerId,sessionId:d.sessionId,enrollmentId:session?.data.enrollmentId,
         classSectionId:d.courseId,status:reviewed?'REVIEWED':'SUBMITTED',
         creditType:d.category==='RELATED'?'COURSE_RELATED':'GENERAL',sportType:d.sportType ?? (d.activityType==='SWIM'?'SWIMMING':null),sportName:d.sportName ?? null,
         description:d.description,businessDate:d.businessDate,version:r.version,createdAt:r.createdAt,updatedAt:r.updatedAt,

@@ -140,6 +140,14 @@ try {
   assert.ok((await request('/api/v1/exercise-records/'+draft.id+'/evidence-context')).data.mediaIds.includes(lease.mediaId));
   const discarded=await sessionWrite('/api/v1/exercise-records/'+draft.id+'/discard',{expectedVersion:edited.version,reason:'Docker test cleanup'});
   assert.equal(discarded.status,'DISCARDED');
+  const finalDraft=await sessionWrite('/api/v1/exercise-records',{sessionId:session.id,creditType:'GENERAL',sportType:'RUNNING',sportName:null,description:'Docker submitted record',clientRequestId:randomUUID()});
+  const submitKey=randomUUID(),submitInput={mediaIds:[lease.mediaId],expectedVersion:finalDraft.version};
+  const submit=async()=>{const response=await fetch(base+'/api/v1/exercise-records/'+finalDraft.id+'/submit',{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':submitKey},body:JSON.stringify(submitInput)});const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;};
+  const submitted=await submit();assert.equal(submitted.status,'SUBMITTED');assert.equal(submitted.id,finalDraft.id);
+  assert.deepEqual(await submit(),submitted);
+  assert.equal((await request('/api/v1/exercise-records/'+finalDraft.id)).data.workflowStage,'PENDING_AI');
+  assert.equal((await request('/api/v1/exercise-records?limit=50')).data.filter(r=>r.sessionId===session.id).length,1);
+
 
 } finally {
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${semesterId}','${courseId}','${enrollmentId}')`],{stdio:'pipe'});
