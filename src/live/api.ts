@@ -30,6 +30,8 @@ export interface Workspace {
   entities: LiveEntity[];
   alumni: AlumniData;
   notifications: {
+    event: string;
+    entityId: string | null;
     id: string;
     body: string;
     readAt: string | null;

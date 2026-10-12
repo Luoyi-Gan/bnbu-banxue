@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Coffee, CalendarDays, Bell } from 'lucide-react'
 import { useV2 } from './useV2'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { PageHeading, Empty, Modal } from './ui'
 import { type V2State, studentName } from './model'
 import { canUseTeacherSports, answerCoffeeMove, cancelCoffee, closeCoffeeSlot, coffeeData, managedTeachers, occupied, proposeCoffeeMove, saveCoffeeSlot, teacherAccount } from './teacherCoffee'
@@ -39,9 +40,10 @@ export function TeacherSchedule() {
 }
 
 export function TeacherMessages() {
-  const { state, setState } = useV2(), account = teacherAccount(state), data = coffeeData(state)
-  const items = data.notices.filter(n => n.teacherId === account.id)
-  return <div className="v2-page"><PageHeading eyebrow="MESSAGES" title="消息与通知" description="预约、取消与改期的业务通知。"/><section className="v2-panel v2-teacher-panel">{items.length ? items.map(n => <article className="v2-teacher-card" key={n.id}><p>{n.body}</p><small>{stamp(n.at)} · {n.read ? '已读' : '未读'}</small><Link to="/v2/teacher/coffee">查看预约</Link>{!n.read && <button className="v2-button v2-button-secondary" onClick={() => setState(value => ({ ...value, teacherCoffee: { ...coffeeData(value), notices: coffeeData(value).notices.map(item => item.id === n.id && item.teacherId === account.id ? { ...item, read: true } : item) } }))}>标为已读</button>}</article>) : <Empty icon={Bell} title="暂无消息"/>}{account.sportsQualified && <Link to="/v2/teacher/sports">查看体育平台通知</Link>}</section></div>
+  const {state} = useV2(), account = teacherAccount(state)
+  const live = useWorkspaceBackend(10000)
+  const items = live.data?.notifications.filter(n => n.event.startsWith('coffee.')) ?? []
+  return <div className="v2-page"><PageHeading eyebrow="MESSAGES" title="消息与通知" description="预约、取消与改期的业务通知。"/>{live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人通知…</p>}<section className="v2-panel v2-teacher-panel">{items.length ? items.map(n => <article className="v2-teacher-card" key={n.id}><p>{n.body}</p><small>{stamp(n.createdAt)} · {n.readAt ? '已读' : '未读'}</small><Link to="/v2/teacher/coffee">查看预约</Link>{!n.readAt && <button disabled={live.busy} className="v2-button v2-button-secondary" onClick={() => void live.mutate('notification.read', {id: n.id})}>标为已读</button>}</article>) : live.data && <Empty icon={Bell} title="暂无消息"/>}{account.sportsQualified && <Link to="/v2/teacher/sports">查看体育平台通知</Link>}</section></div>
 }
 
 export function TeacherProfile() {
