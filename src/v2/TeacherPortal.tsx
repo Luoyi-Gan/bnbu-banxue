@@ -4,7 +4,7 @@ import { Coffee, CalendarDays, Bell } from 'lucide-react'
 import { useV2 } from './useV2'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { PageHeading, Empty, Modal } from './ui'
-import { canUseTeacherSports, coffeeData, managedTeachers, teacherAccount } from './teacherCoffee'
+import { canUseTeacherSports, teacherAccount } from './teacherCoffee'
 import './teacherPortal.css'
 
 const stamp = (value: string) => new Date(value).toLocaleString('zh-CN', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -60,10 +60,17 @@ export function TeacherMessages() {
 }
 
 export function TeacherProfile() {
-  const { state, setState, persistenceError } = useV2(), account = teacherAccount(state), person = managedTeachers(state).find(t => t.id === account.id)!
+  const live = useWorkspaceBackend()
   const [message, setMessage] = useState('')
-  function save(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const f = new FormData(event.currentTarget), nickname = String(f.get('nickname')).trim(); if (!nickname || nickname.length > 20) { setMessage('展示名称须为 1–20 字。'); return } setState(value => ({ ...value, teacherCoffee: { ...coffeeData(value), profiles: { ...coffeeData(value).profiles, [account.id]: { nickname, bio: String(f.get('bio')).trim(), topics: String(f.get('topics')).split('、').map(t => t.trim()).filter(Boolean), location: String(f.get('location')).trim() } } } })); setMessage('资料已更新，学生端老师介绍同步显示。') }
-  return <div className="v2-page"><PageHeading eyebrow="TEACHER PROFILE" title="个人资料" description="维护学生预约前可以查看的介绍。"/><form className="v2-panel v2-form v2-teacher-panel" onSubmit={save}><label>教师标识<input value={account.id} readOnly/></label><label>学院<input value={person.department} readOnly/></label><label>教师资格<input value={account.sportsQualified ? '体育老师（本地演示资格）' : '普通老师（本地演示身份）'} readOnly/></label><label>展示名称<input name="nickname" defaultValue={person.name} maxLength={20} required/></label><label>个人介绍<textarea name="bio" defaultValue={person.bio} maxLength={1000}/></label><label>交流主题（用顿号分隔）<input name="topics" defaultValue={person.topics.join('、')} maxLength={200}/></label><label>默认交流地点<input name="location" defaultValue={person.location} maxLength={100} required/></label><button className="v2-button v2-button-primary">保存资料</button><p role="status">{persistenceError ? '浏览器存储失败，刷新后可能丢失。' : message}</p><p className="v2-form-note">体育资格不能通过编辑资料取得。已开放时段的地点以时段记录为准。</p></form></div>
+  const account = live.data?.account
+  const profile = live.data?.entities.find(e => e.kind === 'teacherProfile' && e.ownerId === account?.id)
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const f = new FormData(event.currentTarget)
+    setMessage('')
+    if (await live.mutate('coffee.profile', {nickname: String(f.get('nickname')).trim(), bio: String(f.get('bio')).trim(), topics: String(f.get('topics')).trim(), location: String(f.get('location')).trim(), enabled: profile?.data.enabled !== false})) setMessage('资料已保存到伴学后台。')
+  }
+  return <div className="v2-page"><PageHeading eyebrow="TEACHER PROFILE" title="个人资料" description="维护学生预约前可以查看的介绍。"/>{!account ? <p role={live.error ? 'alert' : 'status'}>{live.error || '正在读取本人资料…'}</p> : <form key={account.id} className="v2-panel v2-form v2-teacher-panel" onSubmit={save}><label>教师标识<input value={account.id} readOnly/></label><label>学院<input value={account.organization} readOnly/></label><label>教师资格<input value="已授权教师；体育资格以体育平台核验为准" readOnly/></label><label>展示名称<input name="nickname" defaultValue={String(profile?.data.nickname ?? account.name)} maxLength={20} required/></label><label>个人介绍<textarea name="bio" defaultValue={String(profile?.data.bio ?? '')} maxLength={1000}/></label><label>交流主题（用顿号分隔）<input name="topics" defaultValue={String(profile?.data.topics ?? '')} maxLength={200}/></label><label>默认交流地点<input name="location" defaultValue={String(profile?.data.location ?? '')} maxLength={100} required/></label><button disabled={live.busy} className="v2-button v2-button-primary">保存资料</button><p role="status">{live.error || message}</p><p className="v2-form-note">体育资格不能通过编辑资料取得。已开放时段的地点以时段记录为准。</p></form>}</div>
 }
 
 export function TeacherSports() {
