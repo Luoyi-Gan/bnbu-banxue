@@ -554,6 +554,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const applicationResponse=await fetch(base+'/api/v1/exemption-application-details?classSectionId='+course.id,{headers:teacherHeaders});
       expect(applicationResponse.status).toBe(200);expect((await applicationResponse.json()).data).toEqual([expect.objectContaining({id:application.id,studentId:'sports-reader-student',reason:'本地免测读取验收'})]);
       expect((await fetch(base+'/api/v1/exemption-application-details?classSectionId='+foreign.id,{headers:teacherHeaders})).status).toBe(403);
+      const foreignRecord=await db.transaction(client=>new PostgresRepository(client).create('sportsRecord','sports-reader-student',{courseId:foreign.id,status:'VALID'}));
+      const recordResponse=await fetch(base+'/api/v1/exercise-records?classSectionId='+course.id,{headers:teacherHeaders});
+      expect(recordResponse.status).toBe(200);
+      const recordPage=await recordResponse.json();expect(recordPage.data).toHaveLength(1);
+      expect(recordPage.data[0]).toMatchObject({studentId:'sports-reader-student',classSectionId:course.id,status:'REVIEWED',actualDurationSeconds:3600});
+      expect((await fetch(base+'/api/v1/exercise-records/'+foreignRecord.id,{headers:teacherHeaders})).status).toBe(404);
+      expect((await fetch(base+'/api/v1/exercise-records?classSectionId='+foreign.id,{headers:teacherHeaders})).status).toBe(403);
       const response=await fetch(url,{headers:{Cookie:`bnbu_session=${teacher.token}`}});
       expect(response.status).toBe(200);expect(response.headers.get('content-type')).toContain('text/csv');
       expect(await response.text()).toContain('报表核对');

@@ -5,6 +5,8 @@ import type { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
 import { recordDraftGate, recordDraftProjection } from './postgres-record-drafts';
 import { supplementClock } from '../sports/supplements';
+import { sportsRole } from '../sports/courses';
+import { sportsAvailable } from '../sports/materials';
 
 export function studentWorkflowStage(status:unknown) {
   return status==='TEACHER_PENDING'?'PENDING_TEACHER':status==='SUPPLEMENT_REQUIRED'?'AWAITING_SUPPLEMENT':status;
@@ -62,21 +64,30 @@ export async function postgresStudentRecords(db:PostgresDatabase,token:string,in
   return db.transaction(async client=>{
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
-    await recordDraftGate(repo,actor);
-    demand(Object.keys(input).every(k=>['limit','cursor','sort','enrollmentId'].includes(k)),'运动记录查询参数无效。');
+    const identities=await repo.all('sportsIdentity');
+    const teacher=identities.some(i=>i.ownerId===actor.id && i.data.role==='teacher' && i.data.status==='verified');
+    const courses=teacher?(await repo.all('sportsCourse')).filter(c=>c.ownerId===actor.id):[];
+    if(teacher) {
+      sportsRole({all:()=>identities},actor,'teacher');
+      const systems=await repo.all('sportsSystem');sportsAvailable({all:()=>systems});
+    } else await recordDraftGate(repo,actor);
+    demand(Object.keys(input).every(k=>['limit','cursor','sort',teacher?'classSectionId':'enrollmentId'].includes(k)),'运动记录查询参数无效。');
+    const courseId=textField(input,'classSectionId',100,true);
+    if(teacher && courseId)demand(courses.some(c=>c.id===courseId),'无权读取该课程运动记录。',403);
     demand(input.sort===undefined || input.sort==='-businessDate','运动记录排序无效。');
     const limit=input.limit===undefined?50:integerField({limit:Number(input.limit)},'limit',1,100);
     const enrollmentId=textField(input,'enrollmentId',100,true),cursor=textField(input,'cursor',100,true);
-    const sessions=(await repo.all('sportsSession')).filter(s=>s.ownerId===actor.id);
+    const visible=(row:{ownerId:string|null;data:Fields})=>teacher?courses.some(c=>c.id===row.data.courseId) && (!courseId || row.data.courseId===courseId):row.ownerId===actor.id;
+    const sessions=(await repo.all('sportsSession')).filter(visible);
     const sessionMap=new Map(sessions.map(s=>[s.id,s]));
-    const records=(await repo.all('sportsRecord')).filter(r=>r.ownerId===actor.id);
+    const records=(await repo.all('sportsRecord')).filter(visible);
     const batches=await repo.all('sportsMaterialBatch');
-    const progress=(await repo.all('sportsProgress')).filter(p=>p.ownerId===actor.id).sort((a,b)=>Number(b.data.sequence)-Number(a.data.sequence));
+    const progress=(await repo.all('sportsProgress')).filter(visible).sort((a,b)=>Number(b.data.sequence)-Number(a.data.sequence));
     const submittedSessions=new Set(records.map(r=>r.data.sessionId));
-    const drafts=(await repo.all('sportsRecordDraft')).filter(r=>r.ownerId===actor.id && !submittedSessions.has(r.data.sessionId));
+    const drafts=teacher?[]:(await repo.all('sportsRecordDraft')).filter(r=>r.ownerId===actor.id && !submittedSessions.has(r.data.sessionId));
     const entries=[...drafts.map(recordDraftProjection),...records.map(r=>{
       const d=r.data,session=sessionMap.get(String(d.sessionId));
-      const latest=progress.find(p=>p.data.courseId===d.courseId);
+      const latest=progress.find(p=>p.ownerId===r.ownerId && p.data.courseId===d.courseId);
       const detail=Array.isArray(latest?.data.details)?(latest.data.details as Fields[]).find(v=>v.recordId===r.id && v.version===r.version):undefined;
       const reviewed=['VALID','INVALID'].includes(String(d.status));
       return {id:String(d.sourceDraftId ?? r.id),studentId:r.ownerId,sessionId:d.sessionId,enrollmentId:session?.data.enrollmentId,
