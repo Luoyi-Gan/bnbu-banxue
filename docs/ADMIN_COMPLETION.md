@@ -1759,3 +1759,7 @@ API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入�
 ### PostgreSQL 教师体测／最终成绩历史读取
 
 抽出gradeHistoryProjection共用原版历史版本检查、降序及beforeVersion分页，接通GET enrollments/:id/physical-results与final-grades。读取前检查教师身份、维护和原责任课程，仅返回原版公开给教师的字段，不授予学生历史成绩权限。53项PostgreSQL／原版成绩协议测试通过，覆盖体测两版分页和学生拒绝，类型与lint通过。最终成绩写入、更正及本轮接口Docker验证仍待完成，UI未改。
+
+### Docker 教师体测历史查询
+
+重建API健康后，扩展真实HTTP冒烟核对教师录入后的physical-results历史：第一版、245秒、分页结束均正确，学生原事实读取及补证／审核整链继续通过。此证据仅证明本地已接通路径，成绩草稿发布及结算后更正仍待迁移。

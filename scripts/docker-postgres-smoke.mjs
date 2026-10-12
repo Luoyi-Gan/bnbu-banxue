@@ -187,6 +187,8 @@ try {
   const teacherCookie=cookie;
   const physical=await sessionWrite('/api/v1/enrollments/'+enrollmentId+'/physical-results',{expectedVersion:0,runType:'1000m',elapsedSeconds:245,testedOn:'2026-10-01'});
   assert.equal(physical.version,1);assert.equal(physical.elapsedSeconds,245);
+  const physicalHistory=(await request('/api/v1/enrollments/'+enrollmentId+'/physical-results?limit=1')).data;
+  assert.equal(physicalHistory.items.length,1);assert.equal(physicalHistory.items[0].version,1);assert.equal(physicalHistory.items[0].elapsedSeconds,245);assert.equal(physicalHistory.nextBeforeVersion,null);
   cookie=studentCookie;
   assert.deepEqual((await request('/api/v1/student/enrollments/'+enrollmentId+'/physical-result')).data,{status:'RECORDED',result:{runType:'1000m',elapsedSeconds:245,testedOn:'2026-10-01'}});
   cookie=teacherCookie;
