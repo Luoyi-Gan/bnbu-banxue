@@ -16,7 +16,7 @@ export function canManageMode(repo: Pick<Repository,"all"|"get">, actor: Account
 export function currentSystem(repo: Pick<Repository, 'all'>) {
   return repo.all("sportsSystem")[0];
 }
-export function sportsWriteGate(repo: Repository, action: string) {
+export function sportsWriteGate(repo: Pick<Repository,"all">, action: string) {
   if (
     action.startsWith("sports.") &&
     ![

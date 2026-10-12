@@ -199,6 +199,8 @@ try {
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
   const teacherCookie=cookie;
+  assert.equal((await request('/api/v1/admin/exercise-goal')).data.totalTargetMinutes,1200);
+  const templatePage=(await request('/api/v1/rule-templates?limit=1')).data;assert.equal(templatePage.items[0].id,publishedTemplate.id);assert.equal(templatePage.items[0].rules.totalTargetMinutes,1200);
   const createdCourse=await sessionWrite('/api/v1/teacher/courses',{displayName:'Docker real publication'});
   const windowResponse=await fetch(base+'/api/v1/class-sections/'+createdCourse.id,{method:'PATCH',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':randomUUID()},body:JSON.stringify({expectedVersion:1,checkInStartDate:'2026-09-01',checkInEndDate:'2027-01-20',dailyStartTime:'08:00',dailyEndTime:'22:00',excludedDates:[],checkInWindowMode:'AVAILABLE',submissionDeadlineAt:'2027-01-20T23:59:59+08:00'})});
   const savedWindow=await windowResponse.json();assert.equal(windowResponse.status,200,JSON.stringify(savedWindow));assert.equal(savedWindow.data.version,2);
@@ -211,9 +213,18 @@ try {
   assert.equal((await request('/api/v1/class-sections/'+createdCourse.id+'/progress-target')).data.totalTargetSeconds,72000);
   const invitePath='/api/v1/class-sections/'+createdCourse.id+'/course-invites';
   const publishedInvite=await sessionWrite(invitePath,{expiresInMinutes:5});assert.equal(publishedInvite.status,'ACTIVE');
+  const joinStudentId=randomUUID(),joinStudentEmail='join-'+randomUUID()+'@example.test';
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind) SELECT '${joinStudentId}','${joinStudentEmail}',password_hash,'Docker joining student','["student"]','now','PERSONAL' FROM accounts WHERE id='${actor.id}'; INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES('${randomUUID()}','sportsIdentity','${joinStudentId}','{"role":"student","status":"verified"}','now','now')`],{stdio:'pipe'});
+  await request('/api/auth/sign-in',{identifier:joinStudentEmail,password});
+  const joinFlow=(await request('/api/commands',{action:'sports.enrollment.begin',input:{code:publishedInvite.inviteToken},requestId:randomUUID()})).data;
+  const joinCommand={action:'sports.enrollment.join',input:{flowId:joinFlow.id},requestId:randomUUID()};
+  const joined=await request('/api/commands',joinCommand);assert.deepEqual(await request('/api/commands',joinCommand),joined);
+  assert.ok((await request('/api/v1/enrollments?classSectionId='+createdCourse.id)).data.some(e=>e.id===joined.data.id && e.status==='ACTIVE'));
+  cookie=teacherCookie;
+  assert.ok((await request('/api/v1/enrollments?classSectionId='+createdCourse.id)).data.some(e=>e.studentId===joinStudentId));
   assert.equal((await sessionWrite(invitePath+'/revocations',{inviteToken:publishedInvite.inviteToken})).status,'REVOKED');
   await request('/api/commands',{action:'sports.course.close',input:{id:createdCourse.id,version:publishedView.version,reason:'Docker test completed'},requestId:randomUUID()});
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind='sportsInvitation' AND data::jsonb->>'courseId'='${createdCourse.id}')`],{stdio:'pipe'});
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind IN ('sportsInvitation','sportsEnrollment','sportsEnrollmentFlow') AND data::jsonb->>'courseId'='${createdCourse.id}'); UPDATE accounts SET status='banned',roles='[]' WHERE id='${joinStudentId}'`],{stdio:'pipe'});
   const teachingReport=await request('/api/sports/course-reports/'+courseId);
   assert.equal(teachingReport.reportType,'CURRENT_TEACHING_REPORT');
   assert.equal(teachingReport.rows.find(r=>r.enrollmentId===enrollmentId).facts.enduranceStatus,'NOT_RECORDED');

@@ -1,4 +1,5 @@
 import { postgresCourseReport } from './storage/postgres-course-report';
+import { postgresRuleTemplates } from './storage/postgres-rule-templates';
 import { reportCsv } from './sports/report';
 import { courseWindowInput, courseInviteInput, courseInviteProjection } from './sports/portal-courses';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
@@ -44,6 +45,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      if(request.method==='GET' && ['/api/v1/rule-templates','/api/v1/admin/exercise-goal'].includes(pathname)) return send(response,200,await postgresRuleTemplates(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams),pathname.endsWith('/exercise-goal')));
       const reportRead=/^\/api\/sports\/course-reports\/([a-f0-9-]+)(\.csv)?$/.exec(pathname);
       if(request.method==='GET' && reportRead) {
         const report=await postgresCourseReport(db,cookieToken(request) ?? '',reportRead[1]);

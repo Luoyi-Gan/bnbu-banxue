@@ -1,5 +1,6 @@
 import { postgresCourseReport } from '../backend/src/storage/postgres-course-report';
 import { checkPostgresDeadlineReminders } from '../backend/src/storage/postgres-deadline-reminders';
+import { postgresRuleTemplates } from '../backend/src/storage/postgres-rule-templates';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
@@ -467,6 +468,29 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect(await response.text()).toContain('报表核对');
       expect((await fetch(url,{headers:{Cookie:`bnbu_session=${student.token}`}})).status).toBe(403);
     } finally {await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
+  });
+  it('reads published template revisions with teacher access and denies students', async()=>{
+    const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const first=await postgresRuleTemplates(db,teacher.token,{limit:1});
+    expect('items' in first.data && first.data.items).toHaveLength(1);
+    expect(await postgresRuleTemplates(db,teacher.token,{},true)).toEqual({data:{totalTargetMinutes:1200,version:1}});
+    await expect(postgresRuleTemplates(db,student.token,{})).rejects.toMatchObject({status:403});
+    await expect(postgresRuleTemplates(db,teacher.token,{beforeVersion:'invalid'})).rejects.toMatchObject({status:400});
+  });
+  it('joins through an owned invitation flow once and blocks a second active enrollment', async()=>{
+    const auth=new PostgresAuth(db),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const invite=await db.transaction(async client=>{const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'CURRENT',name:'入班学期'}),course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,name:'入班课程',status:'PUBLISHED',enrollmentOpen:true});return repo.create('sportsInvitation',course.ownerId,{courseId:course.id,code:randomUUID(),status:'ACTIVE',expiresAt:Date.now()+300000});});
+    const flow=await executePostgres(db,student.token,'sports.enrollment.begin',{code:invite.data.code},randomUUID());
+    const storedFlow=await db.transaction(client=>new PostgresRepository(client).get(flow.id));expect(storedFlow.data).toMatchObject({courseName:'入班课程',semesterName:'入班学期',status:'OPEN',teacherName:'sports-reader-other'});
+    const key=randomUUID(),joined=await executePostgres(db,student.token,'sports.enrollment.join',{flowId:flow.id},key);
+    expect(await executePostgres(db,student.token,'sports.enrollment.join',{flowId:flow.id},key)).toEqual(joined);
+    expect((await db.transaction(client=>new PostgresRepository(client).get(joined.id))).data).toMatchObject({status:'ACTIVE',source:'INVITE',invitationId:invite.id});
+    expect((await db.transaction(client=>new PostgresRepository(client).get(flow.id))).data.status).toBe('COMPLETED');
+    await expect(executePostgres(db,student.token,'sports.enrollment.join',{code:invite.data.code},randomUUID())).rejects.toMatchObject({status:409});
+    expect((await db.pool.query('SELECT * FROM notifications WHERE entity_id=$1',[joined.id])).rows).toHaveLength(2);
+    await db.pool.query('DELETE FROM notifications WHERE entity_id=$1',[joined.id]);
+    const course=await db.transaction(client=>new PostgresRepository(client).get(invite.data.courseId));
+    await db.pool.query('DELETE FROM entities WHERE id=$1',[course.data.semesterId]);
   });
   it('creates teacher course drafts without inventing rules or opening enrollment', async()=>{
     const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');

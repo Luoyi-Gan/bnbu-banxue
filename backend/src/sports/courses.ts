@@ -192,113 +192,7 @@ export function sportsCourseCommand(
   if(["sports.course.window","sports.course.create","sports.course.save"].includes(action)) return runSync(sportsCourseDraftPolicy(repo,actor,action,input));
   if(["sports.course.configurepublish","sports.course.publish"].includes(action)) return runSync(sportsCoursePublishPolicy(repo,actor,action,input,course=>checkDeadlineReminders(repo,Date.now(),course)));
   if(["sports.course.close","sports.invitation.create","sports.invitation.revoke"].includes(action)) return runSync(sportsInvitationPolicy(repo,actor,action,input));
-  if (
-    action === "sports.enrollment.join" ||
-    action === "sports.enrollment.begin"
-  ) {
-    sportsRole(repo, actor, "student");
-    const flow = input.flowId
-      ? repo.get(input.flowId, "sportsEnrollmentFlow")
-      : undefined;
-    if (flow)
-      demand(
-        action === "sports.enrollment.join" &&
-          flow.ownerId === actor.id &&
-          flow.data.status === "OPEN",
-        "入班流程不属于本人或已结束。",
-        409,
-      );
-    const invite = flow
-      ? repo.get(flow.data.invitationId, "sportsInvitation")
-      : repo
-          .all("sportsInvitation")
-          .find((i) => i.data.code === textField(input, "code", 100));
-    const now = Date.now();
-    demand(
-      invite &&
-        invite.data.status === "ACTIVE" &&
-        (Number(invite.data.expiresAt) > now ||
-          (flow &&
-            Number(flow.data.startedAt) < Number(invite.data.expiresAt) &&
-            now < Number(flow.data.deadline))),
-      "邀请无效或已过期。",
-    );
-    const course = repo.get(invite.data.courseId, "sportsCourse");
-    currentSemester(repo, course.data.semesterId);
-    demand(
-      course.data.status === "PUBLISHED" && course.data.enrollmentOpen,
-      "课程未开放入班。",
-    );
-    demand(
-      !repo
-        .all("sportsEnrollment")
-        .some(
-          (e) =>
-            e.ownerId === actor.id &&
-            e.data.semesterId === course.data.semesterId &&
-            e.data.status === "ACTIVE",
-        ),
-      "当前学期已有有效体育教学班。",
-      409,
-    );
-    demand(
-      !repo
-        .all("sportsEnrollment")
-        .some(
-          (e) =>
-            e.ownerId === actor.id &&
-            e.data.courseId === course.id &&
-            e.data.status === "REMOVED",
-        ),
-      "已移出的原班成员须由责任教师恢复。",
-    );
-    if (action === "sports.enrollment.begin") {
-      const existing = repo
-        .all("sportsEnrollmentFlow")
-        .find(
-          (f) =>
-            f.ownerId === actor.id &&
-            f.data.invitationId === invite.id &&
-            f.data.status === "OPEN",
-        );
-      return (
-        existing ??
-        repo.create("sportsEnrollmentFlow", actor.id, {
-          invitationId: invite.id,
-          courseId: course.id,
-          courseName: course.data.name,
-          semesterName: repo.get(course.data.semesterId).data.name,
-          teacherName:
-            repo.db
-              .prepare("SELECT name FROM accounts WHERE id=?")
-              .get(course.ownerId!)?.name ?? "责任教师",
-          startedAt: now,
-          deadline: Number(invite.data.expiresAt) + 10 * 60000,
-          status: "OPEN",
-        })
-      );
-    }
-    const member = repo.create("sportsEnrollment", actor.id, {
-      courseId: course.id,
-      semesterId: course.data.semesterId,
-      status: "ACTIVE",
-      source: "INVITE",
-      invitationId: invite.id,
-    });
-    if (flow)
-      repo.save(flow, {
-        status: "COMPLETED",
-        completedAt: now,
-        enrollmentId: member.id,
-      });
-    repo.notify(
-      [actor.id, course.ownerId!],
-      member.id,
-      action,
-      "已加入体育教学班。",
-    );
-    return member;
-  }
+  if(["sports.enrollment.join","sports.enrollment.begin"].includes(action)) return runSync(sportsEnrollmentPolicy(repo,actor,action,input,id=>String(repo.db.prepare("SELECT name FROM accounts WHERE id=?").get(id)?.name ?? "责任教师")));
   return undefined;
 }
 
@@ -731,5 +625,115 @@ export function* sportsCoursePublishPolicy(repo:BusinessRepository,actor:Account
     }));
     yield* effect(remind(published));
     return published;
+  }
+}
+
+export function* sportsEnrollmentPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields,nameById:(id:string)=>string|Promise<string>):Generator<unknown,Entity|undefined,unknown> {
+ const entities:Entity[]=[];
+ for(const kind of ["sportsIdentity","sportsSemester","sportsCourse","sportsEnrollment","sportsEnrollmentFlow","sportsInvitation"]) entities.push(...(yield* effect(repo.all(kind))));
+ const reader:Pick<Repository,"all"|"get">={all:kind=>entities.filter(e=>e.kind===kind),get:(id,kind)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,"对象不存在。",404);return e;}};
+  if (
+    action === "sports.enrollment.join" ||
+    action === "sports.enrollment.begin"
+  ) {
+    sportsRole(reader, actor, "student");
+    const flow = input.flowId
+      ? reader.get(input.flowId, "sportsEnrollmentFlow")
+      : undefined;
+    if (flow)
+      demand(
+        action === "sports.enrollment.join" &&
+          flow.ownerId === actor.id &&
+          flow.data.status === "OPEN",
+        "入班流程不属于本人或已结束。",
+        409,
+      );
+    const invite = flow
+      ? reader.get(flow.data.invitationId, "sportsInvitation")
+      : reader
+          .all("sportsInvitation")
+          .find((i) => i.data.code === textField(input, "code", 100));
+    const now = Date.now();
+    demand(
+      invite &&
+        invite.data.status === "ACTIVE" &&
+        (Number(invite.data.expiresAt) > now ||
+          (flow &&
+            Number(flow.data.startedAt) < Number(invite.data.expiresAt) &&
+            now < Number(flow.data.deadline))),
+      "邀请无效或已过期。",
+    );
+    const course = reader.get(invite.data.courseId, "sportsCourse");
+    currentSemester(reader, course.data.semesterId);
+    demand(
+      course.data.status === "PUBLISHED" && course.data.enrollmentOpen,
+      "课程未开放入班。",
+    );
+    demand(
+      !reader
+        .all("sportsEnrollment")
+        .some(
+          (e) =>
+            e.ownerId === actor.id &&
+            e.data.semesterId === course.data.semesterId &&
+            e.data.status === "ACTIVE",
+        ),
+      "当前学期已有有效体育教学班。",
+      409,
+    );
+    demand(
+      !reader
+        .all("sportsEnrollment")
+        .some(
+          (e) =>
+            e.ownerId === actor.id &&
+            e.data.courseId === course.id &&
+            e.data.status === "REMOVED",
+        ),
+      "已移出的原班成员须由责任教师恢复。",
+    );
+    if (action === "sports.enrollment.begin") {
+      const existing = reader
+        .all("sportsEnrollmentFlow")
+        .find(
+          (f) =>
+            f.ownerId === actor.id &&
+            f.data.invitationId === invite.id &&
+            f.data.status === "OPEN",
+        );
+      return (
+        existing ??
+        (yield* effect(repo.create("sportsEnrollmentFlow", actor.id, {
+          invitationId: invite.id,
+          courseId: course.id,
+          courseName: course.data.name,
+          semesterName: reader.get(course.data.semesterId).data.name,
+          teacherName: yield* effect(nameById(course.ownerId!)),
+          startedAt: now,
+          deadline: Number(invite.data.expiresAt) + 10 * 60000,
+          status: "OPEN",
+        })))
+      );
+    }
+    const member = yield* effect(repo.create("sportsEnrollment", actor.id, {
+      courseId: course.id,
+      semesterId: course.data.semesterId,
+      status: "ACTIVE",
+      source: "INVITE",
+      invitationId: invite.id,
+    }));
+    if (flow)
+      yield* effect(repo.save(flow, {
+        status: "COMPLETED",
+        completedAt: now,
+        enrollmentId: member.id,
+      }));
+    yield* effect(repo.notify(
+      [actor.id, course.ownerId!],
+      member.id,
+      action,
+      "已加入体育教学班。",
+    ));
+    return member;
   }
 }
