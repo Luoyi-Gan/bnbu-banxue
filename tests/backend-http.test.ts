@@ -106,6 +106,11 @@ describe("API、持久化和跨角色联动", () => {
     });
     expect(read(c)?.data.snapshot).not.toHaveProperty("members");
     expect(repo.get(report.id)).toEqual(stored);
+    const history = snapshot(db,b.account).relationshipHistory.find(h=>h.entity.sourceId===room.id);
+    expect(history?.changes.map(c=>c.status)).toEqual(["入队申请已通过","已被移出队伍"]);
+    expect(history?.entity.active).toBe(false);
+    expect(JSON.stringify(history)).not.toContain(a.id);
+    expect(snapshot(db,c.account).relationshipHistory).toEqual([]);
   });
   it("活动资格检查所有本人认证，旧驳回和撤销记录不遮挡有效认证", () => {
     const { a, b, admin, run, repo } = setup();

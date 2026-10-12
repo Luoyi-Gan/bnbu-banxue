@@ -213,6 +213,8 @@ export function execute(
       typeof input.reason === "string" ? input.reason : "",
       JSON.stringify({
         result,
+        ...(["room.create", "room.decide", "room.finish", "room.moderate"].includes(action)
+          ? {teamResult: repo.get((result as {id:string}).id)} : {}),
         ...(action === "relation.set"
           ? { relation: { kind: input.kind, enabled: input.enabled === true } }
           : {}),

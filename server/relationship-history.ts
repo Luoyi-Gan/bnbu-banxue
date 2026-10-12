@@ -27,5 +27,33 @@ export function relationshipHistory(db: Database, actorId: string, visible: Enti
     entry.entity.active = relation.enabled && !!isPublic
     if (relation.enabled && !entry.entity.establishedAt) entry.entity.establishedAt = row.at
   }
+  const teamRows = db.prepare("SELECT action,data,created_at AS at FROM audit WHERE action IN ('room.create','room.decide','room.finish','room.moderate') ORDER BY created_at,rowid").all() as unknown as {action:string;data:string;at:string}[]
+  const membership = new Map<string, boolean>()
+  for (const row of teamRows) {
+    const saved = (JSON.parse(row.data) as {teamResult?:Entity}).teamResult
+    if (!saved?.data) continue
+    let roomId: string, joined: boolean, status: string, active: boolean
+    if (row.action === 'room.decide') {
+      if (saved.ownerId !== actorId || saved.data.status !== 'approved' || typeof saved.data.roomId !== 'string') continue
+      roomId = saved.data.roomId; joined = true; active = true; status = '入队申请已通过'
+    } else {
+      roomId = saved.id
+      joined = Array.isArray(saved.data.members) && saved.data.members.includes(actorId)
+      if (!joined && !membership.get(roomId)) continue
+      active = joined && saved.data.status === 'open' && saved.data.visibility === 'visible'
+      status = !joined ? '已被移出队伍' : saved.data.status === 'finished' ? '队伍已结束' : saved.data.visibility !== 'visible' ? '队伍已下架' : '已加入队伍'
+    }
+    membership.set(roomId, joined)
+    const id = 'team:' + roomId, current = visible.find(e=>e.id===roomId && e.kind==='room')
+    const isPublic = current?.data.visibility === 'visible'
+    let entry = grouped.get(id)
+    if (!entry) {
+      entry = {entity:{id,sourceId:roomId,title:isPublic ? String(current.data.title) : '原队伍当前不可见',kind:'team',relation:'joined',status,active,path:'/v2/partners/teams',establishedAt:row.action==='room.create'||row.action==='room.decide' ? row.at : null},changes:[]}
+      grouped.set(id,entry)
+    }
+    if (entry.changes.at(-1)?.status !== status) entry.changes.push({at:row.at,status,active})
+    entry.entity.active = active && !!isPublic
+    entry.entity.status = status
+  }
   return [...grouped.values()]
 }
