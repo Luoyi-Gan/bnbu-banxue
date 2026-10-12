@@ -435,6 +435,18 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await db.transaction(client=>new PostgresRepository(client).get(first.id))).data).toMatchObject({status:'published',thresholds:[30,45,60],weeklyLimits:[2,3,4],totalTarget:1200,singleCap:60,dailyLimit:1});
     } finally {await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='ai-governor'");}
   });
+  it('creates teacher course drafts without inventing rules or opening enrollment', async()=>{
+    const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const semester=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{status:'CURRENT',startDate:'2026-09-01',endDate:'2027-01-31'}));
+    try {
+      const input={name:'Draft course'},key=randomUUID();
+      await expect(executePostgres(db,student.token,'sports.course.create',input,randomUUID())).rejects.toMatchObject({status:403});
+      const saved=await executePostgres(db,teacher.token,'sports.course.create',input,key);expect(await executePostgres(db,teacher.token,'sports.course.create',input,key)).toEqual(saved);
+      const course=await db.transaction(client=>new PostgresRepository(client).get(saved.id));
+      expect(course.data).toEqual({name:'Draft course',semesterId:semester.id,status:'DRAFT',settlementStatus:'PENDING',enrollmentOpen:false});
+      await expect(executePostgres(db,teacher.token,'sports.course.create',{...input,threshold:30},randomUUID())).rejects.toMatchObject({status:400});
+    } finally {await db.pool.query('DELETE FROM entities WHERE id=$1',[semester.id]);}
+  });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const record=await db.transaction(async client=>{

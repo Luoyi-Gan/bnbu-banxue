@@ -33,7 +33,7 @@ import { projectSportsNotification } from '../sports/portal-notifications';
 import { sportsSessionPolicy } from '../sports/sessions';
 import { saveSportsPreferences, sportsPreferencesGate } from './postgres-sports-preferences';
 import { studentSessionProjection } from './postgres-sports-session';
-import { sportsRole, sportsSemesterPolicy, publishedTemplateFields } from '../sports/courses';
+import { sportsRole, sportsSemesterPolicy, sportsCourseDraftPolicy, publishedTemplateFields } from '../sports/courses';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -49,6 +49,10 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
+    if(['sports.course.create','sports.course.window','sports.course.save'].includes(action)) {
+      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
+      sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
+    }
     if(action==='sports.template.publish') {
       await requirePostgresSuperAdmin(repo,actor);
       const systems=await repo.all('sportsSystem');sportsAvailable({all:()=>systems});
@@ -112,6 +116,9 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       result=studentSessionProjection(session);
     }
     else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
+    else if(['sports.course.create','sports.course.window','sports.course.save'].includes(action)) {
+      const saved=await runAsync(sportsCourseDraftPolicy(repo,actor,action,input));if(saved)result={id:saved.id};
+    }
     else if(action==='sports.template.publish') {
       const template=await repo.create('sportsTemplate',actor.id,publishedTemplateFields(input));
       await client.query('INSERT INTO sports_template_publications(template_id) VALUES($1)',[template.id]);

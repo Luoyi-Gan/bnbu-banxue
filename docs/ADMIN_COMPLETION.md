@@ -1795,3 +1795,7 @@ API重建健康后，通过管理员真实HTTP创建未来学期、按版本修�
 ### PostgreSQL 固定规则模板发布
 
 SQLite与PostgreSQL共用publishedTemplateFields，模板仍为V8.1固定门槛／周限／1200目标／单次60／每日1规则。PostgreSQL仅总管理员可发布，维护门禁先于幂等回执；模板实体与sports_template_publications顺序行同事务。新增教师拒绝、幂等单次发布、两次发布顺序及固定字段测试，56项真实PostgreSQL测试、类型与lint通过。Docker模板发布及教师建课写入尚待验证／接通，UI未改。
+
+### PostgreSQL 教师课程草稿命令
+
+抽出sportsCourseDraftPolicy供两种数据库共用create/window/save，保留唯一当前学期、教师本人、字段白名单、版本、已发布锁定及规则日期检查。创建只保存名称与当前学期，不生成目标或开放入班。此前完整70文件461测试通过；新增PG创建草稿、幂等、学生拒绝及额外规则字段拒绝测试通过。类型与核心文件lint通过。configurepublish和课程发布、原版页面协议及Docker建课仍待继续，UI未改。

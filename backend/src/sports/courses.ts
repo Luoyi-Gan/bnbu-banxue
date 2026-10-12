@@ -54,12 +54,12 @@ function dateField(input: Fields, key: string) {
   return date;
 }
 const instant = (day: string) => Date.parse(`${day}T00:00:00+08:00`);
-function currentSemester(repo: Repository, id: unknown) {
+function currentSemester(repo: Pick<Repository,"all"|"get">, id: unknown) {
   const semester = repo.get(id, "sportsSemester");
   demand(semester.data.status === "CURRENT", "体育学期不是当前学期。", 409);
   return semester;
 }
-function courseRules(repo: Repository, input: Fields) {
+function courseRules(repo: Pick<Repository,"all"|"get">, input: Fields) {
   const semester = currentSemester(repo, input.semesterId);
   const window = courseWindow(input, semester.data);
   const template = repo.get(input.templateId, "sportsTemplate");
@@ -189,68 +189,7 @@ export function sportsCourseCommand(
       .run(template.id);
     return template;
   }
-  if (action === "sports.course.window") {
-    const course = ownedCourse(repo, actor, input.id);
-    version(course, input);
-    demand(course.data.status === "DRAFT", "已发布课程日程已锁定。", 409);
-    const semester = currentSemester(repo, course.data.semesterId);
-    demand(
-      Object.keys(input).every((key) =>
-        [
-          "id",
-          "version",
-          "startDate",
-          "deadlineDate",
-          "startTime",
-          "endTime",
-          "excludedDates",
-          "checkInAvailable",
-        ].includes(key),
-      ),
-      "课程时间窗参数无效。",
-    );
-    return repo.save(
-      course,
-      courseWindow({ ...course.data, ...input }, semester.data),
-    );
-  }
-  if (action === "sports.course.create") {
-    sportsRole(repo, actor, "teacher");
-    demand(
-      Object.keys(input).every((key) => key === "name"),
-      "新建课程仅接受课程名称，规则须另行配置。",
-    );
-    const semesters = repo
-      .all("sportsSemester")
-      .filter((item) => item.data.status === "CURRENT");
-    demand(semesters.length === 1, "请先确认唯一的当前体育学期。", 409);
-    return repo.create("sportsCourse", actor.id, {
-      name: textField(input, "name", 100),
-      semesterId: semesters[0].id,
-      status: "DRAFT",
-      settlementStatus: "PENDING",
-      enrollmentOpen: false,
-    });
-  }
-  if (action === "sports.course.save") {
-    sportsRole(repo, actor, "teacher");
-    const old = input.id ? ownedCourse(repo, actor, input.id) : undefined;
-    if (old) {
-      version(old, input);
-      demand(old.data.status === "DRAFT", "已发布课程规则已锁定。");
-    }
-    const data = {
-      ...courseRules(repo, input),
-      name: textField(input, "name", 100),
-      description: textField(input, "description", 1000),
-      status: "DRAFT",
-      settlementStatus: "PENDING",
-      enrollmentOpen: false,
-    };
-    return old
-      ? repo.save(old, data)
-      : repo.create("sportsCourse", actor.id, data);
-  }
+  if(["sports.course.window","sports.course.create","sports.course.save"].includes(action)) return runSync(sportsCourseDraftPolicy(repo,actor,action,input));
   if (action === "sports.course.configurepublish") {
     const course = ownedCourse(repo, actor, input.id);
     demand(
@@ -713,4 +652,71 @@ export function publishedTemplateFields(input:Fields) {
       singleCap: 60,
       dailyLimit: 1,
       };
+}
+
+export function* sportsCourseDraftPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields):Generator<unknown,Entity|undefined,unknown> {
+ const entities:Entity[]=[];
+ for(const kind of ["sportsIdentity","sportsSemester","sportsCourse","sportsTemplate"]) entities.push(...(yield* effect(repo.all(kind))));
+ const reader:Pick<Repository,"all"|"get">={all:kind=>entities.filter(e=>e.kind===kind),get:(id,kind)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,"对象不存在。",404);return e;}};
+  if (action === "sports.course.window") {
+    const course = ownedCourse(reader, actor, input.id);
+    version(course, input);
+    demand(course.data.status === "DRAFT", "已发布课程日程已锁定。", 409);
+    const semester = currentSemester(reader, course.data.semesterId);
+    demand(
+      Object.keys(input).every((key) =>
+        [
+          "id",
+          "version",
+          "startDate",
+          "deadlineDate",
+          "startTime",
+          "endTime",
+          "excludedDates",
+          "checkInAvailable",
+        ].includes(key),
+      ),
+      "课程时间窗参数无效。",
+    );
+    return yield* effect(repo.save(
+      course,
+      courseWindow({ ...course.data, ...input }, semester.data),
+    ));
+  }
+  if (action === "sports.course.create") {
+    sportsRole(reader, actor, "teacher");
+    demand(
+      Object.keys(input).every((key) => key === "name"),
+      "新建课程仅接受课程名称，规则须另行配置。",
+    );
+    const semesters = reader.all("sportsSemester")
+      .filter((item) => item.data.status === "CURRENT");
+    demand(semesters.length === 1, "请先确认唯一的当前体育学期。", 409);
+    return yield* effect(repo.create("sportsCourse", actor.id, {
+      name: textField(input, "name", 100),
+      semesterId: semesters[0].id,
+      status: "DRAFT",
+      settlementStatus: "PENDING",
+      enrollmentOpen: false,
+    }));
+  }
+  if (action === "sports.course.save") {
+    sportsRole(reader, actor, "teacher");
+    const old = input.id ? ownedCourse(reader, actor, input.id) : undefined;
+    if (old) {
+      version(old, input);
+      demand(old.data.status === "DRAFT", "已发布课程规则已锁定。");
+    }
+    const data = {
+      ...courseRules(reader, input),
+      name: textField(input, "name", 100),
+      description: textField(input, "description", 1000),
+      status: "DRAFT",
+      settlementStatus: "PENDING",
+      enrollmentOpen: false,
+    };
+    return old
+      ? (yield* effect(repo.save(old, data)))
+      : (yield* effect(repo.create("sportsCourse", actor.id, data)));
+  }
 }
