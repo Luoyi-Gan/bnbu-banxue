@@ -15,7 +15,7 @@ await build({
       formats: ["es"],
       fileName: () => "backend.mjs",
     },
-    rollupOptions: { external: [/^node:/, "sharp", "ffprobe-static"] },
+    rollupOptions: { external: [/^node:/] },
   },
 });
 const { startBackend } = await import(
