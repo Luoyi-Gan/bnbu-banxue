@@ -8,6 +8,8 @@
 
 `compose.postgres.yaml` 支持从部署环境传入以下参数；空值保持未配置，不会自动启用真实服务。密钥只在部署环境保存，不提交仓库。
 
+部署到 HTTPS 域名时设置 `BNBU_ALLOWED_ORIGINS` 为实际网页来源（包含协议，多个来源以逗号分隔），并设置 `BNBU_SECURE_COOKIES=1`。本地默认允许 4188 的两个 localhost 来源、Secure 为 0，以便本机 HTTP 验收。TLS 终止及服务器反向代理需部署时配置；本 Compose 仍只绑定本机端口，不是已上线服务。
+
 | 服务 | 参数 | 部署检查 |
 | --- | --- | --- |
 | 邮件发送 | `BNBU_EMAIL_DELIVERY_URL`、`BNBU_EMAIL_DELIVERY_TOKEN` | 接口接收收件人、主题、正文、幂等标识；实际验证送达后再验收 |
