@@ -1,9 +1,11 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { demand, ServiceError, type Account } from "../auth";
 import {
   Repository,
   integerField,
   textField,
   type Fields,
+  type Entity,
 } from "../repository";
 import { ownedCourse } from "./courses";
 import { businessWeek } from "./credit";
@@ -18,6 +20,9 @@ export function sportsEnduranceCommand(
   acceptedEnrollmentIds: readonly string[] = [],
   historicalCorrection = false,
 ) {
+  return runSync(sportsEndurancePolicy(repo,actor,action,input,acceptedEnrollmentIds,historicalCorrection));
+}
+export function* sportsEndurancePolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields,acceptedEnrollmentIds:readonly string[]=[],historicalCorrection=false):Generator<unknown,Entity|undefined,unknown> {
   if (action !== "sports.endurance.confirm") return undefined;
   demand(
     Object.keys(input).every((k) =>
@@ -33,14 +38,17 @@ export function sportsEnduranceCommand(
     "只接受原始测试事实，不接受指定换算表或分数。",
   );
   demand(input.confirmed === true, "请对照真实测试记录确认项目、用时和日期。");
-  const member = repo.get(input.enrollmentId, "sportsEnrollment");
-  const course = ownedCourse(repo, actor, member.data.courseId);
+  const entities:Entity[]=[];
+  for(const kind of ["sportsEnrollment","sportsCourse","sportsIdentity","sportsSemester","sportsExemption","sportsEndurance","sportsConversionTable"]) entities.push(...(yield* effect(repo.all(kind))));
+  const reader:Pick<Repository,"all"|"get">={all:kind=>entities.filter(e=>e.kind===kind),get:(id,kind)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,"对象不存在。",404);return e;}};
+  const member = reader.get(input.enrollmentId, "sportsEnrollment");
+  const course = ownedCourse(reader, actor, member.data.courseId);
   demand(
-    !approvedExemption(repo, member.ownerId, course.id),
+    !approvedExemption(reader, member.ownerId, course.id),
     "当前耐力跑已获免测，不能录入普通用时。",
     409,
   );
-  const semester = repo.get(course.data.semesterId, "sportsSemester");
+  const semester = reader.get(course.data.semesterId, "sportsSemester");
   demand(
     historicalCorrection ||
       (course.data.settlementStatus !== "SETTLED" &&
@@ -48,7 +56,7 @@ export function sportsEnduranceCommand(
     "已结算或归档体测须通过历史报告更正流程。",
     409,
   );
-  const old = repo
+  const old = reader
     .all("sportsEndurance")
     .find((r) => r.data.enrollmentId === member.id);
   demand(
@@ -80,7 +88,7 @@ export function sportsEnduranceCommand(
     "原始事实未变化，不重新换算历史结果。",
     409,
   );
-  const identities = repo
+  const identities = reader
     .all("sportsIdentity")
     .filter(
       (i) =>
@@ -111,7 +119,7 @@ export function sportsEnduranceCommand(
       conversion = {
         status: "AVAILABLE",
         ...convertEndurance(
-          repo,
+          reader,
           sex,
           year <= 2 ? "JUNIOR" : "SENIOR",
           event,
@@ -135,25 +143,25 @@ export function sportsEnduranceCommand(
     confirmedAt: Date.now(),
   };
   const saved = old
-    ? repo.save(old, data)
-    : repo.create("sportsEndurance", member.ownerId, data);
-  repo.create("sportsEnduranceRevision", member.ownerId, {
+    ? (yield* effect(repo.save(old, data)))
+    : (yield* effect(repo.create("sportsEndurance", member.ownerId, data)));
+  yield* effect(repo.create("sportsEnduranceRevision", member.ownerId, {
     ...data,
     recordId: saved.id,
     recordVersion: saved.version,
     previousVersion: old?.version ?? null,
-  });
+  }));
   if (member.ownerId)
-    repo.notify(
+    yield* effect(repo.notify(
       [member.ownerId],
       saved.id,
       action,
       `耐力跑原始记录已${old ? "更正" : "确认"}：${event}米，${seconds}秒，${testDate}。`,
-    );
+    ));
   return saved;
 }
 
-export function enduranceWorkspace(repo: Repository, actor: Account) {
+export function enduranceWorkspace(repo: Pick<Repository,"all">, actor: Account) {
   const roles = repo
     .all("sportsIdentity")
     .filter((i) => i.ownerId === actor.id && i.data.status === "verified")

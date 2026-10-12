@@ -1747,3 +1747,7 @@ API重建并健康启动，真实HTTP冒烟新增退回后GET student/proof-todo
 ### Docker 本人体测读取验证
 
 API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入状态断言，返回NOT_RECORDED及null结果，不补造分数；整链通过。已核对教师侧sportsEnduranceCommand包含结课、归档、免测、版本和换算历史约束，后续迁移需复用原规则。教师写入尚未接通PostgreSQL，不能将此次读取验证表述为体测全流程完成。
+
+### PostgreSQL 教师体测确认命令
+
+将sportsEnduranceCommand规则抽为同步／异步共用policy，PostgreSQL sports.endurance.confirm使用既有事务、角色／维护门禁及幂等回执；保留原责任教师、原始项目用时日期、版本、免测、结算归档限制、换算快照、历史与通知规则。workspace增加既有enduranceWorkspace投影，学生仍不见换算分。新增教师录入、学生拒绝、重试、旧版本拒绝、历史追加及结算拒绝测试；完整70文件457测试、类型与lint通过。新命令Docker验证及教师physical-results协议适配仍待完成，UI未改。

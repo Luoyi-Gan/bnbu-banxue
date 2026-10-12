@@ -355,6 +355,19 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const other=await new PostgresAuth(db).login('sports-reader-other@example.test','Sports-read-123');
     await expect(postgresStudentPhysical(db,other.token,member.id)).rejects.toMatchObject({status:403});
   });
+  it('persists responsible teacher physical confirmations and versioned history', async()=>{
+    const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const member=await db.transaction(async client=>{const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'DRAFT'}),course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,status:'PUBLISHED'});return repo.create('sportsEnrollment','sports-reader-student',{courseId:course.id,status:'ACTIVE'});});
+    const input={enrollmentId:member.id,version:0,event:1000,seconds:250,testDate:'2026-10-01',confirmed:true},key=randomUUID();
+    await expect(executePostgres(db,student.token,'sports.endurance.confirm',input,randomUUID())).rejects.toMatchObject({status:403});
+    const saved=await executePostgres(db,teacher.token,'sports.endurance.confirm',input,key);
+    expect(await executePostgres(db,teacher.token,'sports.endurance.confirm',input,key)).toEqual(saved);
+    expect((await postgresStudentPhysical(db,student.token,member.id)).data).toEqual({status:'RECORDED',result:{runType:'1000m',elapsedSeconds:250,testedOn:'2026-10-01'}});
+    await expect(executePostgres(db,teacher.token,'sports.endurance.confirm',{...input,seconds:251},randomUUID())).rejects.toMatchObject({status:409});
+    await executePostgres(db,teacher.token,'sports.endurance.confirm',{...input,version:1,seconds:251},randomUUID());
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.all('sportsEnduranceRevision')).filter(r=>r.data.recordId===saved.id)).toHaveLength(2);const course=await repo.get(member.data.courseId);await repo.save(course,{settlementStatus:'SETTLED'});await client.query('DELETE FROM notifications WHERE entity_id=$1',[saved.id]);});
+    await expect(executePostgres(db,teacher.token,'sports.endurance.confirm',{...input,version:2,seconds:252},randomUUID())).rejects.toMatchObject({status:409});
+  });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const record=await db.transaction(async client=>{

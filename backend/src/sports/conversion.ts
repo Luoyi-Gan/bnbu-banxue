@@ -104,7 +104,7 @@ export function conversionWorkspace(repo: Repository, actor: Account) {
   };
 }
 export function convertEndurance(
-  repo: Repository,
+  repo: Pick<Repository,"all">,
   sex: string,
   group: string,
   event: number,
