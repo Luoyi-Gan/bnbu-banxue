@@ -92,6 +92,9 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
     notices: [],
   };
   const notifications = source.notifications;
+  const eligibleTeachers = new Set(repo.people().filter(p => p.status !== 'banned' && p.roles.includes('teacher')).map(p => p.id));
+  const visibleCoffeeBookings = repo.all('coffeeBooking').filter(b => own(b.ownerId) || (b.data.teacherId === actor.id && has(actor, 'teacher')) || operate);
+  const readableTeacher = (id: string | null) => !!id && (eligibleTeachers.has(id) || own(id) || operate || visibleCoffeeBookings.some(b => b.data.teacherId === id));
   const entities = [
     ...posts,
     ...repo
@@ -161,11 +164,12 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
     ...repo.all("profile").filter((p) => own(p.ownerId)),
     ...repo.all("preferences").filter((p) => own(p.ownerId)),
     ...repo.all("timetable").filter((t) => own(t.ownerId)),
-    ...repo.all("teacherProfile"),
-    ...repo.all("coffeeSlot").map((s) => ({
+    ...repo.all("teacherProfile").filter(p => readableTeacher(p.ownerId)).map(p => ({...p, data: {...p.data, enabled: eligibleTeachers.has(p.ownerId!) && p.data.enabled !== false}})),
+    ...repo.all("coffeeSlot").filter(s => readableTeacher(s.ownerId)).map((s) => ({
       ...s,
       data: {
         ...s.data,
+        closed: s.data.closed === true || !eligibleTeachers.has(s.ownerId!),
         occupied: repo
           .all("coffeeBooking")
           .filter(
@@ -175,14 +179,7 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
           ).length,
       },
     })),
-    ...repo
-      .all("coffeeBooking")
-      .filter(
-        (b) =>
-          own(b.ownerId) ||
-          (b.data.teacherId === actor.id && has(actor, "teacher")) ||
-          operate,
-      ).map((booking) => ({...booking, data: {...booking.data, history: source.coffeeHistory(booking.id)}})),
+    ...visibleCoffeeBookings.map((booking) => ({...booking, data: {...booking.data, history: source.coffeeHistory(booking.id)}})),
     ...repo
       .all("activity")
       .filter(
@@ -195,7 +192,6 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
     actor.id,
     ...entities.map((e) => e.ownerId),
     ...memberRooms.flatMap((r) => strings(r.data.members)),
-    ...repo.all("coffeeSlot").map((s) => s.ownerId),
   ]);
   const hiddenProfiles = new Set(repo.all("preferences").filter(p => p.data.profilePreview === false).map(p => p.ownerId));
   const people = repo
