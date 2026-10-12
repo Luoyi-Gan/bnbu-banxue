@@ -191,7 +191,7 @@ try {
   assert.equal((await request('/api/v1/exercise-records?limit=50')).data.filter(r=>r.sessionId===session.id).length,1);
 
 
-  const teacherId=randomUUID(),adminId=randomUUID(),adminLogin='smoke-admin-'+randomUUID(),teacherEmail='teacher-'+randomUUID()+'@example.test';
+  const teacherId=randomUUID(),adminId=randomUUID(),adminLogin='smoke-admin-'+randomUUID(),teacherEmail='teacher-'+randomUUID()+'@bnbu.edu.cn';
   docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',
     `INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) SELECT '${teacherId}','${teacherEmail}',password_hash,'Docker teacher','["teacher"]','now','PERSONAL',NULL FROM accounts WHERE id='${actor.id}';
      INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) SELECT '${adminId}','${adminLogin}@example.test',password_hash,'Docker administrator','["superadmin"]','now','ADMIN','${adminLogin}' FROM accounts WHERE id='${actor.id}';
@@ -199,6 +199,12 @@ try {
      UPDATE entities SET owner_id='${teacherId}',data=(data::jsonb || '{"weeklyLimit":3,"relatedTarget":600,"otherTarget":600}'::jsonb)::text WHERE id='${courseId}';`],{stdio:'pipe'});
   const studentCookie=cookie;
   assert.equal((await request('/api/v1/auth/password-login',{account:adminLogin,password})).data.user.role,'ADMIN');
+  const subadmin=await sessionWrite('/api/v1/admin/subadmins',{identityVerifiedByAdmin:true,email:teacherEmail,account:'sub-'+randomUUID(),name:'Docker subadmin',department:'Local test',permissions:['HELP_CENTER'],initialPassword:password,confirmPassword:password});
+  assert.ok((await request('/api/v1/admin/subadmins')).data.items.some(item=>item.id===subadmin.id));
+  const editedSubadmin=await sessionWrite('/api/v1/admin/subadmins/'+subadmin.id+'/profile',{expectedVersion:subadmin.version,name:'Docker edited subadmin',email:teacherEmail,department:'Local test',permissions:['AUDIT_QUERY']});
+  assert.deepEqual(editedSubadmin.permissions,['AUDIT_QUERY']);
+  const disabledSubadmin=await sessionWrite('/api/v1/admin/subadmins/'+subadmin.id+'/status',{expectedVersion:editedSubadmin.version,status:'DISABLED',handoverCompleted:true});
+  assert.equal(disabledSubadmin.status,'DISABLED');
   const publishedTemplate=(await request('/api/commands',{action:'sports.template.publish',input:{name:'Docker fixed V8.1'},requestId:randomUUID()})).data;
   const futureYear=2100+Math.floor(Math.random()*7000),futureSemester={name:'Docker future semester',academicYear:futureYear+'-'+(futureYear+1),type:'SUMMER',startDate:futureYear+'-06-01',endDate:futureYear+'-08-31'};
   const createdSemester=(await request('/api/commands',{action:'sports.semester.create',input:futureSemester,requestId:randomUUID()})).data;

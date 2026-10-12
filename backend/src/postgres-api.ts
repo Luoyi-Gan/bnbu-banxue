@@ -5,6 +5,7 @@ import { requestStudentJoinEmail, verifyStudentJoinEmail } from './storage/postg
 import { requestStudentLogin, verifyStudentLogin } from './storage/postgres-student-login';
 import {issueNewStudentJoin,consumeNewStudentJoin} from './storage/postgres-new-student-join';
 import {postgresPortalLogin,postgresPortalSecurity} from './storage/postgres-portal-auth';
+import {postgresPortalSubadmins,postgresPortalSubadminWrite} from './storage/postgres-portal-subadmins';
 import { reportCsv } from './sports/report';
 import { courseWindowInput, courseInviteInput, courseInviteProjection } from './sports/portal-courses';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
@@ -59,6 +60,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
       if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && pathname==='/api/v1/admin/subadmins') {
+        const query=new URL(request.url ?? '/','http://localhost').searchParams;
+        demand([...query.keys()].every(k=>k==='after'),'管理账号查询参数无效。');
+        return send(response,200,{data:await postgresPortalSubadmins(db,cookieToken(request) ?? '',query.get('after') ?? '')});
+      }
       if(request.method==='GET' && pathname==='/api/v1/auth/account-security')return send(response,200,{data:await postgresPortalSecurity(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && teacherStudent) {
         demand([...new URL(request.url ?? '/', 'http://localhost').searchParams.keys()].length===0,'学生资料查询参数无效。');
@@ -185,6 +191,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           const result=await postgresPortalLogin(db,input.account,input.password);
           response.setHeader('Set-Cookie',cookie(result.token,43200));
           return send(response,200,{data:{user:result.user}});
+        }
+        const subadminWrite=/^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(pathname);
+        if(subadminWrite) {
+          const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');
+          return send(response,200,{data:await postgresPortalSubadminWrite(db,cookieToken(request) ?? '',subadminWrite[1]?decodeURIComponent(subadminWrite[1]):undefined,(subadminWrite[2] ?? 'create') as 'create'|'profile'|'status',input,key)});
         }
         if(pathname==='/api/v1/auth/own-password') {
           demand(Object.keys(input).every(k=>['currentPassword','newPassword','confirmPassword','expectedVersion'].includes(k)),'修改密码参数无效。');
