@@ -26,10 +26,34 @@ it('未接入的体育摘要不生成零进度卡片',()=>{
   expect(renderToStaticMarkup(<MemoryRouter><SportsProgressCard sports={null}/></MemoryRouter>)).toBe('');
 });
 
-it('确认无课保持空内容，读取失败不伪装无课，不按年级或管理员角色开放体育面板',()=>{
+it('确认无课保持空内容，源未接通仍保留现有看板布局且不展示虚构统计',()=>{
  const workspace={account:{roles:['student']},sports:null,sportsStatus:'not-enrolled'} as Workspace;
  const render=(value:Workspace)=>renderToStaticMarkup(<MemoryRouter><SportsPortal workspace={value}/></MemoryRouter>);
  expect(render(workspace)).toBe('');
- expect(render({...workspace,sportsStatus:'unavailable'})).toContain('无法确认课程情况');
+ const unavailable=render({...workspace,sportsStatus:'unavailable'});
+ for(const text of ['无法确认课程情况','sports-hero','运动数据总览','运动提交趋势','记录状态分布','sports-course-panel']) expect(unavailable).toContain(text);
+ expect(unavailable).not.toContain('当前展示：伴学本地数据');
+ expect(unavailable).not.toContain('<iframe');
+ expect(unavailable).toContain('disabled="" aria-label="刷新体育数据"');
  expect(render({...workspace,sportsStatus:'unavailable',account:{...workspace.account,roles:['superadmin']}})).toContain('无法确认课程情况');
+});
+
+it('学生完整看板只使用可用源的授权投影，源失败时隐藏旧数据而保留图表',()=>{
+ const entity=(id:string,data:Record<string,unknown>)=>({id,kind:'fixture',ownerId:'student',data,version:1,createdAt:'2026-10-12T00:00:00Z',updatedAt:'2026-10-12T00:00:00Z'});
+ const workspace={account:{roles:['student']},sports:{source:'local',role:'student',progress:null},sportsStatus:'available',sportsDashboard:{
+   identity:entity('identity',{role:'student'}),serverNow:Date.parse('2026-10-12T00:00:00Z'),
+   semesters:[entity('semester',{status:'CURRENT',name:'测试学期'})],
+   courses:[entity('course',{semesterId:'semester',name:'授权课程样例',status:'PUBLISHED'})],
+   enrollments:[entity('enrollment',{courseId:'course',status:'ACTIVE'})],records:[],
+   progress:[entity('progress',{courseId:'course',total:630,sequence:1})],
+ }} as Workspace;
+ const render=(value:Workspace)=>renderToStaticMarkup(<SportsPortal workspace={value}/>);
+ const available=render(workspace);
+ expect(available).toContain('运动提交趋势');
+ expect(available).toContain('授权课程样例');
+ expect(available).toContain('630');
+ const failed=render({...workspace,sportsStatus:'unavailable'});
+ expect(failed).toContain('运动提交趋势');
+ expect(failed).not.toContain('授权课程样例');
+ expect(failed).not.toContain('>630<');
 });

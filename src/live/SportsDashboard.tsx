@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { Activity, ArrowDownToLine, ArrowUpRight, BookOpen, CalendarDays, Check, ChevronRight, CircleHelp, Clock3, Database, ExternalLink, Layers3, RefreshCw, Search, ShieldCheck, Timer, Users, WifiOff } from "lucide-react";
-import { api, sportsChangedEvent } from "./api";
 import { buildSportsDashboard, type SportsDashboardData } from "./sportsDashboardModel";
 
 const platformUrl = import.meta.env.VITE_SPORTS_TEACHER_URL || "https://www.teacher.bnbusports.cn/#admin/accounts";
@@ -44,35 +43,19 @@ function TrendChart({ items, allowed }: { items: ReturnType<typeof buildSportsDa
   </div>;
 }
 
-export function SportsDashboard() {
-  const [data, setData] = useState<SportsDashboardData | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+export function SportsDashboard({ data, role, loading = false, onRefresh, sourceLabel, notice }: {
+  data: SportsDashboardData | null;
+  role: "student" | "teacher";
+  loading?: boolean;
+  onRefresh?: () => Promise<void>;
+  sourceLabel: string;
+  notice?: string;
+}) {
   const [semesterChoice, setSemesterChoice] = useState("");
   const [courseChoice, setCourseChoice] = useState("");
   const [days, setDays] = useState(7);
   const [search, setSearch] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
-  const request = useRef(0);
-  const cancelRequests = useCallback(() => { ++request.current; }, []);
-  const refresh = useCallback(async () => {
-    const generation = ++request.current;
-    setLoading(true);
-    try {
-      const result = await api<SportsDashboardData>("/api/sports/workspace");
-      if (generation !== request.current) return;
-      setData(result); setError("");
-    } catch (failure) {
-      if (generation !== request.current) return;
-      setData(null); setError(failure instanceof Error ? failure.message : "数据读取失败，请重试。");
-    } finally { if (generation === request.current) setLoading(false); }
-  }, []);
-  useEffect(() => {
-    void refresh();
-    window.addEventListener("focus", refresh);
-    window.addEventListener(sportsChangedEvent, refresh);
-    return () => { cancelRequests(); window.removeEventListener("focus", refresh); window.removeEventListener(sportsChangedEvent, refresh); };
-  }, [refresh, cancelRequests]);
 
   const semesters = data?.semesters ?? [];
   const semester = semesters.find(item => item.id === semesterChoice) ?? semesters.find(item => item.data.status === "CURRENT");
@@ -89,7 +72,7 @@ export function SportsDashboard() {
     const start = offset; offset += totalRecords ? group.count / totalRecords * 100 : 0;
     return `${group.color} ${start}% ${offset}%`;
   }).join(", ");
-  const scopeLabel = view?.role === "student" ? "我的有效课程" : view?.role === "teacher" ? "我的教学课程" : "获授权的课程";
+  const scopeLabel = (view?.role ?? role) === "student" ? "我的有效课程" : "我的教学课程";
   const now = data ? new Date(data.serverNow).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "尚未读取";
   const dayDetail = view?.trend.find(item => item.day === selectedDay);
 
@@ -97,14 +80,14 @@ export function SportsDashboard() {
     if (!view) return;
     const cell = (value: unknown) => `"${String(value ?? "未提供").replace(/^\s*[=+@-]/, "'$&").replaceAll('"', '""')}"`;
     const csv = [
-      ["数据来源", "伴学本地服务（未与线上体育平台同步）"],
+      ["数据来源", sourceLabel],
       ["读取时间（北京时间）", now],
       ["学期", semester?.data.name ?? "未提供"],
       ["课程", "状态", "有效成员人数", "确认进度累计分钟", "提交记录数"],
       ...rows.map(row => [row.course.data.name, courseStatus[String(row.course.data.status)] ?? "未提供", row.memberCount, row.minutes, row.records]),
     ].map(row => row.map(cell).join(",")).join("\r\n");
     const url = URL.createObjectURL(new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8;" }));
-    const anchor = document.createElement("a"); anchor.href = url; anchor.download = "体育课程-本地数据摘要.csv"; anchor.click();
+    const anchor = document.createElement("a"); anchor.href = url; anchor.download = "体育课程-只读摘要.csv"; anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
@@ -114,18 +97,18 @@ export function SportsDashboard() {
       <CourtIllustration />
     </section>
 
-    <div className="sports-source-note"><Database size={17} /><div><strong>当前展示：伴学本地数据</strong><span>数据来自已接入的本地体育库，线上平台后续接入。</span></div><a href={platformUrl} target="_blank" rel="noopener noreferrer">体育平台 <ExternalLink size={13} /></a></div>
+    <div className="sports-source-note"><Database size={17} /><div><strong>{sourceLabel}</strong><span>{data ? "只读展示当前账号获授权的课程和运动进度。" : "接通后展示获授权数据；未读取的数值显示为 —。"}</span></div><a href={platformUrl} target="_blank" rel="noopener noreferrer">体育平台 <ExternalLink size={13} /></a></div>
 
     <div className="sports-toolbar">
       <div className="sports-section-title"><span className="sports-title-icon"><BarIcon /></span><div><h3>运动数据总览</h3><p>{scopeLabel} · 按学期统计</p></div></div>
-      <div className="sports-filters"><label><CalendarDays size={15} /><select aria-label="选择学期" value={semester?.id ?? ""} onChange={event => { setSemesterChoice(event.target.value); setCourseChoice(""); }} disabled={!semesters.length}><option value="" disabled>暂无学期</option>{semesters.map(item => <option key={item.id} value={item.id}>{String(item.data.name)}</option>)}</select></label><button type="button" onClick={() => void refresh()} disabled={loading} aria-label="刷新体育数据"><RefreshCw size={15} className={loading ? "sports-spinning" : ""} />{loading ? "读取中" : "刷新"}</button></div>
+      <div className="sports-filters"><label><CalendarDays size={15} /><select aria-label="选择学期" value={semester?.id ?? ""} onChange={event => { setSemesterChoice(event.target.value); setCourseChoice(""); }} disabled={!semesters.length}><option value="" disabled>暂无学期</option>{semesters.map(item => <option key={item.id} value={item.id}>{String(item.data.name)}</option>)}</select></label><button type="button" onClick={() => void onRefresh?.()} disabled={loading || !onRefresh} aria-label="刷新体育数据"><RefreshCw size={15} className={loading ? "sports-spinning" : ""} />{loading ? "读取中" : "刷新"}</button></div>
     </div>
-    {error && <div className="sports-error" role="alert"><WifiOff size={18} /><span>{error} 当前未展示旧统计。</span><button type="button" onClick={() => void refresh()}>重试</button></div>}
+    {notice && <div className="sports-error" role="status"><WifiOff size={18} /><span>{notice}</span></div>}
     {gated && <div className="sports-error" role="status"><ShieldCheck size={18} /><span>{data?.firstLoginOnly ? "请先在体育平台完成首次密码修改，再查看统计。" : "体育服务维护中，统计暂不可用。"}</span></div>}
     <div className="sports-metrics">
       {[
         { label: "所选学期课程", value: view?.selectedCourses.length, unit: "门", note: scopeLabel, icon: BookOpen, tone: "blue" },
-        { label: view?.role === "student" ? "有效课程成员（本人）" : "有效课程成员", value: view?.memberCount, unit: "人", note: view?.canReadRecords ? "当前有效成员 · 按账号去重" : "当前身份未提供此统计", icon: Users, tone: "violet" },
+        { label: (view?.role ?? role) === "student" ? "有效课程成员（本人）" : "有效课程成员", value: view?.memberCount, unit: "人", note: view?.canReadRecords ? "当前有效成员 · 按账号去重" : "当前身份未提供此统计", icon: Users, tone: "violet" },
         { label: "已确认运动进度", value: view?.confirmedMinutes, unit: "分钟", note: view?.confirmedMinutes == null ? "尚无可用的确认进度" : "所选课程的服务端计入累计", icon: Timer, tone: "green" },
         { label: "待完成处理", value: view?.pendingCount, unit: "条", note: view?.canReadRecords ? "检查、补证及技术处理中" : "当前身份未提供此统计", icon: Clock3, tone: "amber" },
       ].map(metric => <article className={`sports-metric sports-tone-${metric.tone}`} key={metric.label}><div><span>{metric.label}</span><i><metric.icon size={18} /></i></div><strong>{loading && !data ? "—" : format(metric.value)}<small>{metric.unit}</small></strong><p>{metric.note}</p></article>)}
@@ -146,7 +129,7 @@ export function SportsDashboard() {
     </section>
 
     <div className="sports-bottom-grid"><a className="sports-platform-card" href={platformUrl} target="_blank" rel="noopener noreferrer"><span className="sports-platform-icon"><Activity size={25} /></span><div><small>BNBU SPORTS</small><h3>前往体育平台</h3><p>课程管理、运动审核与完整记录</p></div><ArrowUpRight size={22} /></a><div className="sports-help-card"><CircleHelp size={22} /><div><h3>数据怎么看？</h3><p>“—”表示尚未提供，0 表示当前统计为零。已确认进度、有效记录与提交记录分别计算。</p></div></div></div>
-    <footer className="sports-footer"><span><Database size={12} />伴学本地服务 · 仅显示当前账号可读范围</span><span>最后读取 {now} <ChevronRight size={12} /></span></footer>
+    <footer className="sports-footer"><span><Database size={12} />体育平台只读展示 · 仅显示当前账号可读范围</span><span>最后读取 {now} <ChevronRight size={12} /></span></footer>
   </div>;
 }
 

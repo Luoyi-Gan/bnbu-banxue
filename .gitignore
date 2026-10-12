@@ -2,7 +2,7 @@ node_modules/
 dist/
 *.local
 *.log
-data/
+/data/
 .runtime/
 artifacts/local-accounts.json
 

@@ -8,6 +8,6 @@ export function V2Sports() {
   if (!live.data) return <p role="status">{live.error || '正在读取体育账号…'}</p>
   return <section className="v2-sports-embedded" aria-label="体育运动平台">
     <div className="v2-sports-toolbar"><Link to="/v2" className="v2-sports-back"><ArrowLeft size={16}/>返回伴学</Link></div>
-    <SportsPortal workspace={live.data} />
+    <div className="v2-sports-content"><SportsPortal workspace={live.data} onRefresh={live.refresh}/></div>
   </section>
 }

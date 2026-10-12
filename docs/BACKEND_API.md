@@ -129,3 +129,7 @@ JSON 写请求必须发送 `Content-Type: application/json`，上限 12MB。浏�
 外部邮件投递、学校核验、课表识别和 COS 参数见 `docs/LOCAL_BACKEND_HANDOFF.md`；体育只读源和活动收件邮箱由用户确认留到部署时配置。腾讯云 OCR 已开通不代表结构化课表适配已经联通。当前返回路径与错误边界以 `backend/src/postgres-api.ts` 和测试为准。
 
 校园 AI 形象偏好：preferences.aiicon，学生本人提交 choice（yellow/kitty/custom），可选 image 为 JPG/PNG/WebP data URL。custom 要求已有或本次上传图片；保存到本人的 preferences，不向其他账号投影。
+
+### 2026-10-12 体育可视化投影预留
+
+前端 Workspace 预留可选 sportsDashboard（identity、serverNow、semesters、courses、enrollments、records、progress），供部署阶段服务端完成独立源表/授权映射后提供。当前 /api/workspace 不填充这个字段并返回 sportsStatus=unavailable；前端保留已有只读看板，数值显示未知。它不读取伴学残留体育实体、不接受客户端指定邮箱查询，也不恢复 /api/sports/*。只有源状态available和源身份同时存在才展示投影；not-enrolled为空内容，unavailable不展示缓存统计。

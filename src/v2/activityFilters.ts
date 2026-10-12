@@ -12,6 +12,7 @@ export type ActivityItem = {
   capacity: number | null
   host: string
   image?: string
+  isDefaultCover?: boolean
   local?: LocalEvent
 }
 

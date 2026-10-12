@@ -2377,3 +2377,20 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 最终检查点：当前全量266/266零跳过，ESLint199文件零错误零警告，后端类型检查通过。修正交接中两个体育目录均与origin/main一致的过时描述：学生目录无差异，教师目录5文件为此前体育写入集成撤回差异；原始清单哈希测试通过。未为消除diff而恢复已撤回体育业务。
 
 2026-10-12 教师交流主题必填浏览器复验：4188原个人资料表单清空主题并点击保存，浏览器validity.valueMissing=true并提示请填写此字段；刷新后原学习规划、校园生活仍在，没有空值覆盖。截图.runtime/teacher-topics-required-browser-proof.png。
+
+## 2026-10-12 用户反馈后的界面及交付修复
+
+用户指出体育界面消失、关系图空状态遮挡、活动图片变绿底字图，以及另机提交 dfc69d2 补漏 shared/data/mockData.ts。当前工作库不存在 dfc69d2 对象，未声称合入该提交；在当前 PR 分支补齐同一遗漏。
+
+| 反馈 | 根因与修复 | 本轮验证 |
+| --- | --- | --- |
+| 体育页面不见 | 体育源未配置时 SportsPortal 提前返回一句话，挡住仓库现有看板；恢复学生/教师完整只读横幅、指标、图表、课程列表和滚动。源确认无课仍空白，未接入显示未知，不恢复运动写业务 | 学生与教师 4188 浏览器截图；回归覆盖无源布局、无课空白、学生授权投影、源失败隐藏旧统计 |
+| 关系图文字压住本人节点 | 空说明与加载提示共用 top:45%；改到画布下独立正常排版，不改变节点或原图操作 | 默认宽度与390px宽度，放大138%时说明位于画布底部之外，窄屏无横向溢出 |
+| 活动封面全绿底字图 | 当前数据库仅3条无海报测试邮件，统一默认 SVG 为绿色文字图；原照片文件未删除。缺图和旧默认图显示已有校园通用照片并标“默认封面”，真实海报不替换 | 实际浏览器卡片与精选照片已恢复；3项回归覆盖真实图保留、旧占位/缺图、空列表不混入虚构演示数据 |
+| PR缺少共享源码 | .gitignore 的 data/ 误忽略 shared/data；改为仅根 /data/，跟踪 mockData.ts。该文件是主分支原演示源码移动，仅类型导入路径不同 | 从Git索引树3e81b6361bebcf2490e666c05df7607681f2915c导出干净目录，单独Docker前端构建（含前端类型检查）及服务端类型检查通过；不依赖本机未跟踪文件 |
+
+本轮完整测试270/270通过，零失败零跳过（包括本地PostgreSQL测试）；200个文件ESLint零错误零警告。干净源码构建的前端镜像已部署到127.0.0.1:4188；伴学API和PostgreSQL健康，未变更体育独立库。原有大JS块构建提示仍在，不是构建错误。
+
+浏览器证据：.runtime/sports-ui-restored-browser-proof.png、teacher-sports-ui-restored-browser-proof.png、relationship-no-overlap-browser-proof.png、activity-photo-restored-browser-proof.png。测试和lint报告为.runtime/ui-repair-tests.json和ui-repair-lint.json。本轮存档 D:/伴学/archive/goal-scope-rollback-20261012/ui-repair-20261012，包括新的源码bundle、报告与截图；早前final-local-delivery不作为本轮修复版本。
+
+体育真实源仍待服务器部署配置与授权映射，Workspace.sportsDashboard只是预留投影，不表示已接真实数据。活动图片修复未改写活动或邮件数据库，也未重加旧模拟活动。先前“保留原布局/本地构建通过”的总体结论不足以覆盖这些回归和干净检出，已在交接开头更正。

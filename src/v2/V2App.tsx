@@ -69,7 +69,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
     { path: '/v2/teacher/messages', label: '消息与通知', icon: MessageCircle },
     { path: '/v2/teacher/profile', label: '个人资料', icon: UserRound },
-    ...(live.data?.sports?.role === 'teacher' ? [{ path: '/v2/teacher/sports', label: '体育管理', icon: GraduationCap }] : []),
+    { path: '/v2/teacher/sports', label: '体育课程', icon: GraduationCap },
   ]
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
