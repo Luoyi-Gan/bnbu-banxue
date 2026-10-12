@@ -26,6 +26,7 @@ import {
 } from "./local-preview.js";
 import {
   hasApiSession,
+  restoreCompanionSession,
   clearApiSession,
   logoutApi,
   getMyPreferences,
@@ -904,7 +905,7 @@ export const app = {
       void this.refreshSystemMode();
     });
     loadPolicyMarkdown();
-    const restoreSession = () => {
+    const restoreSession = async () => {
       const session = localStore.getSession();
       const privacyAccepted = localStore.hasAgreedPrivacyPolicy(BUILD.PRIVACY_POLICY_VERSION);
       this.state.privacyConsentChecked = true;
@@ -915,6 +916,7 @@ export const app = {
       }
       this.state.needsPrivacyConsent = !privacyAccepted;
       this.state.loginPrivacyAccepted = privacyAccepted;
+      await restoreCompanionSession();
       if (this.restoreRememberedSession()) return;
       if (session) {
         // API tokens are gone; fall back to a fresh sign-in.

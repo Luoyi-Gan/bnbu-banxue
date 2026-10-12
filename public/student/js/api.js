@@ -168,18 +168,33 @@ function writeRefreshIntent(intent) {
 // results without confusing a normal refresh with a different signed-in user.
 let authSessionEpoch = 0;
 let pendingInviteJoin = null;
+let companionSession = null;
 
-export function hasApiSession() { return !!readTokens(); }
+export function hasApiSession() { return !!readTokens() || !!companionSession; }
+/** Same-origin companion cookies remain HttpOnly; never copy them into token storage. */
+export async function restoreCompanionSession() {
+  if (hasApiSession()) return true;
+  const epoch = authSessionEpoch;
+  const location = globalThis.location;
+  if (!location || new URL(apiBaseUrl(), location.href).origin !== location.origin) return false;
+  try {
+    const identity = await rawRequest('/me');
+    if (epoch !== authSessionEpoch || !identity?.studentProfile || identity.user?.role !== 'STUDENT') return false;
+    companionSession = { userId: identity.user.id };
+    return true;
+  } catch { return false; }
+}
 export function clearApiSession() {
   authSessionEpoch += 1;
   pendingInviteJoin = null;
+  companionSession = null;
   writeTokens(null);
   writeRefreshIntent(null);
   writeRaw("apiJoinContext", null);
 }
 
 export function currentApiSessionEpoch() { return authSessionEpoch; }
-export function currentApiUserId() { return readTokens()?.userId ?? null; }
+export function currentApiUserId() { return readTokens()?.userId ?? companionSession?.userId ?? null; }
 export function isCurrentApiSessionEpoch(epoch) { return epoch === authSessionEpoch; }
 
 export function storeAuthSession(authSession) {
@@ -856,6 +871,7 @@ export async function request(path, options = {}) {
   try {
     return await rawRequest(path, stableOptions);
   } catch (error) {
+    if (companionSession && error.status === 401 && authSessionEpoch === requestEpoch) { clearApiSession(); throw error; }
     if (authSessionEpoch !== requestEpoch || (requestSessionId && requestSessionId !== readTokens()?.sessionId)) throw new Error("API_SESSION_EPOCH_CHANGED");
     const authenticated = stableOptions.auth !== false && readTokens();
     if (authenticated && isTerminalAccessFailure(error)) {
@@ -899,6 +915,7 @@ export async function contractRequest(path, options = {}) {
   try {
     return await rawContractRequest(path, stableOptions);
   } catch (error) {
+    if (companionSession && error.status === 401 && authSessionEpoch === requestEpoch) { clearApiSession(); throw error; }
     if (authSessionEpoch !== requestEpoch || (requestSessionId && requestSessionId !== readTokens()?.sessionId)) throw new Error("API_SESSION_EPOCH_CHANGED");
     const authenticated = stableOptions.auth !== false && readTokens();
     if (authenticated && isTerminalAccessFailure(error)) {
@@ -1035,10 +1052,15 @@ export async function joinWithInvite(inviteToken, profile) {
 
 export async function logoutApi() {
   const tokens = readTokens();
+  const companion = companionSession;
   // Invalidate the local session synchronously. The best-effort server revoke
   // uses the captured bearer token and can no longer clear a later login.
   clearApiSession();
   try {
+    if (companion) {
+      await fetch('/api/auth/logout', {method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:'{}'});
+      return;
+    }
     if (tokens?.refreshToken && tokens.accessToken) {
       await rawRequest("/auth/logout", {
         method: "POST",

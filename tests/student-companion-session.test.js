@@ -1,0 +1,40 @@
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { clearApiSession, currentApiUserId, hasApiSession, logoutApi, request, restoreCompanionSession } from '../public/student/js/api.js';
+
+beforeEach(() => {
+  clearApiSession();
+  vi.stubGlobal('location',{href:'http://127.0.0.1:4188/student/index.html',origin:'http://127.0.0.1:4188'});
+});
+afterEach(() => { clearApiSession(); vi.unstubAllGlobals(); });
+const identity={data:{user:{id:'student-one',role:'STUDENT'},studentProfile:{id:'student-one'}}};
+it('restores a real cookie identity without manufacturing browser tokens and revokes on logout', async () => {
+  const fetcher=vi.fn().mockResolvedValue(new Response(JSON.stringify(identity),{status:200}));
+  vi.stubGlobal('fetch',fetcher);
+  expect(await restoreCompanionSession()).toBe(true);
+  expect(hasApiSession()).toBe(true);
+  expect(currentApiUserId()).toBe('student-one');
+  expect(fetcher.mock.calls[0][1].headers.Authorization).toBeUndefined();
+  fetcher.mockResolvedValue(new Response('{}',{status:200}));
+  await logoutApi();
+  expect(hasApiSession()).toBe(false);
+  expect(fetcher.mock.calls.at(-1)[0]).toBe('/api/auth/logout');
+});
+it('rejects nonstudents and ignores a restore response that arrives after logout', async () => {
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({data:{user:{role:'TEACHER'}}}),{status:200})));
+  expect(await restoreCompanionSession()).toBe(false);
+  let complete;
+  vi.stubGlobal('fetch',()=>new Promise(resolve=>{complete=resolve;}));
+  const pending=restoreCompanionSession();
+  clearApiSession();
+  complete(new Response(JSON.stringify(identity),{status:200}));
+  expect(await pending).toBe(false);
+  expect(hasApiSession()).toBe(false);
+});
+it('clears a cookie session when the server revokes it', async () => {
+  const fetcher=vi.fn().mockResolvedValue(new Response(JSON.stringify(identity),{status:200}));
+  vi.stubGlobal('fetch',fetcher);
+  await restoreCompanionSession();
+  fetcher.mockResolvedValue(new Response(JSON.stringify({code:'AUTH_REQUIRED',message:'Login required'}),{status:401}));
+  await expect(request('/me')).rejects.toMatchObject({status:401});
+  expect(hasApiSession()).toBe(false);
+});
