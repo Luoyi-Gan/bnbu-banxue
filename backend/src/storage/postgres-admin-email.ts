@@ -63,7 +63,7 @@ export async function postgresAdminEmailConfirm(db:PostgresDatabase,token:string
     await repo.save(identity,{schoolEmail:email,schoolEmailVerified:true,schoolEmailVerifiedAt:now});
     await client.query('UPDATE admin_security_challenges SET code_hash=NULL,consumed_at=$1 WHERE id=$2',[now,id]);
     await client.query('DELETE FROM mail_outbox WHERE id=$1',[row.mail_id]);
-    await client.query('INSERT INTO audit(id,actor_id,role,action,entity_id,reason,data,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[randomUUID(),actor.id,'admin','sports.account.email.verify',identity.id,'',JSON.stringify({purpose:'EMAIL_VERIFY',result:'VERIFIED'}),timestamp()]);
+    await client.query('INSERT INTO audit(id,actor_id,role,action,entity_id,reason,data,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[randomUUID(),actor.id,'admin','accounts.email.verify',identity.id,'',JSON.stringify({purpose:'EMAIL_VERIFY',result:'VERIFIED'}),timestamp()]);
     return {verified:true};
   });
   if(result instanceof ServiceError) throw result;

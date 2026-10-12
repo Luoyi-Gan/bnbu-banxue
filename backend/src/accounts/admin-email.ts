@@ -154,7 +154,7 @@ export function confirmAdminEmail(db: Database, actor: Account, input: Fields) {
       randomUUID(),
       actor.id,
       "admin",
-      "sports.account.email.verify",
+      "accounts.email.verify",
       identity.id,
       "",
       JSON.stringify({ purpose: "EMAIL_VERIFY", result: "VERIFIED" }),

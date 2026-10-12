@@ -191,10 +191,7 @@ export function createApiServer(
             await checkSchoolIdentity(authenticate(db, token)),
           );
         }
-        if (
-          pathname === "/api/auth/logout" ||
-          pathname === "/api/v1/auth/logout"
-        ) {
+        if (pathname === "/api/auth/logout") {
           db.prepare("DELETE FROM sessions WHERE token_hash=?").run(
             digest(token!),
           );
@@ -205,9 +202,7 @@ export function createApiServer(
           return send(
             response,
             200,
-            pathname === "/api/v1/auth/logout"
-              ? { data: null }
-              : { loggedOut: true },
+            { loggedOut: true },
           );
         }
         if (pathname === "/api/commands") {

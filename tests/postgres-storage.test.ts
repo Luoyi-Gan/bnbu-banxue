@@ -198,7 +198,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(postgresAdminEmailConfirm(db,token,{challengeId:stale.id,code:stale.code})).rejects.toMatchObject({code:'VERSION_CONFLICT'});
     expect((await postgresAdminEmailStatus(db,token)).verified).toBe(false);
     const challenge=await issue();
-    await db.pool.query("CREATE FUNCTION reject_email_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='sports.account.email.verify' THEN RAISE EXCEPTION 'injected audit failure'; END IF; RETURN NEW; END; $$");
+    await db.pool.query("CREATE FUNCTION reject_email_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='accounts.email.verify' THEN RAISE EXCEPTION 'injected audit failure'; END IF; RETURN NEW; END; $$");
     await db.pool.query('CREATE TRIGGER reject_email_audit BEFORE INSERT ON audit FOR EACH ROW EXECUTE FUNCTION reject_email_audit()');
     try {
       await expect(postgresAdminEmailConfirm(db,token,{challengeId:challenge.id,code:challenge.code})).rejects.toThrow('injected audit failure');

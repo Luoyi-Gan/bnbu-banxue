@@ -27,7 +27,6 @@ import {
   ApiError,
   command,
   loadWorkspace,
-  sportsChangedEvent,
   type LiveEntity,
   type Workspace,
 } from "./api";
@@ -347,8 +346,6 @@ export function ConnectedApp() {
     setMessage("");
     try {
       await command(action, input);
-      if (action.startsWith("sports."))
-        window.dispatchEvent(new Event(sportsChangedEvent));
       setForm(null);
       setMessage("已保存到本地服务。");
       await refresh();
