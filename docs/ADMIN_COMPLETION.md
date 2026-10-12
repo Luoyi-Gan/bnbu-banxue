@@ -1414,3 +1414,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### 2026-10-12 新目标：前后端分离与 PostgreSQL/COS
 用户恢复工作并要求独立 backend 目录、三端后端全流程、保持原 UI/UX，以及本地 Docker 验证；腾讯云 CVM、PostgreSQL、COS 为目标基础设施。已新增 backend 的独立构建/运行入口，API 监听地址和端口可配置；构建和服务端类型检查通过，Docker 引擎已启动（29.8.2）。当前入口仍复用 server 及 SQLite，尚未完成源码迁移、PostgreSQL 和 COS 接入，不能称为最终分离交付。
 下一步：提取共享业务规则并迁移服务端源码；引入 PostgreSQL 数据访问与事务、迁移脚本及现有数据迁移校验；媒体存储适配 COS；独立前端/API/数据库 Compose 联调；复核三端接口与权限覆盖；归档最终证据。保持现有验收 SQLite 库，不原地覆盖。
+
+### 后端源码迁移与独立容器验证
+77 个 server 源文件已迁入 backend/src，测试、构建脚本、类型引用同步更新；仅修改前端类型导入路径，未改变页面布局或交互。独立 backend/Dockerfile 多阶段构建 API，运行镜像不启动 Vite，使用非 root 用户。API 地址和端口可配置，默认保持原本地端口。现有 SQLite 数据未移动或重置。
+验证：66 文件 396 项测试通过；前后端类型检查、全仓 ESLint 和 backend 构建通过。Docker 镜像 bnbu-backend:split-check 构建成功，在独立 4189 端口及临时数据库启动，/api/health 为 200（SQLite schema 7），匿名 /api/workspace 为 401；测试容器已停止删除。此证据只证明源码迁移和独立 API 容器，PostgreSQL、COS 与前后端完整 Compose 仍未完成。

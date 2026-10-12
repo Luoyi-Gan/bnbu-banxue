@@ -1,10 +1,10 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
-import { sportsWorkspace } from "../server/sports/courses";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { sportsWorkspace } from "../backend/src/sports/courses";
 
 const databases: Database[] = [];
 afterEach(() => {
@@ -738,7 +738,7 @@ it("首次改密HTTP只返回必要状态，媒体请求被阻断且管理员维
     .all("sportsIdentity")
     .find((i) => i.ownerId === teacher.account.id)!;
   f.repo.save(identity, { mustChangePassword: true });
-  const { createApiServer } = await import("../server/main");
+  const { createApiServer } = await import("../backend/src/main");
   const server = createApiServer(f.db);
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   try {
@@ -859,7 +859,7 @@ it("教师CSV错误和预览后冲突整批拒绝，未知学校域名及密码�
 
 it("学生反馈仅本人和授权管理员可见，回复关闭后可追加跟进且历史不覆盖", async () => {
   const f = setup();
-  const { feedbackWorkspace } = await import("../server/sports/feedback");
+  const { feedbackWorkspace } = await import("../backend/src/sports/feedback");
   const feedback = f.run(f.student, "sports.feedback.submit", {
     type: "ACCESSIBILITY",
     description: "键盘无法操作某按钮",
@@ -941,7 +941,7 @@ it("反馈状态必须伴随公开回复，不能回待受理，撤销反馈权�
 
 it("双语帮助发布校验、单语言公开、下线与重新上线保持同一文章和历史", async () => {
   const f = setup();
-  const { helpRead } = await import("../server/sports/help");
+  const { helpRead } = await import("../backend/src/sports/help");
   const fields = {
     titleZh: "帮助",
     titleEn: "Help",
@@ -1000,7 +1000,7 @@ it("双语帮助发布校验、单语言公开、下线与重新上线保持同�
 });
 it("帮助管理权限、并发版本和发布内容完整性不能绕过", async () => {
   const f = setup();
-  const { helpRead } = await import("../server/sports/help");
+  const { helpRead } = await import("../backend/src/sports/help");
   const fields = {
     titleZh: "标题",
     titleEn: "Title",
@@ -1051,7 +1051,7 @@ it("用户确认的正式教师邮箱默认域名为bnbu.edu.cn，测试域名�
 it("耐力跑四表初始化404行，闭区间边界与等级精确且学生不取得规则", async () => {
   const f = setup();
   const { convertEndurance, conversionWorkspace } =
-    await import("../server/sports/conversion");
+    await import("../backend/src/sports/conversion");
   expect(f.repo.all("sportsConversionTable")).toHaveLength(4);
   expect(
     f.repo
@@ -1075,7 +1075,7 @@ it("耐力跑四表初始化404行，闭区间边界与等级精确且学生不�
 });
 it("换算表编辑整表验证及版本冲突，历史结果不被修改", async () => {
   const f = setup();
-  const { convertEndurance } = await import("../server/sports/conversion");
+  const { convertEndurance } = await import("../backend/src/sports/conversion");
   let table = f.repo
     .all("sportsConversionTable")
     .find((t) => t.data.key === "MALE_JUNIOR")!;
@@ -1119,7 +1119,7 @@ it("换算表编辑整表验证及版本冲突，历史结果不被修改", asyn
 
 it("教师内部成绩接受完整INT而非0到100，发布历史保留且学生无分数或通知", async () => {
   const f = managementFixture();
-  const { gradeWorkspace } = await import("../server/sports/grades");
+  const { gradeWorkspace } = await import("../backend/src/sports/grades");
   const count = Number(
     f.db.prepare("SELECT count(*) n FROM notifications").get()?.n,
   );
@@ -1191,7 +1191,7 @@ it("最终成绩拒绝备注、非整数、越权、陈旧版本和结算后直�
 
 it("耐力跑保存真实秒数、冻结自动换算版本，更正追加历史且学生投影不含内部字段", async () => {
   const f = managementFixture();
-  const { enduranceWorkspace } = await import("../server/sports/endurance");
+  const { enduranceWorkspace } = await import("../backend/src/sports/endurance");
   const identity = f.repo
     .all("sportsIdentity")
     .find((i) => i.ownerId === f.student.account.id)!;
@@ -1373,7 +1373,7 @@ it("原始体测拒绝歧义用时、越权、陈旧版本、未来或无效日�
 it("电子成绩单逐行草稿、部分确认和明确排除保留原始材料及待处理状态", async () => {
   const f = managementFixture();
   const { enduranceImportWorkspace } =
-    await import("../server/sports/endurance-import");
+    await import("../backend/src/sports/endurance-import");
   const identity = f.repo
     .all("sportsIdentity")
     .find((i) => i.ownerId === f.student.account.id)!;
@@ -1440,7 +1440,7 @@ it("电子成绩单逐行草稿、部分确认和明确排除保留原始材料�
 it("重复行全部标疑，修正明确留痕；课程关闭不截断已受理成绩单", async () => {
   const f = managementFixture();
   const { enduranceImportWorkspace } =
-    await import("../server/sports/endurance-import");
+    await import("../backend/src/sports/endurance-import");
   const identity = f.repo
     .all("sportsIdentity")
     .find((i) => i.ownerId === f.student.account.id)!;

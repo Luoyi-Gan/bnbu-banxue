@@ -1,9 +1,9 @@
 import { afterEach, expect, it } from "vitest";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { accountDirectory } from "../server/sports/account-directory";
-import { createApiServer } from "../server/main";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { accountDirectory } from "../backend/src/sports/account-directory";
+import { createApiServer } from "../backend/src/main";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 function setup() {

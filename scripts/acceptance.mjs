@@ -9,7 +9,7 @@ await build({
     outDir: ".runtime/tooling",
     minify: false,
     lib: {
-      entry: resolve("server/tooling.ts"),
+      entry: resolve("backend/src/tooling.ts"),
       formats: ["es"],
       fileName: () => "tooling.mjs",
     },

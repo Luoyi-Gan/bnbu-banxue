@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
-import { createAccount, login } from "../server/auth";
-import { openDatabase } from "../server/database";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
-import { createApiServer } from "../server/main";
+import { createAccount, login } from "../backend/src/auth";
+import { openDatabase } from "../backend/src/database";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { createApiServer } from "../backend/src/main";
 
 it("原版成绩页区分缺测、零秒和草稿/发布版本，历史分页不改变已发布分数", async () => {
   const db = openDatabase(":memory:"),

@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
-import { mappedRosterCsv } from "../server/sports/roster-mapping";
-import { parseCsv } from "../server/sports/csv";
+import { mappedRosterCsv } from "../backend/src/sports/roster-mapping";
+import { parseCsv } from "../backend/src/sports/csv";
 
 it("按教师列选择读取学号姓名，保留原件列和错误行形状", () => {
   const result = mappedRosterCsv(

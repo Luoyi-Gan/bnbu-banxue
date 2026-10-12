@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
-import { createAccount, login } from "../server/auth";
-import { openDatabase } from "../server/database";
-import { Repository } from "../server/repository";
-import { createApiServer } from "../server/main";
-import { execute } from "../server/commands";
+import { createAccount, login } from "../backend/src/auth";
+import { openDatabase } from "../backend/src/database";
+import { Repository } from "../backend/src/repository";
+import { createApiServer } from "../backend/src/main";
+import { execute } from "../backend/src/commands";
 
 it("原版课程列表、目录、学期与目标读取本人真实课程，不泄露其他教师数据", async () => {
   const db = openDatabase(":memory:"),

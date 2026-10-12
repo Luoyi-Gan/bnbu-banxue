@@ -1,9 +1,9 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { openDatabase, type Database, transaction } from "../server/database";
-import { createAccount } from "../server/auth";
-import { Repository } from "../server/repository";
-import { checkDeadlineReminders } from "../server/sports/deadline-reminders";
-import { processSportsReview } from "../server/sports/review-worker";
+import { openDatabase, type Database, transaction } from "../backend/src/database";
+import { createAccount } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { checkDeadlineReminders } from "../backend/src/sports/deadline-reminders";
+import { processSportsReview } from "../backend/src/sports/review-worker";
 const dbs: Database[] = [];
 afterEach(() => {
   vi.useRealTimers();

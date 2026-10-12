@@ -1,14 +1,14 @@
 import { expect, it, vi } from "vitest";
-import { createAccount, login } from "../server/auth";
-import { openDatabase } from "../server/database";
-import { Repository } from "../server/repository";
-import { createApiServer } from "../server/main";
+import { createAccount, login } from "../backend/src/auth";
+import { openDatabase } from "../backend/src/database";
+import { Repository } from "../backend/src/repository";
+import { createApiServer } from "../backend/src/main";
 import {
   portalAccountPage,
   portalSubadmins,
   portalSubadminWrite,
   portalSubadminDelete,
-} from "../server/sports/portal-accounts";
+} from "../backend/src/sports/portal-accounts";
 
 it("本人注销仅允许独立分管理员，核对资料后清除会话且不影响个人账号", async () => {
   const db = openDatabase(":memory:"),

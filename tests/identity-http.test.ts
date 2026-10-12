@@ -1,8 +1,8 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { createServer, type Server } from "node:http";
-import { openDatabase } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { createApiServer } from "../server/main";
+import { openDatabase } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { createApiServer } from "../backend/src/main";
 
 const cleanup: (() => Promise<void> | void)[] = [];
 afterEach(async () => {

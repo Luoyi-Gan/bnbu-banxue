@@ -1,15 +1,15 @@
 import { afterEach, expect, it } from "vitest";
 import ExcelJS from "exceljs";
 import { randomUUID } from "node:crypto";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
-import { createApiServer } from "../server/main";
-import { parseWorkbook, uploadWorkbook } from "../server/sports/workbook";
-import { enduranceImportWorkspace } from "../server/sports/endurance-import";
-import { mappedRosterCsv } from "../server/sports/roster-mapping";
-import { parseCsv } from "../server/sports/csv";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { createApiServer } from "../backend/src/main";
+import { parseWorkbook, uploadWorkbook } from "../backend/src/sports/workbook";
+import { enduranceImportWorkspace } from "../backend/src/sports/endurance-import";
+import { mappedRosterCsv } from "../backend/src/sports/roster-mapping";
+import { parseCsv } from "../backend/src/sports/csv";
 
 it("原版列选择工作簿保留自定义表头、跨空列和原行号，公式仍待核对", async () => {
   const book = new ExcelJS.Workbook(),

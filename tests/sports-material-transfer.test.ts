@@ -1,14 +1,14 @@
 import { createHash, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { execute } from "../server/commands";
-import { uploadMaterial } from "../server/sports/materials";
+import { execute } from "../backend/src/commands";
+import { uploadMaterial } from "../backend/src/sports/materials";
 import { afterEach, expect, it, vi } from "vitest";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { flagExpiredTransfers } from "../server/sports/material-transfer";
-import { processSportsReview } from "../server/sports/review-worker";
-import { writableMaterial } from "../server/sports/materials";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { flagExpiredTransfers } from "../backend/src/sports/material-transfer";
+import { processSportsReview } from "../backend/src/sports/review-worker";
+import { writableMaterial } from "../backend/src/sports/materials";
 const dbs: Database[] = [];
 afterEach(() => {
   vi.restoreAllMocks();

@@ -5,7 +5,7 @@ import {
   selectCredit,
   type CreditCandidate,
   type CreditInput,
-} from "../server/sports/credit";
+} from "../backend/src/sports/credit";
 const row = (
   id: string,
   day: string,

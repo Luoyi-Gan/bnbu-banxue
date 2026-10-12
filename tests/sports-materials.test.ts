@@ -1,16 +1,16 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { createHash, randomUUID } from "node:crypto";
 import sharp from "sharp";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
 import {
   uploadMaterial,
   readMaterial,
   materialWorkspace,
-} from "../server/sports/materials";
-import { createApiServer } from "../server/main";
+} from "../backend/src/sports/materials";
+import { createApiServer } from "../backend/src/main";
 const resources: (() => void | Promise<void>)[] = [];
 afterEach(async () => {
   vi.restoreAllMocks();

@@ -1,6 +1,6 @@
 import type { LiveEntity } from "./api";
 import type { OpenForm } from "./ConnectedApp";
-import type { CourseReport } from "../../server/sports/report";
+import type { CourseReport } from "../../backend/src/sports/report";
 const labels: Record<string, string> = {
   COURSE_NOT_PUBLISHED: "课程未发布",
   ALREADY_SETTLED: "已结算，须走历史更正",

@@ -1,10 +1,10 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
-import { sessionProjection } from "../server/sports/sessions";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { sessionProjection } from "../backend/src/sports/sessions";
 const databases: Database[] = [];
 afterEach(() => {
   databases.splice(0).forEach((db) => db.close());

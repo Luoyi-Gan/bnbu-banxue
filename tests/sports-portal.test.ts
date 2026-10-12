@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
-import { openDatabase } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { portalLogin, portalMe, portalSecurity } from "../server/sports/portal";
-import { createApiServer } from "../server/main";
+import { openDatabase } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { portalLogin, portalMe, portalSecurity } from "../backend/src/sports/portal";
+import { createApiServer } from "../backend/src/main";
 
 it("原版登录保留独立管理账号与个人邮箱账号隔离，不猜测冲突身份", () => {
   const db = openDatabase(":memory:");

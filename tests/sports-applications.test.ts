@@ -1,20 +1,20 @@
 import { afterEach, expect, it } from "vitest";
 import sharp from "sharp";
 import { randomUUID } from "node:crypto";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
 import {
   uploadApplicationAsset,
   readApplicationAsset,
   applicationWorkspace,
-} from "../server/sports/applications";
-import { enduranceWorkspace } from "../server/sports/endurance";
-import { reviewWorkspace } from "../server/sports/review";
-import { courseReport } from "../server/sports/report";
-import { createApiServer } from "../server/main";
-import { calculateProgress } from "../server/sports/progress";
+} from "../backend/src/sports/applications";
+import { enduranceWorkspace } from "../backend/src/sports/endurance";
+import { reviewWorkspace } from "../backend/src/sports/review";
+import { courseReport } from "../backend/src/sports/report";
+import { createApiServer } from "../backend/src/main";
+import { calculateProgress } from "../backend/src/sports/progress";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 function setup() {
@@ -505,7 +505,7 @@ it("审核幂等且仅原责任教师，结算后拒绝直接变更", async () =
 });
 it("申请证明真实HTTP上传/读取，提交后才向责任教师开放，维护和首次改密均拒绝", async () => {
   const f = setup(),
-    { createApiServer } = await import("../server/main"),
+    { createApiServer } = await import("../backend/src/main"),
     server = createApiServer(f.db);
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const base = `http://127.0.0.1:${(server.address() as { port: number }).port}`;

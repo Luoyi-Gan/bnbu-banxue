@@ -1,8 +1,8 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { openDatabase } from "../server/database";
-import { Repository } from "../server/repository";
-import { reviewClock, checkReviewReminders } from "../server/sports/calendar";
-import { createAccount } from "../server/auth";
+import { openDatabase } from "../backend/src/database";
+import { Repository } from "../backend/src/repository";
+import { reviewClock, checkReviewReminders } from "../backend/src/sports/calendar";
+import { createAccount } from "../backend/src/auth";
 const closes: (() => void)[] = [];
 afterEach(() => {
   vi.restoreAllMocks();

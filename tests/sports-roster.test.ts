@@ -1,10 +1,10 @@
 import { afterEach, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
-import { reconcileRoster, rosterWorkspace } from "../server/sports/roster";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { reconcileRoster, rosterWorkspace } from "../backend/src/sports/roster";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 it("原件按列选择生成可确认草稿，同原件不同选择不能静默复用", () => {
@@ -295,7 +295,7 @@ it("正式快照拒绝结构错误、陈旧基准、越权和结算覆盖；关�
 
 it("学校名单CSV文件原件保留、同源去重、关闭后受理链可继续，管理员不读取源", async () => {
   const f = setup();
-  const { uploadRosterFile } = await import("../server/sports/roster-files");
+  const { uploadRosterFile } = await import("../backend/src/sports/roster-files");
   const bytes = Buffer.from("\uFEFF学号,姓名\r\n S001 , student \r\n");
   const source = await uploadRosterFile(
     f.repo,
@@ -335,7 +335,7 @@ it("学校名单CSV文件原件保留、同源去重、关闭后受理链可继�
 });
 it("名单XLSX两列保留实际行号，公式缓存不能直接成为正式名单", async () => {
   const f = setup();
-  const { uploadRosterFile } = await import("../server/sports/roster-files");
+  const { uploadRosterFile } = await import("../backend/src/sports/roster-files");
   const Excel = (await import("exceljs")).default;
   const book = new Excel.Workbook(),
     sheet = book.addWorksheet("学校名单");
@@ -383,8 +383,8 @@ it("名单XLSX两列保留实际行号，公式缓存不能直接成为正式名
 });
 it("名单文件真实HTTP上传/下载隔离，编码、行数和100MB上限在服务端拒绝", async () => {
   const f = setup();
-  const { uploadRosterFile } = await import("../server/sports/roster-files");
-  const { createApiServer } = await import("../server/main");
+  const { uploadRosterFile } = await import("../backend/src/sports/roster-files");
+  const { createApiServer } = await import("../backend/src/main");
   await expect(
     uploadRosterFile(
       f.repo,
@@ -447,7 +447,7 @@ it("名单文件真实HTTP上传/下载隔离，编码、行数和100MB上限在
   }
 });
 it("综合报告分别统计注册、体测、计入和待办，复用选择算法且不改变教学事实", async () => {
-  const { courseReport, reportCsv } = await import("../server/sports/report");
+  const { courseReport, reportCsv } = await import("../backend/src/sports/report");
   const f = setup();
   const snap = f.confirm(
     f.preview("student_number,name\nS001,student\nS002,=1+1"),
@@ -530,7 +530,7 @@ it("综合报告分别统计注册、体测、计入和待办，复用选择算�
     expect(JSON.stringify(report) + csv).not.toContain(secret);
 });
 it("重复名单不合并身份，回退报告基准不抹除成员事实，未确认名单不虚报完成", async () => {
-  const { courseReport } = await import("../server/sports/report");
+  const { courseReport } = await import("../backend/src/sports/report");
   const f = setup();
   expect(courseReport(f.repo, f.teacher.account, f.course.id)).toMatchObject({
     snapshotId: null,
@@ -549,7 +549,7 @@ it("重复名单不合并身份，回退报告基准不抹除成员事实，未�
 });
 it("综合报告HTTP下载仅责任教师，首次改密与维护门禁不能绕过", async () => {
   const f = setup(),
-    { createApiServer } = await import("../server/main");
+    { createApiServer } = await import("../backend/src/main");
   const server = createApiServer(f.db);
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const base = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/sports/course-reports/${f.course.id}`;

@@ -1,11 +1,11 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { createHash, randomUUID } from "node:crypto";
 import sharp from "sharp";
-import { openDatabase } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository, type Fields } from "../server/repository";
-import { execute } from "../server/commands";
-import { uploadMaterial } from "../server/sports/materials";
+import { openDatabase } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository, type Fields } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { uploadMaterial } from "../backend/src/sports/materials";
 
 const closes: (() => void)[] = [];
 afterEach(() => {

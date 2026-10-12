@@ -1,10 +1,10 @@
-import {createApiServer} from '../server/main';
+import {createApiServer} from '../backend/src/main';
 import {randomUUID} from 'node:crypto';
 import {it,expect} from 'vitest';
-import {openDatabase} from '../server/database';
-import {createAccount,login,issueCode,register,verifyOwnEmail} from '../server/auth';
-import {Repository} from '../server/repository';
-import {searchStudents,studentNumber} from '../server/student-search';
+import {openDatabase} from '../backend/src/database';
+import {createAccount,login,issueCode,register,verifyOwnEmail} from '../backend/src/auth';
+import {Repository} from '../backend/src/repository';
+import {searchStudents,studentNumber} from '../backend/src/student-search';
 it('学校邮箱验证码绑定前缀，搜索尊重角色与隐私',()=>{
  const db=openDatabase(':memory:');try {
  createAccount(db,{email:'viewer@example.test',name:'查找者',password:'Acceptance-123',roles:['student']});

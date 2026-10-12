@@ -1,13 +1,13 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
 import {
   adminEmailStatus,
   requestAdminEmail,
   confirmAdminEmail,
   clearAdminChallenges,
-} from "../server/sports/admin-email";
+} from "../backend/src/sports/admin-email";
 const dbs: Database[] = [];
 afterEach(() => {
   vi.useRealTimers();

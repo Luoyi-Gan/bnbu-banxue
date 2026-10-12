@@ -1,8 +1,8 @@
 import { expect, it } from "vitest";
-import { createAccount, login } from "../server/auth";
-import { openDatabase } from "../server/database";
-import { Repository } from "../server/repository";
-import { createApiServer } from "../server/main";
+import { createAccount, login } from "../backend/src/auth";
+import { openDatabase } from "../backend/src/database";
+import { Repository } from "../backend/src/repository";
+import { createApiServer } from "../backend/src/main";
 
 it("原版名单只含本人课程，移出成员保留关系但不再开放当前个人资料", async () => {
   const db = openDatabase(":memory:"),

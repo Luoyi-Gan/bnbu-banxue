@@ -3,19 +3,19 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { openDatabase, type Database } from "../server/database";
+import { openDatabase, type Database } from "../backend/src/database";
 import {
   createAccount,
   login,
   loginAdministrator,
   authenticate,
-} from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
-import { administratorDirectory } from "../server/sports/administrators";
-import { migrateAccountNamespaces } from "../server/account-migration";
-import { createApiServer } from "../server/main";
-import { administratorSelf } from "../server/sports/administrator-deletion";
+} from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { administratorDirectory } from "../backend/src/sports/administrators";
+import { migrateAccountNamespaces } from "../backend/src/account-migration";
+import { createApiServer } from "../backend/src/main";
+import { administratorSelf } from "../backend/src/sports/administrator-deletion";
 const dbs: Database[] = [];
 it("删除清空独立登录资料和资料副本，业务历史及个人账号保留且历史主体不能复活", () => {
   const f = setup(),

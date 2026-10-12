@@ -3,12 +3,12 @@ import { randomUUID } from "node:crypto";
 import { mkdtempSync, unlinkSync, rmdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { createApiServer } from "../server/main";
-import { execute, snapshot } from "../server/commands";
-import { Repository } from "../server/repository";
-import { communityView } from "../server/community-view";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { createApiServer } from "../backend/src/main";
+import { execute, snapshot } from "../backend/src/commands";
+import { Repository } from "../backend/src/repository";
+import { communityView } from "../backend/src/community-view";
 
 const resources: (() => Promise<void> | void)[] = [];
 afterEach(async () => {

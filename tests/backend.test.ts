@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { openDatabase, transaction, type Database } from "../server/database";
+import { openDatabase, transaction, type Database } from "../backend/src/database";
 import {
   authenticate,
   createAccount,
   issueCode,
   login,
   register,
-} from "../server/auth";
-import { Repository } from "../server/repository";
-import { communityCommand } from "../server/community";
-import { coffeeCommand, occupied } from "../server/coffee";
+} from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { communityCommand } from "../backend/src/community";
+import { coffeeCommand, occupied } from "../backend/src/coffee";
 
 const databases: Database[] = [];
 afterEach(() => {

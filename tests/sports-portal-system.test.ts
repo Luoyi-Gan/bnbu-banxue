@@ -1,8 +1,8 @@
 import { expect, it } from "vitest";
-import { createAccount, login } from "../server/auth";
-import { openDatabase } from "../server/database";
-import { Repository } from "../server/repository";
-import { createApiServer } from "../server/main";
+import { createAccount, login } from "../backend/src/auth";
+import { openDatabase } from "../backend/src/database";
+import { Repository } from "../backend/src/repository";
+import { createApiServer } from "../backend/src/main";
 
 it("原版维护切换、公告及历史使用共享暂停事实，重复请求不重复通知", async () => {
   const db = openDatabase(":memory:"),

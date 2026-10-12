@@ -1,14 +1,14 @@
 import { afterEach, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { execute } from "../server/commands";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
 import {
   settlementCheck,
   settlementWorkspace,
-} from "../server/sports/settlement";
-import { createApiServer } from "../server/main";
+} from "../backend/src/sports/settlement";
+import { createApiServer } from "../backend/src/main";
 import ExcelJS from "exceljs";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));

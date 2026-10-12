@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login, type Account } from "../server/auth";
-import { Repository } from "../server/repository";
-import { snapshot } from "../server/commands";
-import { sportsCompanion } from "../server/sports/companion";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login, type Account } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { snapshot } from "../backend/src/commands";
+import { sportsCompanion } from "../backend/src/sports/companion";
 import { SportsProgressCard } from "../src/v2/SportsProgressCard";
 
 let db: Database, repo: Repository, actor: Account, otherId: string;

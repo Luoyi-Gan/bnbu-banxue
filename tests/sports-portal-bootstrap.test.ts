@@ -1,13 +1,13 @@
 import { expect, it } from "vitest";
-import { openDatabase } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { createApiServer } from "../server/main";
+import { openDatabase } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { createApiServer } from "../backend/src/main";
 import {
   portalAnnouncement,
   portalEnduranceTables,
   portalHealth,
-} from "../server/sports/portal-bootstrap";
+} from "../backend/src/sports/portal-bootstrap";
 
 it("原版规则增改删实际写入共享表，保护版本、表归属、连续区间与幂等", async () => {
   const db = openDatabase(":memory:"),

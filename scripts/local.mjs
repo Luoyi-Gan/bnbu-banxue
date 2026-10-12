@@ -11,7 +11,7 @@ await build({
     emptyOutDir: true,
     minify: false,
     lib: {
-      entry: resolve("server/main.ts"),
+      entry: resolve("backend/src/main.ts"),
       formats: ["es"],
       fileName: () => "backend.mjs",
     },

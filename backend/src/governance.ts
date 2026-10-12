@@ -13,7 +13,7 @@ import {
   parseTimetableResponse,
   type StudentTimetable,
   type TimetableLesson,
-} from "../src/v2/timetableModel";
+} from "../../src/v2/timetableModel";
 
 export function governanceCommand(
   repo: Repository,

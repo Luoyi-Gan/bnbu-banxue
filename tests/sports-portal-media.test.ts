@@ -1,9 +1,9 @@
 import { expect, it, vi } from "vitest";
 import { createHash } from "node:crypto";
-import { createAccount, login } from "../server/auth";
-import { openDatabase } from "../server/database";
-import { Repository } from "../server/repository";
-import { createApiServer } from "../server/main";
+import { createAccount, login } from "../backend/src/auth";
+import { openDatabase } from "../backend/src/database";
+import { Repository } from "../backend/src/repository";
+import { createApiServer } from "../backend/src/main";
 
 it("原版证明链接绑定账号和截止时间，读取原图仍重查教师归属与维护状态", async () => {
   const db = openDatabase(":memory:"),

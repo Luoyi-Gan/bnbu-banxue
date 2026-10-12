@@ -3,7 +3,7 @@ import {
   elapsedMilliseconds,
   startClock,
   transitionClock,
-} from "../server/sports/session-clock";
+} from "../backend/src/sports/session-clock";
 
 describe("体育服务端计时事实", () => {
   const start = Date.parse("2026-10-11T23:50:00+08:00");

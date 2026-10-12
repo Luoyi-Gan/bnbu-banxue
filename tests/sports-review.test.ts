@@ -1,18 +1,18 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { supplementClock } from "../server/sports/supplements";
+import { supplementClock } from "../backend/src/sports/supplements";
 import { createServer, type ServerResponse } from "node:http";
 import { randomUUID, createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { openDatabase } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository, type Fields } from "../server/repository";
-import { execute } from "../server/commands";
-import { uploadMaterial, materialWorkspace } from "../server/sports/materials";
-import { processSportsReview } from "../server/sports/review-worker";
-import { createApiServer } from "../server/main";
-import { systemWorkspace } from "../server/sports/system";
-import { reviewClock } from "../server/sports/calendar";
-import { incidentWorkspace } from "../server/sports/incidents";
+import { openDatabase } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository, type Fields } from "../backend/src/repository";
+import { execute } from "../backend/src/commands";
+import { uploadMaterial, materialWorkspace } from "../backend/src/sports/materials";
+import { processSportsReview } from "../backend/src/sports/review-worker";
+import { createApiServer } from "../backend/src/main";
+import { systemWorkspace } from "../backend/src/sports/system";
+import { reviewClock } from "../backend/src/sports/calendar";
+import { incidentWorkspace } from "../backend/src/sports/incidents";
 const closes: (() => void | Promise<void>)[] = [];
 const calendarInput = () => ({
   name: "隔离测试日历",

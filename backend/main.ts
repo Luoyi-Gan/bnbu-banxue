@@ -1,4 +1,4 @@
-import { startBackend } from '../server/main';
+import { startBackend } from './src/main';
 
 const server = await startBackend();
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {

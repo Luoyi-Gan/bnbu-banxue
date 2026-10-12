@@ -1,10 +1,10 @@
 import { afterEach, expect, it } from "vitest";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { historicalRemarks } from "../server/sports/historical-remarks";
-import { gradeWorkspace } from "../server/sports/grades";
-import { createApiServer } from "../server/main";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { historicalRemarks } from "../backend/src/sports/historical-remarks";
+import { gradeWorkspace } from "../backend/src/sports/grades";
+import { createApiServer } from "../backend/src/main";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 function setup() {

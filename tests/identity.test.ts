@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { checkSchoolIdentity } from "../server/identity";
-import type { Account } from "../server/auth";
+import { checkSchoolIdentity } from "../backend/src/identity";
+import type { Account } from "../backend/src/auth";
 
 const actor: Account = {
   id: "account-1",
