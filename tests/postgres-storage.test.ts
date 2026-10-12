@@ -154,6 +154,15 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const semester=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{name:'当前学期',academicYear:'2026-2027',type:'AUTUMN',status:'CURRENT',startDate:'2026-09-01',endDate:'2027-01-31'}));
       ids.push(semester.id);
       expect(await postgresStudentCourses(db,login.token,'/api/v1/semesters/current',{})).toMatchObject({data:{id:semester.id,displayName:'当前学期',academicYear:'2026-2027',termCode:'AUTUMN'}});
+      const course=await db.transaction(client=>new PostgresRepository(client).create('sportsCourse','sports-reader-other',{name:'老师资料课程',semesterId:semester.id,status:'PUBLISHED'}));
+      ids.push(course.id);
+      const enrollment=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-student',{courseId:course.id,status:'ACTIVE'}));
+      ids.push(enrollment.id);
+      const teacher=await postgresStudentCourses(db,login.token,'/api/v1/teachers/sports-reader-other',{});
+      expect(teacher).toEqual({data:{id:'sports-reader-other',fullName:'sports-reader-other',departmentName:''}});
+      await expect(postgresStudentCourses(db,login.token,'/api/v1/teachers/sports-reader-teacher',{})).rejects.toMatchObject({status:404});
+      await db.transaction(client=>new PostgresRepository(client).save(enrollment,{...enrollment.data,status:'LEFT'}));
+      await expect(postgresStudentCourses(db,login.token,'/api/v1/teachers/sports-reader-other',{})).rejects.toMatchObject({status:404});
       const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsSemester',null,{status:'CURRENT'}));
       ids.push(duplicate.id);
       await expect(postgresStudentCourses(db,login.token,'/api/v1/semesters/current',{})).rejects.toMatchObject({status:409});

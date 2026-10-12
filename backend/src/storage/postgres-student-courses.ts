@@ -26,6 +26,19 @@ export async function postgresStudentCourses(db:PostgresDatabase,token:string,pa
     }
     const enrollments=await source.all('sportsEnrollment');
     const courses=(await source.all('sportsCourse')).filter(c=>teacher ? c.ownerId===actor.id : enrollments.some(e=>e.ownerId===actor.id && e.data.courseId===c.id));
+    const teacherDetail=/^\/api\/v1\/teachers\/([^/]+)$/.exec(path);
+    if(teacherDetail) {
+      demand(!teacher && Object.keys(input).length===0,'仅学生可通过此入口查看任课老师。',403);
+      const teacherId=decodeURIComponent(teacherDetail[1]);
+      const current=semesters.filter(s=>s.data.status==='CURRENT');
+      demand(current.length===1,'当前学期须核对。',409);
+      demand(courses.some(c=>c.ownerId===teacherId && c.data.semesterId===current[0].id && enrollments.some(e=>e.ownerId===actor.id && e.data.courseId===c.id && e.data.status==='ACTIVE')),'老师不存在或不属于本人当前课程。',404);
+      const verified=identities.filter(i=>i.ownerId===teacherId && i.data.role==='teacher' && i.data.status==='verified');
+      demand(verified.length===1,'老师身份不可用。',404);
+      const account=(await client.query<{id:string;name:string;organization:string}>("SELECT id,name,organization FROM accounts WHERE id=$1 AND login_kind='PERSONAL' AND status='active'",[teacherId])).rows[0];
+      demand(account,'老师账号不可用。',404);
+      return {data:{id:account.id,fullName:account.name,departmentName:account.organization}};
+    }
     if(path==='/api/v1/enrollments') {
       demand(Object.keys(input).every(key=>['classSectionId','limit','cursor'].includes(key)),'班级成员查询参数无效。');
       demand(input.classSectionId===undefined || typeof input.classSectionId==='string','班级标识无效。');
