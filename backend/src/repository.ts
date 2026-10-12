@@ -75,6 +75,12 @@ export function enumField<T extends string>(
 }
 export class Repository {
   constructor(public db: Database) {}
+  ownsNotification(id: string, recipientId: string) {
+    return !!this.db.prepare('SELECT 1 FROM notifications WHERE id=? AND recipient_id=?').get(id,recipientId);
+  }
+  readNotification(id: string, recipientId: string, at: string) {
+    this.db.prepare('UPDATE notifications SET read_at=COALESCE(read_at,?) WHERE id=? AND recipient_id=?').run(at,id,recipientId);
+  }
   all(kind: string): Entity[] {
     return (
       this.db

@@ -1459,3 +1459,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### PostgreSQL 工作台读取与共用权限投影
 从 snapshot 提取 projectWorkspace，两种数据库复用原可见性、校友资料脱敏、队伍成员/聊天限制、教师预约权限和人员资料预览规则；关系历史和本地体育摘要提取纯投影函数。PostgreSQL /api/workspace 在只读 repeatable-read 事务内构建读取模型，所有写操作仍走实际事务仓储，不使用读取模型写回。新增 audit 顺序列迁移，保持同毫秒操作历史可排序。
 67 文件 410 项全量测试通过（含实际 PostgreSQL 14 项）；前后端类型检查与修改文件 lint 通过。新增断言覆盖本人社区通知与他人隔离、教师及学生取消记录/改期历史、无关审核员不可见私人预约及通知。该读取实现为保持原规则会加载相关全量实体/审计，后续应按数据规模优化查询；不影响当前本地几十人验收但未作大规模性能承诺。PostgreSQL 其余写命令、COS、分离 Compose 和最终归档仍待完成。
+
+### PostgreSQL 通知已读、群发与阅读率
+提取 notificationPolicy，两套数据库共用通知归属验证、批量预检和群发权限规则，仓储新增 ownsNotification/readNotification。PostgreSQL 命令保留批量 ids 和群发 recipients 返回字段，通知、审计、幂等回执同事务保存。
+47 项针对测试通过（PostgreSQL 15、原 HTTP 和并发 32）；修改文件 lint 与服务端类型检查通过。新增真实 PostgreSQL 场景覆盖重复收件人去重、请求重试不重发、混入他人通知时整批拒绝且本人仍未读、个人通知隔离、学生不能群发，以及 2 人收件 1 人已读时阅读率 0.5。该变更未删除通知或改变提醒开关规则，前端页面保持原样。

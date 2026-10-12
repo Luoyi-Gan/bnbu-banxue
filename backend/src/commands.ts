@@ -1,3 +1,4 @@
+import { notificationPolicy } from "./notification-policy";
 import { projectWorkspace } from "./snapshot-projection";
 import { runSync } from "./storage/effects";
 import { relationPolicy } from "./relation-policy";
@@ -6,11 +7,10 @@ import { relationshipHistory } from './relationship-history';
 import { randomUUID } from "node:crypto";
 import { authenticate, demand, digest, timestamp, type Account } from "./auth";
 import { transaction, type Database } from "./database";
-import { Repository, strings, textField, type Fields } from "./repository";
+import { Repository, type Fields } from "./repository";
 import {
   communityCommand,
   has,
-  operator,
 } from "./community";
 import { coffeeCommand } from "./coffee";
 import { governanceCommand } from "./governance";
@@ -101,44 +101,9 @@ export function execute(
       return JSON.parse(String(old.result));
     }
     let result: unknown;
-    if (action === "notification.read") {
-      const id = textField(input, "id", 100);
-      demand(
-        db
-          .prepare("SELECT 1 FROM notifications WHERE id=? AND recipient_id=?")
-          .get(id, actor.id),
-        "通知不存在。",
-        404,
-      );
-      db.prepare(
-        "UPDATE notifications SET read_at=COALESCE(read_at,?) WHERE id=? AND recipient_id=?",
-      ).run(timestamp(), id, actor.id);
-      result = { id };
-    } else if (action === "notification.readmany") {
-      demand(Array.isArray(input.ids) && input.ids.length > 0 && input.ids.every(id => typeof id === "string" && id.length > 0 && id.length <= 100), "请选择要标为已读的通知。");
-      const ids = [...new Set(input.ids as string[])];
-      const owned = db.prepare("SELECT 1 FROM notifications WHERE id=? AND recipient_id=?");
-      for (const id of ids) demand(owned.get(id, actor.id), "通知不存在。", 404);
-      const update = db.prepare("UPDATE notifications SET read_at=COALESCE(read_at,?) WHERE id=? AND recipient_id=?");
-      const at = timestamp();
-      for (const id of ids) update.run(at, id, actor.id);
-      result = { ids };
-    } else if (action === "notification.send") {
-      operator(actor);
-      const recipients = strings(input.recipients);
-      demand(
-        recipients.length > 0 && recipients.length <= 1000,
-        "请选择 1–1000 位接收人。",
-      );
-      recipients.forEach((id) => repo.person(id));
-      const batch = randomUUID();
-      repo.notify(
-        recipients,
-        batch,
-        "broadcast",
-        textField(input, "body", 2000),
-      );
-      result = { id: batch, recipients: [...new Set(recipients)].length };
+    if (action.startsWith("notification.")) {
+      result = runSync(notificationPolicy(repo,actor,action,input));
+      demand(result,"不支持该业务操作。",404);
     } else if (action === "relation.set") {
       result = runSync(relationPolicy(repo, actor, input));
     } else {

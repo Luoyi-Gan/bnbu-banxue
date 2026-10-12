@@ -305,4 +305,26 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(unrelatedView.entities.some(e=>e.id===bookingId)).toBe(false);
     expect(unrelatedView.notifications.some(n=>n.entityId===bookingId)).toBe(false);
   });
+  it('deduplicates broadcasts and atomically enforces notification ownership for batch reads', async () => {
+    const auth=new PostgresAuth(db);
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('notify-operator','notify@example.test',$1,'运营','now','[\"operator\"]')",[hashPassword('Notify-test-123')]);
+    const operator=(await auth.login('notify@example.test','Notify-test-123')).token;
+    const a=(await auth.login('coffee-a@example.test','Coffee-test-123')).token;
+    const b=(await auth.login('coffee-b@example.test','Coffee-test-123')).token;
+    const request=randomUUID(),input={recipients:['coffee-a','coffee-b','coffee-a'],body:'群发通知'};
+    const first=await executePostgres(db,operator,'notification.send',input,request);
+    expect(first.recipients).toBe(2);
+    expect(await executePostgres(db,operator,'notification.send',input,request)).toEqual(first);
+    const notices=(await db.pool.query('SELECT id,recipient_id FROM notifications WHERE entity_id=$1',[first.id])).rows;
+    expect(notices).toHaveLength(2);
+    const own=notices.find(n=>n.recipient_id==='coffee-a').id,other=notices.find(n=>n.recipient_id==='coffee-b').id;
+    await expect(executePostgres(db,a,'notification.readmany',{ids:[own,other]},randomUUID())).rejects.toMatchObject({status:404});
+    expect((await db.pool.query('SELECT read_at FROM notifications WHERE id=$1',[own])).rows[0].read_at).toBeNull();
+    await executePostgres(db,a,'notification.readmany',{ids:[own,own]},randomUUID());
+    const batch=(await postgresWorkspace(db,operator)).notificationBatches.find(row=>row.id===first.id);
+    expect(batch).toMatchObject({total:2,read:1,readRate:0.5});
+    expect((await postgresWorkspace(db,b)).notifications.find(row=>row.id===other)?.readAt).toBeNull();
+    expect((await postgresWorkspace(db,a)).notifications.some(row=>row.id===other)).toBe(false);
+    await expect(executePostgres(db,a,'notification.send',input,randomUUID())).rejects.toMatchObject({status:403});
+  });
 });
