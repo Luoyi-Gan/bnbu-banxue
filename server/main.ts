@@ -136,7 +136,7 @@ export function createApiServer(
           const parsed = new URL(origin);
           demand(
             ["127.0.0.1", "localhost", "[::1]"].includes(parsed.hostname) &&
-              ["4174", "4175"].includes(parsed.port),
+              ["4174", "4175", "4186"].includes(parsed.port),
             "来源不允许。",
             403,
           );
@@ -400,7 +400,10 @@ export function createApiServer(
             await checkSchoolIdentity(authenticate(db, token)),
           );
         }
-        if (pathname === "/api/auth/logout") {
+        if (
+          pathname === "/api/auth/logout" ||
+          pathname === "/api/v1/auth/logout"
+        ) {
           db.prepare("DELETE FROM sessions WHERE token_hash=?").run(
             digest(token!),
           );
@@ -408,7 +411,13 @@ export function createApiServer(
             "Set-Cookie",
             "bnbu_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0",
           );
-          return send(response, 200, { loggedOut: true });
+          return send(
+            response,
+            200,
+            pathname === "/api/v1/auth/logout"
+              ? { data: null }
+              : { loggedOut: true },
+          );
         }
         if (pathname === "/api/commands") {
           demand(

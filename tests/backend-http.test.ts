@@ -84,7 +84,7 @@ describe("API、持久化和跨角色联动", () => {
     expect(
       (await fetch(`${base}/api/v1/me`, { headers: { Cookie: cookie } }))
         .status,
-    ).toBe(503);
+    ).toBe(403); // A companion account without sports identity cannot enter the original portal.
   });
   it("命令幂等与参数冲突，事务外客户端不能伪造作者或审核状态", () => {
     const { a, b, run, repo } = setup(),

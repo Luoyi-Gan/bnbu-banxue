@@ -767,6 +767,27 @@ function writeRefreshIntent(intent: StoredRefreshIntent | null): void {
 // Refresh only rotates tokens inside the same generation.
 let authSessionEpoch = 0;
 let apiRequestMode: "real" | "demo" = "real";
+let cookieSession: { userId: string; role: ApiRole } | null = null;
+export const usesCookieSession = (): boolean =>
+  process.env.NEXT_PUBLIC_BNBU_COOKIE_SESSION === "true";
+
+// Only the server can establish this session. No credential is copied into JS storage.
+export async function restoreCookieSession(): Promise<boolean> {
+  if (!usesCookieSession()) return hasApiSession();
+  const epoch = authSessionEpoch;
+  try {
+    const security = await rawRequest<AccountSecurityData>("/auth/account-security");
+    if (epoch !== authSessionEpoch || apiRequestMode !== "real") return false;
+    cookieSession = { userId: security.userId, role: security.adminKind ? "ADMIN" : "TEACHER" };
+    return true;
+  } catch (error) {
+    if (epoch === authSessionEpoch && error instanceof ApiError && error.status === 401) {
+      cookieSession = null;
+      return false;
+    }
+    throw error;
+  }
+}
 
 export function setApiRequestMode(mode: "real" | "demo"): void {
   apiRequestMode = mode;
@@ -778,12 +799,13 @@ export function apiBaseUrl(): string {
   return DEFAULT_BASE;
 }
 
-export const hasApiSession = (): boolean => readTokens() !== null;
-export const apiSessionRole = (): ApiRole | null => readTokens()?.role ?? null;
+export const hasApiSession = (): boolean => usesCookieSession() ? cookieSession !== null : readTokens() !== null;
+export const apiSessionRole = (): ApiRole | null => usesCookieSession() ? cookieSession?.role ?? null : readTokens()?.role ?? null;
 // Non-secret account scope for pending UI requests. Never persist tokens with the request.
-export const apiSessionUserId = (): string | null => readTokens()?.userId ?? null;
+export const apiSessionUserId = (): string | null => usesCookieSession() ? cookieSession?.userId ?? null : readTokens()?.userId ?? null;
 export function clearApiSession() {
   authSessionEpoch += 1;
+  cookieSession = null;
   writeTokens(null);
   writeRefreshIntent(null);
 }
@@ -877,11 +899,12 @@ async function rawEnvelopeRequest<T>(
   if (method !== "GET" && !hasIdempotencyKey(requestHeaders))
     requestHeaders["Idempotency-Key"] = uuid();
   const tokens = readTokens();
-  if (auth && tokens?.accessToken)
+  if (auth && !usesCookieSession() && tokens?.accessToken)
     requestHeaders["Authorization"] = `Bearer ${tokens.accessToken}`;
   let response: Response;
   try {
     response = await fetch(`${apiBaseUrl()}${path}`, {
+      credentials: "same-origin",
       method,
       headers: requestHeaders,
       body:
@@ -1012,7 +1035,12 @@ async function requestWithRefresh<T>(
   try {
     return await operation();
   } catch (error) {
+    if (usesCookieSession() && options.auth !== false && authSessionEpoch === requestEpoch && error instanceof ApiError && error.status === 401 && !options.credentialProof) {
+      clearApiSession();
+      throw error;
+    }
     const canRefresh =
+      !usesCookieSession() &&
       options.auth !== false &&
       authSessionEpoch === requestEpoch &&
       readTokens() !== null;
@@ -1197,6 +1225,10 @@ export async function logoutApi(): Promise<void> {
   // and so completion of this logout can never erase a later login.
   clearApiSession();
   try {
+    if (usesCookieSession()) {
+      await rawRequest<null>("/auth/logout", { method: "POST", auth: false, body: {} });
+      return;
+    }
     if (tokens?.refreshToken && tokens.accessToken) {
       await rawRequest<null>("/auth/logout", {
         method: "POST",

@@ -42,6 +42,19 @@ it("原版接口使用共享 HttpOnly 会话，拒绝匿名并返回 data 协议
     expect(await security.json()).toMatchObject({
       data: { userId: id, adminKind: null, permissions: [] },
     });
+    const logout = await fetch(`${base}/auth/logout`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+        Origin: "http://127.0.0.1:4186",
+      },
+      body: "{}",
+    });
+    expect(logout.status).toBe(200);
+    expect(await logout.json()).toEqual({ data: null });
+    expect(logout.headers.get("set-cookie")).toContain("Max-Age=0");
+    expect((await fetch(`${base}/me`, { headers })).status).toBe(401);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
     db.close();

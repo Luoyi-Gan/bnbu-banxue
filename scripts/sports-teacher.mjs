@@ -13,6 +13,7 @@ if (!existsSync(cli)) {
 }
 process.chdir(fileURLToPath(portal));
 process.env.BNBU_LOCAL_BACKEND_ORIGIN ??= "http://127.0.0.1:4175";
+process.env.NEXT_PUBLIC_BNBU_COOKIE_SESSION = "true";
 process.argv = [
   process.execPath,
   fileURLToPath(cli),

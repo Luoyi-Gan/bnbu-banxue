@@ -51,6 +51,8 @@ import {
   currentApiSessionEpoch,
   getMe,
   hasApiSession,
+  usesCookieSession,
+  restoreCookieSession,
   logoutApi,
   passwordLogin,
   getAccountSecurity,
@@ -610,7 +612,7 @@ export function PortalApp() {
 
     setApiRequestMode("real");
     setSessionRestoreError(null);
-    if (!hasApiSession()) {
+    if (!hasApiSession() && !usesCookieSession()) {
       setSessionRestorePhase("idle");
       return;
     }
@@ -618,6 +620,10 @@ export function PortalApp() {
     setSessionRestorePhase("restoring");
     const expectedEpoch = currentApiSessionEpoch();
     try {
+      if (usesCookieSession() && !(await restoreCookieSession())) {
+        if (sessionRestoreAttemptRef.current === attempt) setSessionRestorePhase("idle");
+        return;
+      }
       const security = await getAccountSecurity();
       setAdminKind(security.adminKind);
       if (sessionRestoreAttemptRef.current !== attempt || currentApiSessionEpoch() !== expectedEpoch) return;
