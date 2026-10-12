@@ -67,11 +67,12 @@ export class ApiError extends Error {
     super(message);
   }
 }
-export async function api<T>(path: string, body?: unknown): Promise<T> {
+export async function api<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
   const response = await fetch(path, {
     method: body === undefined ? "GET" : "POST",
     credentials: "same-origin",
     cache: "no-store",
+    signal,
     headers: {
       Accept: "application/json",
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
@@ -79,11 +80,17 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   const data = await response.json().catch(() => null);
-  if (!response.ok || !data)
+  if (!response.ok)
     throw new ApiError(
       response.status,
       data?.message ?? "暂时无法连接后端，请检查本地服务。",
     );
+  if (!data || typeof data !== "object")
+    throw new ApiError(response.status, "数据接口尚未连接，请检查本地服务。");
+  if (path === "/api/workspace" && (!data.account?.id || !Array.isArray(data.account?.roles)))
+    throw new ApiError(response.status, "账号接口尚未返回有效身份，暂不展示业务数据。");
+  if (path === "/api/sports/workspace" && !data.firstLoginOnly && data.system?.mode !== "MAINTENANCE" && !data.identity?.data?.role)
+    throw new ApiError(response.status, "体育接口尚未返回有效身份，暂不展示统计。");
   return data as T;
 }
 export const loadWorkspace = () => api<Workspace>("/api/workspace");

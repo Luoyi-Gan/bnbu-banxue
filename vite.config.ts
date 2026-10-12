@@ -8,6 +8,6 @@ export default defineConfig({
   server: { host: '127.0.0.1', port: 4174, strictPort: true, watch: { ignored: ['**/docs/**', '**/data/**', '**/artifacts/**'] }, proxy: {
     ...(process.env.BNBU_SPORTS_ORIGIN ? { '/api/v1': { target: process.env.BNBU_SPORTS_ORIGIN, changeOrigin: false } } : {}),
     ...(process.env.BNBU_SPORTS_OBJECT_ORIGIN ? { '/minio': { target: process.env.BNBU_SPORTS_OBJECT_ORIGIN, rewrite: (path: string) => path.replace(/^\/minio/, '') } } : {}),
-    '/api': { target: 'http://127.0.0.1:4175' },
+    '/api': { target: process.env.BNBU_COMPANION_ORIGIN || 'http://127.0.0.1:4175' },
   } },
 })

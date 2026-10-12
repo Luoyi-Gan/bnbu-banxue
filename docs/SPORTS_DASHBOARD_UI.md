@@ -33,3 +33,11 @@
 - 教师页手机窄屏无文档横向溢出；表格使用内部横向滚动。浏览器未报告脚本错误。
 - `artifacts/sports-ui/teacher-dashboard.jpg`、`teacher-mobile.jpg`：本地教师会话截图。
 - `artifacts/sports-ui/student-card-check.html` 与对应脚本为明确标记的独立布局样例，无数据库写入；`student-card.jpg`、`student-mobile.jpg` 用于验证蓝白卡片和窄屏排版。真实学生无确认记录时隐藏卡片，由服务端及组件测试验证。
+
+## PR #10 与 #11 整合（2026-10-12）
+
+- PR #10 单独交付时的 20 组、130 项前端测试和浏览器记录保留在 `ADMIN_COMPLETION.md`。教师桌面截图采用 #10 的交付版本，其余截图保留原有来源；这些截图不是本次整合后的重新验收证据。
+- `/workspace` 及 `/workspace/sports` 统一由 `ConnectedApp` 读取当前会话并展示；体育内容沿用双方相同的 `SportsPortal`、`SportsDashboard` 和紧凑进度卡。前端单独交付时的 `WorkspaceSportsPage` 组件保留，主入口使用整合后的共享工作台。
+- `/api/workspace` 返回已登录账号和本人体育摘要，`/api/sports/workspace` 返回获授权课程、成员、记录和确认进度。保留 #10 对无效响应的检查，同时保留 #11 的业务 POST、错误状态和幂等重试；读取请求的取消信号不作为请求正文提交。
+- 开发代理通过 `BNBU_COMPANION_ORIGIN` 配置共享伴学后端，默认 `http://127.0.0.1:4175`；`/api/v1` 与媒体代理仍沿用体育服务配置。生产环境须提供相应的同源后端接口。
+- 完整后端在 `server/`，通过 `npm run dev:local` 启动。数据明确来自本地体育库，线上体育数据和真实学校身份仍按原交接要求另行接入。
