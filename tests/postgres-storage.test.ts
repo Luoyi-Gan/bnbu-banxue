@@ -346,4 +346,36 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await command(reviewer,'certification.review',{id:certification.id,approve:false,reason:'撤销测试'});
     expect((await postgresWorkspace(db,student)).entities.find(e=>e.id===certification.id)?.data.status).toBe('rejected');
   });
+  it('keeps published knowledge answers as private snapshots when administrators edit the source', async () => {
+    const auth=new PostgresAuth(db);
+    const operator=(await auth.login('notify@example.test','Notify-test-123')).token;
+    const student=(await auth.login('coffee-a@example.test','Coffee-test-123')).token;
+    const other=(await auth.login('coffee-b@example.test','Coffee-test-123')).token;
+    const command=(token:string,action:string,input:Record<string,unknown>)=>executePostgres(db,token,action,input,randomUUID());
+    const fields={title:'图书馆',body:'九点开放',keywords:'图书馆',source:'学校说明',status:'published'};
+    const entry=await command(operator,'knowledge.save',fields);
+    await command(operator,'knowledge.save',{title:'内部草稿',body:'不可公开',keywords:'图书馆',source:'内部',status:'draft'});
+    const answer=await command(student,'knowledge.ask',{question:'图书馆何时开放？'});
+    const before=(await postgresWorkspace(db,student)).entities.find(e=>e.id===answer.id)!;
+    expect(before.data.body).toContain('九点开放');
+    expect(before.data.body).not.toContain('不可公开');
+    await command(operator,'knowledge.save',{...fields,id:entry.id,body:'十点开放'});
+    expect((await postgresWorkspace(db,student)).entities.find(e=>e.id===answer.id)?.data.body).toBe(before.data.body);
+    expect((await postgresWorkspace(db,other)).entities.some(e=>e.id===answer.id)).toBe(false);
+    await expect(command(student,'knowledge.save',fields)).rejects.toMatchObject({status:403});
+    const next=await command(student,'knowledge.ask',{question:'图书馆开放时间'});
+    expect((await postgresWorkspace(db,student)).entities.find(e=>e.id===next.id)?.data.body).toContain('十点开放');
+  });
+  it('protects the last active superadmin and blocks writes through a previously valid banned session', async () => {
+    const auth=new PostgresAuth(db);
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('govern-super','govern-super@example.test',$1,'超管','now','[\"superadmin\"]')",[hashPassword('Govern-test-123')]);
+    await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES('govern-student','govern-student@example.test',$1,'测试学生','now','[\"student\"]')",[hashPassword('Govern-test-123')]);
+    const superToken=(await auth.login('govern-super@example.test','Govern-test-123')).token;
+    const student=(await auth.login('govern-student@example.test','Govern-test-123')).token;
+    await expect(executePostgres(db,superToken,'account.update',{id:'govern-super',status:'banned',roles:[],reason:'停用测试'},randomUUID())).rejects.toThrow('唯一有效超级管理员');
+    await expect(executePostgres(db,student,'account.update',{id:'govern-super',status:'banned',roles:[],reason:'越权测试'},randomUUID())).rejects.toMatchObject({status:403});
+    await executePostgres(db,superToken,'account.update',{id:'govern-student',status:'banned',roles:['student'],reason:'封禁测试'},randomUUID());
+    await expect(executePostgres(db,student,'post.create',{title:'不应发布',body:'测试',board:'校园'},randomUUID())).rejects.toMatchObject({status:403});
+    expect((await db.pool.query("SELECT status FROM accounts WHERE id='govern-super'")).rows[0].status).toBe('active');
+  });
 });
