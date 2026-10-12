@@ -1,3 +1,26 @@
+# 2026-10-12 本地交付验收结论（优先于后续历史检查点）
+
+已完成用户当前授权的伴学本地后端交付。此结论针对本地可真实操作的业务与已确认规则，不表示腾讯云生产服务已经接通，也不表示穷尽所有设备与浏览器组合。后续历史段落中的未完成、待确认主题与旧测试数字不代表本检查点。
+
+| 交付要求 | 验证依据 | 结果 |
+| --- | --- | --- |
+| 独立后端、前后端分离 | backend/src、backend/Dockerfile、frontend/Dockerfile、compose.postgres.yaml；本机4188前端经同源代理调用API，PostgreSQL及API健康 | 已落实 |
+| 登录、角色、独立管理账号 | unified-login、auth-return-path、identity-http、管理员及账号隔离测试；学生/教师/审核员浏览器登录 | 已验证本地账号及权限，不冒充学校核验 |
+| 社区、举报、组队与聊天互评 | backend-http/concurrency、PostgreSQL事务测试、Docker跨角色脚本；用户之前实际验收记录 | 共享保存、权限、通知、并发和结束限制通过 |
+| 教师与校友业务 | Docker预约/改期/取消/资格撤销链；浏览器教师资料、时段、学生发现、校友认证审核撤销；主题必填实测 | 已验证现行首版规则 |
+| 邮件活动、组织和成员活动 | Docker发布/更正/通知/权限链；PostgreSQL拆分原子性及更正幂等；原邮件详情拆分、更正浏览器提交刷新 | 已验证；真实收件按用户决定部署配置 |
+| 课表、搜索、隐私、消息、校园知识 | timetable-backend、student-search、notification-preferences、live-search/relationships及Docker知识链；页面课表示例隔离、问答、设置和通知已读 | 已验证本地及适配接口边界 |
+| AI形象偏好 | PostgreSQL账号隔离与图片切换保存；浏览器内置形象、自定义上传及刷新 | 已接本人后端 |
+| 体育独立且只读 | sports-companion、sports-dashboard、sports-source-reader；拒绝旧写入接口、真实PG只读事务阻止写函数、原前端清单校验 | 不重建体育业务；源表与授权映射部署配置 |
+| 原页面布局 | 未重新设计页面；仅用户批准的邮件入口及职责/必填/数据接线修正；截图存档 | 保留原有布局 |
+| 本地测试 | 当前266项通过、零失败零跳过；199文件ESLint零错误零警告；类型检查、前后端Docker构建和跨角色脚本通过 | 已通过 |
+| PR与存档 | PR #12，交付分支codex/banxue-postgres-readonly-delivery；本地source.bundle、报告、截图与哈希清单 | 已交付，未合并PR |
+
+正式部署仍须配置验证：CVM网络与HTTPS、伴学PostgreSQL参数、COS真实存储、邮件发送及学校身份服务、学校活动收件邮箱、腾讯云OCR到结构化课表的适配、体育独立只读账号/内网/源表/授权映射。这些不会用本地夹具冒充。新增收费、到场、爽约、自动超时等未确认扩展不启用。
+
+启动和参数见 POSTGRES_DOCKER.md，协议见 BACKEND_API.md，逐次证据见 ADMIN_COMPLETION.md。当前入口 http://127.0.0.1:4188/v2/login。测试账号凭据仅留本机.runtime，不写入源码或公开存档。
+
+---
 # BNBU 伴学本地后端交接
 
 ## 2026-10-12 体育清理后的当前结论（优先于下方历史记录）
