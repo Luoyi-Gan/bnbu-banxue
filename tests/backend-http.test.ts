@@ -229,10 +229,23 @@ describe("API、持久化和跨角色联动", () => {
       likes: 0,
     });
     expect((await read(f.b)).posts).toEqual([]);
-    f.run(f.reviewer, "content.review", {
-      id: post.id,
+    const reviewRequest = async (who: typeof f.a, status: string, reason: string, requestId = randomUUID()) => fetch(url.replace('/community','/commands'), {
+      method: 'POST', headers: {Cookie: `bnbu_session=${who.token}`, 'Content-Type': 'application/json'},
+      body: JSON.stringify({action:'content.review',input:{id:post.id,status,reason},requestId}),
+    });
+    expect((await reviewRequest(f.b,'visible','越权')).status).toBe(403);
+    expect((await reviewRequest(f.reviewer,'visible','')).status).toBe(400);
+    expect(f.repo.get(post.id).data.status).toBe('pending');
+    const reviewKey = randomUUID();
+    expect((await reviewRequest(f.reviewer,'visible','符合社区要求',reviewKey)).status).toBe(200);
+    expect((await reviewRequest(f.reviewer,'visible','符合社区要求',reviewKey)).status).toBe(200);
+    const notices = f.db.prepare("SELECT recipient_id,body FROM notifications WHERE entity_id=? AND event='content.review'").all(post.id);
+    expect(notices).toHaveLength(1);
+    expect(notices[0]).toMatchObject({recipient_id:f.a.id,body:'内容已公开：符合社区要求'});
+    /* The original moderation form uses this same content.review protocol. */
+    expect(f.repo.get(post.id).data).toMatchObject({
       status: "visible",
-      reason: "符合社区要求",
+      reviewNote: "符合社区要求",
     });
     f.run(f.b, "relation.set", { id: post.id, kind: "like", enabled: true });
     f.run(f.b, "relation.set", { id: post.id, kind: "save", enabled: true });
