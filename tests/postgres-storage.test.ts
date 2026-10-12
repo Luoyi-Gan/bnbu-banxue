@@ -94,7 +94,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(listing.data).toEqual([expect.objectContaining({id:course.id,courseName:'本人课程'})]);
     await expect(postgresStudentCourses(db,student.token,`/api/v1/courses/${hidden.id}`,{})).rejects.toMatchObject({status:404});
     await expect(postgresStudentCourses(db,student.token,'/api/v1/courses',{cursor:'not-visible'})).rejects.toMatchObject({status:409});
-    await expect(postgresStudentCourses(db,teacher.token,'/api/v1/courses',{})).rejects.toMatchObject({status:403});
+    const teacherListing=await postgresStudentCourses(db,teacher.token,'/api/v1/courses',{});
+    expect(teacherListing.data).toEqual([expect.objectContaining({id:course.id})]);
+    expect(teacherListing).toMatchObject({meta:{pagination:{hasMore:false,nextCursor:null}}});
+    await expect(postgresStudentCourses(db,teacher.token,`/api/v1/courses/${hidden.id}`,{})).rejects.toMatchObject({status:404});
     await db.transaction(async client=>{
       const repo=new PostgresRepository(client);
       const identity=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-teacher')!;
