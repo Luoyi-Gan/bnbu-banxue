@@ -3,6 +3,7 @@ import { postgresStudentProgress } from '../backend/src/storage/postgres-student
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
 import { postgresStudentPhysical } from '../backend/src/storage/postgres-student-physical';
 import { postgresTeacherHistory } from '../backend/src/storage/postgres-teacher-history';
+import { gradeWorkspace } from '../backend/src/sports/grades';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
 import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
@@ -372,6 +373,21 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await expect(postgresTeacherHistory(db,student.token,member.id,'physical-results',{})).rejects.toMatchObject({status:403});
     await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.all('sportsEnduranceRevision')).filter(r=>r.data.recordId===saved.id)).toHaveLength(2);const course=await repo.get(member.data.courseId);await repo.save(course,{settlementStatus:'SETTLED'});await client.query('DELETE FROM notifications WHERE entity_id=$1',[saved.id]);});
     await expect(executePostgres(db,teacher.token,'sports.endurance.confirm',{...input,version:2,seconds:252},randomUUID())).rejects.toMatchObject({status:409});
+  });
+  it('keeps grade drafts separate from publications and hidden from students', async()=>{
+    const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    const member=await db.transaction(async client=>{const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'DRAFT'}),course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,status:'PUBLISHED'});return repo.create('sportsEnrollment','sports-reader-student',{courseId:course.id,status:'ACTIVE'});});
+    const input={enrollmentId:member.id,version:0,score:82};
+    await expect(executePostgres(db,student.token,'sports.grade.save',input,randomUUID())).rejects.toMatchObject({status:403});
+    const draft=await executePostgres(db,teacher.token,'sports.grade.save',input,randomUUID());
+    const key=randomUUID(),publish={id:draft.id,version:1};
+    const publication=await executePostgres(db,teacher.token,'sports.grade.publish',publish,key);
+    expect(await executePostgres(db,teacher.token,'sports.grade.publish',publish,key)).toEqual(publication);
+    await executePostgres(db,teacher.token,'sports.grade.save',{...input,version:2,score:91},randomUUID());
+    await db.transaction(async client=>{const repo=new PostgresRepository(client),actor=await auth.authenticate(student.token,client),entities=[...await repo.all('sportsIdentity'),...await repo.all('sportsCourse'),...await repo.all('sportsGradeDraft'),...await repo.all('sportsGradePublication')];expect(gradeWorkspace({all:kind=>entities.filter(e=>e.kind===kind)},actor)).toEqual({gradeDrafts:[],gradePublications:[]});});
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(publication.id)).data.score).toBe(82);expect((await repo.get(draft.id)).data.score).toBe(91);});
+    const history=(await postgresTeacherHistory(db,teacher.token,member.id,'final-grades',{})).data;
+    expect(history.items).toMatchObject([{version:3,published:false,finalGrade:91},{version:2,published:true,finalGrade:82},{version:1,published:false,finalGrade:82}]);
   });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

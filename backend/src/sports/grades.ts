@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { demand, type Account } from "../auth";
 import {
   Repository,
@@ -13,6 +14,9 @@ export function sportsGradeCommand(
   input: Fields,
   historicalCorrection = false,
 ): Entity | undefined {
+  return runSync(sportsGradePolicy(repo,actor,action,input,historicalCorrection));
+}
+export function* sportsGradePolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields,historicalCorrection=false):Generator<unknown,Entity|undefined,unknown> {
   if (action === "sports.grade.append") {
     demand(
       Object.keys(input).every((key) =>
@@ -21,18 +25,17 @@ export function sportsGradeCommand(
       "成绩提交参数无效。",
     );
     demand(typeof input.published === "boolean", "请明确选择是否发布成绩。");
-    const saved = sportsGradeCommand(repo, actor, "sports.grade.save", {
+    const saved = (yield* sportsGradePolicy(repo, actor, "sports.grade.save", {
       enrollmentId: input.enrollmentId,
       version: input.version,
       score: input.score,
-    })!;
+    }))!;
     if (input.published)
-      return sportsGradeCommand(repo, actor, "sports.grade.publish", {
+      return yield* sportsGradePolicy(repo, actor, "sports.grade.publish", {
         id: saved.id,
         version: saved.version,
       });
-    const history = repo
-      .all("sportsGradeHistory")
+    const history = (yield* effect(repo.all("sportsGradeHistory")))
       .find(
         (row) =>
           row.data.draftId === saved.id &&
@@ -51,17 +54,19 @@ export function sportsGradeCommand(
     "最终成绩不接受备注或其他附加字段。",
   );
   const draft = action.endsWith("publish")
-    ? repo.get(input.id, "sportsGradeDraft")
+    ? (yield* effect(repo.get(input.id, "sportsGradeDraft")))
     : null;
-  const member = repo.get(
+  const member = (yield* effect(repo.get(
     draft?.data.enrollmentId ?? input.enrollmentId,
     "sportsEnrollment",
-  );
-  const course = ownedCourse(repo, actor, member.data.courseId);
+  )));
+  const identities=yield* effect(repo.all("sportsIdentity"));
+  const courseRow=yield* effect(repo.get(member.data.courseId,"sportsCourse"));
+  const course = ownedCourse({all:()=>identities,get:()=>courseRow}, actor, member.data.courseId);
   demand(
     historicalCorrection ||
       (course.data.settlementStatus !== "SETTLED" &&
-        repo.get(course.data.semesterId, "sportsSemester").data.status !==
+        (yield* effect(repo.get(course.data.semesterId, "sportsSemester"))).data.status !==
           "ARCHIVED"),
     "已结算或归档成绩须通过历史报告更正流程。",
     409,
@@ -69,11 +74,10 @@ export function sportsGradeCommand(
   if (draft) {
     version(draft, input);
     demand(draft.data.status === "DRAFT", "此成绩草稿已经发布。", 409);
-    const previous = repo
-      .all("sportsGradePublication")
+    const previous = (yield* effect(repo.all("sportsGradePublication")))
       .filter((g) => g.data.enrollmentId === member.id)
       .sort((a, b) => Number(b.data.sequence) - Number(a.data.sequence))[0];
-    const publication = repo.create("sportsGradePublication", member.ownerId, {
+    const publication = yield* effect(repo.create("sportsGradePublication", member.ownerId, {
       courseId: course.id,
       enrollmentId: member.id,
       semesterId: course.data.semesterId,
@@ -84,12 +88,11 @@ export function sportsGradeCommand(
       previousId: previous?.id ?? null,
       draftId: draft.id,
       draftVersion: draft.version,
-    });
-    repo.save(draft, { status: "PUBLISHED", publicationId: publication.id });
+    }));
+    yield* effect(repo.save(draft, { status: "PUBLISHED", publicationId: publication.id }));
     return publication;
   }
-  const old = repo
-    .all("sportsGradeDraft")
+  const old = (yield* effect(repo.all("sportsGradeDraft")))
     .find((g) => g.data.enrollmentId === member.id);
   demand(
     input.version === (old?.version ?? 0),
@@ -107,9 +110,9 @@ export function sportsGradeCommand(
     publicationId: null,
   };
   const saved = old
-    ? repo.save(old, data)
-    : repo.create("sportsGradeDraft", member.ownerId, data);
-  repo.create("sportsGradeHistory", actor.id, {
+    ? (yield* effect(repo.save(old, data)))
+    : (yield* effect(repo.create("sportsGradeDraft", member.ownerId, data)));
+  yield* effect(repo.create("sportsGradeHistory", actor.id, {
     enrollmentId: member.id,
     courseId: course.id,
     previousScore: old?.data.score ?? null,
@@ -117,10 +120,10 @@ export function sportsGradeCommand(
     at: Date.now(),
     draftId: saved.id,
     resultVersion: saved.version,
-  });
+  }));
   return saved;
 }
-export function gradeWorkspace(repo: Repository, actor: Account) {
+export function gradeWorkspace(repo: Pick<Repository,"all">, actor: Account) {
   const teacher = repo
     .all("sportsIdentity")
     .some(

@@ -1,6 +1,7 @@
 import { postgresAiGovernance, requireAiGovernor } from './postgres-ai-governance';
 import { sportsReviewDecisionPolicy } from '../sports/review';
 import { sportsEndurancePolicy } from '../sports/endurance';
+import { sportsGradePolicy } from '../sports/grades';
 import { submitStudentRecord } from './postgres-record-submit';
 import { submitStudentSupplement } from './postgres-supplement-submit';
 import { mediaCommand } from './postgres-student-media';
@@ -47,7 +48,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
-    if(['sports.endurance.confirm','sports.physical.confirm'].includes(action)) {
+    if(['sports.endurance.confirm','sports.physical.confirm','sports.grade.save','sports.grade.publish','sports.grade.append'].includes(action)) {
       const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
       sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
     }
@@ -100,6 +101,9 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
     else if(action==='sports.endurance.confirm') {
       const record=await runAsync(sportsEndurancePolicy(repo,actor,action,input));if(record) result={id:record.id};
+    }
+    else if(['sports.grade.save','sports.grade.publish','sports.grade.append'].includes(action)) {
+      const record=await runAsync(sportsGradePolicy(repo,actor,action,input));if(record) result={id:record.id};
     }
     else if(action==='sports.physical.confirm') {
       demand(Object.keys(input).every(k=>['enrollmentId','expectedVersion','runType','elapsedSeconds','testedOn'].includes(k)),'体测录入只接受实际项目、用时和测试日期。');

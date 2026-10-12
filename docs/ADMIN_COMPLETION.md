@@ -1763,3 +1763,7 @@ API重建健康后，真实三端HTTP冒烟新增本人physical-result未录入�
 ### Docker 教师体测历史查询
 
 重建API健康后，扩展真实HTTP冒烟核对教师录入后的physical-results历史：第一版、245秒、分页结束均正确，学生原事实读取及补证／审核整链继续通过。此证据仅证明本地已接通路径，成绩草稿发布及结算后更正仍待迁移。
+
+### PostgreSQL 成绩草稿和发布命令
+
+抽出sportsGradePolicy供SQLite和PostgreSQL共享save/publish/append规则，沿用任课教师、版本、结算归档及禁止备注规则；发布保存独立对象，后来草稿不改原发布。workspace复用gradeWorkspace限定教师课程范围，学生成绩数组为空。新增82发布后91草稿、幂等、历史三版及学生权限测试；完整70文件458测试、类型和lint通过。首轮直接调用workspace受到旧测试会话缺ruleSnapshot夹具影响，改为对真实PG读取实体运行同一gradeWorkspace投影以隔离无关夹具。原版final-grades写入协议及Docker验证尚待接通，UI未改。
