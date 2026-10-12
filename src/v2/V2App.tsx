@@ -114,7 +114,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
 function V2Routes() {
   const location = useLocation()
   const { state, setState } = useV2()
-  const session = useOriginalSession(location.pathname)
+  const session = useOriginalSession(location.pathname, location.key)
   const requestedRole = location.pathname.startsWith('/v2/admin') ? 'admin' : location.pathname.startsWith('/v2/teacher') ? 'teacher' : 'student'
   const authorized = !!session?.account?.roles.some(role => requestedRole === 'admin' ? ['superadmin', 'operator', 'reviewer'].includes(role) : role === requestedRole)
   useEffect(() => {

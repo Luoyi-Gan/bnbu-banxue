@@ -108,7 +108,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
         if (adminLogin) await authApi.adminLogin(normalizedEmail, password);
         else await authApi.login(normalizedEmail, password);
         const {account} = await api<{account:LiveAccount}>("/api/auth/me");
-        navigate(roleLoginPath(location.state?.returnTo, account.roles), { replace: true });
+        window.location.replace(roleLoginPath(location.state?.returnTo, account.roles));
       } else {
         await authApi.register(normalizedEmail, code.trim(), password);
         navigate("/v2/login", { replace: true, state: { registered: true } });
