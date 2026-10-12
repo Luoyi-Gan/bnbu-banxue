@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useV2 } from './useV2'
-import type { useWorkspaceBackend } from './useWorkspaceBackend'
-import { studentName, type V2State } from './model'
-import { alumniData, currentAlumniActor, bookingStatus, requestAlumniChat, decideAlumniChat, cancelAlumniBooking, submitAlumniCertification, reviewAlumni } from './alumniPolicy'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
+import { type V2State } from './model'
+import { alumniData, currentAlumniActor, bookingStatus, requestAlumniChat, decideAlumniChat, cancelAlumniBooking, reviewAlumni } from './alumniPolicy'
 import { SectionHeading } from './ui'
 
 const time = (value: string) => new Date(value).toLocaleString('zh-CN')
@@ -29,13 +29,16 @@ export function AlumniAppointmentArea({ personId }: { personId: string }) {
 }
 
 export function AlumniCertification() {
-  const { state, message, act } = useAction(), data = alumniData(state), actor = currentAlumniActor(state)
-  const mine = data.profiles.find(p => p.owner === actor.id)
-  function submit(event: FormEvent<HTMLFormElement>) {
+  const live = useWorkspaceBackend()
+  const [message, setMessage] = useState('')
+  const mine = live.data?.alumni.profiles.find(p => p.owner === live.data?.account.id)
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const f = new FormData(event.currentTarget), get = (key: string) => String(f.get(key) ?? '').trim()
-    act(s => submitAlumniCertification(s, actor, { name: studentName, major: get('major'), graduationYear: Number(get('year')), city: get('city'), direction: get('direction') as '升学' | '就业', experience: get('experience'), topics: get('topics'), bio: get('bio'), evidence: get('evidence') }), '认证申请已提交，等待管理员审核。')
+    setMessage('')
+    if (await live.mutate('alumni.apply', { major: get('major'), graduationYear: Number(get('year')), city: get('city'), direction: get('direction'), experience: get('experience'), topics: get('topics'), bio: get('bio'), evidence: get('evidence') })) setMessage('认证申请已提交，等待管理员审核。')
   }
-  return <section className="v2-panel v2-list-panel"><SectionHeading title="校友身份认证" detail="核验毕业身份，保持原账号的校园关系"/>{message && <p role="status" className="v2-info-box">{message}</p>}{mine && <div className="v2-info-box"><strong>{statusLabel[mine.status]}</strong><p>{mine.name} · {mine.major} · {mine.graduationYear} 届</p>{mine.reviewNote && <p>审核说明：{mine.reviewNote}</p>}</div>}{(!mine || mine.status === 'rejected') && <form className="v2-form" onSubmit={submit}><p>申请人：{studentName}</p><div className="v2-alumni-form-grid"><label>原专业<input name="major" defaultValue={mine?.major} maxLength={80} required/></label><label>毕业年份<input name="year" type="number" min={2005} max={new Date().getFullYear()} defaultValue={mine?.graduationYear} required/></label><label>所在城市<input name="city" defaultValue={mine?.city} maxLength={40} required/></label><label>交流方向<select name="direction" defaultValue={mine?.direction}><option>升学</option><option>就业</option></select></label></div><label>当前升学或职业经历<input name="experience" defaultValue={mine?.experience} maxLength={120} required/></label><label>愿意分享的话题<input name="topics" defaultValue={mine?.topics} maxLength={120} required/></label><label>个人介绍<textarea name="bio" defaultValue={mine?.bio} maxLength={500}/></label><label>毕业身份核验说明<textarea name="evidence" defaultValue={mine?.evidence} maxLength={1000} rows={3} required placeholder="演示填写：毕业专业、年份及可供核验的说明"/></label><p className="v2-form-note">当前为本地演示，请勿填写证件号码或提交真实证明材料。核验说明仅本人及管理员可见。</p><button className="v2-button v2-button-primary">提交校友认证</button></form>}</section>
+  if (!live.data) return <p role={live.error ? 'alert' : 'status'}>{live.error || '正在读取校友认证…'}</p>
+  return <section className="v2-panel v2-list-panel"><SectionHeading title="校友身份认证" detail="核验毕业身份，保持原账号的校园关系"/>{message && <p role="status" className="v2-info-box">{message}</p>}{mine && <div className="v2-info-box"><strong>{statusLabel[mine.status]}</strong><p>{mine.name} · {mine.major} · {mine.graduationYear} 届</p>{mine.reviewNote && <p>审核说明：{mine.reviewNote}</p>}</div>}{live.error && <p role="alert" className="v2-info-box">{live.error}</p>}{(!mine || mine.status === 'rejected') && <form className="v2-form" onSubmit={submit}><p>申请人：{live.data.account.name}</p><div className="v2-alumni-form-grid"><label>原专业<input name="major" defaultValue={mine?.major} maxLength={80} required/></label><label>毕业年份<input name="year" type="number" min={2005} max={new Date().getFullYear()} defaultValue={mine?.graduationYear} required/></label><label>所在城市<input name="city" defaultValue={mine?.city} maxLength={40} required/></label><label>交流方向<select name="direction" defaultValue={mine?.direction}><option>升学</option><option>就业</option></select></label></div><label>当前升学或职业经历<input name="experience" defaultValue={mine?.experience} maxLength={120} required/></label><label>愿意分享的话题<input name="topics" defaultValue={mine?.topics} maxLength={120} required/></label><label>个人介绍<textarea name="bio" defaultValue={mine?.bio} maxLength={500}/></label><label>毕业身份核验说明<textarea name="evidence" defaultValue={mine?.evidence} maxLength={1000} rows={3} required placeholder="演示填写：毕业专业、年份及可供核验的说明"/></label><p className="v2-form-note">当前为本地演示，请勿填写证件号码或提交真实证明材料。核验说明仅本人及管理员可见。</p><button disabled={live.busy} className="v2-button v2-button-primary">{live.busy ? '正在提交…' : '提交校友认证'}</button></form>}</section>
 }
 
 export function AlumniIncoming() {
