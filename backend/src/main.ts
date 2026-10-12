@@ -128,7 +128,6 @@ import {
 } from "./sports/account-gate";
 import { sessionProjection } from "./sports/sessions";
 import { reviewWorkspace } from "./sports/review";
-import { processSportsReview } from "./sports/review-worker";
 import { systemWorkspace } from "./sports/system";
 import { calendarWorkspace } from "./sports/calendar";
 import { incidentWorkspace } from "./sports/incidents";
@@ -1662,16 +1661,7 @@ export async function startBackend() {
     server.listen(port, host, done);
   });
   console.log(`BNBU API: http://${host}:${port} (SQLite)`);
-  const worker = setInterval(() => {
-    void processSportsReview(db).catch(() =>
-      console.error(
-        "Sports review worker could not complete its current task.",
-      ),
-    );
-  }, 2000);
-  worker.unref();
   server.on("close", () => {
-    clearInterval(worker);
     db.close();
   });
   return server;
