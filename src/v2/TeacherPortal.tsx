@@ -1,10 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Coffee, CalendarDays, Bell } from 'lucide-react'
-import { useV2 } from './useV2'
+import { SportsPortal } from '../live/SportsPortal'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { PageHeading, Empty, Modal } from './ui'
-import { canUseTeacherSports, teacherAccount } from './teacherCoffee'
 import './teacherPortal.css'
 
 const stamp = (value: string) => new Date(value).toLocaleString('zh-CN', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -45,18 +44,16 @@ export function StudentCoffeeChanges() {
 }
 
 export function TeacherSchedule() {
-  const { state } = useV2(), account = teacherAccount(state)
   const live = useWorkspaceBackend()
   const entities = live.data?.entities ?? []
   const items = entities.filter(e => e.kind === 'coffeeBooking' && e.data.status === 'confirmed' && e.data.teacherId === live.data?.account.id).map(booking => ({booking, slot: entities.find(e => e.kind === 'coffeeSlot' && e.id === booking.data.slotId)})).filter(item => item.slot).sort((a,b) => Date.parse(String(a.slot!.data.startAt)) - Date.parse(String(b.slot!.data.startAt)))
-  return <div className="v2-page"><PageHeading eyebrow="MY SCHEDULE" title="日程信息" description="已成立的 Coffee Chat 安排；改期确认前保留原时间。"/>{live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人日程…</p>}<section className="v2-panel v2-teacher-panel">{items.length ? items.map(({ booking, slot }) => <Link className="v2-saved-row" key={booking.id} to="/v2/teacher/coffee"><CalendarDays size={20}/><span><strong>{live.data?.people.find(p => p.id === booking.ownerId)?.name ?? '学生'} · Coffee Chat</strong><small>{stamp(String(slot!.data.startAt))} – {stamp(String(slot!.data.endAt))} · {String(slot!.data.location)}{booking.data.proposedSlotId ? ' · 改期待确认' : ''}</small></span></Link>) : live.data && <Empty icon={CalendarDays} title="暂无预约日程"/>}{account.sportsQualified && <Link className="v2-button v2-button-secondary" to="/v2/teacher/sports">查看体育课程安排</Link>}</section></div>
+  return <div className="v2-page"><PageHeading eyebrow="MY SCHEDULE" title="日程信息" description="已成立的 Coffee Chat 安排；改期确认前保留原时间。"/>{live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人日程…</p>}<section className="v2-panel v2-teacher-panel">{items.length ? items.map(({ booking, slot }) => <Link className="v2-saved-row" key={booking.id} to="/v2/teacher/coffee"><CalendarDays size={20}/><span><strong>{live.data?.people.find(p => p.id === booking.ownerId)?.name ?? '学生'} · Coffee Chat</strong><small>{stamp(String(slot!.data.startAt))} – {stamp(String(slot!.data.endAt))} · {String(slot!.data.location)}{booking.data.proposedSlotId ? ' · 改期待确认' : ''}</small></span></Link>) : live.data && <Empty icon={CalendarDays} title="暂无预约日程"/>}{live.data?.sports?.role === 'teacher' && <Link className="v2-button v2-button-secondary" to="/v2/teacher/sports">查看体育课程安排</Link>}</section></div>
 }
 
 export function TeacherMessages() {
-  const {state} = useV2(), account = teacherAccount(state)
   const live = useWorkspaceBackend(10000)
   const items = live.data?.notifications.filter(n => n.event.startsWith('coffee.')) ?? []
-  return <div className="v2-page"><PageHeading eyebrow="MESSAGES" title="消息与通知" description="预约、取消与改期的业务通知。"/>{live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人通知…</p>}<section className="v2-panel v2-teacher-panel">{items.length ? items.map(n => <article className="v2-teacher-card" key={n.id}><p>{n.body}</p><small>{stamp(n.createdAt)} · {n.readAt ? '已读' : '未读'}</small><Link to="/v2/teacher/coffee">查看预约</Link>{!n.readAt && <button disabled={live.busy} className="v2-button v2-button-secondary" onClick={() => void live.mutate('notification.read', {id: n.id})}>标为已读</button>}</article>) : live.data && <Empty icon={Bell} title="暂无消息"/>}{account.sportsQualified && <Link to="/v2/teacher/sports">查看体育平台通知</Link>}</section></div>
+  return <div className="v2-page"><PageHeading eyebrow="MESSAGES" title="消息与通知" description="预约、取消与改期的业务通知。"/>{live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人通知…</p>}<section className="v2-panel v2-teacher-panel">{items.length ? items.map(n => <article className="v2-teacher-card" key={n.id}><p>{n.body}</p><small>{stamp(n.createdAt)} · {n.readAt ? '已读' : '未读'}</small><Link to="/v2/teacher/coffee">查看预约</Link>{!n.readAt && <button disabled={live.busy} className="v2-button v2-button-secondary" onClick={() => void live.mutate('notification.read', {id: n.id})}>标为已读</button>}</article>) : live.data && <Empty icon={Bell} title="暂无消息"/>}{live.data?.sports?.role === 'teacher' && <Link to="/v2/teacher/sports">查看体育平台通知</Link>}</section></div>
 }
 
 export function TeacherProfile() {
@@ -74,8 +71,8 @@ export function TeacherProfile() {
 }
 
 export function TeacherSports() {
-  const { state } = useV2()
-  if (!canUseTeacherSports(state)) return <Navigate to="/v2/teacher/coffee" replace/>
-  const origin = import.meta.env.DEV ? 'http://127.0.0.1:4186/?mock=teacher' : import.meta.env.VITE_SPORTS_TEACHER_URL
-  return <section className="v2-sports-embedded"><div className="v2-sports-toolbar"><Link className="v2-sports-back" to="/v2/teacher/coffee">返回伴学教师端</Link><span>原体育平台教师端 · {import.meta.env.DEV ? '独立本地演示数据' : '使用体育系统授权'}</span></div>{origin ? <iframe className="v2-sports-frame" title="原体育平台教师端" src={origin} allow="camera 'self'; microphone 'self'; fullscreen"/> : <p>尚未配置体育教师平台地址，请配置 VITE_SPORTS_TEACHER_URL 并接入原体育系统身份验证。</p>}</section>
+  const live = useWorkspaceBackend(30000)
+  if (!live.data) return <p role="status">{live.error || '正在读取体育账号…'}</p>
+  if (live.data.sports?.role !== 'teacher') return <Navigate to="/v2/teacher/coffee" replace/>
+  return <div className="v2-page"><SportsPortal workspace={live.data}/></div>
 }

@@ -35,6 +35,7 @@ import { prepareCommunityImage } from "../v2/communityImages";
 import { ManagementTools } from "./ManagementTools";
 import { LiveTimetable } from "./LiveTimetable";
 import { SportsPortal } from "./SportsPortal";
+import { SportsProgressCard } from "../v2/SportsProgressCard";
 import { MailResolution } from "./MailResolution";
 import { Modal, PageHeading } from "../v2/ui";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
@@ -464,7 +465,7 @@ export function ConnectedApp() {
     ? [["sports", "首次改密", ShieldCheck]]
     : ([
         ["home", "概览", LayoutDashboard],
-        ...(student || teacher || operate
+        ...(data.sports || operate
           ? [
               ["sports", "体育课程", CalendarDays] as [
                 string,
@@ -652,10 +653,11 @@ export function ConnectedApp() {
             </p>
           )}
           {module === "sports" && (
-            <SportsPortal />
+            <SportsPortal workspace={data} />
           )}
           {module === "home" && (
             <>
+              {student && <SportsProgressCard sports={data.sports}/>}
               <section className="live-hero">
                 <span>你好，{me.name}</span>
                 <h2>

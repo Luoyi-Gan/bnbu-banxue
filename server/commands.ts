@@ -15,6 +15,7 @@ import { activityCommand } from "./activities";
 import { alumniCommand, readAlumni } from "./alumni";
 import { bookingStatus } from "../src/v2/alumniPolicy";
 import { sportsCourseCommand } from "./sports/courses";
+import { sportsCompanion } from "./sports/companion";
 import { sportsCourseManagementCommand } from "./sports/course-management";
 import { sportsSessionCommand } from "./sports/sessions";
 import { sportsMaterialCommand } from "./sports/materials";
@@ -435,6 +436,7 @@ export function snapshot(db: Database, actor: Account) {
     );
   return {
     account: actor,
+    sports: sportsCompanion(repo, actor),
     entities,
     alumni: scopedAlumni,
     notifications,

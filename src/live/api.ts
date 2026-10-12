@@ -1,4 +1,5 @@
 import type { AlumniData } from "../v2/alumniModel";
+import type { SportsCompanion } from "./sportsCompanion";
 export interface LiveAccount {
   id: string;
   email: string;
@@ -17,6 +18,7 @@ export interface LiveEntity {
   updatedAt: string;
 }
 export interface Workspace {
+  sports?: SportsCompanion | null;
   firstLoginOnly?: boolean;
   notificationBatches?: {
     id: string;
