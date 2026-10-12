@@ -7,21 +7,21 @@ import {
   type Account,
 } from "../auth";
 import { Repository, textField, type Fields } from "../repository";
-import { sportsPermissions, requireSportsSuperAdmin } from "./permissions";
-import { sportsAccountGate } from "./account-gate";
+import { accountPermissions, requireSuperAdmin } from "./permissions";
+import { accountSecurityGate } from "./account-gate";
 import { version } from "../version-check";
 import { clearAdminChallenges } from "./admin-email";
 
 export function administratorDirectory(repo: Repository, actor: Account) {
-  sportsAccountGate(repo, actor);
-  requireSportsSuperAdmin(repo, actor);
+  accountSecurityGate(repo, actor);
+  requireSuperAdmin(repo, actor);
   const accounts = repo.db
     .prepare(
       "SELECT id,login_name,name,email,organization,status FROM accounts WHERE login_kind='ADMIN' ORDER BY login_name",
     )
     .all();
   return {
-    permissions: sportsPermissions,
+    permissions: accountPermissions,
     items: accounts.map((a) => {
       const identity = repo
         .all("companionIdentity")
@@ -46,7 +46,7 @@ export function administratorDirectory(repo: Repository, actor: Account) {
       .all(),
   };
 }
-export function sportsAdministratorCommand(
+export function administratorCommand(
   repo: Repository,
   actor: Account,
   action: string,
@@ -60,7 +60,7 @@ export function sportsAdministratorCommand(
     ].includes(action)
   )
     return undefined;
-  requireSportsSuperAdmin(repo, actor);
+  requireSuperAdmin(repo, actor);
   const create = action === "accounts.admins.create",
     state = action === "accounts.admins.state";
   const allowed = create
@@ -150,7 +150,7 @@ export function sportsAdministratorCommand(
   demand(
     Array.isArray(input.permissions) &&
       input.permissions.length > 0 &&
-      input.permissions.every((p) => sportsPermissions.includes(p)) &&
+      input.permissions.every((p) => accountPermissions.includes(p)) &&
       new Set(input.permissions).size === input.permissions.length,
     "须选择至少一项固定业务权限，不得授予管理账号或教师权限。",
   );

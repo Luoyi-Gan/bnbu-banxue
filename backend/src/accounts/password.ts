@@ -8,7 +8,7 @@ import {
 import { Repository, type Fields } from "../repository";
 import { version } from "../version-check";
 
-export function sportsPasswordCommand(
+export function passwordCommand(
   repo: Repository,
   actor: Account,
   token: string,

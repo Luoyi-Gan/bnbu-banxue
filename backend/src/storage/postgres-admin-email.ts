@@ -2,7 +2,7 @@ import { randomInt, randomUUID } from 'node:crypto';
 import { demand, digest, ServiceError, timestamp } from '../auth';
 import { textField, type Fields } from '../repository';
 import { deliverMessage } from '../mail-delivery';
-import { passwordChangeRequired } from '../sports/account-gate';
+import { passwordChangeRequired } from '../accounts/account-gate';
 import { PostgresRepository } from './postgres-repository';
 import { PostgresAuth } from './postgres-auth';
 import type { PostgresDatabase } from './postgres';

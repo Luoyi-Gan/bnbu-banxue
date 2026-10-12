@@ -13,7 +13,7 @@ export function passwordChangeRequired(identities: Entity[], actor: Account) {
         i.data.mustChangePassword === true,
     );
 }
-export function sportsAccountGate(repo: Pick<Repository, "all">, actor: Account) {
+export function accountSecurityGate(repo: Pick<Repository, "all">, actor: Account) {
   if (requiresPasswordChange(repo, actor))
     throw new ServiceError(
       403,

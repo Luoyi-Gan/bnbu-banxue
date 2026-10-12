@@ -12,7 +12,7 @@ import { postgresStudentSearch } from './storage/postgres-student-search';
 import { checkSchoolIdentity } from './identity';
 import { recognize } from './timetable';
 import { student } from './community';
-import { passwordChangeRequired } from './sports/account-gate';
+import { passwordChangeRequired } from './accounts/account-gate';
 import { PostgresRepository } from './storage/postgres-repository';
 import { postgresAdministratorDirectory } from './storage/postgres-administrators';
 import { postgresAdministratorSelf } from './storage/postgres-admin-deletion';

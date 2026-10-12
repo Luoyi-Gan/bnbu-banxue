@@ -2,15 +2,15 @@ import { randomUUID } from 'node:crypto';
 import { demand, ServiceError, encodePassword, normalizeEmail, timestamp, type Account } from '../auth';
 import { textField, type Fields } from '../repository';
 import { version } from "../version-check";
-import { sportsPermissions } from '../sports/permissions';
-import { passwordChangeRequired } from '../sports/account-gate';
+import { accountPermissions } from '../accounts/permissions';
+import { passwordChangeRequired } from '../accounts/account-gate';
 import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
 import type { PostgresDatabase } from './postgres';
 
 export async function requirePostgresSuperAdmin(repo:PostgresRepository,actor:Account) {
   const identities=await repo.all('companionIdentity');
-  demand(actor.status!=='banned' && actor.roles.includes('superadmin') && identities.some(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified'),'仅体育总管理员可执行此治理操作。',403);
+  demand(actor.status!=='banned' && actor.roles.includes('superadmin') && identities.some(i=>i.ownerId===actor.id && i.data.role==='admin' && i.data.status==='verified'),'仅总管理员可执行此治理操作。',403);
 
 }
 
@@ -41,7 +41,7 @@ export async function postgresAdministratorCreate(repo:PostgresRepository,actor:
   const name=textField(input,'name',40),email=normalizeEmail(input.email),department=textField(input,'department',200,true);
   const domains=(process.env.BNBU_SCHOOL_EMAIL_DOMAINS ?? 'bnbu.edu.cn').split(',').map(d=>d.trim().toLowerCase()).filter(Boolean);
   demand(domains.includes(email.split('@')[1]),'请填写已配置学校域名的邮箱。');
-  demand(Array.isArray(input.permissions) && input.permissions.length>0 && input.permissions.every(p=>sportsPermissions.includes(p)) && new Set(input.permissions).size===input.permissions.length,'须选择至少一项固定业务权限，不得授予管理账号或教师权限。');
+  demand(Array.isArray(input.permissions) && input.permissions.length>0 && input.permissions.every(p=>accountPermissions.includes(p)) && new Set(input.permissions).size===input.permissions.length,'须选择至少一项固定业务权限，不得授予管理账号或教师权限。');
   demand(!(await repo.client.query("SELECT id FROM accounts WHERE email=$1 AND login_kind='ADMIN'",[email])).rows.length,'学校邮箱已被另一分管理员使用。',409);
   const personId=textField(input,'personId',100);
   const person=(await repo.client.query('SELECT status,login_kind FROM accounts WHERE id=$1',[personId])).rows[0];
@@ -68,7 +68,7 @@ export async function postgresAdministratorEdit(repo:PostgresRepository,actor:Ac
   const name=textField(input,'name',40),email=normalizeEmail(input.email),department=textField(input,'department',200,true);
   const domains=(process.env.BNBU_SCHOOL_EMAIL_DOMAINS ?? 'bnbu.edu.cn').split(',').map(d=>d.trim().toLowerCase()).filter(Boolean);
   demand(domains.includes(email.split('@')[1]),'请填写已配置学校域名的邮箱。');
-  demand(Array.isArray(input.permissions) && input.permissions.length>0 && input.permissions.every(p=>sportsPermissions.includes(p)) && new Set(input.permissions).size===input.permissions.length,'须选择至少一项固定业务权限，不得授予管理账号或教师权限。');
+  demand(Array.isArray(input.permissions) && input.permissions.length>0 && input.permissions.every(p=>accountPermissions.includes(p)) && new Set(input.permissions).size===input.permissions.length,'须选择至少一项固定业务权限，不得授予管理账号或教师权限。');
   demand(!(await repo.client.query("SELECT id FROM accounts WHERE email=$1 AND login_kind='ADMIN' AND id<>$2",[email,identity.ownerId])).rows.length,'学校邮箱已被另一分管理员使用。',409);
   if(row.email!==email) {
     await repo.client.query('DELETE FROM mail_outbox WHERE id IN (SELECT mail_id FROM admin_security_challenges WHERE account_id=$1)',[identity.ownerId]);
@@ -89,7 +89,7 @@ export async function postgresAdministratorDirectory(db:PostgresDatabase, token:
     await requirePostgresSuperAdmin(repo,actor);
     const rows=(await client.query("SELECT id,login_name,name,email,organization,status FROM accounts WHERE login_kind='ADMIN' ORDER BY login_name")).rows;
     return {
-      permissions:sportsPermissions,
+      permissions:accountPermissions,
       items:rows.map(a=>{
         const identity=identities.find(i=>i.ownerId===a.id && i.data.role==='admin');
         return {id:a.id,identityId:identity?.id,loginName:a.login_name,name:a.name,email:a.email,department:a.organization,status:a.status==='active'?'ACTIVE':'DISABLED',permissions:identity?.data.permissions ?? [],version:identity?.version,updatedAt:identity?.updatedAt};

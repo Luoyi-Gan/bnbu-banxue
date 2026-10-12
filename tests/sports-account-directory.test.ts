@@ -2,7 +2,7 @@ import { afterEach, expect, it } from "vitest";
 import { openDatabase, type Database } from "../backend/src/database";
 import { createAccount, login } from "../backend/src/auth";
 import { Repository } from "../backend/src/repository";
-import { accountDirectory } from "../backend/src/sports/account-directory";
+import { accountDirectory } from "../backend/src/accounts/account-directory";
 import { createApiServer } from "../backend/src/main";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));

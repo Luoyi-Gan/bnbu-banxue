@@ -12,10 +12,10 @@ import {
 } from "../backend/src/auth";
 import { Repository } from "../backend/src/repository";
 import { execute } from "../backend/src/commands";
-import { administratorDirectory } from "../backend/src/sports/administrators";
+import { administratorDirectory } from "../backend/src/accounts/administrators";
 import { migrateAccountNamespaces } from "../backend/src/account-migration";
 import { createApiServer } from "../backend/src/main";
-import { administratorSelf } from "../backend/src/sports/administrator-deletion";
+import { administratorSelf } from "../backend/src/accounts/administrator-deletion";
 const dbs: Database[] = [];
 it("删除清空独立登录资料和资料副本，业务历史及个人账号保留且历史主体不能复活", () => {
   const f = setup(),
@@ -26,7 +26,7 @@ it("删除清空独立登录资料和资料副本，业务历史及个人账号�
     name: "管理专属新名",
     email: "adminonly@example.test",
     department: "私人部门",
-    permissions: ["HELP"],
+    permissions: ["ACCOUNTS"],
     confirmed: true,
   });
   const logged = loginAdministrator(f.db, "staff.one", "x");
@@ -293,7 +293,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
     name: "更新",
     email: "teacher@example.test",
     department: "",
-    permissions: ["HELP"],
+    permissions: ["ACCOUNTS"],
     confirmed: true,
   });
   f.cmd("accounts.admins.state", {
@@ -305,7 +305,7 @@ it("同邮箱独立建号、短初始密码、首次本人改密和状态隔离�
   expect(loginAdministrator(f.db, "staff.one", "y").account.id).toBe(
     identity.ownerId,
   );
-  expect(f.repo.get(identity.id).data.permissions).toEqual(["HELP"]);
+  expect(f.repo.get(identity.id).data.permissions).toEqual(["ACCOUNTS"]);
   expect(() => authenticate(f.db, first.token)).toThrow();
 });
 it("只有总管理员可建管，禁止改登录名或密码，重复和无权限创建原子失败", () => {
@@ -316,6 +316,9 @@ it("只有总管理员可建管，禁止改登录名或密码，重复和无权�
   for (const patch of [
     { permissions: [] },
     { permissions: ["SUPERADMIN"] },
+    { permissions: ["SEMESTERS"] },
+    { permissions: ["GLOBAL_RULES"] },
+    { permissions: ["HELP"] },
     { confirmPassword: "different" },
     { personId: "missing" },
     { confirmed: false },
@@ -342,7 +345,7 @@ it("只有总管理员可建管，禁止改登录名或密码，重复和无权�
     name: "新姓名",
     email: f.input.email,
     department: "",
-    permissions: ["HELP"],
+    permissions: ["ACCOUNTS"],
     confirmed: true,
   };
   for (const patch of [

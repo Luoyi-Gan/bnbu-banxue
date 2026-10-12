@@ -5,8 +5,8 @@ import {
   integerField,
   type Fields,
 } from "../repository";
-import { requireSportsPermission } from "./permissions";
-import { sportsAccountGate } from "./account-gate";
+import { requireAccountPermission } from "./permissions";
+import { accountSecurityGate } from "./account-gate";
 /** Current account data only; no membership, credential, grade or media mutation. */
 export function accountDirectory(
   repo: Repository,
@@ -14,8 +14,8 @@ export function accountDirectory(
   kind: "student" | "teacher",
   input: Fields,
 ) {
-  sportsAccountGate(repo, actor);
-  requireSportsPermission(repo, actor, "ACCOUNTS");
+  accountSecurityGate(repo, actor);
+  requireAccountPermission(repo, actor, "ACCOUNTS");
   const accounts=repo.db.prepare('SELECT id,name,organization,status,email FROM accounts').all();
   return projectAccountDirectory(repo,accounts,kind,input);
 }

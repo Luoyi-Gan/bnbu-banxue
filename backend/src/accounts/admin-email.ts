@@ -3,10 +3,10 @@ import { demand, digest, ServiceError, timestamp, type Account } from "../auth";
 import { Repository, textField, type Fields } from "../repository";
 import { transaction, type Database } from "../database";
 import { deliverOutbox } from "../mail-delivery";
-import { sportsAccountGate } from "./account-gate";
+import { accountSecurityGate } from "./account-gate";
 
 function current(repo: Repository, actor: Account) {
-  sportsAccountGate(repo, actor);
+  accountSecurityGate(repo, actor);
   const identity = repo
     .all("companionIdentity")
     .find(

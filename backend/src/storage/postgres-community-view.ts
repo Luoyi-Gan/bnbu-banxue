@@ -2,7 +2,7 @@ import type { PostgresDatabase } from './postgres';
 import { PostgresAuth } from './postgres-auth';
 import { PostgresRepository } from './postgres-repository';
 import { projectCommunity } from '../community-view';
-import { passwordChangeRequired } from '../sports/account-gate';
+import { passwordChangeRequired } from '../accounts/account-gate';
 import type { AlumniData } from '../../../shared/v2/alumniModel';
 
 export async function postgresCommunityView(db: PostgresDatabase, token: string) {

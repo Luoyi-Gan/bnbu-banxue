@@ -1,12 +1,12 @@
 import { demand, type Account } from "../auth";
 import { Repository, type Fields } from "../repository";
-import { requireSportsSuperAdmin } from "./permissions";
+import { requireSuperAdmin } from "./permissions";
 import { version } from "../version-check";
-import { sportsAccountGate } from "./account-gate";
+import { accountSecurityGate } from "./account-gate";
 import { clearAdminChallenges } from "./admin-email";
 
 export function administratorSelf(repo: Repository, actor: Account) {
-  sportsAccountGate(repo, actor);
+  accountSecurityGate(repo, actor);
   const row = repo.db
     .prepare(
       "SELECT login_name,name,email FROM accounts WHERE id=? AND login_kind='ADMIN'",
@@ -34,7 +34,7 @@ export function administratorSelf(repo: Repository, actor: Account) {
   };
 }
 
-export function sportsAdministratorDeletion(
+export function administratorDeletion(
   repo: Repository,
   actor: Account,
   action: string,
@@ -43,7 +43,7 @@ export function sportsAdministratorDeletion(
   if (!["accounts.admins.delete", "accounts.close"].includes(action))
     return undefined;
   const self = action === "accounts.close";
-  if (!self) requireSportsSuperAdmin(repo, actor);
+  if (!self) requireSuperAdmin(repo, actor);
   // The original portal confirms the displayed account and immutable version.
   // Resolve that snapshot inside execute's transaction; the receipt hashes the
   // original account ID/version so retries still work after identity removal.

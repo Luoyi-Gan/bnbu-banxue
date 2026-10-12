@@ -87,7 +87,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(directory.items.find(i=>i.id==='password-admin')?.loginName).toBe('password-manager');
     expect(JSON.stringify(directory)).not.toContain('password_hash');
     expect(JSON.stringify(directory)).not.toContain('Changed-test-123');
-    expect(directory.permissions).toHaveLength(8);
+    expect(directory.permissions).toEqual(["ACCOUNTS"]);
     const system=await db.transaction(client=>new PostgresRepository(client).create('sportsSystem','password-admin',{mode:'MAINTENANCE'}));
     expect((await postgresAdministratorDirectory(db,login.token)).items).toEqual(directory.items);
     await db.transaction(client=>new PostgresRepository(client).save(system,{mode:'NORMAL'}));
@@ -148,13 +148,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await db.pool.query("INSERT INTO mail_outbox VALUES('admin-edit-mail',$1,'test','code','now',NULL)",[input.email]);
       await db.pool.query("INSERT INTO admin_security_challenges(id,account_id,purpose,email,code_hash,expires_at,sent_at,identity_version,mail_id) VALUES('admin-edit-challenge',$1,'EMAIL_VERIFY',$2,'hash',9999999999999,1,1,'admin-edit-mail')",[identity.ownerId,input.email]);
       await db.pool.query("INSERT INTO email_challenges VALUES($1,'personal-proof',9999999999999,0,1)",[input.email]);
-      const edit={id:identity.id,version:identity.version,name:'修改后',email:'changed-manager@bnbu.edu.cn',department:'新部门',permissions:['HELP'],confirmed:true};
+      const edit={id:identity.id,version:identity.version,name:'修改后',email:'changed-manager@bnbu.edu.cn',department:'新部门',permissions:['ACCOUNTS'],confirmed:true};
       await expect(executePostgres(db,root,'accounts.admins.edit',{...edit,loginName:'forbidden'},randomUUID())).rejects.toThrow('不允许的字段');
       await expect(executePostgres(db,root,'accounts.admins.edit',{...edit,version:0},randomUUID())).rejects.toMatchObject({status:409});
       expect((await db.pool.query("SELECT id FROM admin_security_challenges WHERE id='admin-edit-challenge'")).rows).toHaveLength(1);
       await executePostgres(db,root,'accounts.admins.edit',edit,randomUUID());
       const changed=await db.transaction(client=>new PostgresRepository(client).get(identity.id));
-      expect(changed.data.permissions).toEqual(['HELP']);
+      expect(changed.data.permissions).toEqual(['ACCOUNTS']);
       expect(changed.data.schoolEmailVerified).toBe(false);
       expect((await db.pool.query("SELECT id FROM admin_security_challenges WHERE id='admin-edit-challenge'")).rows).toHaveLength(0);
       expect((await db.pool.query("SELECT id FROM mail_outbox WHERE id='admin-edit-mail'")).rows).toHaveLength(0);

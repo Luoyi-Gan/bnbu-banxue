@@ -7,7 +7,7 @@ import {
   requestAdminEmail,
   confirmAdminEmail,
   clearAdminChallenges,
-} from "../backend/src/sports/admin-email";
+} from "../backend/src/accounts/admin-email";
 const dbs: Database[] = [];
 afterEach(() => {
   vi.useRealTimers();

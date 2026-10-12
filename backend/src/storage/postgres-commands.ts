@@ -8,7 +8,7 @@ import { alumniPolicy } from '../alumni';
 import { relationPolicy } from '../relation-policy';
 import { notificationPolicy } from '../notification-policy';
 import type { Fields } from '../repository';
-import { passwordChangeRequired } from '../sports/account-gate';
+import { passwordChangeRequired } from '../accounts/account-gate';
 import { runAsync } from './effects';
 import type { PostgresDatabase } from './postgres';
 import { PostgresAuth } from './postgres-auth';

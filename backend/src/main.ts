@@ -28,20 +28,20 @@ import { Repository, type Fields } from "./repository";
 
 
 
-import { accountDirectory } from "./sports/account-directory";
-import { administratorDirectory } from "./sports/administrators";
+import { accountDirectory } from "./accounts/account-directory";
+import { administratorDirectory } from "./accounts/administrators";
 
 
 
 
 
 
-import { administratorSelf } from "./sports/administrator-deletion";
+import { administratorSelf } from "./accounts/administrator-deletion";
 import {
   adminEmailStatus,
   requestAdminEmail,
   confirmAdminEmail,
-} from "./sports/admin-email";
+} from "./accounts/admin-email";
 
 
 
@@ -59,7 +59,7 @@ import {
 
 
 
-import { sportsAccountGate } from "./sports/account-gate";
+import { accountSecurityGate } from "./accounts/account-gate";
 
 
 
@@ -114,7 +114,7 @@ export function createApiServer(
         );
         if (pathname === "/api/timetable/recognize") {
           const actor = authenticate(db, cookieToken(request));
-          sportsAccountGate(new Repository(db), actor);
+          accountSecurityGate(new Repository(db), actor);
           student(actor);
           demand(actor.status !== "banned", "账号已封禁。", 403);
           return send(response, 200, await recognize(request));
@@ -180,7 +180,7 @@ export function createApiServer(
             confirmAdminEmail(db, authenticate(db, token), input),
           );
         if (pathname === "/api/identity/check") {
-          sportsAccountGate(new Repository(db), authenticate(db, token));
+          accountSecurityGate(new Repository(db), authenticate(db, token));
           demand(
             Object.keys(input).length === 0,
             "核验对象只能来自当前登录账号。",

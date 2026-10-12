@@ -17,14 +17,14 @@ import { governanceCommand } from "./governance";
 import { activityCommand } from "./activities";
 import { alumniCommand } from "./alumni";
 
-import { sportsPasswordCommand } from "./sports/password";
-import { sportsAdministratorCommand } from "./sports/administrators";
-import { sportsAdministratorDeletion } from "./sports/administrator-deletion";
-import { requireSportsSuperAdmin } from "./sports/permissions";
+import { passwordCommand } from "./accounts/password";
+import { administratorCommand } from "./accounts/administrators";
+import { administratorDeletion } from "./accounts/administrator-deletion";
+import { requireSuperAdmin } from "./accounts/permissions";
 import {
-  sportsAccountGate,
+  accountSecurityGate,
   requiresPasswordChange,
-} from "./sports/account-gate";
+} from "./accounts/account-gate";
 
 export function execute(
   db: Database,
@@ -44,9 +44,9 @@ export function execute(
     const actor = authenticate(db, token),
       repo = new Repository(db);
     demand(actor.status !== "banned", "账号已封禁，不能进行业务写入。", 403);
-    if (action !== "accounts.password.change") sportsAccountGate(repo, actor);
+    if (action !== "accounts.password.change") accountSecurityGate(repo, actor);
     if (action.startsWith("accounts.admins."))
-      requireSportsSuperAdmin(repo, actor);
+      requireSuperAdmin(repo, actor);
     const booleanArguments: Record<string, string> = {
       "content.review": "",
       "room.decide": "accept",
@@ -86,9 +86,9 @@ export function execute(
       result = runSync(relationPolicy(repo, actor, input));
     } else {
       result =
-        sportsPasswordCommand(repo, actor, token, action, input) ??
-        sportsAdministratorCommand(repo, actor, action, input) ??
-        sportsAdministratorDeletion(repo, actor, action, input) ??
+        passwordCommand(repo, actor, token, action, input) ??
+        administratorCommand(repo, actor, action, input) ??
+        administratorDeletion(repo, actor, action, input) ??
         communityCommand(repo, actor, action, input) ??
         coffeeCommand(repo, actor, action, input) ??
         governanceCommand(repo, actor, action, input) ??

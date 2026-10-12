@@ -1,7 +1,7 @@
 import { demand, ServiceError, type Account } from '../auth';
 import type { Fields } from '../repository';
 import { version } from "../version-check";
-import { passwordChangeRequired } from '../sports/account-gate';
+import { passwordChangeRequired } from '../accounts/account-gate';
 import { PostgresRepository } from './postgres-repository';
 import { PostgresAuth } from './postgres-auth';
 import type { PostgresDatabase } from './postgres';

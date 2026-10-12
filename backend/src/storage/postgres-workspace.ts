@@ -5,7 +5,7 @@ import { demand } from '../auth';
 import type { Entity, Fields, Repository } from '../repository';
 import { projectWorkspace } from '../snapshot-projection';
 import { projectRelationshipHistory } from '../relationship-history';
-import { passwordChangeRequired } from '../sports/account-gate';
+import { passwordChangeRequired } from '../accounts/account-gate';
 import { recordedStudentNumber } from '../student-search';
 
 export async function postgresWorkspace(db: PostgresDatabase, token: string) {
