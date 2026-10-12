@@ -185,6 +185,9 @@ try {
   cookie=studentCookie;
   const workflow=(await request('/api/v1/exercise-records/'+finalDraft.id+'/workflow')).data;
   assert.equal(workflow.stage,'AWAITING_SUPPLEMENT');assert.equal(workflow.supplement.expired,false);
+  const proofTodos=(await request('/api/v1/student/proof-todos?limit=100')).data;
+  const todo=proofTodos.items.find(item=>item.recordId===finalDraft.id);
+  assert.ok(todo);assert.equal(todo.reasonCode,'UNCLEAR_EVIDENCE');assert.equal(todo.publicComment,'Docker supplementary evidence');assert.equal(todo.expired,false);assert.equal(proofTodos.nextCursor,null);
   assert.ok(workflow.materials.some(m=>m.mediaId===lease.mediaId && m.materialVersion===1));
   const extraBytes=await sharp({create:{width:4,height:4,channels:3,background:'#654321'}}).png().toBuffer(),extraHash=createHash('sha256').update(extraBytes).digest('hex');
   const extra=await sessionWrite('/api/v1/media-uploads',{sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:extraBytes.length,captureSource:'FILE_PICKER',declaredContentSha256:extraHash,durationSeconds:null});
@@ -193,6 +196,7 @@ try {
   await sessionWrite('/api/v1/media/'+extra.mediaId+'/bind',{sessionId:session.id,expectedVersion:extraConfirmed.version});
   const supplemented=await sessionWrite('/api/v1/exercise-records/'+finalDraft.id+'/supplements',{mediaIds:[lease.mediaId,extra.mediaId],expectedVersion:workflow.version});
   assert.equal(supplemented.workflowStage,'PENDING_TEACHER');assert.equal(supplemented.materialVersion,2);
+  assert.equal((await request('/api/v1/student/proof-todos?limit=100')).data.items.some(item=>item.recordId===finalDraft.id),false);
   assert.equal((await request('/api/v1/exercise-records/'+finalDraft.id)).data.materialVersion,2);
   cookie=teacherCookie;
   const afterSupplement=await request('/api/sports/workspace');reviewRecord=afterSupplement.records.find(r=>r.id===reviewRecord.id);

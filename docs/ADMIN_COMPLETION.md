@@ -1727,3 +1727,7 @@ GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需�
 ### 学生待补证列表与公开原因协议
 
 核对现有listOwnProofTodos后补齐 GET /api/v1/student/proof-todos，返回本人待补证记录、运动时间／时长、课程、公开原因、暂停与截止、游标；补交进入教师复核即从列表移除。共享原因代码投影将内部UNCLEAR等转换为学生已有词表，避免返回原因对象导致页面无法识别；记录列表也保留待补证公开说明。49项真实PostgreSQL测试通过，覆盖列表出现／移除及原因码，类型与lint通过。尚未重建Docker验证此新增列表接口，UI未改。
+
+### Docker 学生补证待办验证
+
+API重建并健康启动，真实HTTP冒烟新增退回后GET student/proof-todos：核对公开ID、UNCLEAR_EVIDENCE原因、教师说明、未逾期及分页结束；补交后再次GET确认该项移除。连同原件读取、教师审核、进度及登录持久化整链通过。未修改UI。
