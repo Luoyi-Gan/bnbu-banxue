@@ -222,6 +222,32 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await auth.login('state@example.test','State-test-123')).account.id).toBe('state-person');
     expect((await db.pool.query("SELECT email FROM email_challenges WHERE email='new-manager@bnbu.edu.cn'")).rows).toHaveLength(1);
   });
+  it('rolls administrator deletion back on audit failure and supports authorized retries', async () => {
+    const auth=new PostgresAuth(db),root=(await auth.login('password-manager','Changed-test-123')).token;
+    const target=await auth.login('state-manager','State-test-123');
+    await db.pool.query("UPDATE accounts SET roles='[\"superadmin\"]' WHERE id='password-admin'");
+    const identity=await db.transaction(async client=>(await new PostgresRepository(client).all('sportsIdentity')).find(i=>i.ownerId===target.account.id)!);
+    const input={accountId:target.account.id,version:identity.version,confirmed:true,handoverConfirmed:true};
+    await db.pool.query("CREATE FUNCTION reject_delete_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='sports.admins.delete' THEN RAISE EXCEPTION 'injected deletion audit failure'; END IF; RETURN NEW; END; $$");
+    await db.pool.query('CREATE TRIGGER reject_delete_audit BEFORE INSERT ON audit FOR EACH ROW EXECUTE FUNCTION reject_delete_audit()');
+    try {
+      await expect(executePostgres(db,root,'sports.admins.delete',input,randomUUID())).rejects.toThrow('injected deletion audit failure');
+      expect((await auth.authenticate(target.token)).id).toBe(target.account.id);
+      expect((await db.pool.query('SELECT login_kind FROM accounts WHERE id=$1',[target.account.id])).rows[0].login_kind).toBe('ADMIN');
+    } finally {
+      await db.pool.query('DROP TRIGGER reject_delete_audit ON audit');
+      await db.pool.query('DROP FUNCTION reject_delete_audit()');
+    }
+    try {
+      const key=randomUUID();
+      const result=await executePostgres(db,root,'sports.admins.delete',input,key);
+      expect(await executePostgres(db,root,'sports.admins.delete',input,key)).toEqual(result);
+      await expect(auth.authenticate(target.token)).rejects.toMatchObject({status:401});
+      expect((await auth.login('state@example.test','State-test-123')).account.id).toBe('state-person');
+      await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'");
+      await expect(executePostgres(db,root,'sports.admins.delete',input,key)).rejects.toMatchObject({status:403});
+    } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
+  });
   it('serializes concurrent migrations and rejects changed migration contents', async () => {
     await Promise.all([db.migrate(postgresMigrations), db.migrate(postgresMigrations)]);
     expect((await db.pool.query('SELECT * FROM backend_migrations')).rows).toHaveLength(postgresMigrations.length);
