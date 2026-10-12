@@ -2375,3 +2375,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 用户确认教师交流主题不允许留空。原教师资料表单 topics 添加 required，后端原有 textField 必填校验保持，UI布局不变。前端类型检查和文件ESLint通过，Docker前端重新构建部署；此前待确认记录以本条决定为准。
 
 2026-10-12 最终检查点：当前全量266/266零跳过，ESLint199文件零错误零警告，后端类型检查通过。修正交接中两个体育目录均与origin/main一致的过时描述：学生目录无差异，教师目录5文件为此前体育写入集成撤回差异；原始清单哈希测试通过。未为消除diff而恢复已撤回体育业务。
+
+2026-10-12 教师交流主题必填浏览器复验：4188原个人资料表单清空主题并点击保存，浏览器validity.valueMissing=true并提示请填写此字段；刷新后原学习规划、校园生活仍在，没有空值覆盖。截图.runtime/teacher-topics-required-browser-proof.png。
