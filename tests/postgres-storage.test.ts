@@ -26,6 +26,7 @@ import { postgresSportsHelp } from '../backend/src/storage/postgres-sports-help'
 import { postgresSportsMe } from '../backend/src/storage/postgres-sports-me';
 import { postgresStudentCourses } from '../backend/src/storage/postgres-student-courses';
 import { postgresSportsNotifications } from '../backend/src/storage/postgres-sports-notifications';
+import { startClock } from '../backend/src/sports/session-clock';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -146,6 +147,22 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const duplicate=await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity','sports-reader-student',{role:'student',status:'verified'}));
     await expect(postgresSportsMe(db,studentLogin.token)).rejects.toMatchObject({status:403});
     await db.pool.query('DELETE FROM entities WHERE id=$1',[duplicate.id]);
+  });
+  it('persists sports pause resume and end with ownership, versions and idempotency', async () => {
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const session=await db.transaction(client=>new PostgresRepository(client).create('sportsSession','sports-reader-student',{clock:startClock(Date.now()-2000),ruleSnapshot:{threshold:30}}));
+    const key=randomUUID(),input={id:session.id,version:session.version};
+    const paused=await executePostgres(db,login.token,'sports.session.pause',input,key);
+    expect(await executePostgres(db,login.token,'sports.session.pause',input,key)).toEqual(paused);
+    await expect(executePostgres(db,login.token,'sports.session.resume',input,randomUUID())).rejects.toMatchObject({status:409});
+    let saved=await db.transaction(client=>new PostgresRepository(client).get(session.id));
+    await executePostgres(db,login.token,'sports.session.resume',{id:saved.id,version:saved.version},randomUUID());
+    saved=await db.transaction(client=>new PostgresRepository(client).get(session.id));
+    await executePostgres(db,login.token,'sports.session.end',{id:saved.id,version:saved.version},randomUUID());
+    saved=await db.transaction(client=>new PostgresRepository(client).get(session.id));
+    expect(saved.data.clock).toMatchObject({state:'ENDED'});
+    const events=await db.transaction(client=>new PostgresRepository(client).all('sportsSessionEvent'));
+    expect(events.filter(e=>e.data.sessionId===session.id)).toHaveLength(3);
   });
   it('paginates only the current recipients sports notifications', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

@@ -20,6 +20,7 @@ import { sportsHelpPolicy } from '../sports/help';
 import { requireSportsPermission } from '../sports/permissions';
 import { sportsAvailable } from '../sports/materials';
 import { projectSportsNotification } from '../sports/portal-notifications';
+import { sportsSessionPolicy } from '../sports/sessions';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
@@ -55,6 +56,10 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     let result:Fields|undefined;
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
+    else if(action.startsWith('sports.session.')) {
+      const session=await runAsync(sportsSessionPolicy(repo,actor,action,input));
+      if(session) result={id:session.id};
+    }
     else if(action==='sports.notification.read') {
       await runAsync(notificationPolicy(repo,actor,'notification.read',input));
       const row=(await client.query<Fields>('SELECT n.*,e.kind AS target_kind,e.owner_id AS target_owner FROM notifications n LEFT JOIN entities e ON e.id=n.entity_id WHERE n.id=$1 AND n.recipient_id=$2',[input.id,actor.id])).rows[0];

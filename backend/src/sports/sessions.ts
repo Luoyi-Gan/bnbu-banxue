@@ -1,3 +1,4 @@
+import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { demand, type Account } from "../auth";
 import { Repository, enumField, type Entity, type Fields } from "../repository";
 import { beforeEvidence } from "./swimming";
@@ -10,24 +11,28 @@ import {
 } from "./session-clock";
 import { eligibleMinutes } from "./credit";
 
-export function sportsSessionCommand(
-  repo: Repository,
+export function sportsSessionCommand(repo: Repository, actor: Account, action: string, input: Fields): Entity | undefined {
+  return runSync(sportsSessionPolicy(repo, actor, action, input));
+}
+export function* sportsSessionPolicy(
+  repo: BusinessRepository,
   actor: Account,
   action: string,
   input: Fields,
-): Entity | undefined {
+): Generator<unknown, Entity | undefined, unknown> {
   if (!action.startsWith("sports.session.")) return undefined;
-  sportsRole(repo, actor, "student");
+  const identities = yield* effect(repo.all("sportsIdentity"));
+  sportsRole({all:()=>identities}, actor, "student");
   const now = Date.now();
-  const mode = repo.all("sportsSystem")[0];
+  const mode = (yield* effect(repo.all("sportsSystem")))[0];
   demand(
     !mode || mode.data.mode === "NORMAL",
     "体育服务当前处于维护模式。",
     503,
   );
   if (action === "sports.session.start") {
-    const course = repo.get(input.courseId, "sportsCourse");
-    const semester = repo.get(course.data.semesterId, "sportsSemester");
+    const course = (yield* effect(repo.get(input.courseId, "sportsCourse")));
+    const semester = (yield* effect(repo.get(course.data.semesterId, "sportsSemester")));
     demand(
       course.data.status === "PUBLISHED" &&
         semester.data.status === "CURRENT" &&
@@ -35,8 +40,7 @@ export function sportsSessionCommand(
       "当前课程不能开始新运动。",
       409,
     );
-    const enrollment = repo
-      .all("sportsEnrollment")
+    const enrollment = (yield* effect(repo.all("sportsEnrollment")))
       .find(
         (e) =>
           e.ownerId === actor.id &&
@@ -45,8 +49,7 @@ export function sportsSessionCommand(
       );
     demand(enrollment, "须有本班有效成员关系。", 403);
     demand(
-      !repo
-        .all("sportsSession")
+      !(yield* effect(repo.all("sportsSession")))
         .some(
           (s) =>
             s.ownerId === actor.id &&
@@ -62,8 +65,7 @@ export function sportsSessionCommand(
       !((course.data.excludedDates ?? []) as string[]).includes(day) &&
       day >= String(course.data.startDate) &&
       day <= String(course.data.deadlineDate);
-    const makeup = repo
-      .all("sportsMakeup")
+    const makeup = (yield* effect(repo.all("sportsMakeup")))
       .some(
         (m) =>
           m.ownerId === actor.id &&
@@ -85,11 +87,12 @@ export function sportsSessionCommand(
       "activityType",
       ["EXERCISE", "SWIM"] as const,
     );
+    const before = activityType === "SWIM" ? yield* effect(repo.get(input.beforeEvidenceId, "sportsSwimEvidence")) : null;
     const evidence =
       activityType === "SWIM"
-        ? beforeEvidence(repo, actor, course.id, input.beforeEvidenceId)
+        ? beforeEvidence({get:()=>before!}, actor, course.id, input.beforeEvidenceId)
         : null;
-    const session = repo.create("sportsSession", actor.id, {
+    const session = yield* effect(repo.create("sportsSession", actor.id, {
       activityType,
       beforeEvidenceId: evidence?.id ?? null,
       courseId: course.id,
@@ -104,14 +107,14 @@ export function sportsSessionCommand(
         templateVersion: course.data.templateVersion,
       },
       clock,
-    });
-    if (evidence) repo.save(evidence, { sessionId: session.id, boundAt: now });
-    repo.create("sportsSessionEvent", actor.id, {
+    }));
+    if (evidence) yield* effect(repo.save(evidence, { sessionId: session.id, boundAt: now }));
+    yield* effect(repo.create("sportsSessionEvent", actor.id, {
       sessionId: session.id,
       action: "start",
       at: now,
       clock,
-    });
+    }));
     return session;
   }
   demand(
@@ -122,7 +125,7 @@ export function sportsSessionCommand(
     ].includes(action),
     "未知运动会话动作。",
   );
-  const session = repo.get(input.id, "sportsSession");
+  const session = (yield* effect(repo.get(input.id, "sportsSession")));
   demand(session.ownerId === actor.id, "只能操作本人运动会话。", 403);
   version(session, input);
   const next = transitionClock(
@@ -130,13 +133,13 @@ export function sportsSessionCommand(
     action.split(".")[2] as "pause" | "resume" | "end",
     now,
   );
-  repo.create("sportsSessionEvent", actor.id, {
+  yield* effect(repo.create("sportsSessionEvent", actor.id, {
     sessionId: session.id,
     action: action.split(".")[2],
     at: now,
     clock: next,
-  });
-  return repo.save(session, { clock: next });
+  }));
+  return yield* effect(repo.save(session, { clock: next }));
 }
 export function sessionProjection(session: Entity, serverNow: number) {
   const clock = session.data.clock as unknown as SportsClock;

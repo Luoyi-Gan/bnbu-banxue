@@ -43,7 +43,7 @@ export function sportsSwimCommand(
   });
 }
 export function beforeEvidence(
-  repo: Repository,
+  repo: Pick<Repository, "get">,
   actor: Account,
   courseId: string,
   id: unknown,
