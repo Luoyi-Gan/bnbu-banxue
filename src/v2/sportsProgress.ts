@@ -8,7 +8,7 @@ export interface SportsWorkspace {
 export type SportsProgressStatus = 'not-started' | 'in-progress' | 'completed' | 'not-enrolled' | 'no-target' | 'unavailable' | 'sign-in'
 export interface SportsProgress {
   status: SportsProgressStatus
-  source: 'preview' | 'api'
+  source: 'preview' | 'api' | 'local'
   semester: string
   course: string
   completedHours: number | null

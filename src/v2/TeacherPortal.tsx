@@ -4,7 +4,9 @@ import { Coffee, CalendarDays, Bell } from 'lucide-react'
 import { useV2 } from './useV2'
 import { PageHeading, Empty, Modal } from './ui'
 import { type V2State, studentName } from './model'
-import { canUseTeacherSports, answerCoffeeMove, cancelCoffee, closeCoffeeSlot, coffeeData, managedTeachers, occupied, proposeCoffeeMove, saveCoffeeSlot, teacherAccount } from './teacherCoffee'
+import { answerCoffeeMove, cancelCoffee, closeCoffeeSlot, coffeeData, managedTeachers, occupied, proposeCoffeeMove, saveCoffeeSlot, teacherAccount } from './teacherCoffee'
+import { useSportsAccount } from '../live/useSportsAccount'
+import { SportsPortal } from '../live/SportsPortal'
 import './teacherPortal.css'
 
 const stamp = (value: string) => new Date(value).toLocaleString('zh-CN', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -33,15 +35,17 @@ export function StudentCoffeeChanges() {
 }
 
 export function TeacherSchedule() {
+  const sports = useSportsAccount()
   const { state } = useV2(), account = teacherAccount(state), data = coffeeData(state)
   const items = data.bookings.filter(b => b.status === 'confirmed').map(b => ({ booking: b, slot: data.slots.find(s => s.id === b.slotId) })).filter(x => x.slot?.teacherId === account.id).sort((a, b) => Date.parse(a.slot!.startAt) - Date.parse(b.slot!.startAt))
-  return <div className="v2-page"><PageHeading eyebrow="MY SCHEDULE" title="日程信息" description="已成立的 Coffee Chat 安排；改期确认前保留原时间。"/><section className="v2-panel v2-teacher-panel">{items.length ? items.map(({ booking, slot }) => <Link className="v2-saved-row" key={booking.id} to="/v2/teacher/coffee"><CalendarDays size={20}/><span><strong>{booking.student} · Coffee Chat</strong><small>{stamp(slot!.startAt)} – {stamp(slot!.endAt)} · {slot!.location ?? managedTeachers(state).find(t => t.id === account.id)?.location}{booking.proposedSlotId ? ' · 改期待确认' : ''}</small></span></Link>) : <Empty icon={CalendarDays} title="暂无预约日程"/>}{account.sportsQualified && <Link className="v2-button v2-button-secondary" to="/v2/teacher/sports">查看体育课程安排</Link>}</section></div>
+  return <div className="v2-page"><PageHeading eyebrow="MY SCHEDULE" title="日程信息" description="已成立的 Coffee Chat 安排；改期确认前保留原时间。"/><section className="v2-panel v2-teacher-panel">{items.length ? items.map(({ booking, slot }) => <Link className="v2-saved-row" key={booking.id} to="/v2/teacher/coffee"><CalendarDays size={20}/><span><strong>{booking.student} · Coffee Chat</strong><small>{stamp(slot!.startAt)} – {stamp(slot!.endAt)} · {slot!.location ?? managedTeachers(state).find(t => t.id === account.id)?.location}{booking.proposedSlotId ? ' · 改期待确认' : ''}</small></span></Link>) : <Empty icon={CalendarDays} title="暂无预约日程"/>}{sports.data?.sports?.role === 'teacher' && <Link className="v2-button v2-button-secondary" to="/v2/teacher/sports">查看体育课程安排</Link>}</section></div>
 }
 
 export function TeacherMessages() {
+  const sports = useSportsAccount()
   const { state, setState } = useV2(), account = teacherAccount(state), data = coffeeData(state)
   const items = data.notices.filter(n => n.teacherId === account.id)
-  return <div className="v2-page"><PageHeading eyebrow="MESSAGES" title="消息与通知" description="预约、取消与改期的业务通知。"/><section className="v2-panel v2-teacher-panel">{items.length ? items.map(n => <article className="v2-teacher-card" key={n.id}><p>{n.body}</p><small>{stamp(n.at)} · {n.read ? '已读' : '未读'}</small><Link to="/v2/teacher/coffee">查看预约</Link>{!n.read && <button className="v2-button v2-button-secondary" onClick={() => setState(value => ({ ...value, teacherCoffee: { ...coffeeData(value), notices: coffeeData(value).notices.map(item => item.id === n.id && item.teacherId === account.id ? { ...item, read: true } : item) } }))}>标为已读</button>}</article>) : <Empty icon={Bell} title="暂无消息"/>}{account.sportsQualified && <Link to="/v2/teacher/sports">查看体育平台通知</Link>}</section></div>
+  return <div className="v2-page"><PageHeading eyebrow="MESSAGES" title="消息与通知" description="预约、取消与改期的业务通知。"/><section className="v2-panel v2-teacher-panel">{items.length ? items.map(n => <article className="v2-teacher-card" key={n.id}><p>{n.body}</p><small>{stamp(n.at)} · {n.read ? '已读' : '未读'}</small><Link to="/v2/teacher/coffee">查看预约</Link>{!n.read && <button className="v2-button v2-button-secondary" onClick={() => setState(value => ({ ...value, teacherCoffee: { ...coffeeData(value), notices: coffeeData(value).notices.map(item => item.id === n.id && item.teacherId === account.id ? { ...item, read: true } : item) } }))}>标为已读</button>}</article>) : <Empty icon={Bell} title="暂无消息"/>}{sports.data?.sports?.role === 'teacher' && <Link to="/v2/teacher/sports">查看体育平台通知</Link>}</section></div>
 }
 
 export function TeacherProfile() {
@@ -52,8 +56,8 @@ export function TeacherProfile() {
 }
 
 export function TeacherSports() {
-  const { state } = useV2()
-  if (!canUseTeacherSports(state)) return <Navigate to="/v2/teacher/coffee" replace/>
-  const origin = import.meta.env.DEV ? 'http://127.0.0.1:4186/?mock=teacher' : import.meta.env.VITE_SPORTS_TEACHER_URL
-  return <section className="v2-sports-embedded"><div className="v2-sports-toolbar"><Link className="v2-sports-back" to="/v2/teacher/coffee">返回伴学教师端</Link><span>原体育平台教师端 · {import.meta.env.DEV ? '独立本地演示数据' : '使用体育系统授权'}</span></div>{origin ? <iframe className="v2-sports-frame" title="原体育平台教师端" src={origin} allow="camera 'self'; microphone 'self'; fullscreen"/> : <p>尚未配置体育教师平台地址，请配置 VITE_SPORTS_TEACHER_URL 并接入原体育系统身份验证。</p>}</section>
+  const live = useSportsAccount()
+  if (!live.data) return <p role="status">{live.error || '正在读取体育账号…'}</p>
+  if (live.data.sports?.role !== 'teacher') return <Navigate to="/v2/teacher/coffee" replace/>
+  return <div className="v2-page"><SportsPortal workspace={live.data}/></div>
 }

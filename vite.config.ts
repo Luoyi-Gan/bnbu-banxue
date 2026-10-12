@@ -5,5 +5,8 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
-  server: { host: '127.0.0.1', port: 4174, strictPort: true },
+  server: { host: '127.0.0.1', port: 4174, strictPort: true, proxy: {
+    '/api/workspace': { target: process.env.BNBU_COMPANION_ORIGIN || 'http://127.0.0.1:4175' },
+    '/api/sports/workspace': { target: process.env.BNBU_COMPANION_ORIGIN || 'http://127.0.0.1:4175' },
+  } },
 })
