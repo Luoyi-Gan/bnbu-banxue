@@ -14,6 +14,7 @@ import { enduranceWorkspace } from "../server/sports/endurance";
 import { reviewWorkspace } from "../server/sports/review";
 import { courseReport } from "../server/sports/report";
 import { createApiServer } from "../server/main";
+import { calculateProgress } from "../server/sports/progress";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 function setup() {
@@ -157,6 +158,81 @@ it("原版审核接口复用批准、补证和驳回事务及认可学时", asyn
         .sort((a, b) => Number(a) - Number(b)),
     ).toEqual([60, 120]);
     expect((await review(cert.id, body, "stale-review")).status).toBe(409);
+    const change = (revoke: boolean, input: object, key: string) =>
+      fetch(
+        `http://127.0.0.1:${address.port}/api/v1/activity-certification-applications/${cert.id}/${revoke ? "revoke" : "recognition-allocation-revisions"}`,
+        {
+          method: "POST",
+          headers: {
+            Cookie: `bnbu_session=${f.teacher.token}`,
+            "Content-Type": "application/json",
+            "Idempotency-Key": key,
+          },
+          body: JSON.stringify(input),
+        },
+      );
+    const adjustment = {
+      expectedVersion: 2,
+      reason: "更正认可分钟",
+      courseMinutes: 240,
+      generalMinutes: 120,
+    };
+    expect((await change(false, adjustment, "adjust-credit")).status).toBe(200);
+    expect((await change(false, adjustment, "adjust-credit")).status).toBe(200);
+    expect(
+      calculateProgress(f.repo, f.course.id, f.student.account.id).total,
+    ).toBe(360);
+    const revoked = await change(
+      true,
+      { expectedVersion: 3, reason: "认证证明失效" },
+      "revoke-credit",
+    );
+    expect(revoked.status).toBe(200);
+    expect((await revoked.json()).data.status).toBe("REVOKED");
+    expect(
+      calculateProgress(f.repo, f.course.id, f.student.account.id).total,
+    ).toBe(0);
+    const history = (query: string, token = f.teacher.token) =>
+      fetch(
+        `http://127.0.0.1:${address.port}/api/v1/activity-certification-applications/${cert.id}/recognition-allocation-revisions${query}`,
+        { headers: { Cookie: `bnbu_session=${token}` } },
+      );
+    const first = await (await history("?limit=2")).json();
+    expect(
+      first.data.map((row: { revisionNumber: number }) => row.revisionNumber),
+    ).toEqual([3, 2]);
+    expect(first.data[0]).toMatchObject({
+      active: false,
+      courseSeconds: 14400,
+      generalSeconds: 7200,
+    });
+    expect(first.data[1]).toMatchObject({
+      active: true,
+      courseSeconds: 14400,
+      generalSeconds: 7200,
+    });
+    expect(
+      (
+        await (
+          await history("?limit=2&cursor=" + first.meta.pagination.nextCursor)
+        ).json()
+      ).data[0],
+    ).toMatchObject({
+      revisionNumber: 1,
+      courseSeconds: 7200,
+      generalSeconds: 3600,
+    });
+    expect((await history("", f.other.token)).status).toBe(403);
+    expect((await history("", f.student.token)).status).toBe(403);
+    expect(
+      (
+        await change(
+          false,
+          { ...adjustment, expectedVersion: 4 },
+          "adjust-revoked",
+        )
+      ).status,
+    ).toBe(409);
     const exempt = f.submit([(await f.image()).id]);
     expect(
       (

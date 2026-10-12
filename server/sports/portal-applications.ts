@@ -156,7 +156,11 @@ function applicationProjection(app: Entity, histories: Entity[]) {
       : (certification?.organizationOrTeamName ?? null),
     reason: typeof app.data.reason === "string" ? app.data.reason : "",
     mediaIds: strings(app.data.assetIds),
-    status: app.data.status,
+    status:
+      app.data.applicationType === "CERTIFICATION" &&
+      app.data.creditStatus === "REVOKED"
+        ? "REVOKED"
+        : app.data.status,
     publicComment: app.data.publicReason ?? null,
     submittedAt:
       typeof app.data.submittedAt === "number"
@@ -167,5 +171,122 @@ function applicationProjection(app: Entity, histories: Entity[]) {
         ? new Date(history.data.at).toISOString()
         : null,
     version: app.version,
+  };
+}
+
+export function portalCertificationChange(
+  db: Database,
+  token: string,
+  id: string,
+  revoke: boolean,
+  input: Fields,
+  key: string,
+) {
+  demand(
+    Object.keys(input).every((field) =>
+      [
+        "expectedVersion",
+        "reason",
+        ...(revoke ? [] : ["courseMinutes", "generalMinutes"]),
+      ].includes(field),
+    ),
+    "认证变更参数无效。",
+  );
+  const repo = new Repository(db),
+    actor = authenticate(db, token),
+    app = repo.get(id, "sportsApplication");
+  ownedCourse(repo, actor, app.data.courseId);
+  execute(
+    db,
+    token,
+    revoke ? "sports.certification.revoke" : "sports.certification.adjust",
+    {
+      id,
+      version: input.expectedVersion,
+      reason: input.reason,
+      ...(revoke
+        ? {}
+        : {
+            relatedMinutes: input.courseMinutes,
+            otherMinutes: input.generalMinutes,
+          }),
+    },
+    key,
+  );
+  return applicationProjection(
+    repo.get(id, "sportsApplication"),
+    repo.all("sportsApplicationHistory"),
+  );
+}
+
+export function portalRecognitionHistory(
+  repo: Repository,
+  actor: Account,
+  id: string,
+  input: Fields,
+) {
+  const app = repo.get(id, "sportsApplication");
+  ownedCourse(repo, actor, app.data.courseId);
+  sportsWriteGate(repo, "sports.course.read");
+  demand(
+    app.data.applicationType === "CERTIFICATION",
+    "此申请不是组织认证。",
+    409,
+  );
+  demand(
+    Object.keys(input).every((key) => ["limit", "cursor"].includes(key)),
+    "认可历史查询参数无效。",
+  );
+  const limit =
+    input.limit === undefined
+      ? 100
+      : integerField({ value: Number(input.limit) }, "value", 1, 100);
+  const histories = repo
+    .all("sportsCertificationHistory")
+    .filter((row) => row.data.applicationId === id);
+  const versions = [
+    ...new Set(histories.map((row) => Number(row.data.creditVersion))),
+  ].sort((a, b) => b - a);
+  const cursor = textField(input, "cursor", 100, true),
+    index = cursor ? versions.indexOf(Number(cursor)) : -1;
+  demand(!cursor || index >= 0, "分页基准已变化，请刷新。", 409);
+  const data = versions.slice(index + 1, index + 1 + limit).map((revision) => {
+    const pair = histories.filter((row) => row.data.creditVersion === revision);
+    const related = pair.find((row) => row.data.category === "RELATED"),
+      other = pair.find((row) => row.data.category === "OTHER");
+    demand(
+      pair.length === 2 &&
+        related &&
+        other &&
+        related.data.status === other.data.status &&
+        related.data.reason === other.data.reason,
+      "认可历史不完整，须先核对。",
+      409,
+    );
+    return {
+      id: `${id}:${revision}`,
+      applicationId: id,
+      revisionNumber: revision,
+      courseSeconds: Number(related.data.minutes) * 60,
+      generalSeconds: Number(other.data.minutes) * 60,
+      reason: related.data.reason,
+      active: related.data.status === "VALID",
+      createdAt: related.createdAt,
+    };
+  });
+  const nextCursor =
+    index + 1 + limit < versions.length
+      ? String(data.at(-1)!.revisionNumber)
+      : null;
+  return {
+    data,
+    meta: {
+      pagination: {
+        total: versions.length,
+        limit,
+        nextCursor,
+        hasMore: nextCursor !== null,
+      },
+    },
   };
 }

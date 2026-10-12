@@ -20,6 +20,8 @@ import { sportsWorkspace } from "./sports/courses";
 import {
   portalApplications,
   portalApplicationReview,
+  portalCertificationChange,
+  portalRecognitionHistory,
 } from "./sports/portal-applications";
 import { portalProofAccess, portalProofRead } from "./sports/portal-media";
 import {
@@ -437,6 +439,24 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const certificationChange =
+          /^\/api\/v1\/activity-certification-applications\/([^/]+)\/(revoke|recognition-allocation-revisions)$/.exec(
+            pathname,
+          );
+        if (certificationChange) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalCertificationChange(
+              db,
+              token!,
+              certificationChange[1],
+              certificationChange[2] === "revoke",
+              input,
+              key,
+            ),
+          });
+        }
         const applicationReview =
           /^\/api\/v1\/exemption-applications\/([^/]+)\/review$/.exec(pathname);
         if (applicationReview) {
@@ -807,6 +827,23 @@ export function createApiServer(
           ),
         );
       }
+      const recognitionHistory =
+        /^\/api\/v1\/activity-certification-applications\/([^/]+)\/recognition-allocation-revisions$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && recognitionHistory)
+        return send(
+          response,
+          200,
+          portalRecognitionHistory(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            recognitionHistory[1],
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        );
       const portalDirectory =
         /^\/api\/v1\/(students|teachers)(?:\/([^/]+))?$/.exec(pathname);
       if (
