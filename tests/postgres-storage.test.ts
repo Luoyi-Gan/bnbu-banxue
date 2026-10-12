@@ -28,6 +28,7 @@ import { postgresStudentCourses } from '../backend/src/storage/postgres-student-
 import { postgresSportsNotifications } from '../backend/src/storage/postgres-sports-notifications';
 import { startClock } from '../backend/src/sports/session-clock';
 import { postgresSportsPreferences } from '../backend/src/storage/postgres-sports-preferences';
+import { postgresSportsSession } from '../backend/src/storage/postgres-sports-session';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -176,6 +177,8 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await executePostgres(db,login.token,'sports.session.end',{id:saved.id,version:saved.version},randomUUID());
     saved=await db.transaction(client=>new PostgresRepository(client).get(session.id));
     expect(saved.data.clock).toMatchObject({state:'ENDED'});
+    expect(await postgresSportsSession(db,login.token,session.id)).toMatchObject({id:session.id,status:'COMPLETED',completedAt:expect.any(String),actualDurationSeconds:expect.any(Number)});
+    await expect(postgresSportsSession(db,login.token,'active')).rejects.toMatchObject({status:404});
     const events=await db.transaction(client=>new PostgresRepository(client).all('sportsSessionEvent'));
     expect(events.filter(e=>e.data.sessionId===session.id)).toHaveLength(3);
   });

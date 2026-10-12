@@ -1627,3 +1627,7 @@ Compose 重建并健康启动，扩展 Docker 冒烟：显式创建隔离学期/
 ### 偏好 Docker 与运动开始验证
 
 重建 API 镜像并健康启动，Docker 冒烟新增 GET 偏好默认关闭、PATCH 保存英文、同幂等键重试一致及再次 GET 读回，通过真实 Nginx/API/PostgreSQL。原通知、课程和持久化检查继续通过。随机 schema 新增运动开始的无成员拒绝、有效成员启动及已有未结束会话时第二次启动拒绝，数据库 42 项通过。当前镜像包含共享运动命令，但学生 exercise-sessions 协议尚未适配，不能宣称页面运动操作完成。UI 未改。
+
+### 学生运动会话读取适配
+
+新增 GET /api/v1/exercise-sessions/:id 与 active，限定本人体育学生会话、首次改密和维护门禁，活动会话重复时拒绝。按现有页面字段返回 IN_PROGRESS/PAUSED/COMPLETED、服务器计算秒数、startedAt/completedAt/endedAt 与版本；无活动会话返回 404。PostgreSQL 42 项测试通过，新增结束会话读取及活动查询不返回结束记录；类型检查通过。开始/暂停/继续/结束 POST 协议、取消语义及恢复计时其他字段仍待继续核对，本轮未更新 Docker，UI 未改。

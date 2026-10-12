@@ -22,6 +22,7 @@ import { postgresSportsMe } from './storage/postgres-sports-me';
 import { postgresStudentCourses } from './storage/postgres-student-courses';
 import { postgresSportsNotifications } from './storage/postgres-sports-notifications';
 import { postgresSportsPreferences } from './storage/postgres-sports-preferences';
+import { postgresSportsSession } from './storage/postgres-sports-session';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean} = {}) {
@@ -31,6 +32,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const sportsSessionRead=/^\/api\/v1\/exercise-sessions\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && sportsSessionRead) return send(response,200,{data:await postgresSportsSession(db,cookieToken(request) ?? '',decodeURIComponent(sportsSessionRead[1]))});
       if(request.method==='GET' && pathname==='/api/v1/me/preferences') return send(response,200,{data:await postgresSportsPreferences(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && pathname==='/api/v1/notifications') return send(response,200,await postgresSportsNotifications(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && /^\/api\/v1\/teachers\/[^/]+$/.test(pathname)) return send(response,200,await postgresStudentCourses(db,cookieToken(request) ?? '',pathname,Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
