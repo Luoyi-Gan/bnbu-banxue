@@ -1,14 +1,3 @@
-import { postgresAiGovernance, requireAiGovernor } from './postgres-ai-governance';
-import { postgresSettlementFinalize, postgresSettlementGate } from './postgres-settlement';
-import { sportsReviewDecisionPolicy } from '../sports/review';
-import { sportsEndurancePolicy } from '../sports/endurance';
-import { sportsGradePolicy } from '../sports/grades';
-import { sportsConversionPolicy } from '../sports/conversion';
-import { submitStudentRecord } from './postgres-record-submit';
-import { submitStudentSupplement } from './postgres-supplement-submit';
-import { mediaCommand } from './postgres-student-media';
-import { recordDraftGate, saveRecordDraft } from './postgres-record-drafts';
-import { sportsMaterialPolicy } from "../sports/materials";
 import { randomUUID } from 'node:crypto';
 import { demand, digest, ServiceError, timestamp } from '../auth';
 import { communityPolicy } from '../community';
@@ -27,20 +16,12 @@ import { PostgresRepository } from './postgres-repository';
 import { postgresPassword } from './postgres-password';
 import { postgresAdministratorState, postgresAdministratorCreate, postgresAdministratorEdit, requirePostgresSuperAdmin } from './postgres-administrators';
 import { postgresAdministratorDelete } from './postgres-admin-deletion';
-import { sportsHelpPolicy } from '../sports/help';
-import {portalHelpArticle} from './postgres-sports-help';
-import { requireSportsPermission } from '../sports/permissions';
-import { sportsAvailable } from '../sports/materials';
-import { projectSportsNotification } from '../sports/portal-notifications';
-import { sportsSessionPolicy } from '../sports/sessions';
-import { saveSportsPreferences, sportsPreferencesGate } from './postgres-sports-preferences';
-import { studentSessionProjection } from './postgres-sports-session';
-import { sportsRole, sportsSemesterPolicy, sportsCourseDraftPolicy, sportsCoursePublishPolicy, sportsInvitationPolicy, sportsEnrollmentPolicy, publishedTemplateFields } from '../sports/courses';
-import { checkPostgresDeadlineReminders } from './postgres-deadline-reminders';
-import {semesterRow} from '../sports/portal-courses';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
+  // These legacy names are still used by Banxue account controls, not sports teaching.
+  const accountActions=['sports.password.change','sports.admins.state','sports.admins.create','sports.admins.edit','sports.admins.delete','sports.account.close'];
+  demand(!action.startsWith('sports.') || accountActions.includes(action),'伴学不提供体育业务写入。',404);
   return db.transaction(async client => {
     // Preserve SQLite's serialized business-command boundary while policies are migrated.
     // All API instances share this lock; external I/O must remain outside this transaction.
@@ -53,51 +34,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
     }
     const hash = digest(JSON.stringify({action,input}));
-    if(['sports.enrollment.join','sports.enrollment.begin'].includes(action)) await recordDraftGate(repo,actor);
-    if(['sports.course.create','sports.course.window','sports.course.save','sports.course.configurepublish','sports.course.publish','sports.course.close','sports.invitation.create','sports.invitation.revoke'].includes(action)) {
-      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
-      sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
-    }
-    if(action==='sports.template.publish') {
-      await requirePostgresSuperAdmin(repo,actor);
-      const systems=await repo.all('sportsSystem');sportsAvailable({all:()=>systems});
-    }
-    if(action.startsWith('sports.semester.')) {
-      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
-      sportsRole({all:()=>identities},actor,'admin');requireSportsPermission({all:()=>identities},actor,'SEMESTERS');sportsAvailable({all:()=>systems});
-    }
-    if(action.startsWith('sports.conversion.')) {
-      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
-      requireSportsPermission({all:()=>identities},actor,'GLOBAL_RULES');sportsAvailable({all:()=>systems});
-    }
-    if(['sports.endurance.confirm','sports.physical.confirm','sports.grade.save','sports.grade.publish','sports.grade.append','sports.grade.portal'].includes(action)) {
-      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
-      sportsRole({all:()=>identities},actor,'teacher');sportsAvailable({all:()=>systems});
-    }
-    if(action.startsWith('sports.ai.')) await requireAiGovernor(repo,actor);
-    if(['sports.record.submit','sports.record.supplement'].includes(action)) await recordDraftGate(repo,actor);
-    if(action.startsWith('sports.media.')) await recordDraftGate(repo,actor);
-    if(action.startsWith('sports.recorddraft.')) await recordDraftGate(repo,actor);
-    if(action.startsWith('sports.exercise.')) {
-      const identities=await repo.all('sportsIdentity'),systems=await repo.all('sportsSystem');
-      sportsRole({all:()=>identities},actor,'student');
-      sportsAvailable({all:()=>systems});
-    }
-    if(action==='sports.preferences.save') await sportsPreferencesGate(repo,actor);
-    if(action==='sports.notification.read') {
-      const identities=await repo.all('sportsIdentity');
-      demand(identities.filter(i=>i.ownerId===actor.id && i.data.status==='verified' && ['student','teacher','admin'].includes(String(i.data.role))).length===1,'没有有效体育身份。',403);
-      const systems=await repo.all('sportsSystem');
-      sportsAvailable({all:()=>systems});
-      demand(typeof input.id==='string' && (await client.query("SELECT 1 FROM notifications WHERE id=$1 AND recipient_id=$2 AND event LIKE 'sports.%'",[input.id,actor.id])).rows.length===1,'通知不存在。',404);
-    }
     if(action.startsWith('sports.admins.')) await requirePostgresSuperAdmin(repo,actor);
-    if(action.startsWith('sports.help.')) {
-      const identities=await repo.all('sportsIdentity'),system=await repo.all('sportsSystem');
-      requireSportsPermission({all:()=>identities},actor,'HELP');
-      sportsAvailable({all:()=>system});
-    }
-    if(action==='sports.settlement.finalize')await postgresSettlementGate(repo,actor,input.id);
     const previous = (await client.query<{request_hash:string;result:string}>('SELECT request_hash,result FROM command_receipts WHERE actor_id=$1 AND request_id=$2',[actor.id,requestId])).rows[0];
     if(previous) {
       demand(previous.request_hash===hash,'该请求标识已用于不同操作。',409);
@@ -105,95 +42,6 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     }
     let result:Fields|undefined;
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
-    else if(action==='sports.settlement.finalize') result=await postgresSettlementFinalize(repo,actor,input);
-    else if(action.startsWith('sports.exercise.')) {
-      const operation=action.split('.')[2];
-      demand(['start','pause','resume','finish','cancel'].includes(operation),'未知运动动作。');
-      const allowed=operation==='start'?['enrollmentId','clientObservedAt']:operation==='cancel'?['id','expectedVersion','reason']:['id','expectedVersion','clientObservedAt'];
-      demand(Object.keys(input).every(k=>allowed.includes(k)),'运动请求参数无效。');
-      if(operation!=='cancel') demand(typeof input.clientObservedAt==='string' && Number.isFinite(Date.parse(input.clientObservedAt)),'客户端时间格式无效。');
-      let fields:Fields;
-      if(operation==='start') {
-        const enrollment=await repo.get(input.enrollmentId,'sportsEnrollment');
-        demand(enrollment.ownerId===actor.id && enrollment.data.status==='ACTIVE','须使用本人有效成员关系。',403);
-        fields={courseId:enrollment.data.courseId};
-      } else fields={id:input.id,version:input.expectedVersion,...(operation==='cancel'?{reason:input.reason}:{})};
-      const session=await runAsync(sportsSessionPolicy(repo,actor,`sports.session.${operation==='finish'?'end':operation}`,fields));
-      demand(session,'运动会话操作失败。',500);
-      result=studentSessionProjection(session);
-    }
-    else if(action.startsWith('sports.ai.')) result=await postgresAiGovernance(repo,actor,action,input);
-    else if(['sports.enrollment.join','sports.enrollment.begin'].includes(action)) {
-      const saved=await runAsync(sportsEnrollmentPolicy(repo,actor,action,input,async id=>(await client.query<{name:string}>('SELECT name FROM accounts WHERE id=$1',[id])).rows[0]?.name ?? '责任教师'));if(saved)result={id:saved.id};
-    }
-    else if(['sports.course.close','sports.invitation.create','sports.invitation.revoke'].includes(action)) {
-      const saved=await runAsync(sportsInvitationPolicy(repo,actor,action,input));if(saved)result={id:saved.id};
-    }
-    else if(['sports.course.configurepublish','sports.course.publish'].includes(action)) {
-      const saved=await runAsync(sportsCoursePublishPolicy(repo,actor,action,input,course=>checkPostgresDeadlineReminders(repo,Date.now(),course)));if(saved)result={id:saved.id};
-    }
-    else if(['sports.course.create','sports.course.window','sports.course.save'].includes(action)) {
-      const saved=await runAsync(sportsCourseDraftPolicy(repo,actor,action,input));if(saved)result={id:saved.id};
-    }
-    else if(action==='sports.template.publish') {
-      const template=await repo.create('sportsTemplate',actor.id,publishedTemplateFields(input));
-      await client.query('INSERT INTO sports_template_publications(template_id) VALUES($1)',[template.id]);
-      result={id:template.id};
-    }
-    else if(action.startsWith('sports.semester.')) {
-      const saved=await runAsync(sportsSemesterPolicy(repo,actor,action,input));
-      if(saved)result=action==='sports.semester.switch'?{switchedAt:saved.updatedAt,current:semesterRow(saved),archived:input.currentSemesterId?semesterRow(await repo.get(input.currentSemesterId,'sportsSemester')):null}:{id:saved.id};
-    }
-    else if(action.startsWith('sports.conversion.')) {
-      const saved=await runAsync(sportsConversionPolicy(repo,actor,action,input));if(saved) result={id:saved.id};
-    }
-    else if(action==='sports.endurance.confirm') {
-      const record=await runAsync(sportsEndurancePolicy(repo,actor,action,input));if(record) result={id:record.id};
-    }
-    else if(['sports.grade.save','sports.grade.publish','sports.grade.append'].includes(action)) {
-      const record=await runAsync(sportsGradePolicy(repo,actor,action,input));if(record) result={id:record.id};
-    }
-    else if(action==='sports.grade.portal') {
-      demand(Object.keys(input).every(k=>['enrollmentId','expectedVersion','finalGrade','published'].includes(k)),'最终成绩不接受备注或其他附加字段。');
-      const saved=await runAsync(sportsGradePolicy(repo,actor,'sports.grade.append',{enrollmentId:input.enrollmentId,version:input.expectedVersion,score:input.finalGrade,published:input.published}));
-      demand(saved && ['sportsGradePublication','sportsGradeHistory'].includes(saved.kind),'成绩提交回执无效。',409);
-      const published=saved.kind==='sportsGradePublication';
-      result={enrollmentId:input.enrollmentId,version:published?Number(saved.data.draftVersion)+1:Number(saved.data.resultVersion),finalGrade:saved.data.score,published,createdAt:saved.createdAt};
-    }
-    else if(action==='sports.physical.confirm') {
-      demand(Object.keys(input).every(k=>['enrollmentId','expectedVersion','runType','elapsedSeconds','testedOn'].includes(k)),'体测录入只接受实际项目、用时和测试日期。');
-      demand(input.runType==='800m' || input.runType==='1000m','体测项目无效。');
-      const record=await runAsync(sportsEndurancePolicy(repo,actor,'sports.endurance.confirm',{enrollmentId:input.enrollmentId,version:input.expectedVersion,event:input.runType==='800m'?800:1000,seconds:input.elapsedSeconds,testDate:input.testedOn,confirmed:true}));
-      demand(record,'体测保存失败。',500);
-      const revision=(await repo.all('sportsEnduranceRevision')).find(r=>r.data.recordId===record.id && r.data.recordVersion===record.version);
-      demand(revision,'原始体测保存历史不完整。',409);
-      result={version:revision.data.recordVersion,runType:revision.data.event===800?'800m':'1000m',elapsedSeconds:revision.data.seconds,testedOn:revision.data.testDate,createdAt:revision.createdAt};
-    }
-    else if(['sports.review.decide','sports.review.correct','sports.transfer.decide'].includes(action)) {
-      const record=await runAsync(sportsReviewDecisionPolicy(repo,actor,action,input));if(record)result={id:record.id};
-    }
-    else if(action==='sports.record.submit') result=await submitStudentRecord(repo,actor,input);
-    else if(action==='sports.record.supplement') result=await submitStudentSupplement(repo,actor,input);
-    else if(action.startsWith('sports.media.')) result=await mediaCommand(repo,actor,action.split('.')[2],input);
-    else if(action.startsWith('sports.recorddraft.')) result=await saveRecordDraft(repo,actor,action.split('.')[2],input);
-    else if(action==='sports.record.accept') {
-      const record=await runAsync(sportsMaterialPolicy(repo,actor,action,input));
-      if(record) result={id:record.id};
-    }
-    else if(action==='sports.preferences.save') result=await saveSportsPreferences(repo,actor,input);
-    else if(action.startsWith('sports.session.')) {
-      const session=await runAsync(sportsSessionPolicy(repo,actor,action,input));
-      if(session) result={id:session.id};
-    }
-    else if(action==='sports.notification.read') {
-      await runAsync(notificationPolicy(repo,actor,'notification.read',input));
-      const row=(await client.query<Fields>('SELECT n.*,e.kind AS target_kind,e.owner_id AS target_owner FROM notifications n LEFT JOIN entities e ON e.id=n.entity_id WHERE n.id=$1 AND n.recipient_id=$2',[input.id,actor.id])).rows[0];
-      result=projectSportsNotification(row,row.target_kind ? {kind:row.target_kind,owner_id:row.target_owner} : undefined);
-    }
-    else if(action.startsWith('sports.help.')) {
-      const article=await runAsync(sportsHelpPolicy(repo,actor,action,input));
-      if(article) result=action==='sports.help.portal'?portalHelpArticle(article):{id:article.id};
-    }
     else if(action==='sports.admins.state') result=await postgresAdministratorState(repo,actor,input);
     else if(action==='sports.admins.create') result=await postgresAdministratorCreate(repo,actor,input);
     else if(action==='sports.admins.edit') result=await postgresAdministratorEdit(repo,actor,input);
