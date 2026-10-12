@@ -334,9 +334,6 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
             <span>
               本地账号与业务数据由后端保存。开发验证码使用本地收件箱，不代表真实邮箱或学校身份核验。
             </span>
-            <Link to="/v2">
-              浏览旧版演示 <ArrowRight size={14} />
-            </Link>
           </div>
         </section>
       </main>
