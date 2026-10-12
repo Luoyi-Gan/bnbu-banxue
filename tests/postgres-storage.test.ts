@@ -1,3 +1,4 @@
+import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
 import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
@@ -264,6 +265,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const auth=new PostgresAuth(db),teacher=await auth.login('sports-reader-other@example.test','Sports-read-123'),other=await auth.login('sports-reader-teacher@example.test','Sports-read-123');
     const proof=await sharp({create:{width:4,height:4,channels:3,background:'#102030'}}).png().toBuffer(),proofHash=createHash('sha256').update(proof).digest('hex');
     const record=await db.transaction(async client=>{const repo=new PostgresRepository(client);const semester=await repo.create('sportsSemester',null,{status:'DRAFT'});const course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,threshold:30,weeklyLimit:3,relatedTarget:600,otherTarget:600});const session=await repo.create('sportsSession','sports-reader-student',{clock:{...startClock(Date.now()-1800000),state:'ENDED',endedAt:Date.now(),activeMilliseconds:1800000}});const r=await repo.create('sportsRecord','sports-reader-student',{courseId:course.id,semesterId:semester.id,sessionId:session.id,status:'TEACHER_PENDING',category:'RELATED',activeMilliseconds:1800000});const batch=await repo.create('sportsMaterialBatch',r.ownerId,{recordId:r.id,status:'COMPLETE'});await client.query('INSERT INTO sports_media_blobs(sha256,bytes,created_at) VALUES($1,$2,$3)',[proofHash,proof,new Date().toISOString()]);await repo.create('sportsMaterial',r.ownerId,{recordId:r.id,batchId:batch.id,status:'COMPLETE',mime:'image/png',sha256:proofHash});return repo.save(r,{batchId:batch.id});});
+    const member=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-student',{courseId:record.data.courseId,status:'ACTIVE'}));
+    const student=await auth.login('sports-reader-student@example.test','Sports-read-123');
+    expect((await postgresStudentProgress(db,student.token,{},String(record.data.courseId))).data).toMatchObject({courseTargetSeconds:36000,generalTargetSeconds:36000});
+    await expect(postgresStudentProgress(db,student.token,{},'foreign-course')).rejects.toMatchObject({status:404});
     const input={id:record.id,version:record.version,batchId:record.data.batchId,checksCompleted:true,decision:'PASS'},key=randomUUID();
     await expect(executePostgres(db,other.token,'sports.review.decide',input,randomUUID())).rejects.toMatchObject({status:403});
     const material=await db.transaction(async client=>(await new PostgresRepository(client).all('sportsMaterial')).find(m=>m.data.recordId===record.id)!);
@@ -274,6 +279,8 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const locked=await postgresSportsWorkspace(db,other.token);expect(locked).toMatchObject({firstLoginOnly:true});expect('records' in locked).toBe(false);
     const result=await executePostgres(db,teacher.token,'sports.review.decide',input,key);expect(result.id).toBe(record.id);
     expect(await executePostgres(db,teacher.token,'sports.review.decide',input,key)).toEqual(result);
+    const progressPage=await postgresStudentProgress(db,student.token,{enrollmentId:member.id});
+    expect(progressPage.data).toEqual([expect.objectContaining({enrollmentId:member.id,courseRelated:{effectiveSeconds:1800,targetSeconds:36000},general:{effectiveSeconds:0,targetSeconds:36000},status:'IN_PROGRESS'})]);
     await db.transaction(async client=>{const repo=new PostgresRepository(client);expect((await repo.get(record.id)).data.status).toBe('VALID');const progress=(await repo.all('sportsProgress')).find(p=>p.data.courseId===record.data.courseId)!;expect((progress.data.details as {recordId:string;actual:number}[]).find(d=>d.recordId===record.id)?.actual).toBe(30);await client.query('DELETE FROM notifications WHERE entity_id=$1',[record.id]);});
   });
   it('governs technical AI retries and limited manual review without changing teaching decisions', async()=>{

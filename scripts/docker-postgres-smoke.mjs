@@ -183,6 +183,9 @@ try {
   await request('/api/commands',{action:'sports.review.decide',input:{id:reviewRecord.id,version:reviewRecord.version,batchId:reviewRecord.data.batchId,checksCompleted:true,decision:'PASS'},requestId:randomUUID()});
   cookie=studentCookie;const reviewed=(await request('/api/v1/exercise-records/'+finalDraft.id)).data;
   assert.equal(reviewed.status,'REVIEWED');assert.equal(reviewed.currentReview.result,'VALID');assert.equal(reviewed.creditedDurationSeconds,0,'Short fixture must not receive unearned credit');
+  const studentProgress=(await request('/api/v1/student-progress?limit=100')).data.find(p=>p.enrollmentId===enrollmentId);
+  assert.ok(studentProgress);assert.equal(studentProgress.general.effectiveSeconds,0);
+  assert.equal((await request('/api/v1/class-sections/'+courseId+'/progress-target')).data.totalTargetSeconds,72000);
   await request('/api/auth/sign-in',{identifier:adminLogin,password});
   const manual=(await request('/api/sports/workspace')).manualModes.find(m=>m.id===mode.id);
   await request('/api/commands',{action:'sports.ai.stop',input:{id:manual.id,version:manual.version,reason:'Docker fixture complete'},requestId:randomUUID()});
