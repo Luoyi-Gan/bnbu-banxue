@@ -1719,3 +1719,7 @@ GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需�
 ### PostgreSQL 补证正式提交接线
 
 新增 POST exercise-records/:id/supplements，复用抽出的 supplementFiles 校验，沿用版本、本人、补证期限和维护门禁，核对已绑定媒体与真实对象摘要。新批次、材料关联、教师审核轮次和通知在现有命令事务内形成；学生公开ID保持原草稿ID，列表读取第二版材料序号。71项针对性测试通过，完整回归70文件454测试通过（含真实PostgreSQL），类型及lint通过。新接口Docker完整补证操作仍待扩展验证，本轮未重建镜像。UI未改。
+
+### Docker 补证完整接口链验证
+
+重建 API 并健康启动，扩展真实HTTP冒烟：教师退回一次24小时补证，学生读取待补证状态和原材料版本，上传并确认绑定新增PNG，原材料加新增材料正式提交，教师读取第二版两份原件并逐字节核对，审核通过，学生读回VALID且短运动仍为零计入。首轮脚本原因代码错误被400拒绝，改用现有UNCLEAR后整链通过。保留原版本并验证刷新后的materialVersion=2；UI未改。该证据为本地Docker接口验证，不代表真实AI或云端服务已验收。

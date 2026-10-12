@@ -177,9 +177,27 @@ try {
   await request('/api/auth/sign-in',{identifier:adminLogin,password});
   const mode=(await request('/api/commands',{action:'sports.ai.manual',input:{courseId,endAt:new Date(Date.now()+3600000).toISOString(),reason:'Docker manual review fixture'},requestId:randomUUID()})).data;
   await request('/api/auth/sign-in',{identifier:teacherEmail,password});
-  const teacherWorkspace=await request('/api/sports/workspace'),reviewRecord=teacherWorkspace.records.find(r=>r.data.sourceDraftId===finalDraft.id);
+  const teacherWorkspace=await request('/api/sports/workspace');let reviewRecord=teacherWorkspace.records.find(r=>r.data.sourceDraftId===finalDraft.id);
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
+  const teacherCookie=cookie;
+  await request('/api/commands',{action:'sports.review.decide',input:{id:reviewRecord.id,version:reviewRecord.version,batchId:reviewRecord.data.batchId,checksCompleted:true,decision:'RETURN',reason:'UNCLEAR',publicExplanation:'Docker supplementary evidence',hours:24,canSupplementOriginal:true},requestId:randomUUID()});
+  cookie=studentCookie;
+  const workflow=(await request('/api/v1/exercise-records/'+finalDraft.id+'/workflow')).data;
+  assert.equal(workflow.stage,'AWAITING_SUPPLEMENT');assert.equal(workflow.supplement.expired,false);
+  assert.ok(workflow.materials.some(m=>m.mediaId===lease.mediaId && m.materialVersion===1));
+  const extraBytes=await sharp({create:{width:4,height:4,channels:3,background:'#654321'}}).png().toBuffer(),extraHash=createHash('sha256').update(extraBytes).digest('hex');
+  const extra=await sessionWrite('/api/v1/media-uploads',{sessionId:session.id,businessPurpose:'EXERCISE_RECORD',mediaType:'IMAGE',mimeType:'image/png',fileSizeBytes:extraBytes.length,captureSource:'FILE_PICKER',declaredContentSha256:extraHash,durationSeconds:null});
+  const extraPut=await fetch(base+extra.uploadUrl,{method:'PUT',headers:{Cookie:cookie,Origin:base,...extra.requiredHeaders},body:extraBytes});assert.equal(extraPut.status,200,await extraPut.text());
+  const extraConfirmed=await sessionWrite('/api/v1/media-uploads/'+extra.uploadSessionId+'/confirm',{etag:extraHash});
+  await sessionWrite('/api/v1/media/'+extra.mediaId+'/bind',{sessionId:session.id,expectedVersion:extraConfirmed.version});
+  const supplemented=await sessionWrite('/api/v1/exercise-records/'+finalDraft.id+'/supplements',{mediaIds:[lease.mediaId,extra.mediaId],expectedVersion:workflow.version});
+  assert.equal(supplemented.workflowStage,'PENDING_TEACHER');assert.equal(supplemented.materialVersion,2);
+  assert.equal((await request('/api/v1/exercise-records/'+finalDraft.id)).data.materialVersion,2);
+  cookie=teacherCookie;
+  const afterSupplement=await request('/api/sports/workspace');reviewRecord=afterSupplement.records.find(r=>r.id===reviewRecord.id);
+  const secondMaterials=afterSupplement.materials.filter(m=>m.data.batchId===reviewRecord.data.batchId);assert.equal(secondMaterials.length,2);
+  for(const m of secondMaterials) {const response=await fetch(base+'/api/sports/materials/'+m.id,{headers:{Cookie:cookie}});assert.equal(response.status,200);assert.deepEqual(Buffer.from(await response.arrayBuffer()),m.data.mediaId===lease.mediaId?bytes:extraBytes);}
   await request('/api/commands',{action:'sports.review.decide',input:{id:reviewRecord.id,version:reviewRecord.version,batchId:reviewRecord.data.batchId,checksCompleted:true,decision:'PASS'},requestId:randomUUID()});
   cookie=studentCookie;const reviewed=(await request('/api/v1/exercise-records/'+finalDraft.id)).data;
   assert.equal(reviewed.status,'REVIEWED');assert.equal(reviewed.currentReview.result,'VALID');assert.equal(reviewed.creditedDurationSeconds,0,'Short fixture must not receive unearned credit');
@@ -200,3 +218,4 @@ try {
 await request('/api/auth/logout',{});
 assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
 console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence, sports help, exercise upload and submission, technical handling, administrator manual mode, teacher review, student result, logout.');
+
