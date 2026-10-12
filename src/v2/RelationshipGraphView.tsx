@@ -1,5 +1,5 @@
 import type { Workspace } from '../live/api'
-import { liveRelationships } from './liveRelationships'
+import { liveRelationships, liveRelationshipChanges } from './liveRelationships'
 import { ArrowRight, CalendarDays, Maximize, Minus, Network, Plus, RotateCcw, Search, UsersRound, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { Link } from 'react-router-dom'
@@ -28,7 +28,7 @@ export function V2RelationshipGraph({ state, workspace }: { state: V2State; work
   const selectedNode = graph.nodes.find(n => n.id === selectedId)
   const selected = entities.find(e => e.id === selectedNode?.entityId)
   const effectiveId = selectedNode ? selectedId : 'self'
-  const selectedChanges = !demo && selected ? (workspace !== undefined ? workspace?.relationshipHistory?.find(h => h.entity.id === selected.id)?.changes ?? [] : state.relationshipHistory?.[selected.id]?.changes ?? []) : []
+  const selectedChanges = !demo && selected ? (workspace !== undefined ? liveRelationshipChanges(workspace, selected.id) : state.relationshipHistory?.[selected.id]?.changes ?? []) : []
 
   useEffect(() => {
     let disposed = false

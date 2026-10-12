@@ -41,3 +41,19 @@ export function liveRelationships(data: Workspace | null): RelationshipEntity[] 
     return item
   })
 }
+
+export function liveRelationshipChanges(data: Workspace | null, id: string) {
+  if (!data) return []
+  const recorded = data.relationshipHistory?.find(h => h.entity.id === id)
+  if (recorded) return recorded.changes
+  if (id.startsWith('coffee:alumni:')) {
+    const bookingId = id.slice('coffee:alumni:'.length)
+    return data.alumni.history.filter(h => h.objectId === bookingId).slice().sort((a,b)=>a.at.localeCompare(b.at)).map(h=>({at:h.at,status:h.action,active:h.action==='校友交流预约已确认'}))
+  }
+  if (id.startsWith('coffee:')) {
+    const booking = data.entities.find(e => e.kind === 'coffeeBooking' && e.id === id.slice('coffee:'.length) && e.ownerId === data.account.id)
+    if (!Array.isArray(booking?.data.history)) return []
+    return booking.data.history.map((h: {action:string;at:string;accepted?:boolean})=>({at:h.at,status:h.action==='coffee.book' ? '预约已确认' : h.action==='coffee.move' ? '老师提出改期，等待回应' : h.action==='coffee.cancel' ? '预约已取消' : h.accepted===true ? '已接受改期' : h.accepted===false ? '已拒绝改期，保留原预约' : '已回应改期',active:h.action!=='coffee.cancel'}))
+  }
+  return []
+}

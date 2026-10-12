@@ -1,5 +1,5 @@
 import {expect, it} from 'vitest'
-import {liveRelationships} from '../src/v2/liveRelationships'
+import {liveRelationships, liveRelationshipChanges} from '../src/v2/liveRelationships'
 import type {Workspace} from '../src/live/api'
 it('仅关联本人对象，关闭队伍不展开成员，不将收藏视为参与', () => {
   const data = {account:{id:'me'}, people:[{id:'other',name:'同学'}], relations:[{entityId:'saved',kind:'save'},{entityId:'marked',kind:'participate'}], alumni:{profiles:[],slots:[],bookings:[]}, entities:[
@@ -21,4 +21,12 @@ it('认证撤销导致待确认申请取消时，不将其当作曾成立的关�
   expect(liveRelationships(data)).toEqual([])
   data.alumni.history.push({id:'confirmation',objectId:'booking',actor:'other',action:'校友交流预约已确认',reason:'',at:'2026-10-01T10:00:00Z'})
   expect(liveRelationships(data)[0]).toMatchObject({active:false,establishedAt:'2026-10-01T10:00:00Z'})
+})
+
+it('预约回应只按已保存结果显示，旧记录不猜测接受或拒绝', () => {
+  const data = {account:{id:'me'},entities:[{id:'booking',kind:'coffeeBooking',ownerId:'me',data:{history:[{action:'coffee.book',at:'1'},{action:'coffee.answer',at:'2'},{action:'coffee.answer',at:'3',accepted:false},{action:'coffee.cancel',at:'4'}]}}]} as unknown as Workspace
+  expect(liveRelationshipChanges(data,'coffee:booking').map(h=>h.status)).toEqual(['预约已确认','已回应改期','已拒绝改期，保留原预约','预约已取消'])
+  expect(liveRelationshipChanges(data,'coffee:booking').at(-1)?.active).toBe(false)
+  data.account.id='other'
+  expect(liveRelationshipChanges(data,'coffee:booking')).toEqual([])
 })
