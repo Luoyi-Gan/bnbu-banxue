@@ -1463,3 +1463,7 @@ GET /api/students/search?number=完整学号 仅当前学生可读，匹配 PERS
 ### PostgreSQL 通知已读、群发与阅读率
 提取 notificationPolicy，两套数据库共用通知归属验证、批量预检和群发权限规则，仓储新增 ownsNotification/readNotification。PostgreSQL 命令保留批量 ids 和群发 recipients 返回字段，通知、审计、幂等回执同事务保存。
 47 项针对测试通过（PostgreSQL 15、原 HTTP 和并发 32）；修改文件 lint 与服务端类型检查通过。新增真实 PostgreSQL 场景覆盖重复收件人去重、请求重试不重发、混入他人通知时整批拒绝且本人仍未读、个人通知隔离、学生不能群发，以及 2 人收件 1 人已读时阅读率 0.5。该变更未删除通知或改变提醒开关规则，前端页面保持原样。
+
+### PostgreSQL 资料、认证和治理命令
+governanceCommand 提取为两数据库共用 governancePolicy，PostgreSQL 接入认证/社团、知识问答、反馈处理、资料、提醒/搜索/预览设置、课表保存修正及账号治理策略；账号更新通过仓储执行，不直接依赖 SQLite。原权限和唯一有效超级管理员约束保留，未新增 UI 入口。
+原 HTTP、课表与 PostgreSQL 33 项针对回归通过；补充 PostgreSQL 认证审批/撤销、学生越权拒绝、设置合并不覆盖其他字段、关闭提醒通知仍保留的测试后，PostgreSQL 16 项通过。服务端类型检查及修改文件 lint 通过。问答、课表及账号治理虽共用规则接线，仍需进一步真实 PostgreSQL 业务案例覆盖；不把接线等同全流程验收。

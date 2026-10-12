@@ -9,6 +9,9 @@ const decode = (row: EntityRow): Entity => ({ id: row.id, kind: row.kind, ownerI
 /** Construct inside PostgresDatabase.transaction; every operation shares its client. */
 export class PostgresRepository {
   constructor(readonly client: PoolClient) {}
+  async updateAccount(id: string, status: Account['status'], roles: string[]) {
+    await this.client.query('UPDATE accounts SET status=$1,roles=$2 WHERE id=$3',[status,JSON.stringify([...new Set(roles)]),id]);
+  }
   async ownsNotification(id: string, recipientId: string) {
     return (await this.client.query('SELECT 1 FROM notifications WHERE id=$1 AND recipient_id=$2',[id,recipientId])).rows.length>0;
   }

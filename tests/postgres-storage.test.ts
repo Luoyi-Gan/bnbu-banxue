@@ -327,4 +327,23 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await postgresWorkspace(db,a)).notifications.some(row=>row.id===other)).toBe(false);
     await expect(executePostgres(db,a,'notification.send',input,randomUUID())).rejects.toMatchObject({status:403});
   });
+  it('shares certification review and persists independent preference fields without deleting notifications', async () => {
+    const auth=new PostgresAuth(db);
+    const student=(await auth.login('coffee-a@example.test','Coffee-test-123')).token;
+    const reviewer=(await auth.login('review-pg@example.test','Review-postgres-123')).token;
+    const command=(token:string,action:string,input:Record<string,unknown>)=>executePostgres(db,token,action,input,randomUUID());
+    const certification=await command(student,'certification.apply',{kind:'club',organization:'测试社团',note:'测试材料'});
+    await expect(command(student,'certification.review',{id:certification.id,approve:true})).rejects.toMatchObject({status:403});
+    await command(reviewer,'certification.review',{id:certification.id,approve:true});
+    await command(student,'preferences.searchable',{enabled:false});
+    await command(student,'preferences.preview',{enabled:false});
+    await command(student,'preferences.reminders',{key:'messages',enabled:false});
+    const view=await postgresWorkspace(db,student);
+    expect(view.entities.find(e=>e.id===certification.id)?.data.status).toBe('approved');
+    expect(view.entities.find(e=>e.kind==='preferences')?.data).toMatchObject({searchable:false,profilePreview:false,messages:false});
+    expect(view.notifications.some(n=>n.entityId===certification.id)).toBe(true);
+    await expect(command(reviewer,'certification.review',{id:certification.id,approve:false})).rejects.toMatchObject({status:400});
+    await command(reviewer,'certification.review',{id:certification.id,approve:false,reason:'撤销测试'});
+    expect((await postgresWorkspace(db,student)).entities.find(e=>e.id===certification.id)?.data.status).toBe('rejected');
+  });
 });

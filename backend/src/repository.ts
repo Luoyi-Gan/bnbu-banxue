@@ -75,6 +75,9 @@ export function enumField<T extends string>(
 }
 export class Repository {
   constructor(public db: Database) {}
+  updateAccount(id: string, status: Account['status'], roles: string[]) {
+    this.db.prepare('UPDATE accounts SET status=?,roles=? WHERE id=?').run(status,JSON.stringify([...new Set(roles)]),id);
+  }
   ownsNotification(id: string, recipientId: string) {
     return !!this.db.prepare('SELECT 1 FROM notifications WHERE id=? AND recipient_id=?').get(id,recipientId);
   }
