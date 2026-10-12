@@ -52,4 +52,13 @@ CREATE TABLE member_join_capabilities (
  issue_key TEXT NOT NULL,profile_hash TEXT NOT NULL,expires_at BIGINT NOT NULL,
  consume_key TEXT,result TEXT,UNIQUE(account_id,session_hash,issue_key)
 );
-`},{version:6,sql:`ALTER TABLE member_join_capabilities ADD COLUMN source_hash TEXT NOT NULL DEFAULT '';`}];
+`},{version:6,sql:`ALTER TABLE member_join_capabilities ADD COLUMN source_hash TEXT NOT NULL DEFAULT '';`},{version:7,sql:`
+CREATE TABLE student_login_challenges (
+ id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),email TEXT NOT NULL,
+ request_id TEXT NOT NULL,request_hash TEXT NOT NULL,code_hash TEXT,session_secret TEXT NOT NULL,
+ sent_at BIGINT NOT NULL,expires_at BIGINT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,
+ verified_at BIGINT,verify_key TEXT,verify_hash TEXT,mail_id TEXT NOT NULL,
+ UNIQUE(account_id,request_id)
+);
+CREATE INDEX student_login_challenge_account ON student_login_challenges(account_id,sent_at);
+`}];

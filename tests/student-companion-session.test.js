@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { clearApiSession, currentApiUserId, hasApiSession, joinWithInvite, logoutApi, request, restoreCompanionSession } from '../public/student/js/api.js';
+import { clearApiSession, currentApiUserId, hasApiSession, joinWithInvite, logoutApi, request, restoreCompanionSession, verifyStudentSignInCode } from '../public/student/js/api.js';
 
 beforeEach(() => {
   clearApiSession();
@@ -47,6 +47,15 @@ it('keeps the existing cookie session after a successful member join',async()=>{
   expect(fetcher.mock.calls.at(-1)[1].headers['X-Join-Capability']).toBe('one-time');
   expect(fetcher.mock.calls.at(-1)[1].headers['Content-Type']).toBe('application/json');
   expect(fetcher.mock.calls.at(-1)[1].body).toBe('{}');
+});
+it('restores server identity after email-code login without storing a fake bearer token',async()=>{
+  const fetcher=vi.fn().mockImplementationOnce(async()=>new Response(JSON.stringify({data:{kind:'COMPANION',user:{id:'student-one'}}}),{status:200}))
+    .mockImplementationOnce(async()=>new Response(JSON.stringify(identity),{status:200}));
+  vi.stubGlobal('fetch',fetcher);
+  await verifyStudentSignInCode('challenge','123456');
+  expect(currentApiUserId()).toBe('student-one');
+  expect(fetcher.mock.calls.at(-1)[0]).toContain('/me');
+  expect(fetcher.mock.calls.at(-1)[1].headers.Authorization).toBeUndefined();
 });
 it('rejects nonstudents and ignores a restore response that arrives after logout', async () => {
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({data:{user:{role:'TEACHER'}}}),{status:200})));

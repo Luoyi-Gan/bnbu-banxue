@@ -44,6 +44,7 @@ import { postgresSportsCourses } from '../backend/src/storage/postgres-sports-co
 import { postgresSportsHelp } from '../backend/src/storage/postgres-sports-help';
 import { postgresSportsMe } from '../backend/src/storage/postgres-sports-me';
 import { issueMemberJoin, consumeMemberJoin } from '../backend/src/storage/postgres-member-join';
+import {requestStudentLogin,verifyStudentLogin} from '../backend/src/storage/postgres-student-login';
 import { postgresStudentCourses } from '../backend/src/storage/postgres-student-courses';
 import { postgresSportsNotifications } from '../backend/src/storage/postgres-sports-notifications';
 import { startClock } from '../backend/src/sports/session-clock';
@@ -214,6 +215,33 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       await db.pool.query("DELETE FROM entities WHERE data::jsonb->>'invitationId'=$1 OR id=ANY($2::text[])",[fixtures.invite.id,[fixtures.invite.id,fixtures.course.id,fixtures.semester.id]]);
       await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(fixtures.identity.id),{...fixtures.identity.data,schoolEmailVerified:false});});
     }
+  });
+  it('logs in an existing verified student by purpose-bound code without reviving a logged-out session',async()=>{
+    const id=randomUUID(),email='y123456789@bnbu.edu.cn';
+    await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES($1,$2,$3,$4,$5,$6)',[id,email,hashPassword('Unused-test-123'),'验证码学生','["student"]','now']);
+    const input={organizationCode:'BNBU',account:email,channel:'EMAIL',locale:'zh-CN'},key=randomUUID();
+    await expect(requestStudentLogin(db,input,key,true)).rejects.toMatchObject({status:403});
+    await db.transaction(client=>new PostgresRepository(client).create('sportsIdentity',id,{role:'student',status:'verified',schoolEmail:email,schoolEmailVerified:true}));
+    const issued=await requestStudentLogin(db,input,key,true);
+    expect(await requestStudentLogin(db,input,key,true)).toEqual(issued);
+    await expect(requestStudentLogin(db,input,randomUUID(),true)).rejects.toMatchObject({status:429});
+    const code=/\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1',[email])).rows[0].body)![0];
+    for(let n=0;n<4;n++)await expect(verifyStudentLogin(db,{challengeId:issued.challengeId,code:'000000'},randomUUID())).rejects.toMatchObject({status:400});
+    const verifyKey=randomUUID(),verification={challengeId:issued.challengeId,code,deviceId:'test'};
+    const result=await verifyStudentLogin(db,verification,verifyKey);
+    expect((await new PostgresAuth(db).authenticate(result.token)).id).toBe(id);
+    expect(await verifyStudentLogin(db,verification,verifyKey)).toEqual(result);
+    await expect(verifyStudentLogin(db,verification,randomUUID())).rejects.toMatchObject({status:409});
+    expect((await db.pool.query('SELECT code_hash FROM student_login_challenges WHERE id=$1',[issued.challengeId])).rows[0].code_hash).toBeNull();
+    expect((await db.pool.query('SELECT 1 FROM mail_outbox WHERE recipient=$1',[email])).rows).toHaveLength(0);
+    await new PostgresAuth(db).logout(result.token);
+    await expect(verifyStudentLogin(db,verification,verifyKey)).rejects.toMatchObject({status:401});
+    await db.pool.query('UPDATE student_login_challenges SET sent_at=0 WHERE id=$1',[issued.challengeId]);
+    const locked=await requestStudentLogin(db,input,randomUUID(),true);
+    for(let n=0;n<6;n++)await expect(verifyStudentLogin(db,{challengeId:locked.challengeId,code:'000000'},randomUUID())).rejects.toMatchObject({status:400});
+    expect((await db.pool.query('SELECT attempts FROM student_login_challenges WHERE id=$1',[locked.challengeId])).rows[0].attempts).toBe(5);
+    await db.pool.query('DELETE FROM mail_outbox WHERE recipient=$1',[email]);
+    await db.pool.query("UPDATE accounts SET email='login-done@example.test' WHERE id=$1",[id]);
   });
   it('stores sports language without enabling delivery or overwriting companion privacy settings', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

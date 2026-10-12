@@ -1841,7 +1841,13 @@ export async function verifyStudentSignInCode(challengeId, code) {
     method: "POST", auth: false, idempotent: true,
     body: { challengeId, code, deviceId: stableDeviceId() },
   });
-  storeAuthSession(authSession);
+  if(authSession?.kind==='COMPANION') {
+    clearApiSession();
+    if(!await restoreCompanionSession() || currentApiUserId()!==authSession.user?.id) {
+      clearApiSession();
+      throw new Error('AUTH_SESSION_CHANGED');
+    }
+  } else storeAuthSession(authSession);
   return authSession;
 }
 
