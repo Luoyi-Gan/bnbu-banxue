@@ -1695,3 +1695,7 @@ GET /api/sports/workspace 已在 PostgreSQL 接通现有 SportsDashboard 必需�
 ### 学生已确认进度与分类目标
 
 接通 GET student-progress 和 class-sections/:id/progress-target，按本人成员关系返回最新已保存 sportsProgress 分类计入秒数、分类目标和完成状态；无已确认投影不伪造进度行，目标缺失明确拒绝。支持进度分页及 enrollmentId 筛选。52 项 PostgreSQL／计入测试通过，验证教师审核后 30 分钟映射 1800 秒及非本人课程目标拒绝。类型和 lint 通过。Docker 重建后，三端审核链路读回本人进度、0 秒短运动及课程 72000 秒总目标，冒烟通过。未改 UI；学生端其他必需模块和所有管理流程仍未完全接通。
+
+### 学生课程 V8.1 规则协议
+
+提取原教师 publishedCourseRules 共用投影，PostgreSQL class-sections/:id/v81-rules 按既有课程读取范围供学生和责任教师使用。包含最低分钟、单次上限、每周／每天名额、分类目标和三个截止时点；发布时间读取课程事实或真实发布审计，缺失明确 409，不填演示默认。50 项 PostgreSQL／体育协议测试通过，覆盖缺发布记录拒绝、真实字段读回和非本人课程拒绝；类型与 lint 通过。UI 未改，本轮尚未重建 Docker；规则接通不代表课程创建和其余学生模块已完成。

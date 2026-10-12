@@ -226,41 +226,8 @@ export function portalTeacherCourse(
       "SELECT created_at FROM audit WHERE action='sports.course.publish' AND entity_id=? ORDER BY created_at LIMIT 1",
     )
     .get(id);
-  if (kind === "v81-rules") {
-    const publishedAt = course.data.publishedAt ?? published?.created_at;
-    demand(
-      typeof publishedAt === "string",
-      "课程发布事实尚不完整，须先核对历史数据。",
-      409,
-    );
-    const at = (field: string, time: string) => {
-      const value = Date.parse(`${course.data[field]}T${time}+08:00`);
-      demand(
-        Number.isFinite(value),
-        "课程日期事实尚不完整，须先核对历史数据。",
-        409,
-      );
-      return new Date(value).toISOString();
-    };
-    return {
-      version: course.data.rulesVersion ?? 1,
-      template_id: course.data.templateId,
-      description: course.data.description,
-      published_at: publishedAt,
-      minimum_minutes: course.data.threshold,
-      maximum_minutes: 60,
-      global_target_minutes: 1200,
-      global_target_version: 1,
-      allocation_pending: false,
-      weekly_limit: course.data.weeklyLimit,
-      daily_limit: 1,
-      course_target: course.data.relatedTarget,
-      general_target: course.data.otherTarget,
-      regular_deadline: at("deadlineDate", "23:59:59"),
-      closing_deadline: at("closingDate", "23:59:59"),
-      settlement_planned_at: at("settlementDate", "00:00:00"),
-    };
-  }
+  if (kind === "v81-rules") return publishedCourseRules(course,published?.created_at);
+
   return {
     id: course.id,
     classSectionId: course.id,
@@ -298,4 +265,42 @@ export function portalTeacherSemesters(
       .map(semesterRow),
     input,
   );
+}
+
+export function publishedCourseRules(course: Entity,publicationTime?:unknown) {
+
+    const publishedAt = course.data.publishedAt ?? publicationTime;
+    demand(
+      typeof publishedAt === "string",
+      "课程发布事实尚不完整，须先核对历史数据。",
+      409,
+    );
+    const at = (field: string, time: string) => {
+      const value = Date.parse(`${course.data[field]}T${time}+08:00`);
+      demand(
+        Number.isFinite(value),
+        "课程日期事实尚不完整，须先核对历史数据。",
+        409,
+      );
+      return new Date(value).toISOString();
+    };
+    return {
+      version: course.data.rulesVersion ?? 1,
+      template_id: course.data.templateId,
+      description: course.data.description,
+      published_at: publishedAt,
+      minimum_minutes: course.data.threshold,
+      maximum_minutes: 60,
+      global_target_minutes: 1200,
+      global_target_version: 1,
+      allocation_pending: false,
+      weekly_limit: course.data.weeklyLimit,
+      daily_limit: 1,
+      course_target: course.data.relatedTarget,
+      general_target: course.data.otherTarget,
+      regular_deadline: at("deadlineDate", "23:59:59"),
+      closing_deadline: at("closingDate", "23:59:59"),
+      settlement_planned_at: at("settlementDate", "00:00:00"),
+    };
+  
 }

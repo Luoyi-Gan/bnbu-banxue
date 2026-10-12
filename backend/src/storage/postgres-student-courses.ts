@@ -2,7 +2,7 @@ import { demand } from '../auth';
 import type { Fields } from '../repository';
 import { sportsRole } from '../sports/courses';
 import { sportsAvailable } from '../sports/materials';
-import { catalog, page, section, semesterRow } from '../sports/portal-courses';
+import { catalog, page, section, semesterRow, publishedCourseRules } from '../sports/portal-courses';
 import { PostgresAuth } from './postgres-auth';
 import type { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
@@ -63,6 +63,14 @@ export async function postgresStudentCourses(db:PostgresDatabase,token:string,pa
       const semester=semesters.find(s=>s.id===id && (!kind || s.kind===kind));
       demand(semester,'课程学期不存在。',404);return semester;
     }},course);
+    const rules=/^\/api\/v1\/class-sections\/([^/]+)\/v81-rules$/.exec(path);
+    if(rules) {
+      demand(Object.keys(input).length===0,'规则查询参数无效。');
+      const course=courses.find(c=>c.id===decodeURIComponent(rules[1]));demand(course,'课程不存在或无权读取。',404);
+      demand(course.data.status!=='DRAFT','课程规则尚未发布。',404);
+      const published=(await client.query<{created_at:string}>("SELECT created_at FROM audit WHERE action='sports.course.publish' AND entity_id=$1 ORDER BY created_at LIMIT 1",[course.id])).rows[0];
+      return {data:publishedCourseRules(course,published?.created_at)};
+    }
     const detail=/^\/api\/v1\/(courses|class-sections)\/([^/]+)$/.exec(path);
     if(detail) {
       const course=courses.find(c=>c.id===detail[2]);
