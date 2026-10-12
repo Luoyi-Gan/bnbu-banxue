@@ -156,6 +156,37 @@ it("邮件来源去重、人工修正保留及内部原文隔离", () => {
   expect(repo.get(second.id)).toEqual(beforeMails.find(e => e.id === second.id));
 });
 
+it("无海报邮件用默认封面，修改时间地点通知参与或收藏者且去重", () => {
+  const { db, a, b, admin, run } = fixture();
+  const repo = new Repository(db);
+  const mail = run(admin, "mail.import", {
+    messageId: "coverless", subject: "校园活动", sender: "school@example.test",
+    body: "活动名称：公开讲座\n活动介绍：介绍\n活动开始时间：2027-01-01 10:00\n活动结束时间：2027-01-01 11:00\n活动地点：图书馆\n主办方：学院",
+  });
+  const event = repo.all("activity")[0];
+  expect(event.data).toMatchObject({status: "published", image: "/activity-default-cover.svg"});
+  expect((repo.get(mail.id).data.record as {source: object}).source).not.toHaveProperty("cover");
+  run(a, "relation.set", {id: event.id, kind: "save", enabled: true});
+  run(a, "relation.set", {id: event.id, kind: "participate", enabled: true});
+  run(b, "relation.set", {id: event.id, kind: "like", enabled: true});
+  const correction = {id: mail.id, title: "公开讲座", description: "核实说明",
+    startAt: "2027-01-01T10:00:00+08:00", endAt: "2027-01-01T11:00:00+08:00",
+    location: "T2", host: "学院", conditions: "", reason: "地点调整"};
+  run(admin, "mail.correct", correction);
+  const notices = () => db.prepare("SELECT recipient_id FROM notifications WHERE event='activity.changed'").all();
+  expect(notices()).toEqual([{recipient_id: a.account.id}]);
+  run(admin, "mail.correct", {...correction, description: "仅更新介绍"});
+  expect(notices()).toHaveLength(1);
+  run(a, "relation.set", {id: event.id, kind: "save", enabled: false});
+  run(a, "relation.set", {id: event.id, kind: "participate", enabled: false});
+  run(b, "relation.set", {id: event.id, kind: "save", enabled: true});
+  run(admin, "mail.correct", {...correction, endAt: "2027-01-01T12:00:00+08:00"});
+  expect(notices()).toEqual([{recipient_id: a.account.id}, {recipient_id: b.account.id}]);
+  run(admin, "mail.cover", {id: mail.id, cover: "data:image/png;base64,aGVsbG8=", coverName: "poster.png", reason: "补充海报"});
+  expect(repo.get(event.id).data.image).toBe("data:image/png;base64,aGVsbG8=");
+  expect(notices()).toHaveLength(2);
+});
+
 it("无效课表不能覆盖本人数据，也不能被其他账号读取", () => {
   const { db, a, b, run } = fixture();
   run(a, "timetable.save", {

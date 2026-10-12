@@ -737,6 +737,7 @@ export function ConnectedApp() {
               </div>
               {cards(all("activity"), (entity) => (
                 <>
+                  {typeof entity.data.image === "string" && <img src={entity.data.image} alt="活动封面" style={{ width: "100%", maxHeight: 240, objectFit: "cover" }} />}
                   {title(entity)}
                   <p>{read(entity, "description")}</p>
                   <p>

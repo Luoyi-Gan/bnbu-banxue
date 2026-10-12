@@ -117,15 +117,6 @@ export function activityCommand(
         )!;
     }
     next = importActivityMail(state, source);
-    // Coverless automatic publication has not been authorized in BUSINESS_RULES.
-    if (!source.cover && next.mailActivities?.[0]?.status === "published") {
-      const record = next.mailActivities[0];
-      record.status = "pending";
-      record.extraction.issues.push("缺少封面，自动发布策略待确认");
-      record.history[0].action = "待核实";
-      record.history[0].reason = record.extraction.issues.join("；");
-      next.localEvents = [];
-    }
   } else {
     const stored = repo.get(input.id, "mail"),
       record = stored.data.record as unknown as MailActivityRecord;
@@ -171,10 +162,6 @@ export function activityCommand(
           ),
         ]),
       ) as unknown as MailActivityFields;
-      demand(
-        record.source.cover,
-        "无封面发布规则待确认；请提供活动相关封面后处理。",
-      );
       next = correctActivityMail(
         state,
         record.id,
@@ -208,8 +195,20 @@ export function activityCommand(
   const projected = next.localEvents.find((e) => e.id === record.eventId);
   if (projected) {
     const old = repo.all("activity").find((e) => e.data.mailId === stored.id);
-    const data = { ...projected, source: "mail", mailId: stored.id };
-    if (old) repo.save(old, data);
+    const data = { ...projected, image: projected.image || "/activity-default-cover.svg", source: "mail", mailId: stored.id };
+    if (old) {
+      repo.save(old, data);
+      if (action === "mail.correct" && old.data.status === "published" &&
+        (Date.parse(String(old.data.startAt)) !== Date.parse(data.startAt) ||
+         Date.parse(String(old.data.endAt)) !== Date.parse(data.endAt!) ||
+         old.data.location !== data.location)) {
+        const recipients = repo.db.prepare(
+          "SELECT DISTINCT account_id FROM relations WHERE entity_id=? AND kind IN ('participate','save')",
+        ).all(old.id).map(row => String(row.account_id));
+        repo.notify(recipients, old.id, "activity.changed",
+          `活动“${data.title}”的时间或地点已更新，请查看最新安排。`);
+      }
+    }
     else repo.create("activity", null, data);
   }
   return stored;
