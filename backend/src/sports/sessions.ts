@@ -1,6 +1,6 @@
 import { effect, runSync, type BusinessRepository } from "../storage/effects";
 import { demand, type Account } from "../auth";
-import { Repository, enumField, type Entity, type Fields } from "../repository";
+import { Repository, enumField, textField, type Entity, type Fields } from "../repository";
 import { beforeEvidence } from "./swimming";
 import { sportsRole, version } from "./courses";
 import {
@@ -122,15 +122,18 @@ export function* sportsSessionPolicy(
       "sports.session.pause",
       "sports.session.resume",
       "sports.session.end",
+      "sports.session.cancel",
     ].includes(action),
     "未知运动会话动作。",
   );
   const session = (yield* effect(repo.get(input.id, "sportsSession")));
   demand(session.ownerId === actor.id, "只能操作本人运动会话。", 403);
   version(session, input);
+  const cancelled=action==='sports.session.cancel';
+  const cancelReason=cancelled ? textField(input,'reason',1000) : null;
   const next = transitionClock(
     session.data.clock as unknown as SportsClock,
-    action.split(".")[2] as "pause" | "resume" | "end",
+    cancelled ? 'end' : action.split(".")[2] as "pause" | "resume" | "end",
     now,
   );
   yield* effect(repo.create("sportsSessionEvent", actor.id, {
@@ -138,8 +141,9 @@ export function* sportsSessionPolicy(
     action: action.split(".")[2],
     at: now,
     clock: next,
+    ...(cancelled ? {reason:cancelReason} : {}),
   }));
-  return yield* effect(repo.save(session, { clock: next }));
+  return yield* effect(repo.save(session, { clock: next,...(cancelled?{cancelledAt:now,cancelReason}:{}) }));
 }
 export function sessionProjection(session: Entity, serverNow: number) {
   const clock = session.data.clock as unknown as SportsClock;

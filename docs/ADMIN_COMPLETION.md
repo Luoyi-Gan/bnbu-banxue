@@ -1639,3 +1639,7 @@ POST /api/v1/exercise-sessions 及 pause/resume/finish 接入共享命令事务�
 ### 运动恢复协议与 Docker 计时流程
 
 直接将后端会话投影传给原学生 restoreServerSession/sessionDurationMs，验证活动会话恢复后持续计时、暂停会话刷新后不增加暂停时长，新增协议测试通过，无前端改动。重建 API 镜像，Docker 冒烟使用隔离学期/课程/成员 fixture 经 HTTP 开始运动、查询活动会话、暂停、继续、结束及读回 COMPLETED，全部通过。仅验证计时流程，未将其视为运动材料提交、审核或学时计入完成；取消与记录/材料主流程仍待接通。
+
+### 运动取消协议与材料限制
+
+接通学生 exercise-sessions/:id/cancel，复用共享会话事务、版本和幂等校验，保留取消原因及事件；读取投影显示 CANCELLED。取消后不能继续计时或提交首批材料，保留历史并释放活动会话。材料校验先检查本人归属，再返回取消状态，避免暴露他人运动状态。PostgreSQL、会话、材料三组共 55 项测试通过，服务端类型检查和本次文件 lint 通过。本轮尚未重建 Docker；材料主流程的 PostgreSQL 协议仍未完成，不能视为体育闭环验收。

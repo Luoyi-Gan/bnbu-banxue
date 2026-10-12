@@ -67,16 +67,16 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
     if(action==='sports.password.change') result=await postgresPassword(client,repo,actor,token,input);
     else if(action.startsWith('sports.exercise.')) {
       const operation=action.split('.')[2];
-      demand(['start','pause','resume','finish'].includes(operation),'未知运动动作。');
-      const allowed=operation==='start'?['enrollmentId','clientObservedAt']:['id','expectedVersion','clientObservedAt'];
+      demand(['start','pause','resume','finish','cancel'].includes(operation),'未知运动动作。');
+      const allowed=operation==='start'?['enrollmentId','clientObservedAt']:operation==='cancel'?['id','expectedVersion','reason']:['id','expectedVersion','clientObservedAt'];
       demand(Object.keys(input).every(k=>allowed.includes(k)),'运动请求参数无效。');
-      demand(typeof input.clientObservedAt==='string' && Number.isFinite(Date.parse(input.clientObservedAt)),'客户端时间格式无效。');
+      if(operation!=='cancel') demand(typeof input.clientObservedAt==='string' && Number.isFinite(Date.parse(input.clientObservedAt)),'客户端时间格式无效。');
       let fields:Fields;
       if(operation==='start') {
         const enrollment=await repo.get(input.enrollmentId,'sportsEnrollment');
         demand(enrollment.ownerId===actor.id && enrollment.data.status==='ACTIVE','须使用本人有效成员关系。',403);
         fields={courseId:enrollment.data.courseId};
-      } else fields={id:input.id,version:input.expectedVersion};
+      } else fields={id:input.id,version:input.expectedVersion,...(operation==='cancel'?{reason:input.reason}:{})};
       const session=await runAsync(sportsSessionPolicy(repo,actor,`sports.session.${operation==='finish'?'end':operation}`,fields));
       demand(session,'运动会话操作失败。',500);
       result=studentSessionProjection(session);

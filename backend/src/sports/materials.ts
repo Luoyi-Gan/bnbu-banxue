@@ -77,6 +77,7 @@ function ownSession(repo: Repository, actor: Account, id: unknown) {
   sportsAvailable(repo);
   const session = repo.get(id, "sportsSession");
   demand(session.ownerId === actor.id, "只能提交本人运动材料。", 403);
+  demand(!session.data.cancelledAt, "已取消的运动不能提交材料。", 409);
   return session;
 }
 export function sportsMaterialCommand(

@@ -82,7 +82,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
-        const exerciseWrite=/^\/api\/v1\/exercise-sessions(?:\/([^/]+)\/(pause|resume|finish))?$/.exec(pathname);
+        const exerciseWrite=/^\/api\/v1\/exercise-sessions(?:\/([^/]+)\/(pause|resume|finish|cancel))?$/.exec(pathname);
         if(exerciseWrite) {
           const key=request.headers['idempotency-key'];
           demand(typeof key==='string','缺少操作幂等标识。');

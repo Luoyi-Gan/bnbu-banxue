@@ -10,7 +10,7 @@ import { PostgresRepository } from './postgres-repository';
 export function studentSessionProjection(session:Entity,now=Date.now()) {
   const clock=session.data.clock as unknown as SportsClock;
   return {id:session.id,studentId:session.ownerId,enrollmentId:session.data.enrollmentId,
-    status:clock.state==='ACTIVE'?'IN_PROGRESS':clock.state==='ENDED'?'COMPLETED':'PAUSED',
+    status:session.data.cancelledAt?'CANCELLED':clock.state==='ACTIVE'?'IN_PROGRESS':clock.state==='ENDED'?'COMPLETED':'PAUSED',
     completedAt:clock.endedAt===null?null:new Date(clock.endedAt).toISOString(),
     startedAt:new Date(clock.startedAt).toISOString(),endedAt:clock.endedAt===null?null:new Date(clock.endedAt).toISOString(),
     actualDurationSeconds:Math.floor(elapsedMilliseconds(clock,now)/1000),version:session.version,

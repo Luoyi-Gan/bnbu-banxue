@@ -182,6 +182,19 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const events=await db.transaction(client=>new PostgresRepository(client).all('sportsSessionEvent'));
     expect(events.filter(e=>e.data.sessionId===session.id)).toHaveLength(3);
   });
+  it('cancels an unfinished sports session while retaining facts and preventing resume', async () => {
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const session=await db.transaction(client=>new PostgresRepository(client).create('sportsSession','sports-reader-student',{enrollmentId:'cancel-fixture',clock:startClock(Date.now()-2000)}));
+    const key=randomUUID(),input={id:session.id,expectedVersion:session.version,reason:'student discarded'};
+    const result=await executePostgres(db,login.token,'sports.exercise.cancel',input,key);
+    expect(result.status).toBe('CANCELLED');
+    expect(await executePostgres(db,login.token,'sports.exercise.cancel',input,key)).toEqual(result);
+    const saved=await db.transaction(client=>new PostgresRepository(client).get(session.id));
+    expect(saved.data.cancelReason).toBe('student discarded');
+    expect(saved.data.clock).toMatchObject({state:'ENDED'});
+    await expect(executePostgres(db,login.token,'sports.session.resume',{id:saved.id,version:saved.version},randomUUID())).rejects.toMatchObject({status:409});
+    await expect(postgresSportsSession(db,login.token,'active')).rejects.toMatchObject({status:404});
+  });
   it('starts a sports session only with active membership and prevents a second live session', async () => {
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
     const day=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'}),ids:string[]=[];

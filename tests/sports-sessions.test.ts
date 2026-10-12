@@ -159,3 +159,18 @@ it("日时间窗与常规截止不是客户端可改字段", () => {
     f.run(next, "sports.session.start", { courseId: f.course.id }),
   ).toThrow("补练窗口");
 });
+
+it("取消保留运动历史、禁止继续和提交材料，并允许重新开始", () => {
+  const f = setup();
+  const started = f.run(f.a, "sports.session.start", { courseId: f.course.id });
+  vi.advanceTimersByTime(60000);
+  const cancelled = f.run(f.a, "sports.session.cancel", { id: started.id, version: started.version, reason: "学生放弃本次运动" });
+  expect(cancelled.data.cancelReason).toBe("学生放弃本次运动");
+  expect(cancelled.data.cancelledAt).toBe(Date.now());
+  expect(() => f.run(f.a, "sports.session.resume", { id: cancelled.id, version: cancelled.version })).toThrow();
+  expect(() => f.run(f.a, "sports.record.accept", { sessionId: cancelled.id, version: cancelled.version })).toThrow("已取消的运动不能提交材料");
+  expect(() => f.run(f.b, "sports.record.accept", { sessionId: cancelled.id, version: cancelled.version })).toThrow("只能提交本人运动材料");
+  expect(f.repo.all("sportsRecord")).toHaveLength(0);
+  expect(f.run(f.a, "sports.session.start", { courseId: f.course.id }).id).not.toBe(cancelled.id);
+  expect(f.repo.get(cancelled.id).data.cancelledAt).toBeTruthy();
+});
