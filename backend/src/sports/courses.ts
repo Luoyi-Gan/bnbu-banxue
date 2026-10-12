@@ -496,7 +496,7 @@ export function* sportsInvitationPolicy(repo:BusinessRepository,actor:Account,ac
       input.minutes === undefined ? 30 : integerField(input, "minutes", 5, 120);
     return yield* effect(repo.create("sportsInvitation", actor.id, {
       courseId: course.id,
-      code: randomBytes(12).toString("base64url"),
+      code: "v1." + randomBytes(12).toString("base64url"),
       expiresAt: Date.now() + minutes * 60000,
       status: "ACTIVE",
     }));

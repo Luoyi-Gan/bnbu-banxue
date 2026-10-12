@@ -1,6 +1,7 @@
 import { postgresCourseReport } from '../backend/src/storage/postgres-course-report';
 import { checkPostgresDeadlineReminders } from '../backend/src/storage/postgres-deadline-reminders';
 import { postgresRuleTemplates } from '../backend/src/storage/postgres-rule-templates';
+import { postgresInvitationPreview } from '../backend/src/storage/postgres-invitation-preview';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
@@ -480,6 +481,9 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   it('joins through an owned invitation flow once and blocks a second active enrollment', async()=>{
     const auth=new PostgresAuth(db),student=await auth.login('sports-reader-student@example.test','Sports-read-123');
     const invite=await db.transaction(async client=>{const repo=new PostgresRepository(client),semester=await repo.create('sportsSemester',null,{status:'CURRENT',name:'入班学期'}),course=await repo.create('sportsCourse','sports-reader-other',{semesterId:semester.id,name:'入班课程',status:'PUBLISHED',enrollmentOpen:true});return repo.create('sportsInvitation',course.ownerId,{courseId:course.id,code:randomUUID(),status:'ACTIVE',expiresAt:Date.now()+300000});});
+    const preview=await postgresInvitationPreview(db,String(invite.data.code));expect(preview.data).toMatchObject({courseName:'入班课程',teacherDisplayName:'sports-reader-other',enrollmentOpen:true,inGrace:false});
+    expect(JSON.stringify(preview)).not.toContain('sports-reader-student');
+    expect((await db.transaction(client=>new PostgresRepository(client).all('sportsEnrollmentFlow'))).filter(f=>f.data.invitationId===invite.id)).toHaveLength(0);
     const flow=await executePostgres(db,student.token,'sports.enrollment.begin',{code:invite.data.code},randomUUID());
     const storedFlow=await db.transaction(client=>new PostgresRepository(client).get(flow.id));expect(storedFlow.data).toMatchObject({courseName:'入班课程',semesterName:'入班学期',status:'OPEN',teacherName:'sports-reader-other'});
     const key=randomUUID(),joined=await executePostgres(db,student.token,'sports.enrollment.join',{flowId:flow.id},key);
@@ -488,6 +492,11 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await db.transaction(client=>new PostgresRepository(client).get(flow.id))).data.status).toBe('COMPLETED');
     await expect(executePostgres(db,student.token,'sports.enrollment.join',{code:invite.data.code},randomUUID())).rejects.toMatchObject({status:409});
     expect((await db.pool.query('SELECT * FROM notifications WHERE entity_id=$1',[joined.id])).rows).toHaveLength(2);
+    const expired=await db.transaction(client=>new PostgresRepository(client).save(invite,{expiresAt:Date.now()-1}));
+    await expect(postgresInvitationPreview(db,String(invite.data.code))).rejects.toMatchObject({status:410,code:'COURSE_INVITE_EXPIRED'});
+    await db.transaction(client=>new PostgresRepository(client).save(expired,{status:'REVOKED'}));
+    await expect(postgresInvitationPreview(db,String(invite.data.code))).rejects.toMatchObject({status:410,code:'COURSE_INVITE_REVOKED'});
+    await expect(postgresInvitationPreview(db,randomUUID())).rejects.toMatchObject({status:404});
     await db.pool.query('DELETE FROM notifications WHERE entity_id=$1',[joined.id]);
     const course=await db.transaction(client=>new PostgresRepository(client).get(invite.data.courseId));
     await db.pool.query('DELETE FROM entities WHERE id=$1',[course.data.semesterId]);
