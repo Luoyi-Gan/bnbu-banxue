@@ -19,6 +19,8 @@ async function request(path,input) {
   return data;
 }
 assert.equal((await request('/api/health')).storage,'postgresql');
+assert.equal((await request('/api/v1/system-mode/announcement')).data.mode,'NORMAL');
+assert.equal((await fetch(base+'/api/v1/me')).status,401);
 assert.equal((await fetch(base+'/v2/login')).status,200);
 assert.equal((await fetch(base+'/api/auth/me')).status,401);
 await request('/api/auth/verification-codes',{email});
@@ -59,6 +61,12 @@ execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu
 const studentArticle=(await request('/api/sports/help?lang=en')).articles.find(article=>article.id===help.id);
 assert.equal(studentArticle.data.body,'Local acceptance fixture');
 assert.equal(studentArticle.ownerId,null);
+const sportsMe=(await request('/api/v1/me')).data;
+assert.equal(sportsMe.user.id,actor.id);
+assert.equal(sportsMe.user.role,'STUDENT');
+assert.equal(sportsMe.user.emailVerified,false);
+assert.equal(sportsMe.studentProfile.studentNumber,null);
+assert.equal(sportsMe.studentProfile.fullName,actor.name);
 await request('/api/auth/logout',{});
 assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
 console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence, sports help publication and student reading, logout.');
