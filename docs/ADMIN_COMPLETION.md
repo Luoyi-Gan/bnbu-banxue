@@ -2081,3 +2081,9 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 - 体育写命令在回执查询之前拒绝，避免旧请求回执继续表现为可用业务。仅暂留伴学账号控件依赖的六个历史命名账号命令；后续迁移其命名和依赖。
 - TypeScript及该文件lint通过，Docker重新构建健康，伴学默认smoke通过。历史体育测试仍需随删除范围整理，不声称全量测试已通过。
 - 待继续清理：SQLite写入口、原生体育HTTP路由、未引用体育实现、体育前端接线及文档。外部平台未修改。
+
+### 2026-10-12 越界实现清理：SQLite 命令入口
+- 与 PostgreSQL 对齐，删除体育课程/运动/审核/成绩/结算/规则等写命令分派；仅暂留伴学账号功能依赖的历史命名命令。旧体育写请求在回执查询前拒绝。
+- 清理时残留一条 sportsSupplementCommand 调用导致初次检查失败，已删除该残留并重跑：后端 TypeScript 通过，backend.test.ts 与 backend-concurrency.test.ts 共23项通过。
+- 用户更新 Goal 再次确认体育按最新要求执行：只在伴学学生端、教师端做只读可视化，既有体育平台不属于开发范围。目标仓库仍为 https://github.com/chchaiai/bnbu-banxue.git；附在 URL 后的中文视为范围指示，不作为新仓库地址。
+- 本批未修改 UI；混合 HTTP 路由和历史体育源码仍需清理，不声明还原完成。

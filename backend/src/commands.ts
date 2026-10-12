@@ -17,32 +17,11 @@ import { governanceCommand } from "./governance";
 import { activityCommand } from "./activities";
 import { alumniCommand } from "./alumni";
 
-import { sportsCourseCommand } from "./sports/courses";
 import { sportsCompanion } from "./sports/companion";
-import { sportsCourseManagementCommand } from "./sports/course-management";
-import { sportsSessionCommand } from "./sports/sessions";
-import { sportsMaterialCommand } from "./sports/materials";
-import { sportsReviewCommand } from "./sports/review";
-import { sportsSupplementCommand } from "./sports/supplements";
-import { sportsSystemCommand, sportsWriteGate } from "./sports/system";
-import { sportsCalendarCommand } from "./sports/calendar";
-import { sportsIncidentCommand } from "./sports/incidents";
-import { sportsSwimCommand } from "./sports/swimming";
 import { sportsPasswordCommand } from "./sports/password";
-import { sportsTeacherAccountCommand } from "./sports/teacher-accounts";
 import { sportsAdministratorCommand } from "./sports/administrators";
 import { sportsAdministratorDeletion } from "./sports/administrator-deletion";
 import { requireSportsSuperAdmin } from "./sports/permissions";
-import { sportsFeedbackCommand } from "./sports/feedback";
-import { sportsHelpCommand } from "./sports/help";
-import { sportsConversionCommand } from "./sports/conversion";
-import { sportsRosterCommand } from "./sports/roster";
-import { sportsEnduranceImportCommand } from "./sports/endurance-import";
-import { sportsEnduranceCommand } from "./sports/endurance";
-import { sportsGradeCommand } from "./sports/grades";
-import { sportsApplicationCommand } from "./sports/applications";
-import { sportsSettlementCommand } from "./sports/settlement";
-import { sportsCorrectionCommand } from "./sports/corrections";
 import {
   sportsAccountGate,
   requiresPasswordChange,
@@ -61,12 +40,13 @@ export function execute(
       requestId.length <= 100,
     "请求格式无效。",
   );
+  const accountActions=['sports.password.change','sports.admins.state','sports.admins.create','sports.admins.edit','sports.admins.delete','sports.account.close'];
+  demand(!action.startsWith('sports.') || accountActions.includes(action),'伴学不提供体育业务写入。',404);
   return transaction(db, () => {
     const actor = authenticate(db, token),
       repo = new Repository(db);
     demand(actor.status !== "banned", "账号已封禁，不能进行业务写入。", 403);
     if (action !== "sports.password.change") sportsAccountGate(repo, actor);
-    sportsWriteGate(repo, action);
     if (action.startsWith("sports.admins."))
       requireSportsSuperAdmin(repo, actor);
     const booleanArguments: Record<string, string> = {
@@ -109,34 +89,13 @@ export function execute(
     } else {
       result =
         sportsPasswordCommand(repo, actor, token, action, input) ??
-        sportsTeacherAccountCommand(repo, actor, action, input) ??
         sportsAdministratorCommand(repo, actor, action, input) ??
         sportsAdministratorDeletion(repo, actor, action, input) ??
-        sportsFeedbackCommand(repo, actor, action, input) ??
-        sportsHelpCommand(repo, actor, action, input) ??
-        sportsConversionCommand(repo, actor, action, input) ??
-        sportsRosterCommand(repo, actor, action, input) ??
-        sportsEnduranceImportCommand(repo, actor, action, input) ??
-        sportsEnduranceCommand(repo, actor, action, input) ??
-        sportsGradeCommand(repo, actor, action, input) ??
-        sportsApplicationCommand(repo, actor, action, input) ??
-        sportsSettlementCommand(repo, actor, action, input) ??
-        sportsCorrectionCommand(repo, actor, action, input) ??
         communityCommand(repo, actor, action, input) ??
         coffeeCommand(repo, actor, action, input) ??
         governanceCommand(repo, actor, action, input) ??
         activityCommand(repo, actor, action, input) ??
-        alumniCommand(repo, actor, action, input) ??
-        sportsSystemCommand(repo, actor, action, input) ??
-        sportsCalendarCommand(repo, actor, action, input) ??
-        sportsIncidentCommand(repo, actor, action, input) ??
-        sportsSwimCommand(repo, actor, action, input) ??
-        sportsCourseCommand(repo, actor, action, input) ??
-        sportsCourseManagementCommand(repo, actor, action, input) ??
-        sportsSessionCommand(repo, actor, action, input) ??
-        sportsMaterialCommand(repo, actor, action, input) ??
-        sportsReviewCommand(repo, actor, action, input) ??
-        sportsSupplementCommand(repo, actor, action, input);
+        alumniCommand(repo, actor, action, input);
       demand(result, "不支持该业务操作。", 404);
       // A full alumni aggregate must never be returned in a mutation response.
       result = { id: (result as { id: string }).id };
