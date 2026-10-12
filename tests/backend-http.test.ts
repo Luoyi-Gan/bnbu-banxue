@@ -435,6 +435,8 @@ describe("API、持久化和跨角色联动", () => {
       run(admin, "alumni.decide", { id: first.id, accept: true }),
     ).toThrow("学生身份");
     run(a, "alumni.decide", { id: first.id, accept: true });
+    expect(snapshot(db, c.account).alumni.slots[0].occupied).toBe(true);
+    expect(snapshot(db, c.account).alumni.bookings.some(x => x.id === first.id)).toBe(false);
     expect(snapshot(db, c.account).alumni.bookings[0].status).toBe(
       "unavailable",
     );
@@ -451,6 +453,10 @@ describe("API、持久化和跨角色联动", () => {
       reason: "核验失效",
     });
     expect(snapshot(db, b.account).alumni.bookings[0].status).toBe("cancelled");
+    const history = snapshot(db, b.account).alumni;
+    expect(history.slots.find(s => s.id === slot.id)).toMatchObject({ open: false, occupied: false });
+    expect(history.profiles.find(p => p.id === profile.id)).toMatchObject({ status: "rejected", evidence: "", reviewNote: "" });
+    expect(snapshot(db, teacher.account).alumni.profiles.some(p => p.id === profile.id)).toBe(false);
   });
   it("举报处置、社团入驻、知识反馈共享原记录并定向通知", () => {
     const { a, b, admin, operator, run, repo, db } = setup();

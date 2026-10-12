@@ -283,19 +283,20 @@ export function snapshot(db: Database, actor: Account) {
     .map((b) => ({ ...b, status: bookingStatus(alumni, b) }));
   const scopedAlumni = {
     profiles: alumni.profiles
-      .filter((p) => p.status === "approved" || p.owner === actor.id || review)
+      .filter((p) => p.status === "approved" || p.owner === actor.id || review ||
+        alumni.slots.some(s => s.alumniId === p.id && bookings.some(b => b.slotId === s.id)))
       .map((p) =>
         p.owner === actor.id || review
           ? p
           : { ...p, evidence: "", reviewNote: "" },
       ),
-    slots: alumni.slots.filter((s) =>
+    slots: alumni.slots.filter((s) => bookings.some(b => b.slotId === s.id) ||
       alumni.profiles.some(
         (p) =>
           p.id === s.alumniId &&
           (p.status === "approved" || p.owner === actor.id),
       ),
-    ),
+    ).map(s => ({...s, occupied: alumni.bookings.some(b => b.slotId === s.id && bookingStatus(alumni, b) === "confirmed")})),
     bookings,
     follows: alumni.follows.filter((f) => f.student === actor.id),
     history: alumni.history.filter(

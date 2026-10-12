@@ -22,7 +22,7 @@ export function AlumniAppointmentArea({ personId, live }: { personId: string; li
   const [question, setQuestion] = useState('')
   const slots = data.slots.filter(s => s.alumniId === personId && s.open && Date.parse(s.startAt) > Date.now())
   return <div>{message && <p role="status" className="v2-info-box">{message}</p>}{person.owner === actor.id ? <Link to="/v2/alumni?view=manage">管理我的时段和申请</Link> : !person.accepting ? <p>该校友暂不接受新申请。</p> : <><label className="v2-drawer-label">交流主题与问题<textarea value={question} onChange={e => setQuestion(e.target.value)} maxLength={500} rows={3} placeholder="介绍你的背景，以及希望请教的具体问题"/></label>{slots.map(slot => {
-    const taken = data.bookings.some(b => b.slotId === slot.id && b.status === 'confirmed')
+    const taken = slot.occupied || data.bookings.some(b => b.slotId === slot.id && b.status === 'confirmed')
     const pending = data.bookings.some(b => b.slotId === slot.id && b.student === actor.id && bookingStatus(data, b) === 'pending')
     return <div className="v2-alumni-booking" key={slot.id}><strong>{time(slot.startAt)} — {time(slot.endAt)}</strong><p>{slot.location}</p><button className="v2-button v2-button-primary" disabled={live.busy || taken || pending || !question.trim()} onClick={() => live.mutate('alumni.request', {slotId: slot.id, question})}>{taken ? '已被预约' : pending ? '等待校友确认' : '申请交流'}</button></div>
   })}{!slots.length && <p>暂未开放新的交流时段。</p>}<p className="v2-form-note">同一时段可能有多名申请人，校友确认后预约才成立。</p></>}</div>
