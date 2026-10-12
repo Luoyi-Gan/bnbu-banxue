@@ -132,6 +132,36 @@ assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Imag
   }
   docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-v','ON_ERROR_STOP=1','-Atc',`DELETE FROM sessions WHERE account_id='${teacherId}'; UPDATE accounts SET status='banned',roles='[]' WHERE id='${teacherId}'`],{stdio:'pipe'});
   console.log('PASS Docker teacher appointments: shared booking, reschedule reservation and consent, privacy, cancellation and released capacity.');
+  cookie=authorCookie;
+  const privateNumber='TEST-'+randomUUID(),privateEvidence='验收核验说明-'+randomUUID();
+  await command('alumni.apply',{studentNumber:privateNumber,major:'计算机',graduationYear:2024,city:'珠海',direction:'就业',experience:'工作',topics:'实习',bio:'',evidence:privateEvidence});
+  await request('/api/auth/sign-in',{identifier:reviewerId+'@example.test',password});
+  const reviewerCookie=cookie;
+  const alumniProfile=(await request('/api/workspace')).alumni.profiles.find(p=>p.owner===actor.id);
+  assert.equal(alumniProfile.studentNumber,privateNumber);
+  await command('alumni.review',{id:alumniProfile.id,approve:true});
+  cookie=memberCookie;
+  const publicAlumni=await request('/api/workspace');
+  assert.equal(publicAlumni.alumni.profiles.find(p=>p.id===alumniProfile.id).studentNumber,undefined);
+  assert.ok(!JSON.stringify(publicAlumni).includes(privateEvidence));
+  cookie=authorCookie;
+  const alumniStart=Date.now()+3*86400000;
+  await command('alumni.slot.create',{startAt:new Date(alumniStart).toISOString(),endAt:new Date(alumniStart+3600000).toISOString(),location:'本地校友交流室'});
+  const alumniSlot=(await request('/api/workspace')).alumni.slots.find(s=>s.alumniId===alumniProfile.id);
+  cookie=memberCookie;
+  await command('alumni.request',{slotId:alumniSlot.id,question:'实习交流'});
+  const alumniBooking=(await request('/api/workspace')).alumni.bookings.find(b=>b.slotId===alumniSlot.id);
+  cookie=authorCookie;
+  await command('alumni.decide',{id:alumniBooking.id,accept:true});
+  cookie=memberCookie;
+  assert.equal((await request('/api/workspace')).alumni.bookings.find(b=>b.id===alumniBooking.id).status,'confirmed');
+  cookie=reviewerCookie;
+  await command('alumni.review',{id:alumniProfile.id,approve:false,reason:'本地验收撤销认证'});
+  for(const session of [authorCookie,memberCookie]) {
+    cookie=session;
+    assert.equal((await request('/api/workspace')).alumni.bookings.find(b=>b.id===alumniBooking.id).status,'cancelled');
+  }
+  console.log('PASS Docker alumni: verification, private evidence, appointment acceptance and cancellation after revocation.');
   await request('/api/auth/sign-in',{identifier:operatorId+'@example.test',password});
   const keyword=randomUUID();
   const knowledgeInput={title:'容器知识验证',body:'测试资料第一版',keywords:keyword,source:'本地验收资料',status:'published'};
