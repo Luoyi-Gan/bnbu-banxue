@@ -18,6 +18,7 @@ import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import { portalApplications } from "./sports/portal-applications";
+import { portalProofAccess, portalProofRead } from "./sports/portal-media";
 import {
   portalEnrollments,
   portalTeacherStudent,
@@ -433,6 +434,18 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const proofAccess = /^\/api\/v1\/media\/([^/]+)\/access-url$/.exec(
+          pathname,
+        );
+        if (proofAccess)
+          return send(response, 200, {
+            data: portalProofAccess(
+              new Repository(db),
+              authenticate(db, token),
+              proofAccess[1],
+              input,
+            ),
+          });
         if (pathname === "/api/v1/teacher/courses") {
           const key = request.headers["idempotency-key"];
           demand(typeof key === "string", "缺少操作幂等标识。");
@@ -1103,13 +1116,26 @@ export function createApiServer(
       }
       const proofRead =
         /^\/api\/sports\/application-assets\/([a-f0-9-]+)$/.exec(pathname);
-      if (request.method === "GET" && proofRead) {
+      const portalProof = /^\/api\/v1\/media\/([^/]+)\/content$/.exec(pathname);
+      if (request.method === "GET" && (proofRead || portalProof)) {
         const repo = new Repository(db),
-          asset = readApplicationAsset(
-            repo,
-            authenticate(db, cookieToken(request)),
-            proofRead[1],
-          );
+          asset = portalProof
+            ? portalProofRead(
+                repo,
+                authenticate(db, cookieToken(request)),
+                portalProof[1],
+                Object.fromEntries(
+                  new URL(
+                    request.url!,
+                    "http://localhost",
+                  ).searchParams.entries(),
+                ),
+              )
+            : readApplicationAsset(
+                repo,
+                authenticate(db, cookieToken(request)),
+                proofRead![1],
+              );
         const blob = db
           .prepare("SELECT bytes FROM sports_media_blobs WHERE sha256=?")
           .get(String(asset.data.sha256));
