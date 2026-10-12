@@ -15,6 +15,7 @@ import {
 } from "./auth";
 import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
+import { communityView } from "./community-view";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
 import {
@@ -187,6 +188,12 @@ export function createApiServer(
   return createServer(async (request, response) => {
     try {
       const pathname = new URL(request.url ?? "/", "http://127.0.0.1").pathname;
+      if (request.method === "GET" && pathname === "/api/community")
+        return send(
+          response,
+          200,
+          communityView(db, cookieToken(request) ?? ""),
+        );
       if (request.method === "GET" && pathname === "/api/health")
         return send(response, 200, {
           ok: true,

@@ -41,6 +41,66 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("原版社区投影用账号隔离同名作者，点赞共享而收藏只归本人", async () => {
+    const f = setup();
+    f.db
+      .prepare("UPDATE accounts SET name=? WHERE id IN (?,?)")
+      .run("同名同学", f.a.id, f.b.id);
+    const post = f.run(f.a, "post.create", {
+      title: "原版社区联调",
+      body: "待审核内容",
+      board: "校园",
+      images: [],
+    });
+    const server = createApiServer(f.db);
+    await new Promise<void>((done) => server.listen(0, "127.0.0.1", done));
+    resources.push(
+      () =>
+        new Promise<void>((done) => {
+          server.closeAllConnections();
+          server.close(() => done());
+        }),
+    );
+    const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/community`;
+    const read = async (who: typeof f.a) => {
+      const response = await fetch(url, {
+        headers: { Cookie: `bnbu_session=${who.token}` },
+      });
+      expect(response.status).toBe(200);
+      return response.json();
+    };
+    expect((await fetch(url)).status).toBe(401);
+    expect((await read(f.a)).posts[0]).toMatchObject({
+      id: post.id,
+      ownerId: f.a.id,
+      author: "同名同学",
+      status: "pending",
+      likes: 0,
+    });
+    expect((await read(f.b)).posts).toEqual([]);
+    f.run(f.reviewer, "content.review", {
+      id: post.id,
+      status: "visible",
+      reason: "符合社区要求",
+    });
+    f.run(f.b, "relation.set", { id: post.id, kind: "like", enabled: true });
+    f.run(f.b, "relation.set", { id: post.id, kind: "save", enabled: true });
+    f.run(f.b, "comment.create", { postId: post.id, body: "自己的待审核评论" });
+    const author = await read(f.a),
+      reader = await read(f.b);
+    expect(author.posts[0].likes).toBe(1);
+    expect(author.posts[0].comments).toEqual([]);
+    expect(author.savedPosts).toEqual([]);
+    expect(reader.savedPosts).toEqual([post.id]);
+    expect(reader.posts[0].comments).toHaveLength(1);
+    f.run(f.reviewer, "content.review", {
+      id: post.id,
+      status: "hidden",
+      reason: "下架核对",
+    });
+    expect((await read(f.b)).posts).toEqual([]);
+    expect((await read(f.b)).savedPosts).toEqual([]);
+  });
   it("实际 HTTP 登录 cookie、来源校验、错误响应和私有接口认证", async () => {
     const { db, a } = setup(),
       server = createApiServer(db, { localOutbox: true });
