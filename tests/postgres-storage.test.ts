@@ -547,6 +547,20 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     try {
       const url=`http://127.0.0.1:${(server.address() as AddressInfo).port}/api/sports/course-reports/${course.id}.csv`;
       const base=url.split('/api/')[0],teacherHeaders={Cookie:`bnbu_session=${teacher.token}`};
+      const reportsUrl=base+'/api/v1/class-sections/'+course.id+'/settlement-reports';
+      expect((await (await fetch(reportsUrl,{headers:teacherHeaders})).json()).data).toEqual({items:[],nextBeforeVersion:null});
+      const reports=await db.transaction(async client=>{
+        const repo=new PostgresRepository(client);
+        const first=await repo.create('sportsSettlementReport',teacher.account.id,{courseId:course.id,sequence:1,report:{private:'DO_NOT_EXPOSE'}});
+        const second=await repo.create('sportsSettlementReport',teacher.account.id,{courseId:course.id,sequence:2,previousId:first.id,correctionReason:'本地更正测试'});
+        return [first,second];
+      });
+      const reportList=await fetch(reportsUrl+'?limit=1',{headers:teacherHeaders});expect(reportList.status).toBe(200);
+      const reportListBody=await reportList.json();expect(reportListBody.data).toMatchObject({items:[{id:reports[1].id,version:2,kind:'CORRECTION'}],nextBeforeVersion:2});
+      expect(JSON.stringify(reportListBody)).not.toContain('DO_NOT_EXPOSE');
+      expect((await (await fetch(reportsUrl+'?beforeVersion=2',{headers:teacherHeaders})).json()).data.items).toEqual([expect.objectContaining({id:reports[0].id,kind:'INITIAL'})]);
+      expect((await fetch(reportsUrl,{headers:{Cookie:`bnbu_session=${student.token}`}})).status).toBe(403);
+      expect((await fetch(base+'/api/v1/class-sections/'+foreign.id+'/settlement-reports',{headers:teacherHeaders})).status).toBe(403);
       const progressResponse=await fetch(base+'/api/v1/teacher-progress?classSectionId='+course.id,{headers:teacherHeaders});
       expect(progressResponse.status).toBe(200);expect((await progressResponse.json()).data).toEqual(teacherProgress.data);
       expect((await fetch(base+'/api/v1/teacher-progress',{headers:{Cookie:`bnbu_session=${student.token}`}})).status).toBe(403);

@@ -111,7 +111,7 @@ export function portalPhysicalWrite(
 }
 
 export function portalSettlementReports(
-  repo: Repository,
+  repo: Pick<Repository, 'all' | 'get'>,
   actor: Account,
   courseId: string,
   input: Fields,
