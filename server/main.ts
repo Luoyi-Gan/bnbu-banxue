@@ -20,6 +20,7 @@ import { sportsWorkspace } from "./sports/courses";
 import {
   portalEnrollments,
   portalTeacherStudent,
+  portalTeacherProgress,
 } from "./sports/portal-enrollments";
 import { administratorAccess } from "./sports/permissions";
 import {
@@ -731,6 +732,19 @@ export function createApiServer(
             query.get("after") ?? "",
           ),
         });
+      }
+      if (request.method === "GET" && pathname === "/api/v1/teacher-progress") {
+        return send(
+          response,
+          200,
+          portalTeacherProgress(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        );
       }
       if (request.method === "GET" && pathname === "/api/v1/enrollments") {
         return send(

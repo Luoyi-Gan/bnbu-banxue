@@ -7,6 +7,32 @@ import {
 } from "../repository";
 import { ownedCourse, sportsRole } from "./courses";
 import { sportsWriteGate } from "./system";
+import { calculateProgress } from "./progress";
+
+export function portalTeacherProgress(
+  repo: Repository,
+  actor: Account,
+  input: Fields,
+) {
+  const page = portalEnrollments(repo, actor, input);
+  return {
+    data: page.data.map((member) => {
+      const progress = calculateProgress(
+        repo,
+        String(member.classSectionId),
+        member.studentId,
+      );
+      return {
+        enrollmentId: member.id,
+        courseRelated: { effectiveSeconds: progress.categoryTotals[0] * 60 },
+        general: { effectiveSeconds: progress.categoryTotals[1] * 60 },
+        totalEffectiveSeconds: progress.total * 60,
+        status: progress.total === 1200 ? "COMPLETED" : "IN_PROGRESS",
+      };
+    }),
+    meta: page.meta,
+  };
+}
 
 function teacherCourses(repo: Repository, actor: Account) {
   sportsRole(repo, actor, "teacher");

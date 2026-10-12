@@ -28,6 +28,10 @@ it("原版名单只含本人课程，移出成员保留关系但不再开放当�
       student = make("student", "student");
     const course = repo.create("sportsCourse", teacher.account.id, {
       semesterId: "semester",
+      relatedTarget: 600,
+      otherTarget: 600,
+      threshold: 30,
+      weeklyLimit: 3,
     });
     const foreign = repo.create("sportsCourse", other.account.id, {
       semesterId: "semester",
@@ -70,6 +74,56 @@ it("原版名单只含本人课程，移出成员保留关系但不再开放当�
       gradeYear: 2026,
       primaryEmail: null,
     });
+    repo.create("sportsCertification", student.account.id, {
+      courseId: course.id,
+      status: "VALID",
+      category: "RELATED",
+      minutes: 600,
+    });
+    for (let day = 12; day <= 17; day++) {
+      const clock = {
+        businessDate: `2026-10-${day}`,
+        startedAt: Date.parse(`2026-10-${day}T10:00:00+08:00`),
+        activeMilliseconds: 60 * 60000,
+      };
+      const session = repo.create("sportsSession", student.account.id, {
+        clock,
+      });
+      repo.create("sportsRecord", student.account.id, {
+        courseId: course.id,
+        sessionId: session.id,
+        category: "OTHER",
+        status: day <= 15 ? "VALID" : day === 16 ? "PENDING_AI" : "INVALID",
+        activeMilliseconds: clock.activeMilliseconds,
+      });
+    }
+    const progress = (await (await get("/teacher-progress")).json()).data;
+    expect(progress).toEqual([
+      {
+        enrollmentId: member.id,
+        courseRelated: { effectiveSeconds: 36000 },
+        general: { effectiveSeconds: 10800 },
+        totalEffectiveSeconds: 46800,
+        status: "IN_PROGRESS",
+      },
+    ]);
+    expect(repo.all("sportsProgress")).toHaveLength(0);
+    const certification = repo.create(
+      "sportsCertification",
+      student.account.id,
+      { courseId: course.id, status: "VALID", category: "OTHER", minutes: 420 },
+    );
+    expect(
+      (await (await get("/teacher-progress")).json()).data[0],
+    ).toMatchObject({ totalEffectiveSeconds: 72000, status: "COMPLETED" });
+    repo.save(certification, { status: "REVOKED" });
+    expect(
+      (await (await get("/teacher-progress")).json()).data[0],
+    ).toMatchObject({ totalEffectiveSeconds: 46800, status: "IN_PROGRESS" });
+    expect((await get("/teacher-progress", student.token)).status).toBe(403);
+    expect(
+      (await get("/teacher-progress?classSectionId=" + foreign.id)).status,
+    ).toBe(403);
     repo.save(member, {
       status: "REMOVED",
       changedAt: Date.now(),
@@ -82,6 +136,7 @@ it("原版名单只含本人课程，移出成员保留关系但不再开放当�
     });
     repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
     expect((await get("/enrollments")).status).toBe(503);
+    expect((await get("/teacher-progress")).status).toBe(503);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
     db.close();
