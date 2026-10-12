@@ -1,11 +1,14 @@
 import {demand, type Account} from './auth';
 import type {Database} from './database';
-import {Repository} from './repository';
+import {Repository, type Entity} from './repository';
 export function studentNumber(db: Database, actor: Account): string | null {
+  return verifiedStudentNumber(actor,new Repository(db).all('verifiedEmail'));
+}
+export function verifiedStudentNumber(actor: Account, records: Entity[]): string|null {
   if (!actor.roles.includes('student') || actor.status === 'banned') return null;
   const [prefix,domain] = actor.email.toLowerCase().split('@');
   if (domain !== 'bnbu.edu.cn') return null;
-  const verified = new Repository(db).all('verifiedEmail').some(e=>e.ownerId===actor.id && e.data.email===actor.email);
+  const verified = records.some(e=>e.ownerId===actor.id && e.data.email===actor.email);
   return verified ? prefix : null;
 }
 export function searchStudents(db: Database, actor: Account, query: string) {

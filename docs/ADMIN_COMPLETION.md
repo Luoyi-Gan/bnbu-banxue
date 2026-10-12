@@ -1474,3 +1474,7 @@ governanceCommand 提取为两数据库共用 governancePolicy，PostgreSQL 接�
 ### PostgreSQL 活动与邮件处理迁移
 activityCommand 提取为同步/异步共用 activityPolicy，包含社团发布资格、可见性、邮件导入去重、图片替换、人工更正、拆分与关联更正；递归子操作使用同一事务仓储。活动订阅人查询纳入两种仓储，通知只取 save/participate 并去重。
 51 项针对测试通过（PostgreSQL 19、原 HTTP/并发 32）；服务端类型检查与修改文件 lint 通过。新增 PostgreSQL 实测覆盖默认封面、双关系单份通知、仅点赞不通知、原邮件私密信息不进入学生工作台、重复导入保留原活动及人工更正。拆分/关联策略共用原通过案例，但仍需追加真实 PostgreSQL 多活动原子失败案例。未改动 UI。
+
+### PostgreSQL 校友认证与交流主链
+alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态规则和教师预约冲突输入；邮箱学号提取为共用纯判断，SQLite 学号查询、PostgreSQL 工作台和校友申请统一调用。PostgreSQL 入口增加校友审批、确认、资料接受交流开关的布尔校验。
+52 项针对测试通过（PostgreSQL 20、原 HTTP/并发 32）；服务端类型检查和修改文件 lint 通过。新增真实 PostgreSQL 主链验证申请学号→审核→公开资料去除学号/证明→开放时段→学生申请→校友确认→撤销认证取消预约与禁止新时段。原 UI 未改动，COS、独立前后端 Compose、学号搜索/外部适配等尚未完成的路由继续推进。

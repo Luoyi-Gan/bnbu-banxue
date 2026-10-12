@@ -7,6 +7,7 @@ import { projectWorkspace } from '../snapshot-projection';
 import { projectRelationshipHistory } from '../relationship-history';
 import { projectSportsCompanion } from '../sports/companion';
 import { passwordChangeRequired } from '../sports/account-gate';
+import { verifiedStudentNumber } from '../student-search';
 
 export async function postgresWorkspace(db: PostgresDatabase, token: string) {
   return db.transaction(async client => {
@@ -26,8 +27,7 @@ export async function postgresWorkspace(db: PostgresDatabase, token: string) {
     const notifications=allNotifications.filter(row=>row.recipient_id===actor.id).map(row=>({id:row.id,entityId:row.entityId,event:row.event,body:row.body,createdAt:row.createdAt,readAt:row.readAt}));
     const relations=(await client.query<Fields>('SELECT entity_id AS "entityId",kind,created_at AS "createdAt" FROM relations WHERE account_id=$1',[actor.id])).rows;
     const personal=(await client.query("SELECT 1 FROM accounts WHERE id=$1 AND lower(trim(email))=$2 AND login_kind='PERSONAL'",[actor.id,actor.email.trim().toLowerCase()])).rows.length>0;
-    const [prefix,domain]=actor.email.toLowerCase().split('@');
-    const number=actor.roles.includes('student') && actor.status!=='banned' && domain==='bnbu.edu.cn' && repo.all('verifiedEmail').some(e=>e.ownerId===actor.id && e.data.email===actor.email) ? prefix : null;
+    const number=verifiedStudentNumber(actor,repo.all('verifiedEmail'));
     return projectWorkspace({
       repo,firstLoginOnly:passwordChangeRequired(repo.all('sportsIdentity'),actor),studentNumber:number,
       sports:projectSportsCompanion(repo,actor,personal),notifications,relations,

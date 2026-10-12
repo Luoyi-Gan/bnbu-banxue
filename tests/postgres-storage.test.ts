@@ -400,4 +400,28 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect(activities).toHaveLength(1);
     expect(activities[0].data.location).toBe('T2');
   });
+  it('runs alumni verification and booking while keeping student numbers private and cancelling revoked bookings', async () => {
+    const auth=new PostgresAuth(db);
+    const alumni=(await auth.login('coffee-a@example.test','Coffee-test-123')).token;
+    const student=(await auth.login('coffee-b@example.test','Coffee-test-123')).token;
+    const reviewer=(await auth.login('review-pg@example.test','Review-postgres-123')).token;
+    const command=(token:string,action:string,input:Record<string,unknown>)=>executePostgres(db,token,action,input,randomUUID());
+    await command(alumni,'alumni.apply',{studentNumber:'TEST-2024-PRIVATE',major:'计算机',graduationYear:2024,city:'珠海',direction:'就业',experience:'工作',topics:'实习',bio:'',evidence:'内部核对说明'});
+    const profile=(await postgresWorkspace(db,reviewer)).alumni.profiles.find(p=>p.owner==='coffee-a')!;
+    expect(profile.studentNumber).toBe('TEST-2024-PRIVATE');
+    await command(reviewer,'alumni.review',{id:profile.id,approve:true});
+    const publicView=await postgresWorkspace(db,student);
+    expect(publicView.alumni.profiles.find(p=>p.id===profile.id)?.studentNumber).toBeUndefined();
+    expect(JSON.stringify(publicView)).not.toContain('内部核对说明');
+    const start=Date.now()+3*86400_000;
+    await command(alumni,'alumni.slot.create',{startAt:new Date(start).toISOString(),endAt:new Date(start+3600_000).toISOString(),location:'图书馆'});
+    const slot=(await postgresWorkspace(db,alumni)).alumni.slots.find(s=>s.alumniId===profile.id)!;
+    await command(student,'alumni.request',{slotId:slot.id,question:'实习交流'});
+    const booking=(await postgresWorkspace(db,student)).alumni.bookings.find(b=>b.slotId===slot.id)!;
+    await command(alumni,'alumni.decide',{id:booking.id,accept:true});
+    expect((await postgresWorkspace(db,student)).alumni.bookings.find(b=>b.id===booking.id)?.status).toBe('confirmed');
+    await command(reviewer,'alumni.review',{id:profile.id,approve:false,reason:'撤销认证测试'});
+    expect((await postgresWorkspace(db,student)).alumni.bookings.find(b=>b.id===booking.id)?.status).toBe('cancelled');
+    await expect(command(alumni,'alumni.slot.create',{startAt:new Date(start+7200_000).toISOString(),endAt:new Date(start+10800_000).toISOString(),location:'图书馆'})).rejects.toThrow();
+  });
 });

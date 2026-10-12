@@ -1,4 +1,5 @@
-import { studentNumber } from './student-search';
+import { effect, runSync, type BusinessRepository } from "./storage/effects";
+import { verifiedStudentNumber } from './student-search';
 import { initialV2State, type V2State } from "../../shared/v2/model";
 import type { AlumniData } from "../../shared/v2/alumniModel";
 import {
@@ -37,16 +38,17 @@ export function readAlumni(repo: Pick<Repository,"all">): AlumniData {
     emptyAlumni()
   );
 }
-export function alumniCommand(
-  repo: Repository,
+export function* alumniPolicy(
+  repo: BusinessRepository,
   actor: Account,
   action: string,
   input: Fields,
-): Entity | undefined {
+): Generator<unknown,Entity | undefined,unknown> {
   if (!action.startsWith("alumni.")) return undefined;
   if (action === "alumni.review") reviewer(actor);
   else student(actor);
-  const before = readAlumni(repo);
+  const before = ((yield* effect(repo.all("alumniState")))[0]?.data.value as AlumniData | undefined) ?? emptyAlumni();
+  const verifiedNumber=verifiedStudentNumber(actor,(yield* effect(repo.all("verifiedEmail"))));
   if (action === "alumni.post") {
     canSpeak(actor);
     const profile = before.profiles.find(
@@ -54,14 +56,14 @@ export function alumniCommand(
     );
     demand(profile, "需要本人已通过校友认证。", 403);
     const direction = enumField(input, "direction", ["升学", "就业"]);
-    return repo.create("post", actor.id, {
+    return (yield* effect(repo.create("post", actor.id, {
       alumniId: profile.id,
       title: textField(input, "title", 80),
       body: textField(input, "body", 1000),
       board: `校友${direction}`,
       images: [],
       status: "pending",
-    });
+    })));
   }
   const state: V2State = {
     ...initialV2State,
@@ -72,7 +74,7 @@ export function alumniCommand(
     teacherCoffee: {
       profiles: {},
       notices: [],
-      slots: repo.all("coffeeSlot").map((s) => ({
+      slots: (yield* effect(repo.all("coffeeSlot"))).map((s) => ({
         id: s.id,
         teacherId: s.ownerId!,
         startAt: String(s.data.startAt),
@@ -85,7 +87,7 @@ export function alumniCommand(
         dateLabel: "",
         timeLabel: "",
       })),
-      bookings: repo.all("coffeeBooking").map((b) => ({
+      bookings: (yield* effect(repo.all("coffeeBooking"))).map((b) => ({
         id: b.id,
         student: b.ownerId!,
         slotId: String(b.data.slotId),
@@ -115,8 +117,8 @@ export function alumniCommand(
       next = submitAlumniCertification(state, policyActor, {
         ...profileInput(),
         name: actor.name,
-        studentNumber: studentNumber(repo.db, actor) ?? textField(input, "studentNumber", 100),
-        studentNumberSource: studentNumber(repo.db, actor) ? "verified-email" : "applicant",
+        studentNumber: verifiedNumber ?? textField(input, "studentNumber", 100),
+        studentNumberSource: verifiedNumber ? "verified-email" : "applicant",
         major: textField(input, "major", 80),
         graduationYear: integerField(
           input,
@@ -156,7 +158,7 @@ export function alumniCommand(
       const slot = before.slots.find((s) => s.id === input.slotId),
         profile = before.profiles.find((p) => p.id === slot?.alumniId);
       demand(
-        profile && repo.person(profile.owner).status !== "banned",
+        profile && (yield* effect(repo.person(profile.owner))).status !== "banned",
         "校友当前无法接受申请。",
       );
       next = requestAlumniChat(
@@ -172,7 +174,7 @@ export function alumniCommand(
       demand(
         booking &&
           (input.accept !== true ||
-            repo.person(booking.student).status !== "banned"),
+            (yield* effect(repo.person(booking.student))).status !== "banned"),
         "申请人当前无法预约。",
       );
       next = decideAlumniChat(
@@ -199,16 +201,18 @@ export function alumniCommand(
   for (const notice of data.notices.filter(
     (n) => !before.notices.some((old) => old.id === n.id),
   ))
-    repo.notify(
+    (yield* effect(repo.notify(
       [notice.recipient],
       typeof input.id === "string" ? input.id : null,
       action,
       notice.body,
-    );
+    )));
   // Notices live in the shared notification table; rule history remains append-only.
   data.notices = [];
-  const stored = repo.all("alumniState")[0];
+  const stored = (yield* effect(repo.all("alumniState")))[0];
   return stored
-    ? repo.save(stored, { value: data })
-    : repo.create("alumniState", null, { value: data });
+    ? (yield* effect(repo.save(stored, { value: data })))
+    : (yield* effect(repo.create("alumniState", null, { value: data })));
 }
+
+export function alumniCommand(repo:Repository,actor:Account,action:string,input:Fields) { return runSync(alumniPolicy(repo,actor,action,input)); }
