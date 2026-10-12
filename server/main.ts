@@ -17,6 +17,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { portalGradeHistory } from "./sports/portal-grades";
 import {
   portalApplications,
   portalApplicationReview,
@@ -827,6 +828,22 @@ export function createApiServer(
           ),
         );
       }
+      const gradeHistory =
+        /^\/api\/v1\/enrollments\/([^/]+)\/(physical-results|final-grades)$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && gradeHistory)
+        return send(response, 200, {
+          data: portalGradeHistory(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            gradeHistory[1],
+            gradeHistory[2] as "physical-results" | "final-grades",
+            Object.fromEntries(
+              new URL(request.url!, "http://localhost").searchParams.entries(),
+            ),
+          ),
+        });
       const recognitionHistory =
         /^\/api\/v1\/activity-certification-applications\/([^/]+)\/recognition-allocation-revisions$/.exec(
           pathname,
