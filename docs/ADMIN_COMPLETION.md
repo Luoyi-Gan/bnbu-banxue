@@ -2321,3 +2321,7 @@ Docker smoke 增加进程退出收尾：仅追踪本次创建的随机账号，�
 ### 2026-10-12 教师资料跨端补验及 PR
 
 PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分支 codex/banxue-postgres-readonly-delivery；未合并。教师资料页通过 useWorkspaceBackend.mutate 调用 coffee.profile，非本地 store 保存。Docker smoke 补验教师资料保存后学生共享读取、学生不能代改教师资料、修改默认地点不改写已开放时段地点，完整脚本通过。本次只扩展验收覆盖，无页面布局或业务规则变化。
+
+### 2026-10-12 教师个人资料浏览器验收
+
+在 4188 使用新建的独立本地教师夹具，从登录进入原教师工作台，再点击个人资料，填写展示名称、介绍、交流主题和默认地点。页面出现“资料已保存到伴学后台。”后刷新，四项填写结果仍在。教师标识、学院、教师资格为只读。证据截图 .runtime/teacher-profile-browser-proof.png（本地存档，不提交测试凭据）。本次主题填写非空，不替代尚待用户确认的“主题能否留空”规则。此前学生直接访问审核和教师路由均显示身份权限不足并返回登录页。
