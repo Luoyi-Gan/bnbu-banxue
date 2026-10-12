@@ -1799,3 +1799,7 @@ SQLite与PostgreSQL共用publishedTemplateFields，模板仍为V8.1固定门槛�
 ### PostgreSQL 教师课程草稿命令
 
 抽出sportsCourseDraftPolicy供两种数据库共用create/window/save，保留唯一当前学期、教师本人、字段白名单、版本、已发布锁定及规则日期检查。创建只保存名称与当前学期，不生成目标或开放入班。此前完整70文件461测试通过；新增PG创建草稿、幂等、学生拒绝及额外规则字段拒绝测试通过。类型与核心文件lint通过。configurepublish和课程发布、原版页面协议及Docker建课仍待继续，UI未改。
+
+### PostgreSQL 课程关闭与邀请管理
+
+课程发布依赖期末提醒及报表，本轮未跳过该依赖；先抽出sportsInvitationPolicy，共用本人课程关闭、当前学期已发布且开放课程生成邀请、按版本或课程邀请码撤销规则。57项PG测试验证草稿不能邀请、已发布夹具可生成／撤销、关闭后关闭入班；此前完整70文件462测试通过，类型和lint通过。测试已发布状态为显式夹具，不代表发布流程完成。Docker邀请／关闭及真正课程发布仍待接通验证，UI未改。

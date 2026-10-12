@@ -444,6 +444,14 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const saved=await executePostgres(db,teacher.token,'sports.course.create',input,key);expect(await executePostgres(db,teacher.token,'sports.course.create',input,key)).toEqual(saved);
       const course=await db.transaction(client=>new PostgresRepository(client).get(saved.id));
       expect(course.data).toEqual({name:'Draft course',semesterId:semester.id,status:'DRAFT',settlementStatus:'PENDING',enrollmentOpen:false});
+      await expect(executePostgres(db,teacher.token,'sports.invitation.create',{courseId:course.id},randomUUID())).rejects.toMatchObject({status:400});
+      const published=await db.transaction(client=>new PostgresRepository(client).save(course,{status:'PUBLISHED',enrollmentOpen:true}));
+      const invite=await executePostgres(db,teacher.token,'sports.invitation.create',{courseId:course.id,minutes:5},randomUUID());
+      const row=await db.transaction(client=>new PostgresRepository(client).get(invite.id));expect(row.data.status).toBe('ACTIVE');expect(typeof row.data.code).toBe('string');
+      await executePostgres(db,teacher.token,'sports.invitation.revoke',{courseId:course.id,code:row.data.code},randomUUID());
+      expect((await db.transaction(client=>new PostgresRepository(client).get(invite.id))).data.status).toBe('REVOKED');
+      await executePostgres(db,teacher.token,'sports.course.close',{id:course.id,version:published.version,reason:'测试关闭'},randomUUID());
+      expect((await db.transaction(client=>new PostgresRepository(client).get(course.id))).data.enrollmentOpen).toBe(false);
       await expect(executePostgres(db,teacher.token,'sports.course.create',{...input,threshold:30},randomUUID())).rejects.toMatchObject({status:400});
     } finally {await db.pool.query('DELETE FROM entities WHERE id=$1',[semester.id]);}
   });

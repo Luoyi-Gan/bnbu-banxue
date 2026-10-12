@@ -288,54 +288,7 @@ export function sportsCourseCommand(
     checkDeadlineReminders(repo, Date.now(), published);
     return published;
   }
-  if (action === "sports.course.close") {
-    const course = ownedCourse(repo, actor, input.id);
-    version(course, input);
-    demand(course.data.status === "PUBLISHED", "课程当前不能关闭。", 409);
-    return repo.save(course, {
-      status: "CLOSED",
-      enrollmentOpen: false,
-      closeReason: textField(input, "reason", 1000),
-    });
-  }
-  if (action === "sports.invitation.create") {
-    const course = ownedCourse(repo, actor, input.courseId);
-    currentSemester(repo, course.data.semesterId);
-    demand(
-      course.data.status === "PUBLISHED" && course.data.enrollmentOpen,
-      "课程未开放入班。",
-    );
-    const minutes =
-      input.minutes === undefined ? 30 : integerField(input, "minutes", 5, 120);
-    return repo.create("sportsInvitation", actor.id, {
-      courseId: course.id,
-      code: randomBytes(12).toString("base64url"),
-      expiresAt: Date.now() + minutes * 60000,
-      status: "ACTIVE",
-    });
-  }
-  if (action === "sports.invitation.revoke") {
-    if (input.code !== undefined) {
-      demand(
-        Object.keys(input).every((key) => ["courseId", "code"].includes(key)),
-        "撤销邀请参数无效。",
-      );
-      const course = ownedCourse(repo, actor, input.courseId);
-      const code = textField(input, "code", 100);
-      const invite = repo
-        .all("sportsInvitation")
-        .find(
-          (item) => item.data.courseId === course.id && item.data.code === code,
-        );
-      demand(invite, "本课程邀请不存在。", 404);
-      demand(invite.data.status === "ACTIVE", "邀请已撤销。", 409);
-      return repo.save(invite, { status: "REVOKED" });
-    }
-    const invite = repo.get(input.id, "sportsInvitation");
-    ownedCourse(repo, actor, invite.data.courseId);
-    version(invite, input);
-    return repo.save(invite, { status: "REVOKED" });
-  }
+  if(["sports.course.close","sports.invitation.create","sports.invitation.revoke"].includes(action)) return runSync(sportsInvitationPolicy(repo,actor,action,input));
   if (
     action === "sports.enrollment.join" ||
     action === "sports.enrollment.begin"
@@ -718,5 +671,58 @@ export function* sportsCourseDraftPolicy(repo:BusinessRepository,actor:Account,a
     return old
       ? (yield* effect(repo.save(old, data)))
       : (yield* effect(repo.create("sportsCourse", actor.id, data)));
+  }
+}
+
+export function* sportsInvitationPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields):Generator<unknown,Entity|undefined,unknown> {
+ const entities:Entity[]=[];
+ for(const kind of ["sportsIdentity","sportsSemester","sportsCourse","sportsInvitation"]) entities.push(...(yield* effect(repo.all(kind))));
+ const reader:Pick<Repository,"all"|"get">={all:kind=>entities.filter(e=>e.kind===kind),get:(id,kind)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,"对象不存在。",404);return e;}};
+  if (action === "sports.course.close") {
+    const course = ownedCourse(reader, actor, input.id);
+    version(course, input);
+    demand(course.data.status === "PUBLISHED", "课程当前不能关闭。", 409);
+    return yield* effect(repo.save(course, {
+      status: "CLOSED",
+      enrollmentOpen: false,
+      closeReason: textField(input, "reason", 1000),
+    }));
+  }
+  if (action === "sports.invitation.create") {
+    const course = ownedCourse(reader, actor, input.courseId);
+    currentSemester(reader, course.data.semesterId);
+    demand(
+      course.data.status === "PUBLISHED" && course.data.enrollmentOpen,
+      "课程未开放入班。",
+    );
+    const minutes =
+      input.minutes === undefined ? 30 : integerField(input, "minutes", 5, 120);
+    return yield* effect(repo.create("sportsInvitation", actor.id, {
+      courseId: course.id,
+      code: randomBytes(12).toString("base64url"),
+      expiresAt: Date.now() + minutes * 60000,
+      status: "ACTIVE",
+    }));
+  }
+  if (action === "sports.invitation.revoke") {
+    if (input.code !== undefined) {
+      demand(
+        Object.keys(input).every((key) => ["courseId", "code"].includes(key)),
+        "撤销邀请参数无效。",
+      );
+      const course = ownedCourse(reader, actor, input.courseId);
+      const code = textField(input, "code", 100);
+      const invite = reader.all("sportsInvitation")
+        .find(
+          (item) => item.data.courseId === course.id && item.data.code === code,
+        );
+      demand(invite, "本课程邀请不存在。", 404);
+      demand(invite.data.status === "ACTIVE", "邀请已撤销。", 409);
+      return yield* effect(repo.save(invite, { status: "REVOKED" }));
+    }
+    const invite = reader.get(input.id, "sportsInvitation");
+    ownedCourse(reader, actor, invite.data.courseId);
+    version(invite, input);
+    return yield* effect(repo.save(invite, { status: "REVOKED" }));
   }
 }
