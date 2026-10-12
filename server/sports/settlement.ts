@@ -183,7 +183,39 @@ export function sportsSettlementCommand(
   actor: Account,
   action: string,
   input: Fields,
-) {
+): Entity | undefined {
+  if (action === "sports.settlement.finalize") {
+    demand(
+      Object.keys(input).every((k) =>
+        ["id", "expectedVersion", "previewFingerprint"].includes(k),
+      ),
+      "结算确认不接受客户端报告内容。",
+    );
+    demand(input.expectedVersion === 0, "首次结算版本必须为零。", 409);
+    demand(
+      typeof input.previewFingerprint === "string" &&
+        /^[a-f0-9]{64}$/.test(input.previewFingerprint),
+      "请先核对结算预览。",
+    );
+    const check = settlementCheck(repo, actor, String(input.id));
+    demand(
+      check.manifest.hash === input.previewFingerprint,
+      "结算来源已变化，请重新检查并核对。",
+      409,
+    );
+    demand(!check.blockers.length, "仍有合法待办或教学事项，不能结算。", 409);
+    const prep = sportsSettlementCommand(
+      repo,
+      actor,
+      "sports.settlement.prepare",
+      { id: check.course.id, version: check.course.version },
+    )!;
+    return sportsSettlementCommand(repo, actor, "sports.settlement.confirm", {
+      id: prep.id,
+      version: prep.version,
+      confirmed: true,
+    });
+  }
   if (
     action !== "sports.settlement.prepare" &&
     action !== "sports.settlement.confirm"

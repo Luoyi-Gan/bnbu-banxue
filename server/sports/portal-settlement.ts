@@ -1,6 +1,41 @@
-import type { Account } from "../auth";
-import type { Repository } from "../repository";
+import { authenticate, demand, type Account } from "../auth";
+import { Repository, type Fields } from "../repository";
+import type { Database } from "../database";
+import { execute } from "../commands";
+import { ownedCourse } from "./courses";
 import { settlementCheck } from "./settlement";
+
+export function portalSettlementConfirm(
+  db: Database,
+  token: string,
+  courseId: string,
+  input: Fields,
+  key: string,
+) {
+  demand(
+    Object.keys(input).every((k) =>
+      ["expectedVersion", "previewFingerprint"].includes(k),
+    ),
+    "结算确认不接受客户端报告内容。",
+  );
+  const repo = new Repository(db);
+  ownedCourse(repo, authenticate(db, token), courseId);
+  const result = execute(
+    db,
+    token,
+    "sports.settlement.finalize",
+    { id: courseId, ...input },
+    key,
+  ) as { id: string };
+  const report = repo.get(result.id, "sportsSettlementReport");
+  return {
+    id: report.id,
+    version: report.data.sequence,
+    kind: "INITIAL",
+    createdAt: report.createdAt,
+    correctionReason: null,
+  };
+}
 
 // Translate only equivalent checks; retain other blockers so none disappear.
 const codes: Record<string, string> = {

@@ -190,6 +190,63 @@ it("原版结算预检只读，保留阻塞和未知分母，按课程隔离", a
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });
+it("原版结算确认拒绝过期预览，原子保存且重试返回原报告", async () => {
+  const f = setup();
+  const server = createApiServer(f.db);
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/v1/class-sections/${f.course.id}/settlement-reports`;
+  const post = (body: unknown, key = randomUUID(), who = f.teacher) =>
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Cookie: `bnbu_session=${who.token}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": key,
+      },
+      body: JSON.stringify(body),
+    });
+  try {
+    const old = {
+      expectedVersion: 0,
+      previewFingerprint: settlementCheck(
+        f.repo,
+        f.teacher.account,
+        f.course.id,
+      ).manifest.hash,
+    };
+    f.repo.save(f.course, { name: "改名后须重新核对" });
+    expect((await post(old)).status).toBe(409);
+    expect(f.repo.all("sportsSettlementPreparation")).toHaveLength(0);
+    const body = {
+      ...old,
+      previewFingerprint: settlementCheck(
+        f.repo,
+        f.teacher.account,
+        f.course.id,
+      ).manifest.hash,
+    };
+    for (const who of [f.student, f.other, f.admin])
+      expect((await post(body, randomUUID(), who)).status).toBe(403);
+    expect((await post({ ...body, canConfirm: true })).status).toBe(400);
+    const key = randomUUID();
+    const response = await post(body, key);
+    expect(response.status).toBe(200);
+    const saved = (await response.json()).data;
+    expect(saved).toMatchObject({
+      version: 1,
+      kind: "INITIAL",
+      correctionReason: null,
+    });
+    expect((await (await post(body, key)).json()).data).toEqual(saved);
+    expect(f.repo.all("sportsSettlementReport")).toHaveLength(1);
+    expect(f.repo.all("sportsSettlementPreparation")).toHaveLength(1);
+    expect(f.repo.get(f.course.id).data.settlementReportId).toBe(saved.id);
+    expect((await post(body)).status).toBe(409);
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
 it("低于目标不阻止合法结算，冻结内容与来源同事务保存，重放不另建报告", () => {
   const f = setup(),
     prep = f.prepare();

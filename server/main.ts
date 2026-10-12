@@ -17,7 +17,10 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
-import { portalSettlementPreview } from "./sports/portal-settlement";
+import {
+  portalSettlementPreview,
+  portalSettlementConfirm,
+} from "./sports/portal-settlement";
 import { portalFrozenReportExport } from "./sports/portal-report-export";
 import {
   portalGradeHistory,
@@ -447,6 +450,23 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const settlementConfirm =
+          /^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(
+            pathname,
+          );
+        if (settlementConfirm) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalSettlementConfirm(
+              db,
+              token!,
+              settlementConfirm[1],
+              input,
+              key,
+            ),
+          });
+        }
         const physicalWrite =
           /^\/api\/v1\/enrollments\/([^/]+)\/physical-results$/.exec(pathname);
         if (physicalWrite) {
