@@ -3,6 +3,13 @@ import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import { PostgresDatabase } from '../backend/src/storage/postgres';
 import { postgresMigrations } from '../backend/src/storage/postgres-schema';
+import { PostgresRepository } from '../backend/src/storage/postgres-repository';
+import { importSqlite } from '../backend/src/storage/import-sqlite';
+import { openDatabase } from '../backend/src/database';
+import { createAccount } from '../backend/src/auth';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on a real server', () => {
   const schema = `test_${randomUUID().replaceAll('-', '')}`;
@@ -46,5 +53,76 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   it('prevents historical identities regaining login even with otherwise valid fields', async () => {
     await db.pool.query("INSERT INTO accounts(id,organization,status,roles,created_at,login_kind) VALUES('history',NULL,'banned','[]','now','HISTORY')");
     await expect(db.pool.query("UPDATE accounts SET login_kind='PERSONAL',email='revive@example.test',password_hash='hash',name='revive' WHERE id='history'")).rejects.toMatchObject({code:'23514'});
+  });
+  it('persists business entities, deduplicates relations and keeps notifications in the transaction', async () => {
+    const entity = await db.transaction(async client => {
+      const repo = new PostgresRepository(client);
+      const created = await repo.create('post', null, {title:'真实 PostgreSQL 数据'});
+      return repo.save(created, {status:'visible'});
+    });
+    await db.transaction(async client => {
+      const repo = new PostgresRepository(client);
+      expect((await repo.get(entity.id,'post')).data.status).toBe('visible');
+      await repo.relation('student',entity.id,'saved',true);
+      await repo.relation('student',entity.id,'saved',true);
+      expect(await repo.related('student',entity.id,'saved')).toBe(true);
+      await repo.notify(['student','student'],entity.id,'post.visible','已公开');
+    });
+    expect((await db.pool.query('SELECT * FROM notifications WHERE entity_id=$1',[entity.id])).rows).toHaveLength(1);
+    await expect(db.transaction(async client => {
+      const repo = new PostgresRepository(client);
+      await repo.save(entity,{status:'hidden'});
+      await repo.notify(['missing'],entity.id,'post.hidden','不应保存');
+    })).rejects.toMatchObject({code:'23503'});
+    await db.transaction(async client => {
+      const repo = new PostgresRepository(client);
+      expect((await repo.get(entity.id)).data.status).toBe('visible');
+      await repo.relation('student',entity.id,'saved',false);
+      expect(await repo.related('student',entity.id,'saved')).toBe(false);
+      expect((await repo.people()).some(p=>p.id==='history')).toBe(false);
+      expect((await repo.person('history')).name).toBe('已注销用户');
+    });
+  });
+  it('rejects stale concurrent edits instead of overwriting committed business data', async () => {
+    const original = await db.transaction(client=>new PostgresRepository(client).create('post',null,{title:'original'}));
+    const results = await Promise.allSettled(['first','second'].map(title => db.transaction(client => new PostgresRepository(client).save(original,{title}))));
+    expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+    const failure = results.find(r=>r.status==='rejected');
+    expect(failure?.status==='rejected' && failure.reason.status).toBe(409);
+    const saved = await db.transaction(client=>new PostgresRepository(client).get(original.id));
+    expect(saved.version).toBe(2);
+  });
+  it('imports a read-only SQLite snapshot atomically and refuses to overwrite a populated target', async () => {
+    const importSchema = `${schema}_import`;
+    await admin.query(`CREATE SCHEMA ${importSchema}`);
+    const target = new PostgresDatabase({connectionString:process.env.BNBU_TEST_POSTGRES_URL,options:`-c search_path=${importSchema}`});
+    const directory = mkdtempSync(join(tmpdir(),'bnbu-import-'));
+    const filename = join(directory,'source.sqlite');
+    try {
+      await target.migrate(postgresMigrations);
+      const source = openDatabase(filename);
+      let accountId: string;
+      try {
+        accountId = createAccount(source,{email:'import@example.test',name:'导入账号',password:'Test-import-123',roles:['student']});
+        source.prepare('INSERT INTO sports_media_blobs VALUES(?,?,?)').run('blob-test',Buffer.from([0,1,255]),'now');
+        // Force a failure after accounts have been inserted; the whole import must roll back.
+        source.exec('ALTER TABLE entities ADD COLUMN unexpected_column TEXT');
+      } finally { source.close(); }
+      await expect(importSqlite(filename,target)).rejects.toThrow('schema does not match');
+      expect((await target.pool.query('SELECT * FROM accounts')).rows).toHaveLength(0);
+      const fix = openDatabase(filename);
+      try { fix.exec('ALTER TABLE entities DROP COLUMN unexpected_column'); } finally { fix.close(); }
+      const counts = await importSqlite(filename,target);
+      expect(counts.accounts).toBe(1);
+      expect(counts.entities).toBeGreaterThan(0);
+      expect((await target.pool.query('SELECT id FROM accounts')).rows[0].id).toBe(accountId!);
+      expect((await target.pool.query("SELECT bytes FROM sports_media_blobs WHERE sha256='blob-test'")).rows[0].bytes).toEqual(Buffer.from([0,1,255]));
+      await expect(importSqlite(filename,target)).rejects.toThrow('not empty');
+      expect((await target.pool.query('SELECT * FROM accounts')).rows).toHaveLength(1);
+    } finally {
+      await target.close();
+      await admin.query(`DROP SCHEMA ${importSchema} CASCADE`);
+      rmSync(directory,{recursive:true,force:true});
+    }
   });
 });
