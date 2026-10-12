@@ -69,6 +69,9 @@ function portalIdentity(repo: Pick<Repository, 'all'>, actor: Account) {
 
 /** Original portal contract; all authorization remains in the shared domain. */
 export function portalSecurity(repo: Repository, actor: Account) {
+  return portalSecurityData(repo,actor,repo.db.prepare('SELECT login_kind FROM accounts WHERE id=?').get(actor.id)?.login_kind==='ADMIN');
+}
+export function portalSecurityData(repo:Pick<Repository,'all'>,actor:Account,independentAdmin:boolean) {
   const identity = portalIdentity(repo, actor);
   const access = administratorAccess(repo, actor);
   return {
@@ -86,9 +89,7 @@ export function portalSecurity(repo: Repository, actor: Account) {
       identity.data.role === "admin" &&
       !access.superAdmin &&
       actor.status === "active" &&
-      repo.db
-        .prepare("SELECT login_kind FROM accounts WHERE id=?")
-        .get(actor.id)?.login_kind === "ADMIN",
+      independentAdmin,
   };
 }
 

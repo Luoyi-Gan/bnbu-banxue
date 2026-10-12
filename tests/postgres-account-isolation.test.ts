@@ -32,6 +32,27 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     const companionCookie=companion.headers.get('set-cookie')!.split(';')[0],sportsCookie=sports.headers.get('set-cookie')!.split(';')[0];
     expect(companionCookie).toMatch(/^bnbu_session=/);expect(sportsCookie).toMatch(/^bnbu_sports_session=/);
     const combined=companionCookie+'; '+sportsCookie;
+    const sessionCount=async()=>Number((await databases[1].pool.query('SELECT count(*) FROM sessions')).rows[0].count);
+    const before=await sessionCount();
+    expect((await post(1,'/api/v1/auth/password-login',{account:email,password})).status).toBe(403);
+    expect(await sessionCount()).toBe(before);
+    for(const role of ['teacher','admin']){
+      const id='portal-'+role,identifier=role+'@bnbu.edu.cn';
+      await databases[1].pool.query('INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[id,identifier,hashPassword(password),role,JSON.stringify([role]),'now',role==='admin'?'ADMIN':'PERSONAL',role==='admin'?identifier:null]);
+      const identity=await databases[1].transaction(client=>new PostgresRepository(client).create('sportsIdentity',id,{role,status:'verified',mustChangePassword:true}));
+      const login=await post(1,'/api/v1/auth/password-login',{account:identifier,password});
+      expect(login.status).toBe(200);expect((await login.json()).data.user.role).toBe(role.toUpperCase());
+      const portalCookie=login.headers.get('set-cookie')!.split(';')[0];
+      expect(portalCookie).toMatch(/^bnbu_sports_session=/);
+      const security=await fetch(urls[1]+'/api/v1/auth/account-security',{headers:{Cookie:portalCookie}});
+      expect(security.status).toBe(200);expect((await security.json()).data.mustChangePassword).toBe(true);
+      await databases[1].pool.query("UPDATE entities SET data=jsonb_set(data::jsonb,'{status}','\"revoked\"')::text WHERE id=$1",[identity.id]);
+      expect((await fetch(urls[1]+'/api/v1/auth/account-security',{headers:{Cookie:portalCookie}})).status).toBe(403);
+      const count=await sessionCount();
+      expect((await post(1,'/api/v1/auth/password-login',{account:identifier,password})).status).toBe(403);
+      expect(await sessionCount()).toBe(count);
+      expect((await post(1,'/api/v1/auth/logout',{},portalCookie)).status).toBe(200);
+    }
     expect((await (await fetch(urls[0]+'/api/auth/me',{headers:{Cookie:combined}})).json()).account.id).toBe('account-0');
     expect((await (await fetch(urls[1]+'/api/v1/me',{headers:{Cookie:combined}})).json()).data.user.id).toBe('account-1');
     expect((await fetch(urls[1]+'/api/v1/me',{headers:{Cookie:companionCookie}})).status).toBe(401);

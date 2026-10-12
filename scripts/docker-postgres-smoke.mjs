@@ -9,7 +9,16 @@ const base='http://127.0.0.1:4188';
 const email=`smoke-${randomUUID()}@example.test`;
 const password=randomBytes(24).toString('base64url');
 let cookie='';
+let sportsMode=false;
+function docker(args,options) {
+  if(sportsMode && args[0]==='exec' && args[1]==='bnbu-postgres-local-postgres-1')args=['exec','-e','PGOPTIONS=-c search_path=sports',...args.slice(1)];
+  return execFileSync('docker',args,options);
+}
 async function request(path,input) {
+  if(sportsMode){
+    if(path.startsWith('/api/auth/'))path=path.replace('/api/auth/','/api/sports/auth/');
+    if(path==='/api/commands')path='/api/sports/commands';
+  }
   const response=await fetch(base+path,{
     method:input===undefined?'GET':'POST',
     headers:{...(cookie?{Cookie:cookie}:{}),...(input===undefined?{}:{'Content-Type':'application/json',Origin:base})},
@@ -27,23 +36,23 @@ assert.equal((await fetch(base+'/v2/login')).status,200);
 assert.equal((await fetch(base+'/api/auth/me')).status,401);
 await request('/api/auth/verification-codes',{email});
 // email is generated above using UUID characters only, never supplied by a caller.
-const body=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${email}'`],{encoding:'utf8'});
+const body=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${email}'`],{encoding:'utf8'});
 const code=/\d{6}/.exec(body)?.[0];
 assert.ok(code);
 await request('/api/auth/register',{email,password,code});
 await request('/api/auth/sign-in',{identifier:email,password});
-const actor=(await request('/api/auth/me')).account;
+let actor=(await request('/api/auth/me')).account;
 assert.deepEqual(actor.roles,[]);
 assert.match(actor.id,/^[0-9a-f-]{36}$/);
 // Local fixture authorization is explicit; registration itself grants no school role.
-execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE accounts SET roles='["student"]' WHERE id='${actor.id}'`],{stdio:'pipe'});
+docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE accounts SET roles='["student"]' WHERE id='${actor.id}'`],{stdio:'pipe'});
 await request('/api/commands',{action:'preferences.preview',input:{enabled:false},requestId:randomUUID()});
 const avatar='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=';
 await request('/api/commands',{action:'profile.save',input:{nickname:'容器验证',avatar},requestId:randomUUID()});
-const profile=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data FROM entities WHERE kind='profile' AND owner_id='${actor.id}'`],{encoding:'utf8'});
+const profile=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data FROM entities WHERE kind='profile' AND owner_id='${actor.id}'`],{encoding:'utf8'});
 assert.ok(profile.includes('$bnbuStoredImage'));
 assert.ok(!profile.includes('data:image'));
-execFileSync('docker',['restart','bnbu-postgres-local-postgres-1','bnbu-postgres-local-api-1'],{stdio:'pipe'});
+docker(['restart','bnbu-postgres-local-postgres-1','bnbu-postgres-local-api-1'],{stdio:'pipe'});
 let ready=false;
 for(let i=0;i<30;i++) {
   try { if((await fetch(base+'/api/health')).ok) {ready=true;break;} } catch { /* startup */ }
@@ -51,15 +60,23 @@ for(let i=0;i<30;i++) {
 }
 assert.ok(ready,'API did not recover after restart');
 assert.equal((await request('/api/auth/me')).account.id,actor.id);
-const stored=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data::jsonb->>'profilePreview' FROM entities WHERE kind='preferences' AND owner_id='${actor.id}'`],{encoding:'utf8'}).trim();
+const stored=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT data::jsonb->>'profilePreview' FROM entities WHERE kind='preferences' AND owner_id='${actor.id}'`],{encoding:'utf8'}).trim();
 assert.equal(stored,'false');
 assert.ok(JSON.stringify(await request('/api/workspace')).includes(avatar),'Image did not survive restart');
+const companionCookie=cookie,companionId=actor.id;
+sportsMode=true;
+const independentId=randomUUID();
+docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at) SELECT '${independentId}',email,password_hash,name,'["student"]','now' FROM public.accounts WHERE id='${companionId}'`],{stdio:'pipe'});
+await request('/api/auth/sign-in',{identifier:email,password});
+actor=(await request('/api/auth/me')).account;
+assert.notEqual(actor.id,companionId);
+assert.ok(cookie.startsWith('bnbu_sports_session='));
 const sportsIdentity=randomUUID();
-execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO entities(id,kind,owner_id,data,version,created_at,updated_at) VALUES('${sportsIdentity}','sportsIdentity','${actor.id}','{"role":"admin","status":"verified","permissions":["HELP"]}',1,'now','now')`],{stdio:'pipe'});
+docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO entities(id,kind,owner_id,data,version,created_at,updated_at) VALUES('${sportsIdentity}','sportsIdentity','${actor.id}','{"role":"admin","status":"verified","permissions":["HELP"]}',1,'now','now')`],{stdio:'pipe'});
 const helpInput={titleZh:'容器帮助验证',titleEn:'Container help',bodyZh:'本地验收内容',bodyEn:'Local acceptance fixture',category:'EXERCISE',keywords:'test',weight:1,publish:true};
 const help=(await request('/api/commands',{action:'sports.help.save',input:helpInput,requestId:randomUUID()})).data;
 assert.ok((await request('/api/sports/help?lang=zh')).articles.some(article=>article.id===help.id));
-execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data='{"role":"student","status":"verified"}' WHERE id='${sportsIdentity}'`],{stdio:'pipe'});
+docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data='{"role":"student","status":"verified"}' WHERE id='${sportsIdentity}'`],{stdio:'pipe'});
 const studentArticle=(await request('/api/sports/help?lang=en')).articles.find(article=>article.id===help.id);
 assert.equal(studentArticle.data.body,'Local acceptance fixture');
 assert.equal(studentArticle.ownerId,null);
@@ -82,7 +99,7 @@ assert.equal(preferenceResult.data.locale,'en');
 assert.deepEqual(await (await fetch(base+'/api/v1/me/preferences',{method:'PATCH',headers:preferencesHeaders,body:preferenceBody})).json(),preferenceResult);
 assert.deepEqual((await request('/api/v1/me/preferences')).data,preferenceResult.data);
 const notificationId=randomUUID();
-execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO notifications(id,recipient_id,event,body,created_at) VALUES('${notificationId}','${actor.id}','sports.fixture','Docker notification','2026-10-12T00:00:00Z')`],{stdio:'pipe'});
+docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO notifications(id,recipient_id,event,body,created_at) VALUES('${notificationId}','${actor.id}','sports.fixture','Docker notification','2026-10-12T00:00:00Z')`],{stdio:'pipe'});
 assert.ok((await request('/api/v1/notifications?unreadOnly=true')).data.some(n=>n.id===notificationId));
 const readHeaders={Cookie:cookie,Origin:base,'Idempotency-Key':randomUUID()};
 const readResponse=await fetch(`${base}/api/v1/notifications/${notificationId}/read`,{method:'POST',headers:readHeaders});
@@ -98,7 +115,7 @@ const fixtureRows=[
   [courseId,'sportsCourse',{name:'Docker 课程',semesterId,status:'PUBLISHED',description:'Local fixture',publishedAt:'2026-09-01T00:00:00Z',closingDate:'2027-01-27',settlementDate:'2027-01-28',startDate:'2026-09-01',deadlineDate:'2027-01-20',enrollmentOpen:true}],
   [enrollmentId,'sportsEnrollment',{courseId,semesterId,status:'ACTIVE'}],
 ];
-for(const [id,kind,data] of fixtureRows) execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO entities(id,kind,owner_id,data,version,created_at,updated_at) VALUES('${id}','${kind}','${actor.id}','${JSON.stringify(data).replaceAll("'","''")}',1,'2026-10-12T00:00:00Z','2026-10-12T00:00:00Z')`],{stdio:'pipe'});
+for(const [id,kind,data] of fixtureRows) docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO entities(id,kind,owner_id,data,version,created_at,updated_at) VALUES('${id}','${kind}','${actor.id}','${JSON.stringify(data).replaceAll("'","''")}',1,'2026-10-12T00:00:00Z','2026-10-12T00:00:00Z')`],{stdio:'pipe'});
 try {
   assert.equal((await request(`/api/v1/courses/${courseId}`)).data.courseName,'Docker 课程');
   const section=(await request(`/api/v1/class-sections/${courseId}`)).data;
@@ -115,7 +132,7 @@ try {
   assert.deepEqual((await request('/api/v1/student/enrollments/'+enrollmentId+'/physical-result')).data,{status:'NOT_RECORDED',result:null});
   assert.equal(members.meta.pagination.hasMore,false);
   const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'});
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data=(data::jsonb || '{"status":"CURRENT"}'::jsonb)::text WHERE id='${semesterId}'; UPDATE entities SET data=(data::jsonb || '{"startDate":"${today}","deadlineDate":"${today}","startTime":"00:00","endTime":"23:59","threshold":30}'::jsonb)::text WHERE id='${courseId}'`],{stdio:'pipe'});
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data=(data::jsonb || '{"status":"CURRENT"}'::jsonb)::text WHERE id='${semesterId}'; UPDATE entities SET data=(data::jsonb || '{"startDate":"${today}","deadlineDate":"${today}","startTime":"00:00","endTime":"23:59","threshold":30}'::jsonb)::text WHERE id='${courseId}'`],{stdio:'pipe'});
   const sessionWrite=async(path,input,key=randomUUID())=>{
     const response=await fetch(base+path,{method:'POST',headers:{Cookie:cookie,Origin:base,'Content-Type':'application/json','Idempotency-Key':key},body:JSON.stringify(input)});
     const payload=await response.json();assert.equal(response.status,200,JSON.stringify(payload));return payload.data;
@@ -175,20 +192,20 @@ try {
 
 
   const teacherId=randomUUID(),adminId=randomUUID(),adminLogin='smoke-admin-'+randomUUID(),teacherEmail='teacher-'+randomUUID()+'@example.test';
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',
     `INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) SELECT '${teacherId}','${teacherEmail}',password_hash,'Docker teacher','["teacher"]','now','PERSONAL',NULL FROM accounts WHERE id='${actor.id}';
      INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) SELECT '${adminId}','${adminLogin}@example.test',password_hash,'Docker administrator','["superadmin"]','now','ADMIN','${adminLogin}' FROM accounts WHERE id='${actor.id}';
      INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES('${randomUUID()}','sportsIdentity','${teacherId}','{"role":"teacher","status":"verified"}','now','now'),('${randomUUID()}','sportsIdentity','${adminId}','{"role":"admin","status":"verified"}','now','now');
      UPDATE entities SET owner_id='${teacherId}',data=(data::jsonb || '{"weeklyLimit":3,"relatedTarget":600,"otherTarget":600}'::jsonb)::text WHERE id='${courseId}';`],{stdio:'pipe'});
   const studentCookie=cookie;
-  await request('/api/auth/sign-in',{identifier:adminLogin,password});
+  assert.equal((await request('/api/v1/auth/password-login',{account:adminLogin,password})).data.user.role,'ADMIN');
   const publishedTemplate=(await request('/api/commands',{action:'sports.template.publish',input:{name:'Docker fixed V8.1'},requestId:randomUUID()})).data;
   const futureYear=2100+Math.floor(Math.random()*7000),futureSemester={name:'Docker future semester',academicYear:futureYear+'-'+(futureYear+1),type:'SUMMER',startDate:futureYear+'-06-01',endDate:futureYear+'-08-31'};
   const createdSemester=(await request('/api/commands',{action:'sports.semester.create',input:futureSemester,requestId:randomUUID()})).data;
   await request('/api/commands',{action:'sports.semester.update',input:{...futureSemester,id:createdSemester.id,version:1,name:'Docker checked semester'},requestId:randomUUID()});
   const semesterView=(await request('/api/sports/workspace')).semesters.find(s=>s.id===createdSemester.id);
   assert.equal(semesterView.data.status,'UPCOMING');assert.equal(semesterView.data.name,'Docker checked semester');
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdSemester.id}'`],{stdio:'pipe'});
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdSemester.id}'`],{stdio:'pipe'});
   const conversionTables=(await request('/api/sports/workspace')).conversionTables;
   assert.equal(conversionTables.length,4);assert.equal(conversionTables.reduce((n,t)=>n+t.data.rows.length,0),404);
   const conversionTable=conversionTables[0],conversionRow=conversionTable.data.rows[0];
@@ -197,7 +214,8 @@ try {
   assert.equal(changedConversion.version,conversionTable.version+1);assert.equal(changedConversion.data.rows[0].note,'Docker verification');
   await request('/api/commands',{action:'sports.conversion.edit',input:{id:conversionTable.id,version:changedConversion.version,rowId:conversionRow.id,min:conversionRow.min,max:conversionRow.max,score:conversionRow.score,grade:conversionRow.grade,note:conversionRow.note},requestId:randomUUID()});
   const mode=(await request('/api/commands',{action:'sports.ai.manual',input:{courseId,endAt:new Date(Date.now()+3600000).toISOString(),reason:'Docker manual review fixture'},requestId:randomUUID()})).data;
-  await request('/api/auth/sign-in',{identifier:teacherEmail,password});
+  assert.equal((await request('/api/v1/auth/password-login',{account:teacherEmail,password})).data.user.role,'TEACHER');
+  assert.equal((await request('/api/v1/auth/account-security')).data.mustChangePassword,false);
   const teacherWorkspace=await request('/api/sports/workspace');let reviewRecord=teacherWorkspace.records.find(r=>r.data.sourceDraftId===finalDraft.id);
   assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
   const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
@@ -220,17 +238,17 @@ try {
   const publicPreview=await fetch(base+'/api/v1/course-invites/'+publishedInvite.inviteToken+'/preview');assert.equal(publicPreview.status,200);assert.equal((await publicPreview.json()).data.enrollmentOpen,true);
   const joinEmail='y'+String(Math.floor(Math.random()*1000000000)).padStart(9,'0')+'@bnbu.edu.cn';
   const emailChallenge=await sessionWrite('/api/v1/auth/student-sign-in-codes',{organizationCode:'BNBU',account:joinEmail,channel:'EMAIL',locale:'zh-CN',joinInviteToken:publishedInvite.inviteToken});assert.equal(emailChallenge.delivery,'local-outbox');
-  const joinMail=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${joinEmail}'`],{encoding:'utf8'});
+  const joinMail=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${joinEmail}'`],{encoding:'utf8'});
   const emailVerification={challengeId:emailChallenge.challengeId,code:/\d{6}/.exec(joinMail)[0],joinEmail,joinInviteToken:publishedInvite.inviteToken,deviceId:'docker-test'},emailVerifyKey=randomUUID();
   const emailProof=await sessionWrite('/api/v1/auth/student-sign-in-codes/verify',emailVerification,emailVerifyKey);assert.ok(emailProof.joinEmailProof);assert.deepEqual(await sessionWrite('/api/v1/auth/student-sign-in-codes/verify',emailVerification,emailVerifyKey),emailProof);
   const joinStudentId=randomUUID(),joinStudentEmail=joinEmail;
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind) SELECT '${joinStudentId}','${joinStudentEmail}',password_hash,'Docker joining student','["student"]','now','PERSONAL' FROM accounts WHERE id='${actor.id}'; INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES('${randomUUID()}','sportsIdentity','${joinStudentId}','{"role":"student","status":"verified"}','now','now')`],{stdio:'pipe'});
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind) SELECT '${joinStudentId}','${joinStudentEmail}',password_hash,'Docker joining student','["student"]','now','PERSONAL' FROM accounts WHERE id='${actor.id}'; INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES('${randomUUID()}','sportsIdentity','${joinStudentId}','{"role":"student","status":"verified"}','now','now')`],{stdio:'pipe'});
   await request('/api/auth/sign-in',{identifier:joinStudentEmail,password});
   const memberProfile={fullName:'Docker joining student',studentNumber:'2030123456',gender:'MALE',gradeYear:2030,collegeName:'FST',majorName:'CST',dateOfBirth:'2010-01-01',regionCode:'GD'};
   const memberIdentity={role:'student',status:'verified',studentNumber:memberProfile.studentNumber,sex:memberProfile.gender,year:memberProfile.gradeYear,collegeName:memberProfile.collegeName,majorName:memberProfile.majorName,dateOfBirth:memberProfile.dateOfBirth,regionCode:memberProfile.regionCode,schoolEmail:joinStudentEmail,schoolEmailVerified:true};
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data='${JSON.stringify(memberIdentity)}' WHERE kind='sportsIdentity' AND owner_id='${joinStudentId}'`],{stdio:'pipe'});
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data='${JSON.stringify(memberIdentity)}' WHERE kind='sportsIdentity' AND owner_id='${joinStudentId}'`],{stdio:'pipe'});
   const signInChallenge=await sessionWrite('/api/v1/auth/student-sign-in-codes',{organizationCode:'BNBU',account:joinStudentEmail,channel:'EMAIL',locale:'zh-CN'});
-  const signInMail=execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${joinStudentEmail}'`],{encoding:'utf8'});
+  const signInMail=docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`SELECT body FROM mail_outbox WHERE recipient='${joinStudentEmail}'`],{encoding:'utf8'});
   const signInBody=JSON.stringify({challengeId:signInChallenge.challengeId,code:/\d{6}/.exec(signInMail)[0],deviceId:'docker-email-login'}),signInHeaders={Origin:base,'Content-Type':'application/json','Idempotency-Key':randomUUID()};
   const signedIn=await fetch(base+'/api/v1/auth/student-sign-in-codes/verify',{method:'POST',headers:signInHeaders,body:signInBody});
   assert.equal(signedIn.status,200);assert.equal((await signedIn.json()).data.kind,'COMPANION');
@@ -244,16 +262,14 @@ try {
   assert.equal(joinedResponse.status,200);const joined=await joinedResponse.json();
   assert.deepEqual(await (await fetch(base+memberPath+'/join',{method:'POST',headers:joinHeaders,body:'{}'})).json(),joined);
   assert.equal(joined.data.authSession.kind,'COMPANION');
-  assert.equal((await request('/api/workspace')).account.studentNumber,memberProfile.studentNumber);
-  assert.ok((await request('/api/students/search?number='+memberProfile.studentNumber)).students.some(s=>s.id===joinStudentId));
-  assert.equal((await request('/api/students/search?number='+joinStudentEmail.split('@')[0])).students.length,0);
+  assert.equal((await request('/api/v1/me')).data.studentProfile.studentNumber,memberProfile.studentNumber);
   assert.ok((await request('/api/v1/enrollments?classSectionId='+createdCourse.id)).data.some(e=>e.id===joined.data.enrollment.id && e.status==='ACTIVE'));
   cookie=teacherCookie;
   assert.ok((await request('/api/v1/enrollments?classSectionId='+createdCourse.id)).data.some(e=>e.studentId===joinStudentId));
   assert.equal((await sessionWrite(invitePath+'/revocations',{inviteToken:publishedInvite.inviteToken})).status,'REVOKED');
   assert.equal((await fetch(base+'/api/v1/course-invites/'+publishedInvite.inviteToken+'/preview')).status,410);
   await request('/api/commands',{action:'sports.course.close',input:{id:createdCourse.id,version:publishedView.version,reason:'Docker test completed'},requestId:randomUUID()});
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM member_join_capabilities WHERE account_id='${joinStudentId}'; DELETE FROM student_email_challenges WHERE invitation_id IN (SELECT id FROM entities WHERE kind='sportsInvitation' AND data::jsonb->>'courseId'='${createdCourse.id}'); DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind IN ('sportsInvitation','sportsEnrollment','sportsEnrollmentFlow') AND data::jsonb->>'courseId'='${createdCourse.id}'); UPDATE accounts SET status='banned',roles='[]' WHERE id='${joinStudentId}'`],{stdio:'pipe'});
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM member_join_capabilities WHERE account_id='${joinStudentId}'; DELETE FROM student_email_challenges WHERE invitation_id IN (SELECT id FROM entities WHERE kind='sportsInvitation' AND data::jsonb->>'courseId'='${createdCourse.id}'); DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind IN ('sportsInvitation','sportsEnrollment','sportsEnrollmentFlow') AND data::jsonb->>'courseId'='${createdCourse.id}'); UPDATE accounts SET status='banned',roles='[]' WHERE id='${joinStudentId}'`],{stdio:'pipe'});
   const teachingReport=await request('/api/sports/course-reports/'+courseId);
   const teachingProgress=await request('/api/v1/student-progress?classSectionId='+courseId);assert.equal(teachingProgress.data.find(p=>p.enrollmentId===enrollmentId).totalEffectiveSeconds,0);
   assert.equal((await request('/api/v1/students/'+actor.id)).data.id,actor.id);
@@ -305,15 +321,16 @@ try {
   const studentProgress=(await request('/api/v1/student-progress?limit=100')).data.find(p=>p.enrollmentId===enrollmentId);
   assert.ok(studentProgress);assert.equal(studentProgress.general.effectiveSeconds,0);
   assert.equal((await request('/api/v1/class-sections/'+courseId+'/progress-target')).data.totalTargetSeconds,72000);
-  await request('/api/auth/sign-in',{identifier:adminLogin,password});
+  assert.equal((await request('/api/v1/auth/password-login',{account:adminLogin,password})).data.user.role,'ADMIN');
   const manual=(await request('/api/sports/workspace')).manualModes.find(m=>m.id===mode.id);
   await request('/api/commands',{action:'sports.ai.stop',input:{id:manual.id,version:manual.version,reason:'Docker fixture complete'},requestId:randomUUID()});
   cookie=studentCookie;
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${mode.id}'; UPDATE accounts SET roles='[]',status='banned' WHERE id IN ('${adminId}','${teacherId}')`],{stdio:'pipe'});
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${mode.id}'; UPDATE accounts SET roles='[]',status='banned' WHERE id IN ('${adminId}','${teacherId}')`],{stdio:'pipe'});
 } finally {
-  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${semesterId}','${courseId}','${enrollmentId}')`],{stdio:'pipe'});
+  docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${semesterId}','${courseId}','${enrollmentId}')`],{stdio:'pipe'});
 }
 await request('/api/auth/logout',{});
-assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
-console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence, sports help, exercise upload and submission, technical handling, administrator manual mode, teacher review, student result, logout.');
+assert.equal((await fetch(base+'/api/sports/auth/me',{headers:{Cookie:cookie}})).status,401);
+assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:companionCookie}})).status,200);
+console.log('PASS: independent-account PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence, sports help, exercise upload and submission, technical handling, administrator manual mode, teacher review, student result, logout.');
 

@@ -4,6 +4,7 @@ import { postgresInvitationPreview } from './storage/postgres-invitation-preview
 import { requestStudentJoinEmail, verifyStudentJoinEmail } from './storage/postgres-student-email';
 import { requestStudentLogin, verifyStudentLogin } from './storage/postgres-student-login';
 import {issueNewStudentJoin,consumeNewStudentJoin} from './storage/postgres-new-student-join';
+import {postgresPortalLogin,postgresPortalSecurity} from './storage/postgres-portal-auth';
 import { reportCsv } from './sports/report';
 import { courseWindowInput, courseInviteInput, courseInviteProjection } from './sports/portal-courses';
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
@@ -58,6 +59,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
       if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && pathname==='/api/v1/auth/account-security')return send(response,200,{data:await postgresPortalSecurity(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && teacherStudent) {
         demand([...new URL(request.url ?? '/', 'http://localhost').searchParams.keys()].length===0,'学生资料查询参数无效。');
         return send(response,200,await postgresTeacherStudent(db,cookieToken(request) ?? '',decodeURIComponent(teacherStudent[1])));
@@ -178,6 +180,17 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,cookieToken(request) ?? '','sports.notification.read',{id:decodeURIComponent(notificationRead[1])},key)});
         }
         const input = await body(request);
+        if(pathname==='/api/v1/auth/password-login') {
+          demand(Object.keys(input).every(k=>['account','password'].includes(k)),'登录参数无效。');
+          const result=await postgresPortalLogin(db,input.account,input.password);
+          response.setHeader('Set-Cookie',cookie(result.token,43200));
+          return send(response,200,{data:{user:result.user}});
+        }
+        if(pathname==='/api/v1/auth/logout') {
+          demand(Object.keys(input).length===0,'退出参数无效。');
+          await auth.logout(cookieToken(request));response.setHeader('Set-Cookie',cookie('',0));
+          return send(response,200,{data:null});
+        }
         const newStudentJoin=/^\/api\/v1\/course-invites\/([^/]+)\/join-capabilities$/.exec(pathname);
         if(newStudentJoin){
           const key=request.headers['idempotency-key'];demand(typeof key==='string','缺少操作幂等标识。');

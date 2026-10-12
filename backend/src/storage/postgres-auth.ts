@@ -6,7 +6,7 @@ import type { PostgresDatabase } from './postgres';
 export class PostgresAuth {
   constructor(private readonly db: PostgresDatabase) {}
 
-  async login(identifierInput: unknown, password: unknown, kind?: 'PERSONAL' | 'ADMIN') {
+  async login(identifierInput: unknown, password: unknown, kind?: 'PERSONAL' | 'ADMIN', validate?: (client:PoolClient,actor:ReturnType<typeof account>)=>Promise<void>) {
     demand(typeof identifierInput === 'string' && identifierInput.trim().length > 0 && identifierInput.trim().length <= (kind === 'ADMIN' ? 100 : 254), '请填写邮箱或管理账号。');
     const identifier = kind === 'PERSONAL' ? normalizeEmail(identifierInput) : identifierInput.trim().toLowerCase();
     demand(typeof password === 'string', '邮箱或密码错误。', 401);
@@ -32,6 +32,7 @@ export class PostgresAuth {
         demand(identity.rows.length,'管理账号身份不可用。',403);
       }
       await client.query('DELETE FROM login_attempts WHERE identifier=$1',[identifier]);
+      if(validate)await validate(client,account(row));
       const token = randomBytes(32).toString('base64url');
       await client.query('INSERT INTO sessions(token_hash,account_id,expires_at,created_at) VALUES($1,$2,$3,$4)', [digest(token),row.id,now+43_200_000,timestamp()]);
       return {token,account:account(row)};
