@@ -17,7 +17,10 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
-import { portalApplications } from "./sports/portal-applications";
+import {
+  portalApplications,
+  portalApplicationReview,
+} from "./sports/portal-applications";
 import { portalProofAccess, portalProofRead } from "./sports/portal-media";
 import {
   portalEnrollments,
@@ -434,6 +437,21 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const applicationReview =
+          /^\/api\/v1\/exemption-applications\/([^/]+)\/review$/.exec(pathname);
+        if (applicationReview) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalApplicationReview(
+              db,
+              token!,
+              applicationReview[1],
+              input,
+              key,
+            ),
+          });
+        }
         const proofAccess = /^\/api\/v1\/media\/([^/]+)\/access-url$/.exec(
           pathname,
         );

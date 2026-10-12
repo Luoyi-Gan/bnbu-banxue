@@ -13,6 +13,7 @@ import {
 import { enduranceWorkspace } from "../server/sports/endurance";
 import { reviewWorkspace } from "../server/sports/review";
 import { courseReport } from "../server/sports/report";
+import { createApiServer } from "../server/main";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 function setup() {
@@ -98,6 +99,99 @@ function setup() {
     submit,
   };
 }
+it("原版审核接口复用批准、补证和驳回事务及认可学时", async () => {
+  const f = setup(),
+    server = createApiServer(f.db);
+  try {
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", resolve),
+    );
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("listener");
+    const review = (
+      id: string,
+      body: object,
+      key: string,
+      token = f.teacher.token,
+    ) =>
+      fetch(
+        `http://127.0.0.1:${address.port}/api/v1/exemption-applications/${id}/review`,
+        {
+          method: "POST",
+          headers: {
+            Cookie: `bnbu_session=${token}`,
+            "Content-Type": "application/json",
+            "Idempotency-Key": key,
+          },
+          body: JSON.stringify(body),
+        },
+      );
+    const cert = f.submit([(await f.image()).id], "CERTIFICATION");
+    const body = {
+      decision: "APPROVE",
+      expectedVersion: cert.version,
+      publicComment: "已核实组织证明",
+      courseMinutes: 120,
+      generalMinutes: 60,
+    };
+    expect(
+      (await review(cert.id, body, "other-review", f.other.token)).status,
+    ).toBe(403);
+    expect(
+      (await review(cert.id, { ...body, courseMinutes: 601 }, "over-target"))
+        .status,
+    ).toBe(400);
+    expect(f.repo.get(cert.id).version).toBe(cert.version);
+    const approved = await review(cert.id, body, "approve-cert");
+    expect(approved.status).toBe(200);
+    expect((await approved.json()).data).toMatchObject({
+      id: cert.id,
+      status: "APPROVED",
+      publicComment: body.publicComment,
+    });
+    expect((await review(cert.id, body, "approve-cert")).status).toBe(200);
+    expect(
+      f.repo
+        .all("sportsCertification")
+        .map((item) => item.data.minutes)
+        .sort((a, b) => Number(a) - Number(b)),
+    ).toEqual([60, 120]);
+    expect((await review(cert.id, body, "stale-review")).status).toBe(409);
+    const exempt = f.submit([(await f.image()).id]);
+    expect(
+      (
+        await review(
+          exempt.id,
+          {
+            decision: "REQUEST_SUPPLEMENT",
+            expectedVersion: exempt.version,
+            publicComment: "请补充证明",
+          },
+          "request-proof",
+        )
+      ).status,
+    ).toBe(200);
+    expect(f.repo.get(exempt.id).data.status).toBe("SUPPLEMENT_REQUIRED");
+    expect(f.repo.all("sportsExemption")).toHaveLength(0);
+    const another = f.submit([(await f.image()).id]);
+    expect(
+      (
+        await review(
+          another.id,
+          {
+            decision: "REJECT",
+            expectedVersion: another.version,
+            publicComment: "材料不符合要求",
+          },
+          "reject-proof",
+        )
+      ).status,
+    ).toBe(200);
+    expect(f.repo.get(another.id).data.status).toBe("REJECTED");
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
 it("证明按原字节私有保存，未正式提交不授予教师查看，格式和绑定归属受限", async () => {
   const f = setup(),
     asset = await f.image();
