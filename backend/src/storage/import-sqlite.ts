@@ -4,7 +4,7 @@ import type { PostgresDatabase } from './postgres';
 const tables = [
   'accounts', 'sessions', 'email_challenges', 'mail_outbox',
   'admin_security_challenges', 'entities', 'relations', 'notifications',
-  'audit', 'command_receipts', 'sports_media_blobs', 'sports_template_publications',
+  'audit', 'command_receipts',
 ] as const;
 
 /** Offline cutover only: take a consistent read-only source snapshot, then import atomically. */
@@ -41,9 +41,6 @@ export async function importSqlite(sourcePath: string, target: PostgresDatabase)
       if (count !== rows.length) throw new Error(`Imported ${table} count mismatch`);
       counts[table] = count;
     }
-    // Restart is transactional, unlike setval; an import rollback must not change the sequence.
-    const next = BigInt((await client.query('SELECT COALESCE(MAX(sequence),0)+1 AS next FROM sports_template_publications')).rows[0].next);
-    await client.query(`ALTER TABLE sports_template_publications ALTER COLUMN sequence RESTART WITH ${next}`);
     return counts;
   });
 }

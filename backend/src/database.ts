@@ -70,9 +70,6 @@ export function openDatabase(filename: string) {
       request_hash TEXT NOT NULL, result TEXT NOT NULL, created_at TEXT NOT NULL,
       PRIMARY KEY (actor_id, request_id)
     );
-    CREATE TABLE IF NOT EXISTS sports_media_blobs (
-      sha256 TEXT PRIMARY KEY, bytes BLOB NOT NULL, created_at TEXT NOT NULL
-    );
     INSERT OR IGNORE INTO schema_migrations VALUES (2, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
     INSERT OR IGNORE INTO schema_migrations VALUES (1, strftime('%Y-%m-%dT%H:%M:%fZ','now'));
   `);
@@ -81,20 +78,6 @@ export function openDatabase(filename: string) {
   db.exec(
     "INSERT OR IGNORE INTO schema_migrations VALUES(6,strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
   );
-  transaction(db, () => {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS sports_template_publications (
-        sequence INTEGER PRIMARY KEY AUTOINCREMENT,
-        template_id TEXT NOT NULL UNIQUE REFERENCES entities(id)
-      );
-      INSERT INTO sports_template_publications(template_id)
-      SELECT id FROM entities
-      WHERE kind='sportsTemplate' AND json_extract(data,'$.status')='published'
-        AND id NOT IN (SELECT template_id FROM sports_template_publications)
-      ORDER BY created_at,id;
-      INSERT OR IGNORE INTO schema_migrations VALUES(7,strftime('%Y-%m-%dT%H:%M:%fZ','now'));
-    `);
-  });
   return db;
 }
 

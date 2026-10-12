@@ -416,7 +416,6 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       try {
         accountId = createAccount(source,{email:'import@example.test',name:'导入账号',password:'Test-import-123',roles:['student']});
         new Repository(source).create('post', accountId, { title: '导入验证', body: '伴学社区数据', status: 'pending' });
-        source.prepare('INSERT INTO sports_media_blobs VALUES(?,?,?)').run('blob-test',Buffer.from([0,1,255]),'now');
         // Force a failure after accounts have been inserted; the whole import must roll back.
         source.exec('ALTER TABLE entities ADD COLUMN unexpected_column TEXT');
       } finally { source.close(); }
@@ -426,9 +425,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       try { fix.exec('ALTER TABLE entities DROP COLUMN unexpected_column'); } finally { fix.close(); }
       const counts = await importSqlite(filename,target);
       expect(counts.accounts).toBe(1);
-      expect(counts.entities).toBeGreaterThan(0);
+      expect(counts.entities).toBe(1);
+      expect((await target.pool.query("SELECT data FROM entities WHERE kind='post'")).rows[0].data).toContain('导入验证');
+      expect(counts).not.toHaveProperty('sports_media_blobs');
       expect((await target.pool.query('SELECT id FROM accounts')).rows[0].id).toBe(accountId!);
-      expect((await target.pool.query("SELECT bytes FROM sports_media_blobs WHERE sha256='blob-test'")).rows[0].bytes).toEqual(Buffer.from([0,1,255]));
       await expect(importSqlite(filename,target)).rejects.toThrow('not empty');
       expect((await target.pool.query('SELECT * FROM accounts')).rows).toHaveLength(1);
     } finally {

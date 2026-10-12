@@ -2159,3 +2159,14 @@ scripts/docker-postgres-smoke.mjs新增--companion-only，在体育阶段前退�
 - 清理 BUSINESS_RULES 中约 270 行已经撤回的体育重建/打卡/审核/结算实施条款，将当前范围置顶并同步师生能力表。
 - 旧全文存档：D:/伴学/archive/goal-scope-rollback-20261012/BUSINESS_RULES-before-consolidation.md。伴学其他模块规则保留；旧 sports-v81 只作历史参考，不再驱动开发。
 - 此轮仅文档调整，未修改运行代码、界面或数据库，不重复运行无关测试。
+
+### 2026-10-12 体育清理：登录适配与数据库初始化
+| 项目 | 处理 |
+| --- | --- |
+| sports/portal.ts 与 portal-accounts.ts | 删除未使用体育登录、账号写入适配；移除仅服务原体育接口的投影分支 |
+| SQLite sports_media_blobs / sports_template_publications | 不再建表或回填体育规则发布记录；既有表不自动删除 |
+| SQLite → PostgreSQL 导入 | 不再导入体育专用材料和规则发布表，不调整体育序列；保留伴学原子导入及目标非空保护 |
+| PostgreSQL 已有迁移 | 保持原历史版本，避免 checksum 不匹配；并不代表体育表仍有业务入口 |
+| 外部体育库 | 未连接、未修改 |
+
+完整测试251通过、0失败、0跳过；后端类型检查通过。导入测试明确校验伴学帖子内容，不再依赖体育材料。尚需进一步审查历史 sportsIdentity 与伴学授权/学号查询的耦合，不能宣称全部清理完毕。
