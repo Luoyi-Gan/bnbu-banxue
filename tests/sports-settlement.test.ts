@@ -138,6 +138,35 @@ it("原版结算预检只读，保留阻塞和未知分母，按课程隔离", a
     );
     expect(f.repo.all("sportsSettlementPreparation")).toHaveLength(0);
     expect(f.repo.all("sportsSettlementReport")).toHaveLength(0);
+    const exportUrl = url.replace(/settlement-$/, "composite-roster/export");
+    const exported = await fetch(exportUrl, {
+      headers: { Cookie: `bnbu_session=${f.teacher.token}` },
+    });
+    expect(exported.status).toBe(200);
+    const file = (await exported.json()).data;
+    expect(file.fileName).toBe("composite-roster.xlsx");
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(Buffer.from(file.fileBase64, "base64"));
+    const exportedRows: unknown[][] = [];
+    workbook.worksheets[0].eachRow((row) =>
+      exportedRows.push(row.values as unknown[]),
+    );
+    expect(exportedRows.find((row) => row[1] === "报告类型")?.[2]).toBe(
+      "CURRENT_TEACHING_REPORT",
+    );
+    expect(exportedRows.find((row) => row[1] === "名单分母")?.[2]).toBe(1);
+    expect(exportedRows.find((row) => row[1] === "SCHOOL")?.[4]).toBe(
+      "student",
+    );
+    expect(JSON.stringify(exportedRows)).not.toContain("97531");
+    for (const who of [f.student, f.other, f.admin])
+      expect(
+        (
+          await fetch(exportUrl, {
+            headers: { Cookie: `bnbu_session=${who.token}` },
+          })
+        ).status,
+      ).toBe(403);
     f.repo.create("sportsGradeDraft", f.teacher.account.id, {
       courseId: f.course.id,
       enrollmentId: f.member.id,

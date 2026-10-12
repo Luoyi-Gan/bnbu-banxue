@@ -21,7 +21,10 @@ import {
   portalSettlementPreview,
   portalSettlementConfirm,
 } from "./sports/portal-settlement";
-import { portalFrozenReportExport } from "./sports/portal-report-export";
+import {
+  portalFrozenReportExport,
+  portalCompositeReportExport,
+} from "./sports/portal-report-export";
 import {
   portalGradeHistory,
   portalFinalGradeWrite,
@@ -896,6 +899,18 @@ export function createApiServer(
               : { checks: preview.checks },
         });
       }
+      const compositeExport =
+        /^\/api\/v1\/class-sections\/([^/]+)\/composite-roster\/export$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && compositeExport)
+        return send(response, 200, {
+          data: await portalCompositeReportExport(
+            new Repository(db),
+            cookieToken(request) ?? "",
+            compositeExport[1],
+          ),
+        });
       const frozenExport =
         /^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports\/(\d+)\/export$/.exec(
           pathname,

@@ -3,7 +3,23 @@ import { authenticate, demand } from "../auth";
 import { Repository } from "../repository";
 import { ownedCourse } from "./courses";
 import { sportsWriteGate } from "./system";
-import { reportRows, type CourseReport } from "./report";
+import { courseReport, reportRows, type CourseReport } from "./report";
+
+export async function portalCompositeReportExport(
+  repo: Repository,
+  token: string,
+  courseId: string,
+) {
+  const report = courseReport(repo, authenticate(repo.db, token), courseId);
+  return workbookExport(
+    repo,
+    token,
+    courseId,
+    "实时综合名单",
+    "composite-roster.xlsx",
+    reportRows(report),
+  );
+}
 
 export async function portalFrozenReportExport(
   repo: Repository,
@@ -20,9 +36,7 @@ export async function portalFrozenReportExport(
       (row) => row.data.courseId === courseId && row.data.sequence === version,
     );
   demand(reports.length === 1, "该版本结算报告不存在或需要核对。", 404);
-  const entry = reports[0],
-    book = new ExcelJS.Workbook(),
-    sheet = book.addWorksheet("结算报告");
+  const entry = reports[0];
   // Explicit primitive cells keep source strings as text, never Excel formulas.
   const rows: unknown[][] = [
     ["冻结报告ID", entry.id],
@@ -31,6 +45,26 @@ export async function portalFrozenReportExport(
     ["更正原因", entry.data.correctionReason ?? ""],
     ...reportRows(entry.data.report as CourseReport),
   ];
+  return workbookExport(
+    repo,
+    token,
+    courseId,
+    "结算报告",
+    `settlement-report-v${version}.xlsx`,
+    rows,
+  );
+}
+
+async function workbookExport(
+  repo: Repository,
+  token: string,
+  courseId: string,
+  title: string,
+  fileName: string,
+  rows: unknown[][],
+) {
+  const book = new ExcelJS.Workbook(),
+    sheet = book.addWorksheet(title);
   for (const row of rows)
     sheet.addRow(
       row.map((value) =>
@@ -47,7 +81,7 @@ export async function portalFrozenReportExport(
   ownedCourse(repo, authenticate(repo.db, token), courseId);
   sportsWriteGate(repo, "sports.settlement.read");
   return {
-    fileName: `settlement-report-v${version}.xlsx`,
+    fileName,
     contentType:
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     fileBase64: Buffer.from(bytes).toString("base64"),
