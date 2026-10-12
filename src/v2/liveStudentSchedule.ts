@@ -21,7 +21,7 @@ export function liveStudentSchedule(data: Workspace | null, now = Date.now()): S
     const slot = data.alumni.slots.find(s => s.id === b.slotId), person = data.alumni.profiles.find(p => p.id === slot?.alumniId)
     if (b.status !== 'confirmed' || !slot || !person || (b.student !== actor && person.owner !== actor) || Date.parse(slot.endAt) <= now) continue
     const name = person.owner === actor ? data.people.find(p => p.id === b.student)?.name ?? '同学' : person.name
-    items.push({id: b.id, kind: 'coffee', title: `与${name}的 Coffee Chat`, time: '', startAt: slot.startAt, location: slot.location, path: '/workspace/alumni', label: '校友 Coffee Chat'})
+    items.push({id: b.id, kind: 'coffee', title: `与${name}的 Coffee Chat`, time: '', startAt: slot.startAt, location: slot.location, path: person.owner === actor ? '/v2/alumni?view=manage' : '/v2/alumni?view=bookings', label: '校友 Coffee Chat'})
   }
   return items.sort((a,b) => (a.startAt ? Date.parse(a.startAt) : Infinity) - (b.startAt ? Date.parse(b.startAt) : Infinity))
 }
