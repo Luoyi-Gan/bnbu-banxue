@@ -41,6 +41,29 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("举报队伍不向非成员泄露历史成员名单，审核证据保持完整", () => {
+    const { a, b, c, reviewer, operator, run, db, repo } = setup();
+    const room = run(a, "room.create", {
+      type: "study", title: "公开队伍", body: "组队学习",
+      time: "周末", place: "图书馆", capacity: 3,
+    });
+    const application = run(b, "room.apply", { id: room.id });
+    run(a, "room.decide", { id: application.id, accept: true });
+    const report = run(c, "report.create", { id: room.id, reason: "核对信息" });
+    const stored = repo.get(report.id);
+    expect(stored.data.snapshot).toMatchObject({ members: [a.id, b.id] });
+    const read = (who: typeof a) => snapshot(db, who.account).entities
+      .find(e => e.id === report.id);
+    expect(read(c)?.data.snapshot).not.toHaveProperty("members");
+    expect(read(c)?.data.snapshot).toMatchObject({ title: "公开队伍" });
+    expect(read(operator)).toBeUndefined();
+    expect(read(reviewer)?.data.snapshot).toMatchObject({ members: [a.id, b.id] });
+    run(reviewer, "room.moderate", {
+      id: room.id, decision: "remove", memberId: b.id, reason: "成员移除",
+    });
+    expect(read(c)?.data.snapshot).not.toHaveProperty("members");
+    expect(repo.get(report.id)).toEqual(stored);
+  });
   it("活动资格检查所有本人认证，旧驳回和撤销记录不遮挡有效认证", () => {
     const { a, b, admin, run, repo } = setup();
     const rejected = run(a, "certification.apply", {

@@ -341,7 +341,14 @@ export function snapshot(db: Database, actor: Account) {
       .all("message")
       .filter((m) => memberRooms.some((r) => r.id === m.data.roomId)),
     ...repo.all("certification").filter((c) => own(c.ownerId) || review),
-    ...repo.all("report").filter((c) => own(c.ownerId) || review),
+    ...repo.all("report").filter((c) => own(c.ownerId) || review).map((report) => {
+      if (review) return report;
+      const evidence = report.data.snapshot as Fields;
+      // Historical evidence does not grant access to a team's member list.
+      const publicEvidence = { ...evidence };
+      delete publicEvidence.members;
+      return { ...report, data: { ...report.data, snapshot: publicEvidence } };
+    }),
     ...repo
       .all("organization")
       .filter(
