@@ -167,9 +167,30 @@ try {
   assert.equal((await request('/api/v1/exercise-records?limit=50')).data.filter(r=>r.sessionId===session.id).length,1);
 
 
+  const teacherId=randomUUID(),adminId=randomUUID(),adminLogin='smoke-admin-'+randomUUID(),teacherEmail='teacher-'+randomUUID()+'@example.test';
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',
+    `INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) SELECT '${teacherId}','${teacherEmail}',password_hash,'Docker teacher','["teacher"]','now','PERSONAL',NULL FROM accounts WHERE id='${actor.id}';
+     INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) SELECT '${adminId}','${adminLogin}@example.test',password_hash,'Docker administrator','["superadmin"]','now','ADMIN','${adminLogin}' FROM accounts WHERE id='${actor.id}';
+     INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES('${randomUUID()}','sportsIdentity','${teacherId}','{"role":"teacher","status":"verified"}','now','now'),('${randomUUID()}','sportsIdentity','${adminId}','{"role":"admin","status":"verified"}','now','now');
+     UPDATE entities SET owner_id='${teacherId}',data=(data::jsonb || '{"weeklyLimit":3,"relatedTarget":600,"otherTarget":600}'::jsonb)::text WHERE id='${courseId}';`],{stdio:'pipe'});
+  const studentCookie=cookie;
+  await request('/api/auth/sign-in',{identifier:adminLogin,password});
+  const mode=(await request('/api/commands',{action:'sports.ai.manual',input:{courseId,endAt:new Date(Date.now()+3600000).toISOString(),reason:'Docker manual review fixture'},requestId:randomUUID()})).data;
+  await request('/api/auth/sign-in',{identifier:teacherEmail,password});
+  const teacherWorkspace=await request('/api/sports/workspace'),reviewRecord=teacherWorkspace.records.find(r=>r.data.sourceDraftId===finalDraft.id);
+  assert.equal(reviewRecord.data.status,'TEACHER_PENDING');
+  const teacherMaterial=await fetch(base+'/api/sports/materials/'+submittedMaterial.id,{headers:{Cookie:cookie}});assert.equal(teacherMaterial.status,200);
+  await request('/api/commands',{action:'sports.review.decide',input:{id:reviewRecord.id,version:reviewRecord.version,batchId:reviewRecord.data.batchId,checksCompleted:true,decision:'PASS'},requestId:randomUUID()});
+  cookie=studentCookie;const reviewed=(await request('/api/v1/exercise-records/'+finalDraft.id)).data;
+  assert.equal(reviewed.status,'REVIEWED');assert.equal(reviewed.currentReview.result,'VALID');assert.equal(reviewed.creditedDurationSeconds,0,'Short fixture must not receive unearned credit');
+  await request('/api/auth/sign-in',{identifier:adminLogin,password});
+  const manual=(await request('/api/sports/workspace')).manualModes.find(m=>m.id===mode.id);
+  await request('/api/commands',{action:'sports.ai.stop',input:{id:manual.id,version:manual.version,reason:'Docker fixture complete'},requestId:randomUUID()});
+  cookie=studentCookie;
+  execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${mode.id}'; UPDATE accounts SET roles='[]',status='banned' WHERE id IN ('${adminId}','${teacherId}')`],{stdio:'pipe'});
 } finally {
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id IN ('${semesterId}','${courseId}','${enrollmentId}')`],{stdio:'pipe'});
 }
 await request('/api/auth/logout',{});
 assert.equal((await fetch(base+'/api/auth/me',{headers:{Cookie:cookie}})).status,401);
-console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence, sports help publication and student reading, logout.');
+console.log('PASS: PostgreSQL Docker proxy, registration, login, settings, private image storage, restart persistence, sports help, exercise upload and submission, technical handling, administrator manual mode, teacher review, student result, logout.');

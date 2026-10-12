@@ -396,8 +396,7 @@ export function reviewWorkspace(repo: Pick<Repository,"all"|"get">, actor: Accou
               i.data.status === "verified" &&
               ((i.data.role === "student" && p.ownerId === actor.id) ||
                 (i.data.role === "teacher" &&
-                  repo.get(p.data.courseId, "sportsCourse").ownerId ===
-                    actor.id)),
+                  repo.all("sportsCourse").some(c=>c.id===p.data.courseId && c.ownerId===actor.id))),
           ) ||
         records.some(
           (r) => r.ownerId === p.ownerId && r.data.courseId === p.data.courseId,
@@ -428,7 +427,7 @@ export function reviewWorkspace(repo: Pick<Repository,"all"|"get">, actor: Accou
       .filter(
         (m) =>
           admin ||
-          repo.get(m.data.courseId, "sportsCourse").ownerId === actor.id,
+          repo.all("sportsCourse").some(c=>c.id===m.data.courseId && c.ownerId===actor.id),
       ),
     technicalTasks: admin
       ? repo

@@ -307,7 +307,7 @@ export function visibleRecords(repo: Pick<Repository,"all"|"get">, actor: Accoun
       identity.data.role === "student"
         ? r.ownerId === actor.id
         : identity.data.role === "teacher" &&
-          repo.get(r.data.courseId, "sportsCourse").ownerId === actor.id,
+          repo.all("sportsCourse").some(c=>c.id===r.data.courseId && c.ownerId===actor.id),
     );
 }
 export function materialWorkspace(repo: Pick<Repository,"all"|"get">, actor: Account) {
