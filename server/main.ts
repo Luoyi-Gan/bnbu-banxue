@@ -21,6 +21,11 @@ import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
 import { portalLogin, portalMe, portalSecurity } from "./sports/portal";
 import {
+  portalAccountPage,
+  portalSubadmins,
+  portalSubadminWrite,
+} from "./sports/portal-accounts";
+import {
   portalAnnouncement,
   portalHealth,
   portalEnduranceTables,
@@ -380,6 +385,24 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        const subadminWrite =
+          /^\/api\/v1\/admin\/subadmins(?:\/([^/]+)\/(profile|status))?$/.exec(
+            pathname,
+          );
+        if (subadminWrite) {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalSubadminWrite(
+              db,
+              token!,
+              subadminWrite[1],
+              (subadminWrite[2] ?? "create") as "create" | "profile" | "status",
+              input,
+              key,
+            ),
+          });
+        }
         if (pathname === "/api/v1/auth/own-password") {
           const key = request.headers["idempotency-key"];
           demand(typeof key === "string", "缺少操作幂等标识。");
@@ -512,6 +535,55 @@ export function createApiServer(
             pathname === "/api/v1/health/admin"
               ? portalHealth(repo, actor)
               : portalEnduranceTables(repo, actor),
+        });
+      }
+      if (request.method === "GET" && pathname === "/api/v1/admin/subadmins") {
+        const query = new URL(request.url!, "http://localhost").searchParams;
+        return send(response, 200, {
+          data: portalSubadmins(
+            new Repository(db),
+            authenticate(db, cookieToken(request)),
+            query.get("after") ?? "",
+          ),
+        });
+      }
+      const portalDirectory =
+        /^\/api\/v1\/(students|teachers)(?:\/([^/]+))?$/.exec(pathname);
+      if (
+        request.method === "GET" &&
+        (portalDirectory || pathname === "/api/v1/admin/teacher-accounts")
+      ) {
+        const query = new URL(request.url!, "http://localhost").searchParams;
+        const teacher = !portalDirectory || portalDirectory[1] === "teachers";
+        const input = Object.fromEntries(query.entries());
+        if (input.after !== undefined) {
+          input.cursor = input.after;
+          delete input.after;
+        }
+        if (portalDirectory?.[2])
+          input.id = decodeURIComponent(portalDirectory[2]);
+        const page = portalAccountPage(
+          new Repository(db),
+          authenticate(db, cookieToken(request)),
+          teacher ? "teacher" : "student",
+          input,
+        );
+        if (portalDirectory?.[2])
+          return send(response, 200, { data: page.items[0] });
+        if (!portalDirectory)
+          return send(response, 200, {
+            data: { items: page.items, nextCursor: page.nextCursor },
+          });
+        return send(response, 200, {
+          data: page.items,
+          meta: {
+            pagination: {
+              total: page.total,
+              hasMore: page.nextCursor !== null,
+              nextCursor: page.nextCursor,
+              limit: Number(input.limit ?? 20),
+            },
+          },
         });
       }
       if (request.method === "GET" && pathname === "/api/auth/me")

@@ -4,7 +4,7 @@ import { Repository } from "../repository";
 import { requiresPasswordChange, sportsAccountGate } from "./account-gate";
 import { administratorAccess } from "./permissions";
 
-const permissionNames = {
+export const permissionNames = {
   COURSES_VIEW: "COURSE_VIEW",
   SEMESTERS: "SEMESTER_MANAGE",
   ACCOUNTS: "USER_ACCOUNTS",
