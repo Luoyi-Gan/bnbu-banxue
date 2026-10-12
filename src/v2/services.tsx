@@ -9,7 +9,6 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import yellowIcon from '../assets/companion-yellow.png'
 import kittyIcon from '../assets/companion-kitty.png'
 import mapPreview from '../assets/campus/campus-guide-map.png'
-import { makeId } from './model'
 import { useV2 } from './useV2'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { AnimatedSearchField } from './AnimatedSearchField'
@@ -46,21 +45,20 @@ export function V2Campus() {
   </div>
 }
 
-const aiReply = (question: string): { body: string; path: string; label: string } => {
-  if (/搭子|组队|拼车|学习/.test(question)) return { body: '找搭子目前有拼车、娱乐和学习三种计划。可以查看招募中的队伍，或自己发起一个。', path: '/v2/partners', label: '打开找搭子' }
-  if (/消息|申请|队伍/.test(question)) return { body: '你的组队申请与队伍管理集中在“我的组队”；新消息会出现在消息中心。', path: '/v2/partners/teams', label: '查看我的组队' }
-  if (/活动|周末|这周/.test(question)) return { body: '发现活动里可以按时间、类别和关键词筛选。可以查看活动时间、地点和主办方。', path: '/v2/activities', label: '发现活动' }
-  return { body: '我可以帮你找到活动、社区与校园服务。当前回答基于本地演示内容，你可以从对应页面查看来源。', path: '/v2/campus', label: '打开校园服务' }
-}
-
 export function V2AI() {
   const { state, setState } = useV2()
+  const live = useWorkspaceBackend()
+  const messages: {id: string; from: string; body: string; sourcePath?: string; sourceLabel?: string}[] = (live.data?.entities ?? []).filter(e => e.kind === 'answer' && e.ownerId === live.data?.account.id).sort((a,b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id)).flatMap(e => {
+    const sources = e.data.sources as {title: string; source: string}[]
+    const citation = sources?.length ? '\n来源：' + sources.map(s => s.title + '（' + s.source + '）').join('；') : ''
+    return [{id: e.id + ':question', from: 'user', body: String(e.data.question)}, {id: e.id, from: 'assistant', body: String(e.data.body) + citation}]
+  })
   const [text, setText] = useState('')
   const [iconMenu, setIconMenu] = useState(false)
   const [uploadError, setUploadError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const currentIcon = state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon
-  const send = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const question = text.trim(); if (!question) return; const answer = aiReply(question); setState((value) => ({ ...value, aiMessages: [...value.aiMessages, { id: makeId(), from: 'user', body: question }, { id: makeId(), from: 'assistant', body: answer.body, sourcePath: answer.path, sourceLabel: answer.label }] })); setText('') }
+  const send = async (event: FormEvent<HTMLFormElement>) => {event.preventDefault(); const question = text.trim(); if (!question) return; if (await live.mutate('knowledge.ask', {question})) setText(value => value.trim() === question ? '' : value)}
   const choose = (next: 'yellow' | 'kitty' | 'custom') => { setState((value) => ({ ...value, aiIconChoice: next })); setIconMenu(false); setUploadError('') }
   const upload = async (file?: File) => {
     if (!file) return
@@ -87,7 +85,7 @@ export function V2AI() {
     finally { URL.revokeObjectURL(objectUrl) }
   }
   const toggleSource = (path: string) => setState((value) => ({ ...value, aiPinnedSources: value.aiPinnedSources.includes(path) ? value.aiPinnedSources.filter((source) => source !== path) : [...value.aiPinnedSources, path] }))
-  return <div className="v2-page v2-ai-page"><Link to="/v2" className="v2-button v2-button-secondary" style={{ marginBottom: 16 }}><ArrowLeft size={17}/> 返回首页</Link><PageHeading eyebrow="CAMPUS AI" title="问问奶蛙" description="根据本地演示内容，快速找到校园里的下一步。" action={<button type="button" className="v2-button v2-button-secondary" onClick={() => setIconMenu(true)}><img src={currentIcon} alt=""/> 更换图标</button>}/><div className="v2-ai-layout"><aside className="v2-panel v2-ai-context"><span className="v2-eyebrow">CONTEXT</span><h3>资料来源</h3><p>回答可关联到这些本地页面。</p>{[['活动资料', '/v2/activities'], ['组队与申请', '/v2/partners/teams'], ['校园服务', '/v2/campus']].map(([label, path]) => <div className="v2-ai-source" key={path}><button type="button" aria-label={`${state.aiPinnedSources.includes(path) ? '取消固定' : '固定'}${label}`} aria-pressed={state.aiPinnedSources.includes(path)} onClick={() => toggleSource(path)}><Bookmark size={16} fill={state.aiPinnedSources.includes(path) ? 'currentColor' : 'none'}/></button><Link to={path}>{label}<ChevronRight size={15}/></Link></div>)}</aside><section className="v2-panel v2-ai-chat"><div className="v2-ai-messages">{state.aiMessages.map((item) => <div className={`v2-ai-message ${item.from === 'user' ? 'is-user' : ''}`} key={item.id}>{item.from === 'assistant' && <img src={currentIcon} alt="奶蛙"/>}<div className="v2-ai-message-body"><p>{item.id === 'ai-hello' ? item.body.replace('奶娃', '奶蛙') : item.body}</p>{item.sourcePath && <Link className="v2-ai-citation" to={item.sourcePath}><Bookmark size={15}/> 来源：{item.sourceLabel} <ArrowRight size={14}/></Link>}</div></div>)}</div><div className="v2-ai-suggestions">{['这周有什么活动？', '我接下来有什么安排？', '去哪里找学习搭子？'].map((question) => <button type="button" key={question} onClick={() => setText(question)}>{question}</button>)}</div><form className="v2-ai-composer" onSubmit={send}><input value={text} onChange={(event) => setText(event.target.value)} placeholder="输入你的校园问题…" aria-label="校园 AI 问题"/><button type="submit" className="v2-button v2-button-primary" disabled={!text.trim()}><Send size={17}/></button></form></section></div>
+  return <div className="v2-page v2-ai-page"><Link to="/v2" className="v2-button v2-button-secondary" style={{ marginBottom: 16 }}><ArrowLeft size={17}/> 返回首页</Link><PageHeading eyebrow="CAMPUS AI" title="问问奶蛙" description="查询已发布的校园知识，回答附有资料来源。" action={<button type="button" className="v2-button v2-button-secondary" onClick={() => setIconMenu(true)}><img src={currentIcon} alt=""/> 更换图标</button>}/><div className="v2-ai-layout"><aside className="v2-panel v2-ai-context"><span className="v2-eyebrow">CONTEXT</span><h3>资料来源</h3><p>校园功能快捷入口；回答来源以正文引用为准。</p>{[['活动资料', '/v2/activities'], ['组队与申请', '/v2/partners/teams'], ['校园服务', '/v2/campus']].map(([label, path]) => <div className="v2-ai-source" key={path}><button type="button" aria-label={`${state.aiPinnedSources.includes(path) ? '取消固定' : '固定'}${label}`} aria-pressed={state.aiPinnedSources.includes(path)} onClick={() => toggleSource(path)}><Bookmark size={16} fill={state.aiPinnedSources.includes(path) ? 'currentColor' : 'none'}/></button><Link to={path}>{label}<ChevronRight size={15}/></Link></div>)}</aside><section className="v2-panel v2-ai-chat"><div className="v2-ai-messages">{messages.map((item) => <div className={`v2-ai-message ${item.from === 'user' ? 'is-user' : ''}`} key={item.id}>{item.from === 'assistant' && <img src={currentIcon} alt="奶蛙"/>}<div className="v2-ai-message-body"><p>{item.id === 'ai-hello' ? item.body.replace('奶娃', '奶蛙') : item.body}</p>{item.sourcePath && <Link className="v2-ai-citation" to={item.sourcePath}><Bookmark size={15}/> 来源：{item.sourceLabel} <ArrowRight size={14}/></Link>}</div></div>)}</div>{live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人问答…</p>}<div className="v2-ai-suggestions">{['这周有什么活动？', '我接下来有什么安排？', '去哪里找学习搭子？'].map((question) => <button type="button" key={question} onClick={() => setText(question)}>{question}</button>)}</div><form className="v2-ai-composer" onSubmit={send}><input value={text} onChange={(event) => setText(event.target.value)} placeholder="输入你的校园问题…" aria-label="校园 AI 问题"/><button type="submit" className="v2-button v2-button-primary" disabled={live.busy || !text.trim()}><Send size={17}/></button></form></section></div>
     {iconMenu && <Modal title="选择奶蛙的形象" onClose={() => setIconMenu(false)}><div className="v2-icon-options"><button type="button" className={state.aiIconChoice === 'yellow' ? 'is-active' : ''} onClick={() => choose('yellow')}><img src={yellowIcon} alt=""/>奶蛙</button><button type="button" className={state.aiIconChoice === 'kitty' ? 'is-active' : ''} onClick={() => choose('kitty')}><img src={kittyIcon} alt=""/>Hello Kitty</button></div>{state.aiCustomIcon && <button type="button" className={`v2-custom-icon-option${state.aiIconChoice === 'custom' ? ' is-active' : ''}`} onClick={() => choose('custom')}><img src={state.aiCustomIcon} alt=""/> 我上传的图片</button>}<button type="button" className="v2-button v2-button-secondary v2-upload-button" onClick={() => inputRef.current?.click()}><ImagePlus size={17}/> 上传自己的图片</button><input ref={inputRef} type="file" accept="image/*" hidden onChange={(event) => { void upload(event.target.files?.[0]); event.target.value = '' }}/>{uploadError && <p className="v2-upload-error" role="alert">{uploadError}</p>}<p className="v2-form-note">图片会缩小后保存在当前浏览器的新版演示中。</p></Modal>}
   </div>
 }
