@@ -5,6 +5,11 @@ import type {RelationshipHistory} from '../../shared/v2/relationshipAdapter'
 /** Returns only this account's own relationship actions; never historic private content. */
 export function relationshipHistory(db: Database, actorId: string, visible: Entity[]): RelationshipHistory[] {
   const rows = db.prepare("SELECT entity_id AS entityId, data, created_at AS at FROM audit WHERE actor_id=? AND action='relation.set' ORDER BY created_at,rowid").all(actorId) as unknown as {entityId:string;data:string;at:string}[]
+  const teamRows = db.prepare("SELECT action,data,created_at AS at FROM audit WHERE action IN ('room.create','room.decide','room.finish','room.moderate') ORDER BY created_at,rowid").all() as unknown as {action:string;data:string;at:string}[]
+  return projectRelationshipHistory(actorId,visible,rows,teamRows);
+}
+
+export function projectRelationshipHistory(actorId:string,visible:Entity[],rows:{entityId:string;data:string;at:string}[],teamRows:{action:string;data:string;at:string}[]):RelationshipHistory[] {
   const grouped = new Map<string, RelationshipHistory>()
   for (const row of rows) {
     const payload = JSON.parse(row.data) as {relation?:{kind?:string;enabled?:boolean}}
@@ -27,7 +32,6 @@ export function relationshipHistory(db: Database, actorId: string, visible: Enti
     entry.entity.active = relation.enabled && !!isPublic
     if (relation.enabled && !entry.entity.establishedAt) entry.entity.establishedAt = row.at
   }
-  const teamRows = db.prepare("SELECT action,data,created_at AS at FROM audit WHERE action IN ('room.create','room.decide','room.finish','room.moderate') ORDER BY created_at,rowid").all() as unknown as {action:string;data:string;at:string}[]
   const membership = new Map<string, boolean>()
   for (const row of teamRows) {
     const saved = (JSON.parse(row.data) as {teamResult?:Entity}).teamResult

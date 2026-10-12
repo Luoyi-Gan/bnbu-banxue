@@ -31,7 +31,7 @@ export const emptyAlumni = (): AlumniData => ({
   notices: [],
   history: [],
 });
-export function readAlumni(repo: Repository): AlumniData {
+export function readAlumni(repo: Pick<Repository,"all">): AlumniData {
   return (
     (repo.all("alumniState")[0]?.data.value as AlumniData | undefined) ??
     emptyAlumni()

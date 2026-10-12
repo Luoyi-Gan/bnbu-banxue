@@ -2,18 +2,21 @@ import type { Account } from "../auth";
 import { Repository } from "../repository";
 import type { SportsCompanion } from "../../../shared/live/sportsCompanion";
 import { mapSportsProgress } from "../../../shared/v2/sportsProgress";
-import { requiresPasswordChange } from "./account-gate";
-import { currentSystem } from "./system";
+import { passwordChangeRequired } from "./account-gate";
+
 
 /** The local sports service shares account IDs with Companion. No online sync is implied. */
 export function sportsCompanion(repo: Repository, actor: Account): SportsCompanion | null {
-  if (actor.status === "banned" || requiresPasswordChange(repo, actor)) return null;
-  const system = currentSystem(repo);
-  if (system && system.data.mode !== "NORMAL") return null;
-  // An independent admin account with the same email must never match a personal account.
   const personal = repo.db.prepare("SELECT id FROM accounts WHERE id=? AND lower(trim(email))=? AND login_kind='PERSONAL'")
     .get(actor.id, actor.email.trim().toLowerCase());
-  if (!personal) return null;
+  return projectSportsCompanion(repo,actor,!!personal);
+}
+
+export function projectSportsCompanion(repo: Pick<Repository,"all">,actor:Account,personal:boolean):SportsCompanion | null {
+  if (actor.status === "banned" || passwordChangeRequired(repo.all("sportsIdentity"),actor)) return null;
+  const system=repo.all("sportsSystem")[0];
+  if(system && system.data.mode!=="NORMAL") return null;
+  if(!personal) return null;
   const identity = repo.all("sportsIdentity").find(item => item.ownerId === actor.id && item.data.status === "verified");
   const role = identity?.data.role;
   if ((role !== "teacher" && role !== "student") || !actor.roles.includes(role)) return null;

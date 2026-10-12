@@ -6,6 +6,7 @@ import { PostgresEmail } from './storage/postgres-email';
 import type { PostgresDatabase } from './storage/postgres';
 import { executePostgres } from './storage/postgres-commands';
 import { postgresCommunityView } from './storage/postgres-community-view';
+import { postgresWorkspace } from './storage/postgres-workspace';
 
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean} = {}) {
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
@@ -14,6 +15,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      if (request.method === 'GET' && pathname === '/api/workspace') return send(response,200,await postgresWorkspace(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityView(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/health') {
         const result = await db.pool.query('SELECT MAX(version) AS version FROM backend_migrations');
