@@ -8,6 +8,7 @@ import {
 } from "../repository";
 import { ownedCourse, version } from "./courses";
 import { parseCsv } from "./csv";
+import { mappedRosterCsv } from "./roster-mapping";
 import { administratorAccess } from "./permissions";
 import type { WorkbookSheet } from "./workbook";
 interface RosterRow {
@@ -79,7 +80,7 @@ export function sportsRosterCommand(
   action: string,
   input: Fields,
   source?: { entity: Entity; sheet: WorkbookSheet },
-) {
+): Entity | undefined {
   if (action === "sports.roster.source.import") {
     const entity = repo.get(input.id, "sportsRosterSource");
     usable(repo, actor, entity.data.courseId);
@@ -88,19 +89,32 @@ export function sportsRosterCommand(
       (s) => s.index === input.sheet,
     );
     demand(sheet && !sheet.error, "名单工作表不存在或无法解析。");
+    const mapped =
+      input.fieldMapping === undefined
+        ? null
+        : mappedRosterCsv(sheet.csv, input.fieldMapping);
     const prior = repo
       .all("sportsRosterDraft")
       .find(
         (d) => d.data.sourceId === entity.id && d.data.sheet === sheet.index,
       );
-    if (prior) return prior;
-    return sportsRosterCommand(
+    if (prior) {
+      demand(
+        JSON.stringify(prior.data.fieldMapping ?? null) ===
+          JSON.stringify(mapped?.mapping ?? null),
+        "同一名单原件已有不同列选择，请核对已有导入。",
+        409,
+      );
+      return prior;
+    }
+    const draft = sportsRosterCommand(
       repo,
       actor,
       "sports.roster.preview",
-      { courseId: entity.data.courseId, csv: sheet.csv },
+      { courseId: entity.data.courseId, csv: mapped?.csv ?? sheet.csv },
       { entity, sheet },
     );
+    return mapped ? repo.save(draft!, { fieldMapping: mapped.mapping }) : draft;
   }
   if (
     ![

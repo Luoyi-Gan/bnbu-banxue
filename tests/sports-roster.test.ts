@@ -7,6 +7,47 @@ import { execute } from "../server/commands";
 import { reconcileRoster, rosterWorkspace } from "../server/sports/roster";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
+it("原件按列选择生成可确认草稿，同原件不同选择不能静默复用", () => {
+  const f = setup();
+  const source = f.repo.create("sportsRosterSource", f.teacher.account.id, {
+    courseId: f.course.id,
+    sheets: [
+      {
+        index: 0,
+        name: "名单",
+        csv: "注册号,学生姓名\nS001,student",
+        rowNumbers: [1, 2],
+        issues: [],
+      },
+    ],
+  });
+  const input = {
+    id: source.id,
+    sheet: 0,
+    fieldMapping: { studentNumber: "注册号", fullName: "学生姓名" },
+  };
+  const draft = f.run(f.teacher, "sports.roster.source.import", input);
+  expect(draft.data.rows).toMatchObject([
+    {
+      studentNumber: "S001",
+      name: "student",
+      sourceRow: 2,
+      columnError: false,
+    },
+  ]);
+  expect(f.run(f.teacher, "sports.roster.source.import", input).id).toBe(
+    draft.id,
+  );
+  expect(() =>
+    f.run(f.teacher, "sports.roster.source.import", {
+      ...input,
+      fieldMapping: { studentNumber: "学生姓名", fullName: "注册号" },
+    }),
+  ).toThrow("不同列选择");
+  expect(f.repo.all("sportsRosterDraft")).toHaveLength(1);
+  const snapshot = f.confirm(draft);
+  expect(snapshot.data.rows).toEqual(draft.data.rows);
+});
 function setup() {
   const db = openDatabase(":memory:");
   dbs.push(db);
