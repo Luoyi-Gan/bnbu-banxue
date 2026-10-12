@@ -1,5 +1,5 @@
 import { postgresCourseReport } from './storage/postgres-course-report';
-import {postgresAdminSemesters,postgresAdminSemesterSave} from './storage/postgres-admin-semesters';
+import {postgresAdminSemesters,postgresAdminSemesterSave,postgresSemesterSwitchCheck} from './storage/postgres-admin-semesters';
 import {postgresEnduranceTables,postgresEnduranceWrite} from './storage/postgres-endurance-tables';
 import { postgresRuleTemplates } from './storage/postgres-rule-templates';
 import { postgresInvitationPreview } from './storage/postgres-invitation-preview';
@@ -62,6 +62,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(options.surface==='sports' && pathname.startsWith('/api/sports/auth/'))pathname=pathname.replace('/api/sports/auth/','/api/auth/');
       if(options.surface==='sports' && pathname==='/api/sports/commands')pathname='/api/commands';
       const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
+      const semesterCheck=/^\/api\/v1\/admin\/semesters\/([^/]+)\/switch-check$/.exec(pathname);
+      if(request.method==='GET' && semesterCheck)return send(response,200,{data:await postgresSemesterSwitchCheck(db,cookieToken(request) ?? '',decodeURIComponent(semesterCheck[1]),Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
       if(request.method==='GET' && pathname==='/api/v1/admin/semesters')return send(response,200,{data:await postgresAdminSemesters(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/','http://localhost').searchParams))});
       if(request.method==='GET' && pathname==='/api/v1/admin/endurance-tables')return send(response,200,{data:await postgresEnduranceTables(db,cookieToken(request) ?? '')});
       if(request.method==='GET' && ['/api/v1/students','/api/v1/teachers','/api/v1/admin/teacher-accounts'].includes(pathname)) {

@@ -106,6 +106,18 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('isolates same-email accounts, co
     expect(semesterUpdated.status).toBe(200);expect((await semesterUpdated.json()).data.displayName).toBe('Updated');
     expect((await fetch(urls[1]+'/api/v1/admin/semesters',{headers:{Cookie:sportsCookie}})).status).toBe(403);
     expect((await (await fetch(urls[1]+'/api/v1/admin/semesters?limit=1',{headers:{Cookie:governorCookie}})).json()).data.items).toHaveLength(1);
+    const switchUrl=urls[1]+'/api/v1/admin/semesters/'+semester.id+'/switch-check?limit=1';
+    const preview=await (await fetch(switchUrl,{headers:{Cookie:governorCookie}})).json();
+    expect(preview.data.ready).toBe(false);expect(preview.data.timezone).toBe('Asia/Shanghai');
+    expect(preview.data.checks.find((c:{code:string})=>c.code==='TARGET_STARTED').status).toBe('BLOCKED');
+    await databases[1].transaction(async client=>{
+      const repo=new PostgresRepository(client);
+      const current=await repo.create('sportsSemester','governor',{status:'CURRENT',startDate:'2020-01-01'});
+      await repo.create('sportsCourse','governor',{semesterId:current.id,settlementStatus:'SETTLED',settlementReportId:'missing-report'});
+    });
+    const blocked=await (await fetch(switchUrl,{headers:{Cookie:governorCookie}})).json();
+    expect(blocked.data.totalCourseCount).toBe(1);expect(blocked.data.courses[0].ready).toBe(false);
+    expect((await fetch(switchUrl,{headers:{Cookie:sportsCookie}})).status).toBe(403);
     await databases[1].transaction(client=>new PostgresRepository(client).create('sportsConversionTable','governor',{sex:'MALE',group:'JUNIOR',event:1000,rows:[{id:'initial',min:201,max:400,score:60,grade:'PASS',note:''}]}));
     const tableInput={gender:'male',gradeGroup:'freshman_sophomore',runType:'1000m',expectedVersion:1,minSeconds:0,maxSeconds:200,score:100,tier:'excellent',note:'Test'};
     const added=await write('/api/v1/admin/endurance-tables/rules',tableInput);expect(added.status).toBe(200);

@@ -230,6 +230,8 @@ try {
   const createdSemester=await sessionWrite('/api/v1/admin/semesters',semesterConfig);
   await sessionWrite('/api/v1/admin/semesters/'+createdSemester.id,{...semesterConfig,expectedVersion:createdSemester.version,displayName:'Docker checked semester'});
   assert.ok((await request('/api/v1/admin/semesters?limit=100')).data.items.some(s=>s.id===createdSemester.id));
+  const switchPreview=(await request('/api/v1/admin/semesters/'+createdSemester.id+'/switch-check?limit=100')).data;
+  assert.equal(switchPreview.ready,false);assert.equal(switchPreview.timezone,'Asia/Shanghai');
   const semesterView=(await request('/api/sports/workspace')).semesters.find(s=>s.id===createdSemester.id);
   assert.equal(semesterView.data.status,'UPCOMING');assert.equal(semesterView.data.name,'Docker checked semester');
   docker(['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM entities WHERE id='${createdSemester.id}'`],{stdio:'pipe'});
