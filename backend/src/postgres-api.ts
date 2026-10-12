@@ -1,6 +1,7 @@
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from './storage/postgres-student-applications';
 import { postgresStudentProgress } from './storage/postgres-student-progress';
 import { postgresStudentRoster } from './storage/postgres-student-roster';
+import { postgresStudentPhysical } from './storage/postgres-student-physical';
 import { postgresReviewMaterial } from './storage/postgres-review-material';
 import { postgresSportsWorkspace } from './storage/postgres-sports-workspace';
 import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresMediaOriginal } from './storage/postgres-student-media';
@@ -39,6 +40,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const physicalResult=/^\/api\/v1\/student\/enrollments\/([^/]+)\/physical-result$/.exec(pathname);
+      if(request.method==='GET' && physicalResult) return send(response,200,await postgresStudentPhysical(db,cookieToken(request) ?? '',decodeURIComponent(physicalResult[1])));
       const rosterStatus=/^\/api\/v1\/enrollments\/([^/]+)\/roster-status$/.exec(pathname);
       if(request.method==='GET' && rosterStatus) return send(response,200,await postgresStudentRoster(db,cookieToken(request) ?? '',decodeURIComponent(rosterStatus[1])));
       if(request.method==='GET' && pathname==='/api/v1/student/proof-todos') return send(response,200,await postgresProofTodos(db,cookieToken(request) ?? '',Object.fromEntries(new URL(request.url ?? '/', 'http://localhost').searchParams)));

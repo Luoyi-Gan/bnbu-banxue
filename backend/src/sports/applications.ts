@@ -427,7 +427,7 @@ function saveCredit(
   );
 }
 export function approvedExemption(
-  repo: Repository,
+  repo: Pick<Repository,"all">,
   ownerId: string | null,
   courseId: unknown,
 ) {

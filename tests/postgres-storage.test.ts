@@ -1,6 +1,7 @@
 import { postgresStudentApplications, postgresStudentRecognitionHistory } from '../backend/src/storage/postgres-student-applications';
 import { postgresStudentProgress } from '../backend/src/storage/postgres-student-progress';
 import { postgresStudentRoster } from '../backend/src/storage/postgres-student-roster';
+import { postgresStudentPhysical } from '../backend/src/storage/postgres-student-physical';
 import { postgresReviewMaterial } from '../backend/src/storage/postgres-review-material';
 import { postgresSportsWorkspace } from '../backend/src/storage/postgres-sports-workspace';
 import { processPostgresSportsReview } from '../backend/src/storage/postgres-review-worker';
@@ -340,6 +341,19 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     expect((await postgresStudentRoster(db,login.token,member.id)).data.status).toBe('IDENTITY_CONFLICT');
     await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(identity.id),{studentNumber:identity.data.studentNumber ?? null,schoolEmailVerified:identity.data.schoolEmailVerified ?? false,schoolEmail:identity.data.schoolEmail ?? null});await repo.save(await repo.get(snapshot.id),{courseId:'wrong-course'});});
     await expect(postgresStudentRoster(db,login.token,member.id)).rejects.toMatchObject({status:409});
+  });
+  it('shows owned raw physical facts and exemption revocation without exposing scores', async()=>{
+    const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');
+    const member=await db.transaction(client=>new PostgresRepository(client).create('sportsEnrollment','sports-reader-student',{courseId:'physical-read-fixture',status:'ACTIVE'}));
+    expect((await postgresStudentPhysical(db,login.token,member.id)).data).toEqual({status:'NOT_RECORDED',result:null});
+    const exemption=await db.transaction(client=>new PostgresRepository(client).create('sportsExemption',member.ownerId,{courseId:member.data.courseId,status:'APPROVED'}));
+    expect((await postgresStudentPhysical(db,login.token,member.id)).data).toEqual({status:'EXEMPT',result:null});
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(exemption,{status:'REVOKED'});});
+    expect((await postgresStudentPhysical(db,login.token,member.id)).data.status).toBe('NOT_RECORDED');
+    await db.transaction(client=>new PostgresRepository(client).create('sportsEndurance',member.ownerId,{enrollmentId:member.id,courseId:member.data.courseId,event:1000,seconds:245,testDate:'2026-10-01',conversion:{score:100},internalNote:'secret'}));
+    expect((await postgresStudentPhysical(db,login.token,member.id)).data).toEqual({status:'RECORDED',result:{runType:'1000m',elapsedSeconds:245,testedOn:'2026-10-01'}});
+    const other=await new PostgresAuth(db).login('sports-reader-other@example.test','Sports-read-123');
+    await expect(postgresStudentPhysical(db,other.token,member.id)).rejects.toMatchObject({status:403});
   });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{
     const login=await new PostgresAuth(db).login('sports-reader-student@example.test','Sports-read-123');

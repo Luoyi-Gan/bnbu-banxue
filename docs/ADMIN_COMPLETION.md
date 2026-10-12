@@ -1739,3 +1739,7 @@ API重建并健康启动，真实HTTP冒烟新增退回后GET student/proof-todo
 ### 名单状态分支与Docker补充验证
 
 数据库测试补充真实共享核对分支：学号姓名、学校邮箱验证与入班匹配显示MATCHED；撤销邮箱验证显示PENDING_REGISTRATION；姓名冲突显示IDENTITY_CONFLICT；测试后恢复原身份字段。相关62测试通过，lint通过。重建API后Docker整链通过，新增未确认名单返回严格七字段、available=false、registrationComplete=false及空状态断言。正式教师名单写入仍待迁移。
+
+### PostgreSQL 学生原始体测结果读取
+
+新增 GET student/enrollments/:id/physical-result，仅本人学生成员关系可读，复用approvedExemption判断：有效免测优先，无原事实返回NOT_RECORDED，已有事实仅投影项目、整数秒和测试日期；不返回换算分、成绩或内部备注，重复／错误课程事实拒绝。51项真实PostgreSQL测试通过，覆盖未录入、免测、撤销免测后无记录、原用时投影及身份限制；类型与lint通过。教师体测写入及此接口Docker验证仍待迁移／验证，UI未改。
