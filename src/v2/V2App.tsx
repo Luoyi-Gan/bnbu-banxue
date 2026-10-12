@@ -8,7 +8,7 @@ import yellowIcon from '../assets/companion-yellow.png'
 import kittyIcon from '../assets/companion-kitty.png'
 import { V2Provider } from './store'
 import { useV2 } from './useV2'
-import { canUseTeacherSports, managedTeachers, teacherAccount } from './teacherCoffee'
+import { canUseTeacherSports } from './teacherCoffee'
 import { TeacherCoffee, TeacherProfile, TeacherSchedule, TeacherMessages, TeacherSports } from './TeacherPortal'
 import { canAccessPortal, portalHome } from './portalAccess'
 import { StudentSearch } from './StudentSearch'
@@ -21,6 +21,7 @@ import { V2Sports } from './V2Sports'
 import { useSportsHomeScroll } from './useSportsHomeScroll'
 import { V2CampusExplore } from './V2CampusExplorer'
 import { V2Auth } from './V2Auth'
+import { useOriginalSession } from './useOriginalSession'
 import './v2.css'
 import './aRedesign.css'
 import './aControls.css'
@@ -49,7 +50,7 @@ const adminNav = [
   { path: '/v2/admin/moderation', label: '内容审核', icon: Newspaper },
 ]
 
-function V2Shell({ children }: { children: ReactNode }) {
+function V2Shell({ children, accountName }: { children: ReactNode; accountName: string }) {
   const { state } = useV2()
   const location = useLocation()
   useSportsHomeScroll()
@@ -95,7 +96,7 @@ function V2Shell({ children }: { children: ReactNode }) {
         <div className="v2-top-actions">
           {!admin && !teacher && <NavLink to="/v2/messages" className={({ isActive }) => `v2-icon-button v2-header-messages${isActive ? ' is-active' : ''}`} aria-label={unread + unreadNotices > 0 ? `消息，${unread + unreadNotices} 条未读` : '消息，暂无未读'} title={`消息 · 聊天 ${unread} 条未读，通知 ${unreadNotices} 条未读`}><MessageCircle size={19} aria-hidden="true"/>{unread + unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unread + unreadNotices > 99 ? '99+' : unread + unreadNotices}</span>}</NavLink>}
           {!admin && !teacher && <StudentSearch/>}
-          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{admin ? '管' : teacher ? '师' : state.profile?.avatar ? <img src={state.profile.avatar} alt="我的头像"/> : (state.profile?.nickname ?? '陈雨晴').slice(0, 1)}</span><strong>{admin ? '管理员演示' : teacher ? (managedTeachers(state).find(t => t.id === teacherAccount(state).id)?.name ?? '老师') + ' · 演示' : (state.profile?.nickname ?? '陈雨晴')}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}<Link to="/v2/login" onClick={() => setRoleMenu(false)}>登录 / 注册</Link></div>}</div>
+          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{accountName.slice(0, 1)}</span><strong>{accountName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}<Link to="/v2/login" onClick={() => setRoleMenu(false)}>登录 / 注册</Link></div>}</div>
         </div>
       </header>
       <main className="v2-main">{children}</main>
@@ -109,11 +110,22 @@ function V2Shell({ children }: { children: ReactNode }) {
 
 function V2Routes() {
   const location = useLocation()
-  const { state } = useV2()
+  const { state, setState } = useV2()
+  const session = useOriginalSession(location.pathname)
+  const requestedRole = location.pathname.startsWith('/v2/admin') ? 'admin' : location.pathname.startsWith('/v2/teacher') ? 'teacher' : 'student'
+  const authorized = !!session?.account?.roles.some(role => requestedRole === 'admin' ? ['superadmin', 'operator', 'reviewer'].includes(role) : role === requestedRole)
+  useEffect(() => {
+    if (authorized && state.role !== requestedRole) setState(current => ({...current, role: requestedRole}))
+  }, [authorized, requestedRole, state.role, setState])
   if (location.pathname === '/v2/login') return <V2Auth mode="login"/>
   if (location.pathname === '/v2/register') return <V2Auth mode="register"/>
+  if (!session) return <p role="status">正在核对登录状态…</p>
+  if (session.anonymous) return <Navigate to="/v2/login" state={{returnTo: location.pathname}} replace/>
+  if (session.error) return <p role="alert">{session.error}</p>
+  if (!authorized) return <Navigate to="/workspace" replace/>
+  if (state.role !== requestedRole) return <p role="status">正在切换本人已授权身份…</p>
   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>
-  return <V2Shell><Routes>
+  return <V2Shell accountName={session.account!.name}><Routes>
     <Route path="/v2" element={<V2Home/>}/>
     <Route path="/v2/alumni" element={<V2Alumni/>}/>
     <Route path="/v2/sports" element={<V2Sports/>}/>
