@@ -32,6 +32,19 @@ export async function deliverOutbox(
       delivery: "local-outbox",
       message: "验证码已写入本地开发收件箱，未发送至真实邮箱。",
     };
+  await deliverMessage({id:message.id,recipient:message.recipient,subject:message.subject,body:message.body}, endpoint);
+  db.prepare("UPDATE mail_outbox SET delivered_at=? WHERE id=?").run(
+    timestamp(),
+    message.id,
+  );
+  return {
+    sent: true,
+    delivery: "email",
+    message: "验证码已发送，请查看邮箱。",
+  };
+}
+
+export async function deliverMessage(message: {id: unknown; recipient: unknown; subject: unknown; body: unknown}, endpoint: string) {
   const result = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -60,13 +73,4 @@ export async function deliverOutbox(
     "邮件服务未确认发送，请稍后重试。",
     502,
   );
-  db.prepare("UPDATE mail_outbox SET delivered_at=? WHERE id=?").run(
-    timestamp(),
-    message.id,
-  );
-  return {
-    sent: true,
-    delivery: "email",
-    message: "验证码已发送，请查看邮箱。",
-  };
 }

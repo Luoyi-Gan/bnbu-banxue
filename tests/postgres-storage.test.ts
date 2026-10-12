@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import { PostgresDatabase } from '../backend/src/storage/postgres';
@@ -8,6 +8,7 @@ import { importSqlite } from '../backend/src/storage/import-sqlite';
 import { openDatabase } from '../backend/src/database';
 import { createAccount, hashPassword, digest } from '../backend/src/auth';
 import { PostgresAuth } from '../backend/src/storage/postgres-auth';
+import { PostgresEmail } from '../backend/src/storage/postgres-email';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -17,12 +18,14 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   let admin: Pool;
   let db: PostgresDatabase;
   beforeAll(async () => {
+    vi.stubEnv('BNBU_EMAIL_DELIVERY_URL', '');
     admin = new Pool({ connectionString: process.env.BNBU_TEST_POSTGRES_URL });
     await admin.query(`CREATE SCHEMA ${schema}`);
     db = new PostgresDatabase({ connectionString: process.env.BNBU_TEST_POSTGRES_URL, options: `-c search_path=${schema}` });
     await db.migrate(postgresMigrations);
   });
   afterAll(async () => {
+    vi.unstubAllEnvs();
     await db?.close();
     if (admin) {
       try { await admin.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`); }
@@ -154,5 +157,36 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     for (let i=0;i<10;i++) await expect(auth.login('missing@example.test','wrong-password')).rejects.toMatchObject({status:401});
     await expect(new PostgresAuth(db).login('missing@example.test','wrong-password')).rejects.toMatchObject({status:429});
     expect((await db.pool.query('SELECT failures FROM login_attempts WHERE identifier=$1',['missing@example.test'])).rows[0].failures).toBe(10);
+  });
+  it('serializes email sending and registration, consumes a code once and never grants school roles', async () => {
+    const mail = new PostgresEmail(db);
+    const email = 'registration@bnbu.edu.cn';
+    const sends = await Promise.allSettled([mail.sendVerification(email,true),mail.sendVerification(email,true)]);
+    expect(sends.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+    const messages = (await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1',[email])).rows;
+    expect(messages).toHaveLength(1);
+    const code = /\d{6}/.exec(messages[0].body)![0];
+    const attempts = await Promise.allSettled([mail.register({email,code,password:'Register-test-123'}),mail.register({email,code,password:'Register-test-123'})]);
+    expect(attempts.filter(r=>r.status==='fulfilled')).toHaveLength(1);
+    const accounts = (await db.pool.query('SELECT id,roles FROM accounts WHERE email=$1',[email])).rows;
+    expect(accounts).toHaveLength(1);
+    expect(accounts[0].roles).toBe('[]');
+    expect((await db.pool.query("SELECT * FROM entities WHERE kind='verifiedEmail' AND owner_id=$1",[accounts[0].id])).rows).toHaveLength(1);
+    await expect(mail.register({email,code,password:'Register-test-123'})).rejects.toThrow('验证码已失效');
+  });
+  it('commits wrong-code attempts, enforces the limit and verifies only the current account email', async () => {
+    const mail = new PostgresEmail(db);
+    const email = 'wrong-code@example.test';
+    await mail.sendVerification(email,true);
+    const code = /\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1',[email])).rows[0].body)![0];
+    for(let i=0;i<5;i++) await expect(mail.register({email,code:'invalid',password:'Register-test-123'})).rejects.toThrow('验证码错误');
+    await expect(mail.register({email,code,password:'Register-test-123'})).rejects.toThrow('验证码已失效');
+    expect((await db.pool.query('SELECT attempts FROM email_challenges WHERE email=$1',[email])).rows[0].attempts).toBe(5);
+    const actor = await db.transaction(client=>new PostgresRepository(client).person('login-student'));
+    await mail.sendVerification(actor.email,true);
+    const ownCode = /\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1 ORDER BY created_at DESC',[actor.email])).rows[0].body)![0];
+    await expect(mail.verifyOwnEmail({...actor,status:'banned'},ownCode)).rejects.toMatchObject({status:403});
+    expect(await mail.verifyOwnEmail(actor,ownCode)).toEqual({verified:true});
+    await expect(mail.verifyOwnEmail(actor,ownCode)).rejects.toThrow('验证码已失效');
   });
 });
