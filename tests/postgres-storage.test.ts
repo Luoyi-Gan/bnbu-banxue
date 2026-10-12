@@ -332,7 +332,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const result=await postgresStudentRoster(db,login.token,member.id);
     expect(result.data).toMatchObject({available:true,rosterVersion:1,registrationComplete:false});
     expect(Object.keys(result.data)).toHaveLength(7);expect(JSON.stringify(result)).not.toContain('private classmate');
-    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(snapshot,{courseId:'wrong-course'});});
+    const identity=await db.transaction(async client=>{const repo=new PostgresRepository(client),i=(await repo.all('sportsIdentity')).find(i=>i.ownerId==='sports-reader-student')!;await repo.save(i,{studentNumber:'roster-number',schoolEmailVerified:true,schoolEmail:'sports-reader-student@example.test'});await repo.save(await repo.get(snapshot.id),{rows:[{studentNumber:'roster-number',name:'sports-reader-student',excluded:false,columnError:false}]});return i;});
+    expect((await postgresStudentRoster(db,login.token,member.id)).data).toMatchObject({status:'MATCHED',registrationComplete:true});
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(identity.id),{schoolEmailVerified:false});});
+    expect((await postgresStudentRoster(db,login.token,member.id)).data.status).toBe('PENDING_REGISTRATION');
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(snapshot.id),{rows:[{studentNumber:'roster-number',name:'incorrect name',excluded:false,columnError:false}]});});
+    expect((await postgresStudentRoster(db,login.token,member.id)).data.status).toBe('IDENTITY_CONFLICT');
+    await db.transaction(async client=>{const repo=new PostgresRepository(client);await repo.save(await repo.get(identity.id),{studentNumber:identity.data.studentNumber ?? null,schoolEmailVerified:identity.data.schoolEmailVerified ?? false,schoolEmail:identity.data.schoolEmail ?? null});await repo.save(await repo.get(snapshot.id),{courseId:'wrong-course'});});
     await expect(postgresStudentRoster(db,login.token,member.id)).rejects.toMatchObject({status:409});
   });
   it('projects owned workflow aliases and supplement deadlines without exposing internal fields', async()=>{

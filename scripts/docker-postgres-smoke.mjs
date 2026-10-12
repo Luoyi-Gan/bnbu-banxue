@@ -107,6 +107,9 @@ try {
   const members=await request(`/api/v1/enrollments?classSectionId=${courseId}`);
   assert.equal(members.data[0].studentId,actor.id);
   assert.equal(members.data[0].id,enrollmentId);
+  const roster=(await request('/api/v1/enrollments/'+enrollmentId+'/roster-status')).data;
+  assert.deepEqual(Object.keys(roster).sort(),['enrollmentId','classSectionId','generatedAt','available','rosterVersion','status','registrationComplete'].sort());
+  assert.equal(roster.available,false);assert.equal(roster.registrationComplete,false);assert.equal(roster.status,null);
   assert.equal(members.meta.pagination.hasMore,false);
   const today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'});
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`UPDATE entities SET data=(data::jsonb || '{"status":"CURRENT"}'::jsonb)::text WHERE id='${semesterId}'; UPDATE entities SET data=(data::jsonb || '{"startDate":"${today}","deadlineDate":"${today}","startTime":"00:00","endTime":"23:59","threshold":30}'::jsonb)::text WHERE id='${courseId}'`],{stdio:'pipe'});

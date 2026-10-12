@@ -1735,3 +1735,7 @@ API重建并健康启动，真实HTTP冒烟新增退回后GET student/proof-todo
 ### PostgreSQL 学生名单核对状态
 
 接通 GET enrollments/:id/roster-status，严格本人成员范围，仅返回现有学生页面要求的七字段。抽出reconcileRosterData共用原名单核对规则，未确认名单available=false；有基准时按当前身份、学校邮箱、姓名和有效成员事实投影，不返回同学名单。跨课程快照及重复基准拒绝。62项数据库／名单测试通过，类型与lint通过。教师名单上传确认写入尚待PostgreSQL接通，新增状态接口Docker验证待补；未改UI。
+
+### 名单状态分支与Docker补充验证
+
+数据库测试补充真实共享核对分支：学号姓名、学校邮箱验证与入班匹配显示MATCHED；撤销邮箱验证显示PENDING_REGISTRATION；姓名冲突显示IDENTITY_CONFLICT；测试后恢复原身份字段。相关62测试通过，lint通过。重建API后Docker整链通过，新增未确认名单返回严格七字段、available=false、registrationComplete=false及空状态断言。正式教师名单写入仍待迁移。
