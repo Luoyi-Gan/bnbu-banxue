@@ -81,6 +81,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
 }
 export const loadWorkspace = () => api<Workspace>("/api/workspace");
 export const sportsChangedEvent = "bnbu:sports-updated";
+export const workspaceChangedEvent = "bnbu:workspace-updated";
 const uncertainRequests = new Map<string, string>();
 export async function command(
   action: string,
@@ -98,6 +99,7 @@ export async function command(
       requestId: id,
     });
     uncertainRequests.delete(fingerprint);
+    if (typeof window !== "undefined") window.dispatchEvent(new Event(workspaceChangedEvent));
     return result;
   } catch (error) {
     // Keep the same idempotency key when the server may have committed but its

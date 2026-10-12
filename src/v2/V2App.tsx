@@ -22,6 +22,7 @@ import { useSportsHomeScroll } from './useSportsHomeScroll'
 import { V2CampusExplore } from './V2CampusExplorer'
 import { V2Auth } from './V2Auth'
 import { useOriginalSession } from './useOriginalSession'
+import { useWorkspaceBackend } from './useWorkspaceBackend'
 import './v2.css'
 import './aRedesign.css'
 import './aControls.css'
@@ -52,6 +53,7 @@ const adminNav = [
 
 function V2Shell({ children, accountName }: { children: ReactNode; accountName: string }) {
   const { state } = useV2()
+  const live = useWorkspaceBackend()
   const location = useLocation()
   useSportsHomeScroll()
   const [mobileMenu, setMobileMenu] = useState(false)
@@ -70,7 +72,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   ]
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = state.conversations.reduce((sum, item) => sum + item.unread, 0)
-  const unreadNotices = state.notifications.filter((item) => !item.read).length
+  const unreadNotices = live.data?.notifications.filter((item) => !item.readAt).length ?? 0
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
   useEffect(() => { setMobileMenu(false); setRoleMenu(false) }, [location.pathname, location.search])
   useEffect(() => {
@@ -94,7 +96,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
       <header className="v2-topbar">
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>BNBU 伴学</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
         <div className="v2-top-actions">
-          {!admin && !teacher && <NavLink to="/v2/messages" className={({ isActive }) => `v2-icon-button v2-header-messages${isActive ? ' is-active' : ''}`} aria-label={unread + unreadNotices > 0 ? `消息，${unread + unreadNotices} 条未读` : '消息，暂无未读'} title={`消息 · 聊天 ${unread} 条未读，通知 ${unreadNotices} 条未读`}><MessageCircle size={19} aria-hidden="true"/>{unread + unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unread + unreadNotices > 99 ? '99+' : unread + unreadNotices}</span>}</NavLink>}
+          {!admin && !teacher && <NavLink to="/v2/messages" className={({ isActive }) => `v2-icon-button v2-header-messages${isActive ? ' is-active' : ''}`} aria-label={unread + unreadNotices > 0 ? `消息，${unread + unreadNotices} 条未读` : live.data ? '消息，暂无未读' : '消息，通知状态暂不可用'} title={`消息 · 演示聊天 ${unread} 条未读，${live.data ? `通知 ${unreadNotices} 条未读` : '通知状态暂不可用'}`}><MessageCircle size={19} aria-hidden="true"/>{unread + unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unread + unreadNotices > 99 ? '99+' : unread + unreadNotices}</span>}</NavLink>}
           {!admin && !teacher && <StudentSearch/>}
           <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{accountName.slice(0, 1)}</span><strong>{accountName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}<Link to="/v2/login" onClick={() => setRoleMenu(false)}>登录 / 注册</Link></div>}</div>
         </div>

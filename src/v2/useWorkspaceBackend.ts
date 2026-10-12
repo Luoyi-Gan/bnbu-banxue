@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { command, loadWorkspace, type Workspace } from '../live/api'
+import { command, loadWorkspace, workspaceChangedEvent, type Workspace } from '../live/api'
 
 export function useWorkspaceBackend() {
   const [data, setData] = useState<Workspace | null>(null)
@@ -18,7 +18,8 @@ export function useWorkspaceBackend() {
   useEffect(() => {
     active.current = true; void refresh()
     window.addEventListener('focus', refresh)
-    return () => {active.current = false; window.removeEventListener('focus', refresh)}
+    window.addEventListener(workspaceChangedEvent, refresh)
+    return () => {active.current = false; window.removeEventListener('focus', refresh); window.removeEventListener(workspaceChangedEvent, refresh)}
   }, [refresh])
   async function mutate(action: string, input: Record<string, unknown>) {
     if (locked.current) return false
