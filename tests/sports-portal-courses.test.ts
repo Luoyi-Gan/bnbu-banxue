@@ -146,7 +146,72 @@ it("原版课程列表、目录、学期与目标读取本人真实课程，不�
         .all("sportsCourse")
         .filter((item) => item.data.name === "原版新建草稿"),
     ).toHaveLength(1);
+    const windowInput = {
+      expectedVersion: 1,
+      checkInWindowMode: "AVAILABLE",
+      checkInStartDate: "2026-10-12",
+      checkInEndDate: "2026-12-01",
+      dailyStartTime: "06:00",
+      dailyEndTime: "22:00",
+      excludedDates: ["2026-11-01"],
+      submissionDeadlineAt: "2026-12-01T15:59:59.000Z",
+    };
+    const patch = (id: string, body: object, key: string, origin?: string) =>
+      fetch(base + "/class-sections/" + id, {
+        method: "PATCH",
+        headers: {
+          Cookie: `bnbu_session=${own.token}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": key,
+          ...(origin ? { Origin: origin } : {}),
+        },
+        body: JSON.stringify(body),
+      });
+    expect(
+      (
+        await patch(
+          created.data.id,
+          windowInput,
+          "cross-origin",
+          "https://example.org",
+        )
+      ).status,
+    ).toBe(403);
+    const changed = await patch(created.data.id, windowInput, "draft-window");
+    expect(changed.status).toBe(200);
+    expect((await changed.json()).data).toMatchObject({
+      version: 2,
+      checkInWindowMode: "AVAILABLE",
+      excludedDates: ["2026-11-01"],
+      submissionDeadlineAt: windowInput.submissionDeadlineAt,
+      isEnrollmentOpen: false,
+    });
+    expect(
+      (await patch(created.data.id, windowInput, "draft-window")).status,
+    ).toBe(200);
+    expect(
+      (await patch(created.data.id, windowInput, "stale-window")).status,
+    ).toBe(409);
+    expect(
+      (await patch(foreign.id, windowInput, "foreign-window")).status,
+    ).toBe(403);
+    expect(
+      (await patch(course.id, windowInput, "published-window")).status,
+    ).toBe(409);
+    expect(
+      (
+        await patch(
+          created.data.id,
+          { ...windowInput, expectedVersion: 2, excludedDates: ["2026-02-30"] },
+          "bad-date",
+        )
+      ).status,
+    ).toBe(400);
+    expect(repo.get(created.data.id).version).toBe(2);
     repo.create("sportsSystem", null, { mode: "MAINTENANCE" });
+    expect(
+      (await patch(created.data.id, windowInput, "draft-window")).status,
+    ).toBe(503);
     expect((await createDraft()).status).toBe(503);
     expect((await get("/class-sections")).status).toBe(503);
   } finally {

@@ -58,6 +58,8 @@ export function sportsSessionCommand(
     const clock = startClock(now),
       day = clock.businessDate;
     const ordinary =
+      course.data.checkInAvailable !== false &&
+      !((course.data.excludedDates ?? []) as string[]).includes(day) &&
       day >= String(course.data.startDate) &&
       day <= String(course.data.deadlineDate);
     const makeup = repo

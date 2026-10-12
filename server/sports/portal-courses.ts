@@ -1,4 +1,6 @@
-import { demand, type Account } from "../auth";
+import { authenticate, demand, type Account } from "../auth";
+import { execute } from "../commands";
+import type { Database } from "../database";
 import {
   Repository,
   integerField,
@@ -12,6 +14,56 @@ import { sportsWriteGate } from "./system";
 function teacherGate(repo: Repository, actor: Account) {
   sportsRole(repo, actor, "teacher");
   sportsWriteGate(repo, "sports.course.read");
+}
+export function portalCourseWindow(
+  db: Database,
+  token: string,
+  id: string,
+  input: Fields,
+  key: string,
+) {
+  const mapping: Record<string, string> = {
+    expectedVersion: "version",
+    checkInStartDate: "startDate",
+    checkInEndDate: "deadlineDate",
+    dailyStartTime: "startTime",
+    dailyEndTime: "endTime",
+    excludedDates: "excludedDates",
+  };
+  demand(
+    Object.keys(input).every(
+      (field) =>
+        field in mapping ||
+        ["checkInWindowMode", "submissionDeadlineAt"].includes(field),
+    ),
+    "课程时间窗参数无效。",
+  );
+  const fields: Fields = { id };
+  for (const [source, target] of Object.entries(mapping))
+    if (source in input) fields[target] = input[source];
+  if ("checkInWindowMode" in input) {
+    demand(
+      ["AVAILABLE", "UNAVAILABLE"].includes(String(input.checkInWindowMode)),
+      "打卡状态无效。",
+    );
+    fields.checkInAvailable = input.checkInWindowMode === "AVAILABLE";
+  }
+  if ("submissionDeadlineAt" in input) {
+    const deadline = Date.parse(`${input.checkInEndDate}T23:59:59+08:00`);
+    demand(
+      typeof input.submissionDeadlineAt === "string" &&
+        Number.isFinite(deadline) &&
+        Date.parse(input.submissionDeadlineAt) === deadline,
+      "提交截止须为常规运动截止日的上海时间23:59:59。",
+    );
+  }
+  execute(db, token, "sports.course.window", fields, key);
+  return portalTeacherCourse(
+    new Repository(db),
+    authenticate(db, token),
+    id,
+    "class-sections",
+  );
 }
 function semesterRow(semester: Entity) {
   return {
@@ -50,13 +102,18 @@ function section(repo: Repository, course: Entity) {
             : "UPCOMING",
     isEnrollmentOpen:
       course.data.status === "PUBLISHED" && course.data.enrollmentOpen === true,
-    checkInWindowMode: course.data.startDate ? "DATE_RANGE" : "UNAVAILABLE",
+    checkInWindowMode:
+      course.data.startDate && course.data.checkInAvailable !== false
+        ? "AVAILABLE"
+        : "UNAVAILABLE",
     checkInStartDate: course.data.startDate ?? null,
     checkInEndDate: course.data.deadlineDate ?? null,
     dailyStartTime: course.data.startTime ?? null,
     dailyEndTime: course.data.endTime ?? null,
-    submissionDeadlineAt: null,
-    excludedDates: [],
+    submissionDeadlineAt: course.data.deadlineDate
+      ? new Date(`${course.data.deadlineDate}T23:59:59+08:00`).toISOString()
+      : null,
+    excludedDates: course.data.excludedDates ?? [],
     createdAt: course.createdAt,
     updatedAt: course.updatedAt,
     version: course.version,

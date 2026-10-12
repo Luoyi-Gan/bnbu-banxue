@@ -149,6 +149,26 @@ it("原版分步建课只创建关闭入班的草稿，完整配置后才能发�
   expect(repo.all("sportsCourse")).toHaveLength(1);
 });
 
+it("排除日期参与发布可完成性检查，不能用禁止运动的日期凑足目标", () => {
+  const { teacher, run, courseInput } = setup();
+  const excludedDates: string[] = [];
+  for (
+    let day = Date.parse("2026-10-12T00:00:00Z");
+    day <= Date.parse("2026-12-31T00:00:00Z");
+    day += 86400000
+  )
+    excludedDates.push(new Date(day).toISOString().slice(0, 10));
+  const course = run(teacher, "sports.course.save", {
+    ...courseInput,
+    excludedDates,
+  });
+  expect(() =>
+    run(teacher, "sports.course.publish", {
+      id: course.id,
+      version: course.version,
+    }),
+  ).toThrow("无法完成1200分钟");
+});
 it("学期、模板、课程发布、邀请码、直接入班共享同一持久业务记录", () => {
   const f = setup();
   const draft = f.run(f.teacher, "sports.course.save", f.courseInput);

@@ -11,6 +11,7 @@ import {
 import { businessWeek, selectCredit, type CreditCandidate } from "./credit";
 import { checkDeadlineReminders } from "./deadline-reminders";
 import { sportsAccountGate } from "./account-gate";
+import { courseWindow } from "./course-window";
 import {
   administratorAccess,
   requireSportsPermission,
@@ -59,6 +60,7 @@ function currentSemester(repo: Repository, id: unknown) {
 }
 function courseRules(repo: Repository, input: Fields) {
   const semester = currentSemester(repo, input.semesterId);
+  const window = courseWindow(input, semester.data);
   const template = repo.get(input.templateId, "sportsTemplate");
   demand(template.data.status === "published", "请选择已发布的体育规则模板。");
   const threshold = integerField(input, "threshold", 30, 60),
@@ -85,6 +87,7 @@ function courseRules(repo: Repository, input: Fields) {
     "请填写有效的当日运动时间窗。",
   );
   return {
+    ...window,
     semesterId: semester.id,
     templateId: template.id,
     templateVersion: template.version,
@@ -126,7 +129,9 @@ function checkFeasibility(data: Fields) {
   );
   // Same full window every day. This horizon includes enough whole weeks for both
   // targets plus the partial first week/day; never counts dates already elapsed.
-  const horizon = 7 * (Math.ceil(needed / Number(data.weeklyLimit)) + 2);
+  const excluded = new Set((data.excludedDates ?? []) as string[]);
+  const horizon =
+    7 * (Math.ceil(needed / Number(data.weeklyLimit)) + 2) + excluded.size;
   const candidates: CreditCandidate[] = [];
   for (
     let dayStart = from;
@@ -136,6 +141,7 @@ function checkFeasibility(data: Fields) {
     const day = new Date(dayStart).toLocaleDateString("en-CA", {
       timeZone: "Asia/Shanghai",
     });
+    if (excluded.has(day)) continue;
     const begin = Math.max(
       now,
       Date.parse(`${day}T${data.startTime}:00+08:00`),
@@ -268,6 +274,31 @@ export function sportsCourseCommand(
       dailyLimit: 1,
     });
   }
+  if (action === "sports.course.window") {
+    const course = ownedCourse(repo, actor, input.id);
+    version(course, input);
+    demand(course.data.status === "DRAFT", "已发布课程日程已锁定。", 409);
+    const semester = currentSemester(repo, course.data.semesterId);
+    demand(
+      Object.keys(input).every((key) =>
+        [
+          "id",
+          "version",
+          "startDate",
+          "deadlineDate",
+          "startTime",
+          "endTime",
+          "excludedDates",
+          "checkInAvailable",
+        ].includes(key),
+      ),
+      "课程时间窗参数无效。",
+    );
+    return repo.save(
+      course,
+      courseWindow({ ...course.data, ...input }, semester.data),
+    );
+  }
   if (action === "sports.course.create") {
     sportsRole(repo, actor, "teacher");
     demand(
@@ -313,6 +344,7 @@ export function sportsCourseCommand(
     textField(course.data, "name", 100);
     textField(course.data, "description", 1000);
     courseRules(repo, course.data);
+    demand(course.data.checkInAvailable !== false, "发布前须允许打卡。");
     checkFeasibility(course.data);
     const published = repo.save(course, {
       status: "PUBLISHED",

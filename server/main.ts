@@ -24,6 +24,7 @@ import {
   portalTeacherCourses,
   portalTeacherCourse,
   portalTeacherSemesters,
+  portalCourseWindow,
 } from "./sports/portal-courses";
 import {
   portalNotifications,
@@ -156,7 +157,11 @@ export function createApiServer(
           ),
         });
       // Same-origin mutations; media has an explicit non-simple binary content type.
-      if (request.method === "POST") {
+      if (
+        request.method === "POST" ||
+        (request.method === "PATCH" &&
+          /^\/api\/v1\/class-sections\/[^/]+$/.test(pathname))
+      ) {
         const origin = request.headers.origin;
         if (origin) {
           const parsed = new URL(origin);
@@ -172,6 +177,21 @@ export function createApiServer(
           "跨站请求不允许。",
           403,
         );
+        if (request.method === "PATCH") {
+          const token = cookieToken(request);
+          authenticate(db, token);
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalCourseWindow(
+              db,
+              token!,
+              pathname.split("/").at(-1)!,
+              await body(request),
+              key,
+            ),
+          });
+        }
         if (pathname === "/api/timetable/recognize") {
           const actor = authenticate(db, cookieToken(request));
           sportsAccountGate(new Repository(db), actor);

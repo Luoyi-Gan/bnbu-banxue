@@ -53,6 +53,14 @@ function setup() {
   };
   return { db, repo, a, b, course, run };
 }
+it("课程排除日期禁止学生开始普通运动，不生成会话", () => {
+  const f = setup();
+  f.repo.save(f.course, { excludedDates: ["2026-10-11"] });
+  expect(() =>
+    f.run(f.a, "sports.session.start", { courseId: f.course.id, category: 0 }),
+  ).toThrow("当前不在普通打卡日期");
+  expect(f.repo.all("sportsSession")).toHaveLength(0);
+});
 it("服务器持久运动、幂等开始、暂停排除及客户端时长不可覆盖", () => {
   const f = setup(),
     key = randomUUID();
