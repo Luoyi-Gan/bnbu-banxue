@@ -61,6 +61,7 @@ async function postAuth(
 }
 
 export const authApi = {
+  signIn: (identifier: string,password: string) => postAuth("sign-in",{identifier,password},"authenticated"),
   adminLogin: (loginName: string, password: string) =>
     postAuth("admin-login", { loginName, password }, "authenticated"),
   login: (email: string, password: string) =>

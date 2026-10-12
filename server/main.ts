@@ -12,6 +12,7 @@ import {
   digest,
   login,
   loginAdministrator,
+  loginUnified,
   register,
   ServiceError,
 } from "./auth";
@@ -495,10 +496,10 @@ export function createApiServer(
           return send(response, 201, register(db, input));
         if (
           pathname === "/api/auth/login" ||
-          pathname === "/api/auth/admin-login"
+          pathname === "/api/auth/admin-login" || pathname === "/api/auth/sign-in"
         ) {
           const result =
-            pathname === "/api/auth/admin-login"
+            pathname === "/api/auth/sign-in" ? loginUnified(db,input.identifier,input.password) : pathname === "/api/auth/admin-login"
               ? loginAdministrator(db, input.loginName, input.password)
               : login(db, input.email, input.password);
           response.setHeader(

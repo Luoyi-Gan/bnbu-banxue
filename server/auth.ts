@@ -296,3 +296,12 @@ export function verifyOwnEmail(db: Database, actor: Account, code: unknown) {
   });
   return {verified:true};
 }
+
+export function loginUnified(db: Database, rawIdentifier: unknown, password: unknown) {
+ demand(typeof rawIdentifier==='string' && rawIdentifier.trim().length>0 && rawIdentifier.trim().length<=254,'请填写邮箱或管理账号。');
+ const identifier=rawIdentifier.trim().toLowerCase();
+ const candidates=db.prepare("SELECT login_kind,password_hash FROM accounts WHERE (login_kind='PERSONAL' AND email=?) OR (login_kind='ADMIN' AND login_name=?)").all(identifier,identifier) as {login_kind:'PERSONAL'|'ADMIN';password_hash:string}[];
+ const matching=typeof password==='string' ? candidates.filter(row=>matchesPassword(password,row.password_hash)) : [];
+ demand(matching.length<=1,'账号标识重复，请联系管理员调整管理登录账号。',409);
+ return credentialLogin(db,identifier,password,matching[0]?.login_kind ?? candidates[0]?.login_kind ?? 'PERSONAL');
+}

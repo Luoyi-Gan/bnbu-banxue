@@ -23,7 +23,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
-  const [adminLogin, setAdminLogin] = useState(false);
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [code, setCode] = useState("");
@@ -77,8 +77,8 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
     event.preventDefault();
     setError("");
     setMessage("");
-    if (mode === "login" && adminLogin ? !normalizedEmail : !emailValid) {
-      setError(adminLogin ? "请填写管理登录账号。" : "请填写有效的邮箱地址。");
+    if (mode === "login" ? !normalizedEmail : !emailValid) {
+      setError(mode === "login" ? "请填写邮箱或管理账号。" : "请填写有效的邮箱地址。");
       return;
     }
     if (mode === "register" && step === 1) {
@@ -105,8 +105,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
     setBusy(true);
     try {
       if (mode === "login") {
-        if (adminLogin) await authApi.adminLogin(normalizedEmail, password);
-        else await authApi.login(normalizedEmail, password);
+        await authApi.signIn(normalizedEmail, password);
         const {account} = await api<{account:LiveAccount}>("/api/auth/me");
         window.location.replace(roleLoginPath(location.state?.returnTo, account.roles));
       } else {
@@ -165,7 +164,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
             </h2>
             <p>
               {mode === "login"
-                ? "使用邮箱和密码，继续你的校园生活。"
+                ? "输入账号和密码，继续你的校园生活。"
                 : step === 1
                   ? "填写邮箱与验证码，再设置登录密码。"
                   : "提交后由账号服务核验验证码并建立账号。"}
@@ -184,42 +183,23 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
           )}
           {location.state?.roleMismatch && <p role="status">当前账号没有此页面的身份权限，请切换到对应的学生、教师或管理员账号。</p>}
           <form className="v2-auth-form" onSubmit={onSubmit} noValidate>
-            {mode === "login" && (
-              <label>
-                <span>登录身份</span>
-                <select
-                  disabled={busy}
-                  value={adminLogin ? "admin" : "personal"}
-                  onChange={(e) => {
-                    setAdminLogin(e.target.value === "admin");
-                    setEmail("");
-                    setPassword("");
-                    setError("");
-                  }}
-                >
-                  <option value="personal">
-                    邮箱登录（个人账号／总管理员）
-                  </option>
-                  <option value="admin">独立分管理员账号</option>
-                </select>
-              </label>
-            )}
+
             {(mode === "login" || step === 1) && (
               <label>
                 <span>
-                  {mode === "login" && adminLogin ? "管理登录账号" : "邮箱地址"}
+                  {mode === "login" ? "邮箱或管理账号" : "邮箱地址"}
                 </span>
                 <div className="v2-auth-input">
                   <Mail size={18} aria-hidden="true" />
                   <input
-                    type={mode === "login" && adminLogin ? "text" : "email"}
+                    type={mode === "login" ? "text" : "email"}
                     name="email"
                     autoComplete={
-                      mode === "login" && adminLogin ? "username" : "email"
+                      mode === "login" ? "username" : "email"
                     }
                     placeholder={
-                      mode === "login" && adminLogin
-                        ? "总管理员分配的登录账号"
+                      mode === "login"
+                        ? "请输入邮箱或管理账号"
                         : "name@example.com"
                     }
                     value={email}
