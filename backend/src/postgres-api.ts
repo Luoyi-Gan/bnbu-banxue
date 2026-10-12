@@ -8,7 +8,7 @@ import { postgresStudentApplications, postgresStudentRecognitionHistory } from '
 import { postgresStudentProgress } from './storage/postgres-student-progress';
 import { postgresStudentRoster } from './storage/postgres-student-roster';
 import { postgresStudentPhysical } from './storage/postgres-student-physical';
-import { postgresTeacherHistory } from './storage/postgres-teacher-history';
+import { postgresTeacherHistory, postgresTeacherStudent } from './storage/postgres-teacher-history';
 import { postgresReviewMaterial } from './storage/postgres-review-material';
 import { postgresSportsWorkspace } from './storage/postgres-sports-workspace';
 import { postgresMediaRead, postgresMediaPut, postgresEvidenceContext, postgresMediaOriginal } from './storage/postgres-student-media';
@@ -47,6 +47,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   return createServer(async (request,response) => {
     try {
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const teacherStudent=/^\/api\/v1\/students\/([^/]+)$/.exec(pathname);
+      if(request.method==='GET' && teacherStudent) {
+        demand([...new URL(request.url ?? '/', 'http://localhost').searchParams.keys()].length===0,'学生资料查询参数无效。');
+        return send(response,200,await postgresTeacherStudent(db,cookieToken(request) ?? '',decodeURIComponent(teacherStudent[1])));
+      }
       const invitePreview=/^\/api\/v1\/course-invites\/([^/]+)\/preview$/.exec(pathname);
       const contractInvite=/^\/api\/v1\/course-invitations\/([^/]+)$/.exec(pathname);
       if(request.method==='GET' && (invitePreview || contractInvite)) return send(response,200,await postgresInvitationPreview(db,decodeURIComponent((invitePreview ?? contractInvite)![1])));

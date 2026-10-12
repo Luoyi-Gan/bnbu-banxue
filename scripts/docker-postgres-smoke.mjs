@@ -234,6 +234,8 @@ try {
   await request('/api/commands',{action:'sports.course.close',input:{id:createdCourse.id,version:publishedView.version,reason:'Docker test completed'},requestId:randomUUID()});
   execFileSync('docker',['exec','bnbu-postgres-local-postgres-1','psql','-U','bnbu','-d','bnbu','-Atc',`DELETE FROM student_email_challenges WHERE invitation_id IN (SELECT id FROM entities WHERE kind='sportsInvitation' AND data::jsonb->>'courseId'='${createdCourse.id}'); DELETE FROM entities WHERE id='${createdCourse.id}' OR (kind IN ('sportsInvitation','sportsEnrollment','sportsEnrollmentFlow') AND data::jsonb->>'courseId'='${createdCourse.id}'); UPDATE accounts SET status='banned',roles='[]' WHERE id='${joinStudentId}'`],{stdio:'pipe'});
   const teachingReport=await request('/api/sports/course-reports/'+courseId);
+  const teachingProgress=await request('/api/v1/student-progress?classSectionId='+courseId);assert.equal(teachingProgress.data.find(p=>p.enrollmentId===enrollmentId).totalEffectiveSeconds,0);
+  assert.equal((await request('/api/v1/students/'+actor.id)).data.id,actor.id);
   assert.equal(teachingReport.reportType,'CURRENT_TEACHING_REPORT');
   assert.equal(teachingReport.rows.find(r=>r.enrollmentId===enrollmentId).facts.enduranceStatus,'NOT_RECORDED');
   const reportCsvResponse=await fetch(base+'/api/sports/course-reports/'+courseId+'.csv',{headers:{Cookie:teacherCookie}});

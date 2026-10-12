@@ -34,7 +34,7 @@ export function portalTeacherProgress(
   };
 }
 
-function teacherCourses(repo: Repository, actor: Account) {
+function teacherCourses(repo: Pick<Repository,"all">, actor: Account) {
   sportsRole(repo, actor, "teacher");
   sportsWriteGate(repo, "sports.course.read");
   return new Map(
@@ -120,6 +120,9 @@ export function portalTeacherStudent(
   actor: Account,
   studentId: string,
 ) {
+  return portalTeacherStudentData(repo,actor,studentId,id=>repo.db.prepare("SELECT name,email FROM accounts WHERE id=? AND login_kind='PERSONAL'").get(id));
+}
+export function portalTeacherStudentData(repo:Pick<Repository,"all">,actor:Account,studentId:string,personById:(id:string)=>Fields|undefined) {
   const courses = teacherCourses(repo, actor);
   demand(
     repo
@@ -143,11 +146,7 @@ export function portalTeacherStudent(
     );
   demand(identities.length === 1, "学生身份资料须先核对。", 409);
   const identity = identities[0],
-    account = repo.db
-      .prepare(
-        "SELECT name,email FROM accounts WHERE id=? AND login_kind='PERSONAL'",
-      )
-      .get(studentId);
+    account = personById(studentId);
   demand(account, "学生当前资料不存在。", 404);
   return {
     id: studentId,

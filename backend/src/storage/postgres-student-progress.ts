@@ -1,5 +1,6 @@
 import { demand } from '../auth';
-import type { Fields } from '../repository';
+import type { Fields, Entity } from '../repository';
+import { calculateProgress } from '../sports/progress';
 import { page } from '../sports/portal-courses';
 import { recordDraftGate } from './postgres-record-drafts';
 import { sportsRole } from '../sports/courses';
@@ -13,13 +14,13 @@ export async function postgresStudentProgress(db:PostgresDatabase,token:string,i
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client),repo=new PostgresRepository(client);
     const identities=await repo.all('sportsIdentity');
-    const teacher=!!courseId && identities.some(i=>i.ownerId===actor.id && i.data.status==='verified' && i.data.role==='teacher');
+    const teacher=identities.some(i=>i.ownerId===actor.id && i.data.status==='verified' && i.data.role==='teacher');
     if(teacher) {
       sportsRole({all:()=>identities},actor,'teacher');
       const systems=await repo.all('sportsSystem');sportsAvailable({all:()=>systems});
     } else await recordDraftGate(repo,actor);
-    demand(Object.keys(input).every(k=>['limit','cursor','enrollmentId'].includes(k)),'进度查询参数无效。');
-    const memberships=(await repo.all('sportsEnrollment')).filter(e=>e.ownerId===actor.id);
+    demand(Object.keys(input).every(k=>['limit','cursor',teacher?'classSectionId':'enrollmentId'].includes(k)),'进度查询参数无效。');
+    const allMemberships=await repo.all('sportsEnrollment'),memberships=allMemberships.filter(e=>e.ownerId===actor.id);
     const courses=await repo.all('sportsCourse');
     const targets=(id:unknown)=>{
       const course=courses.find(c=>c.id===id);demand(course && course.data.status!=='DRAFT','课程目标尚未发布。',404);
@@ -31,6 +32,18 @@ export async function postgresStudentProgress(db:PostgresDatabase,token:string,i
       demand(teacher?courses.some(c=>c.id===courseId && c.ownerId===actor.id):memberships.some(e=>e.data.courseId===courseId),'课程不存在。',404);
       const {course,related,other}=targets(courseId);
       return {data:{id:course.id,classSectionId:course.id,courseTargetSeconds:related*60,generalTargetSeconds:other*60,totalTargetSeconds:(related+other)*60,effectiveFrom:course.data.publishedAt ?? null,version:course.version}};
+    }
+    if(teacher) {
+      const owned=new Set(courses.filter(c=>c.ownerId===actor.id).map(c=>c.id));
+      if(input.classSectionId!==undefined)demand(typeof input.classSectionId==='string' && owned.has(input.classSectionId),'只能查看本人课程进度。',403);
+      const result=page(allMemberships.filter(m=>owned.has(String(m.data.courseId)) && (!input.classSectionId || m.data.courseId===input.classSectionId)),{limit:input.limit ?? 100,cursor:input.cursor});
+      const entities:Entity[]=[...courses];
+      for(const kind of ['sportsRecord','sportsSession','sportsProgress','sportsCertification'])entities.push(...await repo.all(kind));
+      const reader={all:(kind:string)=>entities.filter(e=>e.kind===kind),get:(id:unknown,kind?:string)=>{const e=entities.find(e=>e.id===id && (!kind || e.kind===kind));demand(e,'进度来源不存在。',409);return e;}};
+      return {data:result.items.map(member=>{
+        const progress=calculateProgress(reader,String(member.data.courseId),member.ownerId);
+        return {enrollmentId:member.id,courseRelated:{effectiveSeconds:progress.categoryTotals[0]*60},general:{effectiveSeconds:progress.categoryTotals[1]*60},totalEffectiveSeconds:progress.total*60,status:progress.total===1200?'COMPLETED':'IN_PROGRESS'};
+      }),meta:{pagination:{total:result.total,limit:result.limit,nextCursor:result.nextCursor,hasMore:result.nextCursor!==null}}};
     }
     const progress=(await repo.all('sportsProgress')).filter(p=>p.ownerId===actor.id).sort((a,b)=>Number(b.data.sequence)-Number(a.data.sequence));
     const rows=memberships.filter(e=>!input.enrollmentId || e.id===input.enrollmentId).flatMap(e=>{
