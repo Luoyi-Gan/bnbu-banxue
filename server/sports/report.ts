@@ -270,7 +270,7 @@ export function buildCourseReport(repo: Repository, course: Entity) {
 }
 export type CourseReport = ReturnType<typeof courseReport>;
 /** Formula-looking text is escaped for spreadsheet readers; source facts remain untouched. */
-export function reportCsv(report: CourseReport) {
+export function reportRows(report: CourseReport) {
   const data: unknown[][] = [
     ["报告类型", report.reportType],
     ["课程", report.course.name],
@@ -341,6 +341,10 @@ export function reportCsv(report: CourseReport) {
       ];
     }),
   ];
+  return data;
+}
+export function reportCsv(report: CourseReport) {
+  const data = reportRows(report);
   return (
     "\uFEFF" +
     data

@@ -9,6 +9,7 @@ import {
   settlementWorkspace,
 } from "../server/sports/settlement";
 import { createApiServer } from "../server/main";
+import ExcelJS from "exceljs";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 function setup() {
@@ -283,6 +284,36 @@ it("结算完成后才能切换学期；历史报告读取和导出始终仅原�
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/sports/settlement-reports/${report.id}`;
   try {
+    const frozenName = (report.data.report as { course: { name: string } })
+      .course.name;
+    f.repo.save(f.repo.get(f.course.id), { name: "当前名称已变化" });
+    const exportUrl = `http://127.0.0.1:${(server.address() as { port: number }).port}/api/v1/class-sections/${f.course.id}/settlement-reports/1/export`;
+    const exported = await fetch(exportUrl, {
+      headers: { Cookie: `bnbu_session=${f.teacher.token}` },
+    });
+    expect(exported.status).toBe(200);
+    const file = (await exported.json()).data;
+    expect(file.fileName).toBe("settlement-report-v1.xlsx");
+    expect(file.contentType).toBe(
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(Buffer.from(file.fileBase64, "base64"));
+    const values: unknown[][] = [];
+    workbook.worksheets[0].eachRow((row) =>
+      values.push(row.values as unknown[]),
+    );
+    expect(values.find((row) => row[1] === "冻结报告ID")?.[2]).toBe(report.id);
+    expect(values.find((row) => row[1] === "课程")?.[2]).toBe(frozenName);
+    expect(JSON.stringify(values)).not.toContain("当前名称已变化");
+    for (const who of [f.student, f.admin, f.other])
+      expect(
+        (
+          await fetch(exportUrl, {
+            headers: { Cookie: `bnbu_session=${who.token}` },
+          })
+        ).status,
+      ).toBe(403);
     for (const suffix of ["", ".csv"]) {
       const good = await fetch(url + suffix, {
         headers: { Cookie: `bnbu_session=${f.teacher.token}` },

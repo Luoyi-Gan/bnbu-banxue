@@ -17,6 +17,7 @@ import { openDatabase, type Database } from "./database";
 import { execute, snapshot } from "./commands";
 import { Repository, type Fields } from "./repository";
 import { sportsWorkspace } from "./sports/courses";
+import { portalFrozenReportExport } from "./sports/portal-report-export";
 import {
   portalGradeHistory,
   portalFinalGradeWrite,
@@ -857,6 +858,19 @@ export function createApiServer(
           ),
         );
       }
+      const frozenExport =
+        /^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports\/(\d+)\/export$/.exec(
+          pathname,
+        );
+      if (request.method === "GET" && frozenExport)
+        return send(response, 200, {
+          data: await portalFrozenReportExport(
+            new Repository(db),
+            cookieToken(request) ?? "",
+            frozenExport[1],
+            Number(frozenExport[2]),
+          ),
+        });
       const settlementReports =
         /^\/api\/v1\/class-sections\/([^/]+)\/settlement-reports$/.exec(
           pathname,
