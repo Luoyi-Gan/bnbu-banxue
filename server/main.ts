@@ -21,6 +21,11 @@ import { accountDirectory } from "./sports/account-directory";
 import { administratorDirectory } from "./sports/administrators";
 import { portalLogin, portalMe, portalSecurity } from "./sports/portal";
 import {
+  portalSystemRead,
+  portalSystemHistory,
+  portalSystemChange,
+} from "./sports/portal-system";
+import {
   portalAccountPage,
   portalSubadmins,
   portalSubadminWrite,
@@ -387,6 +392,13 @@ export function createApiServer(
         }
         const token = cookieToken(request);
         authenticate(db, token);
+        if (pathname === "/api/v1/system-mode/changes") {
+          const key = request.headers["idempotency-key"];
+          demand(typeof key === "string", "缺少操作幂等标识。");
+          return send(response, 200, {
+            data: portalSystemChange(db, token!, input, key),
+          });
+        }
         const enduranceWrite =
           /^\/api\/v1\/admin\/endurance-tables\/rules(?:\/([^/]+)(\/delete)?)?$/.exec(
             pathname,
@@ -621,6 +633,24 @@ export function createApiServer(
               limit: Number(input.limit ?? 20),
             },
           },
+        });
+      }
+      if (
+        request.method === "GET" &&
+        ["/api/v1/system-mode", "/api/v1/system-mode/history"].includes(
+          pathname,
+        )
+      ) {
+        const repo = new Repository(db),
+          actor = authenticate(db, cookieToken(request));
+        const before =
+          new URL(request.url!, "http://localhost").searchParams.get(
+            "beforeVersion",
+          ) ?? undefined;
+        return send(response, 200, {
+          data: pathname.endsWith("/history")
+            ? portalSystemHistory(repo, actor, before)
+            : portalSystemRead(repo, actor),
         });
       }
       if (request.method === "GET" && pathname === "/api/auth/me")
