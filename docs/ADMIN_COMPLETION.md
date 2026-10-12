@@ -2359,3 +2359,5 @@ PR #12：https://github.com/chchaiai/bnbu-banxue/pull/12 ，草稿，交付分�
 2026-10-12 邮件页面职责接线修复：保持原表单和布局，按后端 account.roles 仅允许 operator/superadmin 操作；无运营职责时禁用示例、输入、附件及导入，并在现有提示框说明原因，动作函数同步拦截。后端权限不变。前端类型检查、文件 ESLint、Docker 前端重建通过；4188 浏览器审核员复验全部导入控件禁用，截图 .runtime/reviewer-mail-disabled-browser-proof.png。
 
 2026-10-12 用户批准后，原版邮件详情复用 MailResolution 新增拆分多场活动、关联更正原活动两个入口；仅运营职责可见，成功后关闭原详情并刷新共享数据。未修改 CSS 或其他布局。类型检查、ESLint、Docker 前端构建通过；4188 已看到待核实邮件的两个入口，截图 .runtime/mail-resolution-entry-browser-proof.png。运营浏览器另已验证示例导入自动发布、修改地点并成功保存；新增入口的浏览器提交全链仍需补验，后端对应 PostgreSQL 测试已通过。
+
+2026-10-12 新增邮件入口浏览器提交验收（4188）：运营导入 browser-split-20261012-2200 测试邮件，经拆分表单填写两场活动并确认提交，列表形成测试上午讲座、测试下午交流两条已发布活动，刷新仍在。再导入 browser-revise-20261012-2200，选择上午讲座为原活动、将地点改为测试室C并确认；更正邮件从待处理列表移除，刷新后原上午讲座地点仍为测试室C。截图 .runtime/mail-revision-browser-proof.png。实际操作使用独立本地夹具，无真实邮件接入，未据此宣称生产邮箱已接通。
