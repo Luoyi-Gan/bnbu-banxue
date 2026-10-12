@@ -1027,7 +1027,7 @@ export async function getOwnCurrentCourseContract(classSectionId) {
 }
 
 export async function joinWithInvite(inviteToken, profile) {
-  const member = Boolean(readTokens()?.accessToken);
+  const member = hasApiSession();
   const identity = JSON.stringify(Object.fromEntries(Object.entries(profile).sort(([a],[b])=>a.localeCompare(b))));
   // Retain one in-memory registration across transport retries. Never mint a replacement
   // capability or a different consumption key for an uncertain result in this flow.

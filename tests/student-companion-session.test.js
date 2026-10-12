@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { clearApiSession, currentApiUserId, hasApiSession, logoutApi, request, restoreCompanionSession } from '../public/student/js/api.js';
+import { clearApiSession, currentApiUserId, hasApiSession, joinWithInvite, logoutApi, request, restoreCompanionSession } from '../public/student/js/api.js';
 
 beforeEach(() => {
   clearApiSession();
@@ -7,6 +7,21 @@ beforeEach(() => {
 });
 afterEach(() => { clearApiSession(); vi.unstubAllGlobals(); });
 const identity={data:{user:{id:'student-one',role:'STUDENT'},studentProfile:{id:'student-one'}}};
+it('uses the member invitation endpoint for a restored cookie session and preserves independent number input', async () => {
+  const fetcher=vi.fn().mockResolvedValue(new Response(JSON.stringify(identity),{status:200}));
+  vi.stubGlobal('fetch',fetcher);
+  await restoreCompanionSession();
+  fetcher.mockImplementation(async()=>new Response(JSON.stringify({code:'INVITE_CLOSED',message:'Closed'}),{status:409}));
+  const profile={studentNumber:'2030123456',joinEmail:'y123456789@bnbu.edu.cn'};
+  await expect(joinWithInvite('v1.test',profile)).rejects.toMatchObject({status:409});
+  const [url,options]=fetcher.mock.calls.at(-1);
+  expect(url).toContain('/course-invites/v1.test/join-capabilities/member');
+  expect(JSON.parse(options.body)).toEqual(profile);
+  expect(options.headers.Authorization).toBeUndefined();
+  clearApiSession();
+  await expect(joinWithInvite('v1.test',profile)).rejects.toMatchObject({status:409});
+  expect(fetcher.mock.calls.at(-1)[0]).toMatch(/\/join-capabilities$/);
+});
 it('restores a real cookie identity without manufacturing browser tokens and revokes on logout', async () => {
   const fetcher=vi.fn().mockResolvedValue(new Response(JSON.stringify(identity),{status:200}));
   vi.stubGlobal('fetch',fetcher);
