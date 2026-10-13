@@ -1,5 +1,4 @@
-// Single source of truth for timing. Visual grid: one beat = 15 frames (0.5 s).
-// The score runs at 180 BPM, so each grid beat is 1.5 musical beats and every whole second is on a beat.
+// Single source of truth for timing. 120 BPM at 30 fps: one beat = 15 frames; the score drops at beat 20 (10 s).
 export const FPS = 30;
 export const BEAT = 15;
 export const beatF = (n: number) => Math.round(n * BEAT);

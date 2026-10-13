@@ -1,19 +1,19 @@
-"""Original 40-second score for the BNBU 伴学 launch film: light, rhythmic, not heavy.
+"""Original 40-second score for the BNBU 伴学 launch film, modelled on the reference recording's
+musical shape (not its melody): ~120 BPM, A minor, a dotted-eighth synth pulse that builds without
+a kick, a near-silent breath before the drop, then four-on-floor with sixteenth hats, a pumping
+chord bed and a bass line moving Am-C-Am-G / Am-C-E-F every two beats; the kick leaves for the
+outro and the pulse returns.
 
-Synthesised from scratch (no samples): 180 BPM with a mostly half-time feel, C major,
-Fmaj7-G-Em7-Am7 (8 beats per chord). Soft kick, rim/clap backbeat, shaker sixteenths,
-round sine bass, marimba-like plucks and airy pads.
-Musical beat b sits at b / 3 s (= frame 10b at 30 fps). The film's 15-frame grid in
-src/timeline.ts lands on every third eighth note, and every whole-second cut lands on a beat.
-Sections (beats): intro 0-12 (0-4 s), groove 12-32, full 32-72 (10.7-24 s), lift 72-104,
-build 104-108, final chord 108 (36 s), tail to 120 (40 s).
+Synthesised from scratch (no samples). Beat n sits at n * 0.5 s (= frame 15n at 30 fps).
+Sections (beats): intro 0-4, pulse build 4-16, riser 16-19, breath 19-20, drop 20-66
+(10-33 s; hook from 36), breakdown 66-72, final hit 72 (36 s), pulse tail to 80 (40 s).
 """
 import numpy as np
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
 
 SR = 48000
-BPM = 180
+BPM = 120
 BEAT = 60 / BPM
 DUR = 40.0
 N = int(SR * DUR)
@@ -34,7 +34,7 @@ def place(sig, beat, gain=1.0, pan=0.0, bus="music"):
 
 
 def lp(x, f, order=2):
-    return sosfilt(butter(order, f, "low", fs=SR, output="sos"), x)
+    return sosfilt(butter(order, min(f, SR / 2 - 100), "low", fs=SR, output="sos"), x)
 
 
 def hp(x, f, order=2):
@@ -42,30 +42,31 @@ def hp(x, f, order=2):
 
 
 def bp(x, lo, hi, order=2):
-    return sosfilt(butter(order, [lo, hi], "band", fs=SR, output="sos"), x)
+    return sosfilt(butter(order, [lo, min(hi, SR / 2 - 100)], "band", fs=SR, output="sos"), x)
 
 
 def note_hz(m):
     return 440.0 * 2 ** ((m - 69) / 12)
 
 
-def saw(freq, n, detune=0.0):
+def saw(freq, n, detune=0.0, voices=3):
     t = np.arange(n) / SR
     out = np.zeros(n)
-    for d in (-detune, 0, detune):
-        ph = (t * freq * (1 + d)) % 1.0
+    ds = np.linspace(-detune, detune, voices) if voices > 1 else [0.0]
+    for k, d in enumerate(ds):
+        ph = (t * freq * (1 + d) + k * 0.37) % 1.0
         out += 2 * ph - 1
-    return out / 3
+    return out / voices
 
 
 # ---------------- drums ----------------
 def kick():
-    n = int(0.3 * SR)
+    n = int(0.4 * SR)
     t = np.arange(n) / SR
-    f = 52 + 90 * np.exp(-t * 45)
-    body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 12)
-    click = lp(rng.standard_normal(n), 2500) * np.exp(-t * 300) * 0.08
-    return np.tanh((body + click) * 1.1) * 0.75
+    f = 50 + 120 * np.exp(-t * 40)
+    body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 8)
+    click = hp(rng.standard_normal(n), 3000) * np.exp(-t * 260) * 0.12
+    return np.tanh((body + click) * 1.4) * 0.8
 
 
 def kick_at(beat, gain=1.0):
@@ -73,44 +74,29 @@ def kick_at(beat, gain=1.0):
     KICKS.append((beat * BEAT, gain))
 
 
-def rim():
-    n = int(0.12 * SR)
-    t = np.arange(n) / SR
-    tone = np.sin(2 * np.pi * 820 * t) * np.exp(-t * 60) * 0.35
-    noise = bp(rng.standard_normal(n), 1800, 6000) * np.exp(-t * 55) * 0.35
-    return (tone + noise) * 0.6
-
-
 def clap():
-    n = int(0.25 * SR)
+    n = int(0.3 * SR)
     t = np.arange(n) / SR
-    noise = bp(rng.standard_normal(n), 1000, 6000)
+    noise = bp(rng.standard_normal(n), 900, 6500)
     e = np.zeros(n)
-    for k, off in enumerate([0, 0.009, 0.018]):
-        e += np.exp(-np.clip(t - off, 0, None) * (240 if k < 2 else 30)) * (t >= off)
-    return noise * e * 0.28
+    for k, off in enumerate([0, 0.01, 0.02]):
+        e += np.exp(-np.clip(t - off, 0, None) * (220 if k < 2 else 24)) * (t >= off)
+    return noise * e * 0.34
 
 
-def shaker(g=1.0):
-    n = int(0.06 * SR)
+def hat(open_=False):
+    n = int((0.2 if open_ else 0.05) * SR)
     t = np.arange(n) / SR
-    e = np.clip(t / 0.006, 0, 1) * np.exp(-t * 70)
-    return bp(rng.standard_normal(n), 5000, 12000) * e * 0.14 * g
+    return hp(rng.standard_normal(n), 8000, 4) * np.exp(-t * (16 if open_ else 80)) * (0.22 if open_ else 0.2)
 
 
-def hat_open():
-    n = int(0.18 * SR)
+def snare_roll_hit():
+    n = int(0.15 * SR)
     t = np.arange(n) / SR
-    return hp(rng.standard_normal(n), 8000, 4) * np.exp(-t * 18) * 0.1
+    return bp(rng.standard_normal(n), 1500, 8000) * np.exp(-t * 35) * 0.3
 
 
-def cymbal():
-    n = int(2.4 * SR)
-    t = np.arange(n) / SR
-    return hp(rng.standard_normal(n), 6000, 2) * np.clip(t / 0.01, 0, 1) * np.exp(-t * 2) * 0.1
-
-
-def swell(beats):
+def riser(beats):
     n = int(beats * BEAT * SR)
     t = np.arange(n) / SR
     k = t / t[-1]
@@ -118,59 +104,81 @@ def swell(beats):
     out = np.zeros(n)
     chunk = 2048
     for s in range(0, n, chunk):
-        fc = 600 + 5000 * k[s] ** 2
-        out[s : s + chunk] = bp(noise[s : s + chunk], fc * 0.7, min(fc * 1.4, SR / 2 - 100), 1)
-    return out * 0.18 * k ** 2
+        fc = 500 + 7000 * k[s] ** 2
+        out[s : s + chunk] = bp(noise[s : s + chunk], fc * 0.6, fc * 1.5, 1)
+    sweep = np.sin(2 * np.pi * np.cumsum(330 + 660 * k ** 2) / SR) * 0.08
+    return (out * 0.28 + sweep) * k ** 1.8
 
 
-# ---------------- tonal ----------------
-CHORDS = [  # (bass midi, chord tones)
-    (41, [53, 57, 60, 64]),  # Fmaj7
-    (43, [55, 59, 62, 67]),  # G
-    (40, [55, 59, 62, 64]),  # Em7
-    (45, [55, 60, 64, 67]),  # Am7
+def cymbal():
+    n = int(2.4 * SR)
+    t = np.arange(n) / SR
+    return hp(rng.standard_normal(n), 5000, 2) * np.exp(-t * 1.8) * 0.13
+
+
+def sub_boom():
+    n = int(3.2 * SR)
+    t = np.arange(n) / SR
+    f = 36 + 60 * np.exp(-t * 9)
+    boom = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 1.5)
+    return np.tanh(boom * 1.4) * 0.7
+
+
+# ---------------- harmony ----------------
+# Two beats per chord, eight-chord cycle: Am C Am G | Am C E F.
+CYCLE = [
+    (33, [57, 60, 64]),  # Am
+    (36, [55, 60, 64]),  # C
+    (33, [57, 60, 64]),  # Am
+    (31, [55, 59, 62]),  # G
+    (33, [57, 60, 64]),  # Am
+    (36, [55, 60, 64]),  # C
+    (32, [56, 59, 64]),  # E/G#
+    (29, [57, 60, 65]),  # F
 ]
-FINAL = (48, [55, 60, 64, 71])  # Cmaj7
+DROP = 20
 
 
 def chord_at(b):
-    return CHORDS[(int(b) // 8) % 4]
+    return CYCLE[(int(b - DROP) // 2) % 8]
 
 
-def pad(chord, beats, cutoff):
-    n = int(beats * BEAT * SR)
-    sig = np.zeros(n)
-    for m in chord:
-        sig += saw(note_hz(m), n, 0.005)
-    sig = lp(sig, cutoff, 2)
+def pulse(m, cutoff, length=0.3):
+    """Dotted-eighth synth pulse: detuned saw through a low-pass, plucked."""
+    n = int(length * SR)
     t = np.arange(n) / SR
-    return sig * np.clip(t / 0.4, 0, 1) * np.clip((beats * BEAT - t) / 0.4, 0, 1) * 0.12
+    s = saw(note_hz(m), n, 0.006) + 0.5 * np.sin(2 * np.pi * note_hz(m) * t)
+    return lp(s, cutoff) * np.clip(t / 0.003, 0, 1) * np.exp(-t * 9) * 0.3
 
 
-def bass(m, beats):
-    """Round sine bass with a little warmth, plucked envelope."""
+def sub(m, beats):
     n = int(beats * BEAT * SR)
     t = np.arange(n) / SR
-    f = note_hz(m - 12)
-    s = np.sin(2 * np.pi * f * t) + 0.18 * np.sin(2 * np.pi * 2 * f * t)
-    e = np.clip(t / 0.006, 0, 1) * (0.35 + 0.65 * np.exp(-t * 3.5)) * np.clip((beats * BEAT - t) / 0.03, 0, 1)
-    return np.tanh(s * 1.2) * e * 0.42
+    s = np.sin(2 * np.pi * note_hz(m) * t)
+    return s * np.clip(t / 0.01, 0, 1) * np.clip((beats * BEAT - t) / 0.02, 0, 1) * 0.42
 
 
-def marimba(m, length=0.4):
+def chords(tones, beats, cutoff):
+    n = int(beats * BEAT * SR)
+    t = np.arange(n) / SR
+    s = sum(saw(note_hz(m), n, 0.012, 5) for m in tones) + sum(saw(note_hz(m + 12), n, 0.012, 3) * 0.4 for m in tones)
+    return lp(s, cutoff) * np.clip(t / 0.01, 0, 1) * np.clip((beats * BEAT - t) / 0.03, 0, 1) * 0.11
+
+
+def lead(m, length):
     n = int(length * SR)
     t = np.arange(n) / SR
     f = note_hz(m)
-    s = np.sin(2 * np.pi * f * t) + 0.3 * np.sin(2 * np.pi * 4 * f * t) * np.exp(-t * 40)
-    return s * np.clip(t / 0.002, 0, 1) * np.exp(-t * 11) * 0.2
+    s = saw(f, n, 0.004) * 0.6 + np.sin(2 * np.pi * f * t + 0.6 * np.sin(2 * np.pi * 2 * f * t) * np.exp(-t * 5))
+    return lp(s, 3800) * np.clip(t / 0.004, 0, 1) * np.exp(-t * 4.5) * 0.17
 
 
-def bell(m, length=0.9):
+def bell(m, length=1.2):
     n = int(length * SR)
     t = np.arange(n) / SR
     f = note_hz(m)
-    s = np.sin(2 * np.pi * f * t + 0.5 * np.sin(2 * np.pi * f * 2 * t) * np.exp(-t * 6))
-    return s * np.exp(-t * 4.5) * 0.17
+    s = np.sin(2 * np.pi * f * t + 0.7 * np.sin(2 * np.pi * f * 2 * t) * np.exp(-t * 6))
+    return s * np.exp(-t * 4.5) * 0.18
 
 
 def chime_hit(m):
@@ -178,95 +186,111 @@ def chime_hit(m):
     t = np.arange(n) / SR
     f = note_hz(m)
     s = np.sin(2 * np.pi * f * t) + 0.4 * np.sin(2 * np.pi * f * 3.01 * t) * np.exp(-t * 4)
-    return s * np.exp(-t * 2.6) * 0.18
+    return s * np.exp(-t * 2.6) * 0.16
 
 
-# ---------------- drums arrangement ----------------
-for bar in range(30):
-    b = bar * 4
-    if 12 <= b < 32:  # half-time groove: backbeat on 3
-        kick_at(b, 0.8)
-        kick_at(b + 2.5, 0.55)
-        place(clap(), b + 2, 0.7, bus="drums")
-        for s in range(16):
-            place(shaker(), b + s * 0.25, [0.35, 0.15, 0.6, 0.15][s % 4], 0.3, "drums")
-        if b >= 24:
-            place(rim(), b + 3.5, 0.5, -0.3, "drums")
-    elif 32 <= b < 104:  # lighter two-step: rim on 2, clap on 4
-        kick_at(b, 0.9)
-        kick_at(b + 2.5, 0.65)
-        place(rim(), b + 1, 0.75, -0.25, "drums")
-        place(clap(), b + 3, 0.8, bus="drums")
-        if bar % 2:
-            place(rim(), b + 3.75, 0.35, 0.25, "drums")
-        for s in range(16):
-            place(shaker(), b + s * 0.25, [0.4, 0.15, 0.65, 0.18][s % 4], 0.3 if s % 2 else -0.15, "drums")
-        if b >= 72:
-            place(hat_open(), b + 1.5, 0.8, 0.3, "drums")
-            place(hat_open(), b + 3.5, 0.7, -0.3, "drums")
-    elif b == 104:  # gentle lift into the final chord
-        kick_at(104, 0.7)
-        for i in range(8):
-            place(rim(), 104 + i * 0.5, 0.3 + i * 0.05, 0.2 * (-1) ** i, "drums")
-        for i in range(8):
-            place(shaker(), 106 + i * 0.25, 0.4 + i * 0.07, 0.2, "drums")
+# ---------------- pulse (dotted eighths) ----------------
+def pulse_run(b0, b1, cutoff0, cutoff1, gain, follow=False):
+    b = b0
+    while b < b1 - 1e-6:
+        k = (b - b0) / max(1e-6, b1 - b0)
+        m = (chord_at(b)[0] + 24) if follow else 45
+        place(pulse(m, cutoff0 + (cutoff1 - cutoff0) * k), b, gain, 0.0)
+        place(pulse(m + 12, cutoff0 + (cutoff1 - cutoff0) * k, 0.2), b + 0.25 * 0, gain * 0.3, 0.35)
+        b += 0.75
 
-for b in (32, 72):
-    place(cymbal(), b, 0.8, bus="drums")
 
-# ---------------- music arrangement ----------------
-for b in range(0, 108, 8):
-    _, chord = chord_at(b)
-    cutoff = 1000 if b < 12 else 1600 if b < 32 else 2200 if b < 72 else 2600
-    place(pad(chord, 8, cutoff), b, 1.0 if b < 12 else 0.75)
+pulse_run(0, 16, 900, 3000, 5.0)
+pulse_run(16, 19, 3000, 5200, 5.2)
+pulse_run(20, 66, 3200, 3200, 0.9, follow=True)
+pulse_run(66, 72, 2000, 3600, 4.5)
+pulse_run(72, 80, 2000, 700, 3.4)
 
-for bar in range(3, 26):
-    b = bar * 4
-    root = chord_at(b)[0]
-    g = 0.75 if b < 32 else 1.0
-    place(bass(root, 2.4), b, g)
-    place(bass(root + (7 if b >= 32 and bar % 2 else 0), 1.4), b + 2.5, g * 0.8)
+# Intro sub under the pulse, like the reference's first two seconds.
+place(sub(33, 4), 0, 0.6)
 
-ARP = [0, 2, 1, 3, 2, 1, 3, 2]
-for b8 in range(24, 208):  # eighth notes, beats 12-104
-    b = b8 * 0.5
-    _, chord = chord_at(b)
-    tones = [m + 12 for m in chord]
-    gain = 0.45 if b < 20 else 0.65 if b < 32 else 0.8
-    place(marimba(tones[ARP[b8 % 8]]), b, gain * (1.0 if b8 % 2 == 0 else 0.7), -0.45 + 0.9 * (b8 % 2))
+# ---------------- build percussion ----------------
+for b in range(8, 16):
+    place(hat(), b + 0.5, 0.6, 0.2, "drums")
+for b in range(12, 16):
+    if b % 2:
+        place(clap(), b, 0.45, bus="drums")
+for i in range(6):
+    place(snare_roll_hit(), 16 + i * 0.5, 0.35 + i * 0.05, bus="drums")
+for i in range(4):
+    place(snare_roll_hit(), 18 + i * 0.25, 0.6 + i * 0.08, bus="drums")
+place(riser(3), 16, 0.8, bus="fx")
 
-# Hook on the film's 15-frame grid (every 1.5 beats).
-for b in range(32, 104, 8):
-    _, chord = chord_at(b)
-    line = [chord[3] + 12, chord[2] + 12, chord[1] + 12, chord[2] + 12, chord[3] + 12]
-    for i, m in enumerate(line):
-        place(bell(m, 0.8), b + i * 1.5, 0.45 if b < 72 else 0.7, -0.2 + 0.1 * i)
+# ---------------- drop ----------------
+for b in range(DROP, 66):
+    kick_at(b, 1.0 if b % 2 == 0 else 0.9)
+    if b % 2:
+        place(clap(), b, 0.8, bus="drums")
+    place(hat(True), b + 0.5, 0.75, 0.25, "drums")
+    for s in range(4):
+        place(hat(), b + s * 0.25, [0.5, 0.3, 0.0, 0.3][s], -0.25, "drums")
+    if b >= 48 and b % 4 == 3:
+        place(hat(), b + 0.75, 0.6, 0.3, "drums")
+for b in (DROP, 36, 48):
+    place(cymbal(), b, 0.9, bus="drums")
+for i in range(4):  # small fill into the hook
+    place(snare_roll_hit(), 35 + i * 0.25, 0.3 + i * 0.07, bus="drums")
 
-# Opening: cards light up every 0.5 s, logo at 2.5 s, soft swell into the home push at 4 s.
-for i, m in enumerate([72, 76, 79, 84]):
-    place(chime_hit(m), 1.5 * (i + 1), 0.9, -0.4 + 0.27 * i)
-place(chime_hit(88), 7.5, 1.0)
-place(swell(4), 8, 0.7, bus="fx")
-place(swell(6), 102, 0.9, bus="fx")
+for b in range(DROP, 66, 2):
+    root, tones = chord_at(b)
+    place(sub(root, 2), b, 0.6)
+    place(chords(tones, 2, 3000 if b < 36 else 4200), b, 1.5)
 
-# Final chord at beat 108 (36 s).
-kick_at(108, 0.8)
-place(cymbal(), 108, 1.0, bus="drums")
-place(bass(FINAL[0], 10), 108, 0.9)
-place(pad(FINAL[1], 12, 1800), 108, 1.4)
-for i, m in enumerate([79, 84, 88, 91]):
-    place(bell(m, 2.5), 108 + i * 0.5, 0.75 - i * 0.1, -0.3 + 0.2 * i)
+# Hook from beat 36 (18 s): original line on A minor, dotted rhythm, sits on the chord cycle.
+HOOK = [
+    (0, 76, 0.75), (0.75, 74, 0.75), (1.5, 72, 0.5), (2, 69, 1.0), (3, 72, 0.5), (3.5, 74, 0.5),
+    (4, 76, 0.75), (4.75, 79, 0.75), (5.5, 76, 0.5), (6, 74, 2.0),
+    (8, 76, 0.75), (8.75, 74, 0.75), (9.5, 72, 0.5), (10, 69, 1.0), (11, 67, 0.5), (11.5, 69, 0.5),
+    (12, 71, 1.0), (13, 68, 1.0), (14, 69, 2.0),
+]
+for start in (36, 52):
+    for off, m, ln in HOOK:
+        if start + off < 66:
+            place(lead(m, ln * BEAT + 0.15), start + off, 0.9 if start == 36 else 1.0, 0.1)
+            if start == 52:
+                place(lead(m + 12, ln * BEAT + 0.1), start + off, 0.25, -0.3)
+
+# Sparkle arp from beat 48 (24 s) on chord tones, sixteenths.
+for s16 in range(48 * 4, 66 * 4):
+    b = s16 / 4
+    tones = chord_at(b)[1]
+    m = tones[[0, 1, 2, 1][s16 % 4]] + 24
+    place(bell(m, 0.25), b, 0.28, -0.5 + (s16 % 4) * 0.33)
+
+# ---------------- opening chimes, breakdown, final hit ----------------
+for i, m in enumerate([76, 79, 83, 84]):
+    place(chime_hit(m), 1 + i, 0.9, -0.4 + 0.27 * i)
+place(chime_hit(88), 5, 1.0)
+
+place(chords([57, 60, 64], 2, 1400), 66, 0.7)
+place(chords([57, 60, 65], 2, 1600), 68, 0.7)
+place(chords([55, 59, 62], 2, 1900), 70, 0.7)
+place(riser(6), 66, 0.85, bus="fx")
+
+kick_at(72, 1.0)
+place(sub_boom(), 72, 0.9, bus="fx")
+place(cymbal(), 72, 1.1, bus="drums")
+place(sub(33, 6), 72, 0.8)
+place(chords([57, 60, 64, 69], 8, 1800), 72, 1.0)
+for i, m in enumerate([81, 76, 72, 69]):
+    place(bell(m, 2.4), 72 + i * 0.75, 0.75 - i * 0.12, -0.3 + 0.2 * i)
 
 # ---------------- master ----------------
 t = np.arange(N) / SR
 duck = np.ones(N)
 for tk, g in KICKS:
     i = int(tk * SR)
-    duck[i:] = np.minimum(duck[i:], 1 - 0.25 * g * np.exp(-(t[i:] - tk) / 0.08))
-mix = BUS["drums"] * 0.85 + BUS["music"] * duck + BUS["fx"]
-mix = hp(mix, 30)
-fade = np.clip(np.arange(N) / (0.05 * SR), 0, 1) * np.clip((N - np.arange(N)) / (2.2 * SR), 0, 1)
-mix = np.tanh(mix * fade)
+    seg = t[i:] - tk
+    duck[i:] = np.minimum(duck[i:], 1 - 0.6 * g * np.exp(-seg / 0.11))
+mix = BUS["drums"] * 0.9 + BUS["music"] * duck + BUS["fx"]
+mix = hp(mix, 28)
+fade = np.clip(np.arange(N) / (0.03 * SR), 0, 1) * np.clip((N - np.arange(N)) / (2.5 * SR), 0, 1)
+mix = np.tanh(mix * fade * 1.1)
 mix /= np.max(np.abs(mix)) / 0.89
 wavfile.write("public/audio/bgm-original.wav", SR, (mix.T * 32767).astype(np.int16))
 print("wrote public/audio/bgm-original.wav", N / SR, "s")
