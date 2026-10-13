@@ -18,7 +18,10 @@ export const EVENTS_FRAMES = 286;
 
 export const EVENTS_SFX = [
   { at: CARDS_IN - 2, src: 'sfx/whoosh-big.mp3', volume: 0.26 },
+  { at: CARDS_IN + 8, src: 'sfx/scroll-long.wav', volume: 0.4, len: 50 },
   { at: OPEN, src: 'sfx/swoosh-quick.mp3', volume: 0.26 },
+  { at: 164, src: 'sfx/scroll-long.wav', volume: 0.3, len: 40 },
+  { at: MARK + 2, src: 'sfx/pop-5.wav', volume: 0.26, len: 12 },
   { at: MARK - 1, src: 'sfx/ui-click.wav', volume: 0.55, len: 12 },
   { at: MARK, src: 'sfx/sparkle-touch.mp3', volume: 0.22 },
 ];

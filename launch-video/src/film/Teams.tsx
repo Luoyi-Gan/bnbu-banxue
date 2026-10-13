@@ -19,12 +19,15 @@ const cardPos = (i: number) => ({ x: 28 + (i % 3) * 316, y: 188 + Math.floor(i /
 export const TEAMS_SFX = [
   { at: HALL_IN - 2, src: 'sfx/whoosh-fast.mp3', volume: 0.26 },
   { at: FILTER - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
+  { at: FILTER + 4, src: 'sfx/scroll-short.wav', volume: 0.34, len: 22 },
   { at: OPEN - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
   { at: OPEN + 2, src: 'sfx/swoosh-quick.mp3', volume: 0.24 },
   { at: APPLY - 1, src: 'sfx/ui-click.wav', volume: 0.55, len: 12 },
   { at: APPROVED, src: 'sfx/sparkle-touch.mp3', volume: 0.26 },
+  ...[2, 5, 9].map((d, i) => ({ at: APPROVED + d, src: `sfx/pop-${i + 1}.wav`, volume: 0.24, len: 10 })),
   { at: ENTER - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
   { at: ENTER + 4, src: 'sfx/swoosh-quick.mp3', volume: 0.24 },
+  ...[14, 22, 34].map((d, i) => ({ at: ENTER + d, src: `sfx/pop-${i * 2}.wav`, volume: 0.2, len: 10 })),
 ];
 
 export const Teams = () => {

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "remotion studio src/index.ts",
     "render:film": "remotion render src/index.ts BanxueFilm out/banxue-film.mp4",
-    "render:film-nobgm": "remotion render src/index.ts BanxueFilm out/banxue-film-nobgm.mp4 --props=props-nobgm.json",
+    "render:film-bgm": "remotion render src/index.ts BanxueFilm out/banxue-film-bgm.mp4 --props='{\"bgm\":true}'",
     "render": "remotion render src/index.ts BanxueLaunch out/banxue-launch.mp4",
     "render:nobgm": "remotion render src/index.ts BanxueLaunch out/banxue-launch-nobgm.mp4 --props=props-nobgm.json",
     "render:vo": "remotion render src/index.ts BanxueLaunch out/banxue-launch-vo.mp4 --props=props-vo.json",

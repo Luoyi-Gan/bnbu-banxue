@@ -15,8 +15,12 @@ const slotPos = (i: number) => ({ x: 22 + (i % 2) * 312, y: 96 + Math.floor(i / 
 
 export const COFFEE_SFX = [
   { at: C_IN - 2, src: 'sfx/whoosh-fast.mp3', volume: 0.26 },
+  { at: 86, src: 'sfx/scroll-short.wav', volume: 0.28, len: 22 },
   { at: SLOT - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
+  { at: SLOT + 1, src: 'sfx/pop-3.wav', volume: 0.22, len: 10 },
+  { at: 124, src: 'sfx/scroll-short.wav', volume: 0.3, len: 20 },
   { at: 140, src: 'sfx/keyboard.mp3', volume: 0.26, len: 28 },
+  { at: 172, src: 'sfx/scroll-short.wav', volume: 0.26, len: 18 },
   { at: CONFIRM - 1, src: 'sfx/ui-click.wav', volume: 0.55, len: 12 },
   { at: CONFIRM + 2, src: 'sfx/sparkle-touch.mp3', volume: 0.24 },
 ];
@@ -86,8 +90,11 @@ const QUESTION = '想了解产品经理岗位的实习准备。';
 export const ALUMNI_SFX = [
   { at: A_IN - 2, src: 'sfx/swoosh-quick.mp3', volume: 0.28 },
   { at: LEARN - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
+  { at: LEARN + 3, src: 'sfx/warp-slide.mp3', volume: 0.2 },
+  { at: LEARN + 12, src: 'sfx/pop-3.wav', volume: 0.24, len: 10 },
   { at: 126, src: 'sfx/keyboard.mp3', volume: 0.26, len: 26 },
   { at: REQUEST - 1, src: 'sfx/ui-click.wav', volume: 0.55, len: 12 },
+  { at: REQUEST + 2, src: 'sfx/sparkle-touch.mp3', volume: 0.2 },
 ];
 
 export const Alumni = () => {

@@ -24,15 +24,23 @@ const DRAWER = { x: 1090, y: 60, w: 560, h: 380 };
 
 export const COMMUNITY_SFX = [
   { at: FEED_IN - 2, src: 'sfx/whoosh-fast.mp3', volume: 0.26 },
+  { at: FEED_IN + 4, src: 'sfx/scroll-short.wav', volume: 0.32, len: 30 },
+  { at: 86, src: 'sfx/scroll-short.wav', volume: 0.28, len: 30 },
   { at: LIKE - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
+  { at: LIKE + 1, src: 'sfx/pop-4.wav', volume: 0.3, len: 12 },
   { at: SAVE - 1, src: 'sfx/ui-click.wav', volume: 0.45, len: 12 },
+  { at: SAVE + 1, src: 'sfx/pop-2.wav', volume: 0.26, len: 12 },
   { at: OPEN, src: 'sfx/swoosh-quick.mp3', volume: 0.26 },
   { at: 230, src: 'sfx/keyboard.mp3', volume: 0.26, len: 30 },
   { at: SEND - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
+  { at: SEND + 2, src: 'sfx/swoosh-quick.mp3', volume: 0.16 },
   { at: COMPOSE - 2, src: 'sfx/transition-soft.mp3', volume: 0.28 },
   { at: 300, src: 'sfx/keyboard.mp3', volume: 0.24, len: 22 },
+  { at: 326, src: 'sfx/scroll-short.wav', volume: 0.3, len: 20 },
   { at: 330, src: 'sfx/keyboard.mp3', volume: 0.24, len: 30 },
+  { at: 362, src: 'sfx/scroll-short.wav', volume: 0.3, len: 20 },
   { at: SUBMIT - 1, src: 'sfx/ui-click.wav', volume: 0.55, len: 12 },
+  { at: SUBMIT + 2, src: 'sfx/swoosh-quick.mp3', volume: 0.2 },
 ];
 
 const Field = ({ x, y, w, h, text, placeholder, active, children }: { x: number; y: number; w: number; h: number; text: string; placeholder: string; active: boolean; children?: ReactNode }) => (

@@ -12,7 +12,7 @@ export const Root = () => (
       fps={FPS}
       width={1920}
       height={1080}
-      defaultProps={{ bgm: true }}
+      defaultProps={{ bgm: false }}
     />
     <Composition
       id="BanxueLaunch"

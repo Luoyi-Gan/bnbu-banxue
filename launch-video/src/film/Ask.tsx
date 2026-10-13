@@ -16,6 +16,9 @@ export const ASK_SFX = [
   { at: 50, src: 'sfx/keyboard.mp3', volume: 0.24, len: 24 },
   { at: SEND - 1, src: 'sfx/ui-click.wav', volume: 0.5, len: 12 },
   { at: SEND + 1, src: 'sfx/swoosh-quick.mp3', volume: 0.2 },
+  { at: 100, src: 'sfx/pop-0.wav', volume: 0.2, len: 10 },
+  { at: ANSWER - 1, src: 'sfx/pop-2.wav', volume: 0.24, len: 10 },
+  { at: 140, src: 'sfx/scroll-short.wav', volume: 0.22, len: 20 },
   { at: 172, src: 'sfx/sparkle-touch.mp3', volume: 0.22 },
 ];
 
