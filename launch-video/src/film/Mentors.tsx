@@ -1,9 +1,8 @@
-import { useCurrentFrame } from 'remotion';
 import { Avatar, Box, Btn, Icon, Kicker, P, Tag, Txt } from '../kit/base';
 import { Burst, Cam, camToScreen, typed, Win } from '../kit/fx';
 import { AlumniBooking, AlumniCard, Slot, SLOTS, TeacherCard } from '../kit/product';
 import { EASE_IN_OUT, EASE_OUT, LAND, prog } from '../lib/motion';
-import { camKeys, enter, FeatureTitle, Focused, Tap, Wiped } from './kit';
+import { camKeys, FeatureTitle, Focused, enter, Tap, useF, Wiped } from './kit';
 
 // ---------------- Coffee Chat with a teacher ----------------
 export const COFFEE_FRAMES = 254;
@@ -26,20 +25,20 @@ export const COFFEE_SFX = [
 ];
 
 export const Coffee = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   const cam = camKeys(f, {
     z: [[C_IN, 1.15], [84, 1.15], [104, 1.75], [124, 1.75], [138, 1.8], [172, 1.8], [184, 1.9], [204, 1.9], [226, 1.5]],
     fx: [[C_IN, 95], [84, 95], [104, 330], [124, 330], [138, 330], [172, 330], [184, 420], [204, 420], [226, 330]],
     fy: [[C_IN, 280], [84, 280], [104, 210], [124, 210], [138, 412], [172, 412], [184, 490], [204, 490], [226, 400]],
     rx: [[C_IN, 12], [84, 0]],
     ry: [[C_IN, 12], [84, 0], [104, -6], [226, -4]],
-  }, { opacity: prog(f, C_IN, 8) });
+  }, { opacity: prog(f, C_IN, 14, EASE_IN_OUT) });
   const sel = prog(f, SLOT + 1, 6, EASE_OUT);
   const booked = prog(f, CONFIRM + 1, 8, EASE_OUT);
   const text = typed(TOPIC, prog(f, 140, 26, (t) => t));
   const sp = slotPos(4);
   const slotPt = camToScreen(cam, sp.x + 150, sp.y + 37);
-  const focus = prog(f, 136, 10, EASE_IN_OUT) * (1 - prog(f, 172, 10));
+  const focus = prog(f, 136, 10, EASE_IN_OUT) * (1 - prog(f, 170, 16, EASE_IN_OUT));
   const page = () => (
     <Cam cam={cam}>
       <div style={{ position: 'absolute', left: -470, top: 40, borderRadius: 14, boxShadow: '0 30px 80px rgba(0,0,0,0.55), 0 0 60px rgba(61,123,255,0.35)', ...enter(f, C_IN, 18) }}><TeacherCard /></div>
@@ -98,14 +97,14 @@ export const ALUMNI_SFX = [
 ];
 
 export const Alumni = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   const cam = camKeys(f, {
     z: [[A_IN, 1.85], [90, 2.05], [LEARN + 6, 2.05], [124, 1.95], [REQUEST + 30, 1.8]],
     fx: [[A_IN, 230], [90, 230], [LEARN + 6, 230], [124, 310], [REQUEST + 30, 310]],
     fy: [[A_IN, 160], [90, 150], [LEARN + 6, 150], [124, 130], [REQUEST + 30, 130]],
     rx: [[A_IN, 10], [80, 0]],
     ry: [[A_IN, -14], [80, 0], [124, -5]],
-  }, { opacity: prog(f, A_IN, 8) });
+  }, { opacity: prog(f, A_IN, 14, EASE_IN_OUT) });
   const flip = prog(f, LEARN + 4, 14, EASE_IN_OUT);
   const text = typed(QUESTION, prog(f, 126, 24, (t) => t));
   const requested = prog(f, REQUEST + 1, 10, EASE_OUT);

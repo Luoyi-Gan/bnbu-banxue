@@ -1,9 +1,9 @@
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
 import { Box, P } from '../kit/base';
 import { Burst, Cam, camToScreen, type CamState, Win } from '../kit/fx';
 import { ActivityCard, actById, ActivityDetail } from '../kit/product';
 import { EASE_IN, EASE_IN_OUT, EASE_OUT, LAND, keys, mix, prog } from '../lib/motion';
-import { camKeys, camMix, FeatureTitle, Focused, Tap, Trace, Wiped } from './kit';
+import { camKeys, camMix, FeatureTitle, Focused, Tap, Trace, useF, Wiped } from './kit';
 
 const ROW_IDS = ['career', 'speaking', 'library', 'cinema', 'run', 'ai'];
 const CARD_W = 214, CARD_GAP = 250;
@@ -55,7 +55,7 @@ const Cards = ({ f }: { f: number }) => {
 const Detail = ({ f }: { f: number }) => {
   if (f < OPEN + 2) return null;
   const open = prog(f, OPEN + 2, 18, EASE_OUT);
-  const pull = prog(f, MARK + 4, 24, EASE_OUT);
+  const pull = prog(f, MARK + 3, 30, EASE_IN_OUT);
   const near = camKeys(f, {
     z: [[OPEN, 1.18], [162, 1.22], [180, 1.7], [200, CAM_IN.z]],
     fx: [[OPEN, 345], [162, 345], [180, 330], [200, CAM_IN.fx]],
@@ -67,7 +67,7 @@ const Detail = ({ f }: { f: number }) => {
   const marked = prog(f, MARK + 1, 10, EASE_OUT);
   const press = Math.max(0, 1 - Math.abs(f - MARK) / 4);
   const focusY = keys(f, [[162, 540], [182, 540], [200, BTN.y + BTN.h / 2]]);
-  const amount = prog(f, 162, 14, EASE_IN_OUT) * (1 - prog(f, MARK + 4, 12));
+  const amount = prog(f, 162, 14, EASE_IN_OUT) * (1 - prog(f, MARK + 3, 18, EASE_IN_OUT));
   const btnScreen = camToScreen(CAM_IN, BTN.x + 46, BTN.y + BTN.h / 2);
   const rim = prog(f, MARK + 6, 20, EASE_IN_OUT);
   const page = () => (
@@ -90,7 +90,7 @@ const Detail = ({ f }: { f: number }) => {
 };
 
 export const Events = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   return (
     <Wiped f={f} at={EVENTS_FRAMES - 24}>
       <FeatureTitle f={f} text="活动" id="ev" />

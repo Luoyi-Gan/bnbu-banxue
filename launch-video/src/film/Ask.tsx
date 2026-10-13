@@ -1,9 +1,9 @@
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
 import { Box, Icon, Kicker, P, Txt } from '../kit/base';
 import { Cam, camToScreen, typed, Win } from '../kit/fx';
 import { ANSWER_MAIN, ANSWER_SRC } from '../kit/product';
 import { EASE_IN_OUT, EASE_OUT, LAND, mix, prog } from '../lib/motion';
-import { camKeys, enter, FeatureTitle, Focused, Tap } from './kit';
+import { camKeys, FeatureTitle, Focused, enter, Tap, useF } from './kit';
 
 export const ASK_FRAMES = 230;
 const A_IN = 42;
@@ -23,14 +23,14 @@ export const ASK_SFX = [
 ];
 
 export const Ask = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   const cam = camKeys(f, {
     z: [[A_IN, 1.55], [SEND + 10, 1.6], [140, 1.95], [200, 2.0]],
     fx: [[A_IN, 390], [SEND + 10, 390], [140, 360], [200, 360]],
     fy: [[A_IN, 245], [SEND + 10, 245], [140, 225], [200, 225]],
     rx: [[A_IN, -12], [80, 0]],
     ry: [[A_IN, 10], [80, 0], [200, -4]],
-  }, { opacity: prog(f, A_IN, 8) });
+  }, { opacity: prog(f, A_IN, 14, EASE_IN_OUT) });
   const sent = f >= SEND + 1;
   const qTyped = typed(QUESTION, prog(f, 50, 22, (t) => t));
   const qFly = prog(f, SEND + 1, 12, EASE_OUT);

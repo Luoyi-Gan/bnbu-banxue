@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { AbsoluteFill, Audio, Sequence, staticFile } from 'remotion';
-import { Backdrop, T } from '../lib/ui';
+import { T } from '../lib/ui';
+import { MotionBlur, useF } from './kit';
 import { Ask, ASK_FRAMES, ASK_SFX } from './Ask';
 import { Finale, FINALE_FRAMES, Opening, OPENING_FRAMES } from './Brand';
 import { Community, COMMUNITY_FRAMES, COMMUNITY_SFX } from './Community';
@@ -44,13 +45,29 @@ const SCENES: { C: FC; len: number; sfx: Sfx[] }[] = [
 const STARTS = SCENES.map((_, i) => SCENES.slice(0, i).reduce((s, x) => s + x.len, 0));
 export const FILM_FRAMES = SCENES.reduce((s, x) => s + x.len, 0);
 
+// Night backdrop on the film's global clock, so its slow drift never resets at a scene cut.
+const FilmBackdrop = ({ start }: { start: number }) => {
+  const t = (start + useF()) / 30;
+  const bx = 68 + Math.sin(t * 0.35) * 6, by = 30 + Math.cos(t * 0.27) * 5;
+  const vx = 24 + Math.cos(t * 0.31) * 6, vy = 72 + Math.sin(t * 0.22) * 5;
+  return (
+    <AbsoluteFill style={{ background: T.night }}>
+      <AbsoluteFill style={{ background: `radial-gradient(60% 55% at ${bx}% ${by}%, rgba(46,96,255,0.30) 0%, rgba(46,96,255,0.08) 45%, rgba(0,0,0,0) 70%)` }} />
+      <AbsoluteFill style={{ background: `radial-gradient(55% 50% at ${vx}% ${vy}%, rgba(132,86,255,0.24) 0%, rgba(132,86,255,0.06) 45%, rgba(0,0,0,0) 72%)` }} />
+      <AbsoluteFill style={{ background: 'radial-gradient(120% 90% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.65) 100%)' }} />
+    </AbsoluteFill>
+  );
+};
+
 export const Film = ({ bgm = false }: { bgm?: boolean }) => (
   <AbsoluteFill style={{ background: T.night }}>
-    <Backdrop />
     {bgm && <Audio src={staticFile('audio/film-score.wav')} volume={0.5} />}
     {SCENES.map(({ C, len, sfx }, i) => (
       <Sequence key={i} from={STARTS[i]} durationInFrames={len}>
-        <C />
+        <MotionBlur>
+          <FilmBackdrop start={STARTS[i]} />
+          <C />
+        </MotionBlur>
         {sfx.map((s, j) => (
           <Sequence key={j} from={s.at} durationInFrames={s.len ?? 45} layout="none">
             <Audio src={staticFile(`audio/${s.src}`)} volume={Math.min(1, s.volume * (bgm ? 1 : 1.6))} />

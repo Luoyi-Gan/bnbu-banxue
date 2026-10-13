@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { createContext, type CSSProperties, type ReactNode, useContext } from 'react';
 import { AbsoluteFill } from 'remotion';
 import { EASE_OUT, mix } from '../lib/motion';
 import { P } from './base';
@@ -7,26 +7,44 @@ import { P } from './base';
 export type CamState = { z: number; fx: number; fy: number; ax?: number; ay?: number; rx?: number; ry?: number; blur?: number; opacity?: number };
 export const camToScreen = (c: CamState, x: number, y: number) => ({ x: (c.ax ?? 960) + (x - c.fx) * c.z, y: (c.ay ?? 540) + (y - c.fy) * c.z });
 
+// Camera tilt, read by windows to light themselves from the same direction.
+const Tilt = createContext({ rx: 0, ry: 0 });
+
 export const Cam = ({ cam, children }: { cam: CamState; children: ReactNode }) => (
   <AbsoluteFill style={{ perspective: 2400, perspectiveOrigin: `${cam.ax ?? 960}px ${cam.ay ?? 540}px`, opacity: cam.opacity ?? 1, filter: (cam.blur ?? 0) > 0.05 ? `blur(${cam.blur}px)` : undefined }}>
     <div style={{ position: 'absolute', left: cam.ax ?? 960, top: cam.ay ?? 540, width: 0, height: 0, transformStyle: 'preserve-3d', transformOrigin: '0 0', transform: `rotateX(${cam.rx ?? 0}deg) rotateY(${cam.ry ?? 0}deg) scale(${cam.z}) translate(${-cam.fx}px, ${-cam.fy}px)` }}>
-      {children}
+      <Tilt.Provider value={{ rx: cam.rx ?? 0, ry: cam.ry ?? 0 }}>{children}</Tilt.Provider>
     </div>
   </AbsoluteFill>
 );
 
-const glowShadow = (glow: number) =>
-  `0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(170,195,255,0.18), 0 0 ${60 + glow * 60}px rgba(61,123,255,${0.16 + glow * 0.3}), 0 0 ${120 + glow * 80}px rgba(138,99,255,${0.07 + glow * 0.15})`;
+// Contact, mid and ambient shadows fall away from the light as the camera turns; then the brand glow.
+const glowShadow = (glow: number, rx: number, ry: number) => {
+  const sx = ry * 1.6, sy = 1 + rx * 0.8;
+  return [
+    `${sx * 0.1}px ${2 * sy}px 3px rgba(0,0,0,0.35)`,
+    `${sx * 0.4}px ${12 * sy}px 28px rgba(0,0,0,0.32)`,
+    `${sx}px ${38 * sy}px 90px rgba(0,0,0,0.5)`,
+    '0 0 0 1px rgba(170,195,255,0.2)',
+    `0 0 ${60 + glow * 60}px rgba(61,123,255,${0.14 + glow * 0.28})`,
+    `0 0 ${120 + glow * 80}px rgba(138,99,255,${0.06 + glow * 0.14})`,
+  ].join(', ');
+};
 
 // Floating product window/card. Position is top-left in the parent's space.
 export const Win = ({ x, y, w, h, radius = 22, bg = P.canvas, glow = 0.5, scale = 1, opacity = 1, tz = 0, rx = 0, ry = 0, origin = '50% 50%', style, children }: {
   x: number; y: number; w: number; h: number; radius?: number; bg?: string; glow?: number; scale?: number; opacity?: number; tz?: number; rx?: number; ry?: number; origin?: string; style?: CSSProperties; children?: ReactNode;
-}) => (
-  <div style={{ position: 'absolute', left: x, top: y, width: w, height: h, borderRadius: radius, background: bg, overflow: 'hidden', boxShadow: glowShadow(glow), opacity, transform: `translateZ(${tz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`, transformOrigin: origin, ...style }}>
-    {children}
-    <div style={{ position: 'absolute', inset: 0, borderRadius: radius, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.5)', pointerEvents: 'none' }} />
-  </div>
-);
+}) => {
+  const tilt = useContext(Tilt);
+  const ty = tilt.ry + ry, tx = tilt.rx + rx;
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, width: w, height: h, borderRadius: radius, background: bg, overflow: 'hidden', boxShadow: glowShadow(glow, tx, ty), opacity, transform: `translateZ(${tz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`, transformOrigin: origin, ...style }}>
+      {children}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: `linear-gradient(112deg, rgba(255,255,255,0) ${28 - ty * 2.4}%, rgba(255,255,255,0.11) ${40 - ty * 2.4}%, rgba(255,255,255,0) ${54 - ty * 2.4}%)` }} />
+      <div style={{ position: 'absolute', inset: 0, borderRadius: radius, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.95), inset 0 0 0 1px rgba(255,255,255,0.45), inset 0 -1px 0 rgba(0,0,0,0.06)', pointerEvents: 'none' }} />
+    </div>
+  );
+};
 
 // Brand icon rebuilt from src/assets/brand/brand-app-icon-a.svg; `draw` animates the pulse line.
 export const BrandMark = ({ size, draw = 1, glow = 0, id = 'm' }: { size: number; draw?: number; glow?: number; id?: string }) => (

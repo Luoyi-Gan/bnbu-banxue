@@ -1,10 +1,26 @@
-import type { ReactNode } from 'react';
-import { AbsoluteFill } from 'remotion';
+import { createContext, type ReactNode, useContext } from 'react';
+import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { T } from '../lib/ui';
 import { EASE_IN, EASE_IN_OUT, EASE_OUT, keys, mix, prog } from '../lib/motion';
 import type { CamState } from '../kit/fx';
 
 export const LINE_W = 3;
+
+// ---------------- time ----------------
+// Scene frame plus a sub-frame offset, so MotionBlur can sample between frames.
+const FrameOffset = createContext(0);
+export const useF = () => useCurrentFrame() + useContext(FrameOffset);
+// Children are rendered at `samples` instants across the shutter and averaged. Every sample must be
+// opaque (include the backdrop), otherwise stacked translucent glows would add up.
+export const MotionBlur = ({ samples = 5, shutter = 0.5, children }: { samples?: number; shutter?: number; children: ReactNode }) => (
+  <>
+    {Array.from({ length: samples }, (_, i) => (
+      <AbsoluteFill key={i} style={{ opacity: 1 / (i + 1) }}>
+        <FrameOffset.Provider value={-shutter * ((samples - 1 - i) / (samples - 1))}>{children}</FrameOffset.Provider>
+      </AbsoluteFill>
+    ))}
+  </>
+);
 
 // ---------------- polylines ----------------
 export type Pt = [number, number];
@@ -33,6 +49,20 @@ export const upToX = (pts: Pt[], hx: number): Pt[] => {
   }
   return out;
 };
+// The last `len` px of a polyline (the part right behind the head).
+const tailOf = (pts: Pt[], len: number): Pt[] => {
+  const out: Pt[] = [pts[pts.length - 1]];
+  let left = len;
+  for (let i = pts.length - 1; i > 0 && left > 0; i--) {
+    const [a, b] = [pts[i - 1], pts[i]];
+    const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (l <= left) { out.unshift(a); left -= l; continue; }
+    const k = left / l;
+    out.unshift([mix(b[0], a[0], k), mix(b[1], a[1], k)]);
+    left = 0;
+  }
+  return out;
+};
 const toD = (pts: Pt[]) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
 
 // The visible part of the icon's pulse (its clip trims both ends), in icon path coordinates.
@@ -57,6 +87,9 @@ export const Line = ({ id, pts, w = LINE_W, head = false, opacity = 1 }: { id: s
       <path d={d} fill="none" stroke={T.electric} strokeWidth={w * 3} strokeLinecap="round" strokeLinejoin="round" opacity={0.35} filter={`url(#${id}-wide)`} />
       <path d={d} fill="none" stroke="#86A6FF" strokeWidth={w * 1.6} strokeLinecap="round" strokeLinejoin="round" opacity={0.7} filter={`url(#${id}-near)`} />
       <path d={d} fill="none" stroke="#F5F8FF" strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" />
+      {head && [[420, 0.22, 2.6], [200, 0.4, 2.0], [80, 0.7, 1.5]].map(([len, o, k]) => (
+        <path key={len} d={toD(tailOf(pts, len))} fill="none" stroke="#C9D8FF" strokeWidth={w * k} strokeLinecap="round" strokeLinejoin="round" opacity={o} filter={`url(#${id}-near)`} />
+      ))}
       {head && <><circle cx={tip[0]} cy={tip[1]} r={w * 7} fill={`url(#${id}-h)`} /><circle cx={tip[0]} cy={tip[1]} r={w * 0.9} fill="#FFFFFF" /></>}
     </svg>
   );
@@ -154,7 +187,7 @@ export const Wiped = ({ f, at, children }: { f: number; at: number; children: Re
   const pts: Pt[] = [[hx - 700, y], [hx - 190, y], [hx - 172, y + 10], [hx - 150, y - 64], [hx - 130, y + 18], [hx - 112, y], [hx, y]];
   return (
     <AbsoluteFill>
-      <AbsoluteFill style={{ clipPath: p > 0 ? `inset(0 0 0 ${Math.max(0, hx + 20) / 19.2}%)` : undefined }}>{children}</AbsoluteFill>
+      <AbsoluteFill style={p > 0 ? { WebkitMaskImage: `linear-gradient(90deg, transparent ${hx - 120}px, #000 ${hx + 20}px)`, maskImage: `linear-gradient(90deg, transparent ${hx - 120}px, #000 ${hx + 20}px)` } : undefined}>{children}</AbsoluteFill>
       {p > 0 && p < 1 && <Line id="wipe" pts={pts} head />}
     </AbsoluteFill>
   );
@@ -162,8 +195,19 @@ export const Wiped = ({ f, at, children }: { f: number; at: number; children: Re
 
 // ---------------- camera ----------------
 type Key = [number, number];
+// Keyframes run through a Gaussian over ±R frames, so back-to-back moves blend into one continuous
+// path instead of stopping at every key; holds keep a slow breathing drift.
+const R = 8;
+const KERNEL = Array.from({ length: 2 * R + 1 }, (_, i) => Math.exp(-((i - R) ** 2) / (2 * (R / 2) ** 2)));
+const KSUM = KERNEL.reduce((s, v) => s + v, 0);
+export const smoothKeys = (f: number, pairs: Key[]) => KERNEL.reduce((s, w, i) => s + w * keys(f + i - R, pairs), 0) / KSUM;
 export const camKeys = (f: number, k: { z: Key[]; fx: Key[]; fy: Key[]; rx?: Key[]; ry?: Key[] }, extra: Partial<CamState> = {}): CamState => ({
-  z: keys(f, k.z), fx: keys(f, k.fx), fy: keys(f, k.fy), rx: k.rx ? keys(f, k.rx) : 0, ry: k.ry ? keys(f, k.ry) : 0, ...extra,
+  z: smoothKeys(f, k.z) * (1 + 0.006 * Math.sin(f / 50)),
+  fx: smoothKeys(f, k.fx),
+  fy: smoothKeys(f, k.fy),
+  rx: (k.rx ? smoothKeys(f, k.rx) : 0) + 0.4 * Math.sin(f / 57 + 1),
+  ry: (k.ry ? smoothKeys(f, k.ry) : 0) + 0.6 * Math.sin(f / 63),
+  ...extra,
 });
 export const camMix = (a: CamState, b: CamState, p: number): CamState => ({
   z: mix(a.z, b.z, p), fx: mix(a.fx, b.fx, p), fy: mix(a.fy, b.fy, p), rx: mix(a.rx ?? 0, b.rx ?? 0, p), ry: mix(a.ry ?? 0, b.ry ?? 0, p),
@@ -171,5 +215,5 @@ export const camMix = (a: CamState, b: CamState, p: number): CamState => ({
 // Window entrance inside a Cam: rises from depth and settles.
 export const enter = (f: number, at: number, dur = 18) => {
   const p = prog(f, at, dur, EASE_OUT);
-  return { opacity: Math.min(1, p * 1.6), transform: `translateY(${(1 - p) * 90}px) scale(${mix(0.9, 1, p)})` };
+  return { opacity: prog(f, at, Math.round(dur * 0.7), EASE_IN_OUT), transform: `translateY(${(1 - p) * 90}px) translateZ(${(1 - p) * -160}px) rotateX(${(1 - p) * 18}deg) scale(${mix(0.92, 1, p)})` };
 };

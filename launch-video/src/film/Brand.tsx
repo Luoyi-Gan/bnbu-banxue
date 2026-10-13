@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
 import { Avatar, Chip, Icon, P, Tag, Txt } from '../kit/base';
 import { BrandMark } from '../kit/fx';
 import { Slot } from '../kit/product';
 import { EASE_IN_OUT, EASE_OUT, LAND, keys, mix, prog } from '../lib/motion';
-import { ICON_PULSE, iconPoint, iconStroke, Line, LINE_W, type Pt, resample, upToX } from './kit';
+import { ICON_PULSE, iconPoint, iconStroke, Line, LINE_W, type Pt, resample, upToX, useF } from './kit';
 
 const B = (n: number) => Math.round(n * 21);
 const LINE_Y = 540;
@@ -91,7 +91,7 @@ RUN_LINE.push([2000, LINE_Y]);
 
 export const OPENING_FRAMES = 212;
 export const Opening = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   const square = prog(f, ICON_AT, 14, LAND);
   const ring = prog(f, ICON_AT + 3, 18, EASE_OUT);
   const mv = prog(f, MOVE, 20, EASE_IN_OUT);
@@ -144,7 +144,7 @@ export const Opening = () => {
 // Last 5.7 s: the same line returns with every module on it and folds back into the icon.
 export const FINALE_FRAMES = 170;
 export const Finale = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   const hx = keys(f, [[0, -80], [28, 2000]], (t) => t);
   const fold = prog(f, 34, 18, EASE_IN_OUT);
   return (

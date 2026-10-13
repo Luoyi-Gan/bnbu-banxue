@@ -1,10 +1,9 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { useCurrentFrame } from 'remotion';
 import { Box, Chip, Divider, Icon, Kicker, P, Txt } from '../kit/base';
 import { Burst, Cam, camToScreen, typed, Win } from '../kit/fx';
 import { PostCard, POSTS } from '../kit/product';
-import { EASE_IN_OUT, EASE_OUT, keys, prog } from '../lib/motion';
-import { camKeys, enter, FeatureTitle, Focused, Tap, Wiped } from './kit';
+import { EASE_IN_OUT, EASE_OUT, keys, mix, prog } from '../lib/motion';
+import { camKeys, FeatureTitle, Focused, enter, Tap, useF, Wiped } from './kit';
 
 export const COMMUNITY_FRAMES = 420;
 const FEED_IN = 42;
@@ -121,7 +120,7 @@ const Compose = ({ f }: { f: number }) => {
 };
 
 export const Community = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   const toDrawer = prog(f, OPEN, 26, EASE_IN_OUT);
   const cam = camKeys(f, {
     z: [[FEED_IN, 1.2], [84, 1.3], [104, 2.4], [OPEN, 2.4], [186, 1.6], [214, 1.6], [230, 2.3]],
@@ -138,18 +137,18 @@ export const Community = () => {
     rx: [[COMPOSE, 10], [296, 0]],
     ry: [[COMPOSE, -8], [296, 0], [374, -6]],
   });
-  const feedFocus = prog(f, 90, 12, EASE_IN_OUT) * (1 - prog(f, OPEN, 10));
+  const feedFocus = prog(f, 90, 12, EASE_IN_OUT) * (1 - prog(f, OPEN - 2, 16, EASE_IN_OUT));
   const drawerFocus = prog(f, 216, 12, EASE_IN_OUT) * (1 - out);
-  const composeFocus = prog(f, 298, 10, EASE_IN_OUT) * (1 - prog(f, 364, 10));
+  const composeFocus = prog(f, 298, 10, EASE_IN_OUT) * (1 - prog(f, 362, 16, EASE_IN_OUT));
   const sendPt = camToScreen(cam, DRAWER.x + 506, DRAWER.y + 313);
   const submitPt = camToScreen(ccam, 548, 609);
   const scene = () => (
-    <Cam cam={{ ...cam, opacity: prog(f, FEED_IN, 8) * (1 - out) }}>
+    <Cam cam={{ ...cam, opacity: prog(f, FEED_IN, 14, EASE_IN_OUT) * (1 - out) }}>
       <div style={{ filter: toDrawer > 0.01 ? `brightness(${1 - toDrawer * 0.6}) blur(${toDrawer * 4}px)` : undefined }}><Feed f={f} /></div>
       {f >= OPEN && <Drawer f={f} />}
     </Cam>
   );
-  const focusY = f < OPEN ? camToScreen(cam, 0, 459).y : camToScreen(cam, 0, DRAWER.y + 313).y;
+  const focusY = mix(camToScreen(cam, 0, 459).y, camToScreen(cam, 0, DRAWER.y + 313).y, prog(f, OPEN - 2, 16, EASE_IN_OUT));
   return (
     <Wiped f={f} at={COMMUNITY_FRAMES - 24}>
       <FeatureTitle f={f} text="社区" id="cm" />

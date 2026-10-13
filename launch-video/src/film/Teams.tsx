@@ -1,9 +1,8 @@
-import { useCurrentFrame } from 'remotion';
 import { Box, Chip, Icon, P, Txt } from '../kit/base';
 import { Burst, Cam, camToScreen, Win } from '../kit/fx';
 import { ChatPanel, Roll, TeamCard, TeamDetail, TEAMS } from '../kit/product';
 import { EASE_IN_OUT, EASE_OUT, LAND, prog } from '../lib/motion';
-import { camKeys, enter, FeatureTitle, Note, Tap, Wiped } from './kit';
+import { camKeys, FeatureTitle, Note, enter, Tap, useF, Wiped } from './kit';
 
 export const TEAMS_FRAMES = 324;
 const HALL_IN = 42;
@@ -31,7 +30,7 @@ export const TEAMS_SFX = [
 ];
 
 export const Teams = () => {
-  const f = useCurrentFrame();
+  const f = useF();
   const filt = prog(f, FILTER + 1, 8);
   const moved = prog(f, FILTER + 5, 16, EASE_IN_OUT);
   const bPos = { x: cardPos(3).x, y: cardPos(3).y + (cardPos(0).y - cardPos(3).y) * moved };
@@ -41,7 +40,7 @@ export const Teams = () => {
     fy: [[HALL_IN, 330], [100, 330], [124, 302], [OPEN + 6, 302], [166, 335], [ENTER, 335], [ENTER + 30, CHAT.y + 220]],
     rx: [[HALL_IN, 12], [90, 0]],
     ry: [[HALL_IN, -10], [90, 0], [124, -6], [OPEN + 6, -6], [166, 0], [ENTER, 0], [ENTER + 30, -4]],
-  }, { opacity: prog(f, HALL_IN, 8) });
+  }, { opacity: prog(f, HALL_IN, 14, EASE_IN_OUT) });
   const dim = prog(f, OPEN + 4, 18, EASE_IN_OUT);
   const stage = f >= APPROVED ? 2 : 1;
   const applyP = prog(f, APPLY + 1, 9, EASE_OUT);
