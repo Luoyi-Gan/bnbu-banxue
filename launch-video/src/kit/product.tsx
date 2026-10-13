@@ -92,7 +92,7 @@ const Fact = ({ icon, label, value, w }: { icon: string; label: string; value: s
 );
 
 // Detail drawer for AI 创作工作坊. `reveal(i)` gives per-section entrance (0..1); `marked` 0..1.
-export const ActivityDetail = ({ reveal, marked }: { reveal: (i: number) => number; marked: number }) => {
+export const ActivityDetail = ({ reveal, marked, press = 0 }: { reveal: (i: number) => number; marked: number; press?: number }) => {
   const act = actById('ai');
   const sec = (i: number): CSSProperties => ({ opacity: reveal(i), transform: `translateY(${(1 - reveal(i)) * 18}px)` });
   return (
@@ -117,7 +117,7 @@ export const ActivityDetail = ({ reveal, marked }: { reveal: (i: number) => numb
       <Box x={20} y={572} style={sec(5)}><Fact icon="users" label="人数上限" value="未提供" w={319} /></Box>
       <Box x={351} y={572} style={sec(6)}><Fact icon="megaphone" label="主办方" value="创新创业中心" w={319} /></Box>
       <Box x={20} y={654} style={sec(6)}>
-        <div style={{ position: 'relative', height: 38, width: 92 + marked * 22 }}>
+        <div style={{ position: 'relative', height: 38, width: 92 + marked * 22, transform: `scale(${1 - press * 0.08})` }}>
           <div style={{ position: 'absolute', inset: 0, borderRadius: 9, background: P.action, opacity: 1 - marked }} />
           <div style={{ position: 'absolute', inset: 0, borderRadius: 9, background: P.accentSoft, opacity: marked }} />
           <Txt size={13} weight={700} color="#fff" style={{ position: 'absolute', left: 0, right: 0, top: 9, textAlign: 'center', opacity: 1 - marked }}>标记参与</Txt>

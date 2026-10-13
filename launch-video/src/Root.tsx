@@ -1,6 +1,6 @@
 import { Composition } from 'remotion';
 import { Main } from './Main';
-import { Sample15, SAMPLE_FRAMES } from './sample/Sample15';
+import { Sample, SAMPLE_FRAMES } from './sample/Sample';
 import { FPS, TOTAL_OUT } from './timeline';
 
 export const Root = () => (
@@ -15,8 +15,8 @@ export const Root = () => (
       defaultProps={{ bgm: true, vo: false }}
     />
     <Composition
-      id="BanxueSample15"
-      component={Sample15}
+      id="BanxueSample"
+      component={Sample}
       durationInFrames={SAMPLE_FRAMES}
       fps={FPS}
       width={1920}
