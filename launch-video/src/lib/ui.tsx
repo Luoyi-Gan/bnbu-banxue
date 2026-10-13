@@ -56,8 +56,9 @@ export const pathAt = (frame: number, pts: [number, number, number][]) => {
   return { x: last[1], y: last[2] };
 };
 
-export const Cursor = ({ x, y, clicks, opacity = 1, size = 34 }: { x: number; y: number; clicks: number[]; opacity?: number; size?: number }) => {
-  const frame = useFilmFrame();
+export const Cursor = ({ x, y, clicks, opacity = 1, size = 34, at }: { x: number; y: number; clicks: number[]; opacity?: number; size?: number; at?: number }) => {
+  const film = useFilmFrame();
+  const frame = at ?? film;
   const press = clicks.reduce((m, c) => Math.max(m, 1 - Math.min(1, Math.abs(frame - c) / 4)), 0);
   const ripples = clicks.filter((c) => frame >= c && frame < c + 18);
   return (
