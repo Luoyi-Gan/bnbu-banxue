@@ -1,17 +1,17 @@
 import type { ReactNode } from 'react';
 import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame } from 'remotion';
-import { Avatar, Box, Chip, Icon, Kicker, P, Tag, Txt } from '../kit/base';
+import { Avatar, Box, Chip, Icon, P, Tag, Txt } from '../kit/base';
 import { BrandMark, Burst, Cam, camToScreen, type CamState, Win } from '../kit/fx';
-import { ActivityCard, actById, ActivityDetail, NextCard, ROWS, SchedHeader, SchedRow, Slot, TaskCard } from '../kit/product';
+import { ActivityCard, actById, ActivityDetail, Slot } from '../kit/product';
 import { Backdrop, T } from '../lib/ui';
 import { EASE_IN, EASE_IN_OUT, EASE_OUT, LAND, keys, mix, prog } from '../lib/motion';
 
-// 20 s look test on raw 30 fps frames. The score's beat is 0.7 s = 21 frames:
+// 16.5 s look test on raw 30 fps frames. The score's beat is 0.7 s = 21 frames:
 // chimes at beats 0.5–3 and 5, riser 16–19, breath 19–20, drums from beat 20 (frame 420).
-export const SAMPLE_FRAMES = 600;
+export const SAMPLE_FRAMES = 495;
 const B = (n: number) => Math.round(n * 21);
 const DROP = B(20);
-const MARK_CLICK = B(27);
+const MARK_CLICK = DROP;
 const LINE_W = 3;
 
 // ---------------- line drawing ----------------
@@ -225,98 +225,33 @@ const Opening = ({ frame }: { frame: number }) => {
   );
 };
 
-// ---------------- 7–11.2 s: home heading in close-up, then the 下一步 card lifts out ----------------
-const HEADING = '今天，先做好下一件事';
-const NEXT = { x: 40, y: 306, w: 680, h: 190 };
-const underline: Pt[] = ICON_PULSE.map(([u, v]): Pt => [40 + (u - 60) * 0.81, 112 + (v - 116) * 0.14]);
-
-const HomePage = ({ frame, chars, sub, nextOpacity }: { frame: number; chars: number; sub: number; nextOpacity: number }) => (
-  <Win x={0} y={0} w={760} h={700} glow={0.4}>
-    <Box x={40} y={30}><Kicker>CAMPUS / TODAY</Kicker></Box>
-    <Box x={40} y={50}>
-      <Txt size={30} weight={700}>{[...HEADING].map((c, i) => <span key={i} style={{ opacity: i < chars ? 1 : 0 }}>{c}</span>)}</Txt>
-    </Box>
-    <Box x={40} y={98} style={{ opacity: sub }}><Txt size={12.5} color={P.muted}>你好，林知夏。你的校园安排和需要处理的事项都在这里。</Txt></Box>
-    <Box x={40} y={124} style={{ opacity: sub }}><Txt size={11.5} weight={600} color="#48484A">10月13日，星期二&nbsp;&nbsp;·&nbsp;&nbsp;1 项近期安排</Txt></Box>
-    <Box x={40} y={160}><TaskCard /></Box>
-    <Box x={NEXT.x} y={NEXT.y} style={{ opacity: nextOpacity }}><NextCard kicker="下一步 · 已标记参与" when={ROWS.run.when} title={ROWS.run.title} place={ROWS.run.place} /></Box>
-    <Box x={40} y={512}>
-      <div style={{ position: 'relative', width: 680, height: 162, borderRadius: 16, background: P.surface, border: `1px solid ${P.line}` }}>
-        <Box x={20} y={20}><SchedHeader /></Box>
-        <Box x={20} y={88}><SchedRow {...ROWS.run} /></Box>
-      </div>
-    </Box>
-    {frame > 230 && frame < 262 && <Line id="s-underline" w={1.2} pts={partial(underline, prog(frame, 230, 16, EASE_IN_OUT))} opacity={1 - prog(frame, 250, 10)} />}
-  </Win>
-);
-
-const Home = ({ frame }: { frame: number }) => {
-  if (frame < 206 || frame >= 358) return null;
-  const cam: CamState = {
-    z: keys(frame, [[206, 3.6], [250, 3.0], [272, 1.7], [336, 1.86]]),
-    fx: keys(frame, [[206, 130], [250, 205], [272, 380], [336, 380]]),
-    fy: keys(frame, [[206, 72], [250, 72], [272, 400], [336, 410]]),
-    ry: keys(frame, [[206, -14], [250, -5], [272, 0], [336, 5]]),
-    rx: keys(frame, [[206, 5], [250, 2], [272, 0], [336, -3]]),
-  };
-  const chars = Math.round(prog(frame, 210, 18, (t) => t) * HEADING.length);
-  const focus = 1 - prog(frame, 248, 14, EASE_IN_OUT);
-  const lift = prog(frame, B(13), 16, LAND);
-  const rim = prog(frame, B(13) + 2, 20, EASE_IN_OUT);
-  const wipe = prog(frame, B(16), 20, EASE_IN_OUT);
-  const page = () => (
-    <Cam cam={cam}><HomePage frame={frame} chars={chars} sub={prog(frame, 254, 10)} nextOpacity={1 - lift * 0.85} /></Cam>
-  );
-  return (
-    <AbsoluteFill style={{ opacity: prog(frame, 206, 6), clipPath: wipe > 0 ? `inset(0 0 0 ${wipe * 100}%)` : undefined }}>
-      <AbsoluteFill style={{ filter: lift > 0.01 ? `blur(${lift * 6}px) brightness(${1 - lift * 0.62})` : undefined }}>
-        <Focused y={camToScreen(cam, 190, 82).y} band={110} amount={focus} render={page} />
-      </AbsoluteFill>
-      {lift > 0 && (
-        <Cam cam={cam}>
-          <div style={{ position: 'absolute', left: NEXT.x, top: NEXT.y, width: NEXT.w, height: NEXT.h, transformStyle: 'preserve-3d', transform: `translateZ(${lift * 150}px) rotateX(${lift * -5}deg) translateY(${Math.sin((frame - B(13)) / 14) * 3 * lift}px)` }}>
-            <div style={{ borderRadius: 16, boxShadow: `0 40px 90px rgba(0,0,0,${0.55 * lift}), 0 0 ${60 * rim}px rgba(61,123,255,${0.45 * rim}), 0 0 ${140 * rim}px rgba(138,99,255,${0.25 * rim})` }}>
-              <NextCard kicker="下一步 · 已标记参与" when={ROWS.run.when} title={ROWS.run.title} place={ROWS.run.place} />
-            </div>
-            <Trace id="s-next" x={0} y={0} w={NEXT.w} h={NEXT.h} r={16} p={rim} width={0.9} />
-          </div>
-        </Cam>
-      )}
-      <Word frame={frame} text="下一步" from={284} to={328} y={880} size={92} />
-      {wipe > 0 && wipe < 1 && <WipeBar x={wipe * 1920} />}
-    </AbsoluteFill>
-  );
-};
-
-const WipeBar = ({ x }: { x: number }) => (
-  <div style={{ position: 'absolute', left: x - 40, top: -40, width: 80, height: 1160, background: 'linear-gradient(90deg, rgba(61,123,255,0) 0%, rgba(120,160,255,0.4) 42%, #F5F8FF 50%, rgba(150,120,255,0.4) 58%, rgba(61,123,255,0) 100%)', filter: 'blur(3px)', zIndex: 90 }} />
-);
-
-// ---------------- 11.9–16.1 s: 「活动」 on the riser, cards burst in on the drop and the dolly settles on one ----------------
+// ---------------- 7–11.2 s: 「活动」 where the line leaves the frame, cards burst in, the dolly settles on one ----------------
 const ROW_IDS = ['career', 'speaking', 'library', 'cinema', 'run', 'ai'];
 const CARD_W = 214, CARD_GAP = 250;
 const AI_X = ROW_IDS.indexOf('ai') * CARD_GAP + CARD_W / 2;
 const small: Pt[] = ICON_PULSE.map(([u, v]): Pt => [960 + (u - 245) * 1.0, 650 + (v - 129) * 0.36]);
-const OPEN = B(23);
+const WORD_AT = B(10);
+const CARDS_IN = B(12);
+const OPEN = B(16);
 
 const Events = ({ frame }: { frame: number }) => {
-  if (frame < B(17) || frame >= OPEN + 14) return null;
-  const fx = keys(frame, [[DROP, 300], [OPEN - 6, AI_X]]);
+  if (frame < WORD_AT - 2 || frame >= OPEN + 14) return null;
+  const fx = keys(frame, [[CARDS_IN, 300], [OPEN - 6, AI_X]]);
   const zoom = prog(frame, OPEN, 14, EASE_IN);
   const cam: CamState = {
-    z: keys(frame, [[DROP, 1.7], [OPEN - 6, 2.3]]) * (1 + zoom * 1.6), fx, fy: 200, rx: 10, ry: keys(frame, [[DROP, -30], [OPEN - 6, -8]]),
-    opacity: (frame >= DROP ? 1 : 0) * (1 - zoom), blur: zoom * 10,
+    z: keys(frame, [[CARDS_IN, 1.7], [OPEN - 6, 2.3]]) * (1 + zoom * 1.6), fx, fy: 200, rx: 10, ry: keys(frame, [[CARDS_IN, -30], [OPEN - 6, -8]]),
+    opacity: (frame >= CARDS_IN ? 1 : 0) * (1 - zoom), blur: zoom * 10,
   };
   return (
     <AbsoluteFill>
-      <Word frame={frame} text="活动" from={B(18)} to={DROP - 2} y={500} size={150} outScale={0.5} />
-      {frame > B(18) + 4 && frame < DROP + 8 && <Line id="s-word-line" w={1.8} pts={partial(small, prog(frame, B(18) + 4, 20, EASE_IN_OUT))} opacity={1 - prog(frame, DROP - 2, 8)} />}
-      {frame >= DROP && (
+      <Word frame={frame} text="活动" from={WORD_AT} to={CARDS_IN - 2} y={500} size={150} outScale={0.5} />
+      {frame > WORD_AT + 4 && frame < CARDS_IN + 8 && <Line id="s-word-line" w={1.8} pts={partial(small, prog(frame, WORD_AT + 4, 20, EASE_IN_OUT))} opacity={1 - prog(frame, CARDS_IN - 2, 8)} />}
+      {frame >= CARDS_IN && (
         <Cam cam={cam}>
           {ROW_IDS.map((id, i) => {
             const cx = i * CARD_GAP + CARD_W / 2;
             const d = Math.abs(cx - fx);
-            const inP = prog(frame, DROP + i * 2, 16, LAND);
+            const inP = prog(frame, CARDS_IN + i * 2, 16, LAND);
             return (
               <Box key={id} x={i * CARD_GAP} y={0} style={{ opacity: Math.min(1, inP * 2), filter: `blur(${Math.min(8, d / 45)}px) brightness(${1 - Math.min(0.6, d / 560)})`, transform: `translateZ(${(1 - inP) * -900}px)` }}>
                 <ActivityCard act={actById(id)} w={CARD_W} glow={id === 'ai' ? prog(frame, OPEN - 16, 12) : 0} />
@@ -325,12 +260,12 @@ const Events = ({ frame }: { frame: number }) => {
           })}
         </Cam>
       )}
-      {frame >= DROP && frame < DROP + 14 && <AbsoluteFill style={{ background: `radial-gradient(50% 50% at 50% 46%, rgba(160,190,255,${0.45 * (1 - prog(frame, DROP, 14))}) 0%, rgba(0,0,0,0) 70%)` }} />}
+      {frame >= CARDS_IN && frame < CARDS_IN + 14 && <AbsoluteFill style={{ background: `radial-gradient(50% 50% at 50% 46%, rgba(160,190,255,${0.3 * (1 - prog(frame, CARDS_IN, 14))}) 0%, rgba(0,0,0,0) 70%)` }} />}
     </AbsoluteFill>
   );
 };
 
-// ---------------- 16.1–20 s: read the detail, then 标记参与 (button press, no pointer) ----------------
+// ---------------- 11.2–16.5 s: read the detail on the riser, 标记参与 pressed on the drop (no pointer) ----------------
 const BTN = { x: 20, y: 654, h: 38 };
 const CAM_IN: CamState = { z: 2.7, fx: 150, fy: 668, ry: -6, rx: 2 };
 const CAM_OUT: CamState = { z: 1.08, fx: 345, fy: 370, ry: -18, rx: 7 };
@@ -340,11 +275,11 @@ const Detail = ({ frame }: { frame: number }) => {
   const open = prog(frame, OPEN + 2, 18, EASE_OUT);
   const pull = prog(frame, MARK_CLICK + 4, 24, EASE_OUT);
   const near: CamState = {
-    z: keys(frame, [[OPEN, 1.18], [516, 1.22], [534, 1.7], [556, CAM_IN.z]]),
-    fx: keys(frame, [[OPEN, 345], [516, 345], [534, 330], [556, CAM_IN.fx]]),
-    fy: keys(frame, [[OPEN, 350], [516, 330], [534, 540], [556, CAM_IN.fy]]),
-    ry: keys(frame, [[OPEN, -12], [516, -6], [534, -4], [556, CAM_IN.ry!]]),
-    rx: keys(frame, [[OPEN, 6], [516, 3], [534, 2], [556, CAM_IN.rx!]]),
+    z: keys(frame, [[OPEN, 1.18], [372, 1.22], [390, 1.7], [410, CAM_IN.z]]),
+    fx: keys(frame, [[OPEN, 345], [372, 345], [390, 330], [410, CAM_IN.fx]]),
+    fy: keys(frame, [[OPEN, 350], [372, 330], [390, 540], [410, CAM_IN.fy]]),
+    ry: keys(frame, [[OPEN, -12], [372, -6], [390, -4], [410, CAM_IN.ry!]]),
+    rx: keys(frame, [[OPEN, 6], [372, 3], [390, 2], [410, CAM_IN.rx!]]),
   };
   const cam: CamState = pull > 0
     ? { z: mix(CAM_IN.z, CAM_OUT.z, pull), fx: mix(CAM_IN.fx, CAM_OUT.fx, pull), fy: mix(CAM_IN.fy, CAM_OUT.fy, pull), ry: mix(CAM_IN.ry!, CAM_OUT.ry!, pull), rx: mix(CAM_IN.rx!, CAM_OUT.rx!, pull) }
@@ -352,10 +287,10 @@ const Detail = ({ frame }: { frame: number }) => {
   const marked = prog(frame, MARK_CLICK + 1, 10, EASE_OUT);
   const press = Math.max(0, 1 - Math.abs(frame - MARK_CLICK) / 4);
   const btnW = 92 + marked * 22;
-  const focusY = keys(frame, [[516, 540], [540, 540], [556, BTN.y + BTN.h / 2]]);
-  const amount = prog(frame, 516, 14, EASE_IN_OUT) * (1 - prog(frame, MARK_CLICK + 4, 12));
+  const focusY = keys(frame, [[372, 540], [392, 540], [410, BTN.y + BTN.h / 2]]);
+  const amount = prog(frame, 372, 14, EASE_IN_OUT) * (1 - prog(frame, MARK_CLICK + 4, 12));
   const btnScreen = camToScreen(CAM_IN, BTN.x + 46, BTN.y + BTN.h / 2);
-  const halo = prog(frame, 548, 16, EASE_IN_OUT);
+  const halo = prog(frame, 402, 14, EASE_IN_OUT);
   const rim = prog(frame, MARK_CLICK + 6, 20, EASE_IN_OUT);
   const page = () => (
     <Cam cam={{ ...cam, opacity: open }}>
@@ -381,12 +316,11 @@ const SFX: { at: number; src: string; volume: number; len?: number }[] = [
   { at: B(5) - 2, src: 'sfx/whoosh-fast.mp3', volume: 0.26 },
   { at: 117, src: 'sfx/sparkle.mp3', volume: 0.26 },
   { at: B(9) - 2, src: 'sfx/whoosh-fast.mp3', volume: 0.3 },
-  { at: 204, src: 'sfx/transition-soft.mp3', volume: 0.3 },
-  { at: B(13) - 2, src: 'sfx/swoosh-quick.mp3', volume: 0.26 },
-  { at: B(16) - 2, src: 'sfx/whoosh-big.mp3', volume: 0.26 },
-  { at: DROP - 2, src: 'sfx/impact-deep-whoosh.mp3', volume: 0.32 },
+  { at: WORD_AT - 4, src: 'sfx/transition-soft.mp3', volume: 0.3 },
+  { at: CARDS_IN - 2, src: 'sfx/whoosh-big.mp3', volume: 0.26 },
   { at: OPEN, src: 'sfx/swoosh-quick.mp3', volume: 0.26 },
   { at: MARK_CLICK - 1, src: 'sfx/ui-click.wav', volume: 0.55, len: 12 },
+  { at: DROP - 2, src: 'sfx/impact-deep-whoosh.mp3', volume: 0.3 },
 ];
 
 export const Sample = ({ bgm = true }: { bgm?: boolean }) => {
@@ -395,7 +329,6 @@ export const Sample = ({ bgm = true }: { bgm?: boolean }) => {
     <AbsoluteFill style={{ background: T.night }}>
       <Backdrop />
       <Opening frame={frame} />
-      <Home frame={frame} />
       <Events frame={frame} />
       <Detail frame={frame} />
       {bgm && <Audio src={staticFile('audio/bgm-original.wav')} volume={(f) => interpolate(f, [0, 6, SAMPLE_FRAMES - 20, SAMPLE_FRAMES], [0, 0.6, 0.6, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />}
