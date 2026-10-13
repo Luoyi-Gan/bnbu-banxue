@@ -16,7 +16,7 @@ export const Schedule = () => {
   if (!live(frame, 'schedule')) return null;
   const [l0, l1, l2, l3] = MOMENTS.scheduleLand;
   const enter = prog(frame, 720, 18, EASE_OUT);
-  const out = prog(frame, 924, 10, EASE_IN_OUT);
+  const out = prog(frame, 894, 10, EASE_IN_OUT);
   const cam: CamState = { z: keys(frame, [[720, 1.3], [845, 1.3], [900, 1.36]]), fx: 380, fy: keys(frame, [[720, 600], [845, 600], [900, 640]]), ax: 1260 + (1 - enter) * 500 - out * 200, ay: 540, ry: mix(-18, 0, enter) + prog(frame, 845, 50, EASE_IN_OUT) * -4, opacity: prog(frame, 720, 8) * (1 - out) };
   const camL: CamState = { z: 1.3, fx: 380, fy: 600, ax: 1260, ay: 540 };
 
@@ -108,8 +108,11 @@ export const Knowledge = () => {
   const frame = useCurrentFrame();
   if (!live(frame, 'knowledge')) return null;
   const cOut = prog(frame, 968, 14, EASE_IN_OUT);
-  const ce = prog(frame, 930, 14, EASE_OUT);
-  const cam: CamState = { z: mix(0.9, 1.12, ce), fx: keys(frame, [[930, 470], [972, 560]]), fy: 290, ax: 1180 - cOut * 900, ay: 450, rx: mix(14, 0, ce), opacity: prog(frame, 930, 8) * (1 - cOut) };
+  const ce = prog(frame, 900, 14, EASE_OUT);
+  const cam: CamState = { z: mix(0.9, 1.12, ce), fx: keys(frame, [[900, 470], [972, 560]]), fy: 290, ax: 1180 - cOut * 900, ay: 450, rx: mix(14, 0, ce), opacity: prog(frame, 900, 8) * (1 - cOut) };
+  const saved = prog(frame, CLICKS.communitySave + 1, 8, EASE_OUT);
+  const savePt = camToScreen(cam, 32 + 203.5, 188 + 19.5);
+  const cur0 = pathAt(frame, [[916, 1500, 900], [943, savePt.x, savePt.y], [956, savePt.x, savePt.y], [966, savePt.x + 60, savePt.y + 50]]);
   const A = { x: 700, y: 150, k: 1.3 };
   const ai = prog(frame, 968, 16, EASE_OUT);
   const out = prog(frame, 1046, 10, EASE_IN_OUT);
@@ -132,8 +135,8 @@ export const Knowledge = () => {
             <Box x={900} y={48}><Btn label="发布帖子" style={{ height: 36, fontSize: 12 }} /></Box>
             <Box x={32} y={136} style={{ display: 'flex', gap: 8 }}>{['全部', '校园', '学习', '生活', '活动', '互助', '校友升学', '校友就业'].map((l, i) => <Chip key={l} label={l} active={i === 0 ? 1 : 0} />)}</Box>
             {POSTS.map((p, i) => {
-              const q = prog(frame, 934 + i * 3, 16, LAND);
-              return <Box key={i} x={32 + i * 246} y={188} style={{ opacity: Math.min(1, q * 1.5), transform: `perspective(900px) rotateX(${(1 - q) * 55}deg) translateY(${(1 - q) * 40}px)`, transformOrigin: '50% 100%' }}><PostCard post={p} /></Box>;
+              const q = prog(frame, 904 + i * 3, 16, LAND);
+              return <Box key={i} x={32 + i * 246} y={188} style={{ opacity: Math.min(1, q * 1.5), transform: `perspective(900px) rotateX(${(1 - q) * 55}deg) translateY(${(1 - q) * 40}px)`, transformOrigin: '50% 100%' }}><PostCard post={p} saved={i === 0 ? saved : 0} /></Box>;
             })}
           </Win>
         </Cam>
@@ -166,6 +169,8 @@ export const Knowledge = () => {
           </Win>
         </div>
       )}
+      <Burst frame={frame} at={CLICKS.communitySave + 2} x={savePt.x} y={savePt.y} color="#4F86FF" r={56} n={8} />
+      <Cursor x={cur0.x} y={cur0.y} clicks={[CLICKS.communitySave]} opacity={prog(frame, 916, 5) * (1 - prog(frame, 960, 6))} />
       <Cursor x={cur.x} y={cur.y} clicks={[CLICKS.aiSend]} opacity={prog(frame, 976, 5) * (1 - prog(frame, 998, 6))} />
     </AbsoluteFill>
   );

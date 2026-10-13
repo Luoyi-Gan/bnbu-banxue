@@ -358,10 +358,12 @@ export const TimetableDay = () => (
 );
 
 // ---------------- community & AI ----------------
-export const PostCard = ({ post, w = 230 }: { post: (typeof POSTS)[number]; w?: number }) => (
+export const PostCard = ({ post, w = 230, saved = 0 }: { post: (typeof POSTS)[number]; w?: number; saved?: number }) => (
   <div style={{ width: w }}>
     <div style={{ position: 'relative', height: w * 0.98, borderRadius: 14, background: '#F7F7F9', border: `1px solid ${P.line}`, padding: 16, boxSizing: 'border-box' }}>
-      <Box x={w - 34} y={12}><Icon name="bookmark" size={15} color="#48484A" /></Box>
+      <Box x={w - 41.5} y={4.5} w={30} h={30} style={{ borderRadius: 15, background: 'rgba(255,255,255,0.94)', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${1 + 0.25 * Math.sin(Math.PI * saved)})` }}>
+        <Icon name="bookmark" size={15} color={saved > 0.5 ? P.blue : '#48484A'} fill={saved > 0.5 ? P.blue : 'none'} />
+      </Box>
       <Txt size={10} color={P.muted} style={{ marginTop: 26 }}>{post.board} · 校园分享</Txt>
       <Txt size={20} weight={700} style={{ marginTop: 8, whiteSpace: 'normal', lineHeight: 1.45 }}>{post.title}</Txt>
       <Txt size={11} color={P.muted} style={{ marginTop: 10, whiteSpace: 'normal', lineHeight: 1.6 }}>{post.body}</Txt>

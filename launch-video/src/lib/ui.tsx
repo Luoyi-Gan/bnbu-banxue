@@ -74,14 +74,14 @@ export const Cursor = ({ x, y, clicks, opacity = 1, size = 34 }: { x: number; y:
 };
 
 // Large Chinese headline: per-character rise from soft focus, accent rule in product blue.
-export const Caption = ({ text, from, to, x = 120, y = 856, size = 76 }: { text: string; from: number; to: number; x?: number; y?: number; size?: number }) => {
+export const Caption = ({ text, from, to, right = 120, y = 856, size = 76 }: { text: string; from: number; to: number; right?: number; y?: number; size?: number }) => {
   const frame = useCurrentFrame();
   if (frame < from - 2 || frame > to + 12) return null;
   const out = prog(frame, to, 12, EASE_IN_OUT);
   const rule = prog(frame, from, 18);
   return (
-    <div style={{ position: 'absolute', left: x, top: y, zIndex: 80, opacity: 1 - out, transform: `translateY(${-out * 14}px)` }}>
-      <div style={{ width: 84 * rule, height: 6, borderRadius: 3, marginBottom: 22, background: `linear-gradient(90deg, ${T.electric}, ${T.violet})`, boxShadow: '0 0 18px rgba(61,123,255,0.8)' }} />
+    <div style={{ position: 'absolute', right, top: y, zIndex: 80, opacity: 1 - out, transform: `translateY(${-out * 14}px)`, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+      <div style={{ width: 84 * rule, height: 6, borderRadius: 3, marginBottom: 22, background: `linear-gradient(90deg, ${T.violet}, ${T.electric})`, boxShadow: '0 0 18px rgba(61,123,255,0.8)' }} />
       <div style={{ display: 'flex', fontFamily: T.font, fontWeight: 600, fontSize: size, lineHeight: 1.15, color: '#fff', letterSpacing: '0.04em', whiteSpace: 'nowrap', textShadow: '0 4px 30px rgba(0,0,0,0.6), 0 0 40px rgba(61,123,255,0.35)' }}>
         {[...text].map((ch, i) => {
           const p = prog(frame, from + i * 1.6, 16);
@@ -92,9 +92,9 @@ export const Caption = ({ text, from, to, x = 120, y = 856, size = 76 }: { text:
   );
 };
 
-export const SubCaption = ({ text, from, to, x = 124, y = 984 }: { text: string; from: number; to: number; x?: number; y?: number }) => {
+export const SubCaption = ({ text, from, to, right = 124, y = 984 }: { text: string; from: number; to: number; right?: number; y?: number }) => {
   const frame = useCurrentFrame();
   const p = prog(frame, from, 14) * (1 - prog(frame, to, 10));
   if (p <= 0) return null;
-  return <div style={{ position: 'absolute', left: x, top: y, zIndex: 80, opacity: p, transform: `translateY(${(1 - p) * 10}px)`, fontFamily: T.font, fontWeight: 500, fontSize: 48, color: 'rgba(236,241,255,0.96)', letterSpacing: '0.06em', textShadow: '0 2px 16px rgba(0,0,0,0.7)' }}>{text}</div>;
+  return <div style={{ position: 'absolute', right, top: y, zIndex: 80, opacity: p, transform: `translateY(${(1 - p) * 10}px)`, fontFamily: T.font, fontWeight: 500, fontSize: 48, color: 'rgba(236,241,255,0.96)', letterSpacing: '0.06em', textShadow: '0 2px 16px rgba(0,0,0,0.7)' }}>{text}</div>;
 };

@@ -11,8 +11,8 @@ export const SHOTS = {
   teams: { from: beatF(20), duration: beatF(14) + 6 },
   coffee: { from: beatF(34), duration: beatF(7) + 11 },
   alumni: { from: beatF(41), duration: beatF(7) },
-  schedule: { from: beatF(48), duration: beatF(14) + 4 },
-  knowledge: { from: beatF(62), duration: beatF(8) + 4 },
+  schedule: { from: beatF(48), duration: beatF(12) + 4 },
+  knowledge: { from: beatF(60), duration: beatF(10) + 4 },
   finale: { from: beatF(70), duration: TOTAL - beatF(70) },
 } as const;
 
@@ -29,6 +29,7 @@ export const CLICKS = {
   coffeeConfirm: beatF(39),
   alumniOpen: beatF(42),
   alumniRequest: beatF(45),
+  communitySave: beatF(63),
   aiSend: beatF(66),
 } as const;
 
@@ -47,8 +48,9 @@ export const CAPTIONS = [
   { id: 'activities', text: '好活动，别错过', from: beatF(15), to: beatF(20) - 4 },
   { id: 'teams', text: '找到同频的人', from: beatF(22), to: beatF(34) - 4 },
   { id: 'mentors', text: '向老师请教，与校友交流', from: beatF(35), to: beatF(48) - 4 },
-  { id: 'schedule', text: '下一步，清晰可见', from: beatF(52), to: beatF(62) - 4 },
-  { id: 'knowledge', text: '校园问答，附资料来源', from: beatF(63), to: beatF(70) - 4 },
+  { id: 'schedule', text: '下一步，清晰可见', from: beatF(52), to: beatF(60) - 4 },
+  { id: 'community', text: '校园社区，分享与交流', from: beatF(61), to: beatF(64) + 4 },
+  { id: 'knowledge', text: '校园问答，附资料来源', from: beatF(65) + 3, to: beatF(70) - 4 },
 ] as const;
 
 export const SUBCAPTIONS = [
@@ -59,26 +61,29 @@ export const SUBCAPTIONS = [
 // Close-up camera over all product scenes (captions stay outside it).
 // Each key: [frame, zoom, px, py, sx, sy] puts stage point (px, py) at screen point (sx, sy).
 export const FOCUS: [number, number, number, number, number, number][] = [
-  [212, 1, 960, 540, 960, 540],
-  [226, 1.25, 1200, 420, 960, 500],
-  [250, 1.25, 1200, 420, 960, 500],
-  [268, 1.3, 1440, 531, 1210, 540],
-  [296, 1.3, 1440, 531, 1210, 540],
-  [324, 1.3, 1180, 470, 1060, 480],
-  [372, 1.3, 1180, 470, 1060, 480],
-  [390, 1.35, 1504, 460, 1180, 470],
-  [462, 1.35, 1504, 460, 1180, 470],
-  [478, 1.25, 1120, 480, 1100, 500],
-  [500, 1.25, 1120, 480, 1100, 500],
-  [520, 1, 960, 540, 960, 540],
-  [544, 1.2, 1289, 484, 1220, 460],
-  [606, 1.2, 1289, 484, 1220, 460],
-  [622, 1.3, 1250, 420, 1160, 450],
-  [706, 1.3, 1250, 420, 1160, 450],
-  [722, 1, 960, 540, 960, 540],
-  [968, 1, 960, 540, 960, 540],
-  [986, 1.25, 1207, 455, 1100, 480],
-  [1040, 1.25, 1207, 455, 1100, 480],
+  [120, 1, 960, 540, 780, 540],
+  [200, 1, 960, 540, 780, 540],
+  [226, 1.2, 1200, 420, 612, 435],
+  [250, 1.2, 1200, 420, 612, 435],
+  [268, 1.3, 1440, 531, 574, 538],
+  [296, 1.3, 1440, 531, 574, 538],
+  [324, 1.2, 1180, 470, 660, 480],
+  [372, 1.2, 1180, 470, 660, 480],
+  [390, 1.4, 1504, 460, 554, 466],
+  [462, 1.4, 1504, 460, 554, 466],
+  [478, 1.25, 1120, 480, 660, 462],
+  [500, 1.25, 1120, 480, 660, 462],
+  [520, 1, 960, 540, 820, 540],
+  [544, 1.2, 1289, 484, 595, 467],
+  [606, 1.2, 1289, 484, 595, 467],
+  [622, 1.35, 1250, 420, 678, 430],
+  [706, 1.35, 1250, 420, 678, 430],
+  [722, 0.9, 950, 540, 860, 450],
+  [890, 0.9, 950, 540, 860, 450],
+  [908, 1.05, 1186, 427, 660, 397],
+  [968, 1.05, 1186, 427, 660, 397],
+  [986, 1.3, 1207, 455, 719, 446],
+  [1040, 1.3, 1207, 455, 719, 446],
   [1056, 1, 960, 540, 960, 540],
 ];
 
@@ -111,6 +116,7 @@ export const SFX: { from: number; src: string; volume: number; duration?: number
   { from: SHOTS.schedule.from - 4, src: 'sfx/transition-soft.mp3', volume: 0.36, note: 'mini cards appear' },
   ...MOMENTS.scheduleLand.map((f, i) => ({ from: f - 3, src: i % 2 ? 'sfx/switch-tap.mp3' : 'sfx/swoosh-quick.mp3', volume: [0.3, 0.26, 0.24, 0.22][i], duration: 18, note: `mini card ${i + 1} lands in 近期安排` })),
   { from: SHOTS.knowledge.from - 4, src: 'sfx/whoosh-fast.mp3', volume: 0.34, note: 'community close-up' },
+  { ...click(CLICKS.communitySave), note: 'save a community post' },
   { ...click(CLICKS.aiSend), note: 'send question' },
   { from: SHOTS.finale.from, src: 'sfx/whoosh-big.mp3', volume: 0.28, note: 'windows gather' },
   { from: MOMENTS.finalHit - 2, src: 'sfx/impact-deep-whoosh.mp3', volume: 0.3, note: 'windows collapse into app icon' },

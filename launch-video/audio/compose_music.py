@@ -263,8 +263,8 @@ for s16 in range(48 * 4, 66 * 4):
     place(bell(m, 0.25), b, 0.28, -0.5 + (s16 % 4) * 0.33)
 
 # ---------------- opening chimes, breakdown, final hit ----------------
-for i, m in enumerate([76, 79, 83, 84]):
-    place(chime_hit(m), 1 + i, 0.9, -0.4 + 0.27 * i)
+for i, m in enumerate([69, 72, 76, 79, 81, 84]):  # six module fragments, every eighth from 0.25 s
+    place(chime_hit(m), 0.5 + i * 0.5, 0.8, -0.45 + 0.18 * i)
 place(chime_hit(88), 5, 1.0)
 
 place(chords([57, 60, 64], 2, 1400), 66, 0.7)

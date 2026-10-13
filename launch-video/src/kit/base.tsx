@@ -36,8 +36,8 @@ const ICONS: Record<string, ReactNode> = {
   message: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />,
 };
 
-export const Icon = ({ name, size = 16, color = 'currentColor', stroke = 2, style }: { name: keyof typeof ICONS | string; size?: number; color?: string; stroke?: number; style?: CSSProperties }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none', display: 'block', ...style }}>
+export const Icon = ({ name, size = 16, color = 'currentColor', stroke = 2, fill = 'none', style }: { name: keyof typeof ICONS | string; size?: number; color?: string; stroke?: number; fill?: string; style?: CSSProperties }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none', display: 'block', ...style }}>
     {ICONS[name]}
   </svg>
 );
