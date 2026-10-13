@@ -6,7 +6,9 @@ Remotion 工程，1920×1080 / 30fps / 1680 帧，H.264。
 
 ```bash
 npm install
-npm run render:film     # out/banxue-film.mp4（新版全片 BanxueFilm，约 71s，仅音效、暂无配乐；源码在 src/film/）
+npm run render:film     # out/banxue-film.mp4（新版全片 BanxueFilm，约 71s，混合管弦配乐 + 音效；源码在 src/film/）
+npm run render:film-nobgm  # out/banxue-film-nobgm.mp4（新版全片，仅音效）
+python3 audio/compose_score.py  # 重新合成新版全片配乐 public/audio/film-score.wav（原创，纯代码合成，无采样）
 npm run render          # out/banxue-launch.mp4（配乐 + 音效，无旁白）
 npm run render:nobgm    # out/banxue-launch-nobgm.mp4（仅音效，便于另配音乐）
 npm run render:vo       # out/banxue-launch-vo.mp4（可选：配乐 + 女声旁白 + 音效）

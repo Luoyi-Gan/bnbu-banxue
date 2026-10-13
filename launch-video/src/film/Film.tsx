@@ -35,9 +35,10 @@ const SCENES: { C: FC; len: number; sfx: Sfx[] }[] = [
 const STARTS = SCENES.map((_, i) => SCENES.slice(0, i).reduce((s, x) => s + x.len, 0));
 export const FILM_FRAMES = SCENES.reduce((s, x) => s + x.len, 0);
 
-export const Film = () => (
+export const Film = ({ bgm = true }: { bgm?: boolean }) => (
   <AbsoluteFill style={{ background: T.night }}>
     <Backdrop />
+    {bgm && <Audio src={staticFile('audio/film-score.wav')} volume={0.5} />}
     {SCENES.map(({ C, len, sfx }, i) => (
       <Sequence key={i} from={STARTS[i]} durationInFrames={len}>
         <C />
