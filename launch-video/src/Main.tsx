@@ -1,8 +1,10 @@
 import { AbsoluteFill, Audio, interpolate, Sequence, staticFile } from 'remotion';
 import { Backdrop, Caption } from './lib/ui';
-import { Finale, Opening } from './scenes/Brand';
-import { Activities, Alumni, Coffee, Home, Teams } from './scenes/Flows';
-import { Knowledge, Schedule } from './scenes/Closing';
+import { Finale, Opening } from './motion/Brand';
+import { Activities, Home } from './motion/Discover';
+import { Teams } from './motion/Connect';
+import { Alumni, Coffee } from './motion/Mentors';
+import { Knowledge, Schedule } from './motion/Gather';
 import { CAPTIONS, SFX, TOTAL } from './timeline';
 
 export const Main = ({ bgm }: { bgm: boolean }) => (
