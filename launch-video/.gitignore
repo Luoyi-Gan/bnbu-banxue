@@ -3,3 +3,4 @@ out/
 capture-data/
 capture/explore/
 .DS_Store
+.venv-tts/

@@ -7,6 +7,7 @@
     "dev": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts BanxueLaunch out/banxue-launch.mp4",
     "render:nobgm": "remotion render src/index.ts BanxueLaunch out/banxue-launch-nobgm.mp4 --props=props-nobgm.json",
+    "render:novo": "remotion render src/index.ts BanxueLaunch out/banxue-launch-novo.mp4 --props=props-novo.json",
     "still": "remotion still src/index.ts BanxueLaunch",
     "capture": "node capture/capture.mjs"
   },

@@ -1,3 +1,5 @@
+import voLines from '../public/audio/vo/lines.json';
+
 // Single source of truth for timing. 120 BPM at 30 fps: one beat = 15 frames; the score drops at beat 20 (10 s).
 export const FPS = 30;
 export const BEAT = 15;
@@ -86,6 +88,15 @@ export const FOCUS: [number, number, number, number, number, number][] = [
   [1040, 1.3, 1207, 455, 719, 446],
   [1056, 1, 960, 540, 960, 540],
 ];
+
+// Voice-over (no on-screen text): start frame per line; durations come from the synthesised files.
+const VO_AT: Record<keyof typeof voLines.lines, number> = {
+  open: 10, home: 124, activities: 202, teams: 316, coffee: 518, alumni: 626,
+  schedule: 752, community: 902, ai: 977, final: 1086,
+};
+export const VO = (Object.keys(VO_AT) as (keyof typeof VO_AT)[]).map((id) => ({
+  id, from: VO_AT[id], duration: Math.ceil(voLines.lines[id] * FPS),
+}));
 
 const click = (from: number) => ({ from: from - 1, src: 'sfx/ui-click.wav', volume: 0.5, duration: 12 });
 

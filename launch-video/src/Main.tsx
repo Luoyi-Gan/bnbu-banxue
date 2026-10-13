@@ -7,7 +7,7 @@ import { Activities, Home } from './motion/Discover';
 import { Teams } from './motion/Connect';
 import { Alumni, Coffee } from './motion/Mentors';
 import { Knowledge, Schedule } from './motion/Gather';
-import { CAPTIONS, FOCUS, SFX, SUBCAPTIONS, TOTAL } from './timeline';
+import { CAPTIONS, FOCUS, SFX, SUBCAPTIONS, TOTAL, VO } from './timeline';
 
 const Focus = ({ children }: { children: ReactNode }) => {
   const frame = useCurrentFrame();
@@ -17,7 +17,13 @@ const Focus = ({ children }: { children: ReactNode }) => {
   return <AbsoluteFill style={{ transformOrigin: '0 0', transform: `translate(${tx}px, ${ty}px) scale(${z})` }}>{children}</AbsoluteFill>;
 };
 
-export const Main = ({ bgm }: { bgm: boolean }) => (
+// Music dips under the voice-over with short ramps.
+const duck = (f: number) => {
+  const d = VO.reduce((m, v) => Math.max(m, interpolate(f, [v.from - 8, v.from, v.from + v.duration, v.from + v.duration + 10], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })), 0);
+  return 1 - 0.55 * d;
+};
+
+export const Main = ({ bgm, vo = true }: { bgm: boolean; vo?: boolean }) => (
   <AbsoluteFill style={{ background: '#030409' }}>
     <Backdrop />
     <Opening />
@@ -36,9 +42,14 @@ export const Main = ({ bgm }: { bgm: boolean }) => (
     {bgm && (
       <Audio
         src={staticFile('audio/bgm-original.wav')}
-        volume={(f) => interpolate(f, [0, 6, TOTAL - 4, TOTAL], [0, 0.6, 0.6, 0.55], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })}
+        volume={(f) => interpolate(f, [0, 6, TOTAL - 4, TOTAL], [0, 0.6, 0.6, 0.55], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) * (vo ? duck(f) : 1)}
       />
     )}
+    {vo && VO.map((v) => (
+      <Sequence key={v.id} from={v.from} durationInFrames={Math.min(v.duration + 2, TOTAL - v.from)} layout="none">
+        <Audio src={staticFile(`audio/vo/${v.id}.wav`)} volume={1} />
+      </Sequence>
+    ))}
     {SFX.map((s, i) => (
       <Sequence key={i} from={s.from} durationInFrames={s.duration ?? 45} layout="none">
         <Audio src={staticFile(`audio/${s.src}`)} volume={s.volume} />
