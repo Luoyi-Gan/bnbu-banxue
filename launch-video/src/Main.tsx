@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, Audio, interpolate, Sequence, staticFile } from 'remotion';
+import { toOut, useFilmFrame } from './lib/time';
 import { Backdrop, Caption, SubCaption } from './lib/ui';
 import { keys } from './lib/motion';
 import { Finale, Opening } from './motion/Brand';
@@ -7,10 +8,10 @@ import { Activities, Home } from './motion/Discover';
 import { Teams } from './motion/Connect';
 import { Alumni, Coffee } from './motion/Mentors';
 import { Knowledge, Schedule } from './motion/Gather';
-import { CAPTIONS, FOCUS, SFX, SUBCAPTIONS, TOTAL, VO } from './timeline';
+import { CAPTIONS, FOCUS, SFX, SUBCAPTIONS, TOTAL_OUT, VO } from './timeline';
 
 const Focus = ({ children }: { children: ReactNode }) => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   const z = keys(frame, FOCUS.map(([f, k]) => [f, k]));
   const tx = keys(frame, FOCUS.map(([f, k, px, , sx]) => [f, sx - px * k]));
   const ty = keys(frame, FOCUS.map(([f, k, , py, , sy]) => [f, sy - py * k]));
@@ -42,16 +43,16 @@ export const Main = ({ bgm, vo = true }: { bgm: boolean; vo?: boolean }) => (
     {bgm && (
       <Audio
         src={staticFile('audio/bgm-original.wav')}
-        volume={(f) => interpolate(f, [0, 6, TOTAL - 4, TOTAL], [0, 0.6, 0.6, 0.55], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) * (vo ? duck(f) : 1)}
+        volume={(f) => interpolate(f, [0, 6, TOTAL_OUT - 4, TOTAL_OUT], [0, 0.6, 0.6, 0.55], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) * (vo ? duck(f) : 1)}
       />
     )}
     {vo && VO.map((v) => (
-      <Sequence key={v.id} from={v.from} durationInFrames={Math.min(v.duration + 2, TOTAL - v.from)} layout="none">
+      <Sequence key={v.id} from={v.from} durationInFrames={Math.min(v.duration + 2, TOTAL_OUT - v.from)} layout="none">
         <Audio src={staticFile(`audio/vo/${v.id}.wav`)} volume={1} />
       </Sequence>
     ))}
     {SFX.map((s, i) => (
-      <Sequence key={i} from={s.from} durationInFrames={s.duration ?? 45} layout="none">
+      <Sequence key={i} from={toOut(s.from)} durationInFrames={toOut(s.duration ?? 45)} layout="none">
         <Audio src={staticFile(`audio/${s.src}`)} volume={s.volume} />
       </Sequence>
     ))}

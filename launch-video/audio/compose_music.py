@@ -1,21 +1,22 @@
-"""Original 40-second score for the BNBU 伴学 launch film, modelled on the reference recording's
+"""Original 56-second score for the BNBU 伴学 launch film, modelled on the reference recording's
 musical shape (not its melody): ~120 BPM, A minor, a dotted-eighth synth pulse that builds without
 a kick, a near-silent breath before the drop, then four-on-floor with sixteenth hats, a pumping
 chord bed and a bass line moving Am-C-Am-G / Am-C-E-F every two beats; the kick leaves for the
 outro and the pulse returns.
 
-Synthesised from scratch (no samples). Beat n sits at n * 0.5 s (= frame 15n at 30 fps).
+Synthesised from scratch (no samples). The film plays its 120 BPM story grid 1.4x slower
+(src/lib/time.ts), so the score runs at 120 / 1.4 ≈ 85.7 BPM: beat n sits at n * 0.7 s (= frame 21n).
 Sections (beats): intro 0-4, pulse build 4-16, riser 16-19, breath 19-20, drop 20-66
-(10-33 s; hook from 36), breakdown 66-72, final hit 72 (36 s), pulse tail to 80 (40 s).
+(14-46 s; hook from 36), breakdown 66-72, final hit 72 (50.4 s), pulse tail to 80 (56 s).
 """
 import numpy as np
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
 
 SR = 48000
-BPM = 120
+BPM = 120 / 1.4
 BEAT = 60 / BPM
-DUR = 40.0
+DUR = 56.0
 N = int(SR * DUR)
 rng = np.random.default_rng(20261013)
 BUS = {k: np.zeros((2, N)) for k in ("drums", "music", "fx")}

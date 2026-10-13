@@ -1,4 +1,5 @@
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
+import { useFilmFrame } from './time';
 import { EASE_IN_OUT, EASE_OUT, mix, prog } from './motion';
 
 // Film-level colours layered over the product tokens in kit/base.
@@ -11,7 +12,7 @@ export const T = {
 
 // One diagonal light pass, clipped by the parent's rounded overflow (used once per hero element).
 export const Sweep = ({ start, duration = 26, strength = 0.55 }: { start: number; duration?: number; strength?: number }) => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   const p = prog(frame, start, duration, EASE_IN_OUT);
   if (p <= 0 || p >= 1) return null;
   return (
@@ -27,7 +28,7 @@ export const Sweep = ({ start, duration = 26, strength = 0.55 }: { start: number
 };
 
 export const Backdrop = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   const t = Math.min(frame, 1120) / 30;
   const bx = 68 + Math.sin(t * 0.35) * 6, by = 30 + Math.cos(t * 0.27) * 5;
   const vx = 24 + Math.cos(t * 0.31) * 6, vy = 72 + Math.sin(t * 0.22) * 5;
@@ -56,7 +57,7 @@ export const pathAt = (frame: number, pts: [number, number, number][]) => {
 };
 
 export const Cursor = ({ x, y, clicks, opacity = 1, size = 34 }: { x: number; y: number; clicks: number[]; opacity?: number; size?: number }) => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   const press = clicks.reduce((m, c) => Math.max(m, 1 - Math.min(1, Math.abs(frame - c) / 4)), 0);
   const ripples = clicks.filter((c) => frame >= c && frame < c + 18);
   return (
@@ -75,7 +76,7 @@ export const Cursor = ({ x, y, clicks, opacity = 1, size = 34 }: { x: number; y:
 
 // Large Chinese headline: per-character rise from soft focus, accent rule in product blue.
 export const Caption = ({ text, from, to, right = 120, y = 856, size = 76 }: { text: string; from: number; to: number; right?: number; y?: number; size?: number }) => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (frame < from - 2 || frame > to + 12) return null;
   const out = prog(frame, to, 12, EASE_IN_OUT);
   const rule = prog(frame, from, 18);
@@ -93,7 +94,7 @@ export const Caption = ({ text, from, to, right = 120, y = 856, size = 76 }: { t
 };
 
 export const SubCaption = ({ text, from, to, right = 124, y = 984 }: { text: string; from: number; to: number; right?: number; y?: number }) => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   const p = prog(frame, from, 14) * (1 - prog(frame, to, 10));
   if (p <= 0) return null;
   return <div style={{ position: 'absolute', right, top: y, zIndex: 80, opacity: p, transform: `translateY(${(1 - p) * 10}px)`, fontFamily: T.font, fontWeight: 500, fontSize: 48, color: 'rgba(236,241,255,0.96)', letterSpacing: '0.06em', textShadow: '0 2px 16px rgba(0,0,0,0.7)' }}>{text}</div>;

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
+import { useFilmFrame } from '../lib/time';
 import { Box, Btn, Chip, Icon, Kicker, P, Txt } from '../kit/base';
 import { Burst, Cam, camToScreen, type CamState, typed, Win } from '../kit/fx';
 import { ActivityCard, actById, ANSWER_MAIN, ANSWER_SRC, NextCard, PostCard, POSTS, ROWS, SchedHeader, SchedRow, ShortcutPill, Slot, TaskCard, TeamCard, TEAMS, TimetableDay } from '../kit/product';
@@ -12,7 +13,7 @@ const live = (frame: number, key: keyof typeof SHOTS) => frame >= SHOTS[key].fro
 type Mini = { node: ReactNode; w: number; h: number; k: number; x: number; y: number; land: number; rot: number };
 
 export const Schedule = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (!live(frame, 'schedule')) return null;
   const [l0, l1, l2, l3] = MOMENTS.scheduleLand;
   const enter = prog(frame, 720, 18, EASE_OUT);
@@ -105,7 +106,7 @@ export const Schedule = () => {
 // ---------- 31–35s: community + campus Q&A with a source ----------
 const QUESTION = '怎么预约老师的 Coffee Chat？';
 export const Knowledge = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (!live(frame, 'knowledge')) return null;
   const cOut = prog(frame, 968, 14, EASE_IN_OUT);
   const ce = prog(frame, 900, 14, EASE_OUT);

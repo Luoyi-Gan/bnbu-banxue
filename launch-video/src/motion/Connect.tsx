@@ -1,4 +1,5 @@
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
+import { useFilmFrame } from '../lib/time';
 import { Avatar, Box, Chip, Icon, P, Txt } from '../kit/base';
 import { Burst, Cam, camToScreen, type CamState, Win } from '../kit/fx';
 import { actById, ChatPanel, Cover, Roll, TeamCard, TeamDetail, TEAMS } from '../kit/product';
@@ -13,7 +14,7 @@ const TD = { x: 1180, y: 170, k: 1.35 };
 const CH = { x: 640, y: 150, k: 1.5 };
 
 export const Teams = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (!live(frame, 'teams')) return null;
   const filt = prog(frame, CLICKS.teamFilter + 1, 8);
   const dd = prog(frame, CLICKS.teamOpen + 1, 15, EASE_IN_OUT);

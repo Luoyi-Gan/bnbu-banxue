@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
+import { useFilmFrame } from '../lib/time';
 import { Box, Chip, Kicker, P, Txt } from '../kit/base';
 import { Burst, Cam, camToScreen, type CamState, Win } from '../kit/fx';
 import { ActivityCard, actCardH, ActivityDetail, ACTS, NextCard, Roll, ROWS, SchedHeader, SchedRow, TaskCard } from '../kit/product';
@@ -13,7 +14,7 @@ const pop = (p: number): CSSProperties => ({ opacity: Math.min(1, p * 1.5), tran
 // ---------- home: heading types on, panels build on the beat, dive through the 夜跑 row ----------
 const HEADING = '今天，先做好下一件事';
 export const Home = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (!live(frame, 'home')) return null;
   const dive = prog(frame, MOMENTS.pushThrough - 1, 27, EASE_IN);
   const row = { x: 270, y: 512 + 88 + 29 };
@@ -73,7 +74,7 @@ const chipX = (i: number) => GX + CHIP_W.slice(0, i).reduce((s, w) => s + w + 8,
 export const DETAIL = { x: 1060, y: 140, k: 1.1 };
 
 export const Activities = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (!live(frame, 'activities')) return null;
   const f = CLICKS.actFilter;
   const run = ALL.run;

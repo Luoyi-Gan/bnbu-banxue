@@ -1,4 +1,5 @@
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
+import { useFilmFrame } from '../lib/time';
 import { Avatar, Box, Btn, Icon, Kicker, P, Tag, Txt } from '../kit/base';
 import { Burst, typed, Win } from '../kit/fx';
 import { AlumniBooking, AlumniCard, Slot, SLOTS, TeacherCard } from '../kit/product';
@@ -12,7 +13,7 @@ const slotPos = (i: number) => ({ x: 22 + (i % 2) * 312, y: 96 + Math.floor(i / 
 const TOPIC = '想请教数据科学方向的选课与科研入门。';
 
 export const Coffee = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (!live(frame, 'coffee')) return null;
   const ci = prog(frame, 510, 16, EASE_OUT);
   const xo = prog(frame, 612, 14, EASE_IN_OUT);
@@ -64,7 +65,7 @@ export const Coffee = () => {
 
 const QUESTION = '想了解产品经理岗位的实习准备。';
 export const Alumni = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   if (!live(frame, 'alumni')) return null;
   const CA = { x: 860, y: 250, k: 1.35 };
   const BK = { x: 800, y: 220, k: 1.45 };

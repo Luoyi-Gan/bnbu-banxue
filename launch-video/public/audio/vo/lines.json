@@ -1,15 +1,15 @@
 {
  "voice": "zf_078",
  "lines": {
-  "open": 3.532,
-  "home": 2.51,
-  "activities": 3.293,
-  "teams": 3.686,
-  "coffee": 2.234,
-  "alumni": 3.961,
-  "schedule": 3.691,
-  "community": 2.489,
-  "ai": 3.505,
-  "final": 3.775
+  "open": 3.543,
+  "home": 2.511,
+  "activities": 3.451,
+  "teams": 5.625,
+  "coffee": 3.809,
+  "alumni": 4.218,
+  "schedule": 5.061,
+  "community": 2.898,
+  "ai": 4.015,
+  "final": 3.975
  }
 }

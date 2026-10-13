@@ -1,10 +1,14 @@
 import voLines from '../public/audio/vo/lines.json';
+import { toOut } from './lib/time';
 
-// Single source of truth for timing. 120 BPM at 30 fps: one beat = 15 frames; the score drops at beat 20 (10 s).
+// Single source of truth for timing. Story frames: 120 BPM at 30 fps, one beat = 15 frames, 1200 frames total.
+// Playback stretches every story frame by STRETCH (src/lib/time.ts) to TOTAL_OUT; the score runs at 120/STRETCH BPM
+// so beats stay aligned. VO_AT is in playback frames; everything else here is in story frames.
 export const FPS = 30;
 export const BEAT = 15;
 export const beatF = (n: number) => Math.round(n * BEAT);
 export const TOTAL = 1200;
+export const TOTAL_OUT = toOut(TOTAL);
 
 export const SHOTS = {
   opening: { from: 0, duration: beatF(8) + 6 },
@@ -89,10 +93,10 @@ export const FOCUS: [number, number, number, number, number, number][] = [
   [1056, 1, 960, 540, 960, 540],
 ];
 
-// Voice-over (no on-screen text): start frame per line; durations come from the synthesised files.
+// Voice-over (no on-screen text), in playback frames (not stretched); durations come from the synthesised files.
 const VO_AT: Record<keyof typeof voLines.lines, number> = {
-  open: 10, home: 124, activities: 202, teams: 316, coffee: 518, alumni: 626,
-  schedule: 752, community: 902, ai: 977, final: 1086,
+  open: 14, home: 176, activities: 278, teams: 436, coffee: 720, alumni: 872,
+  schedule: 1050, community: 1266, ai: 1350, final: 1522,
 };
 export const VO = (Object.keys(VO_AT) as (keyof typeof VO_AT)[]).map((id) => ({
   id, from: VO_AT[id], duration: Math.ceil(voLines.lines[id] * FPS),

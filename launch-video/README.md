@@ -1,6 +1,6 @@
-# BNBU 伴学 · 40 秒发布视频
+# BNBU 伴学 · 56 秒发布视频
 
-Remotion 工程，1920×1080 / 30fps / 1200 帧，H.264。
+Remotion 工程，1920×1080 / 30fps / 1680 帧，H.264。
 
 ## 输出
 
@@ -14,13 +14,13 @@ npm run dev             # Remotion Studio 预览与调整
 
 ## 结构
 
-- `src/timeline.ts`：唯一的时间来源。120 BPM，每拍 15 帧；镜头区间、点击帧、字幕、功能特写机位（`FOCUS`）、音效表都在这里。
+- `src/timeline.ts`：唯一的时间来源。镜头按 1200 帧「故事帧」编排（120 BPM，每拍 15 帧），播放时由 `src/lib/time.ts` 的 `STRETCH = 1.4` 统一放慢到 1680 帧；旁白起读帧 `VO_AT` 用播放帧，其余用故事帧。镜头区间、点击帧、字幕、功能特写机位（`FOCUS`）、音效表都在这里。
 - `src/kit/base.tsx`：产品设计令牌（`src/v2/studentTheme.css`）与基础组件：图标、按钮、筛选 Chip、标签、卡片、头像。
 - `src/kit/product.tsx`：用代码重建的产品界面组件（活动卡片与详情、队伍卡片与详情、队伍消息、Coffee Chat 时段、校友卡片与申请、首页近期安排、课表、社区帖子）及其演示数据。
 - `src/kit/fx.tsx`：2.5D 摄像机、发光窗口、矢量品牌图标（脉搏线可逐笔描出）、粒子爆点、逐字输入。
 - `src/motion/`：`Brand.tsx`（开场与收尾）、`Discover.tsx`（首页、活动）、`Connect.tsx`（找搭子）、`Mentors.tsx`（Coffee Chat、校友）、`Gather.tsx`（近期安排汇入、社区与校园问答）。
 - `src/lib/ui.tsx`：光标、字幕、背景、扫光；`src/lib/motion.ts`：缓动。
-- `audio/compose_music.py`：原创配乐合成脚本，按参考录屏的音乐结构设计（约 120 BPM、A 小调、附点八分脉冲铺垫、10 秒进入四拍底鼓与律动和弦、尾段撤鼓回到脉冲），旋律为原创；numpy/scipy，固定随机种子，输出 `public/audio/bgm-original.wav`。
+- `audio/compose_music.py`：原创配乐合成脚本，按参考录屏的音乐结构设计（随画面放慢为 120/1.4 ≈ 85.7 BPM、A 小调、附点八分脉冲铺垫、14 秒进入四拍底鼓与律动和弦、尾段撤鼓回到脉冲），旋律为原创；numpy/scipy，固定随机种子，输出 `public/audio/bgm-original.wav`。
 - `audio/compose_sfx.py`：合成点击音效 `public/audio/sfx/ui-click.wav`。
 - `audio/narrate.py`：女声旁白（只读不出字幕），本地开源模型 Kokoro-82M v1.1-zh（Apache-2.0）合成，默认音色 `zf_078`，输出 `public/audio/vo/*.wav` 与时长表 `lines.json`；起读帧在 `src/timeline.ts` 的 `VO_AT`，旁白期间配乐自动压低。重新合成：
   `uv venv --python 3.12 .venv-tts && VIRTUAL_ENV=.venv-tts uv pip install kokoro "misaki[zh]" soundfile` 后运行 `.venv-tts/bin/python audio/narrate.py [音色]`（首次运行从 Hugging Face 下载模型）。

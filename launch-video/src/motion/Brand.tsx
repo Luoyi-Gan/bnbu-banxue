@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
+import { useFilmFrame } from '../lib/time';
 import { Avatar, Btn, Chip, Icon, P, Tag, Txt } from '../kit/base';
 import { BrandMark } from '../kit/fx';
 import { ActivityCard, actById, AlumniBooking, NextCard, PostCard, POSTS, ROWS, Slot, TeamCard, TEAMS, TimetableDay } from '../kit/product';
@@ -58,7 +59,7 @@ const FRAGS: Frag[] = [
 const MODULES = FRAGS.map((f) => f.name);
 
 export const Opening = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   const { from, duration } = SHOTS.opening;
   if (frame < from || frame >= from + duration) return null;
   const gather = prog(frame, 64, 12, EASE_IN);
@@ -130,7 +131,7 @@ const RING: { node: ReactNode; w: number; h: number; s: number }[] = [
 ];
 
 export const Finale = () => {
-  const frame = useCurrentFrame();
+  const frame = useFilmFrame();
   const { from } = SHOTS.finale;
   if (frame < from - 2) return null;
   const hit = MOMENTS.finalHit;
