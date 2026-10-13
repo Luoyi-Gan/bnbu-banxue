@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatedSearchField } from './AnimatedSearchField'
 import { prepareCommunityImage } from './communityImages'
-import { type Post } from './model'
+import { type Post } from '../../shared/v2/model'
 import { Empty, Modal, PageHeading } from './ui'
 import { useCommunityBackend } from './useCommunityBackend'
 

@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Mail } from 'lucide-react'
+import { MailResolution } from '../live/MailResolution'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, PageHeading, SectionHeading } from './ui'
-import { mailFieldLabels, normalizeMailTime, type MailActivityFields, type MailSource } from './mailActivityAdapter'
-import type { MailActivityRecord } from './mailActivityPolicy'
+import { mailFieldLabels, normalizeMailTime, type MailActivityFields, type MailSource } from '../../shared/v2/mailActivityAdapter'
+import type { MailActivityRecord } from '../../shared/v2/mailActivityPolicy'
 
 
 const emptySource: MailSource = { messageId: '', subject: '', sender: '', body: '' }
@@ -11,6 +12,7 @@ const labels = { pending: '待核实', published: '已发布', hidden: '已下�
 const entries = Object.entries(mailFieldLabels) as [keyof MailActivityFields, string][]
 export function AdminMailActivities() {
   const live = useWorkspaceBackend()
+  const canOperate = live.data?.account.roles.some(role => role === 'operator' || role === 'superadmin') ?? false
   const [source, setSource] = useState<MailSource>(emptySource)
   const [selected, setSelected] = useState('')
   const [filter, setFilter] = useState('all')
@@ -21,6 +23,7 @@ export function AdminMailActivities() {
   const records = (live.data?.entities ?? []).filter(e => e.kind === 'mail' && !e.data.resolvedAs).map(e => ({...(e.data.record as unknown as MailActivityRecord), entityId: e.id}))
   const current = records.find(m => m.id === selected)
   const act = async (action: string, input: Record<string, unknown>, message: string) => {
+    if (!canOperate) {setFeedback('需要运营职责。'); return}
     setFeedback('')
     if (await live.mutate(action, input)) {setFeedback(message); setReason('')}
   }
@@ -55,17 +58,17 @@ export function AdminMailActivities() {
   if (!live.data) return <p role={live.error ? 'alert' : 'status'}>{live.error || '正在读取邮件处理记录…'}</p>
   return <div className="v2-page v2-mail-page">
     <PageHeading eyebrow="SCHOOL MAIL" title="邮件转活动" description="从学校邮件整理活动信息，自动发布，事后修正。"/>
-    <div className="v2-info-box">当前使用规则提取邮件内容，处理记录保存到伴学后台。信息完整但没有海报时使用默认封面；可选择邮件附件图片。</div>
+    <div className="v2-info-box">{!canOperate && <>当前账号没有运营职责，不能导入或修改邮件。 </>}当前使用规则提取邮件内容，处理记录保存到伴学后台。信息完整但没有海报时使用默认封面；可选择邮件附件图片。</div>
     {!current && notice}
-    <section className="v2-panel v2-list-panel"><SectionHeading title="导入邮件内容" action={<button className="v2-button v2-button-secondary" onClick={example}>填入示例邮件</button>}/>
+    <section className="v2-panel v2-list-panel"><SectionHeading title="导入邮件内容" action={<button className="v2-button v2-button-secondary" disabled={!canOperate || live.busy} onClick={example}>填入示例邮件</button>}/>
       <form className="v2-form" onSubmit={importMail}>
-        <div className="v2-form-two"><label>邮件标识<input required maxLength={200} value={source.messageId} onChange={e => setSource({ ...source, messageId: e.target.value })} placeholder="原邮件 Message-ID，用于防止重复"/></label><label>发件人<input required maxLength={200} value={source.sender} onChange={e => setSource({ ...source, sender: e.target.value })}/></label></div>
-        <label>邮件主题<input required maxLength={300} value={source.subject} onChange={e => setSource({ ...source, subject: e.target.value })}/></label>
-        <label>邮件原文<textarea required rows={9} maxLength={30000} value={source.body} onChange={e => setSource({ ...source, body: e.target.value })}/></label>
+        <div className="v2-form-two"><label>邮件标识<input disabled={!canOperate || live.busy} required maxLength={200} value={source.messageId} onChange={e => setSource({ ...source, messageId: e.target.value })} placeholder="原邮件 Message-ID，用于防止重复"/></label><label>发件人<input disabled={!canOperate || live.busy} required maxLength={200} value={source.sender} onChange={e => setSource({ ...source, sender: e.target.value })}/></label></div>
+        <label>邮件主题<input disabled={!canOperate || live.busy} required maxLength={300} value={source.subject} onChange={e => setSource({ ...source, subject: e.target.value })}/></label>
+        <label>邮件原文<textarea disabled={!canOperate || live.busy} required rows={9} maxLength={30000} value={source.body} onChange={e => setSource({ ...source, body: e.target.value })}/></label>
         <p className="v2-form-note">本地识别格式：每行“字段名：内容”。支持活动名称、活动介绍、活动开始时间、活动结束时间、活动地点、主办方、参与条件。时间为北京时间 YYYY-MM-DD HH:mm。自然语言邮件可先导入待核实，再填写结构化信息。</p>
-        <label>活动封面 · 选择邮件附件<input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { void upload(e.target.files?.[0]); e.target.value = '' }}/></label>
+        <label>活动封面 · 选择邮件附件<input disabled={!canOperate || live.busy} type="file" accept="image/png,image/jpeg,image/webp" onChange={e => { void upload(e.target.files?.[0]); e.target.value = '' }}/></label>
         {source.cover && <div><img className="v2-mail-cover" src={source.cover.data} alt="邮件附件封面预览"/><p>{source.cover.name} <button type="button" className="v2-text-button" onClick={() => setSource({ ...source, cover: undefined })}>移除封面</button></p></div>}
-        <button className="v2-button v2-button-primary" disabled={loadingImage || live.busy}>识别并自动发布（信息完整时）</button>
+        <button className="v2-button v2-button-primary" disabled={!canOperate || loadingImage || live.busy}>识别并自动发布（信息完整时）</button>
       </form>
     </section>
     <section className="v2-panel v2-list-panel"><SectionHeading title="邮件处理记录" detail={`已发布 ${records.filter(m => m.status === 'published').length} · 待核实 ${records.filter(m => m.status === 'pending').length} · 已下架 ${records.filter(m => m.status === 'hidden').length}`}/>
@@ -75,6 +78,7 @@ export function AdminMailActivities() {
     </section>
     {current && <Drawer title={current.fields.title || current.source.subject} eyebrow={labels[current.status]} onClose={() => setSelected('')} wide>
       {notice}
+      {canOperate && <MailResolution source={live.data.entities.find(e => e.id === current.entityId)!} mails={live.data.entities.filter(e => e.kind === 'mail')} onSaved={async () => {setSelected(''); await live.refresh()}} />}
       {current.status === 'pending' && <div className="v2-info-box">待核实：{current.extraction.issues.join('；')}。核实补全并保存后自动发布。</div>}
       <details><summary>邮件原文与识别依据</summary><p>标识：{current.source.messageId}</p><p>发件人：{current.source.sender || '未提供'}</p><p>主题：{current.source.subject}</p><pre className="v2-mail-original">{current.source.body}</pre>{entries.map(([key, label]) => <p key={key}>{label}：{current.extraction.evidence[key] || '未识别到明确依据'}</p>)}</details>
       {current.source.cover && <figure><img className="v2-mail-cover" src={current.source.cover.data} alt="活动封面"/><figcaption>邮件附件：{current.source.cover.name}</figcaption></figure>}

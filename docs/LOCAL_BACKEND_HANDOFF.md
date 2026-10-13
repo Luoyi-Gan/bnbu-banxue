@@ -1,4 +1,92 @@
+# 2026-10-12 本地交付验收结论（优先于后续历史检查点）
+
+最终核对：用户已确认体育 UI 即蓝色横幅、统计卡和图表的伴学看板；本批四项反馈及补充发现均已修复，最终证据与部署边界见 ADMIN_COMPLETION.md 末尾。最新存档为 D:/伴学/archive/goal-scope-rollback-20261012/batch-complete-20261012。
+
+更正：用户随后发现体育页被未接入提示替代、关系图空状态遮挡、活动默认封面退化及 PR 漏带 `shared/data/mockData.ts`。因此下表原“保留原有布局”和本机构建结论不足以证明无界面回归或干净检出可构建；本次修复与独立源码构建结果见 `ADMIN_COMPLETION.md` 末尾。原独立体育静态前端仍在；恢复的是仓库现有只读可视化看板，不恢复体育写入业务。旧本地 bundle 缺漏的共享演示源码在本次修复存档补齐。
+
+已完成用户当前授权的伴学本地后端交付。此结论针对本地可真实操作的业务与已确认规则，不表示腾讯云生产服务已经接通，也不表示穷尽所有设备与浏览器组合。后续历史段落中的未完成、待确认主题与旧测试数字不代表本检查点。
+
+| 交付要求 | 验证依据 | 结果 |
+| --- | --- | --- |
+| 独立后端、前后端分离 | backend/src、backend/Dockerfile、frontend/Dockerfile、compose.postgres.yaml；本机4188前端经同源代理调用API，PostgreSQL及API健康 | 已落实 |
+| 登录、角色、独立管理账号 | unified-login、auth-return-path、identity-http、管理员及账号隔离测试；学生/教师/审核员浏览器登录 | 已验证本地账号及权限，不冒充学校核验 |
+| 社区、举报、组队与聊天互评 | backend-http/concurrency、PostgreSQL事务测试、Docker跨角色脚本；用户之前实际验收记录 | 共享保存、权限、通知、并发和结束限制通过 |
+| 教师与校友业务 | Docker预约/改期/取消/资格撤销链；浏览器教师资料、时段、学生发现、校友认证审核撤销；主题必填实测 | 已验证现行首版规则 |
+| 邮件活动、组织和成员活动 | Docker发布/更正/通知/权限链；PostgreSQL拆分原子性及更正幂等；原邮件详情拆分、更正浏览器提交刷新 | 已验证；真实收件按用户决定部署配置 |
+| 课表、搜索、隐私、消息、校园知识 | timetable-backend、student-search、notification-preferences、live-search/relationships及Docker知识链；页面课表示例隔离、问答、设置和通知已读 | 已验证本地及适配接口边界 |
+| AI形象偏好 | PostgreSQL账号隔离与图片切换保存；浏览器内置形象、自定义上传及刷新 | 已接本人后端 |
+| 体育独立且只读 | sports-companion、sports-dashboard、sports-source-reader；拒绝旧写入接口、真实PG只读事务阻止写函数、原前端清单校验 | 不重建体育业务；源表与授权映射部署配置 |
+| 原页面布局 | 未重新设计页面；仅用户批准的邮件入口及职责/必填/数据接线修正；截图存档 | 保留原有布局 |
+| 本地测试 | 当前277项通过、零失败零跳过；201文件ESLint零错误零警告；类型检查、前后端Docker构建和跨角色脚本通过 | 已通过 |
+| PR与存档 | PR #12，交付分支codex/banxue-postgres-readonly-delivery；本地source.bundle、报告、截图与哈希清单 | 已交付，未合并PR |
+
+正式部署仍须配置验证：CVM网络与HTTPS、伴学PostgreSQL参数、COS真实存储、邮件发送及学校身份服务、学校活动收件邮箱、腾讯云OCR到结构化课表的适配、体育独立只读账号/内网/源表/授权映射。这些不会用本地夹具冒充。新增收费、到场、爽约、自动超时等未确认扩展不启用。
+
+启动和参数见 POSTGRES_DOCKER.md，协议见 BACKEND_API.md，逐次证据见 ADMIN_COMPLETION.md。当前入口 http://127.0.0.1:4188/v2/login。测试账号凭据仅留本机.runtime，不写入源码或公开存档。
+
+---
 # BNBU 伴学本地后端交接
+
+## 2026-10-12 体育清理后的当前结论（优先于下方历史记录）
+
+最新部署决定：用户确认外部数据库有独立账号密码，走服务器内网；现在只预留接口，正式部署时手动配置。无需继续为数据库配置读取腾讯云浏览器，连接失败不再阻塞当前本地交付。此决定不表示真实体育数据已经接通，也不取消后续部署验证。
+
+### Docker 外部服务参数
+
+`compose.postgres.yaml` 支持从部署环境传入以下参数；空值保持未配置，不会自动启用真实服务。密钥只在部署环境保存，不提交仓库。
+
+部署到 HTTPS 域名时设置 `BNBU_ALLOWED_ORIGINS` 为实际网页来源（包含协议，多个来源以逗号分隔），并设置 `BNBU_SECURE_COOKIES=1`。本地默认允许 4188 的两个 localhost 来源、Secure 为 0，以便本机 HTTP 验收。TLS 终止及服务器反向代理需部署时配置；本 Compose 仍只绑定本机端口，不是已上线服务。
+
+| 服务 | 参数 | 部署检查 |
+| --- | --- | --- |
+| 邮件发送 | `BNBU_EMAIL_DELIVERY_URL`、`BNBU_EMAIL_DELIVERY_TOKEN` | 接口接收收件人、主题、正文、幂等标识；实际验证送达后再验收 |
+| 本地验证码收件箱 | `BNBU_LOCAL_OUTBOX` | 本地默认 1；正式部署明确设为 0，防止未接邮件时误用开发收件箱 |
+| 学校身份核验 | `BNBU_IDENTITY_VERIFICATION_URL`、`BNBU_IDENTITY_VERIFICATION_TOKEN` | 返回值须匹配请求标识和当前邮箱；核验不自动授予角色 |
+| 课表识别 | `BNBU_TIMETABLE_UPSTREAM`、`BNBU_TIMETABLE_TOKEN` | 接收 image 文件并返回结构化课程；不能直接填写腾讯云通用 OCR 地址冒充课表适配器 |
+
+已使用非真实占位值检查上述七个环境变量均进入 Compose 的 API 配置。本地默认行为保持原样；真实提供方调用仍待配置验证。
+
+部署时依次核对：服务器与源数据库内网路由和访问规则；独立只读账号及授权表；通过部署环境注入 `BNBU_SPORTS_SOURCE_DATABASE_URL`（不提交密码）；实际源表与伴学账号的授权映射；有课、无课、越权和连接失败四类结果。外部连接不得用作伴学 `DATABASE_URL`，不得对源库执行迁移或写入。配置模板见 `backend/sports-source.env.example`，连接器见 `backend/src/storage/sports-source-reader.ts`。源表未知时不猜测查询或按邮箱、年级自动关联账号。
+
+项目后端位于 backend/，前端由 frontend/Dockerfile 单独构建；本地 PostgreSQL 验证使用 compose.postgres.yaml，网页端口4188。原4174验收进程不等于当前Docker镜像，不能混用其验证结论。
+
+用户最新范围：只开发伴学三端。体育平台完全独立，伴学只读可视化；不按年级推断资格或强制入班。已确认无课/未入班保留空板块，读取失败不当作无课。体育重建源码、写入接口、启动及写入验收脚本已清理。原体育前端按 SPORTS_STUDENT_SOURCE.json、SPORTS_TEACHER_SOURCE.json 清单校验通过。与当前 origin/main 比较，public/student 无差异；integrations/sports-teacher 有5个文件差异，涉及此前撤回的伴学体育账号、Cookie会话和课程设置写入接线，不能表述为两个目录均与当前主分支一致。
+
+伴学账号改用companionIdentity，升级保持原有职责、密码和实体关联；旧体育身份不再作为运行时伴学授权来源。账号API使用/api/accounts，账号命令使用accounts.*。学号支持字母或数字开头，与邮箱前缀可以不同，不能靠邮箱证明学校核验。学生邮箱域名bnbu.edu.cn、前缀字母开头；已知u/v对应2024/2025。
+
+| 验证/依赖 | 当前证据与限制 |
+| --- | --- |
+| 本地业务 | 最新完整266项测试通过，0失败、0跳过，含真实本地PostgreSQL；前后端类型检查通过。具体覆盖见tests，不能据此声称生产验收完成 |
+| Docker | 前后端分离构建、健康启动；HTTP实测注册/重启持久化/社区/组队/教师预约改期取消/校友认证预约撤销/邮件活动更正通知/知识发布撤回/退出。最新入口与配置改动已部署4188；这些不是浏览器逐按钮验收 |
+| 邮件收取与识别 | 用户已确认当前保留接口，收件邮箱部署时配置。当前运营通过mail.import导入字段明确的邮件文本，支持自动发布和人工核实；自动收件和任意自然语言识别尚未接通 |
+| 体育真实数据 | 独立只读连接器已实现；源连接、表结构及身份授权映射尚未验证，当前明确unavailable |
+| 腾讯云OCR | 用户确认已开通；尚未取得配置和验通。现有课表接口要求返回结构化课程，不能把开通OCR等同于课表识别完成 |
+| 腾讯云COS | 存储适配已实现，本地测试通过；真实账号配置与读写尚未验通 |
+| 邮件/学校身份 | 本地收件箱与测试账号不代表真实邮件送达或学校身份核验；保留外部适配接口 |
+| 浏览器验收 | 内置浏览器已恢复，4188已实际验证登录、体育未接入提示、资料保存刷新、隐私开关、课表示例隔离、问答保存、通知已读，以及校友申请→审核通过→撤销→学生同步；教师资料保存刷新、时段创建关闭、学生侧关闭时段禁用和失效教师发现过滤。Chrome腾讯云连接是另一项，未读取云凭据或变更云资源 |
+
+当前整体目标未完成。详细体育清理表及逐次验证见ADMIN_COMPLETION.md末尾。本地清理前可恢复备份在D:/伴学/archive/goal-scope-rollback-20261012。
+
+### 当前完成审查与下一步
+
+| 要求 | 当前可核对证据 | 剩余工作 |
+| --- | --- | --- |
+| backend 目录、前后端分离、PostgreSQL 本地运行 | backend/Dockerfile、frontend/Dockerfile、compose.postgres.yaml；4188 容器已健康运行 | 服务器网络、域名、TLS、真实数据库参数由部署阶段配置 |
+| 伴学三端共享业务 | tests/postgres-storage.test.ts 与 scripts/docker-postgres-smoke.mjs，覆盖社区、组队、教师、校友、知识、活动邮件 | 原页面全功能浏览器回归尚未全部验证；不能用 HTTP 通过代替按钮操作验证 |
+| 保留原 UI | 本轮仅恢复被误隐藏的学生体育入口，无 CSS、布局重设计；学生体育入口已浏览器验证 | 继续核对剩余三端页面流程，不重新设计界面 |
+| 体育独立且只读 | 旧体育业务分派移除；只读连接器与状态投影有测试；原静态前端基线保留 | 真实源表、授权身份映射、内网只读配置按用户决定留待服务器部署 |
+| 学校邮件自动处理 | 已验证结构化邮件导入、发布、更正、去重、通知 | 按用户最新决定保留接口、部署时配置邮箱；自动收取及自然语言识别未实现完整外部链路 |
+| OCR、邮件发送、学校身份与 COS | 已有适配器和 Docker 参数透传；未配置明确失败 | 真实配置、OCR 结构化课表适配与服务验证仍未完成，不能据“腾讯云已开通”宣称接通 |
+| 验证、交接与本地存档 | 最新完整266项测试及扩展 Docker smoke；本文件与ADMIN_COMPLETION逐项记录；归档目录有源码bundle和测试报告 | 仍需在全部必需项完成后出最终验收结论；目前均为阶段存档 |
+
+原版邮件详情已按用户授权接入拆分与关联更正两个入口，并在4188完成浏览器提交及刷新验证。校园AI默认/自定义形象已接入本人后端偏好，选择、上传及刷新均已浏览器验证。教师个人资料交流主题已由用户确认为必填，前后端已统一。
+
+邮件收件邮箱和体育数据库参数均已确定部署阶段配置，不再作为待用户回答的问题。不因自动测试通过将整个 Goal 标为完成。
+
+邮件接入复用 `POST /api/commands` 的 `mail.import`，请求包含 `requestId`、`action` 和 `input`；input 必填 `messageId`、`subject`、`sender`、`body`，可选封面沿用现有协议。调用需要伴学运营或超级管理员会话，不是开放 webhook，也没有已上线的无人值守邮箱采集器。部署接入时由受控采集适配器保留邮件稳定标识、原文和来源，衔接现有去重及事务流程，并验证断线重试不会重复发布。不得把验证码邮件发送接口误当成学校活动收件接口。
+
+以下内容为历史检查点，仅供追溯；旧目录、测试数字、邮箱推导和体育实施方向不再作为当前依据。
+
 
 日期：2026-10-11。工作目录：`D:\伴学\bnbu-work`。来源：`https://github.com/chchaiai/bnbu-banxue.git`，基线 `f8f4ca6d466907961fbb6de2137fc11a3fbb7270`。
 
@@ -58,7 +146,8 @@
 
 ### 用户补充答复后的更新
 
-用户已确认本地测试账号验收，且指定 `https://github.com/chchaiai/new_need_version_sports` 作为逻辑参考，尽量重新开发适配伴学。下文“体育版本待提供”“本地测试身份待确认”属于原停点，现已解除；新待确认点是该仓库 V8.1 与伴学现行体育规则的冲突。来源 main 提交 `50b0005e02bc93d5c5de089bbe8842e1d0576966`，下载快照位于 `D:\伴学\sports-reference-source\new_need_version_sports-main`，Contract SHA-256 `0528389bb8b72714d9a4af35ffc66c87503560d41c58ad968b1713b39ff3da2d`。来源只读，不执行其中已有团队任务/审批流程，也未修改源仓库。
+用户已确认本地测试账号验收，且指定 `https://github.com/chchaiai/new_need_version_sports` 作为逻辑参考，尽量重新开发适配伴学。下文“体育版本待提供”“本地测试身份待确认”属于原停点，现已解除；新待确认点是该仓库 V8.1 与伴学现行体育规则的冲突。来源 main 提交 `50b0005e02bc93d5c5de089bbe8842e1d0576966`，下载快照位于 `D:\伴学\sports-reference-source
+ew_need_version_sports-main`，Contract SHA-256 `0528389bb8b72714d9a4af35ffc66c87503560d41c58ad968b1713b39ff3da2d`。来源只读，不执行其中已有团队任务/审批流程，也未修改源仓库。
 
 已保留 `POST /api/identity/check` 真实身份核验适配；未配置明确 503，接口不能授予职责。新增 `server/sports/session-clock.ts` 固定服务端上海开始日并累计 ACTIVE 区间，排除 PAUSED；该核心尚未接通运动持久化/网页。两项工作共 11 项定向测试通过，真实核验与体育全流程均未验收。
 
@@ -70,13 +159,16 @@
 
 ## 启动与验收账号
 
-1. 安装 Node.js 24，在工作目录执行 `npm ci`。
+1. 安装 Node.js 24，在工作目录执行 
+pm ci`。
 2. Windows 执行 `./Start-Local.ps1 -Acceptance`，启动 API 4175 和网页 4174；访问 `http://127.0.0.1:4174/workspace`。
 3. 账号和随机密码在本机 `data/browser-acceptance-accounts.json`。学生甲、学生乙、教师、超级管理员、审核员、运营各一名。该文件和数据库被 Git 忽略，不要作为源码上传。
 4. 退出再切换账号。刷新、退出和服务重启保留业务数据。停止使用 Ctrl+C；重新启动复用原数据库。
-5. 普通运行 `npm run dev:local` 使用 `data/bnbu.sqlite`，不会自动生成身份。学校身份来源待确认，因此没有把“邮箱后缀正确”当作学生/教师资格。
+5. 普通运行 
+pm run dev:local` 使用 `data/bnbu.sqlite`，不会自动生成身份。学校身份来源待确认，因此没有把“邮箱后缀正确”当作学生/教师资格。
 
-验收启动显式启用本地开发发件箱，注册验证码不会发往真实邮箱。指定同一个 `BNBU_DATABASE` 后，可用 `node scripts/acceptance.mjs outbox 用户邮箱` 查看该用户开发邮件；这只用于本地测试。接通真实邮件后移除 `BNBU_LOCAL_OUTBOX=1`。
+验收启动显式启用本地开发发件箱，注册验证码不会发往真实邮箱。指定同一个 `BNBU_DATABASE` 后，可用 
+ode scripts/acceptance.mjs outbox 用户邮箱` 查看该用户开发邮件；这只用于本地测试。接通真实邮件后移除 `BNBU_LOCAL_OUTBOX=1`。
 
 ## 已接通范围与验收标准
 
@@ -100,7 +192,8 @@
 
 续轮修复：改期提出和接受复核教师当前角色、封禁及服务状态，防止学生接受已经失效的教师时段。新增两项回归（身份撤销、封禁），`tests/backend.test.ts` 8/8 通过，后端类型检查及相关 lint 通过；此前 138 项全套结果仍为上一提交的验证记录。
 
-- `node node_modules/vitest/vitest.mjs run`：22 个文件，138 项测试通过。
+- 
+ode node_modules/vitest/vitest.mjs run`：22 个文件，138 项测试通过。
 - 前端 `tsconfig.app.json` 与后端 `tsconfig.server.json` 类型检查通过。
 - ESLint 通过；Vite 构建通过。保留原三维/关系图及主包超过 500KB 的构建提示。
 - 使用原 package-lock 完成干净安装；将七条镜像下载地址还原 npm 官方地址，随后更新锁内允许的修补版本，审计结果 0 vulnerabilities。
@@ -503,3 +596,16 @@ schema v6增加admin_security_challenges，按主体和用途独立于个人emai
 尚需完成或审查：原版关系图、校友全流程、社团、AI知识反馈、邮件运营、待用户确认的内容审核原因控件、顶部体育资格演示条件，以及各页面失败/并发/身份切换体验和双账号浏览器验收。真实学校核验、邮件投递及OCR仍按配置边界处理；OCR未配置已获用户接受，不能声称真实识别已验收。体育按用户最新决定为快捷入口和数据摘要，线上同步未接通。
 
 本轮生产前端构建通过，保留既有大块体积警告；全量测试结果待本轮归档manifest记录。工作区其他来源的体育面板修改单独随存档保存，不混入当前接线提交。不推送、不部署，完整goal保持未完成。
+
+## 2026-10-12 收尾接线审查
+
+| 检查项 | 当前源码证据 | 结论 |
+| --- | --- | --- |
+| 活动点赞收藏 | student.tsx 向 ActivityDiscovery 与 ActivityReactions 传入 live | 当前入口走 relation.set，不执行组件内旧演示分支 |
+| 社区评论和反应 | V2Community.tsx、AlumniDiscoveryFeed.tsx 均给 CommunityPostDetail 传入 live | 当前入口提交后端命令，失败不退回本地发布 |
+| 校友审核 | admin.tsx 给 AdminAlumniReview 传入 live | 当前审核提交 alumni.review；旧 useAction 分支不用于该入口 |
+| 体育旧浏览器读取器 | useSportsProgress 仅存在定义，没有当前页面调用 | 不作为当前体育接入依据，不触碰独立体育前端基线 |
+| 体育当前范围 | backend 仅有独立 sports-source-reader；sports-companion 测试核对残留体育实体不投影、未接通与无课区分 | 外部源配置仍按约定留到部署，不从伴学测试数据推断真实课程 |
+| 纯浏览器状态 | 悬浮入口位置、资料快捷入口固定状态、历史演示恢复 | 不用作帖子、预约、审核或身份授权的事实来源 |
+
+上述为源码接线审查，结合此前真实 PostgreSQL/Docker 和已记录浏览器流程；不将静态检查当作所有按钮均实测。教师交流主题已确认为必填，正式服务配置保持交接中列明的部署边界。

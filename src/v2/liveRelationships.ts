@@ -1,5 +1,5 @@
 import type { Workspace } from '../live/api'
-import type { RelationshipEntity } from './relationshipAdapter'
+import type { RelationshipEntity } from '../../shared/v2/relationshipAdapter'
 
 export function liveRelationships(data: Workspace | null): RelationshipEntity[] {
   if (!data) return []

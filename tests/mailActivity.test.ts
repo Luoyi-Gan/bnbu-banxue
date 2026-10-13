@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { initialV2State, type V2State } from '../src/v2/model'
-import { importActivityMail, correctActivityMail, setMailActivityVisibility } from '../src/v2/mailActivityPolicy'
-import { normalizeMailTime } from '../src/v2/mailActivityAdapter'
+import { initialV2State, type V2State } from '../shared/v2/model'
+import { importActivityMail, correctActivityMail, setMailActivityVisibility } from '../shared/v2/mailActivityPolicy'
+import { normalizeMailTime } from '../shared/v2/mailActivityAdapter'
 import { availableActivities, setActivityParticipation, studentSchedule } from '../src/v2/studentSchedule'
 const fixture = (): V2State => ({ ...structuredClone(initialV2State), role: 'admin' })
 const source = { messageId: 'source-1', subject: '通知', sender: 'school', body: '活动名称：交流\n活动介绍：学习交流\n活动开始时间：2026-10-25 14:00\n活动结束时间：2026-10-25 16:00\n活动地点：资源中心' }

@@ -1,8 +1,21 @@
 # BNBU 伴学
 
-校园综合平台。`/workspace` 为新增的 SQLite 持久化业务入口，`/v2` 保留原浏览器本地演示。当前交付属于本地验收，不代表学校身份核验、真实邮件投递或原体育系统已经接通。
+校园综合平台。原 `/v2` 学生、教师及管理员页面已连接伴学后端，`/workspace` 保留业务工作台入口。后端位于 `backend/`，当前本地交付采用 PostgreSQL 与前后端独立 Docker。体育仅保留独立平台的只读可视化接入边界，未配置时明确不可用；本地验收不代表真实学校身份、邮件或云服务已接通。
 
-## 启动本地完整服务
+## 推荐：启动前后端独立 Docker
+
+在仓库根目录 PowerShell 执行；已有数据卷须沿用创建时的数据库密码：
+
+```powershell
+$env:BNBU_POSTGRES_PASSWORD = '替换为本地数据库密码'
+docker compose -f compose.postgres.yaml up -d --build
+docker compose -f compose.postgres.yaml ps
+Invoke-RestMethod http://127.0.0.1:4188/api/health
+```
+
+访问 http://127.0.0.1:4188/v2/login 。数据库和 API 不发布宿主机端口；前端通过同源代理访问 API。不会自动授予学校身份或管理权限。参数、对象存储、持久化及测试说明见 [PostgreSQL Docker 指南](docs/POSTGRES_DOCKER.md)。停止使用 `docker compose -f compose.postgres.yaml down`，保留数据卷，不加 `-v`。
+
+## 可选：SQLite 开发服务
 
 ```bash
 npm ci
@@ -13,7 +26,7 @@ npm run dev:local
 
 Windows 独立验收：运行 `./Start-Local.ps1 -Acceptance`。首次会创建单独的 `data/browser-acceptance.sqlite` 和随机密码账号文件 `data/browser-acceptance-accounts.json`；重复运行保留已有数据。六个账号仅用于本地验收，不能证明学校身份。普通启动可用 `./Start-Local.ps1`。
 
-`npm run dev` / `npm run dev:v2` 只运行前端；原视觉演示请明确访问 `/v2`。接通版的状态不会写入旧演示 localStorage。
+`npm run dev` / `npm run dev:v2` 只运行前端，需要另行启动后端；`/v2` 业务数据读取服务端，不能仅靠静态页面完成业务操作。
 
 详见 [本地交接与验收](docs/LOCAL_BACKEND_HANDOFF.md)、[API 协议](docs/BACKEND_API.md) 和 [业务规则](BUSINESS_RULES.md)。
 
@@ -23,7 +36,7 @@ Windows 独立验收：运行 `./Start-Local.ps1 -Acceptance`。首次会创建�
 
 ## 数据
 
-接通版业务保存在服务端 SQLite，账号、会话、通知和业务归属按 ID 隔离。旧 `/v2` 演示仍保存在浏览器本地，素材和默认人物仅用于演示。二者不自动迁移。
+Docker 交付的业务数据保存在 PostgreSQL；可选开发入口仍支持 SQLite。账号、会话、通知和业务归属按 ID 隔离。部分界面偏好和明确标记的课表示例保留浏览器本地状态，不代替后端业务记录。两种数据库环境不自动迁移，测试身份不代表学校核验。
 
 ## 检查与构建
 
@@ -34,7 +47,7 @@ npm run typecheck:server
 npm run build
 ```
 
-构建结果输出到 `dist`，仅静态托管不能提供后端业务；本轮交付启动方式是 `dev:local`。没有执行云部署。
+构建结果输出到 `dist`，仅静态托管不能提供后端业务；推荐交付启动方式是 `compose.postgres.yaml`。没有执行云部署。
 
 ## 三维校园导览
 

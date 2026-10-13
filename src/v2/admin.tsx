@@ -2,7 +2,7 @@ import { AdminAlumniReview } from './alumniWorkflow'
 import { ArrowRight, Check, ChevronRight, CircleAlert, FileCheck2, Newspaper, ShieldCheck, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { type Verification } from './model'
+import { type Verification } from '../../shared/v2/model'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, PageHeading, SectionHeading } from './ui'
 

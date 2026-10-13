@@ -1,9 +1,9 @@
 import { afterEach, expect, it } from "vitest";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
-import { accountDirectory } from "../server/sports/account-directory";
-import { createApiServer } from "../server/main";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { accountDirectory } from "../backend/src/accounts/account-directory";
+import { createApiServer } from "../backend/src/main";
 const dbs: Database[] = [];
 afterEach(() => dbs.splice(0).forEach((d) => d.close()));
 function setup() {
@@ -18,7 +18,7 @@ function setup() {
       password: "Test-password-123",
       roles: [],
     });
-    const identity = repo.create("sportsIdentity", id, {
+    const identity = repo.create("companionIdentity", id, {
       role,
       status: "verified",
       permissions: role === "admin" ? ["ACCOUNTS"] : [],
@@ -63,7 +63,7 @@ function setup() {
     member,
   };
 }
-it("账号只读投影不泄露凭据或教学事实，当前学期关系决定学生状态", () => {
+it("账号只读投影不泄露凭据或教学事实，学生状态只取伴学账号状态", () => {
   const f = setup(),
     before = f.db.prepare("SELECT * FROM entities ORDER BY id").all();
   const page = accountDirectory(f.repo, f.admin.account, "student", {});
@@ -74,7 +74,7 @@ it("账号只读投影不泄露凭据或教学事实，当前学期关系决定�
     verifiedEmail: "student@example.test",
   });
   expect(page.items.find((r) => r.id === f.pending.account.id)?.status).toBe(
-    "PENDING",
+    "ACTIVE",
   );
   expect(JSON.stringify(page)).not.toMatch(
     /password|hash|987654|SECRET_GRADE|DO_NOT_EXPOSE|permissions/,
@@ -87,15 +87,18 @@ it("账号只读投影不泄露凭据或教学事实，当前学期关系决定�
     accountDirectory(f.repo, f.admin.account, "student", {
       id: f.student.account.id,
     }).items[0].status,
-  ).toBe("PENDING");
+  ).toBe("ACTIVE");
   f.repo.save(f.repo.get(f.member.id), { status: "ACTIVE" });
   f.repo.save(f.semester, { status: "ARCHIVED" });
   expect(
     accountDirectory(f.repo, f.admin.account, "student", { status: "ACTIVE" })
       .total,
-  ).toBe(0);
-  f.db
-    .prepare("UPDATE accounts SET email=? WHERE id=?")
+  ).toBe(2);
+  f.db.prepare("UPDATE accounts SET status='muted' WHERE id=?").run(f.student.account.id);
+  expect(accountDirectory(f.repo,f.admin.account,"student",{status:"MUTED"}).items.map(i=>i.id)).toEqual([f.student.account.id]);
+  f.db.prepare("UPDATE accounts SET status='banned' WHERE id=?").run(f.student.account.id);
+  expect(accountDirectory(f.repo,f.admin.account,"student",{status:"DISABLED"}).items.map(i=>i.id)).toEqual([f.student.account.id]);
+  f.db.prepare("UPDATE accounts SET email=? WHERE id=?")
     .run("changed@example.test", f.student.account.id);
   expect(
     accountDirectory(f.repo, f.admin.account, "student", {
@@ -117,16 +120,16 @@ it("搜索筛选分页可组合，过期游标、重复身份和非法学生状�
     2,
   );
   expect(() => read({ cursor: "missing" })).toThrow("分页基准");
-  expect(() => read({ status: "DISABLED" })).toThrow("筛选状态");
+  expect(() => read({ status: "PENDING" })).toThrow("筛选状态");
   expect(() => read({ limit: 101 })).toThrow();
   expect(() => read({ password: "x" })).toThrow();
-  f.repo.create("sportsIdentity", f.student.account.id, {
+  f.repo.create("companionIdentity", f.student.account.id, {
     role: "student",
     status: "verified",
   });
   expect(() => read({})).toThrow("重复");
 });
-it("教师三种状态只读；授权、首次改密和维护门禁即时生效", () => {
+it("教师三种状态只读；授权和首次改密即时生效，外部体育维护不影响伴学", () => {
   const f = setup(),
     read = () => accountDirectory(f.repo, f.admin.account, "teacher", {});
   expect(read().items[0]).toMatchObject({
@@ -152,7 +155,7 @@ it("教师三种状态只读；授权、首次改密和维护门禁即时生效"
   expect(read).toThrow("管理权限");
   f.repo.save(f.repo.get(f.admin.identity.id), { permissions: ["ACCOUNTS"] });
   f.repo.create("sportsSystem", f.admin.account.id, { mode: "MAINTENANCE" });
-  expect(read).toThrow("维护中");
+  expect(read().items[0].status).toBe("DISABLED");
 });
 it("HTTP读取校验当前登录和权限、禁止缓存，不提供修改账号入口", async () => {
   const f = setup(),
@@ -161,7 +164,7 @@ it("HTTP读取校验当前登录和权限、禁止缓存，不提供修改账号
   const base =
     "http://127.0.0.1:" +
     (server.address() as { port: number }).port +
-    "/api/sports/accounts/students";
+    "/api/accounts/students";
   try {
     expect((await fetch(base)).status).toBe(401);
     expect(

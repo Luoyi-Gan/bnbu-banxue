@@ -1,3 +1,7 @@
+# 当前入口说明
+
+当前交付使用前后端独立容器与 PostgreSQL，请按 [PostgreSQL Docker 指南](POSTGRES_DOCKER.md) 启动，入口为 http://127.0.0.1:4188/v2/login 。以下是旧 SQLite 单容器验证历史，历史测试数字、体育能力和网络失败状态不作为当前结论。当前范围见 [本地后端交接](LOCAL_BACKEND_HANDOFF.md)。
+
 # Docker 本地启动
 
 最新验证（2026-10-12）：用户修复代理后，项目镜像构建与容器启动成功；容器内网页 `/workspace` 和代理 `/api/health` 返回200，Docker健康状态healthy。Linux下32文件201项测试通过，前后端类型检查及Vite构建通过。临时无端口验证容器已停止并移除，命名数据卷保留；Windows原验收服务未切换。下面首次失败记录仅供追溯。
@@ -18,10 +22,9 @@ docker compose logs --tail 80 bnbu
 
 ```powershell
 docker compose exec bnbu node scripts/acceptance.mjs prepare
-docker compose exec bnbu node scripts/acceptance.mjs sports
 ```
 
-这两个命令创建卷内 `data/browser-acceptance.sqlite` 和 `data/browser-acceptance-accounts.json`，不写默认业务数据库。然后将 compose 的 `BNBU_DATABASE` 改为 `/app/data/browser-acceptance.sqlite`，增加 `BNBU_LOCAL_OUTBOX: "1"`，执行 `docker compose up -d` 重建容器。通过 `docker compose cp bnbu:/app/data/browser-acceptance-accounts.json ./data/docker-acceptance-accounts.json` 将测试凭据保存到本地忽略目录（先确保本地 `data` 目录存在）。测试角色不代表学校真实身份。
+该命令创建卷内 `data/browser-acceptance.sqlite` 和 `data/browser-acceptance-accounts.json`，不写默认业务数据库。然后将 compose 的 `BNBU_DATABASE` 改为 `/app/data/browser-acceptance.sqlite`，增加 `BNBU_LOCAL_OUTBOX: "1"`，执行 `docker compose up -d` 重建容器。通过 `docker compose cp bnbu:/app/data/browser-acceptance-accounts.json ./data/docker-acceptance-accounts.json` 将测试凭据保存到本地忽略目录（先确保本地 `data` 目录存在）。测试角色不代表学校真实身份。
 
 `docker compose down` 停止容器并保留数据卷；不要加 `-v`，否则会删除卷内业务数据。源文件改变后需要重新构建。外部邮件、学校核验和 AI 等服务仍须另行配置，Docker 不会自动提供这些能力。
 

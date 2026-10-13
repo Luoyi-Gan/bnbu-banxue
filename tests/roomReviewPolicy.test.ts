@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { addRoomReview, finishRoom, roomReviewAverage } from '../src/v2/roomReviewPolicy'
-import { initialV2State, studentName, type RoomReview } from '../src/v2/model'
+import { initialV2State, studentName, type RoomReview } from '../shared/v2/model'
 
 const state = () => structuredClone(initialV2State)
 const review = (changes: Partial<RoomReview> = {}): RoomReview => ({ id: 'review-1', roomId: 'room-ai', from: studentName, to: '许宁', stars: 5, tags: ['合作愉快'], comment: '', date: '10月9日', ...changes })

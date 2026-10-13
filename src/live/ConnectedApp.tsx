@@ -27,7 +27,6 @@ import {
   ApiError,
   command,
   loadWorkspace,
-  sportsChangedEvent,
   type LiveEntity,
   type Workspace,
 } from "./api";
@@ -347,8 +346,6 @@ export function ConnectedApp() {
     setMessage("");
     try {
       await command(action, input);
-      if (action.startsWith("sports."))
-        window.dispatchEvent(new Event(sportsChangedEvent));
       setForm(null);
       setMessage("已保存到本地服务。");
       await refresh();
@@ -1595,7 +1592,7 @@ export function ConnectedApp() {
                         <p>
                           {p.major} · {p.graduationYear}
                         </p>
-                        <p>学号：{p.studentNumber || "旧申请未提供"}（{p.studentNumberSource === "verified-email" ? "已验证邮箱" : "申请人填写，待核对"}）</p><p>{p.evidence}</p>
+                        <p>学号：{p.studentNumber || "旧申请未提供"}（{p.studentNumberSource === "enrollment" ? "入班填写，待学校名单核对" : p.studentNumberSource === "verified-email" ? "历史邮箱前缀，待重新核对" : "申请人填写，待核对"}）</p><p>{p.evidence}</p>
                         <div className="live-actions">
                           {button("通过", "alumni.review", {
                             id: p.id,

@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, GraduationCap, UsersRound } from 'lucide-react'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { PageHeading, Empty, SectionHeading } from './ui'
-import { bookingStatus } from './alumniPolicy'
+import { bookingStatus } from '../../shared/v2/alumniPolicy'
 
 import { AlumniDiscovery } from './AlumniDiscoveryFeed'
 

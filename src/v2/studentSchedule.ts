@@ -1,7 +1,7 @@
-import { managedSlots, managedTeachers } from './teacherCoffee'
-import { alumniData } from './alumniPolicy'
-import { events } from '../data/mockData'
-import { studentName, type V2State } from './model'
+import { managedSlots, managedTeachers } from '../../shared/v2/teacherCoffee'
+import { alumniData } from '../../shared/v2/alumniPolicy'
+import { events } from '../../shared/data/mockData'
+import { studentName, type V2State } from '../../shared/v2/model'
 
 export function availableActivities(state: V2State) {
   return [...events, ...state.localEvents.filter(event => event.status === 'published')]

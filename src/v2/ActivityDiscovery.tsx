@@ -13,8 +13,8 @@ function ActivityCover({ item, path }: { item: ActivityItem; path: string }) {
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
   return <Link to={path} className={`discovery-cover activity-discovery-cover${item.image && !loaded && !failed ? ' is-loading' : ''}`} style={{ aspectRatio: coverRatio(item.id) }} aria-label={`查看活动：${item.title}`}>
-    {item.image && !failed ? <img src={item.image} alt="" loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setFailed(true)}/> : <span className="discovery-text-cover"><small>{item.category}</small><strong>{item.title}</strong><span>{failed ? '封面暂不可用' : item.subtitle}</span></span>}
-    <span className="activity-discovery-category">{item.category}</span>
+    {item.image && !failed ? <img src={item.image} alt={item.isDefaultCover ? '校园通用照片，默认封面' : ''} loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setFailed(true)}/> : <span className="discovery-text-cover"><small>{item.category}</small><strong>{item.title}</strong><span>{failed ? '封面暂不可用' : item.subtitle}</span></span>}
+    <span className="activity-discovery-category">{item.category}{item.isDefaultCover && ' · 默认封面'}</span>
   </Link>
 }
 

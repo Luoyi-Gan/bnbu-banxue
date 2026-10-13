@@ -1,5 +1,0 @@
-.sports-workspace-main{max-width:1600px;margin:0 auto;padding:34px clamp(20px,3vw,46px) 48px}
-.sports-account-name{display:block;margin-top:5px;font-size:16px}
-.sports-workspace .v2-sidebar-bottom{color:#6b7e77}
-.sports-workspace .sports-error a{margin-left:auto;white-space:nowrap;color:#2159f5}
-@media(max-width:760px){.sports-workspace{display:block}.sports-workspace .v2-sidebar{position:relative;height:auto;width:auto;padding:16px;border-right:0;border-bottom:1px solid var(--v2-line)}.sports-workspace .v2-brand{padding:0 0 12px}.sports-workspace .v2-nav-label,.sports-workspace .v2-sidebar-bottom{display:none}.sports-workspace .v2-side-nav{display:flex;overflow-x:auto}.sports-workspace .v2-side-link{flex:none;white-space:nowrap}.sports-workspace-main{padding:24px 16px 40px}.sports-workspace .v2-topbar{padding:14px 20px}}

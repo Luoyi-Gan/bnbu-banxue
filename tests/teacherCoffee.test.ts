@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { initialV2State } from '../src/v2/model'
-import { canUseTeacherSports, answerCoffeeMove, bookCoffee, cancelCoffee, closeCoffeeSlot, coffeeData, managedSlots, occupied, proposeCoffeeMove, saveCoffeeSlot } from '../src/v2/teacherCoffee'
+import { initialV2State } from '../shared/v2/model'
+import { canUseTeacherSports, answerCoffeeMove, bookCoffee, cancelCoffee, closeCoffeeSlot, coffeeData, managedSlots, occupied, proposeCoffeeMove, saveCoffeeSlot } from '../shared/v2/teacherCoffee'
 import { studentSchedule } from '../src/v2/studentSchedule'
-import { adaptRelationships } from '../src/v2/relationshipAdapter'
+import { adaptRelationships } from '../shared/v2/relationshipAdapter'
 const future = (hour: number) => `2099-10-10T${hour}:00:00+08:00`
 function setup() {
   let state = { ...structuredClone(initialV2State), role: 'teacher' as const }

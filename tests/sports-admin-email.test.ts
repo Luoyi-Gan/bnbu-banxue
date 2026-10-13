@@ -1,13 +1,13 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { openDatabase, type Database } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { Repository } from "../server/repository";
+import { openDatabase, type Database } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
 import {
   adminEmailStatus,
   requestAdminEmail,
   confirmAdminEmail,
   clearAdminChallenges,
-} from "../server/sports/admin-email";
+} from "../backend/src/accounts/admin-email";
 const dbs: Database[] = [];
 afterEach(() => {
   vi.useRealTimers();
@@ -27,7 +27,7 @@ function setup() {
       password: "Password123",
       roles: role === "admin" ? ["superadmin"] : ["student"],
     });
-    const identity = repo.create("sportsIdentity", id, {
+    const identity = repo.create("companionIdentity", id, {
       role,
       status: "verified",
     });
@@ -171,7 +171,7 @@ it("资料改变不沿用旧证明，清理管理挑战不会删同邮箱个人�
   const second = await requestAdminEmail(f.db, f.admin.account, true),
     secondCode = f.code(second.challengeId);
   f.db.exec(
-    "CREATE TRIGGER reject_email_audit BEFORE INSERT ON audit WHEN NEW.action='sports.account.email.verify' BEGIN SELECT RAISE(ABORT,'audit failed'); END;",
+    "CREATE TRIGGER reject_email_audit BEFORE INSERT ON audit WHEN NEW.action='accounts.email.verify' BEGIN SELECT RAISE(ABORT,'audit failed'); END;",
   );
   expect(() =>
     confirmAdminEmail(f.db, f.admin.account, {

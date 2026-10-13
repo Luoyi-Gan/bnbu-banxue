@@ -11,29 +11,28 @@
     "build": "tsc --noEmit -p tsconfig.app.json && vite build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json --pretty false",
-    "test": "vitest run",
-    "dev:sports-teacher": "node scripts/sports-teacher.mjs"
+    "test": "vitest run"
   },
   "dependencies": {
+    "cos-nodejs-sdk-v5": "3.0.0",
     "cytoscape": "^3.34.3",
     "cytoscape-fcose": "^2.2.0",
-    "exceljs": "4.4.0",
-    "ffprobe-static": "^3.1.0",
     "gsap": "^3.15.0",
     "lucide-react": "^0.468.0",
     "motion": "^12.43.0",
     "ogl": "^1.0.11",
+    "pg": "^8.23.1",
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
-    "sharp": "^0.35.5",
     "three": "^0.180.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/cytoscape": "^3.21.9",
     "@types/node": "^22.10.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.0.3",
     "@types/react-dom": "^19.0.2",
     "@types/three": "^0.180.0",
@@ -46,10 +45,5 @@
     "typescript-eslint": "^8.18.2",
     "vite": "^6.0.5",
     "vitest": "^4.1.10"
-  },
-  "overrides": {
-    "exceljs": {
-      "uuid": "11.1.1"
-    }
   }
 }

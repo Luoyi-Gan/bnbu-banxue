@@ -25,7 +25,7 @@ function StudentProfileEditor({live}: {live: ReturnType<typeof useWorkspaceBacke
     setLoading(true);setVerification('');
     try {
       const result=await api<{message?:string}>(confirm ? '/api/auth/email/confirm' : '/api/auth/email/request',confirm ? {code} : {});
-      setVerification(confirm ? '邮箱已验证，学号已更新。' : result.message ?? '验证码已发送。');
+      setVerification(confirm ? '邮箱已验证，学号保持不变。' : result.message ?? '验证码已发送。');
       if(confirm) window.dispatchEvent(new Event(workspaceChangedEvent));
     } catch(error) {setVerification(error instanceof Error ? error.message : '验证失败')} finally {setLoading(false)}
   }
@@ -55,7 +55,7 @@ function StudentProfileEditor({live}: {live: ReturnType<typeof useWorkspaceBacke
       <div className="v2-profile-photo-row"><span className="v2-profile-avatar">{avatar ? <img src={avatar} alt="头像预览"/> : nickname.slice(0, 1)}</span><div><label className="v2-button v2-button-secondary">{loading ? '处理图片中…' : '更换头像'}<input type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择头像" disabled={loading || live.busy} onChange={upload}/></label><p>JPG、PNG、WebP，最大 5 MB；头像居中裁剪。</p>{avatar && <button type="button" className="v2-text-button" onClick={() => setAvatar('')}>恢复默认头像</button>}</div></div>
       <label>昵称<input value={nickname} maxLength={20} required onChange={event => setNickname(event.target.value)} placeholder="填写你的昵称"/></label>
       <div className="v2-profile-facts"><div><span>姓名</span><strong>{account.name}</strong></div><div><span>学号</span><strong>{account.studentNumber ?? '未验证学校邮箱'}</strong></div><div><span>学院</span><strong>{account.organization}</strong></div><div><span>身份</span><strong>{account.roles.includes('student') ? '已授权学生' : '以账号授权为准'}</strong></div></div>
-      {!account.studentNumber && account.email.endsWith('@bnbu.edu.cn') && <div className="v2-form-note"><p>验证本人学校邮箱后，自动绑定邮箱前缀为学号：{account.email}</p><button type="button" className="v2-button v2-button-secondary" disabled={loading} onClick={() => void verifyEmail(false)}>获取验证码</button><input aria-label="邮箱验证码" value={code} maxLength={6} onChange={event=>setCode(event.target.value)}/><button type="button" className="v2-button v2-button-secondary" disabled={loading || !code.trim()} onClick={() => void verifyEmail(true)}>验证邮箱</button></div>}{verification && <p role="status">{verification}</p>}<p className="v2-form-note">昵称用于展示；姓名、学号与身份由学校资料维护。当前修改保存到伴学后台。</p>
+      {!account.studentNumber && account.email.endsWith('@bnbu.edu.cn') && <div className="v2-form-note"><p>验证本人学校邮箱（学号采用入班时填写的资料）：{account.email}</p><button type="button" className="v2-button v2-button-secondary" disabled={loading} onClick={() => void verifyEmail(false)}>获取验证码</button><input aria-label="邮箱验证码" value={code} maxLength={6} onChange={event=>setCode(event.target.value)}/><button type="button" className="v2-button v2-button-secondary" disabled={loading || !code.trim()} onClick={() => void verifyEmail(true)}>验证邮箱</button></div>}{verification && <p role="status">{verification}</p>}<p className="v2-form-note">昵称用于展示；姓名、学号采用入班资料，后续由学校名单核对。当前修改保存到伴学后台。</p>
       {(error || live.error) && <p role="alert">{error || live.error}</p>}<div className="v2-form-actions"><Link to="/v2/me" className="v2-button v2-button-secondary">取消</Link><button className="v2-button v2-button-primary" disabled={loading} type="submit">保存资料</button></div>
     </form></div>
 }

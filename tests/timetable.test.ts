@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { campusWeekday, correctTimetableLesson, lessonsForDay, parseTimetableResponse, saveTimetable } from '../src/v2/timetableModel'
+import { campusWeekday, correctTimetableLesson, lessonsForDay, parseTimetableResponse, saveTimetable } from '../shared/v2/timetableModel'
 import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto } from '../src/v2/timetableAdapter'
 
 const lesson = { name: '数据结构', weekday: 1, startTime: '09:00', endTime: '10:50', location: 'T2-202', weeks: '1–16 周', needsReview: false }

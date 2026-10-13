@@ -6,7 +6,7 @@ import {
   lessonsForDay,
   weekDays,
   type TimetableLesson,
-} from "../v2/timetableModel";
+} from "../../shared/v2/timetableModel";
 import {
   recognizeTimetable,
   validateTimetablePhoto,

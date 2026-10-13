@@ -1,5 +1,5 @@
-import { alumniData, currentAlumniActor } from './alumniPolicy'
-import type { V2State } from './model'
+import { alumniData, currentAlumniActor } from '../../shared/v2/alumniPolicy'
+import type { V2State } from '../../shared/v2/model'
 import { canReadPost } from './postInteractions'
 
 export type AlumniCategory = '全部' | '升学' | '就业' | '已关注' | '已收藏'

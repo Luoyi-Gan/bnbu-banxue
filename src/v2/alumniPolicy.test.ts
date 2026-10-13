@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { initialV2State, studentName, type V2State } from './model'
-import { alumniData, requestAlumniChat, decideAlumniChat, cancelAlumniBooking, reviewAlumni, submitAlumniCertification, followAlumni, publishAlumniPost, addAlumniSlot, closeAlumniSlot, bookingStatus, type AlumniActor } from './alumniPolicy'
+import { initialV2State, studentName, type V2State } from '../../shared/v2/model'
+import { alumniData, requestAlumniChat, decideAlumniChat, cancelAlumniBooking, reviewAlumni, submitAlumniCertification, followAlumni, publishAlumniPost, addAlumniSlot, closeAlumniSlot, bookingStatus, type AlumniActor } from '../../shared/v2/alumniPolicy'
 import { studentSchedule } from './studentSchedule'
 
 const now = Date.parse('2026-10-09T12:00:00+08:00')

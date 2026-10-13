@@ -1,15 +1,16 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { openDatabase, transaction, type Database } from "../server/database";
+import { openDatabase, transaction, type Database } from "../backend/src/database";
 import {
   authenticate,
   createAccount,
   issueCode,
   login,
   register,
-} from "../server/auth";
-import { Repository } from "../server/repository";
-import { communityCommand } from "../server/community";
-import { coffeeCommand, occupied } from "../server/coffee";
+} from "../backend/src/auth";
+import { Repository } from "../backend/src/repository";
+import { communityCommand } from "../backend/src/community";
+import { coffeeCommand, occupied } from "../backend/src/coffee";
+import { projectWorkspace } from '../backend/src/snapshot-projection';
 
 const databases: Database[] = [];
 afterEach(() => {
@@ -44,6 +45,23 @@ const period = (hours: number) => ({
   location: "交流室",
 });
 describe("数据库与真实账号边界", () => {
+  it.each(['revoked', 'banned'])('教师失效 %s 后隐藏发现资料，但保留当事人预约历史', change => {
+    const {db, repo, a, b, teacher} = setup();
+    const profile = coffeeCommand(repo, teacher, 'coffee.profile', {nickname:'教师',bio:'',topics:'学习',location:'交流室'})!;
+    const slot = coffeeCommand(repo, teacher, 'coffee.slot.create', period(24))!;
+    const booking = coffeeCommand(repo, a, 'coffee.book', {slotId:slot.id,topic:'交流'})!;
+    if(change === 'revoked') db.prepare("UPDATE accounts SET roles='[]' WHERE id=?").run(teacher.id);
+    else db.prepare("UPDATE accounts SET status='banned' WHERE id=?").run(teacher.id);
+    const source = {repo,firstLoginOnly:false,studentNumber:null,sports:null,notifications:[],relations:[],audit:[],notificationBatches:[],coffeeHistory:()=>[],relationshipHistory:()=>[]};
+    const stranger = projectWorkspace(source,b);
+    expect(stranger.entities.some(e => [profile.id,slot.id,booking.id].includes(e.id))).toBe(false);
+    expect(stranger.people.some(p => p.id === teacher.id)).toBe(false);
+    const participant = projectWorkspace(source,a);
+    expect(participant.entities.find(e=>e.id===booking.id)?.data.status).toBe('confirmed');
+    expect(participant.entities.find(e=>e.id===slot.id)?.data.closed).toBe(true);
+    expect(participant.entities.find(e=>e.id===profile.id)?.data.enabled).toBe(false);
+    expect(repo.get(slot.id,'coffeeSlot').data.closed).not.toBe(true);
+  });
   it.each(["revoked", "banned"])(
     "教师资格失效 %s 后不能接受改期，但仍可拒绝并释放预留",
     (change) => {

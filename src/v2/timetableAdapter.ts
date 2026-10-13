@@ -1,4 +1,4 @@
-import { parseTimetableResponse, type TimetableLesson } from './timetableModel'
+import { parseTimetableResponse, type TimetableLesson } from '../../shared/v2/timetableModel'
 
 export type RecognitionStage = 'preparing' | 'recognizing' | 'organizing'
 // Configure a same-origin authenticated backend route; never put provider keys in VITE_*.

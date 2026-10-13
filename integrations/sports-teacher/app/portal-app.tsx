@@ -51,8 +51,6 @@ import {
   currentApiSessionEpoch,
   getMe,
   hasApiSession,
-  usesCookieSession,
-  restoreCookieSession,
   logoutApi,
   passwordLogin,
   getAccountSecurity,
@@ -77,7 +75,6 @@ import {
 } from "./teacher-tab-page-transition";
 import { PageHeader } from "./teacher-ui";
 import { PortalNotifications, type NotificationTarget } from "./portal-notifications";
-import { OwnAdministratorClosure } from "./own-administrator-closure";
 import { clearRosterReconciliationCache } from "./roster-reconciliation-api-service";
 import { clearStudentProfileCache } from "./use-student-profile";
 import type { AdminRoute, SystemMode } from "./admin-types";
@@ -613,7 +610,7 @@ export function PortalApp() {
 
     setApiRequestMode("real");
     setSessionRestoreError(null);
-    if (!hasApiSession() && !usesCookieSession()) {
+    if (!hasApiSession()) {
       setSessionRestorePhase("idle");
       return;
     }
@@ -621,10 +618,6 @@ export function PortalApp() {
     setSessionRestorePhase("restoring");
     const expectedEpoch = currentApiSessionEpoch();
     try {
-      if (usesCookieSession() && !(await restoreCookieSession())) {
-        if (sessionRestoreAttemptRef.current === attempt) setSessionRestorePhase("idle");
-        return;
-      }
       const security = await getAccountSecurity();
       setAdminKind(security.adminKind);
       if (sessionRestoreAttemptRef.current !== attempt || currentApiSessionEpoch() !== expectedEpoch) return;
@@ -2345,7 +2338,6 @@ function Modal({ notifications, onNotificationNavigate, onNotificationChanged, r
                 去修改
               </button>
             </section>
-            {role === "admin" && mode === "real" && <OwnAdministratorClosure locale={locale} onClosed={logout} />}
             <div className="modal-footer">
               <button className="secondary-button" type="button" onClick={close}>
                 取消

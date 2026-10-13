@@ -1,5 +1,5 @@
 import { sportsStudentHref } from './sportsEntry'
-import { mapSportsProgress, type SportsProgress, type SportsWorkspace } from './sportsProgress'
+import { mapSportsProgress, type SportsProgress, type SportsWorkspace } from '../../shared/v2/sportsProgress'
 
 interface Identity { me: { user?: { status?: string } }; student: { emailVerified: boolean } }
 export interface SportsRuntime {

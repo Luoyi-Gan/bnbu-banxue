@@ -1,6 +1,7 @@
-import type { RelationshipHistory } from '../v2/relationshipAdapter';
-import type { AlumniData } from "../v2/alumniModel";
-import type { SportsCompanion } from "./sportsCompanion";
+import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
+import type { AlumniData } from "../../shared/v2/alumniModel";
+import type { SportsCompanion, SportsSourceStatus } from "../../shared/live/sportsCompanion";
+import type { SportsDashboardData } from "./sportsDashboardModel";
 export interface LiveAccount {
   studentNumber?: string | null;
   id: string;
@@ -21,6 +22,9 @@ export interface LiveEntity {
 }
 export interface Workspace {
   sports?: SportsCompanion | null;
+  sportsStatus?: SportsSourceStatus;
+  /** Optional server-authorized read-only projection; never populated from companion entities. */
+  sportsDashboard?: SportsDashboardData | null;
   firstLoginOnly?: boolean;
   notificationBatches?: {
     id: string;
@@ -85,12 +89,10 @@ export async function api<T>(path: string, body?: unknown, signal?: AbortSignal)
       response.status,
       data?.message ?? "暂时无法连接后端，请检查本地服务。",
     );
-  if (!data || typeof data !== "object")
+  if (!data || typeof data !== "object" || Array.isArray(data))
     throw new ApiError(response.status, "数据接口尚未连接，请检查本地服务。");
   if (path === "/api/workspace" && (!data.account?.id || !Array.isArray(data.account?.roles)))
     throw new ApiError(response.status, "账号接口尚未返回有效身份，暂不展示业务数据。");
-  if (path === "/api/sports/workspace" && !data.firstLoginOnly && data.system?.mode !== "MAINTENANCE" && !data.identity?.data?.role)
-    throw new ApiError(response.status, "体育接口尚未返回有效身份，暂不展示统计。");
   return data as T;
 }
 export const loadWorkspace = () => api<Workspace>("/api/workspace");

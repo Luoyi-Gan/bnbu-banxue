@@ -1,4 +1,4 @@
-import type { Role } from './model'
+import type { Role } from '../../shared/v2/model'
 
 export function resolvePortalRole(session: unknown, legacy: unknown): Role {
   const valid = (role: unknown): role is Role => role === 'student' || role === 'teacher' || role === 'admin'

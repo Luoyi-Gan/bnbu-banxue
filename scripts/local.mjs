@@ -11,11 +11,11 @@ await build({
     emptyOutDir: true,
     minify: false,
     lib: {
-      entry: resolve("server/main.ts"),
+      entry: resolve("backend/src/main.ts"),
       formats: ["es"],
       fileName: () => "backend.mjs",
     },
-    rollupOptions: { external: [/^node:/, "sharp", "ffprobe-static"] },
+    rollupOptions: { external: [/^node:/] },
   },
 });
 const { startBackend } = await import(

@@ -1,4 +1,4 @@
-import type { SportsProgress } from './sportsProgress'
+import type { SportsProgress } from '../../shared/v2/sportsProgress'
 
 export interface SportsProgressSnapshot {
   phase: 'loading' | 'ready' | 'error'

@@ -1,0 +1,70 @@
+name: bnbu-postgres-local
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: bnbu
+      POSTGRES_USER: bnbu
+      POSTGRES_PASSWORD: ${BNBU_POSTGRES_PASSWORD:?Set BNBU_POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bnbu -d bnbu"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    init: true
+    command: ["node", "backend/dist/postgres.mjs"]
+    environment:
+      DATABASE_URL: postgresql://bnbu:${BNBU_POSTGRES_PASSWORD:?Set BNBU_POSTGRES_PASSWORD}@postgres:5432/bnbu
+      BNBU_APP_SURFACE: companion
+      BNBU_POSTGRES_SCHEMA: public
+      BNBU_API_HOST: 0.0.0.0
+      BNBU_API_PORT: 4175
+      BNBU_ALLOWED_ORIGINS: ${BNBU_ALLOWED_ORIGINS:-http://127.0.0.1:4188,http://localhost:4188}
+      BNBU_SECURE_COOKIES: ${BNBU_SECURE_COOKIES:-0}
+      BNBU_LOCAL_OUTBOX: ${BNBU_LOCAL_OUTBOX:-1}
+      BNBU_EMAIL_DELIVERY_URL: ${BNBU_EMAIL_DELIVERY_URL:-}
+      BNBU_EMAIL_DELIVERY_TOKEN: ${BNBU_EMAIL_DELIVERY_TOKEN:-}
+      BNBU_IDENTITY_VERIFICATION_URL: ${BNBU_IDENTITY_VERIFICATION_URL:-}
+      BNBU_IDENTITY_VERIFICATION_TOKEN: ${BNBU_IDENTITY_VERIFICATION_TOKEN:-}
+      BNBU_TIMETABLE_UPSTREAM: ${BNBU_TIMETABLE_UPSTREAM:-}
+      BNBU_TIMETABLE_TOKEN: ${BNBU_TIMETABLE_TOKEN:-}
+      BNBU_OBJECT_DIRECTORY: /app/data/objects
+      BNBU_OBJECT_STORE: ${BNBU_OBJECT_STORE:-local}
+      BNBU_COS_BUCKET: ${BNBU_COS_BUCKET:-}
+      BNBU_COS_REGION: ${BNBU_COS_REGION:-}
+      BNBU_COS_SECRET_ID: ${BNBU_COS_SECRET_ID:-}
+      BNBU_COS_SECRET_KEY: ${BNBU_COS_SECRET_KEY:-}
+      BNBU_COS_SESSION_TOKEN: ${BNBU_COS_SESSION_TOKEN:-}
+    volumes:
+      - object-data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4175/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_SPORTS_STUDENT_URL: ${BNBU_SPORTS_STUDENT_URL:-}
+        VITE_SPORTS_TEACHER_URL: ${BNBU_SPORTS_TEACHER_URL:-}
+    ports:
+      - "127.0.0.1:4188:8080"
+    volumes:
+      - ./frontend/nginx.postgres.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+volumes:
+  postgres-data:
+  object-data:

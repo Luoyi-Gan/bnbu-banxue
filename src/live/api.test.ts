@@ -1,26 +1,25 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { api, command } from "./api";
 afterEach(() => vi.unstubAllGlobals());
-it("体育账号读取传递取消信号且仍使用 GET，业务写入仍使用 POST", async () => {
-  const fetcher = vi.fn()
-    .mockResolvedValueOnce(new Response(JSON.stringify({ account: { id: "teacher", roles: ["teacher"] }, sports: null })))
-    .mockResolvedValueOnce(new Response(JSON.stringify({ data: { id: "saved" } })));
+it("读取请求保留取消信号，写入请求保留 POST 请求体", async () => {
+  const fetcher = vi.fn().mockResolvedValue(new Response('{"data":{"id":"saved"}}'));
   vi.stubGlobal("fetch", fetcher);
   const controller = new AbortController();
-  await api("/api/workspace", undefined, controller.signal);
-  expect(fetcher).toHaveBeenNthCalledWith(1, "/api/workspace", expect.objectContaining({ method: "GET", signal: controller.signal }));
+  await api("/api/example", undefined, controller.signal);
+  expect(fetcher).toHaveBeenLastCalledWith("/api/example", expect.objectContaining({method: "GET", signal: controller.signal}));
   expect(fetcher.mock.calls[0][1]).not.toHaveProperty("body");
-  await api("/api/commands", { action: "notification.read", input: { id: "notice" } });
-  expect(fetcher).toHaveBeenNthCalledWith(2, "/api/commands", expect.objectContaining({ method: "POST", body: JSON.stringify({ action: "notification.read", input: { id: "notice" } }) }));
+  fetcher.mockResolvedValue(new Response('{"data":{"id":"saved"}}'));
+  await api("/api/commands", {action: "notification.read"});
+  expect(fetcher).toHaveBeenLastCalledWith("/api/commands", expect.objectContaining({method: "POST", body: '{"action":"notification.read"}'}));
 });
-it("无有效账号响应拒绝显示，体育首次改密与维护响应保留门禁状态", async () => {
+it("拒绝无身份工作台和非对象响应，同时保留后端错误状态", async () => {
   vi.stubGlobal("fetch", vi.fn()
-    .mockResolvedValueOnce(new Response("{}"))
-    .mockResolvedValueOnce(new Response('{"firstLoginOnly":true}'))
-    .mockResolvedValueOnce(new Response('{"system":{"mode":"MAINTENANCE"}}')));
+    .mockResolvedValueOnce(new Response('{}'))
+    .mockResolvedValueOnce(new Response('[]'))
+    .mockResolvedValueOnce(new Response('{"message":"会话已过期"}', {status: 401})));
   await expect(api("/api/workspace")).rejects.toThrow("有效身份");
-  await expect(api("/api/sports/workspace")).resolves.toEqual({ firstLoginOnly: true });
-  await expect(api("/api/sports/workspace")).resolves.toEqual({ system: { mode: "MAINTENANCE" } });
+  await expect(api("/api/example")).rejects.toThrow("数据接口尚未连接");
+  await expect(api("/api/workspace")).rejects.toMatchObject({status: 401, message: "会话已过期"});
 });
 it("响应丢失后的重试复用幂等键，明确成功后新操作使用新键", async () => {
   const mock = vi

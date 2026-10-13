@@ -1,4 +1,4 @@
-import type { LocalEvent } from './model'
+import type { LocalEvent } from '../../shared/v2/model'
 
 export type ActivityItem = {
   id: string
@@ -12,6 +12,7 @@ export type ActivityItem = {
   capacity: number | null
   host: string
   image?: string
+  isDefaultCover?: boolean
   local?: LocalEvent
 }
 

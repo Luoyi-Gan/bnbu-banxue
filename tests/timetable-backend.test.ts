@@ -1,10 +1,10 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { createServer, type Server } from "node:http";
-import { createApiServer } from "../server/main";
-import { openDatabase } from "../server/database";
-import { createAccount, login } from "../server/auth";
-import { execute } from "../server/commands";
-import { Repository } from "../server/repository";
+import { createApiServer } from "../backend/src/main";
+import { openDatabase } from "../backend/src/database";
+import { createAccount, login } from "../backend/src/auth";
+import { execute } from "../backend/src/commands";
+import { Repository } from "../backend/src/repository";
 
 const cleanup: (() => Promise<void> | void)[] = [];
 afterEach(async () => {for (const close of cleanup.splice(0).reverse()) await close(); vi.unstubAllEnvs();});

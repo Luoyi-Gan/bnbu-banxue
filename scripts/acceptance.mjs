@@ -9,11 +9,11 @@ await build({
     outDir: ".runtime/tooling",
     minify: false,
     lib: {
-      entry: resolve("server/tooling.ts"),
+      entry: resolve("backend/src/tooling.ts"),
       formats: ["es"],
       fileName: () => "tooling.mjs",
     },
-    rollupOptions: { external: [/^node:/, "sharp", "ffprobe-static"] },
+    rollupOptions: { external: [/^node:/] },
   },
 });
 const tooling = await import(
@@ -27,6 +27,5 @@ if (process.argv[2] === "outbox")
     ),
   );
 else if (process.argv[2] === "prepare") tooling.prepareBrowserAcceptance();
-else if (process.argv[2] === "sports") tooling.prepareSportsAcceptance();
 else
-  throw new Error("用法：node scripts/acceptance.mjs prepare | sports | outbox <email>");
+  throw new Error("用法：node scripts/acceptance.mjs prepare | outbox <email>");
