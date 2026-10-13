@@ -1,0 +1,5 @@
+node_modules/
+out/
+capture-data/
+capture/explore/
+.DS_Store
