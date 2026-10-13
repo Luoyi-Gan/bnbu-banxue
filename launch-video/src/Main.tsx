@@ -24,7 +24,7 @@ const duck = (f: number) => {
   return 1 - 0.55 * d;
 };
 
-export const Main = ({ bgm, vo = true }: { bgm: boolean; vo?: boolean }) => (
+export const Main = ({ bgm, vo = false }: { bgm: boolean; vo?: boolean }) => (
   <AbsoluteFill style={{ background: '#030409' }}>
     <Backdrop />
     <Opening />

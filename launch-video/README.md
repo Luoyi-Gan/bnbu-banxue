@@ -6,9 +6,9 @@ Remotion 工程，1920×1080 / 30fps / 1680 帧，H.264。
 
 ```bash
 npm install
-npm run render          # out/banxue-launch.mp4（配乐 + 旁白 + 音效）
-npm run render:nobgm    # out/banxue-launch-nobgm.mp4（旁白 + 音效，便于另配音乐）
-npm run render:novo     # out/banxue-launch-novo.mp4（配乐 + 音效，无旁白）
+npm run render          # out/banxue-launch.mp4（配乐 + 音效，无旁白）
+npm run render:nobgm    # out/banxue-launch-nobgm.mp4（仅音效，便于另配音乐）
+npm run render:vo       # out/banxue-launch-vo.mp4（可选：配乐 + 女声旁白 + 音效）
 npm run dev             # Remotion Studio 预览与调整
 ```
 
@@ -22,7 +22,7 @@ npm run dev             # Remotion Studio 预览与调整
 - `src/lib/ui.tsx`：光标、字幕、背景、扫光；`src/lib/motion.ts`：缓动。
 - `audio/compose_music.py`：原创配乐合成脚本，按参考录屏的音乐结构设计（随画面放慢为 120/1.4 ≈ 85.7 BPM、A 小调、附点八分脉冲铺垫、14 秒进入四拍底鼓与律动和弦、尾段撤鼓回到脉冲），旋律为原创；numpy/scipy，固定随机种子，输出 `public/audio/bgm-original.wav`。
 - `audio/compose_sfx.py`：合成点击音效 `public/audio/sfx/ui-click.wav`。
-- `audio/narrate.py`：女声旁白（只读不出字幕），本地开源模型 Kokoro-82M v1.1-zh（Apache-2.0）合成，默认音色 `zf_078`，输出 `public/audio/vo/*.wav` 与时长表 `lines.json`；起读帧在 `src/timeline.ts` 的 `VO_AT`，旁白期间配乐自动压低。重新合成：
+- `audio/narrate.py`：可选女声旁白（默认不混入成片，只在 `render:vo` 中出现；只读不出字幕），本地开源模型 Kokoro-82M v1.1-zh（Apache-2.0）合成，默认音色 `zf_078`，输出 `public/audio/vo/*.wav` 与时长表 `lines.json`；起读帧在 `src/timeline.ts` 的 `VO_AT`，旁白期间配乐自动压低。重新合成：
   `uv venv --python 3.12 .venv-tts && VIRTUAL_ENV=.venv-tts uv pip install kokoro "misaki[zh]" soundfile` 后运行 `.venv-tts/bin/python audio/narrate.py [音色]`（首次运行从 Hugging Face 下载模型）。
 - `public/audio/sfx/`：点击、滑动、转场音效。
 
