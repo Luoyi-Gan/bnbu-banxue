@@ -358,7 +358,7 @@ export const TimetableDay = () => (
 );
 
 // ---------------- community & AI ----------------
-export const PostCard = ({ post, w = 230, saved = 0 }: { post: (typeof POSTS)[number]; w?: number; saved?: number }) => (
+export const PostCard = ({ post, w = 230, saved = 0, liked = 0 }: { post: (typeof POSTS)[number]; w?: number; saved?: number; liked?: number }) => (
   <div style={{ width: w }}>
     <div style={{ position: 'relative', height: w * 0.98, borderRadius: 14, background: '#F7F7F9', border: `1px solid ${P.line}`, padding: 16, boxSizing: 'border-box' }}>
       <Box x={w - 41.5} y={4.5} w={30} h={30} style={{ borderRadius: 15, background: 'rgba(255,255,255,0.94)', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${1 + 0.25 * Math.sin(Math.PI * saved)})` }}>
@@ -371,7 +371,10 @@ export const PostCard = ({ post, w = 230, saved = 0 }: { post: (typeof POSTS)[nu
     <Txt size={12.5} weight={700} style={{ marginTop: 10, overflow: 'hidden', textOverflow: 'ellipsis' }}>{post.title}</Txt>
     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
       <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Avatar ch={post.by[0]} size={18} style={{ background: '#F2F2F4', color: '#48484A' }} /><Txt size={11} color="#48484A">{post.by}</Txt></div>
-      <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}><Icon name="heart" size={13} color="#48484A" /><Txt size={11} color="#48484A">0</Txt></div>
+      <div style={{ display: 'flex', gap: 3, alignItems: 'center', transform: `scale(${1 + 0.35 * Math.sin(Math.PI * liked)})` }}>
+        <Icon name="heart" size={13} color={liked > 0.5 ? P.blue : '#48484A'} fill={liked > 0.5 ? P.blue : 'none'} />
+        <Roll from="0" to="1" p={liked} size={11} color={liked > 0.5 ? P.blue : '#48484A'} />
+      </div>
     </div>
   </div>
 );

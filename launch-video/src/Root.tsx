@@ -1,10 +1,18 @@
 import { Composition } from 'remotion';
+import { Film, FILM_FRAMES } from './film/Film';
 import { Main } from './Main';
-import { Sample, SAMPLE_FRAMES } from './sample/Sample';
 import { FPS, TOTAL_OUT } from './timeline';
 
 export const Root = () => (
   <>
+    <Composition
+      id="BanxueFilm"
+      component={Film}
+      durationInFrames={FILM_FRAMES}
+      fps={FPS}
+      width={1920}
+      height={1080}
+    />
     <Composition
       id="BanxueLaunch"
       component={Main}
@@ -13,15 +21,6 @@ export const Root = () => (
       width={1920}
       height={1080}
       defaultProps={{ bgm: true, vo: false }}
-    />
-    <Composition
-      id="BanxueSample"
-      component={Sample}
-      durationInFrames={SAMPLE_FRAMES}
-      fps={FPS}
-      width={1920}
-      height={1080}
-      defaultProps={{ bgm: true }}
     />
   </>
 );

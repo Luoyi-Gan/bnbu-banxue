@@ -34,6 +34,10 @@ const ICONS: Record<string, ReactNode> = {
   x: <path d="M18 6 6 18M6 6l12 12" />,
   search: <><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></>,
   message: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />,
+  send: <><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></>,
+  plus: <path d="M5 12h14M12 5v14" />,
+  imagePlus: <><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7" /><path d="M16 5h6M19 2v6" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></>,
+  chevronDown: <path d="m6 9 6 6 6-6" />,
 };
 
 export const Icon = ({ name, size = 16, color = 'currentColor', stroke = 2, fill = 'none', style }: { name: keyof typeof ICONS | string; size?: number; color?: string; stroke?: number; fill?: string; style?: CSSProperties }) => (
