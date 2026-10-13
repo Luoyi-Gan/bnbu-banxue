@@ -5,7 +5,7 @@ spiccato ostinato in 3+3+2 accents, low brass swells, taiko, electronic kick/cla
 hall. A minor, 85.7 BPM: one beat = 0.7 s = 21 film frames, so beat n sits on frame 21n.
 
 Beat map against the film (scene starts in frames / 21):
-  0-10   opening: module chimes 0.5-3, fold hit 5, wordmark pad
+  0-10   opening: icon hit 0.5 + wordmark pad, icon slides left 3, line runs out 4, module chimes 4.5-7
   10-20  活动: ostinato enters filtered, detail read on the build, breath 19.5, drop 20 (标记参与)
   20-44  社区: drop A, hook from 28
   44-59  找搭子: drop B with arp
@@ -334,13 +334,16 @@ def drop_drums(b0, b1, taiko_g=0.5, busy=False):
 
 # ---------------- 0-10: opening ----------------
 pads(0, 10, 0.55, 1800, low=True)
-place(bowed(81, 9 * BEAT, 2.0, 1.0, 5000, 5), 1, 0.25, 0.4)
+place(taiko(52, 2.0), 0.5, 0.9, 0, "drums")
+place(boom(), 0.5, 0.45, 0, "fx")
+place(cymbal(2.4), 0.5, 0.6, 0, "drums")
+place(bell(88, 2.4), 0.5, 0.9, 0, "synth")
+place(bowed(81, 8 * BEAT, 1.2, 1.0, 5000, 5), 1, 0.25, 0.4)
+place(gliss(57, 64, 0.9), 3, 0.6, -0.3)
 for i, m in enumerate([69, 72, 76, 79, 81, 84]):
-    place(bell(m), 0.5 + i * 0.5, 0.9, -0.45 + 0.18 * i, "synth")
-place(taiko(52, 2.0), 5, 0.9, 0, "drums")
-place(boom(), 5, 0.45, 0, "fx")
-place(cymbal(2.4), 5, 0.6, 0, "drums")
-place(bell(88, 2.4), 5.6, 0.9, 0, "synth")
+    place(bell(m), 4.5 + i * 0.5, 0.9, -0.6 + 0.24 * i, "synth")
+for e in range(8, 20):
+    place(hat(), e / 2 + 0.5, 0.25 + 0.02 * (e - 8), 0.3, "drums")
 place(gliss(57, 69, 1.4), 8, 0.9, 0.0)
 place(riser(1), 9, 0.4, bus="fx")
 

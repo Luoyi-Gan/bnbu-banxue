@@ -8,7 +8,6 @@ import { ICON_PULSE, iconPoint, iconStroke, Line, LINE_W, type Pt, resample, upT
 
 const B = (n: number) => Math.round(n * 21);
 const LINE_Y = 540;
-const CHIMES = [0.5, 1, 1.5, 2, 2.5, 3].map(B);
 const TIP = 74;
 const CARD_S = 1.5;
 
@@ -56,15 +55,6 @@ const Wordmark = ({ f, at, tagline }: { f: number; at: number; tagline: string }
   </div>
 );
 
-const ModuleRow = ({ f, at }: { f: number; at: number }) => (
-  <div style={{ position: 'absolute', left: 0, right: 0, top: 830, display: 'flex', justifyContent: 'center', gap: 18, fontFamily: P.font, fontSize: 30, fontWeight: 500, color: 'rgba(205,218,255,0.92)', letterSpacing: '0.06em' }}>
-    {MODULES.map((m, i) => {
-      const p = prog(f, at + i * 2, 10);
-      return <span key={m} style={{ display: 'inline-flex', alignItems: 'center', gap: 18, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>{i > 0 && <span style={{ width: 6, height: 6, borderRadius: 3, background: '#6E98FF' }} />}{m}</span>;
-    })}
-  </div>
-);
-
 const Icon3 = ({ f, at, id }: { f: number; at: number; id: string }) => {
   const square = prog(f, at, 14, LAND);
   const ring = prog(f, at + 3, 18, EASE_OUT);
@@ -82,55 +72,71 @@ const Icon3 = ({ f, at, id }: { f: number; at: number; id: string }) => {
 
 const morph = (fold: number): Pt[] => LONG_R.map((p, i): Pt => [mix(p[0], ICON_R[i][0], fold), mix(p[1], ICON_R[i][1], fold)]);
 
-// 0–7 s: the pulse runs past the six modules, folds into the icon, then extends out of it.
+// Opening: the icon and wordmark first; the icon slides left and its pulse line runs out past the six modules.
+const ICON_AT = B(0.5);
+const MOVE = B(3);
+const RUN = B(4);
+const OPEN_CHIMES = [4.5, 5, 5.5, 6, 6.5, 7].map(B);
+const SMALL_S = 120;
+// Small icon placed so the end of its pulse sits exactly on the feature line.
+const SMALL = { x: 120, y: LINE_Y + 0.0394 * SMALL_S, s: SMALL_S };
+const openX = (i: number) => 430 + i * 248;
+const smallEnd = iconPoint(SMALL.x, SMALL.y, SMALL.s)(ICON_PULSE[ICON_PULSE.length - 1]);
+const RUN_LINE: Pt[] = [[smallEnd[0], LINE_Y]];
+FEATS.forEach((ft, i) => {
+  const x = openX(i), dir = ft.up ? -1 : 1;
+  RUN_LINE.push([x - 42, LINE_Y], [x - 20, LINE_Y - dir * 12], [x, LINE_Y + dir * TIP], [x + 18, LINE_Y - dir * 20], [x + 36, LINE_Y]);
+});
+RUN_LINE.push([2000, LINE_Y]);
+
 export const OPENING_FRAMES = 212;
 export const Opening = () => {
   const f = useCurrentFrame();
-  const hx = keys(f, [[2, -80], ...FEATS.map((_, i): [number, number] => [CHIMES[i], featX(i)]), [86, 2000]], (t) => t);
-  const fold = prog(f, B(5), 18, EASE_IN_OUT);
-  const ext = prog(f, B(9) - 6, 14, EASE_IN_OUT);
+  const square = prog(f, ICON_AT, 14, LAND);
+  const ring = prog(f, ICON_AT + 3, 18, EASE_OUT);
+  const mv = prog(f, MOVE, 20, EASE_IN_OUT);
+  const icon = { x: mix(ICON.x, SMALL.x, mv), y: mix(ICON.y, SMALL.y, mv), s: mix(ICON.s, SMALL.s, mv) };
+  const hx = keys(f, [[RUN, smallEnd[0]], ...FEATS.map((_, i): [number, number] => [OPEN_CHIMES[i], openX(i)]), [B(7.6), 2000]], (t) => t);
   const pan = prog(f, B(9) + 6, 18, (t) => t * t);
-  const end = iconPt(ICON_PULSE[ICON_PULSE.length - 1]);
-  const extHead = mix(end[0], 2000, ext) + pan * 800;
   return (
     <AbsoluteFill style={{ transform: `translateX(${-pan * 900}px)`, opacity: 1 - prog(f, 204, 8) }}>
       {FEATS.map((ft, i) => {
-        const at = CHIMES[i];
+        const at = OPEN_CHIMES[i];
         const pop = prog(f, at, 12, LAND);
         if (pop <= 0) return null;
-        const g = prog(f, B(5) - 2, 14, (t) => t * t);
-        const x0 = featX(i), cy = featCardY(ft);
-        const x = mix(x0, ICON.x, g), y = mix(cy, ICON.y, g);
-        const s = CARD_S * mix(1, 0.1, g) * mix(0.6, 1, pop);
-        const drift = Math.sin((f + i * 23) / 26) * 5 * (1 - g);
+        const x = openX(i), cy = featCardY(ft);
+        const drift = Math.sin((f + i * 23) / 26) * 5;
         const tipY = LINE_Y + (ft.up ? -TIP : TIP);
         const tickTo = ft.up ? cy + (ft.h * CARD_S) / 2 + 6 : cy - (ft.h * CARD_S) / 2 - 6;
-        const tick = prog(f, at, 8, EASE_OUT) * (1 - prog(f, B(5) - 4, 6));
+        const tick = prog(f, at, 8, EASE_OUT);
         const labelY = ft.up ? cy - (ft.h * CARD_S) / 2 - 58 : cy + (ft.h * CARD_S) / 2 + 18;
+        const lab = prog(f, at + 2, 12);
         return (
-          <div key={ft.name} style={{ opacity: Math.min(1, pop * 1.5) * (1 - prog(f, B(5) + 8, 6)) }}>
-            {tick > 0 && <Line id={`tick-${i}`} w={1.4} pts={[[x0, tipY], [x0, mix(tipY, tickTo, tick)]]} />}
-            <div style={{ position: 'absolute', left: x - ft.w / 2, top: y + drift - ft.h / 2, width: ft.w, height: ft.h, transform: `scale(${s})` }}>
+          <div key={ft.name} style={{ opacity: Math.min(1, pop * 1.5) }}>
+            <Line id={`tick-${i}`} w={1.4} pts={[[x, tipY], [x, mix(tipY, tickTo, tick)]]} />
+            <div style={{ position: 'absolute', left: x - ft.w / 2, top: cy + drift - ft.h / 2, width: ft.w, height: ft.h, transform: `scale(${CARD_S * mix(0.6, 1, pop)})` }}>
               <div style={{ position: 'absolute', inset: 0, borderRadius: 14, background: P.surface, boxShadow: '0 0 0 1px rgba(170,195,255,0.55), 0 0 36px rgba(61,123,255,0.45), 0 18px 40px rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{ft.node(f, at)}</div>
             </div>
-            <div style={{ position: 'absolute', left: x0 - 200, width: 400, top: labelY + drift, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, opacity: prog(f, at + 2, 12) * (1 - g), transform: `translateY(${(1 - prog(f, at + 2, 12)) * (ft.up ? 12 : -12)}px)`, fontFamily: P.font, fontSize: 36, fontWeight: 600, color: '#fff', letterSpacing: '0.06em', textShadow: '0 0 22px rgba(61,123,255,0.55)' }}>
+            <div style={{ position: 'absolute', left: x - 200, width: 400, top: labelY + drift, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, opacity: lab, transform: `translateY(${(1 - lab) * (ft.up ? 12 : -12)}px)`, fontFamily: P.font, fontSize: 36, fontWeight: 600, color: '#fff', letterSpacing: '0.06em', textShadow: '0 0 22px rgba(61,123,255,0.55)' }}>
               <Icon name={ft.icon} size={28} color="#9DB8FF" stroke={2.2} />{ft.name}
             </div>
           </div>
         );
       })}
-      {f >= 118 && <Icon3 f={f} at={118} id="open" />}
-      {f < 130 && <Line id="o-line" pts={fold > 0 ? morph(fold) : upToX(LONG, hx)} w={mix(LINE_W, ICON_W, fold)} head={fold === 0 && f < 86} opacity={1 - prog(f, 124, 6)} />}
-      {ext > 0 && (
-        <>
-          <svg width={1} height={1} style={{ position: 'absolute', left: 0, top: 0, overflow: 'visible' }}>
-            <polygon points={`${end[0] - 4},${end[1] - ICON_W / 2} ${end[0] + 70},${end[1] - LINE_W / 2} ${end[0] + 70},${end[1] + LINE_W / 2} ${end[0] - 4},${end[1] + ICON_W / 2}`} fill="#F5F8FF" />
-          </svg>
-          <Line id="o-ext" pts={[[end[0] + 60, end[1]], [extHead, end[1]]]} head />
-        </>
+      {f >= ICON_AT && (
+        <div style={{ position: 'absolute', left: icon.x - icon.s / 2, top: icon.y - icon.s / 2, width: icon.s, height: icon.s, transform: `scale(${mix(0.4, 1, square)})`, opacity: prog(f, ICON_AT, 4) }}>
+          <div style={{ position: 'absolute', left: 0, top: 0, transformOrigin: '0 0', transform: `scale(${icon.s / ICON.s})` }}>
+            <BrandMark size={ICON.s} draw={1} glow={Math.max(1 - prog(f, ICON_AT + 10, 30), prog(f, RUN - 6, 8) * 0.6)} id="open" />
+          </div>
+        </div>
       )}
-      <Wordmark f={f} at={126} tagline="你的校园，一处展开" />
-      <ModuleRow f={f} at={144} />
+      {ring > 0 && ring < 1 && (
+        <div style={{ position: 'absolute', left: ICON.x - 460 * ring, top: ICON.y - 460 * ring, width: 920 * ring, height: 920 * ring, borderRadius: '50%', border: `1.5px solid rgba(160,190,255,${0.7 * (1 - ring)})`, boxShadow: `0 0 50px rgba(61,123,255,${0.5 * (1 - ring)})` }} />
+      )}
+      {f > RUN && <Line id="o-run" pts={upToX(RUN_LINE, hx)} head={hx < 2000} />}
+      <div style={{ opacity: 1 - prog(f, MOVE - 4, 10) }}>
+        <Wordmark f={f} at={ICON_AT + 8} tagline="你的校园，一处展开" />
+      </div>
     </AbsoluteFill>
   );
 };
