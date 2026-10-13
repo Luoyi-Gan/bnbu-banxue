@@ -13,13 +13,14 @@ npm run dev             # Remotion Studio 预览与调整
 
 ## 结构
 
-- `src/timeline.ts`：唯一的时间来源。120 BPM，每拍 15 帧；镜头区间、点击帧、字幕、音效表都在这里。
+- `src/timeline.ts`：唯一的时间来源。画面网格每拍 15 帧，配乐 180 BPM（每 0.5 秒 = 1.5 个音乐拍，整秒切点都落在拍上）；镜头区间、点击帧、字幕、功能特写机位（`FOCUS`）、音效表都在这里。
 - `src/kit/base.tsx`：产品设计令牌（`src/v2/studentTheme.css`）与基础组件：图标、按钮、筛选 Chip、标签、卡片、头像。
 - `src/kit/product.tsx`：用代码重建的产品界面组件（活动卡片与详情、队伍卡片与详情、队伍消息、Coffee Chat 时段、校友卡片与申请、首页近期安排、课表、社区帖子）及其演示数据。
 - `src/kit/fx.tsx`：2.5D 摄像机、发光窗口、矢量品牌图标（脉搏线可逐笔描出）、粒子爆点、逐字输入。
 - `src/motion/`：`Brand.tsx`（开场与收尾）、`Discover.tsx`（首页、活动）、`Connect.tsx`（找搭子）、`Mentors.tsx`（Coffee Chat、校友）、`Gather.tsx`（近期安排汇入、社区与校园问答）。
 - `src/lib/ui.tsx`：光标、字幕、背景、扫光；`src/lib/motion.ts`：缓动。
-- `audio/compose_music.py`：原创配乐合成脚本（numpy/scipy，固定随机种子），输出 `public/audio/bgm-original.wav`。
+- `audio/compose_music.py`：原创 Drum & Bass 配乐合成脚本（numpy/scipy，固定随机种子），输出 `public/audio/bgm-original.wav`。
+- `audio/compose_sfx.py`：合成点击音效 `public/audio/sfx/ui-click.wav`。
 - `public/audio/sfx/`：点击、滑动、转场音效。
 
 ## 素材来源与数据说明

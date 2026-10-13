@@ -1,4 +1,5 @@
-// Single source of truth for timing. 120 BPM at 30 fps: one beat = 15 frames.
+// Single source of truth for timing. Visual grid: one beat = 15 frames (0.5 s).
+// The score runs at 180 BPM, so each grid beat is 1.5 musical beats and every whole second is on a beat.
 export const FPS = 30;
 export const BEAT = 15;
 export const beatF = (n: number) => Math.round(n * BEAT);
@@ -51,7 +52,38 @@ export const CAPTIONS = [
   { id: 'knowledge', text: '校园问答，附资料来源', from: beatF(63), to: beatF(70) - 4 },
 ] as const;
 
-const click = (from: number) => ({ from: from - 1, src: 'sfx/switch-click-quick.mp3', volume: 0.42, duration: 18 });
+export const SUBCAPTIONS = [
+  { text: '队长同意后加入队伍', from: MOMENTS.teamApproved - 8, to: CLICKS.teamEnter },
+  { text: '等待校友本人确认', from: CLICKS.alumniRequest + 8, to: SHOTS.alumni.from + SHOTS.alumni.duration - 4 },
+] as const;
+
+// Close-up camera over all product scenes (captions stay outside it).
+// Each key: [frame, zoom, px, py, sx, sy] puts stage point (px, py) at screen point (sx, sy).
+export const FOCUS: [number, number, number, number, number, number][] = [
+  [212, 1, 960, 540, 960, 540],
+  [226, 1.25, 1200, 420, 960, 500],
+  [250, 1.25, 1200, 420, 960, 500],
+  [268, 1.3, 1440, 531, 1210, 540],
+  [296, 1.3, 1440, 531, 1210, 540],
+  [324, 1.3, 1180, 470, 1060, 480],
+  [372, 1.3, 1180, 470, 1060, 480],
+  [390, 1.35, 1504, 460, 1180, 470],
+  [462, 1.35, 1504, 460, 1180, 470],
+  [478, 1.25, 1120, 480, 1100, 500],
+  [500, 1.25, 1120, 480, 1100, 500],
+  [520, 1, 960, 540, 960, 540],
+  [544, 1.2, 1289, 484, 1220, 460],
+  [606, 1.2, 1289, 484, 1220, 460],
+  [622, 1.3, 1250, 420, 1160, 450],
+  [706, 1.3, 1250, 420, 1160, 450],
+  [722, 1, 960, 540, 960, 540],
+  [968, 1, 960, 540, 960, 540],
+  [986, 1.25, 1207, 455, 1100, 480],
+  [1040, 1.25, 1207, 455, 1100, 480],
+  [1056, 1, 960, 540, 960, 540],
+];
+
+const click = (from: number) => ({ from: from - 1, src: 'sfx/ui-click.wav', volume: 0.5, duration: 12 });
 
 export const SFX: { from: number; src: string; volume: number; duration?: number; note: string }[] = [
   { from: beatF(5) - 2, src: 'sfx/sparkle-touch.mp3', volume: 0.3, duration: 50, note: 'icon forms from gathered cards' },

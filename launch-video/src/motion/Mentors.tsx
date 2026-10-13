@@ -2,7 +2,7 @@ import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { Avatar, Box, Btn, Icon, Kicker, P, Tag, Txt } from '../kit/base';
 import { Burst, typed, Win } from '../kit/fx';
 import { AlumniBooking, AlumniCard, Slot, SLOTS, TeacherCard } from '../kit/product';
-import { Cursor, pathAt, SubCaption, Sweep } from '../lib/ui';
+import { Cursor, pathAt, Sweep } from '../lib/ui';
 import { EASE_IN_OUT, EASE_OUT, LAND, mix, prog } from '../lib/motion';
 import { CLICKS, MOMENTS, SHOTS } from '../timeline';
 
@@ -94,7 +94,6 @@ export const Alumni = () => {
         const w = 108 * BK.k * (1 + q * 0.5), h = 38 * BK.k * (1 + q * 0.9);
         return <div key={f} style={{ position: 'absolute', left: btnC.x - w / 2, top: btnC.y - h / 2, width: w, height: h, borderRadius: 16, border: `2px solid rgba(160,185,235,${0.9 * (1 - q)})` }} />;
       })}
-      <SubCaption text="等待校友本人确认" from={CLICKS.alumniRequest + 8} to={716} />
       <Cursor x={cur.x} y={cur.y} clicks={[CLICKS.alumniOpen, CLICKS.alumniRequest]} opacity={prog(frame, 618, 5) * (1 - prog(frame, 696, 8))} />
     </AbsoluteFill>
   );

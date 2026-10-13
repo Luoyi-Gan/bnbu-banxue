@@ -2,7 +2,7 @@ import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { Avatar, Box, Chip, Icon, P, Txt } from '../kit/base';
 import { Burst, Cam, camToScreen, type CamState, Win } from '../kit/fx';
 import { actById, ChatPanel, Cover, Roll, TeamCard, TeamDetail, TEAMS } from '../kit/product';
-import { Cursor, pathAt, SubCaption } from '../lib/ui';
+import { Cursor, pathAt } from '../lib/ui';
 import { EASE_IN_OUT, EASE_OUT, LAND, mix, prog } from '../lib/motion';
 import { CLICKS, MOMENTS, SHOTS } from '../timeline';
 import { DETAIL } from './Discover';
@@ -96,7 +96,6 @@ export const Teams = () => {
         </div>
       )}
       <Burst frame={frame} at={MOMENTS.chatMessage + 3} x={CH.x + 300 * CH.k} y={CH.y + (74 + 18 + 176 + 36) * CH.k} color="#7FA6FF" r={60} n={8} />
-      <SubCaption text="队长同意后加入队伍" from={ap - 8} to={CLICKS.teamEnter} />
       <Cursor x={cur.x} y={cur.y} clicks={[CLICKS.teamFilter, CLICKS.teamOpen, CLICKS.teamApply, CLICKS.teamEnter]} opacity={prog(frame, 328, 6) * (1 - prog(frame, CLICKS.teamEnter + 6, 8))} />
     </AbsoluteFill>
   );
