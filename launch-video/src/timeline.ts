@@ -88,7 +88,7 @@ const click = (from: number) => ({ from: from - 1, src: 'sfx/ui-click.wav', volu
 export const SFX: { from: number; src: string; volume: number; duration?: number; note: string }[] = [
   { from: beatF(5) - 2, src: 'sfx/sparkle-touch.mp3', volume: 0.3, duration: 50, note: 'icon forms from gathered cards' },
   { from: beatF(8) - 4, src: 'sfx/transition-soft.mp3', volume: 0.38, note: 'home window enters' },
-  { from: MOMENTS.pushThrough, src: 'sfx/whoosh-big.mp3', volume: 0.42, note: 'camera passes through the activity row' },
+  { from: MOMENTS.pushThrough, src: 'sfx/whoosh-big.mp3', volume: 0.3, note: 'camera passes through the activity row' },
   { ...click(CLICKS.actFilter), note: 'click 学校邮件活动 filter' },
   { ...click(CLICKS.actOpen), note: 'click AI 创作工作坊 card' },
   { from: CLICKS.actOpen + 2, src: 'sfx/swoosh-quick.mp3', volume: 0.26, note: 'detail drawer slides in' },
@@ -113,7 +113,7 @@ export const SFX: { from: number; src: string; volume: number; duration?: number
   ...MOMENTS.scheduleLand.map((f, i) => ({ from: f - 3, src: i % 2 ? 'sfx/switch-tap.mp3' : 'sfx/swoosh-quick.mp3', volume: [0.3, 0.26, 0.24, 0.22][i], duration: 18, note: `mini card ${i + 1} lands in 近期安排` })),
   { from: SHOTS.knowledge.from - 4, src: 'sfx/whoosh-fast.mp3', volume: 0.34, note: 'community close-up' },
   { ...click(CLICKS.aiSend), note: 'send question' },
-  { from: SHOTS.finale.from, src: 'sfx/whoosh-big.mp3', volume: 0.4, note: 'windows gather' },
-  { from: MOMENTS.finalHit - 2, src: 'sfx/impact-deep-whoosh.mp3', volume: 0.5, note: 'windows collapse into app icon' },
+  { from: SHOTS.finale.from, src: 'sfx/whoosh-big.mp3', volume: 0.28, note: 'windows gather' },
+  { from: MOMENTS.finalHit - 2, src: 'sfx/impact-deep-whoosh.mp3', volume: 0.3, note: 'windows collapse into app icon' },
   { from: MOMENTS.finalHit + 14, src: 'sfx/sparkle.mp3', volume: 0.32, note: 'wordmark shimmer tail' },
 ];

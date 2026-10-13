@@ -19,7 +19,7 @@ npm run dev             # Remotion Studio 预览与调整
 - `src/kit/fx.tsx`：2.5D 摄像机、发光窗口、矢量品牌图标（脉搏线可逐笔描出）、粒子爆点、逐字输入。
 - `src/motion/`：`Brand.tsx`（开场与收尾）、`Discover.tsx`（首页、活动）、`Connect.tsx`（找搭子）、`Mentors.tsx`（Coffee Chat、校友）、`Gather.tsx`（近期安排汇入、社区与校园问答）。
 - `src/lib/ui.tsx`：光标、字幕、背景、扫光；`src/lib/motion.ts`：缓动。
-- `audio/compose_music.py`：原创 Drum & Bass 配乐合成脚本（numpy/scipy，固定随机种子），输出 `public/audio/bgm-original.wav`。
+- `audio/compose_music.py`：原创配乐合成脚本（轻快律动：软底鼓、边击与拍手、沙锤、正弦低音、马林巴琶音）（numpy/scipy，固定随机种子），输出 `public/audio/bgm-original.wav`。
 - `audio/compose_sfx.py`：合成点击音效 `public/audio/sfx/ui-click.wav`。
 - `public/audio/sfx/`：点击、滑动、转场音效。
 

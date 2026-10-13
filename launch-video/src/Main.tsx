@@ -36,7 +36,7 @@ export const Main = ({ bgm }: { bgm: boolean }) => (
     {bgm && (
       <Audio
         src={staticFile('audio/bgm-original.wav')}
-        volume={(f) => interpolate(f, [0, 6, TOTAL - 4, TOTAL], [0, 0.6, 0.6, 0.55], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })}
+        volume={(f) => interpolate(f, [0, 6, TOTAL - 4, TOTAL], [0, 0.75, 0.75, 0.7], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })}
       />
     )}
     {SFX.map((s, i) => (
