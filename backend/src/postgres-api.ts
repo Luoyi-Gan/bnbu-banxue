@@ -9,6 +9,7 @@ import { executePostgres } from './storage/postgres-commands';
 import { postgresCommunityView } from './storage/postgres-community-view';
 import { postgresWorkspace } from './storage/postgres-workspace';
 import { postgresStudentSearch } from './storage/postgres-student-search';
+import { postgresPersonHover } from './storage/postgres-person-hover';
 import { checkSchoolIdentity } from './identity';
 import { recognize } from './timetable';
 import { student } from './community';
@@ -38,6 +39,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(request.method==='GET' && pathname==='/api/accounts/admin-email') return send(response,200,await postgresAdminEmailStatus(db,cookieToken(request) ?? ''));
       if(request.method==='GET' && pathname==='/api/accounts/administrators') return send(response,200,await postgresAdministratorDirectory(db,cookieToken(request) ?? ''));
       if (request.method==='GET' && pathname==='/api/students/search') return send(response,200,await postgresStudentSearch(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('number') ?? ''));
+      const hoverMatch=request.method==='GET' && /^\/api\/people\/([^/]+)\/hover$/.exec(pathname);
+      if(hoverMatch) return send(response,200,await postgresPersonHover(db,cookieToken(request) ?? '',decodeURIComponent(hoverMatch[1]),new URL(request.url!,'http://localhost').searchParams.get('number') ?? undefined));
       if (request.method === 'GET' && pathname === '/api/workspace') return send(response,200,await postgresWorkspace(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityView(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/health') {

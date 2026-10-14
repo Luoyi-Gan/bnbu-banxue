@@ -4,6 +4,7 @@ import { strings } from './repository';
 import { has } from './community';
 import { readAlumni } from './alumni';
 import { bookingStatus } from '../../shared/v2/alumniPolicy';
+import { projectDisplayPeople } from './display-people';
 import type { SportsCompanion, SportsSourceStatus } from '../../shared/live/sportsCompanion';
 import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
 export interface SnapshotSource {
@@ -193,26 +194,8 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
     ...entities.map((e) => e.ownerId),
     ...memberRooms.flatMap((r) => strings(r.data.members)),
     ...scopedAlumni.profiles.map((profile) => profile.owner),
-  ]);
-  const hiddenProfiles = new Set(repo.all("preferences").filter(p => p.data.profilePreview === false).map(p => p.ownerId));
-  const displayProfiles = new Map(repo.all("profile").map(p => [p.ownerId, p.data]));
-  const people = repo
-    .people()
-    .filter(
-      (p) =>
-        operate || has(actor, "superadmin") || visiblePeople.has(String(p.id)),
-    )
-    .map((p) => {
-      const canPreview = p.id === actor.id || !hiddenProfiles.has(p.id) || has(actor, "teacher", "reviewer", "operator", "superadmin");
-      const profile = canPreview ? displayProfiles.get(p.id) : undefined;
-      const display = {
-        nickname: typeof profile?.nickname === "string" ? profile.nickname : undefined,
-        avatar: typeof profile?.avatar === "string" ? profile.avatar : undefined,
-      };
-      return has(actor, "superadmin")
-        ? {...p, ...display}
-        : { id: p.id, name: p.name, organization: canPreview ? p.organization : "", ...display };
-    });
+  ].filter((id):id is string=>typeof id==='string'));
+  const people=projectDisplayPeople(actor,repo.people(),visiblePeople,repo.all('preferences'),repo.all('profile'));
   return {
     account: {...actor, studentNumber:source.studentNumber},
     sports: source.sports,

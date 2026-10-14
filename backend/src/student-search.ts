@@ -30,6 +30,6 @@ export function studentSearchResult(person:Account,prefs:Fields|undefined,proofs
   if (!recordedStudentNumber(person,proofs) || prefs?.searchable===false) return {students:[]};
   const shown=prefs?.profilePreview===false ? undefined : profile;
   return {students:[{id:person.id,name:person.name,organization:prefs?.profilePreview===false ? '' : person.organization,
-    nickname:typeof shown?.nickname==='string' ? shown.nickname : undefined,
-    avatar:typeof shown?.avatar==='string' ? shown.avatar : undefined}]};
+    ...(typeof shown?.nickname==='string' ? {nickname:shown.nickname} : {}),
+    ...(typeof shown?.avatar==='string' ? {avatar:shown.avatar} : {})}]};
 }
