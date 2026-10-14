@@ -215,6 +215,10 @@
 .live-avatar {
   width: 72px;
   height: 72px;
+  display: grid;
+  place-items: center;
+  background: #e9f1ff;
+  font-size: 28px;
   object-fit: cover;
   border-radius: 50%;
 }

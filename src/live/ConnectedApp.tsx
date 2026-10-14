@@ -38,6 +38,7 @@ import { SportsPortal } from "./SportsPortal";
 import { SportsProgressCard } from "../v2/SportsProgressCard";
 import { MailResolution } from "./MailResolution";
 import { Modal, PageHeading } from "../v2/ui";
+import { DisplayAvatar } from "../v2/DisplayAvatar";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import "../v2/v2.css";
 import "../v2/aRedesign.css";
@@ -1439,13 +1440,7 @@ export function ConnectedApp() {
           {module === "profile" && (
             <>
               <section className="v2-panel live-card">
-                {myProfile?.data.avatar ? (
-                  <img
-                    className="live-avatar"
-                    src={String(myProfile.data.avatar)}
-                    alt="我的头像"
-                  />
-                ) : null}
+                <DisplayAvatar className="live-avatar" name={String(myProfile?.data.nickname ?? me.name)} avatar={String(myProfile?.data.avatar ?? "")} personId={me.id}/>
                 <h2>{String(myProfile?.data.nickname ?? me.name)}</h2>
                 <p>学校姓名：{me.name}</p>
                 <p>

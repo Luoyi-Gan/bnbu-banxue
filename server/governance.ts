@@ -217,6 +217,13 @@ export function governanceCommand(
     const previous = repo.all("preferences").find(p => p.ownerId === actor.id);
     return previous ? repo.save(previous, {profilePreview: input.enabled}) : repo.create("preferences", actor.id, {profilePreview: input.enabled});
   }
+  if (action === "preferences.hover") {
+    student(actor);
+    const key = enumField(input, "key", ["hoverRecentTeams", "hoverActiveTeams", "hoverActivities"]);
+    demand(typeof input.enabled === "boolean", "悬浮资料开关必须为布尔值。");
+    const previous = repo.all("preferences").find(p => p.ownerId === actor.id);
+    return previous ? repo.save(previous, {[key]: input.enabled}) : repo.create("preferences", actor.id, {[key]: input.enabled});
+  }
   if (action === "profile.save") {
     const avatar = textField(input, "avatar", 7_000_000, true);
     demand(

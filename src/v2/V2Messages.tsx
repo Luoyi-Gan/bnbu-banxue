@@ -42,7 +42,7 @@ function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened
     }}>
       <span className="inbox-history-caption">会话记录</span>
       {conversation.messages.map(message => <div className={`inbox-message${message.mine ? ' is-mine' : ''}`} key={message.id}>
-        {!message.mine && <DisplayAvatar className="inbox-person-avatar" name={message.from} avatar={message.avatar}/>}
+        {!message.mine && <DisplayAvatar className="inbox-person-avatar" name={message.from} avatar={message.avatar} personId={message.personId}/>}
         <div className="inbox-message-content"><div className="inbox-message-meta"><span>{message.mine ? '我' : message.from}</span><time>{message.time}</time></div><p>{message.body}</p></div>
       </div>)}
       {!conversation.messages.length && <Empty icon={MessageCircle} title="开始一段新对话" description="向一起参与的同学打个招呼吧。"/>}

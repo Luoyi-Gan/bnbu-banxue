@@ -94,7 +94,7 @@ export function StudentSearch() {
     <div ref={panelRef} className="v2-student-search-panel" aria-hidden={!open} inert={!open}>
       <div className="v2-student-search-panel-inner">
         <div className="v2-student-search-heading"><strong>{normalized ? '搜索结果' : '推荐看看'}</strong><small>{normalized ? `${results.length + students.length} 条匹配` : '校园里正在发生'}</small></div>
-        {students.map(person => <div className="v2-student-search-result" key={person.id}><span className="v2-student-search-art">{person.avatar ? <DisplayAvatar className="v2-search-person-avatar" name={person.nickname || person.name} avatar={person.avatar}/> : <UsersRound size={20}/>}</span><span className="v2-student-search-result-copy"><strong>{person.nickname || person.name}</strong><small>{person.organization || '学生'}</small></span></div>)}
+        {students.map(person => <div className="v2-student-search-result" key={person.id}><span className="v2-student-search-art"><DisplayAvatar className="v2-search-person-avatar" name={person.nickname || person.name} avatar={person.avatar} personId={person.id} lookupNumber={query.trim()}/></span><span className="v2-student-search-result-copy"><strong>{person.nickname || person.name}</strong><small>{person.organization || '学生'}</small></span></div>)}
         {studentError && <p role="alert">{studentError}</p>}
         {results.length ? results.map((item) => {
           const Icon = resultIcons[item.kind]
