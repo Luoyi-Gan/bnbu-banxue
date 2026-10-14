@@ -22,8 +22,12 @@ it('入班独立学号用于搜索，邮箱验证不推导学号，尊重角色�
  expect(searchStudents(db,viewer,'123456')).toEqual({students:[]});
  expect(searchStudents(db,viewer,'123')).toEqual({students:[]});
  expect(searchStudents(db,viewer,'2030123456').students[0]).toMatchObject({id:person.id,organization:'学院'});
- const repo=new Repository(db);const prefs=repo.create('preferences',person.id,{profilePreview:false});
+ const repo=new Repository(db);repo.create('profile',person.id,{nickname:'学生昵称',avatar:'data:image/png;base64,YQ=='});
+ expect(searchStudents(db,viewer,'2030123456').students[0]).toMatchObject({nickname:'学生昵称',avatar:'data:image/png;base64,YQ=='});
+ const prefs=repo.create('preferences',person.id,{profilePreview:false});
  expect(searchStudents(db,viewer,'2030123456').students[0].organization).toBe('');
+ expect(searchStudents(db,viewer,'2030123456').students[0].avatar).toBeUndefined();
+ expect(searchStudents(db,viewer,'2030123456').students[0].nickname).toBeUndefined();
  repo.save(prefs,{searchable:false});expect(searchStudents(db,viewer,'2030123456').students).toEqual([]);
  expect(()=>searchStudents(db,{...viewer,roles:['teacher']},'2030123456')).toThrow();
  createAccount(db,{email:'654321@bnbu.edu.cn',name:'未验证',password:'Acceptance-123',roles:['student']});

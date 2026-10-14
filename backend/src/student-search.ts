@@ -14,19 +14,22 @@ export function recordedStudentNumber(actor: Account, records: Entity[]): string
 export function searchStudents(db: Database, actor: Account, query: string) {
   validateStudentSearch(actor,query);
   const repo = new Repository(db);
-  const identities=repo.all('companionIdentity'),preferences=repo.all('preferences');
+  const identities=repo.all('companionIdentity'),preferences=repo.all('preferences'),profiles=repo.all('profile');
   const ids=new Set(identities.filter(i=>i.data.studentNumber===query.trim()).map(i=>i.ownerId));
   return {students:[...ids].flatMap(id=>{
     const row=db.prepare("SELECT id,email,name,organization,status,roles FROM accounts WHERE id=? AND login_kind='PERSONAL'").get(id) as (Omit<Account,'roles'>&{roles:string})|undefined;
     if(!row)return [];
-    return studentSearchResult({...row,roles:JSON.parse(row.roles)},preferences.find(p=>p.ownerId===id)?.data,identities).students;
+    return studentSearchResult({...row,roles:JSON.parse(row.roles)},preferences.find(p=>p.ownerId===id)?.data,identities,profiles.find(p=>p.ownerId===id)?.data).students;
   })};
 }
 export function validateStudentSearch(actor:Account,query:string) {
   demand(actor.roles.includes('student') && actor.status!=='banned','仅学生可按学号查找。',403);
   demand(query.trim().length>0 && query.length<=100,'请填写完整学号。');
 }
-export function studentSearchResult(person:Account,prefs:Fields|undefined,proofs:Entity[]) {
+export function studentSearchResult(person:Account,prefs:Fields|undefined,proofs:Entity[],profile?:Fields) {
   if (!recordedStudentNumber(person,proofs) || prefs?.searchable===false) return {students:[]};
-  return {students:[{id:person.id,name:person.name,organization:prefs?.profilePreview===false ? '' : person.organization}]};
+  const shown=prefs?.profilePreview===false ? undefined : profile;
+  return {students:[{id:person.id,name:person.name,organization:prefs?.profilePreview===false ? '' : person.organization,
+    nickname:typeof shown?.nickname==='string' ? shown.nickname : undefined,
+    avatar:typeof shown?.avatar==='string' ? shown.avatar : undefined}]};
 }

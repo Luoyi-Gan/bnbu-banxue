@@ -10,13 +10,16 @@ export function communityView(db: Database, token: string) {
   return projectCommunity({...workspace, relations: workspace.relations as {entityId:string;kind:string}[]}, new Map(likes.map(row=>[String(row.id),Number(row.count)])));
 }
 
-export function projectCommunity(workspace: {account:{id:string;name:string};entities:Entity[];people:{id:string;name:string}[];relations:{entityId:string;kind:string}[];alumni:{profiles:{id:string;name:string;status:string}[]}}, likes: ReadonlyMap<string,number>) {
+export function projectCommunity(workspace: {account:{id:string;name:string};entities:Entity[];people:{id:string;name:string;nickname?:string;avatar?:string}[];relations:{entityId:string;kind:string}[];alumni:{profiles:{id:string;name:string;status:string}[]}}, likes: ReadonlyMap<string,number>) {
   const account = workspace.account;
   const content = workspace.entities.filter(
     (entity) => entity.kind === "post" || entity.kind === "comment",
   ) as Entity[];
-  const name = (id: string | null) =>
-    workspace.people.find((person) => person.id === id)?.name ?? "已注销用户";
+  const person = (id: string | null) => workspace.people.find((item) => item.id === id);
+  const name = (id: string | null) => {
+    const author = person(id);
+    return author?.nickname || author?.name || "已注销用户";
+  };
   const visible = content.filter(
     (entity) =>
       entity.kind === "post" &&
@@ -32,6 +35,7 @@ export function projectCommunity(workspace: {account:{id:string;name:string};ent
     board: String(post.data.board),
     images: Array.isArray(post.data.images) ? post.data.images : [],
     author: name(post.ownerId),
+    authorAvatar: person(post.ownerId)?.avatar ?? "",
     date: post.createdAt,
     status: post.data.status,
     likes: likes.get(post.id) ?? 0,
@@ -48,6 +52,7 @@ export function projectCommunity(workspace: {account:{id:string;name:string};ent
         id: comment.id,
         ownerId: comment.ownerId,
         author: name(comment.ownerId),
+        authorAvatar: person(comment.ownerId)?.avatar ?? "",
         body: String(comment.data.body),
         date: comment.createdAt,
         status: comment.data.status,
@@ -56,7 +61,7 @@ export function projectCommunity(workspace: {account:{id:string;name:string};ent
   const ids = new Set(posts.map((post) => post.id));
   const relations = workspace.relations as { entityId: string; kind: string }[];
   return {
-    account: { id: account.id, name: account.name },
+    account: { id: account.id, name: account.name, nickname: person(account.id)?.nickname, avatar: person(account.id)?.avatar },
     alumniProfiles: workspace.alumni.profiles.filter(p => p.status === "approved").map(p => ({id:p.id,name:p.name})),
     posts,
     likedPosts: relations

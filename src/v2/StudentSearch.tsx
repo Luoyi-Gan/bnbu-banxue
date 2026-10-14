@@ -5,6 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { liveSearch } from './liveSearch'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
+import { DisplayAvatar } from './DisplayAvatar'
 
 
 
@@ -16,12 +17,12 @@ export function StudentSearch() {
   const location = useLocation()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [students, setStudents] = useState<{id:string;name:string;organization:string}[]>([])
+  const [students, setStudents] = useState<{id:string;name:string;organization:string;nickname?:string;avatar?:string}[]>([])
   const [studentError, setStudentError] = useState('')
   useEffect(() => {
     let active = true; setStudents([]); setStudentError('');
     if (!open || !query.trim()) return;
-    const timer = setTimeout(() => { void api<{students:{id:string;name:string;organization:string}[]}>('/api/students/search?number='+encodeURIComponent(query.trim())).then(result => {if(active) setStudents(result.students)}).catch(error => {if(active) setStudentError(error instanceof Error ? error.message : '学号查询失败')}) },300);
+    const timer = setTimeout(() => { void api<{students:{id:string;name:string;organization:string;nickname?:string;avatar?:string}[]}>('/api/students/search?number='+encodeURIComponent(query.trim())).then(result => {if(active) setStudents(result.students)}).catch(error => {if(active) setStudentError(error instanceof Error ? error.message : '学号查询失败')}) },300);
     return () => {active=false;clearTimeout(timer)}
   },[query,open])
   const rootRef = useRef<HTMLDivElement>(null)
@@ -93,7 +94,7 @@ export function StudentSearch() {
     <div ref={panelRef} className="v2-student-search-panel" aria-hidden={!open} inert={!open}>
       <div className="v2-student-search-panel-inner">
         <div className="v2-student-search-heading"><strong>{normalized ? '搜索结果' : '推荐看看'}</strong><small>{normalized ? `${results.length + students.length} 条匹配` : '校园里正在发生'}</small></div>
-        {students.map(person => <div className="v2-student-search-result" key={person.id}><span className="v2-student-search-art"><UsersRound size={20}/></span><span className="v2-student-search-result-copy"><strong>{person.name}</strong><small>{person.organization || '学生'}</small></span></div>)}
+        {students.map(person => <div className="v2-student-search-result" key={person.id}><span className="v2-student-search-art">{person.avatar ? <DisplayAvatar className="v2-search-person-avatar" name={person.nickname || person.name} avatar={person.avatar}/> : <UsersRound size={20}/>}</span><span className="v2-student-search-result-copy"><strong>{person.nickname || person.name}</strong><small>{person.organization || '学生'}</small></span></div>)}
         {studentError && <p role="alert">{studentError}</p>}
         {results.length ? results.map((item) => {
           const Icon = resultIcons[item.kind]
