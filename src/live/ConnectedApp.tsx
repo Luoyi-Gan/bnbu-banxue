@@ -389,9 +389,11 @@ export function ConnectedApp() {
     superadmin = roles.includes("superadmin");
   const all = (kind: string) => data.entities.filter((e) => e.kind === kind);
   const myProfile = all("profile").find((p) => p.ownerId === me.id);
+  const myDisplayName = typeof myProfile?.data.nickname === "string" ? myProfile.data.nickname : me.name;
   const person = (id: unknown) =>
+    data.people.find((p) => p.id === id)?.nickname ??
     data.people.find((p) => p.id === id)?.name ??
-    (id === me.id ? me.name : "相关成员");
+    (id === me.id ? myDisplayName : "相关成员");
   const own = (entity: LiveEntity) => entity.ownerId === me.id;
   const relation = (entity: LiveEntity, kind: string) =>
     data.relations.some((r) => r.entityId === entity.id && r.kind === kind);
@@ -614,7 +616,7 @@ export function ConnectedApp() {
         <header className="v2-topbar">
           <div>
             <span className="v2-breadcrumb">BNBU / {moduleTitle}</span>
-            <strong>{me.name}</strong>
+            <strong>{student ? myDisplayName : me.name}</strong>
           </div>
           <div className="live-actions">
             <button
@@ -659,7 +661,7 @@ export function ConnectedApp() {
             <>
               {student && <SportsProgressCard sports={data.sports}/>}
               <section className="live-hero">
-                <span>你好，{me.name}</span>
+                <span>你好，{student ? myDisplayName : me.name}</span>
                 <h2>
                   把校园里的下一步，
                   <br />

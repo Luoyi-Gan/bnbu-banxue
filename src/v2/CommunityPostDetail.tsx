@@ -8,6 +8,7 @@ import { photosForPost, usesCampusIllustration } from './postPresentation'
 import { useV2 } from './useV2'
 import type { CommunityBackend } from './useCommunityBackend'
 import { Drawer, SectionHeading } from './ui'
+import { DisplayAvatar } from './DisplayAvatar'
 
 function PostMedia({ post }: { post: Post }) {
   const [index, setIndex] = useState(0)
@@ -36,10 +37,10 @@ export function CommunityPostDetail({ id, onClose, live }: { id: string; onClose
   return <Drawer title={post.title} eyebrow={`${post.board} · ${post.author}`} onClose={onClose}>
     <div className="v2-social-detail-media"><PostMedia key={id} post={post}/></div>
     <p className="v2-detail-date">{post.date}{!publicPost ? ' · 待审核' : ''}</p><p className="v2-detail-lead">{post.body}</p>
-    {alumnus && <Link className="v2-post-alumni-link" to={`/v2/alumni?person=${encodeURIComponent(alumnus.id)}`} onClick={onClose}>了解{alumnus.name} · 查看交流时段</Link>}
+    {alumnus && <Link className="v2-post-alumni-link" to={`/v2/alumni?person=${encodeURIComponent(alumnus.id)}`} onClick={onClose}>了解{post.author} · 查看交流时段</Link>}
     <div className="v2-detail-actions"><button type="button" className={`v2-pulse-heart${liked ? ' is-active' : ''}`} disabled={!publicPost} aria-label={`${liked ? '取消点赞' : '点赞'}，当前 ${post.likes} 个赞`} aria-pressed={liked} onClick={() => toggle('likedPosts')}><span className="v2-pulse-heart-icon"><Heart size={22} fill={liked ? 'currentColor' : 'none'}/></span><span>{post.likes} 次赞</span></button><button type="button" className="v2-button v2-button-secondary" disabled={!publicPost} aria-pressed={saved} onClick={() => toggle('savedPosts')}><Bookmark size={16} fill={saved ? 'currentColor' : 'none'}/>{saved ? '已收藏' : '收藏'}</button></div>
     {(live ? live.error : persistenceError) && <p role="alert" className="v2-form-note">{live ? live.error : '本机保存失败，请检查浏览器存储空间。'}</p>}
-    <div className="v2-comments"><SectionHeading title="评论" detail={`${post.comments.filter(item => item.status === 'visible').length} 条已展示`}/>{post.comments.filter(item => live || item.status === 'visible' || item.status === 'pending' && item.author === studentName).map(item => <div className="v2-comment" key={item.id}><span className="v2-avatar">{item.author.slice(0, 1)}</span><div><strong>{item.author} {item.status === 'pending' && <small>待审核</small>}</strong><p>{item.body}</p><small>{item.date}</small></div></div>)}
+    <div className="v2-comments"><SectionHeading title="评论" detail={`${post.comments.filter(item => item.status === 'visible').length} 条已展示`}/>{post.comments.filter(item => live || item.status === 'visible' || item.status === 'pending' && item.author === studentName).map(item => <div className="v2-comment" key={item.id}><DisplayAvatar className="v2-avatar" name={item.author} avatar={item.authorAvatar}/><div><strong>{item.author} {item.status === 'pending' && <small>待审核</small>}</strong><p>{item.body}</p><small>{item.date}</small></div></div>)}
       {publicPost ? <form onSubmit={comment} className="v2-comment-form"><input value={text} onChange={event => setText(event.target.value)} placeholder="写下你的评论" maxLength={300} aria-label="评论内容"/><button type="submit" aria-label="提交评论" className="v2-button v2-button-primary" disabled={!text.trim() || live?.busy}><Send size={16}/></button></form> : <p className="v2-form-note">内容审核通过后可点赞、收藏和评论。</p>}
     </div>
   </Drawer>

@@ -44,6 +44,8 @@ export interface Workspace {
   people: {
     id: string;
     name: string;
+    nickname?: string;
+    avatar?: string;
     organization: string;
     status?: string;
     roles?: string[];

@@ -133,7 +133,7 @@ export function V2Settings() {
   const [confirmReset, setConfirmReset] = useState(false)
   const rows: Array<{ key: 'messages' | 'teams' | 'searchable' | 'profilePreview'; title: string; copy: string }> = [
     { key: 'searchable', title: '允许通过学号搜索到我', copy: '关闭后别人无法通过学号找到你' },
-    { key: 'profilePreview', title: '展示资料预览', copy: '在成员列表中展示学院与兴趣' },
+    { key: 'profilePreview', title: '展示资料预览', copy: '向其他学生展示昵称、头像与学院' },
     { key: 'messages', title: '消息提醒', copy: '新私聊和组队消息显示提醒' },
     { key: 'teams', title: '组队状态提醒', copy: '申请通过和队伍状态变化时显示提醒' },
   ]

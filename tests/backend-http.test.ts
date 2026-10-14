@@ -86,6 +86,23 @@ describe("API、持久化和跨角色联动", () => {
     run(a,"preferences.preview",{enabled:true});
     expect(person(b)?.organization).toBe("计算机学院");
   });
+  it("展示资料同步到社区作者和评论，并遵守资料预览开关", () => {
+    const {a,b,repo,run,db} = setup();
+    const avatar = "data:image/png;base64," + Buffer.from("avatar").toString("base64");
+    const post = repo.create("post",a.id,{title:"校园分享",body:"正文",board:"校园",status:"visible"});
+    repo.create("comment",a.id,{postId:post.id,body:"评论",status:"visible"});
+    run(a,"profile.save",{nickname:"新昵称",avatar});
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toMatchObject({nickname:"新昵称",avatar});
+    const shown = communityView(db,b.token).posts.find(p=>p.id===post.id)!;
+    expect(shown).toMatchObject({author:"新昵称",authorAvatar:avatar});
+    expect(shown.comments[0]).toMatchObject({author:"新昵称",authorAvatar:avatar});
+    expect(communityView(db,a.token).account).toMatchObject({nickname:"新昵称",avatar});
+    run(a,"preferences.preview",{enabled:false});
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toMatchObject({name:a.account.name,organization:""});
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)?.avatar).toBeUndefined();
+    expect(communityView(db,b.token).posts.find(p=>p.id===post.id)).toMatchObject({author:a.account.name,authorAvatar:""});
+    expect(communityView(db,a.token).posts.find(p=>p.id===post.id)).toMatchObject({author:"新昵称",authorAvatar:avatar});
+  });
   it("关系历史只返回本人操作，下架对象不泄露旧标题", () => {
     const {a,b,run,repo,db} = setup();
     const event = repo.create("activity", b.id, {title:"私有后续标题",status:"published",startAt:new Date(Date.now()+86400000).toISOString()});

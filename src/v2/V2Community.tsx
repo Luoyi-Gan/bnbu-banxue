@@ -7,6 +7,7 @@ import { prepareCommunityImage } from './communityImages'
 import { type Post } from './model'
 import { Empty, Modal, PageHeading } from './ui'
 import { useCommunityBackend } from './useCommunityBackend'
+import { DisplayAvatar } from './DisplayAvatar'
 
 import { photosForPost as photosFor } from './postPresentation'
 import { CommunityPostDetail } from './CommunityPostDetail'
@@ -50,7 +51,7 @@ function DiscoveryFeed({ posts, liked, saved, onOpen, onLike, onSave }: { posts:
       {Array.from({ length: columns }, (_, column) => <div className="discovery-column" key={column}>{shown.filter((_, index) => index % columns === column).map(post => <article className="discovery-card" key={post.id}>
         <DiscoveryCover post={post} onOpen={() => onOpen(post.id)}/>
         <button className="discovery-title" onClick={() => onOpen(post.id)}>{post.title}</button>
-        <div className="discovery-meta"><span className="discovery-author"><span className="discovery-avatar" aria-hidden="true">{post.author.slice(0, 1)}</span><span>{post.author}</span></span><button className={liked.includes(post.id) ? 'is-liked' : ''} aria-label={`${liked.includes(post.id) ? '取消点赞' : '点赞'}：${post.title}`} aria-pressed={liked.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onLike(post.id)}><Heart size={15} fill={liked.includes(post.id) ? 'currentColor' : 'none'}/>{post.likes}</button></div>
+        <div className="discovery-meta"><span className="discovery-author"><DisplayAvatar className="discovery-avatar" name={post.author} avatar={post.authorAvatar}/><span>{post.author}</span></span><button className={liked.includes(post.id) ? 'is-liked' : ''} aria-label={`${liked.includes(post.id) ? '取消点赞' : '点赞'}：${post.title}`} aria-pressed={liked.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onLike(post.id)}><Heart size={15} fill={liked.includes(post.id) ? 'currentColor' : 'none'}/>{post.likes}</button></div>
         <button className="discovery-save" aria-label={`${saved.includes(post.id) ? '取消收藏' : '收藏'}：${post.title}`} aria-pressed={saved.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onSave(post.id)}><Bookmark size={15} fill={saved.includes(post.id) ? 'currentColor' : 'none'}/></button>
       </article>)}</div>)}
     </div>
@@ -60,7 +61,7 @@ function DiscoveryFeed({ posts, liked, saved, onOpen, onLike, onSave }: { posts:
 
 export function V2Community() {
   const state = useCommunityBackend()
-  const studentName = state.account.name
+  const studentName = state.account.nickname || state.account.name
   const location = useLocation()
   const navigate = useNavigate()
   const [board, setBoard] = useState('全部')
@@ -105,7 +106,7 @@ export function V2Community() {
         <DiscoveryFeed key={`${query}|${board}`} posts={visible} liked={state.likedPosts} saved={state.savedPosts} onOpen={setSelected} onLike={toggleLike} onSave={toggleSave}/>
         {(!visible.length || state.error) && <Empty icon={MessageCircle} title={state.error || "暂无帖子"} description="换个分类或搜索词再看看。"/>}
       </section>
-      <aside className="v2-social-aside"><div className="v2-panel v2-social-profile"><span className="v2-social-avatar is-self">{studentName.slice(0, 1)}</span><div><strong>{studentName}</strong><small>分享你眼中的校园</small></div><button type="button" onClick={() => setCompose(true)}>发布 <ArrowRight size={14}/></button></div><div className="v2-panel"><span className="v2-eyebrow">CAMPUS VOICES</span><h3>让校园故事被看见</h3><p>照片、经历或问题，都可以成为下一段交流的开始。</p><span className="v2-social-aside-note"><Camera size={16}/> 最多 9 张图片 · 发布后进入审核</span></div><div className="v2-panel"><h3>热门话题</h3>{state.posts.filter((post) => post.status === 'visible').sort((a, b) => b.likes - a.likes).slice(0, 3).map((post, index) => <button type="button" className="v2-trend-row" key={post.id} onClick={() => setSelected(post.id)}><span>0{index + 1}</span><strong>{post.title}</strong></button>)}</div></aside>
+      <aside className="v2-social-aside"><div className="v2-panel v2-social-profile"><DisplayAvatar className="v2-social-avatar is-self" name={studentName} avatar={state.account.avatar}/><div><strong>{studentName}</strong><small>分享你眼中的校园</small></div><button type="button" onClick={() => setCompose(true)}>发布 <ArrowRight size={14}/></button></div><div className="v2-panel"><span className="v2-eyebrow">CAMPUS VOICES</span><h3>让校园故事被看见</h3><p>照片、经历或问题，都可以成为下一段交流的开始。</p><span className="v2-social-aside-note"><Camera size={16}/> 最多 9 张图片 · 发布后进入审核</span></div><div className="v2-panel"><h3>热门话题</h3>{state.posts.filter((post) => post.status === 'visible').sort((a, b) => b.likes - a.likes).slice(0, 3).map((post, index) => <button type="button" className="v2-trend-row" key={post.id} onClick={() => setSelected(post.id)}><span>0{index + 1}</span><strong>{post.title}</strong></button>)}</div></aside>
     </div>
     {createPortal(<button type="button" className="v2-community-compose v2-a-community-compose" aria-label="发布帖子" onClick={() => setCompose(true)}><span className="v2-community-compose-circle"><Plus size={26}/></span></button>, document.body)}
     {compose && <Modal title="发布社区帖子" onClose={closeCompose}><form className="v2-form v2-social-compose" onSubmit={publish}><label>话题标题<input name="title" required maxLength={80} placeholder="想和同学聊什么？"/></label><label>选择分区<select name="board">{boards.slice(1).filter((item) => !item.startsWith('校友')).map((item) => <option key={item}>{item}</option>)}</select></label><label>正文<textarea name="body" required rows={4} maxLength={1000} placeholder="分享一点具体的经历或问题"/></label><div className="v2-image-uploader"><div className="v2-image-uploader-head"><strong>添加图片</strong><span>{draftImages.length} / 9 张</span></div><div className="v2-upload-grid">{draftImages.map((src, index) => <div className="v2-upload-thumb" key={`${index}-${src.slice(-24)}`}><img src={src} alt={`待发布图片 ${index + 1}`}/><button type="button" aria-label={`移除第 ${index + 1} 张图片`} onClick={() => setDraftImages((items) => items.filter((_, number) => number !== index))}><X size={13}/></button></div>)}{draftImages.length < 9 && <label className="v2-upload-add"><ImagePlus size={22}/><span>{processingImages ? '处理中…' : '添加照片'}</span><input type="file" accept="image/*" multiple onChange={addImages} disabled={processingImages}/></label>}</div>{(imageError || state.error) && <p className="v2-upload-error" role="alert">{imageError || state.error}</p>}<small>最多 9 张，图片会压缩后上传保存。</small></div><p className="v2-form-note">发布后进入审核队列。</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={closeCompose}>取消</button><button type="submit" className="v2-button v2-button-primary" disabled={processingImages || state.busy}>提交帖子</button></div></form></Modal>}

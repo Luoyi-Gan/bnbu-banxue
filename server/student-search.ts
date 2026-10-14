@@ -17,5 +17,8 @@ export function searchStudents(db: Database, actor: Account, query: string) {
   const person={...row,roles:JSON.parse(row.roles)} as Account;
   const prefs=repo.all('preferences').find(p=>p.ownerId===row.id)?.data;
   if (!studentNumber(db,person) || prefs?.searchable===false) return {students:[]};
-  return {students:[{id:person.id,name:person.name,organization:prefs?.profilePreview===false ? '' : person.organization}]};
+  const profile=prefs?.profilePreview===false ? undefined : repo.all('profile').find(p=>p.ownerId===row.id)?.data;
+  return {students:[{id:person.id,name:person.name,organization:prefs?.profilePreview===false ? '' : person.organization,
+    nickname:typeof profile?.nickname==='string' ? profile.nickname : undefined,
+    avatar:typeof profile?.avatar==='string' ? profile.avatar : undefined}]};
 }
