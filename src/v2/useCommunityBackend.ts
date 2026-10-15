@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { api, ApiError, command, workspaceChangedEvent } from '../live/api'
 import type { Post } from '../../shared/v2/model'
 
-type CommunityData = { account: { id: string; name: string }; posts: Post[]; likedPosts: string[]; savedPosts: string[]; alumniProfiles?: {id:string;name:string}[] }
+type CommunityData = { account: { id: string; name: string; nickname?: string; avatar?: string }; posts: Post[]; likedPosts: string[]; savedPosts: string[]; alumniProfiles?: {id:string;name:string}[] }
 export function useCommunityBackend() {
   const [data, setData] = useState<CommunityData>({ account: { id: '', name: '' }, posts: [], likedPosts: [], savedPosts: [] })
   const [error, setError] = useState('')

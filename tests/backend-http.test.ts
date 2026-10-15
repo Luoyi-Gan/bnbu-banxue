@@ -9,6 +9,7 @@ import { createApiServer } from "../backend/src/main";
 import { execute, snapshot } from "../backend/src/commands";
 import { Repository } from "../backend/src/repository";
 import { communityView } from "../backend/src/community-view";
+import { personHover } from "../backend/src/person-hover";
 
 const resources: (() => Promise<void> | void)[] = [];
 afterEach(async () => {
@@ -115,6 +116,63 @@ describe("API、持久化和跨角色联动", () => {
     expect(person(b)?.organization).toBe("");
     run(a,"preferences.preview",{enabled:true});
     expect(person(b)?.organization).toBe("计算机学院");
+  });
+  it("展示资料同步到社区作者和评论，并遵守资料预览开关", () => {
+    const {a,b,repo,run,db} = setup();
+    const avatar = "data:image/png;base64," + Buffer.from("avatar").toString("base64");
+    const post = repo.create("post",a.id,{title:"校园分享",body:"正文",board:"校园",status:"visible"});
+    repo.create("comment",a.id,{postId:post.id,body:"评论",status:"visible"});
+    run(a,"profile.save",{nickname:"新昵称",avatar});
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toMatchObject({nickname:"新昵称",avatar});
+    const shown = communityView(db,b.token).posts.find(p=>p.id===post.id)!;
+    expect(shown).toMatchObject({author:"新昵称",authorAvatar:avatar});
+    expect(shown.comments[0]).toMatchObject({author:"新昵称",authorAvatar:avatar});
+    expect(communityView(db,a.token).account).toMatchObject({nickname:"新昵称",avatar});
+    run(a,"preferences.preview",{enabled:false});
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toMatchObject({name:a.account.name,organization:""});
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)?.avatar).toBeUndefined();
+    expect(communityView(db,b.token).posts.find(p=>p.id===post.id)).toMatchObject({author:a.account.name,authorAvatar:""});
+    expect(communityView(db,a.token).posts.find(p=>p.id===post.id)).toMatchObject({author:"新昵称",authorAvatar:avatar});
+  });
+  it("头像悬浮资料按本人开关和公开范围生成，关闭资料预览不泄露关系", () => {
+    const {a,b,c,repo,run,db} = setup();
+    run(a,"profile.save",{nickname:"悬浮昵称",avatar:""});
+    const active = run(a,"room.create",{type:"study",title:"开放队伍",body:"说明",time:"周末",place:"图书馆",capacity:3});
+    const finished = run(a,"room.create",{type:"study",title:"已结束队伍",body:"说明",time:"上周",place:"图书馆",capacity:3});
+    run(a,"room.finish",{id:finished.id});
+    const hidden = run(a,"room.create",{type:"study",title:"下架队伍",body:"说明",time:"周末",place:"图书馆",capacity:3});
+    repo.save(repo.get(hidden.id),{visibility:"hidden"});
+    const activity = repo.create("activity",c.id,{title:"公开活动",status:"published",startAt:"2026-12-01T12:00:00.000Z",endAt:"2026-12-01T13:00:00.000Z"});
+    const privateActivity = repo.create("activity",c.id,{title:"下架活动",status:"draft"});
+    repo.relation(a.id,activity.id,"participate",true);
+    repo.relation(a.id,privateActivity.id,"participate",true);
+    const read = () => personHover(db,b.account,a.id);
+    expect(read()).toMatchObject({name:"悬浮昵称",recentTeams:[{id:finished.id}],activeTeams:[{id:active.id}],activities:[{id:activity.id}]});
+    for (const key of ["hoverRecentTeams","hoverActiveTeams","hoverActivities"])
+      run(a,"preferences.hover",{key,enabled:false,id:b.id});
+    expect(read()).toMatchObject({recentTeams:[],activeTeams:[],activities:[]});
+    expect(() => run(b,"preferences.hover",{key:"hoverActivities",enabled:"true"})).toThrow();
+    expect(() => run(b,"preferences.hover",{key:"unknown",enabled:true})).toThrow();
+    run(a,"preferences.hover",{key:"hoverActiveTeams",enabled:true});
+    expect(read()).toMatchObject({recentTeams:[],activeTeams:[{id:active.id}],activities:[]});
+    run(a,"preferences.preview",{enabled:false});
+    expect(read()).toMatchObject({name:a.account.name,avatar:"",recentTeams:[],activeTeams:[],activities:[]});
+    expect(personHover(db,a.account,a.id).activeTeams).toEqual([{id:active.id,title:"开放队伍",path:`/v2/partners?item=${active.id}`}]);
+    expect(() => personHover(db,b.account,randomUUID())).toThrow();
+  });
+  it("悬浮资料 HTTP 入口要求登录并即时应用本人隐私设置", async () => {
+    const {a,b,run,db} = setup();
+    run(a,"room.create",{type:"study",title:"公开学习组",body:"说明",time:"周末",place:"图书馆",capacity:3});
+    const server = createApiServer(db);
+    await new Promise<void>(done => server.listen(0,"127.0.0.1",done));
+    resources.push(() => new Promise<void>(done => {server.closeAllConnections();server.close(() => done())}));
+    const url = `http://127.0.0.1:${(server.address() as {port:number}).port}/api/people/${a.id}/hover`;
+    expect((await fetch(url)).status).toBe(401);
+    const read = async () => fetch(url,{headers:{Cookie:`bnbu_session=${b.token}`}});
+    expect((await (await read()).json()).activeTeams).toMatchObject([{title:"公开学习组"}]);
+    run(a,"preferences.hover",{key:"hoverActiveTeams",enabled:false});
+    expect((await (await read()).json()).activeTeams).toEqual([]);
+    expect((await fetch(url.replace(a.id,randomUUID()),{headers:{Cookie:`bnbu_session=${b.token}`}})).status).toBe(404);
   });
   it("关系历史只返回本人操作，下架对象不泄露旧标题", () => {
     const {a,b,run,repo,db} = setup();

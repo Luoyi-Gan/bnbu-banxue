@@ -4,6 +4,7 @@ import { strings } from './repository';
 import { has } from './community';
 import { readAlumni } from './alumni';
 import { bookingStatus } from '../../shared/v2/alumniPolicy';
+import { projectDisplayPeople } from './display-people';
 import type { SportsCompanion, SportsSourceStatus } from '../../shared/live/sportsCompanion';
 import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
 export interface SnapshotSource {
@@ -194,19 +195,9 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
     actor.id,
     ...entities.map((e) => e.ownerId),
     ...memberRooms.flatMap((r) => strings(r.data.members)),
-  ]);
-  const hiddenProfiles = new Set(repo.all("preferences").filter(p => p.data.profilePreview === false).map(p => p.ownerId));
-  const people = repo
-    .people()
-    .filter(
-      (p) =>
-        operate || has(actor, "superadmin") || visiblePeople.has(String(p.id)),
-    )
-    .map((p) =>
-      has(actor, "superadmin")
-        ? p
-        : { id: p.id, name: p.name, organization: p.id !== actor.id && hiddenProfiles.has(p.id) && !has(actor, "teacher", "reviewer", "operator") ? "" : p.organization },
-    );
+    ...scopedAlumni.profiles.map((profile) => profile.owner),
+  ].filter((id):id is string=>typeof id==='string'));
+  const people=projectDisplayPeople(actor,repo.people(),visiblePeople,repo.all('preferences'),repo.all('profile'));
   return {
     account: {...actor, studentNumber:source.studentNumber},
     sports: source.sports,

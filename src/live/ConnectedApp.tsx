@@ -37,6 +37,7 @@ import { SportsPortal } from "./SportsPortal";
 import { SportsProgressCard } from "../v2/SportsProgressCard";
 import { MailResolution } from "./MailResolution";
 import { Modal, PageHeading } from "../v2/ui";
+import { DisplayAvatar } from "../v2/DisplayAvatar";
 import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import "../v2/v2.css";
 import "../v2/aRedesign.css";
@@ -386,9 +387,11 @@ export function ConnectedApp() {
     superadmin = roles.includes("superadmin");
   const all = (kind: string) => data.entities.filter((e) => e.kind === kind);
   const myProfile = all("profile").find((p) => p.ownerId === me.id);
+  const myDisplayName = typeof myProfile?.data.nickname === "string" ? myProfile.data.nickname : me.name;
   const person = (id: unknown) =>
+    data.people.find((p) => p.id === id)?.nickname ??
     data.people.find((p) => p.id === id)?.name ??
-    (id === me.id ? me.name : "相关成员");
+    (id === me.id ? myDisplayName : "相关成员");
   const own = (entity: LiveEntity) => entity.ownerId === me.id;
   const relation = (entity: LiveEntity, kind: string) =>
     data.relations.some((r) => r.entityId === entity.id && r.kind === kind);
@@ -611,7 +614,7 @@ export function ConnectedApp() {
         <header className="v2-topbar">
           <div>
             <span className="v2-breadcrumb">BNBU / {moduleTitle}</span>
-            <strong>{me.name}</strong>
+            <strong>{student ? myDisplayName : me.name}</strong>
           </div>
           <div className="live-actions">
             <button
@@ -656,7 +659,7 @@ export function ConnectedApp() {
             <>
               {student && <SportsProgressCard sports={data.sports}/>}
               <section className="live-hero">
-                <span>你好，{me.name}</span>
+                <span>你好，{student ? myDisplayName : me.name}</span>
                 <h2>
                   把校园里的下一步，
                   <br />
@@ -1434,13 +1437,7 @@ export function ConnectedApp() {
           {module === "profile" && (
             <>
               <section className="v2-panel live-card">
-                {myProfile?.data.avatar ? (
-                  <img
-                    className="live-avatar"
-                    src={String(myProfile.data.avatar)}
-                    alt="我的头像"
-                  />
-                ) : null}
+                <DisplayAvatar className="live-avatar" name={String(myProfile?.data.nickname ?? me.name)} avatar={String(myProfile?.data.avatar ?? "")} personId={me.id}/>
                 <h2>{String(myProfile?.data.nickname ?? me.name)}</h2>
                 <p>学校姓名：{me.name}</p>
                 <p>

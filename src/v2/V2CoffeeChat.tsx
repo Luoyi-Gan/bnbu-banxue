@@ -1,3 +1,4 @@
+import { DisplayAvatar } from './DisplayAvatar'
 import { coffeeSlotStatus } from './coffeeSlotStatus'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 
@@ -104,7 +105,7 @@ export function V2CoffeeChat() {
     <div className="v2-teacher-hero" style={{ backgroundImage: `linear-gradient(90deg,rgba(6,28,68,.92),rgba(6,46,101,.18)),url(${campusServicesPhoto})` }}><span>COFFEE CHAT</span><strong>和老师聊聊，找到新的思路。</strong><small>从学院、研究兴趣和可预约时间开始探索。</small></div>
     <div className="v2-directory-tools"><AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索老师、学院或研究方向"/><span>{filteredTeachers.length} 位老师</span></div>
     <div className="v2-filter-pills v2-directory-filters">{facultyOptions.map((option) => <button type="button" key={option} className={faculty === option ? 'is-active' : ''} onClick={() => setFaculty(option)}>{option}</button>)}</div>
-    <div className="v2-teacher-grid v2-filtered-list" key={`${query}|${faculty}`}>{filteredTeachers.map((person) => <button type="button" key={person.id} className="v2-teacher-card" onClick={() => openTeacher(person.id)}><img src={teacherPhotos[teachers.findIndex((item) => item.id === person.id) % teacherPhotos.length]} alt=""/><span className="v2-teacher-row-copy"><span className="v2-avatar" style={{ background: person.color }}>{person.name.slice(0, 1)}</span><strong>{person.name}<small>{person.englishName}</small></strong><em>{facultyOf(person.department)} · {person.department}</em><span className="v2-teacher-topics">{person.topics.slice(0, 2).map((topic) => <i key={topic}>{topic}</i>)}</span></span><ChevronRight size={19}/></button>)}</div>
+    <div className="v2-teacher-grid v2-filtered-list" key={`${query}|${faculty}`}>{filteredTeachers.map((person) => <button type="button" key={person.id} className="v2-teacher-card" onClick={() => openTeacher(person.id)}><img src={teacherPhotos[teachers.findIndex((item) => item.id === person.id) % teacherPhotos.length]} alt=""/><span className="v2-teacher-row-copy"><DisplayAvatar className="v2-avatar" name={person.name} personId={person.id}/><strong>{person.name}<small>{person.englishName}</small></strong><em>{facultyOf(person.department)} · {person.department}</em><span className="v2-teacher-topics">{person.topics.slice(0, 2).map((topic) => <i key={topic}>{topic}</i>)}</span></span><ChevronRight size={19}/></button>)}</div>
     {live.data && !filteredTeachers.length && <Empty icon={Coffee} title="没有匹配的老师" description="换个学院或搜索词试试。"/>}
   </div>
 }

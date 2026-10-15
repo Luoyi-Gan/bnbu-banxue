@@ -1,4 +1,5 @@
 import { searchStudents } from './student-search';
+import { personHover } from './person-hover';
 import {
   createServer,
 } from "node:http";
@@ -275,6 +276,11 @@ export function createApiServer(
         );
       }
       if (request.method === "GET" && pathname === "/api/students/search") return send(response,200,searchStudents(db,authenticate(db,cookieToken(request)),new URL(request.url!,"http://localhost").searchParams.get("number") ?? ""));
+      const hoverMatch = request.method === "GET" && /^\/api\/people\/([^/]+)\/hover$/.exec(pathname);
+      if (hoverMatch) {
+        const url = new URL(request.url!, "http://localhost");
+        return send(response, 200, personHover(db, authenticate(db, cookieToken(request)), decodeURIComponent(hoverMatch[1]), url.searchParams.get("number") ?? undefined));
+      }
       if (request.method === "GET" && pathname === "/api/workspace")
         return send(
           response,

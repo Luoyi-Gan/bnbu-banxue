@@ -1,0 +1,15 @@
+.v2-display-avatar{overflow:hidden}
+.v2-display-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.v2-member-chip{display:inline-flex;align-items:center;gap:4px}
+.v2-member-avatar{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.7)}
+.v2-search-person-avatar{display:grid;place-items:center;width:100%;height:100%;border-radius:inherit}
+.v2-person-hover{position:fixed;z-index:10000;width:280px;max-height:min(420px,calc(100vh - 24px));overflow:auto;padding:14px;background:#fff;border:1px solid #dce5f4;border-radius:16px;box-shadow:0 16px 44px rgba(19,43,80,.18);color:#162a46}
+.v2-person-hover-head{display:flex;align-items:center;gap:10px;font-size:16px}
+.v2-person-hover-photo{width:42px;height:42px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:#e9f1ff;color:#2661a5;font-weight:700}
+.v2-person-hover-photo img{width:100%;height:100%;object-fit:cover}
+.v2-person-hover section{display:grid;gap:4px;margin-top:12px;padding-top:10px;border-top:1px solid #edf1f7}
+.v2-person-hover section small{color:#71809a;font-size:12px}
+.v2-person-hover section a{color:#1c4d90;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.v2-person-hover section a:hover{text-decoration:underline}
+.v2-person-hover-loading{color:#71809a;font-size:13px}
+.v2-person-hover-empty{color:#8794a7;font-size:12px}

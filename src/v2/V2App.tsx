@@ -23,6 +23,7 @@ import { V2CampusExplore } from './V2CampusExplorer'
 import { V2Auth } from './V2Auth'
 import { useOriginalSession } from './useOriginalSession'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
+import { DisplayAvatar } from './DisplayAvatar'
 import { notificationPreferences, showNoticeBadge } from './notificationPreferences'
 import { liveConversations } from './liveConversations'
 import './v2.css'
@@ -64,6 +65,9 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const roleMenuRef = useRef<HTMLDivElement>(null)
   const admin = state.role === 'admin'
   const teacher = state.role === 'teacher'
+  const studentProfile = !admin && !teacher ? live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data : undefined
+  const displayName = typeof studentProfile?.nickname === 'string' ? studentProfile.nickname : accountName
+  const displayAvatar = typeof studentProfile?.avatar === 'string' ? studentProfile.avatar : ''
   const shellBrandIcon = admin || teacher ? brandIcon : studentBrandIcon
   const sports = location.pathname === '/v2/sports' || location.pathname === '/v2/teacher/sports'
   const teacherNav = [
@@ -101,7 +105,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
         <div className="v2-top-actions">
           {!admin && !teacher && <NavLink to="/v2/messages" className={({ isActive }) => `v2-icon-button v2-header-messages${isActive ? ' is-active' : ''}`} aria-label={unread + unreadNotices > 0 ? `消息，${unread + unreadNotices} 条未读` : live.data ? '消息，暂无未读' : '消息，通知状态暂不可用'} title={`消息 · 聊天 ${unread} 条未读，${live.data ? `通知 ${unreadNotices} 条未读` : '通知状态暂不可用'}`}><MessageCircle size={19} aria-hidden="true"/>{unread + unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unread + unreadNotices > 99 ? '99+' : unread + unreadNotices}</span>}</NavLink>}
           {!admin && !teacher && <StudentSearch/>}
-          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><span>{accountName.slice(0, 1)}</span><strong>{accountName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}<Link to="/v2/login" onClick={() => setRoleMenu(false)}>登录 / 注册</Link></div>}</div>
+          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><DisplayAvatar className="v2-role-avatar" name={displayName} avatar={displayAvatar} personId={live.data?.account.id}/><strong>{displayName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}<Link to="/v2/login" onClick={() => setRoleMenu(false)}>登录 / 注册</Link></div>}</div>
         </div>
       </header>
       <main className="v2-main">{children}</main>
