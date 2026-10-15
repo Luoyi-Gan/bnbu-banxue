@@ -93,10 +93,10 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   return <div className={`v2-app${sports ? ' v2-app-sports' : ''}${!admin && !teacher ? ' v2-app-student' : ''}`}>
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
       <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
-      <div className="v2-nav-label">{admin ? 'MANAGEMENT' : 'CAMPUS LIFE'}</div>
+      <div className="v2-nav-label">{admin ? '管理' : teacher ? '教师' : '校园'}</div>
       <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav>
-      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">MORE TO EXPLORE</div><nav className="v2-side-nav">{studentMore.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav></>}
-      <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>前端演示模式</span></div></div>
+      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">更多服务</div><nav className="v2-side-nav">{studentMore.filter(item => item.path !== '/v2/sports' || live.data?.sports?.role === 'student').map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav></>}
+      <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>{live.data ? '本地服务已连接' : live.error ? '本地服务连接失败' : '正在连接本地服务'}</span></div></div>
     </aside>
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
     <div className="v2-workspace">
