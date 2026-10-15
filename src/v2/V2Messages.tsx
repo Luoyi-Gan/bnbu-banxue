@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowUp, Bell, ChevronRight, MessageCircle, UsersRound } from 'lucide-react'
-import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { liveConversations, type LiveConversation } from './liveConversations'
 import { Empty, PageHeading, SectionHeading } from './ui'
@@ -60,13 +60,25 @@ function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened
 
 export function V2Messages() {
   const live = useWorkspaceBackend(10000)
-  const conversations = liveConversations(live.data)
+  const conversations = useMemo(() => liveConversations(live.data), [live.data])
   const [params, setParams] = useSearchParams()
   const view = params.get('view') === 'notifications' ? 'notifications' : 'conversations'
   const selected = params.get('conversation')
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const readAttempt = useRef('')
   const active = conversations.find(item => item.id === selected)
   const opened = Boolean(selected && active && view === 'conversations')
+  const unreadIds = useMemo(() => active?.messages.filter(message => message.unread).map(message => message.id) ?? [], [active])
+  const unreadKey = opened && active ? `${active.id}:${unreadIds.join(',')}` : ''
+  useEffect(() => {
+    if (!opened || !active || !unreadIds.length) {
+      readAttempt.current = ''
+      return
+    }
+    if (live.busy || readAttempt.current === unreadKey) return
+    readAttempt.current = unreadKey
+    void live.mutate('message.read', {roomId: active.id, ids: unreadIds})
+  }, [active, opened, unreadIds, unreadKey, live])
   const reminders = notificationPreferences(live.data)
   const unreadMessages = reminders.messages ? conversations.reduce((sum, item) => sum + item.unread, 0) : 0
 
@@ -75,8 +87,6 @@ export function V2Messages() {
   const badgeNotices = notices.filter(item => showNoticeBadge(live.data, item)).length
   const open = (id: string) => {
     setParams({ conversation: id })
-    const ids = conversations.find(item => item.id === id)?.messages.filter(m => m.unread).map(m => m.id) ?? []
-    if (ids.length) void live.mutate('message.read', {roomId: id, ids})
   }
   const send = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
