@@ -669,6 +669,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect((await command(student.token,'comment.create',{postId:id,body:'禁止词'})).status).toBe(400);
       expect((await command(reviewer.token,'keyword.set',{id:keywordId,enabled:false})).status).toBe(200);
       expect((await command(student.token,'comment.create',{postId:id,body:'禁止词'})).status).toBe(200);
+      expect((await command(reviewer.token,'keyword.delete',{id:keywordId})).status).toBe(200);
+      expect((await postgresWorkspace(db,reviewer.token)).entities.some(e=>e.id===keywordId)).toBe(false);
+      expect((await command(reviewer.token,'keyword.save',{word:'禁止词'})).status).toBe(200);
+      expect((await command(reviewer.token,'post.delete',{id})).status).toBe(400);
+      expect((await command(reviewer.token,'post.delete',{id,reason:'管理员删除'})).status).toBe(200);
+      expect((await community(viewer.token)).posts.some((p:{id:string})=>p.id===id)).toBe(false);
+      expect((await command(reviewer.token,'content.review',{id,status:'visible',reason:'恢复'})).status).toBe(409);
       expect((await command(student.token,'post.create',{title:'不同操作',body:'正文',board:'校园'},requestId)).status).toBe(409);
     } finally { await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve())); }
   });

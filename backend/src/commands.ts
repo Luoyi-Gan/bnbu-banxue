@@ -113,6 +113,7 @@ export function execute(
         result,
         ...(action === 'keyword.save' ? { keywordChange: { word: input.word } } : {}),
         ...(action === 'keyword.set' ? { keywordChange: { enabled: input.enabled } } : {}),
+        ...(action === 'keyword.delete' ? { keywordChange: { deleted: true } } : {}),
         ...(["room.create", "room.decide", "room.finish", "room.moderate"].includes(action)
           ? {teamResult: repo.get((result as {id:string}).id)} : {}),
         ...(action === "relation.set"

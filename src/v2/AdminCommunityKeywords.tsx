@@ -8,6 +8,7 @@ type Keyword = { id: string; word: string; enabled: boolean; updatedAt: string }
 export function AdminCommunityKeywords() {
   const live = useWorkspaceBackend()
   const [editing, setEditing] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
   const [word, setWord] = useState('')
   const keywords: Keyword[] = (live.data?.entities ?? [])
     .filter(item => item.kind === 'communityKeyword')
@@ -22,6 +23,12 @@ export function AdminCommunityKeywords() {
     }
   }
   const edit = (item: Keyword) => { setEditing(item.id); setWord(item.word) }
+  const remove = async (item: Keyword) => {
+    if (await live.mutate('keyword.delete', { id: item.id })) {
+      setDeleting(null)
+      if (editing === item.id) { setEditing(null); setWord('') }
+    }
+  }
   return <div className="v2-page">
     <PageHeading eyebrow="COMMUNITY / KEYWORDS" title="社区屏蔽词" description="帖子标题、正文与评论共用这套词库。命中启用词汇时，服务端会拒绝发布并提示作者修改。"/>
     <section className="v2-panel v2-list-panel">
@@ -44,6 +51,7 @@ export function AdminCommunityKeywords() {
         <div className="v2-detail-actions">
           <button type="button" className="v2-button v2-button-secondary" onClick={() => edit(item)} disabled={live.busy}>修改</button>
           <button type="button" className="v2-button v2-button-secondary" onClick={() => { void live.mutate('keyword.set', { id: item.id, enabled: !item.enabled }) }} disabled={live.busy}>{item.enabled ? '停用' : '启用'}</button>
+          {deleting === item.id ? <><button type="button" className="v2-button v2-button-secondary" onClick={() => setDeleting(null)} disabled={live.busy}>取消</button><button type="button" className="v2-button v2-button-secondary" onClick={() => { void remove(item) }} disabled={live.busy}>确认删除</button></> : <button type="button" className="v2-button v2-button-secondary" onClick={() => setDeleting(item.id)} disabled={live.busy}>删除</button>}
         </div>
       </div>)}</div>
     </section>

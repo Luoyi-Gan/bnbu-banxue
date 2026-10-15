@@ -74,10 +74,22 @@ export function* communityPolicy(
       status: "visible",
     })));
   }
+  if (action === "post.delete") {
+    const post = yield* effect(repo.get(input.id, "post"));
+    const isAuthor = post.ownerId === actor.id;
+    demand(isAuthor || has(actor, "reviewer", "superadmin"), "只能删除本人帖子，或由审核职责处理。", 403);
+    demand(post.data.status !== "deleted", "帖子已删除。", 409);
+    const reason = isAuthor ? "" : textField(input, "reason", 1000);
+    if (!isAuthor) {
+      yield* effect(repo.notify([post.ownerId!], post.id, action, `帖子已删除：${reason}`));
+    }
+    return yield* effect(repo.save(post, { status: "deleted", deleteReason: reason }));
+  }
   if (action === "content.review") {
     reviewer(actor);
     const entity = (yield* effect(repo.get(input.id)));
     demand(["post", "comment"].includes(entity.kind), "对象类型无效。");
+    demand(entity.data.status !== "deleted", "已删除帖子不能恢复或下架。", 409);
     const status = enumField(input, "status", ["visible", "hidden"]);
     const reason = textField(input, "reason", 1000, entity.data.status === "pending" && status === "visible");
     demand(entity.data.status !== status, "内容已处于该状态。", 409);

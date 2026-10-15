@@ -16,6 +16,7 @@
 .v2-keyword-row strong { overflow-wrap: anywhere; }
 .v2-keyword-row small { color: var(--v2-muted); }
 .v2-keyword-row .v2-detail-actions { margin-top: 0; }
+.v2-keyword-row .v2-detail-actions { flex-wrap: wrap; }
 
 @media (max-width: 520px) {
   .v2-keyword-row { align-items: flex-start; flex-direction: column; }

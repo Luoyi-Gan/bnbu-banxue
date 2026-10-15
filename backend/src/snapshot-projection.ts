@@ -99,7 +99,7 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
   const readableTeacher = (id: string | null) => !!id && (eligibleTeachers.has(id) || own(id) || operate || visibleCoffeeBookings.some(b => b.data.teacherId === id));
   const entities = [
     ...posts,
-    ...(manageKeywords ? repo.all('communityKeyword') : []),
+    ...(manageKeywords ? repo.all('communityKeyword').filter(keyword => keyword.data.deleted !== true) : []),
     ...repo
       .all("comment")
       .filter(
