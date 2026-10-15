@@ -8,6 +8,22 @@
   --ui-surface: #fff;
   --ui-accent: #17617c;
   --ui-accent-soft: #eaf3f3;
+  --ui-accent-ink: #104d65;
+}
+
+body:has(.v2-app-student) {
+  --v2-blue: var(--ui-accent);
+  --v2-action: var(--ui-accent);
+  --v2-canvas: var(--ui-canvas);
+  --v2-soft: var(--ui-canvas);
+  --v2-surface: var(--ui-surface);
+  --v2-ink: var(--ui-ink);
+  --v2-muted: var(--ui-muted);
+  --v2-line: var(--ui-line);
+  --v2-accent-soft: var(--ui-accent-soft);
+  --v2-accent-ink: var(--ui-accent-ink);
+  accent-color: var(--ui-accent);
+  background: var(--ui-canvas);
 }
 
 .v2-app,
@@ -19,7 +35,12 @@
   --v2-soft: var(--ui-canvas);
   --v2-surface: var(--ui-surface);
   --v2-action: var(--ui-accent);
+  --v2-accent-soft: var(--ui-accent-soft);
+  --v2-accent-ink: var(--ui-accent-ink);
+  --v2-canvas: var(--ui-canvas);
+  --v2-outline: #819399;
   --v2-shadow: none;
+  accent-color: var(--ui-accent);
   background: var(--ui-canvas);
   color: var(--ui-ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -166,7 +187,19 @@
 .v2-app-student .v2-featured-copy h2 { font-size: 22px; }
 .v2-app .v2-filter-empty { padding: 14px 0; }
 .v2-app .activity-discovery-note { display: none; }
-.v2-app-student .v2-social-filter { padding: 14px 18px; }
+.v2-app-student .v2-community-page .v2-social-filter {
+  min-width: 0;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--ui-line);
+  border-radius: 11px;
+  background: var(--ui-surface);
+  box-shadow: none;
+}
+.v2-app-student .v2-community-page .v2-social-filter .v2-animated-search { width: 100%; max-width: 260px; }
+.v2-app-student .v2-community-page .v2-social-filter .v2-animated-search.is-open { max-width: min(390px, 100%); }
+.v2-app.v2-app-student .v2-animated-search.is-open .v2-animated-search-field { border-color: #a9c2c6; box-shadow: 0 0 0 3px rgb(23 97 124 / 12%); }
+.v2-app-student .v2-community-page .v2-filter-pills { min-width: 0; margin: 0; padding: 4px 0 0; }
 .v2-app-student .v2-social-aside > .v2-panel:nth-child(2) { display: none; }
 .v2-app-student .v2-partner-overview { min-height: 150px; padding: 22px 28px; background: #eff5f3; color: var(--ui-ink); }
 .v2-app-student .v2-partner-overview .v2-eyebrow,
@@ -189,6 +222,33 @@
 .v2-app-student .v2-service-card > span svg { width: 19px; height: 19px; }
 .v2-app-student .v2-service-card strong { font-size: 14px; }
 .v2-app-student .v2-service-card small { padding-right: 18px; color: var(--ui-muted); font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+
+/* The 3D map and its location picker use the same surface and accent. */
+.v2-app .v2-campus-explorer,
+.v2-map-picker-layer .v2-campus-explorer { border-color: var(--ui-line); border-radius: 11px; box-shadow: none; }
+.v2-app .v2-explorer-map,
+.v2-app .v2-explorer-status,
+.v2-map-picker-layer .v2-explorer-map,
+.v2-map-picker-layer .v2-explorer-status { background: #edf3f2; color: var(--ui-muted); }
+.v2-app .v2-explorer-panel,
+.v2-map-picker-layer .v2-explorer-panel { border-color: var(--ui-line); }
+.v2-app .v2-explorer-map-top > :is(span,button),
+.v2-map-picker-layer .v2-explorer-map-top > :is(span,button) { border-color: var(--ui-line); color: var(--ui-ink); box-shadow: none; }
+.v2-app .v2-explorer-intro,
+.v2-map-picker-layer .v2-explorer-intro { border-color: var(--ui-line); background: var(--ui-canvas); color: var(--ui-muted); }
+.v2-app .v2-explorer-intro :is(svg,strong),
+.v2-map-picker-layer .v2-explorer-intro :is(svg,strong) { color: var(--ui-accent); }
+.v2-app .v2-explorer-building,
+.v2-map-picker-layer .v2-explorer-building { background: linear-gradient(125deg, #124858, #17617c); }
+.v2-app .v2-explorer-events a,
+.v2-map-picker-layer .v2-explorer-events a { border-color: var(--ui-line); background: var(--ui-canvas); box-shadow: none; }
+.v2-app .v2-explorer-events a :is(span,svg,strong),
+.v2-map-picker-layer .v2-explorer-events a :is(span,svg,strong) { color: var(--ui-accent); }
+.v2-map-picker-layer .v2-location-choice > div button.is-active { border-color: #b7ced0; background: var(--ui-accent-soft); color: var(--ui-accent); }
+.v2-map-picker-layer .v2-location-building { border-color: #b7ced0; background: var(--ui-accent-soft); }
+.v2-map-picker-layer .v2-location-building :is(span,button) { color: var(--ui-accent); }
+body:has(.v2-app) .campus-map-spinner { border-color: #c8d9d8; border-top-color: var(--ui-accent); }
+body:has(.v2-app) .campus-map-header small { background: var(--ui-accent-soft); color: var(--ui-accent); }
 
 /* Profile and operations: numbers support tasks instead of looking like hero content. */
 .v2-app-student .v2-profile-header { padding: 19px 22px; border-radius: 11px; }
@@ -223,11 +283,43 @@
 .v2-app.live-app .live-connection { padding: 18px 12px 4px; color: var(--ui-muted); font-size: 11px; }
 
 /* Sports keeps all figures and controls, while opening directly on the data. */
+.v2-app .sports-dashboard { --sd-blue: var(--ui-accent); --sd-ink: var(--ui-ink); --sd-muted: var(--ui-muted); }
+.v2-app .sports-dashboard :is(button,a,input,select):focus-visible { outline-color: var(--ui-accent); }
 .v2-app .sports-hero { display: none; }
-.v2-app .sports-source-note { margin-top: 0; border-color: var(--ui-line); border-radius: 9px; background: #eff5f3; }
+.v2-app .sports-source-note { margin-top: 0; border-color: #d2e1e0; border-radius: 9px; background: #eff5f3; color: var(--ui-ink); }
+.v2-app .sports-source-note :is(svg,a) { color: var(--ui-accent); }
+.v2-app .sports-source-note span { color: var(--ui-muted); }
+.v2-app .sports-title-icon { border-color: var(--ui-line); color: var(--ui-accent); }
+.v2-app .sports-filters > label,
+.v2-app .sports-filters > button,
+.v2-app .sports-dashboard select { border-color: var(--ui-line); color: var(--ui-ink); }
+.v2-app .sports-filters > button:hover { background: var(--ui-accent-soft); }
 .v2-app .sports-metrics { gap: 10px; }
 .v2-app .sports-metric,
 .v2-app .sports-panel { border-color: var(--ui-line); border-radius: 10px; box-shadow: none; }
+.v2-app .sports-metric i,
+.v2-app .sports-tone-violet i,
+.v2-app .sports-tone-green i,
+.v2-app .sports-tone-amber i,
+.v2-app .sports-course-name > span { background: var(--ui-accent-soft); color: var(--ui-accent); }
+.v2-app .sports-segmented { border-color: var(--ui-line); background: var(--ui-canvas); }
+.v2-app .sports-segmented button[aria-pressed=true],
+.v2-app .sports-distribution-foot :is(svg,strong),
+.v2-app .sports-text-button:hover { color: var(--ui-accent); }
+.v2-app .sports-text-button,
+.v2-app .sports-chart-empty :is(strong,span),
+.v2-app .sports-panel-heading > svg,
+.v2-app .sports-dashboard :is(.sports-metric p,.sports-course-name small,.sports-table-empty span) { color: var(--ui-muted); }
+.v2-app .sports-trend-meta i,
+.v2-app .sports-legend i { background: var(--ui-accent); }
+.v2-app .sports-trend-plot path[stroke="#2159f5"],
+.v2-app .sports-trend-plot circle[stroke="#2159f5"] { stroke: var(--ui-accent); }
+.v2-app .sports-trend-plot stop[stop-color="#3871ff"] { stop-color: var(--ui-accent); }
+.v2-app .sports-chart-empty > svg { color: var(--ui-accent); }
+.v2-app .sports-count,
+.v2-app .sports-table-empty button { background: var(--ui-accent-soft); color: var(--ui-accent); }
+.v2-app .sports-search { border-color: var(--ui-line); background: white; color: var(--ui-muted); }
+.v2-app .sports-dashboard th { background: var(--ui-canvas); }
 .v2-app .sports-bottom-grid .sports-platform-card { display: none; }
 .v2-app .sports-bottom-grid { grid-template-columns: 1fr; }
 
@@ -237,7 +329,9 @@
 .v2-modal-layer :is(a,button,input,textarea,select):focus-visible,
 .v2-drawer-layer :is(a,button,input,textarea,select):focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
 .v2-modal-layer,
-.v2-drawer-layer { --v2-blue: var(--ui-accent); --v2-ink: var(--ui-ink); --v2-muted: var(--ui-muted); --v2-line: var(--ui-line); }
+.v2-drawer-layer,
+.v2-map-picker-layer { --v2-blue: var(--ui-accent); --v2-action: var(--ui-accent); --v2-accent-soft: var(--ui-accent-soft); --v2-accent-ink: var(--ui-accent-ink); --v2-canvas: var(--ui-canvas); --v2-soft: var(--ui-canvas); --v2-surface: var(--ui-surface); --v2-ink: var(--ui-ink); --v2-muted: var(--ui-muted); --v2-line: var(--ui-line); accent-color: var(--ui-accent); }
+body:has(.v2-app-student) .v2-map-picker-layer { --v2-blue: var(--ui-accent); --v2-ink: var(--ui-ink); --v2-muted: var(--ui-muted); --v2-line: var(--ui-line); accent-color: var(--ui-accent); }
 .v2-modal-layer .v2-modal,
 .v2-drawer-layer .v2-drawer { border-radius: 10px; box-shadow: 0 24px 70px rgb(17 42 52 / 20%); animation: none; }
 body:has(.v2-app-student) .v2-modal-layer .v2-button-primary:not(:disabled),
@@ -250,6 +344,8 @@ body:has(.v2-app-student) .v2-modal-layer .v2-button-secondary,
 body:has(.v2-app-student) .v2-drawer-layer .v2-button-secondary,
 .v2-modal-layer .v2-button-secondary,
 .v2-drawer-layer .v2-button-secondary { border-color: var(--ui-line); color: var(--ui-ink); background: white; }
+.v2-app.v2-app-student .v2-form :is(input:not([type=checkbox]):not([type=file]),textarea,select):focus-visible,
+body:has(.v2-app-student) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-picker-layer) .v2-form :is(input:not([type=checkbox]):not([type=file]),textarea,select):focus-visible { border-color: #a9c2c6; box-shadow: 0 0 0 3px rgb(23 97 124 / 12%); }
 .v2-app .v2-main,
 .v2-app .v2-activity-card,
 .v2-app .v2-service-card,
@@ -294,6 +390,7 @@ body:has(.v2-app-student) .v2-drawer-layer .v2-button-secondary,
   .v2-app-student .v2-a-campus-card { display: none; }
   .v2-app-student .v2-featured-carousel { height: 140px; }
   .v2-app-student .v2-featured-copy { padding: 18px; }
+  .v2-app-student .v2-community-page .v2-social-filter { margin-bottom: 12px; padding: 14px; }
   .v2-app-student .v2-partner-overview { padding: 20px; }
   .v2-app-student .v2-partner-overview h2 { font-size: 20px; }
   .v2-app-student .v2-service-lead { align-items: flex-start; gap: 10px; padding: 18px; }
