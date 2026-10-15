@@ -656,7 +656,7 @@ export function ConnectedApp() {
             <>
               {student && <SportsProgressCard sports={data.sports}/>}
               <section className="live-hero">
-                <span>你好，{student ? myDisplayName : me.name}</span>
+                <span>你好，{me.name}</span>
                 <h2>{review || operate ? "待处理工作" : "我的近期安排"}</h2>
                 <p>{review || operate ? "查看需要处理的审核与运营事项。" : teacher ? "查看交流预约与日程。" : "查看接下来的活动、组队与交流。"}</p>
                 <Link
