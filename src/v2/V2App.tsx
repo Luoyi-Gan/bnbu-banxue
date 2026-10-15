@@ -1,5 +1,6 @@
 import { AdminMailActivities } from './AdminMailActivities'
-import { Mail, BookOpen, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { AdminCommunityKeywords } from './AdminCommunityKeywords'
+import { Mail, BookOpen, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldAlert, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -49,7 +50,8 @@ const adminNav = [
   { path: '/v2/admin', label: '运营总览', icon: LayoutDashboard, end: true },
   { path: '/v2/admin/mail-activities', label: '邮件转活动', icon: Mail },
   { path: '/v2/admin/verifications', label: '认证审核', icon: ShieldCheck },
-  { path: '/v2/admin/moderation', label: '内容审核', icon: Newspaper },
+  { path: '/v2/admin/moderation', label: '社区内容', icon: Newspaper },
+  { path: '/v2/admin/keywords', label: '社区屏蔽词', icon: ShieldAlert },
 ]
 
 function V2Shell({ children, accountName }: { children: ReactNode; accountName: string }) {
@@ -155,6 +157,7 @@ function V2Routes() {
     <Route path="/v2/admin/verifications" element={<AdminVerifications/>}/>
     <Route path="/v2/admin/mail-activities" element={<AdminMailActivities/>}/>
     <Route path="/v2/admin/moderation" element={<AdminModeration/>}/>
+    <Route path="/v2/admin/keywords" element={<AdminCommunityKeywords/>}/>
     <Route path="*" element={<Navigate to={portalHome[state.role]} replace/>}/>
   </Routes></V2Shell>
 }

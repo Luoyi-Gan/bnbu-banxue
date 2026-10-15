@@ -635,10 +635,12 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       expect(responses[0]).toEqual(responses[1]);
       const id=responses[0].data.id;
       expect((await community(student.token)).posts.some((p:{id:string})=>p.id===id)).toBe(true);
-      expect((await community(viewer.token)).posts.some((p:{id:string})=>p.id===id)).toBe(false);
+      expect((await community(viewer.token)).posts.some((p:{id:string})=>p.id===id)).toBe(true);
       expect((await db.pool.query('SELECT * FROM audit WHERE entity_id=$1',[id])).rows).toHaveLength(1);
-      expect((await command(student.token,'content.review',{id,status:'visible'})).status).toBe(403);
-      expect((await command(reviewer.token,'content.review',{id,status:'visible'})).status).toBe(200);
+      expect((await command(student.token,'content.review',{id,status:'hidden',reason:'越权'})).status).toBe(403);
+      expect((await command(reviewer.token,'content.review',{id,status:'hidden',reason:'核对下架'})).status).toBe(200);
+      expect((await community(viewer.token)).posts.some((p:{id:string})=>p.id===id)).toBe(false);
+      expect((await command(reviewer.token,'content.review',{id,status:'visible',reason:'恢复展示'})).status).toBe(200);
       const studentWorkspace=await postgresWorkspace(db,student.token);
       expect(studentWorkspace.notifications.some(n=>n.entityId===id)).toBe(true);
       expect((await postgresWorkspace(db,viewer.token)).notifications.some(n=>n.entityId===id)).toBe(false);
@@ -652,10 +654,20 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
       const otherView=await community(viewer.token);
       expect(otherView.likedPosts).not.toContain(id);
       expect(otherView.savedPosts).not.toContain(id);
-      expect((await db.pool.query('SELECT * FROM notifications WHERE entity_id=$1',[id])).rows).toHaveLength(1);
+      expect((await db.pool.query('SELECT * FROM notifications WHERE entity_id=$1',[id])).rows).toHaveLength(2);
       expect((await command(reviewer.token,'content.review',{id,status:'hidden'})).status).toBe(400);
       expect((await db.transaction(client=>new PostgresRepository(client).get(id))).data.status).toBe('visible');
-      expect((await db.pool.query('SELECT * FROM audit WHERE entity_id=$1',[id])).rows).toHaveLength(4);
+      expect((await db.pool.query('SELECT * FROM audit WHERE entity_id=$1',[id])).rows).toHaveLength(5);
+      expect((await command(student.token,'keyword.save',{word:'禁止词'})).status).toBe(403);
+      const keywordResponse=await command(reviewer.token,'keyword.save',{word:'禁止词'});
+      expect(keywordResponse.status).toBe(200);
+      const keywordId=(await keywordResponse.json()).data.id;
+      expect((await postgresWorkspace(db,student.token)).entities.some(e=>e.id===keywordId)).toBe(false);
+      expect((await postgresWorkspace(db,reviewer.token)).entities.some(e=>e.id===keywordId)).toBe(true);
+      expect((await command(student.token,'post.create',{title:'禁止词',body:'正文',board:'校园'})).status).toBe(400);
+      expect((await command(student.token,'comment.create',{postId:id,body:'禁止词'})).status).toBe(400);
+      expect((await command(reviewer.token,'keyword.set',{id:keywordId,enabled:false})).status).toBe(200);
+      expect((await command(student.token,'comment.create',{postId:id,body:'禁止词'})).status).toBe(200);
       expect((await command(student.token,'post.create',{title:'不同操作',body:'正文',board:'校园'},requestId)).status).toBe(409);
     } finally { await new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve())); }
   });

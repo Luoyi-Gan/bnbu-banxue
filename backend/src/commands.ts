@@ -111,6 +111,8 @@ export function execute(
       typeof input.reason === "string" ? input.reason : "",
       JSON.stringify({
         result,
+        ...(action === 'keyword.save' ? { keywordChange: { word: input.word } } : {}),
+        ...(action === 'keyword.set' ? { keywordChange: { enabled: input.enabled } } : {}),
         ...(["room.create", "room.decide", "room.finish", "room.moderate"].includes(action)
           ? {teamResult: repo.get((result as {id:string}).id)} : {}),
         ...(action === "relation.set"

@@ -36,7 +36,8 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
       capabilities: {},
     };
   const review = has(actor, "reviewer", "superadmin"),
-    operate = has(actor, "operator", "superadmin");
+    operate = has(actor, "operator", "superadmin"),
+    manageKeywords = has(actor, "reviewer", "operator", "superadmin");
   const own = (ownerId: string | null) => ownerId === actor.id;
   const posts = repo
     .all("post")
@@ -97,6 +98,7 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
   const readableTeacher = (id: string | null) => !!id && (eligibleTeachers.has(id) || own(id) || operate || visibleCoffeeBookings.some(b => b.data.teacherId === id));
   const entities = [
     ...posts,
+    ...(manageKeywords ? repo.all('communityKeyword') : []),
     ...repo
       .all("comment")
       .filter(

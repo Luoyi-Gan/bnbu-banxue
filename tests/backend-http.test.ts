@@ -42,6 +42,36 @@ function setup(db: Database = openDatabase(":memory:")) {
   return { db, repo, a, b, c, teacher, admin, reviewer, operator, run };
 }
 describe("API、持久化和跨角色联动", () => {
+  it("管理员共用屏蔽词库，帖子和评论命中时拒绝创建，停用后可直接公开", () => {
+    const { a, b, admin, reviewer, operator, run, repo, db } = setup();
+    expect(() => run(a, 'keyword.save', { word: '违规词' })).toThrow('管理员职责');
+    const keyword = run(operator, 'keyword.save', { word: '违规词' });
+    expect(repo.get(keyword.id).data.enabled).toBe(true);
+    expect(snapshot(db, a.account).entities.some(item => item.id === keyword.id)).toBe(false);
+    expect(snapshot(db, reviewer.account).entities.some(item => item.id === keyword.id)).toBe(true);
+    expect(snapshot(db, operator.account).entities.some(item => item.id === keyword.id)).toBe(true);
+    expect(() => run(admin, 'keyword.save', { word: '违规词' })).toThrow('词汇已存在');
+    const count = repo.all('post').length;
+    expect(() => run(a, 'post.create', { title: '违规词话题', body: '正文', board: '校园' })).toThrow('请修改');
+    expect(() => run(a, 'post.create', { title: '正常话题', body: '包含违规词', board: '校园' })).toThrow('请修改');
+    expect(repo.all('post')).toHaveLength(count);
+    const post = run(a, 'post.create', { title: '正常话题', body: '正文', board: '校园' });
+    expect(repo.get(post.id).data.status).toBe('visible');
+    expect(snapshot(db, b.account).entities.some(item => item.id === post.id)).toBe(true);
+    expect(() => run(b, 'comment.create', { postId: post.id, body: '违规词评论' })).toThrow('请修改');
+    expect(repo.all('comment')).toHaveLength(0);
+    const comment = run(b, 'comment.create', { postId: post.id, body: '正常评论' });
+    expect(repo.get(comment.id).data.status).toBe('visible');
+    expect(snapshot(db, a.account).entities.some(item => item.id === comment.id)).toBe(true);
+    run(reviewer, 'keyword.save', { id: keyword.id, word: '新屏蔽词' });
+    expect(() => run(a, 'post.create', { title: '新屏蔽词', body: '正文', board: '校园' })).toThrow('请修改');
+    run(admin, 'keyword.set', { id: keyword.id, enabled: false });
+    expect(repo.get(run(a, 'post.create', { title: '新屏蔽词', body: '正文', board: '校园' }).id).data.status).toBe('visible');
+    run(operator, 'keyword.set', { id: keyword.id, enabled: true });
+    expect(() => run(b, 'comment.create', { postId: post.id, body: '新屏蔽词' })).toThrow('请修改');
+    run(admin, 'keyword.save', { word: 'Campus' });
+    expect(() => run(a, 'post.create', { title: 'ＣＡＭＰＵＳ', body: '正文', board: '校园' })).toThrow('请修改');
+  });
   it("待审帖子和评论通过可不填原因，驳回下架恢复仍须原因",()=>{
     const {a,reviewer,repo,run,db}=setup();
     for(const kind of ['post','comment']) {
@@ -129,8 +159,8 @@ describe("API、持久化和跨角色联动", () => {
       const post = run(a, "alumni.post", { direction, title: "经验", body: "分享内容" });
       expect(repo.get(post.id).data.board).toBe(`校友${direction}`);
       expect(communityView(db, a.token).posts.find(p => p.id === post.id))
-        .toMatchObject({ alumniId: profile.id, status: "pending" });
-      expect(communityView(db, admin.token).posts.find(p => p.id === post.id)).toBeUndefined();
+        .toMatchObject({ alumniId: profile.id, status: "visible" });
+      expect(communityView(db, b.token).posts.find(p => p.id === post.id)).toBeDefined();
     }
   });
   it("举报队伍不向非成员泄露历史成员名单，审核证据保持完整", () => {
@@ -240,14 +270,14 @@ describe("API、持久化和跨角色联动", () => {
     run(a, "alumni.decide", { id: next.id, accept: true });
     expect(snapshot(db, c.account).alumni.bookings[0].status).toBe("confirmed");
   });
-  it("原版社区投影用账号隔离同名作者，点赞共享而收藏只归本人", async () => {
+  it("社区直接公开，同名作者按账号区分，点赞共享而收藏只归本人", async () => {
     const f = setup();
     f.db
       .prepare("UPDATE accounts SET name=? WHERE id IN (?,?)")
       .run("同名同学", f.a.id, f.b.id);
     const post = f.run(f.a, "post.create", {
       title: "原版社区联调",
-      body: "待审核内容",
+      body: "直接公开内容",
       board: "校园",
       images: [],
     });
@@ -273,35 +303,37 @@ describe("API、持久化和跨角色联动", () => {
       id: post.id,
       ownerId: f.a.id,
       author: "同名同学",
-      status: "pending",
+      status: "visible",
       likes: 0,
     });
-    expect((await read(f.b)).posts).toEqual([]);
+    expect((await read(f.b)).posts[0].id).toBe(post.id);
     const reviewRequest = async (who: typeof f.a, status: string, reason: string, requestId = randomUUID()) => fetch(url.replace('/community','/commands'), {
       method: 'POST', headers: {Cookie: `bnbu_session=${who.token}`, 'Content-Type': 'application/json'},
       body: JSON.stringify({action:'content.review',input:{id:post.id,status,reason},requestId}),
     });
-    expect((await reviewRequest(f.b,'visible','越权')).status).toBe(403);
+    expect((await reviewRequest(f.b,'hidden','越权')).status).toBe(403);
     expect((await reviewRequest(f.reviewer,'hidden','')).status).toBe(400);
-    expect(f.repo.get(post.id).data.status).toBe('pending');
+    expect(f.repo.get(post.id).data.status).toBe('visible');
     const reviewKey = randomUUID();
-    expect((await reviewRequest(f.reviewer,'visible','符合社区要求',reviewKey)).status).toBe(200);
-    expect((await reviewRequest(f.reviewer,'visible','符合社区要求',reviewKey)).status).toBe(200);
+    expect((await reviewRequest(f.reviewer,'hidden','下架核对',reviewKey)).status).toBe(200);
+    expect((await reviewRequest(f.reviewer,'hidden','下架核对',reviewKey)).status).toBe(200);
     const notices = f.db.prepare("SELECT recipient_id,body FROM notifications WHERE entity_id=? AND event='content.review'").all(post.id);
     expect(notices).toHaveLength(1);
-    expect(notices[0]).toMatchObject({recipient_id:f.a.id,body:'内容已公开：符合社区要求'});
+    expect(notices[0]).toMatchObject({recipient_id:f.a.id,body:'内容已隐藏：下架核对'});
     /* The original moderation form uses this same content.review protocol. */
     expect(f.repo.get(post.id).data).toMatchObject({
-      status: "visible",
-      reviewNote: "符合社区要求",
+      status: "hidden",
+      reviewNote: "下架核对",
     });
+    expect((await read(f.b)).posts).toEqual([]);
+    expect((await reviewRequest(f.reviewer,'visible','恢复展示')).status).toBe(200);
     f.run(f.b, "relation.set", { id: post.id, kind: "like", enabled: true });
     f.run(f.b, "relation.set", { id: post.id, kind: "save", enabled: true });
-    f.run(f.b, "comment.create", { postId: post.id, body: "自己的待审核评论" });
+    f.run(f.b, "comment.create", { postId: post.id, body: "直接发布的评论" });
     const author = await read(f.a),
       reader = await read(f.b);
     expect(author.posts[0].likes).toBe(1);
-    expect(author.posts[0].comments).toEqual([]);
+    expect(author.posts[0].comments).toHaveLength(1);
     expect(author.savedPosts).toEqual([]);
     expect(reader.savedPosts).toEqual([post.id]);
     expect(reader.posts[0].comments).toHaveLength(1);
@@ -373,7 +405,7 @@ describe("API、持久化和跨角色联动", () => {
     expect(duplicate).toEqual(first);
     expect(repo.all("post")).toHaveLength(1);
     expect(repo.get(first.id).ownerId).toBe(a.id);
-    expect(repo.get(first.id).data.status).toBe("pending");
+    expect(repo.get(first.id).data.status).toBe("visible");
     expect(() =>
       run(a, "post.create", { ...input, title: "替换" }, key),
     ).toThrow("不同操作");
@@ -418,11 +450,7 @@ describe("API、持久化和跨角色联动", () => {
   });
   it("待审、隐藏、邮件原文、私人会话和通知按账号过滤", () => {
     const { db, repo, a, b, admin, run } = setup();
-    const post = run(a, "post.create", {
-      title: "私有待审",
-      body: "秘密草稿",
-      board: "校园",
-    });
+    const post = repo.create('post', a.id, {title:'历史待审',body:'旧内容',board:'校园',status:'pending'});
     expect(snapshot(db, b.account).entities.some((e) => e.id === post.id)).toBe(
       false,
     );
@@ -554,11 +582,6 @@ describe("API、持久化和跨角色联动", () => {
       title: "帖子",
       body: "正文",
       board: "校园",
-    });
-    run(admin, "content.review", {
-      id: post.id,
-      status: "visible",
-      reason: "通过",
     });
     const report = run(b, "report.create", { id: post.id, reason: "有问题" });
     run(admin, "report.decide", {

@@ -15,6 +15,7 @@ import {
 } from "../../shared/v2/alumniPolicy";
 import { demand, type Account } from "./auth";
 import { canSpeak, reviewer, student } from "./community";
+import { checkCommunityKeywords } from './community-keywords';
 import {
   integerField,
   enumField,
@@ -56,13 +57,16 @@ export function* alumniPolicy(
     );
     demand(profile, "需要本人已通过校友认证。", 403);
     const direction = enumField(input, "direction", ["升学", "就业"]);
+    const title = textField(input, 'title', 80);
+    const body = textField(input, 'body', 1000);
+    yield* checkCommunityKeywords(repo, title, body);
     return (yield* effect(repo.create("post", actor.id, {
       alumniId: profile.id,
-      title: textField(input, "title", 80),
-      body: textField(input, "body", 1000),
+      title,
+      body,
       board: `校友${direction}`,
       images: [],
-      status: "pending",
+      status: "visible",
     })));
   }
   const state: V2State = {

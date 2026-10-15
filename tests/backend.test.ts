@@ -162,28 +162,28 @@ describe("数据库与真实账号边界", () => {
   });
 });
 describe("跨账号完整状态操作", () => {
-  it("帖子须审核，禁言不能发帖，学生不能审核", () => {
+  it("帖子直接公开，禁言不能发帖，学生不能下架", () => {
     const { repo, a, reviewer } = setup();
     const post = communityCommand(repo, a, "post.create", {
       title: "测试",
       body: "正文",
       board: "校园",
     })!;
-    expect(post.data.status).toBe("pending");
+    expect(post.data.status).toBe("visible");
     expect(() =>
       communityCommand(repo, a, "content.review", {
         id: post.id,
-        status: "visible",
+        status: "hidden",
         reason: "核对",
       }),
     ).toThrow("审核职责");
     expect(
       communityCommand(repo, reviewer, "content.review", {
         id: post.id,
-        status: "visible",
-        reason: "核对通过",
+        status: "hidden",
+        reason: "核对下架",
       })?.data.status,
-    ).toBe("visible");
+    ).toBe("hidden");
     expect(() =>
       communityCommand(repo, { ...a, status: "muted" }, "post.create", {
         title: "test",

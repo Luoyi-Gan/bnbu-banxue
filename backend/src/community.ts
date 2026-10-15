@@ -1,5 +1,6 @@
 import { effect, runSync, type BusinessRepository } from "./storage/effects";
 import { demand, type Account } from "./auth";
+import { checkCommunityKeywords, communityKeywordPolicy } from './community-keywords';
 import {
   enumField,
   integerField,
@@ -34,6 +35,7 @@ export function* communityPolicy(
   action: string,
   input: Fields,
 ): Generator<unknown, Entity | undefined, unknown> {
+  if (action.startsWith('keyword.')) return yield* communityKeywordPolicy(repo, actor, action, input);
   if (action === "post.create") {
     student(actor);
     canSpeak(actor);
@@ -47,12 +49,16 @@ export function* communityPolicy(
         ),
       "最多九张有效 JPG、PNG、WebP 图片。",
     );
+    const title = textField(input, "title", 80);
+    const body = textField(input, "body", 1000);
+    const board = textField(input, "board", 40);
+    yield* checkCommunityKeywords(repo, title, body);
     return (yield* effect(repo.create("post", actor.id, {
-      title: textField(input, "title", 80),
-      body: textField(input, "body", 1000),
-      board: textField(input, "board", 40),
+      title,
+      body,
+      board,
       images,
-      status: "pending",
+      status: "visible",
     })));
   }
   if (action === "comment.create") {
@@ -60,10 +66,12 @@ export function* communityPolicy(
     canSpeak(actor);
     const post = (yield* effect(repo.get(input.postId, "post")));
     demand(post.data.status === "visible", "帖子尚未公开。");
+    const body = textField(input, "body", 300);
+    yield* checkCommunityKeywords(repo, body);
     return (yield* effect(repo.create("comment", actor.id, {
       postId: post.id,
-      body: textField(input, "body", 300),
-      status: "pending",
+      body,
+      status: "visible",
     })));
   }
   if (action === "content.review") {

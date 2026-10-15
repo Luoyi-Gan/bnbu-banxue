@@ -50,7 +50,7 @@ export async function executePostgres(db: PostgresDatabase, token: string, actio
       if(entity) result={id:entity.id};
     }
     demand(result,'不支持该业务操作。',404);
-    const auditData = {result,...(action==='coffee.answer' ? {accepted:input.accept} : {}),...(action==='relation.set' ? {relation:{kind:input.kind,enabled:input.enabled===true}} : {}),...(['room.create','room.decide','room.finish','room.moderate'].includes(action) ? {teamResult:await repo.get(result.id)} : {})};
+    const auditData = {result,...(action==='coffee.answer' ? {accepted:input.accept} : {}),...(action==='relation.set' ? {relation:{kind:input.kind,enabled:input.enabled===true}} : {}),...(action==='keyword.save' ? {keywordChange:{word:input.word}} : {}),...(action==='keyword.set' ? {keywordChange:{enabled:input.enabled}} : {}),...(['room.create','room.decide','room.finish','room.moderate'].includes(action) ? {teamResult:await repo.get(result.id)} : {})};
     await client.query('INSERT INTO audit(id,actor_id,role,action,entity_id,reason,data,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[randomUUID(),actor.id,actor.roles.join(','),action,typeof input.id==='string'?input.id:result.id ?? null,typeof input.reason==='string'?input.reason:'',JSON.stringify(auditData),timestamp()]);
     await client.query('INSERT INTO command_receipts(actor_id,request_id,request_hash,result,created_at) VALUES($1,$2,$3,$4,$5)',[actor.id,requestId,hash,JSON.stringify(result),timestamp()]);
     return result;

@@ -1,0 +1,22 @@
+.v2-keyword-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 3px;
+  border-bottom: 1px solid #edf1f7;
+}
+
+.v2-keyword-row > span {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+}
+
+.v2-keyword-row strong { overflow-wrap: anywhere; }
+.v2-keyword-row small { color: var(--v2-muted); }
+.v2-keyword-row .v2-detail-actions { margin-top: 0; }
+
+@media (max-width: 520px) {
+  .v2-keyword-row { align-items: flex-start; flex-direction: column; }
+}
