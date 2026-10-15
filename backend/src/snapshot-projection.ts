@@ -7,6 +7,8 @@ import { bookingStatus } from '../../shared/v2/alumniPolicy';
 import { projectDisplayPeople } from './display-people';
 import type { SportsCompanion, SportsSourceStatus } from '../../shared/live/sportsCompanion';
 import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
+import { activityMailboxConfigured } from './activity-mailbox';
+import { activityOcrConfigured } from './activity-screenshot-ocr';
 export interface SnapshotSource {
  repo: Pick<Repository,'all'|'get'|'people'>;
  firstLoginOnly:boolean;studentNumber:string|null;sports:SportsCompanion|null;sportsStatus?:SportsSourceStatus;
@@ -217,6 +219,8 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
       sports: source.sportsStatus === "available" || source.sportsStatus === "not-enrolled"
         ? "configured" : "external-service-required",
       mail: "explicit-field-extraction",
+      activityMailbox: activityMailboxConfigured() ? 'configured' : 'unconfigured',
+      activityScreenshotOcr: activityOcrConfigured() ? 'configured' : 'unconfigured',
       email: process.env.BNBU_EMAIL_DELIVERY_URL
         ? "configured"
         : process.env.BNBU_LOCAL_OUTBOX === "1"

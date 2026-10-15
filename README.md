@@ -30,6 +30,12 @@ Windows 独立验收：运行 `./Start-Local.ps1 -Acceptance`。首次会创建�
 
 详见 [本地交接与验收](docs/LOCAL_BACKEND_HANDOFF.md)、[API 协议](docs/BACKEND_API.md) 和 [业务规则](BUSINESS_RULES.md)。
 
+### 学校活动邮件与截图识别
+
+管理员活动页会显示收件邮箱和截图 OCR 的配置状态。部署时设置 `BNBU_ACTIVITY_MAIL_HOST`、`BNBU_ACTIVITY_MAIL_USER`、`BNBU_ACTIVITY_MAIL_PASSWORD`、`BNBU_ACTIVITY_MAIL_ALLOWED_SENDERS`（逗号分隔的完整邮箱或 `@school.edu` 域名）以及 `BNBU_ACTIVITY_MAIL_OPERATOR_ID`（已有且已启用的运营或超级管理员账号 ID）；端口默认 993，邮箱文件夹默认 `INBOX`。服务端每分钟读取未读邮件，只导入允许的发件人；成功写入后标记已读。字段完整的单场活动自动发布，缺项进入待核实。现有自动提取使用邮件正文中的明确字段行，例如“活动开始时间：2027-10-25 14:00”；自由格式邮件仍需管理员核对。
+
+截图识别另需 `BNBU_ACTIVITY_OCR_SECRET_ID` 和 `BNBU_ACTIVITY_OCR_SECRET_KEY`，可选 `BNBU_ACTIVITY_OCR_REGION`。管理员上传 PNG/JPG 活动海报或通知截图后，服务端调用腾讯云通用印刷体高精度识别，保存原图和识别文字。每张截图都先进入待核实，管理员核对并保存完整信息后才公开。未配置凭据时该入口显示不可用；本地演示不代表真实学校邮箱或 OCR 已连接。
+
 ## 功能
 
 公告、活动与票券、搭子、社区、校园服务、Coffee Chat、校园关系图、个人主页，以及管理员公告发布和审核。

@@ -33,6 +33,18 @@ export function execute(
   input: Fields,
   requestId: string,
 ) {
+  return executeWithActor(db, () => authenticate(db, token), token, action, input, requestId);
+}
+
+export function executeMailboxImport(db: Database, actorId: string, input: Fields, requestId: string) {
+  return executeWithActor(db, () => {
+    const actor = new Repository(db).person(actorId);
+    demand(actor.status === 'active' && actor.roles.some(role => role === 'operator' || role === 'superadmin'), '邮箱导入操作账号无效。', 403);
+    return actor;
+  }, '', 'mail.import', input, requestId);
+}
+
+function executeWithActor(db: Database, actorProvider: () => Account, token: string, action: string, input: Fields, requestId: string) {
   demand(
     /^[a-z]+(?:\.[a-z]+)+$/.test(action) &&
       requestId.length >= 8 &&
@@ -41,7 +53,7 @@ export function execute(
   );
   demand(!action.startsWith('sports.'),'伴学不提供体育业务写入。',404);
   return transaction(db, () => {
-    const actor = authenticate(db, token),
+    const actor = actorProvider(),
       repo = new Repository(db);
     demand(actor.status !== "banned", "账号已封禁，不能进行业务写入。", 403);
     if (action !== "accounts.password.change") accountSecurityGate(repo, actor);

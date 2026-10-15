@@ -2,6 +2,8 @@ import { PostgresDatabase } from './src/storage/postgres';
 import { postgresMigrations } from './src/storage/postgres-schema';
 import { createPostgresApiServer } from './src/postgres-api';
 import { configuredObjectStore } from './src/storage/cos-object-store';
+import { startActivityMailbox } from './src/activity-mailbox';
+import { executePostgresMailboxImport } from './src/storage/postgres-commands';
 
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required for PostgreSQL');
 configuredObjectStore();
@@ -28,4 +30,5 @@ try {
   });
 } catch(error) { await db.close(); throw error; }
 console.log(`BNBU PostgreSQL API listening on port ${port}; business route migration in progress`);
-for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>{server.close(()=>void db.close());});
+const mailbox=startActivityMailbox((actorId,input,requestId)=>executePostgresMailboxImport(db,actorId,input,requestId));
+for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>{mailbox?.stop();server.close(()=>void db.close());});

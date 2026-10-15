@@ -33,4 +33,13 @@ describe('活动真实封面与默认封面', () => {
     expect(liveActivities(null)).toEqual([])
     expect(liveActivities(workspace())).toEqual([])
   })
+
+  it('核对发布的截图活动显示独立来源', () => {
+    const data = workspace(undefined)
+    data.entities[0].data.source = 'screenshot'
+    const activity = liveActivities(data)[0]
+    expect(activity.subtitle).toBe('来自活动海报或通知')
+    expect(activity.category).toBe('学校活动')
+    expect(activity.local?.mailSourceId).toBe('activity-0')
+  })
 })

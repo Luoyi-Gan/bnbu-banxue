@@ -1,4 +1,5 @@
 import { searchStudents } from './student-search';
+import { randomUUID } from 'node:crypto';
 import { personHover } from './person-hover';
 import {
   createServer,
@@ -16,7 +17,7 @@ import {
   ServiceError,
 } from "./auth";
 import { openDatabase, type Database } from "./database";
-import { execute, snapshot } from "./commands";
+import { execute, executeMailboxImport, snapshot } from "./commands";
 import { communityView } from "./community-view";
 import { Repository, type Fields } from "./repository";
 
@@ -73,9 +74,11 @@ import { sendVerification } from "./mail-delivery";
 import { checkSchoolIdentity } from "./identity";
 
 import { cookieToken, send, body } from "./http";
+import { recognizeActivityScreenshot, type ScreenshotRecognizer } from './activity-screenshot-ocr';
+import { startActivityMailbox } from './activity-mailbox';
 export function createApiServer(
   db: Database,
-  options: { localOutbox?: boolean } = {},
+  options: { localOutbox?: boolean; screenshotRecognizer?: ScreenshotRecognizer } = {},
 ) {
   return createServer(async (request, response) => {
     try {
@@ -119,6 +122,14 @@ export function createApiServer(
           student(actor);
           demand(actor.status !== "banned", "账号已封禁。", 403);
           return send(response, 200, await recognize(request));
+        }
+        if (pathname === '/api/activity/screenshot/import') {
+          const token = cookieToken(request) ?? '';
+          const actor = authenticate(db, token);
+          accountSecurityGate(new Repository(db), actor);
+          demand(actor.status === 'active' && actor.roles.some(role => role === 'operator' || role === 'superadmin'), '需要运营职责。', 403);
+          const image = await recognizeActivityScreenshot(request, options.screenshotRecognizer);
+          return send(response, 200, { data: execute(db, token, 'screenshot.import', {image: image.image, recognizedText: image.text, ocrRequestId: image.requestId}, randomUUID()) });
         }
         const input = await body(request);
         if (pathname === "/api/auth/verification-codes") {
@@ -207,6 +218,7 @@ export function createApiServer(
           );
         }
         if (pathname === "/api/commands") {
+          demand(input.action !== 'screenshot.import', '请通过截图上传入口识别活动。', 403);
           demand(
             typeof input.action === "string" &&
               typeof input.requestId === "string" &&
@@ -326,7 +338,9 @@ export async function startBackend() {
     server.listen(port, host, done);
   });
   console.log(`BNBU API: http://${host}:${port} (SQLite)`);
+  const mailbox = startActivityMailbox((actorId, input, requestId) => executeMailboxImport(db, actorId, input, requestId));
   server.on("close", () => {
+    mailbox?.stop();
     db.close();
   });
   return server;

@@ -114,7 +114,7 @@ export function V2Activities() {
       <div className="v2-detail-art" role="img" aria-label={active.isDefaultCover ? '校园通用照片，默认封面' : `${active.title}封面`} style={active.image ? { backgroundImage: `url(${active.image})` } : undefined}/>
       <p className="v2-detail-lead">{active.subtitle}{active.isDefaultCover && ' · 默认封面'}</p>
       <ActivityReactions live={live} item={active}/>
-      <section className="v2-event-detail-section"><h3>活动介绍</h3><p>{active.description}</p>{active.local?.conditions && <p>参与条件：{active.local.conditions}</p>}{active.local?.mailSourceId && <p>来源：学校邮件</p>}</section>
+      <section className="v2-event-detail-section"><h3>活动介绍</h3><p>{active.description}</p>{active.local?.conditions && <p>参与条件：{active.local.conditions}</p>}{active.local?.mailSourceId && <p>来源：{active.subtitle}</p>}</section>
       <section className="v2-event-detail-section"><h3>活动信息</h3><div className="v2-event-facts">
         <div><CalendarDays size={20}/><span><small>时间</small><strong>{formatWhen(active.startAt)}{active.local?.endAt && <> 至 {formatWhen(active.local.endAt)}</>}</strong></span></div>
         <div><MapPin size={20}/><span><small>地点</small><strong>{active.location}</strong></span></div>

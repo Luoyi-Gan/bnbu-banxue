@@ -1,5 +1,5 @@
 import { effect, runSync, type BusinessRepository } from "./storage/effects";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { initialV2State } from "../../shared/v2/model";
 import {
   correctActivityMail,
@@ -12,6 +12,7 @@ import {
   normalizeMailTime,
   type MailActivityFields,
 } from "../../shared/v2/mailActivityAdapter";
+import { extractActivityScreenshot } from '../../shared/v2/activityScreenshotAdapter';
 import { demand, type Account } from "./auth";
 import { operator, owner, student } from "./community";
 import {
@@ -65,6 +66,32 @@ export function* activityPolicy(
       status: input.publish === true ? "published" : "draft",
     })));
   }
+  if (action === 'screenshot.import') {
+    operator(actor);
+    const image = textField(input, 'image', 7_000_000);
+    const match = /^data:image\/(png|jpeg);base64,([A-Za-z0-9+/]+={0,2})$/.exec(image);
+    demand(match, '请上传有效的 PNG 或 JPG 活动截图。');
+    const bytes = Buffer.from(match[2], 'base64');
+    demand(bytes.length > 0 && bytes.length <= 5 * 1024 * 1024, '活动截图不能超过 5 MB。');
+    demand(match[1] === 'png' ? bytes.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex')) : bytes.subarray(0, 3).equals(Buffer.from('ffd8ff', 'hex')), '活动截图格式无效。');
+    const screenshotHash = createHash('sha256').update(bytes).digest('hex');
+    const previous = (yield* effect(repo.all('mail'))).find(item => item.data.screenshotHash === screenshotHash);
+    if (previous) return previous;
+    const recognizedText = textField(input, 'recognizedText', 20_000);
+    const extraction = extractActivityScreenshot(recognizedText);
+    const source = { messageId: `screenshot:${screenshotHash}`, subject: extraction.fields.title || '活动截图', sender: '管理员上传截图', body: recognizedText };
+    const state = { ...initialV2State, role: 'admin' as const, localEvents: [], mailActivities: [] };
+    const imported = importActivityMail(state, source);
+    const record = imported.mailActivities![0];
+    record.fields = extraction.fields;
+    record.extraction = extraction;
+    record.status = 'pending';
+    record.history[0] = { ...record.history[0], actor: actor.id, action: '截图识别待核实', reason: extraction.issues.join('；') || '截图须由管理员核对后发布', after: extraction.fields };
+    return yield* effect(repo.create('mail', actor.id, {
+      record, purpose: 'screenshot', screenshot: image, screenshotHash,
+      ocrRequestId: typeof input.ocrRequestId === 'string' ? input.ocrRequestId.slice(0, 100) : '',
+    }));
+  }
   if (!action.startsWith("mail.")) return undefined;
   operator(actor);
   if (action === "mail.split" || action === "mail.revise") {
@@ -83,12 +110,13 @@ export function* activityPolicy(
       for (const fields of input.activities) {
         demand(fields && typeof fields === "object" && !Array.isArray(fields), "活动信息格式无效。");
         const record = { ...original, id: randomUUID(), eventId: randomUUID(), history: [...original.history] };
-        const child = (yield* effect(repo.create("mail", actor.id, {record, parentMailId: source.id})));
+        const child = (yield* effect(repo.create("mail", actor.id, {record, parentMailId: source.id, purpose: source.data.purpose === 'screenshot' ? 'screenshot' : 'activity'})));
         (yield* activityPolicy(repo, actor, "mail.correct", {...fields as Fields, id: child.id, reason}));
         children.push(child.id);
       }
       return (yield* effect(repo.save(source, {resolvedAs: "split", childMailIds: children, resolutionReason: reason, resolvedBy: actor.id})));
     }
+    demand(source.data.purpose !== 'screenshot', '活动截图不能作为更正邮件。');
     const target = (yield* effect(repo.get(input.targetMailId, "mail")));
     demand(target.id !== source.id && !target.data.resolvedAs, "请选择原活动对应的邮件。");
     demand(input.targetVersion === target.version, "原活动已变化，请重新核对。", 409);
@@ -155,6 +183,7 @@ export function* activityPolicy(
         )!;
     }
     next = importActivityMail(state, source);
+    next.mailActivities![0].history[0].actor = actor.id;
     if (input.revision === true) {
       const record = next.mailActivities![0];
       record.status = "pending";
@@ -245,7 +274,7 @@ export function* activityPolicy(
   const projected = next.localEvents.find((e) => e.id === record.eventId);
   if (projected) {
     const old = (yield* effect(repo.all("activity"))).find((e) => e.data.mailId === stored.id);
-    const data = { ...projected, image: projected.image || "/activity-default-cover.svg", source: "mail", mailId: stored.id };
+    const data = { ...projected, image: projected.image || "/activity-default-cover.svg", source: stored.data.purpose === 'screenshot' ? 'screenshot' : 'mail', mailId: stored.id };
     if (old) {
       (yield* effect(repo.save(old, data)));
       if (action === "mail.correct" && old.data.status === "published" &&

@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { randomUUID } from 'node:crypto';
 import { demand, ServiceError } from './auth';
 import { body, cookieToken as readCookieToken, send } from './http';
 
@@ -20,8 +21,9 @@ import { postgresAdministratorSelf } from './storage/postgres-admin-deletion';
 import { postgresAccountDirectory } from './storage/postgres-account-directory';
 
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
+import { recognizeActivityScreenshot, type ScreenshotRecognizer } from './activity-screenshot-ocr';
 
-export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'} = {}) {
+export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'; screenshotRecognizer?:ScreenshotRecognizer} = {}) {
   demand(options.surface!=='sports','伴学不提供独立体育服务。',404);
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
   const origins = new Set(options.origins ?? ['http://127.0.0.1:4174','http://localhost:4174']);
@@ -59,6 +61,15 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
           return send(response,200,await recognize(request));
         }
+        if(pathname==='/api/activity/screenshot/import') {
+          const token=cookieToken(request) ?? '';
+          const actor=await auth.authenticate(token);
+          demand(actor.status==='active' && actor.roles.some(role=>role==='operator'||role==='superadmin'),'需要运营职责。',403);
+          const mustChange=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
+          if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
+          const image=await recognizeActivityScreenshot(request,options.screenshotRecognizer);
+          return send(response,200,{data:await executePostgres(db,token,'screenshot.import',{image:image.image,recognizedText:image.text,ocrRequestId:image.requestId},randomUUID())});
+        }
         const input = await body(request);
         if(pathname==='/api/accounts/admin-email/request') {
           demand(Object.keys(input).length===0,'邮箱验证只能使用本人当前邮箱。');
@@ -67,6 +78,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         if(pathname==='/api/accounts/admin-email/confirm') return send(response,200,await postgresAdminEmailConfirm(db,cookieToken(request) ?? '',input));
         if(pathname==='/api/identity/check') return send(response,200,await checkSchoolIdentity(await auth.authenticate(cookieToken(request))));
         if (pathname === '/api/commands') {
+          demand(input.action !== 'screenshot.import','请通过截图上传入口识别活动。',403);
           const key = input.requestId;
           demand(typeof key==='string','缺少操作幂等标识。');
           demand(typeof input.action==='string' && input.input && typeof input.input==='object' && !Array.isArray(input.input),'请求格式无效。');

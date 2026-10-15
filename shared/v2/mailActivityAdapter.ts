@@ -1,7 +1,7 @@
 export interface MailActivityFields { title: string; description: string; startAt: string; endAt: string; location: string; host: string; conditions: string }
 export const mailFieldLabels: Record<keyof MailActivityFields, string> = { title: '活动名称', description: '活动介绍', startAt: '活动开始时间', endAt: '活动结束时间', location: '活动地点', host: '主办方', conditions: '参与条件' }
 export interface MailSource { messageId: string; subject: string; sender: string; body: string; cover?: { name: string; data: string } }
-export interface MailExtraction { fields: MailActivityFields; evidence: Partial<Record<keyof MailActivityFields, string>>; issues: string[]; adapter: 'local-rules' }
+export interface MailExtraction { fields: MailActivityFields; evidence: Partial<Record<keyof MailActivityFields, string>>; issues: string[]; adapter: 'local-rules' | 'screenshot-ocr' }
 
 // Local demonstration adapter. A future authenticated AI service must return
 // evidence and explicit uncertainty, never instructions executable by this app.

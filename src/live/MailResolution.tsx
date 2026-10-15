@@ -36,10 +36,10 @@ export function MailResolution({source, mails, onSaved}: {source: LiveEntity; ma
   if (record.status !== "pending" || source.data.parentMailId) return null;
   return <>
     {source.data.purpose !== "revision" && <button className="v2-button v2-button-secondary" onClick={() => open("split")}>拆分多场活动</button>}
-    <button className="v2-button v2-button-secondary" onClick={() => open("revise")}>关联更正原活动</button>
+    {source.data.purpose !== 'screenshot' && <button className="v2-button v2-button-secondary" onClick={() => open("revise")}>关联更正原活动</button>}
     {mode && <Modal title={mode === "split" ? "核对并拆分活动" : "核对更正邮件"} onClose={() => {if (!busy) setMode(null);}}>
       <form className="live-form" onSubmit={submit}>
-        <details><summary>查看原邮件</summary><p style={{whiteSpace: "pre-wrap"}}>{(original.data.record as unknown as MailActivityRecord).source.body}</p></details>
+        <details><summary>查看识别原文</summary><p style={{whiteSpace: "pre-wrap"}}>{(original.data.record as unknown as MailActivityRecord).source.body}</p></details>
         <fieldset disabled={busy}>
           {mode === "revise" && <label>选择原活动<select required value={target?.id ?? ""} onChange={event => {
             const selected = mails.find(item => item.id === event.target.value) ?? null;
@@ -53,7 +53,7 @@ export function MailResolution({source, mails, onSaved}: {source: LiveEntity; ma
           </fieldset>)}
           {mode === "split" && rows.length < 50 && <button type="button" onClick={() => {setRows(values => [...values, empty()]); setConfirmed(false);}}>再加一场活动</button>}
           <label>处理原因<textarea required maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} /></label>
-          <label><input type="checkbox" required checked={confirmed} onChange={event => setConfirmed(event.target.checked)} />我已核对原邮件和以上活动信息</label>
+          <label><input type="checkbox" required checked={confirmed} onChange={event => setConfirmed(event.target.checked)} />我已核对来源和以上活动信息</label>
         </fieldset>
         {error && <p role="alert" className="live-error">{error}</p>}
         <button className="v2-button v2-button-primary" disabled={busy || !rows.length}>{busy ? "正在保存…" : "确认提交"}</button>

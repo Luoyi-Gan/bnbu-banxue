@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { demand, digest, ServiceError, timestamp } from '../auth';
+import { demand, digest, ServiceError, timestamp, type Account } from '../auth';
+import type { PoolClient } from 'pg';
 import { communityPolicy } from '../community';
 import { coffeePolicy } from '../coffee';
 import { governancePolicy } from '../governance';
@@ -18,13 +19,25 @@ import { postgresAdministratorState, postgresAdministratorCreate, postgresAdmini
 import { postgresAdministratorDelete } from './postgres-admin-deletion';
 
 export async function executePostgres(db: PostgresDatabase, token: string, action: string, input: Fields, requestId: string) {
+  return executeWithActor(db, client => new PostgresAuth(db).authenticate(token, client), token, action, input, requestId);
+}
+
+export async function executePostgresMailboxImport(db: PostgresDatabase, actorId: string, input: Fields, requestId: string) {
+  return executeWithActor(db, async client => {
+    const actor = await new PostgresRepository(client).person(actorId);
+    demand(actor.status === 'active' && actor.roles.some(role => role === 'operator' || role === 'superadmin'), '邮箱导入操作账号无效。', 403);
+    return actor;
+  }, '', 'mail.import', input, requestId);
+}
+
+async function executeWithActor(db: PostgresDatabase, actorProvider: (client: PoolClient) => Promise<Account>, token: string, action: string, input: Fields, requestId: string) {
   demand(/^[a-z]+(?:\.[a-z]+)+$/.test(action) && requestId.length>=8 && requestId.length<=100,'请求格式无效。');
   demand(!action.startsWith('sports.'),'伴学不提供体育业务写入。',404);
   return db.transaction(async client => {
     // Preserve SQLite's serialized business-command boundary while policies are migrated.
     // All API instances share this lock; external I/O must remain outside this transaction.
     await client.query('SELECT pg_advisory_xact_lock(18422,2)');
-    const actor = await new PostgresAuth(db).authenticate(token,client);
+    const actor = await actorProvider(client);
     demand(actor.status!=='banned','账号已封禁，不能进行业务写入。',403);
     const repo = new PostgresRepository(client);
     if(action!=='accounts.password.change' && passwordChangeRequired(await repo.all('companionIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');

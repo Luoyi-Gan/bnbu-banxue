@@ -20,7 +20,8 @@ export function AdminMailActivities() {
   const [feedback, setFeedback] = useState('')
   const [reason, setReason] = useState('')
   const [loadingImage, setLoadingImage] = useState(false)
-  const records = (live.data?.entities ?? []).filter(e => e.kind === 'mail' && !e.data.resolvedAs).map(e => ({...(e.data.record as unknown as MailActivityRecord), entityId: e.id}))
+  const [uploadingScreenshot, setUploadingScreenshot] = useState(false)
+  const records = (live.data?.entities ?? []).filter(e => e.kind === 'mail' && !e.data.resolvedAs).map(e => ({...(e.data.record as unknown as MailActivityRecord), entityId: e.id, purpose: e.data.purpose, screenshot: e.data.screenshot as string | undefined}))
   const current = records.find(m => m.id === selected)
   const act = async (action: string, input: Record<string, unknown>, message: string) => {
     if (!canOperate) {setFeedback('需要运营职责。'); return}
@@ -30,6 +31,21 @@ export function AdminMailActivities() {
   const importMail = (event: FormEvent) => {
     event.preventDefault()
     void act('mail.import', {...source, cover: source.cover?.data, coverName: source.cover?.name}, '邮件已保存；完整活动自动发布，缺项或冲突保留待核实，重复邮件沿用原记录。')
+  }
+  const importScreenshot = async (file?: File) => {
+    if (!file) return
+    if (!['image/png', 'image/jpeg'].includes(file.type) || file.size > 5 * 1024 * 1024) {setFeedback('请选择不超过 5 MB 的 PNG 或 JPG 活动海报或通知截图。'); return}
+    setFeedback(''); setUploadingScreenshot(true)
+    try {
+      const form = new FormData(); form.set('image', file)
+      const response = await fetch('/api/activity/screenshot/import', {method: 'POST', credentials: 'include', body: form})
+      const result = await response.json() as {data?: {id?: string}; message?: string}
+      if (!response.ok) throw new Error(result.message || '截图识别失败')
+      await live.refresh()
+      setSelected(result.data?.id || '')
+      setFeedback('已打开截图识别记录；新截图需核对原图和提取内容后发布，重复截图沿用原记录。')
+    } catch (error) {setFeedback(error instanceof Error ? error.message : '截图识别失败')}
+    finally {setUploadingScreenshot(false)}
   }
   const example = () => setSource({ messageId: 'demo-school-mail-20261025', subject: '【演示邮件】校园 AI 交流', sender: '演示学校邮件', body: '活动名称：【演示】校园 AI 交流\n活动介绍：交流学习经验与校园创意，仅用于本地流程演示。\n活动开始时间：2026-10-25 14:00\n活动结束时间：2026-10-25 16:00\n活动地点：资源中心 201\n主办方：校园交流中心（演示）\n参与条件：面向在校学生' })
   const upload = async (file?: File) => {
@@ -57,10 +73,15 @@ export function AdminMailActivities() {
   const notice = <>{live.error && <p role="alert">{live.error}</p>}{feedback && <p role="status" className="v2-info-box">{feedback}</p>}</>
   if (!live.data) return <p role={live.error ? 'alert' : 'status'}>{live.error || '正在读取邮件处理记录…'}</p>
   return <div className="v2-page v2-mail-page">
-    <PageHeading eyebrow="SCHOOL MAIL" title="邮件转活动" description="从学校邮件整理活动信息，自动发布，事后修正。"/>
-    <div className="v2-info-box">{!canOperate && <>当前账号没有运营职责，不能导入或修改邮件。 </>}当前使用规则提取邮件内容，处理记录保存到伴学后台。信息完整但没有海报时使用默认封面；可选择邮件附件图片。</div>
+    <PageHeading eyebrow="SCHOOL EVENTS" title="学校活动发布" description="自动接收学校邮件，识别海报或通知截图，集中核对待处理活动。"/>
+    <div className="v2-info-box">{!canOperate && <>当前账号没有运营职责，不能导入或修改活动。 </>}收件邮箱：{live.data.capabilities?.activityMailbox === 'configured' ? '已配置定时收取；连接状态以服务端日志为准' : '未配置；部署时需连接学校收件邮箱'}。邮件信息完整时自动发布，缺项时进入待核实。</div>
     {!current && notice}
-    <section className="v2-panel v2-list-panel"><SectionHeading title="导入邮件内容" action={<button className="v2-button v2-button-secondary" disabled={!canOperate || live.busy} onClick={example}>填入示例邮件</button>}/>
+    <section className="v2-panel v2-list-panel"><SectionHeading title="识别活动海报或通知截图" detail="识别结果仅保存为待核实，管理员核对后发布"/>
+      <p className="v2-form-note">{live.data.capabilities?.activityScreenshotOcr === 'configured' ? '上传 PNG 或 JPG 图片，系统提取文字和活动字段。' : '截图 OCR 尚未配置；部署时配置识别服务后可使用。'}</p>
+      <label className="v2-form">上传截图<input type="file" accept="image/png,image/jpeg" disabled={!canOperate || uploadingScreenshot || live.data.capabilities?.activityScreenshotOcr !== 'configured'} onChange={event => {void importScreenshot(event.target.files?.[0]); event.target.value = ''}}/></label>
+      {uploadingScreenshot && <p role="status">正在识别截图…</p>}
+    </section>
+    <details className="v2-panel v2-list-panel"><summary>高级：手动导入邮件</summary><SectionHeading title="导入邮件内容" action={<button className="v2-button v2-button-secondary" disabled={!canOperate || live.busy} onClick={example}>填入示例邮件</button>}/>
       <form className="v2-form" onSubmit={importMail}>
         <div className="v2-form-two"><label>邮件标识<input disabled={!canOperate || live.busy} required maxLength={200} value={source.messageId} onChange={e => setSource({ ...source, messageId: e.target.value })} placeholder="原邮件 Message-ID，用于防止重复"/></label><label>发件人<input disabled={!canOperate || live.busy} required maxLength={200} value={source.sender} onChange={e => setSource({ ...source, sender: e.target.value })}/></label></div>
         <label>邮件主题<input disabled={!canOperate || live.busy} required maxLength={300} value={source.subject} onChange={e => setSource({ ...source, subject: e.target.value })}/></label>
@@ -70,17 +91,18 @@ export function AdminMailActivities() {
         {source.cover && <div><img className="v2-mail-cover" src={source.cover.data} alt="邮件附件封面预览"/><p>{source.cover.name} <button type="button" className="v2-text-button" onClick={() => setSource({ ...source, cover: undefined })}>移除封面</button></p></div>}
         <button className="v2-button v2-button-primary" disabled={!canOperate || loadingImage || live.busy}>识别并自动发布（信息完整时）</button>
       </form>
-    </section>
-    <section className="v2-panel v2-list-panel"><SectionHeading title="邮件处理记录" detail={`已发布 ${records.filter(m => m.status === 'published').length} · 待核实 ${records.filter(m => m.status === 'pending').length} · 已下架 ${records.filter(m => m.status === 'hidden').length}`}/>
+    </details>
+    <section className="v2-panel v2-list-panel"><SectionHeading title="活动识别记录" detail={`已发布 ${records.filter(m => m.status === 'published').length} · 待核实 ${records.filter(m => m.status === 'pending').length} · 已下架 ${records.filter(m => m.status === 'hidden').length}`}/>
       <div className="v2-form v2-form-two"><label>搜索邮件或活动<input value={query} onChange={e => setQuery(e.target.value)}/></label><label>处理状态<select value={filter} onChange={e => setFilter(e.target.value)}><option value="all">全部</option>{Object.entries(labels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label></div>
-      {records.filter(m => (filter === 'all' || m.status === filter) && (m.source.subject + m.fields.title + m.source.messageId).toLowerCase().includes(query.toLowerCase())).map(m => <button key={m.id} className="v2-mail-record" onClick={() => { setSelected(m.id); setReason(''); setFeedback('') }}><span><strong>{m.fields.title || m.source.subject}</strong><small>{m.source.subject} · {new Date(m.importedAt).toLocaleString('zh-CN')}</small></span><span className="v2-status-chip">{labels[m.status]}</span></button>)}
-      {!records.length && <Empty icon={Mail} title="还没有导入邮件" description="导入后可查看识别结果、修正信息及发布历史。"/>}
+      {records.filter(m => (filter === 'all' || m.status === filter) && (m.source.subject + m.fields.title + m.source.messageId).toLowerCase().includes(query.toLowerCase())).map(m => <button key={m.id} className="v2-mail-record" onClick={() => { setSelected(m.id); setReason(''); setFeedback('') }}><span><strong>{m.fields.title || m.source.subject}</strong><small>{m.purpose === 'screenshot' ? '截图识别' : '学校邮件'} · {new Date(m.importedAt).toLocaleString('zh-CN')}</small></span><span className="v2-status-chip">{labels[m.status]}</span></button>)}
+      {!records.length && <Empty icon={Mail} title="还没有活动识别记录" description="收到学校邮件或上传截图后，可在这里核对结果及发布历史。"/>}
     </section>
     {current && <Drawer title={current.fields.title || current.source.subject} eyebrow={labels[current.status]} onClose={() => setSelected('')} wide>
       {notice}
       {canOperate && <MailResolution source={live.data.entities.find(e => e.id === current.entityId)!} mails={live.data.entities.filter(e => e.kind === 'mail')} onSaved={async () => {setSelected(''); await live.refresh()}} />}
-      {current.status === 'pending' && <div className="v2-info-box">待核实：{current.extraction.issues.join('；')}。核实补全并保存后自动发布。</div>}
-      <details><summary>邮件原文与识别依据</summary><p>标识：{current.source.messageId}</p><p>发件人：{current.source.sender || '未提供'}</p><p>主题：{current.source.subject}</p><pre className="v2-mail-original">{current.source.body}</pre>{entries.map(([key, label]) => <p key={key}>{label}：{current.extraction.evidence[key] || '未识别到明确依据'}</p>)}</details>
+      {current.status === 'pending' && <div className="v2-info-box">待核实：{current.extraction.issues.join('；') || '请逐项核对来源与识别内容'}。核实补全并保存后发布。</div>}
+      {current.screenshot && <figure><img className="v2-mail-cover" src={current.screenshot} alt="上传的活动海报或通知截图"/><figcaption>识别原图，请逐项核对</figcaption></figure>}
+      <details open={current.purpose === 'screenshot'}><summary>{current.purpose === 'screenshot' ? '截图识别原文与依据' : '邮件原文与识别依据'}</summary><p>标识：{current.source.messageId}</p><p>发件人：{current.source.sender || '未提供'}</p><p>主题：{current.source.subject}</p><pre className="v2-mail-original">{current.source.body}</pre>{entries.map(([key, label]) => <p key={key}>{label}：{current.extraction.evidence[key] || '未识别到明确依据'}</p>)}</details>
       {current.source.cover && <figure><img className="v2-mail-cover" src={current.source.cover.data} alt="活动封面"/><figcaption>邮件附件：{current.source.cover.name}</figcaption></figure>}
       <form key={`${current.id}-${current.history.length}`} className="v2-form" onSubmit={save}>
         {entries.map(([key, label]) => <label key={key}>{label}{key === 'startAt' || key === 'endAt' ? '（北京时间）' : ''}{key === 'description' ? <textarea name={key} required rows={4} defaultValue={current.fields[key]}/> : <input name={key} required={!['host', 'conditions'].includes(key)} type={key === 'startAt' || key === 'endAt' ? 'datetime-local' : 'text'} defaultValue={key === 'startAt' || key === 'endAt' ? current.fields[key].slice(0, 16) : current.fields[key]}/>}</label>)}

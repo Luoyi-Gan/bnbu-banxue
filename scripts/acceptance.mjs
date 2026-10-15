@@ -13,7 +13,7 @@ await build({
       formats: ["es"],
       fileName: () => "tooling.mjs",
     },
-    rollupOptions: { external: [/^node:/] },
+    rollupOptions: { external: [/^node:/, 'imapflow', 'mailparser', 'tencentcloud-sdk-nodejs-ocr'] },
   },
 });
 const tooling = await import(
