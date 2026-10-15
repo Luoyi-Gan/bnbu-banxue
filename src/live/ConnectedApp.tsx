@@ -578,7 +578,7 @@ export function ConnectedApp() {
   ];
 
   return (
-    <div className="v2-app live-app">
+    <div className={`v2-app live-app${review || operate ? " live-app-admin" : ""}`}>
       <aside className="v2-sidebar live-sidebar">
         <Link to="/workspace" className="v2-brand">
           <img src={brandIcon} alt="" />
@@ -656,23 +656,18 @@ export function ConnectedApp() {
             <>
               {student && <SportsProgressCard sports={data.sports}/>}
               <section className="live-hero">
-                <span>你好，{me.name}</span>
-                <h2>
-                  把校园里的下一步，
-                  <br />
-                  安排在这里。
-                </h2>
-                <p>活动、伙伴与交流，连接同一份真实操作记录。</p>
+                <span>你好，{student ? myDisplayName : me.name}</span>
+                <h2>{review || operate ? "待处理工作" : "我的近期安排"}</h2>
+                <p>{review || operate ? "查看需要处理的审核与运营事项。" : teacher ? "查看交流预约与日程。" : "查看接下来的活动、组队与交流。"}</p>
                 <Link
                   className="v2-button v2-button-primary"
-                  to="/workspace/notifications"
+                  to={review || operate ? "/workspace/admin" : teacher ? "/workspace/coffee" : "/workspace/activities"}
                 >
-                  查看通知 ·{" "}
-                  {data.notifications.filter((n) => !n.readAt).length}
+                  {review || operate ? "查看工作台" : teacher ? "查看预约" : "发现活动"}
                   <ArrowRight size={16} />
                 </Link>
               </section>
-              <div className="live-summary">
+              {student && !review && !operate && <div className="live-summary">
                 {[
                   ["我的交流", myCoffee.length],
                   [
@@ -691,7 +686,7 @@ export function ConnectedApp() {
                     <span>{name}</span>
                   </div>
                 ))}
-              </div>
+              </div>}
               {!roles.length && (
                 <p className="v2-panel live-card">
                   邮箱账号已建立。学校身份和业务职责须经授权后才能开展校园操作。
