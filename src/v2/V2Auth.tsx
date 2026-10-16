@@ -15,6 +15,7 @@ import brandIcon from "../assets/brand/brand-app-icon-a.svg";
 import { authApi, AuthServiceError } from "./authApi";
 import { roleLoginPath } from "./authReturnPath";
 import "./auth.css";
+import "./editorialAuth.css";
 
 type AuthMode = "login" | "register";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

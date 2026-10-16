@@ -1,0 +1,23 @@
+.v2-auth-page{--auth-ink:#252722;--auth-muted:#77766f;--auth-line:#e4ded5;--auth-blue:#177f70;background:#f4f0eb}
+.v2-auth-header{height:78px}
+.v2-auth-brand{font-family:Georgia,"Songti SC",serif;font-size:21px;font-weight:600}
+.v2-auth-brand small{font-family:ui-sans-serif,system-ui,sans-serif;font-weight:500;letter-spacing:.19em}
+.v2-auth-brand img{border-radius:50%}
+.v2-auth-layout{gap:clamp(35px,6vw,90px);padding:45px 0}
+.v2-auth-intro{position:relative;min-height:540px;overflow:hidden;justify-content:flex-end;padding:34px;color:#fff;background:linear-gradient(0deg,rgba(22,32,26,.70),rgba(22,32,26,.03) 80%),url('../assets/campus/home-background.jpg') center/cover}
+.v2-auth-intro>.v2-auth-eyebrow{position:absolute;top:32px;left:34px;color:#fff}
+.v2-auth-intro>div:nth-child(2){margin:0 0 34px}
+.v2-auth-index{color:#e5e6dd;font-weight:500}
+.v2-auth-intro h1{font-family:Georgia,"Songti SC",serif;font-size:clamp(41px,4vw,62px);font-weight:500;line-height:1.18;letter-spacing:-.045em}
+.v2-auth-intro p{color:#f3f1e9;font-size:14px}
+.v2-auth-intro-footer{border-top-color:#ffffff70;color:#f3f1e9}
+.v2-auth-card{border-radius:5px;background:#fffdf9;box-shadow:0 18px 50px rgba(54,45,31,.06)}
+.v2-auth-card-head h2{font-family:Georgia,"Songti SC",serif;font-size:35px;font-weight:600}
+.v2-auth-input{border-color:var(--auth-line);border-radius:5px;background:#fff}
+.v2-auth-input:focus-within{border-color:#90b4a5;box-shadow:0 0 0 3px #d9e8df}
+.v2-auth-submit{border-radius:5px;background:#252722}
+.v2-auth-submit:hover:not(:disabled){background:#434840}
+.v2-auth-code-row>button{border-color:var(--auth-line);border-radius:5px;background:#f7f3ed;color:#176b60}
+.v2-auth-code-row>button:hover:not(:disabled){background:#e5eee9}
+@media(max-width:850px){.v2-auth-layout{gap:18px}.v2-auth-intro{min-height:235px;padding:24px}.v2-auth-intro>.v2-auth-eyebrow{top:20px;left:23px}.v2-auth-intro>div:nth-child(2){margin-top:auto;margin-bottom:0}.v2-auth-intro h1{margin:8px 0;font-size:33px}.v2-auth-intro p{font-size:12px}.v2-auth-card{box-shadow:none}}
+@media(max-width:520px){.v2-auth-layout{padding-top:20px}.v2-auth-intro{min-height:190px}.v2-auth-intro h1{font-size:29px}.v2-auth-intro .v2-auth-eyebrow{display:block}.v2-auth-card{padding:25px 22px}.v2-auth-card-head h2{font-size:30px}}

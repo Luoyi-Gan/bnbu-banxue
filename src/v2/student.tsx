@@ -13,7 +13,8 @@ import { AnimatedSearchField } from './AnimatedSearchField'
 import { filterActivityItems, type ActivityPeriod, type ActivitySort, type ActivityStatus } from './activityFilters'
 import { liveStudentSchedule } from './liveStudentSchedule'
 import { liveActivities } from './liveActivities'
-import { SportsProgressCard } from './SportsProgressCard'
+import campusHomeImage from '../assets/campus/home-background.jpg'
+import campusEveningImage from '../assets/campus/night-walkway.jpg'
 import { DisplayAvatar } from './DisplayAvatar'
 import { displayPerson } from './displayPerson'
 
@@ -23,19 +24,20 @@ export function V2Home() {
   const live = useWorkspaceBackend(30000)
   const schedule = liveStudentSchedule(live.data)
   const next = schedule[0]
+  const activities = liveActivities(live.data).filter(item => Date.parse(item.endAt ?? item.startAt) > Date.now() && (!item.local || item.local.status === 'published')).slice(0, 2)
   const roomRequests = live.data?.entities.filter(e => e.kind === 'roomApplication' && e.data.status === 'pending' && live.data?.entities.some(r => r.kind === 'room' && r.id === e.data.roomId && r.ownerId === live.data?.account.id)).length ?? 0
   const now = new Date()
+  const greeting = now.getHours() < 11 ? '早上好' : now.getHours() < 18 ? '下午好' : '晚上好'
   const today = `${new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(now)}，${new Intl.DateTimeFormat('zh-CN', { weekday: 'long' }).format(now)}`
-  return <div className="v2-page v2-home">
-    <header className="v2-a-home-heading"><span className="v2-eyebrow">首页</span><h1>今天</h1><p>你好，{String(live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data.nickname ?? live.data?.account.name ?? '同学')}。</p><div className="v2-a-home-date"><strong>{today}</strong><span>·</span><span>{schedule.length} 项近期安排</span></div></header>
+  const name = String(live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data.nickname ?? live.data?.account.name ?? '同学')
+  return <div className="v2-page v2-home v2-editorial-home">
+    <section className="v2-editorial-hero" style={{backgroundImage: `linear-gradient(90deg,rgba(17,24,21,.48),rgba(17,24,21,.04)),url(${campusHomeImage})`}}><span className="v2-eyebrow">BNBU · CAMPUS LIFE</span><h1>在这里，<br/>遇见更大的校园生活。</h1><Link to="/v2/activities">开始探索 <ArrowRight size={17}/></Link><small>01 / CAMPUS</small></section>
+    <header className="v2-editorial-today"><div><span className="v2-eyebrow">TODAY / {today}</span><h2>{greeting}，{name}</h2><p>把今天的校园生活，过得有声有色。</p></div><Link to="/v2/me?tab=events">我的日程 <ArrowRight size={16}/></Link></header>
     {live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人安排…</p>}
-    <div className="v2-a-home-primary">
-      {roomRequests > 0 && <section className="v2-panel v2-a-task-card"><SectionHeading title="待处理" detail="组队申请"/><div className="v2-a-task-list"><Link to="/v2/partners/teams"><span className="v2-a-task-count">{roomRequests}</span><span><strong>组队申请等待答复</strong><small>前往我的队伍处理</small></span><ArrowRight size={15}/></Link></div></section>}
-      <section className="v2-panel v2-a-next-card"><span className="v2-eyebrow">{next ? next.label : '近期安排'}</span>{next ? <><strong className="v2-a-next-time">{next.startAt ? formatWhen(next.startAt) : next.time}</strong><h2>{next.title}</h2><p><MapPin size={15}/>{next.location}</p><div className="v2-a-next-actions"><Link className="v2-button v2-button-primary" to={next.path}>查看详情 <ArrowRight size={16}/></Link><Link className="v2-button v2-button-secondary" to="/v2/activities">发现活动</Link></div></> : <><h2>暂无待进行的安排</h2><p>可以看看近期活动，或找同学一起组队。</p><div className="v2-a-next-actions"><Link className="v2-button v2-button-primary" to="/v2/activities">浏览活动 <ArrowRight size={16}/></Link><Link className="v2-button v2-button-secondary" to="/v2/partners">找搭子</Link></div></>}</section>
-    </div>
-    <SportsProgressCard sports={live.data?.sports}/>
-    {schedule.length > 0 && <section className="v2-panel v2-a-schedule-card"><SectionHeading title="近期安排" action={<Link to="/v2/me?tab=events">查看全部 <ArrowRight size={14}/></Link>}/><div className="v2-a-schedule-list">{schedule.slice(0, 4).map((item, index) => <Link to={item.path} key={item.id} style={{ animationDelay: `${index * 45}ms` }}><time>{item.startAt ? formatWhen(item.startAt) : item.time}</time><span><strong>{item.title}</strong><small>{item.location}</small></span><em>{item.label}</em></Link>)}</div></section>}
-    <Link className="v2-a-campus-link" to="/v2/campus/explore">探索校园地图与活动 <ArrowRight size={15}/></Link>
+    <div className="v2-editorial-summary"><Link to="/v2/me?tab=events"><CalendarDays size={19}/><span><strong>{schedule.length}</strong><small>近期安排</small></span><ArrowRight size={15}/></Link><Link to="/v2/partners/teams"><UsersRound size={19}/><span><strong>{roomRequests}</strong><small>待处理申请</small></span><ArrowRight size={15}/></Link><Link to="/v2/messages"><Megaphone size={19}/><span><strong>{live.data?.notifications.filter(item => !item.readAt).length ?? 0}</strong><small>未读通知</small></span><ArrowRight size={15}/></Link></div>
+    <section className="v2-editorial-section"><SectionHeading title="接下来" action={<Link to="/v2/me?tab=events">全部日程 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-agenda">{next ? <Link to={next.path}><time>{next.startAt ? formatWhen(next.startAt) : next.time}</time><span><strong>{next.title}</strong><small>{next.location}</small></span><em>{next.label}</em><ArrowRight size={16}/></Link> : <p>暂无待进行的安排。<Link to="/v2/activities">看看最近的活动 <ArrowRight size={14}/></Link></p>}</div></section>
+    <section className="v2-editorial-section"><SectionHeading title="为你推荐" action={<Link to="/v2/activities">更多活动 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-recommendations">{activities.map(item => <Link to={`/v2/activities/${item.id}`} key={item.id} className="v2-editorial-recommendation"><div className="v2-editorial-recommendation-image" style={item.image ? {backgroundImage: `url(${item.image})`} : undefined}/><span className="v2-eyebrow">{item.category} · {formatWhen(item.startAt)}</span><strong>{item.title}</strong><small>{item.location}</small></Link>)}{live.data && !activities.length && <p>暂无近期活动，稍后再来看看。</p>}</div></section>
+    <Link className="v2-editorial-campus-link" to="/v2/campus">校园、社群与更多可能 <ArrowRight size={16}/></Link>
   </div>
 }
 
@@ -86,9 +88,11 @@ export function V2Activities() {
     if (await live.mutate('activity.create', {title: String(data.get('title') ?? ''), description: String(data.get('description') ?? ''), startAt: new Date(String(data.get('date'))).toISOString(), location, capacity: Number(data.get('capacity'))})) {setCreateOpen(false); setActivityBuilding(null); setPublishError('')}
   }
   const changeVisibility = (eventId: string) => live.mutate('activity.visibility', {id: eventId, publish: all.find(e => e.id === eventId)?.local?.status !== 'published'})
-  return <div className="v2-page v2-activities"><PageHeading eyebrow="DISCOVER / EVENTS" title="发现活动" description="发现感兴趣的事，让校园生活多一种可能。" action={permitted && <button className="v2-button v2-button-primary" type="button" onClick={() => { setPublishError(''); setCreateOpen(true) }}><Plus size={17}/> 发起活动</button>}/>
+  return <div className="v2-page v2-activities"><PageHeading eyebrow="DISCOVER / CAMPUS" title="发现" description="活动、社群与同行者，从这里开始。" action={permitted && <button className="v2-button v2-button-primary" type="button" onClick={() => { setPublishError(''); setCreateOpen(true) }}><Plus size={17}/> 发起活动</button>}/>
     {live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取活动…</p>}
+    <nav className="v2-editorial-discover-links" aria-label="发现更多"><span>活动</span><Link to="/v2/campus">社团组织</Link><Link to="/v2/community">校园社区</Link><Link to="/v2/partners">找搭子</Link><Link to="/v2/alumni">校友</Link></nav>
     {featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map((event) => ({ src: event.image!, alt: event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}` }))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={(index) => navigate(`${activityBase}/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`${activityBase}/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
+    {!featuredItems.length && <section className="v2-editorial-discover-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(16,30,27,.60),rgba(16,30,27,.08)),url(${campusEveningImage})`}}><span>DISCOVER / 01</span><strong>发现校园的更多可能。</strong><small>活动 · 社群 · 讲座 · 志愿</small></section>}
     <section className="v2-panel v2-list-panel v2-activity-discovery-panel">
       <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`} />
       <div className="v2-toolbar v2-activity-toolbar">
