@@ -46,24 +46,16 @@ export const Win = ({ x, y, w, h, radius = 22, bg = P.canvas, glow = 0.5, scale 
   );
 };
 
-// Brand icon rebuilt from src/assets/brand/brand-app-icon-a.svg; `draw` animates the pulse line.
+// Brand icon rebuilt from src/assets/brand/brand-app-icon-a.svg; `draw` animates the swan outline.
 export const BrandMark = ({ size, draw = 1, glow = 0, id = 'm' }: { size: number; draw?: number; glow?: number; id?: string }) => (
   <div style={{ width: size, height: size, borderRadius: size * 0.219, boxShadow: `0 0 ${60 + glow * 90}px rgba(61,123,255,${0.3 + glow * 0.45}), 0 0 ${150 + glow * 120}px rgba(138,99,255,${0.15 + glow * 0.25}), 0 30px 80px rgba(0,0,0,0.6)` }}>
-    <svg width={size} height={size} viewBox="0 0 1024 1024" style={{ display: 'block' }}>
-      <rect width="1024" height="1024" rx="224" fill={P.brand} />
-      <svg x="132" y="326" width="760" height="370" viewBox="10 10 433 211" preserveAspectRatio="xMidYMid meet">
-        <svg x="10" y="10" width="433" height="211" viewBox="29 17 443 216" preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <clipPath id={`ends-${id}`}>
-              <path d="M-30 -30 L500 -30 L423 93 Q425 93 427 96 L434 107 Q435 109 430 111 L500 280 L-30 280 L60 125 Q56 125 57 121 L62 110 Q63 107 66 107 Z" />
-            </clipPath>
-          </defs>
-          <g clipPath={`url(#ends-${id})`}>
-            <path d="M 45.00 116.00 L 144.00 116.00 Q 154.00 116.00 158.34 125.01 L 203.66 218.99 Q 208.00 228.00 212.29 218.97 L 297.71 39.03 Q 302.00 30.00 305.95 39.18 L 329.05 92.82 Q 333.00 102.00 343.00 102.00 L 445.00 102.00"
-              fill="none" stroke="#FFFFFF" strokeWidth="18" strokeLinejoin="round" pathLength={1} strokeDasharray="1 1" strokeDashoffset={1 - draw} />
-          </g>
-        </svg>
-      </svg>
+    <svg id={id} width={size} height={size} viewBox="0 0 1024 1024" style={{ display: 'block' }}>
+      <rect width="1024" height="1024" rx="224" fill="#DDEBEC" />
+      <g transform="translate(-87 -64) scale(1.17)">
+        <path d="M270 359 L339 340 C365 299 417 295 443 332 C468 367 439 414 426 455 C407 514 443 552 492 551 C553 548 584 468 648 444 C701 425 739 477 783 525 C724 592 651 629 567 637 C451 648 370 595 350 513 C338 463 352 404 383 367"
+          fill="none" stroke="#173B46" strokeWidth="27" strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray="1 1" strokeDashoffset={1 - draw} />
+        <circle cx="400" cy="339" r="10" fill="#173B46" opacity={Math.min(1, Math.max(0, (draw - 0.8) * 5))} />
+      </g>
     </svg>
   </div>
 );

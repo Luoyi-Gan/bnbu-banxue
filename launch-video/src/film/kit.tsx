@@ -65,11 +65,11 @@ const tailOf = (pts: Pt[], len: number): Pt[] => {
 };
 const toD = (pts: Pt[]) => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
 
-// The visible part of the icon's pulse (its clip trims both ends), in icon path coordinates.
-export const ICON_PULSE: Pt[] = [[60, 116], [150, 116], [156, 120], [205, 224], [211, 224], [299, 35], [305, 35], [331, 97], [341, 102], [430, 102]];
-// Where a pulse point sits inside BrandMark (nested viewBoxes of src/assets/brand/brand-app-icon-a.svg, flattened).
-export const iconPoint = (cx: number, cy: number, size: number) => ([u, v]: Pt): Pt => [cx - size / 2 + ((1.7131 * u + 82.8) * size) / 1024, cy - size / 2 + ((1.7131 * v + 296.9) * size) / 1024];
-export const iconStroke = (size: number) => (18 * 1.7131 * size) / 1024;
+// The swan's upper outline, from the beak to the wing tip, in icon path coordinates.
+export const ICON_TRACE: Pt[] = [[270, 359], [339, 340], [355, 315], [384, 305], [416, 314], [443, 332], [454, 358], [444, 397], [426, 455], [421, 490], [437, 528], [465, 546], [492, 551], [530, 538], [564, 510], [598, 475], [648, 444], [680, 439], [714, 458], [748, 489], [783, 525]];
+// BrandMark applies this transform to the path inside its 1024 px icon.
+export const iconPoint = (cx: number, cy: number, size: number) => ([u, v]: Pt): Pt => [cx - size / 2 + ((1.17 * u - 87) * size) / 1024, cy - size / 2 + ((1.17 * v - 64) * size) / 1024];
+export const iconStroke = (size: number) => (27 * 1.17 * size) / 1024;
 
 // ---------------- light ----------------
 // Thin bright core, tight inner glow, faint wide bloom; the head is a small hot point.
@@ -168,9 +168,9 @@ export const Note = ({ f, text, from, to, y = 960 }: { f: number; text: string; 
   return <div style={{ position: 'absolute', left: 0, right: 0, top: y, textAlign: 'center', zIndex: 80, opacity: p, transform: `translateY(${(1 - p) * 10}px)`, fontFamily: T.font, fontSize: 40, fontWeight: 500, letterSpacing: '0.08em', color: 'rgba(226,234,255,0.95)', textShadow: '0 0 20px rgba(61,123,255,0.5), 0 2px 12px rgba(0,0,0,0.7)' }}>{text}</div>;
 };
 
-const WORD_LINE: Pt[] = ICON_PULSE.map(([u, v]): Pt => [960 + (u - 245) * 1.0, 650 + (v - 129) * 0.36]);
+const WORD_LINE: Pt[] = ICON_TRACE.map(([u, v]): Pt => [960 + (u - 526) * 0.75, 650 + (v - 430) * 0.15]);
 export const WORD_END = 33;
-// Feature title on black: the name rises, a short pulse draws beneath it.
+// Feature title on black: the name rises, a short swan trace draws beneath it.
 export const FeatureTitle = ({ f, text, id }: { f: number; text: string; id: string }) => (
   <>
     <Word f={f} text={text} from={2} to={WORD_END} />

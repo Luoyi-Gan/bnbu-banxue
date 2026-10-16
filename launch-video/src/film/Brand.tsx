@@ -4,7 +4,7 @@ import { Avatar, Chip, Icon, P, Tag, Txt } from '../kit/base';
 import { BrandMark } from '../kit/fx';
 import { Slot } from '../kit/product';
 import { EASE_IN_OUT, EASE_OUT, LAND, keys, mix, prog } from '../lib/motion';
-import { ICON_PULSE, iconPoint, iconStroke, Line, LINE_W, type Pt, resample, upToX, useF } from './kit';
+import { ICON_TRACE, iconPoint, iconStroke, Line, LINE_W, type Pt, resample, upToX, useF } from './kit';
 
 const B = (n: number) => Math.round(n * 21);
 const LINE_Y = 540;
@@ -41,7 +41,7 @@ const iconPt = iconPoint(ICON.x, ICON.y, ICON.s);
 const ICON_W = iconStroke(ICON.s);
 const N = 160;
 const LONG_R = resample(LONG, N);
-const ICON_R = resample(ICON_PULSE.map(iconPt), N);
+const ICON_R = resample(ICON_TRACE.map(iconPt), N);
 
 const Wordmark = ({ f, at, tagline }: { f: number; at: number; tagline: string }) => (
   <div style={{ position: 'absolute', left: 0, right: 0, top: 560, textAlign: 'center', fontFamily: P.font, color: '#fff' }}>
@@ -72,16 +72,16 @@ const Icon3 = ({ f, at, id }: { f: number; at: number; id: string }) => {
 
 const morph = (fold: number): Pt[] => LONG_R.map((p, i): Pt => [mix(p[0], ICON_R[i][0], fold), mix(p[1], ICON_R[i][1], fold)]);
 
-// Opening: the icon and wordmark first; the icon slides left and its pulse line runs out past the six modules.
+// Opening: the icon and wordmark first; a line grows from the swan's wing tip past the six modules.
 const ICON_AT = B(0.5);
 const MOVE = B(3);
 const RUN = B(4);
 const OPEN_CHIMES = [4.5, 5, 5.5, 6, 6.5, 7].map(B);
 const SMALL_S = 120;
-// Small icon placed so the end of its pulse sits exactly on the feature line.
-const SMALL = { x: 120, y: LINE_Y + 0.0394 * SMALL_S, s: SMALL_S };
+// Small icon placed so the wing tip sits exactly on the feature line.
+const SMALL = { x: 120, y: LINE_Y - 0.0374 * SMALL_S, s: SMALL_S };
 const openX = (i: number) => 430 + i * 248;
-const smallEnd = iconPoint(SMALL.x, SMALL.y, SMALL.s)(ICON_PULSE[ICON_PULSE.length - 1]);
+const smallEnd = iconPoint(SMALL.x, SMALL.y, SMALL.s)(ICON_TRACE[ICON_TRACE.length - 1]);
 const RUN_LINE: Pt[] = [[smallEnd[0], LINE_Y]];
 FEATS.forEach((ft, i) => {
   const x = openX(i), dir = ft.up ? -1 : 1;
