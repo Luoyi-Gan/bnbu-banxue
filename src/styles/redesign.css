@@ -351,18 +351,6 @@ body:has(.v2-app-student) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-picker-la
 .v2-app .v2-service-card,
 .v2-app .v2-admin-metrics > a { animation: none; }
 
-/* Authentication is a focused form rather than a marketing split screen. */
-.v2-auth-page { --auth-ink: var(--ui-ink); --auth-muted: var(--ui-muted); --auth-line: var(--ui-line); --auth-blue: var(--ui-accent); background: var(--ui-canvas); }
-.v2-auth-page .v2-auth-header,
-.v2-auth-page .v2-auth-footer { width: min(1000px, calc(100% - 48px)); }
-.v2-auth-page .v2-auth-layout { display: flex; justify-content: center; width: min(1000px, calc(100% - 48px)); min-height: 0; padding: 56px 0 72px; }
-.v2-auth-page .v2-auth-intro { display: none; }
-.v2-auth-page .v2-auth-card { width: min(450px, 100%); padding: 32px 34px; border-radius: 11px; box-shadow: none; }
-.v2-auth-page .v2-auth-card-head .v2-auth-eyebrow { display: none; }
-.v2-auth-page .v2-auth-card-head h2 { margin: 0 0 7px; font-size: 27px; }
-.v2-auth-page .v2-auth-submit { border-color: var(--ui-accent); border-radius: 7px; background: var(--ui-accent); }
-.v2-auth-page .v2-auth-submit:hover:not(:disabled) { background: #104d65; transform: none; }
-
 @media (max-width: 900px) {
   .v2-app:not(.live-app) .v2-sidebar,
   .v2-app.v2-app-student:not(.live-app) .v2-sidebar { position: fixed; width: 224px; height: 100vh; transform: translateX(-105%); }

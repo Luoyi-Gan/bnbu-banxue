@@ -1,12 +1,10 @@
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
-import { Mail, BookOpen, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldAlert, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, House, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, PersonStanding, ShieldAlert, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
 import studentBrandIcon from '../assets/brand/brand-app-icon-a.svg'
-import yellowIcon from '../assets/companion-yellow.png'
-import kittyIcon from '../assets/companion-kitty.png'
 import { V2Provider } from './store'
 import { useV2 } from './useV2'
 import { TeacherCoffee, TeacherProfile, TeacherSchedule, TeacherMessages, TeacherSports } from './TeacherPortal'
@@ -15,7 +13,6 @@ import { StudentSearch } from './StudentSearch'
 import { AdminDashboard, AdminModeration, AdminVerifications } from './admin'
 import { V2Activities, V2Community, V2Home, V2Messages, V2Partners, V2Teams } from './student'
 import { V2AI, V2Campus, V2Me, V2Settings } from './services'
-import { DraggableAI } from './DraggableAI'
 import { V2Alumni } from './V2Alumni'
 import { V2Sports } from './V2Sports'
 import { useSportsHomeScroll } from './useSportsHomeScroll'
@@ -31,21 +28,21 @@ import { liveConversations } from './liveConversations'
 import './v2.css'
 import './aRedesign.css'
 import './aControls.css'
-import './timetableShortcut.css'
 import './studentTheme.css'
+import './editorial.css'
 
 const studentNav = [
-  { path: '/v2', label: '首页', icon: LayoutDashboard, end: true },
-  { path: '/v2/activities', label: '活动', icon: Compass },
-  { path: '/v2/community', label: '社区', icon: Newspaper },
-  { path: '/v2/partners', label: '找搭子', icon: UsersRound },
+  { path: '/v2', label: '首页', icon: House, end: true },
+  { path: '/v2/activities', label: '发现', icon: Compass },
+  { path: '/v2/campus', label: '校园', icon: UsersRound },
+  { path: '/v2/sports', label: '打卡', icon: PersonStanding },
   { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const studentMore = [
+  { path: '/v2/community', label: '校园社区', icon: Newspaper },
+  { path: '/v2/partners', label: '找搭子', icon: UsersRound },
   { path: '/v2/alumni', label: '校友同行', icon: UsersRound },
-  { path: '/v2/sports', label: '体育运动', icon: GraduationCap },
   { path: '/v2/campus/explore', label: '校园探索', icon: MapPinned },
-  { path: '/v2/campus', label: '校园服务', icon: GraduationCap },
   { path: '/v2/ai', label: '校园 AI', icon: Sparkles },
   { path: '/v2/messages', label: '消息', icon: MessageCircle },
 ]
@@ -71,7 +68,8 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const displayName = typeof studentProfile?.nickname === 'string' ? studentProfile.nickname : accountName
   const displayAvatar = typeof studentProfile?.avatar === 'string' ? studentProfile.avatar : ''
   const shellBrandIcon = admin || teacher ? brandIcon : studentBrandIcon
-  const sports = location.pathname === '/v2/sports' || location.pathname === '/v2/teacher/sports'
+  const sports = location.pathname === '/v2/teacher/sports'
+  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
@@ -96,8 +94,8 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
       <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
       <div className="v2-nav-label">{admin ? '管理' : teacher ? '教师' : '校园'}</div>
-      <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav>
-      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">更多服务</div><nav className="v2-side-nav">{studentMore.filter(item => item.path !== '/v2/sports' || live.data?.sports?.role === 'student').map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav></>}
+      <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${(admin || teacher ? isActive : studentSectionActive(path, isActive)) ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav>
+      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">更多服务</div><nav className="v2-side-nav">{studentMore.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav></>}
       <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>{live.data ? '本地服务已连接' : live.error ? '本地服务连接失败' : '正在连接本地服务'}</span></div></div>
     </aside>
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
@@ -112,8 +110,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
       </header>
       <main className="v2-main">{children}</main>
     </div>
-    {!admin && !teacher && !sports && !mobileMenu && <Link className="v2-timetable-shortcut" to="/v2/me?tab=timetable" aria-label="打开我的课表" aria-current={location.pathname === '/v2/me' && new URLSearchParams(location.search).get('tab') === 'timetable' ? 'page' : undefined}><BookOpen size={19}/><span>我的课表</span></Link>}
-    {!admin && !teacher && !sports && <><nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.slice(0, 5).map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>{location.pathname !== '/v2/ai' && <DraggableAI src={state.aiIconChoice === 'kitty' ? kittyIcon : state.aiIconChoice === 'custom' && state.aiCustomIcon ? state.aiCustomIcon : yellowIcon}/>}</>}
+    {!admin && !teacher && <nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => studentSectionActive(path, isActive) ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label="手机教师导航">{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label="手机管理导航">{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
   </div>

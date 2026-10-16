@@ -63,14 +63,18 @@ it('学生完整看板只使用可用源的授权投影，源失败时隐藏旧�
  expect(failed).not.toContain('>630<');
 });
 
-it.each([
-  ['学生', V2Sports, '我的有效课程'],
-  ['教师', TeacherSports, '我的教学课程'],
-] as const)('%s体育页面加载和读取失败时保留看板，失败后可以重试', (_name, Page, scopeLabel) => {
+it('新版学生体育打卡只保留留白结构，不展示数据或操作', () => {
+  const page = renderToStaticMarkup(<MemoryRouter><V2Sports/></MemoryRouter>);
+  expect(page).toContain('体育打卡');
+  expect(page).toContain('v2-sports-empty-space');
+  for (const text of ['sports-hero', '运动提交趋势', '运动记录', '已确认学时', '刷新体育数据']) expect(page).not.toContain(text);
+});
+
+it('教师体育页面加载和读取失败时保留看板，失败后可以重试', () => {
   const refresh = vi.fn<() => Promise<void>>().mockResolvedValue();
   const backend = {data: null, error: '', busy: false, mutate: vi.fn().mockResolvedValue(false), refresh};
   const hook = vi.spyOn(workspaceBackend, 'useWorkspaceBackend').mockReturnValue(backend);
-  const render = () => renderToStaticMarkup(<MemoryRouter><Page/></MemoryRouter>);
+  const render = () => renderToStaticMarkup(<MemoryRouter><TeacherSports/></MemoryRouter>);
   const loading = render();
   expect(loading).toContain('sports-hero');
   expect(loading).toContain('正在读取体育数据');
@@ -78,7 +82,7 @@ it.each([
   expect(loading).toContain('disabled="" aria-label="刷新体育数据"');
   hook.mockReturnValue({...backend, error: '读取失败，请重试。'});
   const failed = render();
-  for (const text of ['sports-hero', '运动提交趋势', 'sports-course-panel', scopeLabel, '读取失败，请重试。']) expect(failed).toContain(text);
+  for (const text of ['sports-hero', '运动提交趋势', 'sports-course-panel', '我的教学课程', '读取失败，请重试。']) expect(failed).toContain(text);
   expect(failed).toContain('aria-busy="false"');
   expect(failed).toContain('aria-label="刷新体育数据"');
   expect(failed).not.toContain('disabled="" aria-label="刷新体育数据"');
