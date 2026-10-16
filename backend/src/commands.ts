@@ -2,6 +2,7 @@ import { notificationPolicy } from "./notification-policy";
 import { projectWorkspace } from "./snapshot-projection";
 import { runSync } from "./storage/effects";
 import { relationPolicy } from "./relation-policy";
+import { recordPostView } from './post-views';
 import { studentNumber } from './student-search';
 import { relationshipHistory } from './relationship-history';
 import { randomUUID } from "node:crypto";
@@ -59,6 +60,7 @@ function executeWithActor(db: Database, actorProvider: () => Account, token: str
     if (action !== "accounts.password.change") accountSecurityGate(repo, actor);
     if (action.startsWith("accounts.admins."))
       requireSuperAdmin(repo, actor);
+    if (action === 'post.view') return recordPostView(db, repo, actor, input);
     const booleanArguments: Record<string, string> = {
       "content.review": "",
       "room.decide": "accept",

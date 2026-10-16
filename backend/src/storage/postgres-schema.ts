@@ -77,4 +77,10 @@ CREATE TABLE new_student_join_capabilities (
  issue_key TEXT NOT NULL,request_hash TEXT NOT NULL,started_at BIGINT NOT NULL,expires_at BIGINT NOT NULL,
  session_secret TEXT NOT NULL,consume_key TEXT,result TEXT,account_id TEXT REFERENCES accounts(id)
 );
-`},{version:9,sql:companionIdentityMigrationSql}];
+`},{version:9,sql:companionIdentityMigrationSql},{version:10,sql:`
+CREATE TABLE post_views (
+ post_id TEXT NOT NULL REFERENCES entities(id),viewer_id TEXT NOT NULL REFERENCES accounts(id),
+ open_id TEXT NOT NULL,viewed_at TEXT NOT NULL,PRIMARY KEY(viewer_id,open_id)
+);
+CREATE INDEX post_views_post_time ON post_views(post_id,viewed_at);
+`}];

@@ -8,6 +8,7 @@ import { PostgresEmail } from './storage/postgres-email';
 import type { PostgresDatabase } from './storage/postgres';
 import { executePostgres } from './storage/postgres-commands';
 import { postgresCommunityView } from './storage/postgres-community-view';
+import { searchPostgresRooms, postgresRoomDetail } from './room-search';
 import { postgresWorkspace } from './storage/postgres-workspace';
 import { postgresStudentSearch } from './storage/postgres-student-search';
 import { postgresPersonHover } from './storage/postgres-person-hover';
@@ -32,9 +33,19 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   const cookie = (token: string, age: number) => `${cookieName}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${options.secureCookies ? '; Secure' : ''}`;
   return createServer(async (request,response) => {
     try {
-      const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const requestUrl = new URL(request.url ?? '/', 'http://localhost');
+      const pathname = requestUrl.pathname;
       const sportsPath=pathname.startsWith('/api/v1/') || pathname.startsWith('/api/sports/');
       demand(!sportsPath,'接口不存在。',404);
+      if(request.method==='GET' && (pathname==='/api/rooms' || /^\/api\/rooms\/[^/]+$/.test(pathname))) {
+        const actor=await auth.authenticate(cookieToken(request));
+        student(actor);
+        demand(actor.status!=='banned','账号已封禁。',403);
+        const mustChange=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
+        if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
+        const id=pathname==='/api/rooms' ? null : decodeURIComponent(pathname.slice('/api/rooms/'.length));
+        return send(response,200,id===null ? await searchPostgresRooms(db,actor,requestUrl.searchParams) : await postgresRoomDetail(db,actor,id));
+      }
       const accountDirectory=/^\/api\/accounts\/(students|teachers)$/.exec(pathname);
       if(request.method==='GET' && accountDirectory) return send(response,200,await postgresAccountDirectory(db,cookieToken(request) ?? '',accountDirectory[1]==='students'?'student':'teacher',Object.fromEntries(new URL(request.url!,'http://localhost').searchParams)));
       if(request.method==='GET' && pathname==='/api/accounts/administrator-self') return send(response,200,await postgresAdministratorSelf(db,cookieToken(request) ?? ''));

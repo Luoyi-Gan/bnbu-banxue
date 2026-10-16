@@ -19,6 +19,7 @@ import {
 import { openDatabase, type Database } from "./database";
 import { execute, executeMailboxImport, snapshot } from "./commands";
 import { communityView } from "./community-view";
+import { searchRooms, roomDetail } from './room-search';
 import { Repository, type Fields } from "./repository";
 
 
@@ -82,7 +83,16 @@ export function createApiServer(
 ) {
   return createServer(async (request, response) => {
     try {
-      const pathname = new URL(request.url ?? "/", "http://127.0.0.1").pathname;
+      const requestUrl = new URL(request.url ?? "/", "http://127.0.0.1");
+      const pathname = requestUrl.pathname;
+      if (request.method === 'GET' && (pathname === '/api/rooms' || /^\/api\/rooms\/[^/]+$/.test(pathname))) {
+        const actor = authenticate(db, cookieToken(request));
+        accountSecurityGate(new Repository(db), actor);
+        student(actor);
+        demand(actor.status !== 'banned', '账号已封禁。', 403);
+        const id = pathname === '/api/rooms' ? null : decodeURIComponent(pathname.slice('/api/rooms/'.length));
+        return send(response, 200, id === null ? searchRooms(db, actor, requestUrl.searchParams) : roomDetail(db, actor, id));
+      }
       if (request.method === "GET" && pathname === "/api/community")
         return send(
           response,

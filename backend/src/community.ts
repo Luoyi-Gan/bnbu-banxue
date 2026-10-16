@@ -46,8 +46,17 @@ function roomDetails(value: unknown, type: 'study' | 'entertainment' | 'carpool'
   };
   optionalText('startsAt', 40);
   if (details.startsAt) demand(Number.isFinite(Date.parse(String(details.startsAt))), '约定时间无效。');
-  if (type === 'carpool') { optionalText('departurePlace'); optionalText('destinationPlace'); optionalText('departureAddress', 240); optionalText('destinationAddress', 240); coordinates('departureCoordinates'); coordinates('destinationCoordinates'); }
-  if (type === 'entertainment') optionalText('activityType', 40);
+  if (type === 'carpool') {
+    details.departurePlace = textField(input, 'departurePlace', 120);
+    details.destinationPlace = textField(input, 'destinationPlace', 120);
+    demand(typeof details.startsAt === 'string', '请填写出发时间。');
+    optionalText('departureAddress', 240); optionalText('destinationAddress', 240);
+    coordinates('departureCoordinates'); coordinates('destinationCoordinates');
+  }
+  if (type === 'entertainment') {
+    details.activityType = textField(input, 'activityType', 40);
+    demand(typeof details.startsAt === 'string', '请填写活动时间。');
+  }
   if (type === 'study') {
     const min = input.gpaMin, max = input.gpaMax;
     demand((min === undefined && max === undefined) || (typeof min === 'number' && typeof max === 'number' && Number.isFinite(min) && Number.isFinite(max) && min >= 0 && max >= min), '绩点区间无效。');

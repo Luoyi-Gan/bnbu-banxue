@@ -55,6 +55,14 @@ export function openDatabase(filename: string) {
       data TEXT NOT NULL DEFAULT '{}', created_at TEXT NOT NULL,
       PRIMARY KEY (account_id, entity_id, kind)
     );
+    CREATE TABLE IF NOT EXISTS post_views (
+      post_id TEXT NOT NULL REFERENCES entities(id),
+      viewer_id TEXT NOT NULL REFERENCES accounts(id),
+      open_id TEXT NOT NULL,
+      viewed_at TEXT NOT NULL,
+      PRIMARY KEY (viewer_id, open_id)
+    );
+    CREATE INDEX IF NOT EXISTS post_views_post_time ON post_views(post_id, viewed_at);
     CREATE TABLE IF NOT EXISTS notifications (
       id TEXT PRIMARY KEY, recipient_id TEXT NOT NULL REFERENCES accounts(id),
       entity_id TEXT, event TEXT NOT NULL, body TEXT NOT NULL,
@@ -80,6 +88,7 @@ export function openDatabase(filename: string) {
     "INSERT OR IGNORE INTO schema_migrations VALUES(6,strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
   );
   migrateCompanionIdentity(db);
+  db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(9,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
   return db;
 }
 

@@ -2,15 +2,23 @@ import type { Database } from "./database";
 import { snapshot } from "./commands";
 import { authenticate } from "./auth";
 import type { Entity } from "./repository";
+import { hotLists, emptyEngagement, type Engagement } from './community-hot';
 
 /** Original community UI shape, with identity-based visibility and real counts. */
 export function communityView(db: Database, token: string) {
   const workspace = snapshot(db, authenticate(db, token));
   const likes = db.prepare("SELECT entity_id AS id,count(*) AS count FROM relations WHERE kind='like' GROUP BY entity_id").all();
-  return projectCommunity({...workspace, relations: workspace.relations as {entityId:string;kind:string}[]}, new Map(likes.map(row=>[String(row.id),Number(row.count)])));
+  const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const countMap = (sql: string, ...params: string[]) => new Map<string,number>(db.prepare(sql).all(...params).map(row=>[String(row.id),Number(row.count)]));
+  const engagement: Engagement = {
+    allViews: countMap('SELECT post_id AS id,count(*) AS count FROM post_views GROUP BY post_id'),
+    recentViews: countMap('SELECT post_id AS id,count(*) AS count FROM post_views WHERE viewed_at>=? GROUP BY post_id',cutoff),
+    recentLikes: countMap("SELECT entity_id AS id,count(*) AS count FROM relations WHERE kind='like' AND created_at>=? GROUP BY entity_id",cutoff),
+  };
+  return projectCommunity({...workspace, relations: workspace.relations as {entityId:string;kind:string}[]}, new Map(likes.map(row=>[String(row.id),Number(row.count)])),engagement);
 }
 
-export function projectCommunity(workspace: {account:{id:string;name:string};entities:Entity[];people:{id:string;name:string;nickname?:string;avatar?:string}[];relations:{entityId:string;kind:string}[];alumni:{profiles:{id:string;name:string;status:string}[]}}, likes: ReadonlyMap<string,number>) {
+export function projectCommunity(workspace: {account:{id:string;name:string};entities:Entity[];people:{id:string;name:string;nickname?:string;avatar?:string}[];relations:{entityId:string;kind:string}[];alumni:{profiles:{id:string;name:string;status:string}[]}}, likes: ReadonlyMap<string,number>, engagement: Engagement = emptyEngagement) {
   const account = workspace.account;
   const content = workspace.entities.filter(
     (entity) => entity.kind === "post" || entity.kind === "comment",
@@ -39,6 +47,7 @@ export function projectCommunity(workspace: {account:{id:string;name:string};ent
     date: post.createdAt,
     status: post.data.status,
     likes: likes.get(post.id) ?? 0,
+    ...(post.ownerId === account.id ? { viewCount: engagement.allViews.get(post.id) ?? 0 } : {}),
     comments: content
       .filter(
         (comment) =>
@@ -70,5 +79,7 @@ export function projectCommunity(workspace: {account:{id:string;name:string};ent
     savedPosts: relations
       .filter((row) => row.kind === "save" && ids.has(row.entityId))
       .map((row) => row.entityId),
+    hotLists: hotLists(content.filter(entity => entity.kind === 'post'),content.filter(entity => entity.kind === 'comment'),engagement),
+    features: { postViews: true },
   };
 }

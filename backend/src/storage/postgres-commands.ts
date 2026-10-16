@@ -8,6 +8,7 @@ import { activityPolicy } from '../activities';
 import { alumniPolicy } from '../alumni';
 import { relationPolicy } from '../relation-policy';
 import { notificationPolicy } from '../notification-policy';
+import { recordPostgresPostView } from '../post-views';
 import type { Fields } from '../repository';
 import { passwordChangeRequired } from '../accounts/account-gate';
 import { runAsync } from './effects';
@@ -40,6 +41,7 @@ async function executeWithActor(db: PostgresDatabase, actorProvider: (client: Po
     const actor = await actorProvider(client);
     demand(actor.status!=='banned','账号已封禁，不能进行业务写入。',403);
     const repo = new PostgresRepository(client);
+    if(action==='post.view') return recordPostgresPostView(repo,actor,input);
     if(action!=='accounts.password.change' && passwordChangeRequired(await repo.all('companionIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
     for(const [name,key] of [['room.decide','accept'],['report.decide','upheld'],['coffee.answer','accept'],['coffee.slot.update','closed'],['certification.review','approve'],['organization.review','approve'],['activity.visibility','publish'],['mail.visibility','publish'],['alumni.review','approve'],['alumni.decide','accept'],['alumni.profile','accepting']] as const) {
       if(action===name) demand(typeof input[key]==='boolean',`${key} 必须明确为 true 或 false。`);
