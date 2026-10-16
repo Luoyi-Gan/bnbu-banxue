@@ -1,4 +1,4 @@
-import { ArrowRight, Bookmark, Camera, Heart, ImagePlus, MessageCircle, Plus, X } from 'lucide-react'
+import { ArrowRight, Bookmark, Camera, Eye, Flame, Heart, ImagePlus, MessageCircle, Plus, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -26,7 +26,7 @@ function DiscoveryCover({ post, onOpen }: { post: Post; onOpen: () => void }) {
   </button>
 }
 
-function DiscoveryFeed({ posts, liked, saved, onOpen, onLike, onSave }: { posts: Post[]; liked: string[]; saved: string[]; onOpen: (id: string) => void; onLike: (id: string) => void; onSave: (id: string) => void }) {
+function DiscoveryFeed({ posts, liked, saved, viewerId, onOpen, onLike, onSave }: { posts: Post[]; liked: string[]; saved: string[]; viewerId: string; onOpen: (id: string) => void; onLike: (id: string) => void; onSave: (id: string) => void }) {
   const container = useRef<HTMLDivElement>(null)
   const sentinel = useRef<HTMLDivElement>(null)
   const [columns, setColumns] = useState(2)
@@ -51,12 +51,23 @@ function DiscoveryFeed({ posts, liked, saved, onOpen, onLike, onSave }: { posts:
       {Array.from({ length: columns }, (_, column) => <div className="discovery-column" key={column}>{shown.filter((_, index) => index % columns === column).map(post => <article className="discovery-card" key={post.id}>
         <DiscoveryCover post={post} onOpen={() => onOpen(post.id)}/>
         <button className="discovery-title" onClick={() => onOpen(post.id)}>{post.title}</button>
-        <div className="discovery-meta"><span className="discovery-author"><DisplayAvatar className="discovery-avatar" name={post.author} avatar={post.authorAvatar} personId={post.ownerId}/><span>{post.author}</span></span><button className={liked.includes(post.id) ? 'is-liked' : ''} aria-label={`${liked.includes(post.id) ? '取消点赞' : '点赞'}：${post.title}`} aria-pressed={liked.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onLike(post.id)}><Heart size={15} fill={liked.includes(post.id) ? 'currentColor' : 'none'}/>{post.likes}</button></div>
+        <div className="discovery-meta"><span className="discovery-author"><DisplayAvatar className="discovery-avatar" name={post.author} avatar={post.authorAvatar} personId={post.ownerId}/><span>{post.author}</span></span><span className="discovery-interactions"><button className={liked.includes(post.id) ? 'is-liked' : ''} aria-label={`${liked.includes(post.id) ? '取消点赞' : '点赞'}：${post.title}`} aria-pressed={liked.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onLike(post.id)}><Heart size={15} fill={liked.includes(post.id) ? 'currentColor' : 'none'}/>{post.likes}</button>{post.ownerId === viewerId && typeof post.viewCount === 'number' && <span aria-label={`浏览 ${post.viewCount} 次`}><Eye size={15}/>{post.viewCount}</span>}</span></div>
         <button className="discovery-save" aria-label={`${saved.includes(post.id) ? '取消收藏' : '收藏'}：${post.title}`} aria-pressed={saved.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onSave(post.id)}><Bookmark size={15} fill={saved.includes(post.id) ? 'currentColor' : 'none'}/></button>
       </article>)}</div>)}
     </div>
     <div ref={sentinel} className="discovery-end">{limit < posts.length ? <button className="v2-text-button" onClick={() => setLimit(value => value + 6)}>加载更多</button> : posts.length > 0 ? '已经看完当前内容' : null}</div>
   </div>
+}
+
+function CommunityHotLists({ posts, hotLists, board, onBoard, onOpen }: { posts: Post[]; hotLists?: {eligiblePostCount: number; overall: string[]; byBoard: Record<string, string[]>}; board: string; onBoard: (board: string) => void; onOpen: (id: string) => void }) {
+  const eligibleCount = hotLists?.eligiblePostCount ?? posts.filter(post => post.status === 'visible').length
+  const open = eligibleCount > 75
+  const activeIds = board === '全部' ? hotLists?.overall : hotLists?.byBoard[board]
+  const byId = new Map(posts.filter(post => post.status === 'visible').map(post => [post.id, post]))
+  const ranked = (activeIds ?? []).slice(0, 10).map(id => byId.get(id)).filter((post): post is Post => Boolean(post))
+  return <section className="v2-hot-list v2-panel" aria-label="社区热点榜"><div className="v2-hot-header"><span><Flame size={19}/><strong>热点榜</strong><small>最近 7 天 · 综合热度</small></span><span className="v2-hot-count">公开帖子 {eligibleCount} 篇</span></div>
+    {open && hotLists ? <><div className="v2-hot-tabs" aria-label="热点榜话题">{boards.map(item => <button type="button" key={item} className={board === item ? 'is-active' : ''} aria-pressed={board === item} onClick={() => onBoard(item)}>{item === '全部' ? '综合' : item}</button>)}</div>{ranked.length ? <ol className="v2-hot-rows">{ranked.map((post, index) => <li key={post.id}><button type="button" onClick={() => onOpen(post.id)}><span className={`v2-hot-rank rank-${index + 1}`}>{index + 1}</span><span><strong>{post.title}</strong><small>{post.board} · {post.author}</small></span><ArrowRight size={15}/></button></li>)}</ol> : <p className="v2-hot-empty">该话题最近 7 天暂无有效互动。</p>}</> : <p className="v2-hot-empty">{open ? '热点榜数据暂不可用。' : '全社区公开帖子超过 75 篇后开放综合榜和话题榜。'}</p>}
+  </section>
 }
 
 export function V2Community() {
@@ -65,6 +76,7 @@ export function V2Community() {
   const location = useLocation()
   const navigate = useNavigate()
   const [board, setBoard] = useState('全部')
+  const [hotBoard, setHotBoard] = useState('全部')
   const [query, setQuery] = useState('')
   const [compose, setCompose] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
@@ -76,6 +88,7 @@ export function V2Community() {
   const canSee = (post: Post) => state.posts.some(item => item.id === post.id)
   const visible = state.posts.filter(canSee).filter((post) => (board === '全部' || post.board === board) && `${post.title} ${post.body} ${post.author}`.toLowerCase().includes(query.toLowerCase()))
   const current = state.posts.find((post) => post.id === (selected ?? new URLSearchParams(location.search).get('item')) && canSee(post))
+  const openPost = (id: string) => { setSelected(id); void state.recordOpen(id) }
   const addImages = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     event.target.value = ''
@@ -102,11 +115,11 @@ export function V2Community() {
   return <div className="v2-page v2-community-page">
     <PageHeading eyebrow="CAMPUS / COMMUNITY" title="校园社区" description="先看内容，再决定要不要参与讨论。" action={<button type="button" className="v2-button v2-button-primary v2-community-compose-desktop" onClick={() => setCompose(true)}><Plus size={17}/> 发布帖子</button>}/>
     <div className="v2-social-layout">
-      <section className="v2-social-main"><div className="v2-social-filter v2-panel"><AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索话题或关键词"/><div className="v2-filter-pills" aria-label="内容分类">{boards.map((item) => <button type="button" aria-pressed={board === item} className={board === item ? 'is-active' : ''} onClick={() => setBoard(item)} key={item}>{item}</button>)}</div></div>
-        <DiscoveryFeed key={`${query}|${board}`} posts={visible} liked={state.likedPosts} saved={state.savedPosts} onOpen={setSelected} onLike={toggleLike} onSave={toggleSave}/>
+      <section className="v2-social-main"><CommunityHotLists posts={state.posts} hotLists={state.hotLists} board={hotBoard} onBoard={setHotBoard} onOpen={openPost}/><div className="v2-social-filter v2-panel"><AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索话题或关键词"/><div className="v2-filter-pills" aria-label="内容分类">{boards.map((item) => <button type="button" aria-pressed={board === item} className={board === item ? 'is-active' : ''} onClick={() => setBoard(item)} key={item}>{item}</button>)}</div></div>
+        <DiscoveryFeed key={`${query}|${board}`} posts={visible} liked={state.likedPosts} saved={state.savedPosts} viewerId={state.account.id} onOpen={openPost} onLike={toggleLike} onSave={toggleSave}/>
         {(!visible.length || state.error) && <Empty icon={MessageCircle} title={state.error || "暂无帖子"} description="换个分类或搜索词再看看。"/>}
       </section>
-      <aside className="v2-social-aside"><div className="v2-panel v2-social-profile"><DisplayAvatar className="v2-social-avatar is-self" name={studentName} avatar={state.account.avatar} personId={state.account.id}/><div><strong>{studentName}</strong><small>分享你眼中的校园</small></div><button type="button" onClick={() => setCompose(true)}>发布 <ArrowRight size={14}/></button></div><div className="v2-panel"><span className="v2-eyebrow">CAMPUS VOICES</span><h3>让校园故事被看见</h3><p>照片、经历或问题，都可以成为下一段交流的开始。</p><span className="v2-social-aside-note"><Camera size={16}/> 最多 9 张图片 · 文字检查通过后直接发布</span></div><div className="v2-panel"><h3>热门话题</h3>{state.posts.filter((post) => post.status === 'visible').sort((a, b) => b.likes - a.likes).slice(0, 3).map((post, index) => <button type="button" className="v2-trend-row" key={post.id} onClick={() => setSelected(post.id)}><span>0{index + 1}</span><strong>{post.title}</strong></button>)}</div></aside>
+      <aside className="v2-social-aside"><div className="v2-panel v2-social-profile"><DisplayAvatar className="v2-social-avatar is-self" name={studentName} avatar={state.account.avatar} personId={state.account.id}/><div><strong>{studentName}</strong><small>分享你眼中的校园</small></div><button type="button" onClick={() => setCompose(true)}>发布 <ArrowRight size={14}/></button></div><div className="v2-panel"><span className="v2-eyebrow">CAMPUS VOICES</span><h3>让校园故事被看见</h3><p>照片、经历或问题，都可以成为下一段交流的开始。</p><span className="v2-social-aside-note"><Camera size={16}/> 最多 9 张图片 · 文字检查通过后直接发布</span></div></aside>
     </div>
     {createPortal(<button type="button" className="v2-community-compose v2-a-community-compose" aria-label="发布帖子" onClick={() => setCompose(true)}><span className="v2-community-compose-circle"><Plus size={26}/></span></button>, document.body)}
     {compose && <Modal title="发布社区帖子" onClose={closeCompose}><form className="v2-form v2-social-compose" onSubmit={publish}><label>话题标题<input name="title" required maxLength={80} placeholder="想和同学聊什么？"/></label><label>选择分区<select name="board">{boards.slice(1).filter((item) => !item.startsWith('校友')).map((item) => <option key={item}>{item}</option>)}</select></label><label>正文<textarea name="body" required rows={4} maxLength={1000} placeholder="分享一点具体的经历或问题"/></label><div className="v2-image-uploader"><div className="v2-image-uploader-head"><strong>添加图片</strong><span>{draftImages.length} / 9 张</span></div><div className="v2-upload-grid">{draftImages.map((src, index) => <div className="v2-upload-thumb" key={`${index}-${src.slice(-24)}`}><img src={src} alt={`待发布图片 ${index + 1}`}/><button type="button" aria-label={`移除第 ${index + 1} 张图片`} onClick={() => setDraftImages((items) => items.filter((_, number) => number !== index))}><X size={13}/></button></div>)}{draftImages.length < 9 && <label className="v2-upload-add"><ImagePlus size={22}/><span>{processingImages ? '处理中…' : '添加照片'}</span><input type="file" accept="image/*" multiple onChange={addImages} disabled={processingImages}/></label>}</div>{(imageError || state.error) && <p className="v2-upload-error" role="alert">{imageError || state.error}</p>}<small>最多 9 张，图片会压缩后上传保存。</small></div><p className="v2-form-note">文字检查通过后直接公开；命中屏蔽词时请修改。</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={closeCompose}>取消</button><button type="submit" className="v2-button v2-button-primary" disabled={processingImages || state.busy}>发布帖子</button></div></form></Modal>}

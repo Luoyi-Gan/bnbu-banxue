@@ -1,0 +1,13 @@
+.v2-partner-filter-panel{margin-bottom:15px;padding:12px 16px}
+.v2-partner-filter-toggle{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:var(--v2-ink);font-weight:700;font-size:13px;cursor:pointer;text-align:left}
+.v2-partner-filter-toggle span{margin-left:auto;color:var(--v2-muted);font-size:11px;font-weight:500}
+.v2-partner-filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:16px 0 4px}
+.v2-partner-filter-grid>label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--v2-muted)}
+.v2-partner-filter-grid input,.v2-partner-filter-grid select{width:100%;min-width:0;height:39px;padding:0 10px;border:1px solid var(--v2-line);border-radius:8px;background:var(--v2-surface,#fff);color:var(--v2-ink)}
+.v2-partner-filter-grid>.v2-button{align-self:end;justify-self:start}
+.v2-partner-form .v2-partner-type-picker{grid-template-columns:repeat(4,minmax(0,1fr))}
+.v2-partner-form.type-sport .v2-partner-type-picker button:nth-child(4).is-active{border-color:#47a5a0;background:#e8f7f6;color:#16716d}
+.v2-partner-form.type-sport .v2-partner-form-intro{border-color:#47a5a0;background:#eefaf8}
+.v2-room-sport{background:#e8f7f6;color:#16716d}
+@media(max-width:850px){.v2-partner-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.v2-partner-filter-grid{grid-template-columns:1fr}.v2-partner-type-picker{gap:4px}.v2-partner-type-picker button{padding:9px 2px}}

@@ -68,6 +68,8 @@ services:
       args:
         VITE_SPORTS_STUDENT_URL: ${BNBU_SPORTS_STUDENT_URL:-}
         VITE_SPORTS_TEACHER_URL: ${BNBU_SPORTS_TEACHER_URL:-}
+        VITE_AMAP_KEY: ${BNBU_AMAP_KEY:-}
+        VITE_AMAP_SECURITY_HOST: ${BNBU_AMAP_SECURITY_HOST:-}
     ports:
       - "127.0.0.1:4188:8080"
     volumes:

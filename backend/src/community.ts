@@ -29,6 +29,44 @@ export const publicEntity = (entity: Entity) =>
     entity.data.status === "published" ||
     entity.kind === "room");
 
+function roomDetails(value: unknown, type: 'study' | 'entertainment' | 'carpool' | 'sport'): Fields {
+  if (value === undefined && type !== 'sport') return {};
+  demand(value && typeof value === 'object' && !Array.isArray(value), '组队筛选条件无效。');
+  const input = value as Fields;
+  const details: Fields = {};
+  const optionalText = (key: string, max = 120) => {
+    if (input[key] === undefined || input[key] === '') return;
+    details[key] = textField(input, key, max);
+  };
+  const coordinates = (key: string) => {
+    if (input[key] === undefined) return;
+    const point = input[key];
+    demand(Array.isArray(point) && point.length === 2 && typeof point[0] === 'number' && typeof point[1] === 'number' && Number.isFinite(point[0]) && Number.isFinite(point[1]) && point[0] >= -180 && point[0] <= 180 && point[1] >= -90 && point[1] <= 90, '地点坐标无效。');
+    details[key] = point;
+  };
+  optionalText('startsAt', 40);
+  if (details.startsAt) demand(Number.isFinite(Date.parse(String(details.startsAt))), '约定时间无效。');
+  if (type === 'carpool') { optionalText('departurePlace'); optionalText('destinationPlace'); optionalText('departureAddress', 240); optionalText('destinationAddress', 240); coordinates('departureCoordinates'); coordinates('destinationCoordinates'); }
+  if (type === 'entertainment') optionalText('activityType', 40);
+  if (type === 'study') {
+    const min = input.gpaMin, max = input.gpaMax;
+    demand((min === undefined && max === undefined) || (typeof min === 'number' && typeof max === 'number' && Number.isFinite(min) && Number.isFinite(max) && min >= 0 && max >= min), '绩点区间无效。');
+    if (typeof min === 'number' && typeof max === 'number') { details.gpaMin = min; details.gpaMax = max; }
+  }
+  if (type === 'sport') {
+    details.sportType = textField(input, 'sportType', 40);
+    details.locationScope = enumField(input, 'locationScope', ['campus', 'outside']);
+    demand(typeof input.extraCost === 'boolean', '请明确额外支出。');
+    details.extraCost = input.extraCost;
+    details.genderPreference = enumField(input, 'genderPreference', ['any', 'male', 'female']);
+    if (input.extraCost) details.costDescription = textField(input, 'costDescription', 120);
+    demand(typeof details.startsAt === 'string', '请填写运动时间。');
+  }
+  if (type === 'entertainment' || type === 'study' || type === 'sport') { optionalText('placeAddress', 240); coordinates('coordinates'); }
+  if (type === 'entertainment' && input.locationScope !== undefined) details.locationScope = enumField(input, 'locationScope', ['campus', 'outside']);
+  return details;
+}
+
 export function* communityPolicy(
   repo: BusinessRepository,
   actor: Account,
@@ -103,12 +141,14 @@ export function* communityPolicy(
   }
   if (action === "room.create") {
     student(actor);
+    const type = enumField(input, "type", ["study", "entertainment", "carpool", "sport"]);
     return (yield* effect(repo.create("room", actor.id, {
-      type: enumField(input, "type", ["study", "entertainment", "carpool"]),
+      type,
       title: textField(input, "title", 80),
       body: textField(input, "body", 1000),
       time: textField(input, "time", 120),
       place: textField(input, "place", 120),
+      details: roomDetails(input.details, type),
       capacity: integerField(input, "capacity", 2, 1000),
       members: [actor.id],
       status: "open",

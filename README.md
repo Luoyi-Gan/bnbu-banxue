@@ -28,6 +28,8 @@ Windows 独立验收：运行 `./Start-Local.ps1 -Acceptance`。首次会创建�
 
 `npm run dev` / `npm run dev:v2` 只运行前端，需要另行启动后端；`/v2` 业务数据读取服务端，不能仅靠静态页面完成业务操作。
 
+找搭子地点输入可选接入高德地图 JS API 2.0。前端构建时同时配置 `VITE_AMAP_KEY` 和指向已配置安全代理、以 `/_AMapService` 结尾的 `VITE_AMAP_SECURITY_HOST`；Docker 构建对应设置 `BNBU_AMAP_KEY`、`BNBU_AMAP_SECURITY_HOST`。安全代理须由部署方保存高德安全密钥并转发相关请求，配置方式见[高德官方说明](https://lbs.amap.com/api/javascript-api-v2/guide/abc/jscode)。未配置时保留手动填写地点。地图只用于定位、缩放、拖动和中心点浏览，地点由用户明确选定或填写。社区浏览量和热点榜前端只读取服务端的作者私有浏览数字及榜单结果；对应统计接口未接通时不生成演示数字。
+
 详见 [本地交接与验收](docs/LOCAL_BACKEND_HANDOFF.md)、[API 协议](docs/BACKEND_API.md) 和 [业务规则](BUSINESS_RULES.md)。
 
 ### 学校活动邮件与截图识别

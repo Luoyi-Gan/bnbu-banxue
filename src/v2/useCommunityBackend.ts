@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { api, ApiError, command, workspaceChangedEvent } from '../live/api'
 import type { Post } from '../../shared/v2/model'
 
-type CommunityData = { account: { id: string; name: string; nickname?: string; avatar?: string }; posts: Post[]; likedPosts: string[]; savedPosts: string[]; alumniProfiles?: {id:string;name:string}[] }
+type CommunityData = { account: { id: string; name: string; nickname?: string; avatar?: string }; posts: Post[]; likedPosts: string[]; savedPosts: string[]; alumniProfiles?: {id:string;name:string}[]; hotLists?: {eligiblePostCount: number; overall: string[]; byBoard: Record<string, string[]>}; features?: {postViews?: boolean} }
 export function useCommunityBackend() {
   const [data, setData] = useState<CommunityData>({ account: { id: '', name: '' }, posts: [], likedPosts: [], savedPosts: [] })
   const [error, setError] = useState('')
@@ -43,6 +43,11 @@ export function useCommunityBackend() {
       return null
     } finally { locked.current = false; if (active.current) setBusy(false) }
   }
-  return { ...data, error, busy, mutate }
+  const recordOpen = async (id: string) => {
+    if (!data.features?.postViews) return
+    try { await command('post.view', { id, openId: crypto.randomUUID() }); await refresh() }
+    catch { /* The detail remains readable if view logging is temporarily unavailable. */ }
+  }
+  return { ...data, error, busy, mutate, recordOpen }
 }
 export type CommunityBackend = ReturnType<typeof useCommunityBackend>

@@ -44,6 +44,20 @@ const period = (hours: number) => ({
   capacity: 1,
   location: "交流室",
 });
+describe('找搭子结构化条件', () => {
+  it('运动队伍保存可筛选字段，并拒绝缺失支出说明或非法坐标', () => {
+    const {repo, a} = setup();
+    const base = {type: 'sport', title: '羽毛球搭子', body: '一起打球', time: '周六上午', place: '体育馆', capacity: 4};
+    const details = {startsAt: '2026-10-17T09:00', sportType: '羽毛球', locationScope: 'campus', extraCost: true, costDescription: '场地费约 20 元', genderPreference: 'any', coordinates: [113.57, 22.27]};
+    const room = communityCommand(repo, a, 'room.create', {...base, details})!;
+    expect(room.data.type).toBe('sport');
+    expect(room.data.details).toMatchObject(details);
+    expect(() => communityCommand(repo, a, 'room.create', {...base, details: {...details, costDescription: ''}})).toThrow();
+    expect(() => communityCommand(repo, a, 'room.create', {...base, details: {...details, coordinates: [999, 22]}})).toThrow();
+    const carpool = communityCommand(repo, a, 'room.create', {type: 'carpool', title: '出行', body: '同路', time: '周五', place: '学校南门', capacity: 3, details: {startsAt: '2026-10-16T17:30', departurePlace: '学校南门', destinationPlace: '珠海站', destinationAddress: '珠海市香洲区'}})!;
+    expect((carpool.data.details as Record<string, unknown>).destinationAddress).toBe('珠海市香洲区');
+  });
+});
 describe("数据库与真实账号边界", () => {
   it.each(['revoked', 'banned'])('教师失效 %s 后隐藏发现资料，但保留当事人预约历史', change => {
     const {db, repo, a, b, teacher} = setup();
