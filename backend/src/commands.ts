@@ -150,13 +150,27 @@ function executeWithActor(db: Database, actorProvider: () => Account, token: str
 
 export function snapshot(db: Database, actor: Account) {
  const repo=new Repository(db),operate=has(actor,'operator','superadmin');
+ const relations=db.prepare('SELECT entity_id AS entityId,kind,created_at AS createdAt FROM relations WHERE account_id=?').all(actor.id);
+ const cached=new Map<string,ReturnType<Repository['all']>>();
+ const scopedRepo:Pick<Repository,'all'|'get'|'people'>={
+  all(kind) {
+   if(!['post','room','comment'].includes(kind)) return repo.all(kind);
+   if(cached.has(kind)) return cached.get(kind)!;
+   const ids=kind==='post'
+    ? db.prepare("SELECT id FROM entities WHERE kind='post' AND (owner_id=? OR (json_extract(data,'$.status')='visible' AND id IN (SELECT entity_id FROM relations WHERE account_id=? AND kind='save'))) ORDER BY created_at DESC,id LIMIT 50").all(actor.id,actor.id)
+    :kind==='room'
+    ? db.prepare("SELECT id FROM entities WHERE kind='room' AND (owner_id=? OR id IN (SELECT entity_id FROM relations WHERE account_id=? AND kind='save') OR EXISTS(SELECT 1 FROM json_each(entities.data,'$.members') WHERE value=?)) ORDER BY created_at DESC,id LIMIT 50").all(actor.id,actor.id,actor.id)
+    : db.prepare("SELECT id FROM entities WHERE kind='comment' AND (owner_id=? OR json_extract(data,'$.postId') IN (SELECT id FROM entities WHERE kind='post' AND (owner_id=? OR id IN (SELECT entity_id FROM relations WHERE account_id=? AND kind='save')))) ORDER BY created_at DESC,id LIMIT 50").all(actor.id,actor.id,actor.id);
+   const value=ids.map(row=>repo.get(row.id,kind));cached.set(kind,value);return value;
+  },get:(id,kind)=>repo.get(id,kind),people:()=>repo.people(),
+ };
    const notifications = db
     .prepare(
       "SELECT id,entity_id AS entityId,event,body,created_at AS createdAt,read_at AS readAt FROM notifications WHERE recipient_id=? ORDER BY created_at DESC",
     )
     .all(actor.id);
 
- return projectWorkspace({repo, firstLoginOnly:requiresPasswordChange(repo,actor),studentNumber:studentNumber(db,actor),sports:null,notifications,
+ return projectWorkspace({repo:scopedRepo, firstLoginOnly:requiresPasswordChange(repo,actor),studentNumber:studentNumber(db,actor),sports:null,notifications,
  coffeeHistory:(id:string)=>db.prepare(
         "SELECT id, action, reason, data, created_at AS at FROM audit WHERE entity_id=? AND action IN ('coffee.book','coffee.move','coffee.answer','coffee.cancel') ORDER BY created_at, rowid",
       ).all(id).map(row => {
@@ -177,11 +191,7 @@ export function snapshot(db: Database, actor: Account) {
           )
           .all(actor.id, has(actor, "superadmin") ? 1 : 0)
       : [],
-    relations: db
-      .prepare(
-        "SELECT entity_id AS entityId,kind,created_at AS createdAt FROM relations WHERE account_id=?",
-      )
-      .all(actor.id),
+    relations,
     audit: has(actor, "superadmin")
       ? db
           .prepare("SELECT * FROM audit ORDER BY created_at DESC LIMIT 200")

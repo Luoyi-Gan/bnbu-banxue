@@ -5,10 +5,11 @@ export async function sendVerification(
   db: Database,
   email: unknown,
   localOutbox: boolean,
+  origin='local',
 ) {
   const endpoint = process.env.BNBU_EMAIL_DELIVERY_URL;
   demand(localOutbox || endpoint, "尚未配置验证码邮件服务。", 503);
-  const local = issueCode(db, email);
+  const local = issueCode(db, email, origin);
   if (!endpoint) return local;
   const message = db
     .prepare(

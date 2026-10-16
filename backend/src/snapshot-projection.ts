@@ -38,16 +38,30 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
       },
       capabilities: {},
     };
+  // Registration grants an account, not campus directory or community access.
+  // Keep this projection independent of public posts, rooms and their owners.
+  if (actor.roles.length === 0) {
+    const ownEntities = ['profile', 'preferences', 'verifiedEmail', 'companionIdentity', 'studentIdentityRequest']
+      .flatMap(kind => repo.all(kind).filter(entity => entity.ownerId === actor.id));
+    return {
+      account: {...actor, studentNumber: null}, sports: null, sportsStatus: 'unavailable',
+      entities: ownEntities, people: projectDisplayPeople(actor, repo.people(), new Set([actor.id]), repo.all('preferences'), repo.all('profile')),
+      notifications: source.notifications, relations: [], audit: [], notificationBatches: [], relationshipHistory: [],
+      alumni: {profiles: [], follows: [], slots: [], bookings: [], notices: [], history: []},
+      capabilities: {schoolIdentity: process.env.BNBU_IDENTITY_VERIFICATION_URL ? 'configured' : 'external-service-required'},
+    };
+  }
   const review = has(actor, "reviewer", "superadmin"),
     operate = has(actor, "operator", "superadmin"),
     manageKeywords = has(actor, "reviewer", "operator", "superadmin");
   const own = (ownerId: string | null) => ownerId === actor.id;
+  const savedIds=new Set(source.relations.filter(row=>row.kind==='save').map(row=>String(row.entityId)));
   const posts = repo
     .all("post")
-    .filter((p) => p.data.status === "visible" || own(p.ownerId) || review);
+    .filter((p) => own(p.ownerId) || savedIds.has(p.id) && p.data.status === 'visible').slice(0,50);
   const rooms = repo
     .all("room")
-    .filter((r) => r.data.visibility === "visible" || own(r.ownerId) || review);
+    .filter((r) => own(r.ownerId) || savedIds.has(r.id) && r.data.visibility === 'visible' || strings(r.data.members).includes(actor.id)).slice(0,50);
   const memberRooms = repo
     .all("room")
     .filter(
@@ -112,7 +126,7 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
               (p.data.status === "visible" || review || own(p.ownerId)),
           ) &&
           (c.data.status === "visible" || own(c.ownerId) || review),
-      ),
+      ).slice(0,50),
     ...rooms.map((r) => ({
       ...r,
       data: {

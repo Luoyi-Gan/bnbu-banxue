@@ -6,11 +6,13 @@ import type { Engagement } from '../community-hot';
 import { projectDisplayPeople } from '../display-people';
 import { passwordChangeRequired } from '../accounts/account-gate';
 import type { AlumniData } from '../../../shared/v2/alumniModel';
+import { demand } from '../auth';
 
 export async function postgresCommunityView(db: PostgresDatabase, token: string) {
   return db.transaction(async client => {
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const account=await new PostgresAuth(db).authenticate(token,client);
+    demand(account.roles.length>0 && account.status!=='banned','请先完成校园身份核验。',403);
     const repo=new PostgresRepository(client);
     if(passwordChangeRequired(await repo.all('companionIdentity'),account))
       return projectCommunity({account,entities:[],people:[],relations:[],alumni:{profiles:[]}},new Map());

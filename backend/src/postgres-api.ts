@@ -7,7 +7,8 @@ import { PostgresAuth } from './storage/postgres-auth';
 import { PostgresEmail } from './storage/postgres-email';
 import type { PostgresDatabase } from './storage/postgres';
 import { executePostgres } from './storage/postgres-commands';
-import { postgresCommunityView } from './storage/postgres-community-view';
+import {postgresCommunityFeed,postgresCommunityPostDetail} from './storage/postgres-community-page';
+import {postgresModerationPage} from './storage/postgres-community-moderation-page';
 import { searchPostgresRooms, postgresRoomDetail } from './room-search';
 import { postgresWorkspace } from './storage/postgres-workspace';
 import { postgresStudentSearch } from './storage/postgres-student-search';
@@ -15,6 +16,8 @@ import { postgresPersonHover } from './storage/postgres-person-hover';
 import { checkSchoolIdentity } from './identity';
 import { recognize } from './timetable';
 import { student } from './community';
+import {postgresOwnStudentIdentity,postgresRequestStudentIdentity,postgresListStudentIdentityRequests,postgresReviewStudentIdentity} from './storage/postgres-student-identity';
+import {postgresRequestPasswordReset,postgresCompletePasswordReset} from './storage/postgres-password-reset';
 import { passwordChangeRequired } from './accounts/account-gate';
 import { PostgresRepository } from './storage/postgres-repository';
 import { postgresAdministratorDirectory } from './storage/postgres-administrators';
@@ -51,11 +54,17 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if(request.method==='GET' && pathname==='/api/accounts/administrator-self') return send(response,200,await postgresAdministratorSelf(db,cookieToken(request) ?? ''));
       if(request.method==='GET' && pathname==='/api/accounts/admin-email') return send(response,200,await postgresAdminEmailStatus(db,cookieToken(request) ?? ''));
       if(request.method==='GET' && pathname==='/api/accounts/administrators') return send(response,200,await postgresAdministratorDirectory(db,cookieToken(request) ?? ''));
-      if (request.method==='GET' && pathname==='/api/students/search') return send(response,200,await postgresStudentSearch(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('number') ?? ''));
+      if (request.method==='GET' && pathname==='/api/students/search') return send(response,200,await postgresStudentSearch(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('number') ?? '',request.socket.remoteAddress ?? 'unknown'));
       const hoverMatch=request.method==='GET' && /^\/api\/people\/([^/]+)\/hover$/.exec(pathname);
       if(hoverMatch) return send(response,200,await postgresPersonHover(db,cookieToken(request) ?? '',decodeURIComponent(hoverMatch[1]),new URL(request.url!,'http://localhost').searchParams.get('number') ?? undefined));
       if (request.method === 'GET' && pathname === '/api/workspace') return send(response,200,await postgresWorkspace(db,cookieToken(request) ?? ''));
-      if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityView(db,cookieToken(request) ?? ''));
+      if (request.method === 'GET' && pathname === '/api/identity/me') return send(response,200,await postgresOwnStudentIdentity(db,await auth.authenticate(cookieToken(request))));
+      if (request.method === 'GET' && pathname === '/api/identity/requests') return send(response,200,await postgresListStudentIdentityRequests(db,await auth.authenticate(cookieToken(request)),new URL(request.url!,'http://localhost').searchParams));
+      if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityFeed(db,cookieToken(request) ?? '',requestUrl.searchParams));
+      if(request.method==='GET' && pathname==='/api/community/feed') return send(response,200,await postgresCommunityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
+      if(request.method==='GET' && pathname==='/api/admin/community/moderation') return send(response,200,await postgresModerationPage(db,await auth.authenticate(cookieToken(request)),requestUrl.searchParams));
+      const communityDetail=request.method==='GET' && /^\/api\/community\/posts\/([^/]+)$/.exec(pathname);
+      if(communityDetail) return send(response,200,await postgresCommunityPostDetail(db,cookieToken(request)??'',decodeURIComponent(communityDetail[1]),Number(requestUrl.searchParams.get('page'))||1));
       if (request.method === 'GET' && pathname === '/api/health') {
         const result = await db.pool.query('SELECT MAX(version) AS version FROM backend_migrations');
         return send(response,200,{ok:true,storage:'postgresql',schemaVersion:result.rows[0].version});
@@ -88,6 +97,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         }
         if(pathname==='/api/accounts/admin-email/confirm') return send(response,200,await postgresAdminEmailConfirm(db,cookieToken(request) ?? '',input));
         if(pathname==='/api/identity/check') return send(response,200,await checkSchoolIdentity(await auth.authenticate(cookieToken(request))));
+        if(pathname==='/api/identity/request') return send(response,200,await postgresRequestStudentIdentity(db,await auth.authenticate(cookieToken(request)),input));
+        if(pathname==='/api/identity/review') return send(response,200,await postgresReviewStudentIdentity(db,await auth.authenticate(cookieToken(request)),input));
         if (pathname === '/api/commands') {
           demand(input.action !== 'screenshot.import','请通过截图上传入口识别活动。',403);
           const key = input.requestId;
@@ -98,12 +109,14 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         }
         if (pathname === '/api/auth/sign-in' || pathname === '/api/auth/login' || pathname === '/api/auth/admin-login') {
           const kind = pathname.endsWith('/admin-login') ? 'ADMIN' : pathname.endsWith('/login') ? 'PERSONAL' : undefined;
-          const result = await auth.login(kind==='ADMIN' ? input.loginName : kind==='PERSONAL' ? input.email : input.identifier,input.password,kind);
+          const result = await auth.login(kind==='ADMIN' ? input.loginName : kind==='PERSONAL' ? input.email : input.identifier,input.password,kind,undefined,request.socket.remoteAddress ?? 'unknown');
           response.setHeader('Set-Cookie',cookie(result.token,43200));
           return send(response,200,{authenticated:true,account:result.account});
         }
-        if (pathname === '/api/auth/verification-codes') return send(response,200,await mail.sendVerification(input.email,options.localOutbox===true));
+        if (pathname === '/api/auth/verification-codes') return send(response,200,await mail.sendVerification(input.email,options.localOutbox===true,request.socket.remoteAddress ?? 'unknown'));
         if (pathname === '/api/auth/register') return send(response,201,await mail.register(input));
+        if (pathname === '/api/auth/password-reset/request') return send(response,200,await postgresRequestPasswordReset(db,input.identifier,request.socket.remoteAddress ?? 'unknown',options.localOutbox===true));
+        if (pathname === '/api/auth/password-reset/complete') return send(response,200,await postgresCompletePasswordReset(db,input));
         if (pathname === '/api/auth/logout') {
           await auth.logout(cookieToken(request));
           response.setHeader('Set-Cookie',cookie('',0));
@@ -112,7 +125,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         if (pathname === '/api/auth/email/request' || pathname === '/api/auth/email/confirm') {
           const actor = await auth.authenticate(cookieToken(request));
           demand(actor.status!=='banned','账号已封禁。',403);
-          return send(response,200,pathname.endsWith('/request') ? await mail.sendVerification(actor.email,options.localOutbox===true) : await mail.verifyOwnEmail(actor,input.code));
+          return send(response,200,pathname.endsWith('/request') ? await mail.sendVerification(actor.email,options.localOutbox===true,request.socket.remoteAddress ?? 'unknown') : await mail.verifyOwnEmail(actor,input.code));
         }
       }
       return send(response,404,{code:'NOT_FOUND',message:'接口不存在。'});

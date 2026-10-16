@@ -1,12 +1,22 @@
 import type { Database } from "./database";
-import { snapshot } from "./commands";
-import { authenticate } from "./auth";
+import { authenticate, demand } from "./auth";
 import type { Entity } from "./repository";
+import {Repository} from './repository';
+import {projectDisplayPeople} from './display-people';
+import {readAlumni} from './alumni';
 import { hotLists, emptyEngagement, type Engagement } from './community-hot';
 
 /** Original community UI shape, with identity-based visibility and real counts. */
 export function communityView(db: Database, token: string) {
-  const workspace = snapshot(db, authenticate(db, token));
+  const actor=authenticate(db, token);
+  demand(actor.roles.length>0 && actor.status!=='banned','请先完成校园身份核验。',403);
+  const repo=new Repository(db);
+  const posts=repo.all('post').filter(item=>item.data.status==='visible'||item.ownerId===actor.id);
+  const postIds=new Set(posts.map(item=>item.id));
+  const comments=repo.all('comment').filter(item=>postIds.has(String(item.data.postId)) && (item.data.status==='visible'||item.ownerId===actor.id));
+  const entities=[...posts,...comments];
+  const ids=new Set([actor.id,...entities.map(item=>item.ownerId).filter((id):id is string=>!!id)]);
+  const workspace={account:actor,entities,people:projectDisplayPeople(actor,repo.people(),ids,repo.all('preferences'),repo.all('profile')),relations:db.prepare('SELECT entity_id AS entityId,kind FROM relations WHERE account_id=?').all(actor.id) as {entityId:string;kind:string}[],alumni:{profiles:readAlumni(repo).profiles}};
   const likes = db.prepare("SELECT entity_id AS id,count(*) AS count FROM relations WHERE kind='like' GROUP BY entity_id").all();
   const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const countMap = (sql: string, ...params: string[]) => new Map<string,number>(db.prepare(sql).all(...params).map(row=>[String(row.id),Number(row.count)]));

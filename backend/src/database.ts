@@ -30,6 +30,18 @@ export function openDatabase(filename: string) {
       email TEXT PRIMARY KEY, code_hash TEXT NOT NULL, expires_at INTEGER NOT NULL,
       attempts INTEGER NOT NULL DEFAULT 0, sent_at INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS password_reset_challenges (
+      id TEXT PRIMARY KEY, account_id TEXT NOT NULL REFERENCES accounts(id),
+      identifier TEXT NOT NULL, email TEXT NOT NULL, code_hash TEXT NOT NULL,
+      expires_at INTEGER NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,
+      sent_at INTEGER NOT NULL, consumed_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS password_reset_account ON password_reset_challenges(account_id,sent_at);
+    CREATE TABLE IF NOT EXISTS security_rate_events (
+      category TEXT NOT NULL, subject TEXT NOT NULL, origin TEXT NOT NULL,
+      occurred_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS security_rate_window ON security_rate_events(category,occurred_at,subject,origin);
     CREATE TABLE IF NOT EXISTS mail_outbox (
       id TEXT PRIMARY KEY, recipient TEXT NOT NULL, subject TEXT NOT NULL,
       body TEXT NOT NULL, created_at TEXT NOT NULL, delivered_at TEXT
@@ -88,7 +100,8 @@ export function openDatabase(filename: string) {
     "INSERT OR IGNORE INTO schema_migrations VALUES(6,strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
   );
   migrateCompanionIdentity(db);
-  db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(9,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
+  db.exec("CREATE UNIQUE INDEX IF NOT EXISTS verified_student_number_unique ON entities(json_extract(data,'$.studentNumber')) WHERE kind='companionIdentity' AND json_extract(data,'$.role')='student' AND json_extract(data,'$.status')='verified' AND json_extract(data,'$.studentNumber') IS NOT NULL");
+  db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(10,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
   return db;
 }
 

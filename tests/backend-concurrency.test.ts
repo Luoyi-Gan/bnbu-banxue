@@ -152,7 +152,7 @@ it("结束队伍后成员仍能读取互评名单，外人不获得名单且会�
   run(a, "room.decide", {id: application.id, accept: true});
   run(a, "room.finish", {id: room.id});
   expect(snapshot(db, b.account).entities.find(e => e.id === room.id)!.data.members).toEqual([a.account.id, b.account.id]);
-  expect(snapshot(db, teacher.account).entities.find(e => e.id === room.id)!.data.members).toEqual([]);
+  expect(snapshot(db, teacher.account).entities.find(e => e.id === room.id)).toBeUndefined();
   expect(() => run(b, "message.send", {roomId: room.id, body: "结束后消息"})).toThrow();
   run(b, "room.review", {id: room.id, targetId: a.account.id, stars: 5, comment: "合作愉快"});
   expect(() => run(b, "room.review", {id: room.id, targetId: a.account.id, stars: 5})).toThrow();

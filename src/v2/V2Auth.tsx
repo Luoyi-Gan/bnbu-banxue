@@ -302,9 +302,9 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
               </button>
             )}
             {(message ||
-              (mode === "login" && location.state?.registered === true)) && (
+              (mode === "login" && (location.state?.registered === true || location.state?.passwordReset === true))) && (
               <p className="v2-auth-message" role="status">
-                {message || "注册已完成，请使用邮箱和密码登录。"}
+                {message || (location.state?.passwordReset ? '密码已重置，请重新登录。' : "注册已完成，请使用邮箱和密码登录。")}
               </p>
             )}
             {error && (
@@ -323,6 +323,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
               {!busy && <ArrowRight size={18} />}
             </button>
           </form>
+          {mode === 'login' && <p className="v2-auth-switch"><Link to="/v2/forgot-password">忘记密码？</Link></p>}
           <p className="v2-auth-switch">
             {mode === "login" ? "还没有账号？" : "已有账号？"}{" "}
             <Link to={mode === "login" ? "/v2/register" : "/v2/login"}>

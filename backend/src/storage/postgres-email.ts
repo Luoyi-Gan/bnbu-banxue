@@ -8,15 +8,20 @@ import { PostgresRepository } from './postgres-repository';
 export class PostgresEmail {
   constructor(private readonly db: PostgresDatabase) {}
 
-  async sendVerification(rawEmail: unknown, localOutbox: boolean) {
+  async sendVerification(rawEmail: unknown, localOutbox: boolean, origin='local') {
     const endpoint = process.env.BNBU_EMAIL_DELIVERY_URL;
     demand(localOutbox || endpoint,'尚未配置验证码邮件服务。',503);
     const email = normalizeEmail(rawEmail);
     const message = await this.db.transaction(async client => {
+      await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[`email-source:${digest(origin)}`]);
       await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[`email:${email}`]);
       const now = Date.now();
       const previous = (await client.query<{sent_at:string}>('SELECT sent_at FROM email_challenges WHERE email=$1',[email])).rows[0];
       demand(!previous || now-Number(previous.sent_at)>=60_000,'请稍后再发送验证码。',429);
+      const subject=digest(email),source=digest(origin);
+      const limits=(await client.query<{hour:string;day:string;source:string;global:string}>("SELECT count(*) FILTER (WHERE subject=$1 AND occurred_at>=$3) AS hour,count(*) FILTER (WHERE subject=$1) AS day,count(DISTINCT subject) FILTER (WHERE origin=$2 AND occurred_at>=$3) AS source,count(*) FILTER (WHERE occurred_at>=$3) AS global FROM security_rate_events WHERE category='email-send' AND occurred_at>=$4",[subject,source,now-3_600_000,now-86_400_000])).rows[0];
+      demand(Number(limits.hour)<5 && Number(limits.day)<10 && Number(limits.source)<20 && Number(limits.global)<1000,'请求过于频繁，请稍后再试。',429);
+      await client.query("INSERT INTO security_rate_events(category,subject,origin,occurred_at) VALUES('email-send',$1,$2,$3)",[subject,source,now]);
       const code = String(randomInt(100000,1000000));
       const outbox = {id:randomUUID(),recipient:email,subject:'伴学注册验证码',body:`验证码：${code}，10 分钟内有效。`};
       await client.query('INSERT INTO email_challenges(email,code_hash,expires_at,attempts,sent_at) VALUES($1,$2,$3,0,$4) ON CONFLICT(email) DO UPDATE SET code_hash=excluded.code_hash,expires_at=excluded.expires_at,attempts=0,sent_at=excluded.sent_at',[email,digest(`${email}:${code}`),now+600_000,now]);
@@ -30,6 +35,7 @@ export class PostgresEmail {
   }
 
   private async consume<T>(email: string, code: unknown, operation: (client: PoolClient)=>Promise<T>): Promise<T> {
+    demand(typeof code==='string' && /^\d{6}$/.test(code),'请填写六位验证码。');
     const result = await this.db.transaction(async client => {
       await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[`email:${email}`]);
       const challenge = (await client.query<{code_hash:string;expires_at:string;attempts:number}>('SELECT * FROM email_challenges WHERE email=$1 FOR UPDATE',[email])).rows[0];

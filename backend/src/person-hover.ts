@@ -1,8 +1,8 @@
 import type { Database } from './database';
 import { demand, type Account } from './auth';
-import { snapshot } from './commands';
 import { Repository, strings, type Entity, type Fields } from './repository';
 import { searchStudents } from './student-search';
+import {projectDisplayPeople} from './display-people';
 
 type Person = {id:string;name:string;nickname?:string;avatar?:string};
 type Mark = {id:string;createdAt:string};
@@ -28,12 +28,13 @@ export function projectPersonHover(viewer:Account,personId:string,person:Person,
 }
 
 export function personHover(db:Database,viewer:Account,personId:string,studentNumber?:string) {
-  const workspace=snapshot(db,viewer);
-  const visible=workspace.people.find(person=>person.id===personId);
+  demand(viewer.roles.length>0 && viewer.status!=='banned','请先完成校园身份核验。',403);
+  const business=personId===viewer.id || !!db.prepare("SELECT 1 FROM entities WHERE (kind='post' AND owner_id=? AND json_extract(data,'$.status')='visible') OR (kind='room' AND json_extract(data,'$.visibility')='visible' AND (owner_id=? OR EXISTS(SELECT 1 FROM json_each(entities.data,'$.members') WHERE value=?))) OR (kind='activity' AND owner_id=? AND json_extract(data,'$.status')='published') LIMIT 1").get(personId,personId,personId,personId);
+  const repo=new Repository(db);
+  const visible=business?projectDisplayPeople(viewer,repo.people(),new Set([personId]),repo.all('preferences'),repo.all('profile'))[0]:undefined;
   const searched=!visible && studentNumber ? searchStudents(db,viewer,studentNumber).students.find(person=>person.id===personId) : undefined;
   const person=visible ?? searched;
   demand(person,'用户当前不可查看。',404);
-  const repo=new Repository(db);
   const prefs=repo.all('preferences').find(item=>item.ownerId===personId)?.data;
   const marks=db.prepare("SELECT entity_id AS id,created_at AS createdAt FROM relations WHERE account_id=? AND kind='participate' ORDER BY created_at DESC").all(personId) as Mark[];
   return projectPersonHover(viewer,personId,person,prefs,repo.all('room'),repo.all('activity'),marks);

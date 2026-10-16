@@ -7,6 +7,7 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 import { transaction, type Database } from "./database";
+import {takeEmailSend,takeLoginAttempt} from './security-rate';
 
 export class ServiceError extends Error {
   constructor(
@@ -108,20 +109,15 @@ export function createAccount(
   return id;
 }
 
-export function issueCode(db: Database, rawEmail: unknown) {
+export function issueCode(db: Database, rawEmail: unknown, origin='local') {
   const email = normalizeEmail(rawEmail),
     now = Date.now();
-  const previous = db
-    .prepare("SELECT sent_at FROM email_challenges WHERE email=?")
-    .get(email) as { sent_at: number } | undefined;
-  demand(
-    !previous || now - previous.sent_at >= 60_000,
-    "请稍后再发送验证码。",
-    429,
-  );
   const code = String(randomInt(100000, 1000000)),
     id = randomUUID();
   transaction(db, () => {
+    const previous = db.prepare("SELECT sent_at FROM email_challenges WHERE email=?").get(email) as { sent_at: number } | undefined;
+    demand(!previous || now - previous.sent_at >= 60_000,"请稍后再发送验证码。",429);
+    takeEmailSend(db,email,origin);
     db.prepare(
       "INSERT INTO email_challenges(email,code_hash,expires_at,attempts,sent_at) VALUES(?,?,?,0,?) ON CONFLICT(email) DO UPDATE SET code_hash=excluded.code_hash,expires_at=excluded.expires_at,attempts=0,sent_at=excluded.sent_at",
     ).run(email, digest(`${email}:${code}`), now + 600_000, now);
@@ -147,7 +143,7 @@ export function register(
   input: { email?: unknown; code?: unknown; password?: unknown },
 ) {
   const email = normalizeEmail(input.email);
-  demand(typeof input.code === "string", "请填写验证码。");
+  demand(typeof input.code === "string" && /^\d{6}$/.test(input.code), "请填写六位验证码。");
   const challenge = db
     .prepare("SELECT * FROM email_challenges WHERE email=?")
     .get(email) as
@@ -190,16 +186,16 @@ export function register(
   return { registered: true };
 }
 
-// Rate limiting is shared across sessions; failed logins never issue a cookie.
-const failures = new Map<string, { count: number; until: number }>();
-export function login(db: Database, rawEmail: unknown, rawPassword: unknown) {
+// Attempts are limited by source and source-plus-identifier, never by account alone.
+export function login(db: Database, rawEmail: unknown, rawPassword: unknown, origin='local') {
   const email = normalizeEmail(rawEmail);
-  return credentialLogin(db, email, rawPassword, "PERSONAL");
+  return credentialLogin(db, email, rawPassword, "PERSONAL",origin);
 }
 export function loginAdministrator(
   db: Database,
   rawName: unknown,
   rawPassword: unknown,
+  origin='local',
 ) {
   demand(
     typeof rawName === "string" &&
@@ -212,6 +208,7 @@ export function loginAdministrator(
     rawName.trim().toLowerCase(),
     rawPassword,
     "ADMIN",
+    origin,
   );
 }
 function credentialLogin(
@@ -219,16 +216,12 @@ function credentialLogin(
   identifier: string,
   rawPassword: unknown,
   kind: "PERSONAL" | "ADMIN",
+  origin='local',
+  rated=false,
 ) {
-  const email = kind + ":" + identifier;
   demand(typeof rawPassword === "string", "邮箱或密码错误。", 401);
-  const previous = failures.get(email),
-    now = Date.now();
-  demand(
-    !previous || previous.until < now || previous.count < 10,
-    "登录尝试过多，请十五分钟后重试。",
-    429,
-  );
+  if(!rated) takeLoginAttempt(db,identifier,origin);
+  const now = Date.now();
   const row = db
     .prepare(
       kind === "PERSONAL"
@@ -239,13 +232,8 @@ function credentialLogin(
   const fallback = "00000000000000000000000000000000:" + "00".repeat(64);
   const valid = matchesPassword(rawPassword, row?.password_hash ?? fallback);
   if (!row || !valid) {
-    failures.set(email, {
-      count: previous && previous.until > now ? previous.count + 1 : 1,
-      until: now + 900_000,
-    });
     throw new ServiceError(401, "INVALID_CREDENTIALS", "邮箱或密码错误。");
   }
-  failures.delete(email);
   if (kind === "ADMIN") {
     if (row.status !== "active")
       throw new ServiceError(403, "ACCOUNT_DISABLED", "管理账号已停用。");
@@ -297,11 +285,12 @@ export function verifyOwnEmail(db: Database, actor: Account, code: unknown) {
   return {verified:true};
 }
 
-export function loginUnified(db: Database, rawIdentifier: unknown, password: unknown) {
+export function loginUnified(db: Database, rawIdentifier: unknown, password: unknown, origin='local') {
  demand(typeof rawIdentifier==='string' && rawIdentifier.trim().length>0 && rawIdentifier.trim().length<=254,'请填写邮箱或管理账号。');
  const identifier=rawIdentifier.trim().toLowerCase();
+ takeLoginAttempt(db,identifier,origin);
  const candidates=db.prepare("SELECT login_kind,password_hash FROM accounts WHERE (login_kind='PERSONAL' AND email=?) OR (login_kind='ADMIN' AND login_name=?)").all(identifier,identifier) as {login_kind:'PERSONAL'|'ADMIN';password_hash:string}[];
  const matching=typeof password==='string' ? candidates.filter(row=>matchesPassword(password,row.password_hash)) : [];
  demand(matching.length<=1,'账号标识重复，请联系管理员调整管理登录账号。',409);
- return credentialLogin(db,identifier,password,matching[0]?.login_kind ?? candidates[0]?.login_kind ?? 'PERSONAL');
+ return credentialLogin(db,identifier,password,matching[0]?.login_kind ?? candidates[0]?.login_kind ?? 'PERSONAL',origin,true);
 }

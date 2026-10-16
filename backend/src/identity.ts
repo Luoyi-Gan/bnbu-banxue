@@ -60,3 +60,28 @@ export async function checkSchoolIdentity(actor: Account) {
     authorizationChanged: false,
   };
 }
+
+export interface SchoolStudentAssertion {
+  verified: boolean;
+  subject?: string;
+  studentNumber?: string;
+  schoolName?: string;
+  email?: string;
+  currentEnrollment?: boolean;
+  requestId?: string;
+}
+
+/** Only a complete current-enrollment assertion can authorize student access. */
+export async function verifyStudentAtSchool(actor: Account, candidate: {studentNumber:string;schoolName:string}): Promise<{verified:boolean;subject:string|null}> {
+  const endpoint=process.env.BNBU_IDENTITY_VERIFICATION_URL;
+  if (!endpoint) return {verified:false,subject:null};
+  const requestId=randomUUID();
+  let response:Response;
+  try {
+    response=await fetch(endpoint,{method:'POST',redirect:'error',signal:AbortSignal.timeout(10000),headers:{'Content-Type':'application/json',...(process.env.BNBU_IDENTITY_VERIFICATION_TOKEN?{Authorization:`Bearer ${process.env.BNBU_IDENTITY_VERIFICATION_TOKEN}`}:{})},body:JSON.stringify({requestId,accountId:actor.id,email:actor.email,studentNumber:candidate.studentNumber,schoolName:candidate.schoolName})});
+  } catch { return {verified:false,subject:null}; }
+  const value=await response.json().catch(()=>null) as SchoolStudentAssertion|null;
+  if (!response.ok || !value || value.requestId!==requestId || value.email!==actor.email) return {verified:false,subject:null};
+  return value.verified===true && value.currentEnrollment===true && value.studentNumber===candidate.studentNumber && value.schoolName===candidate.schoolName && typeof value.subject==='string' && value.subject.length>0 && value.subject.length<=200
+    ? {verified:true,subject:value.subject} : {verified:false,subject:null};
+}

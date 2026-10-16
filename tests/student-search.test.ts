@@ -9,6 +9,7 @@ it('入班独立学号用于搜索，邮箱验证不推导学号，尊重角色�
  const db=openDatabase(':memory:');try {
  createAccount(db,{email:'viewer@example.test',name:'查找者',password:'Acceptance-123',roles:['student']});
  const viewer=login(db,'viewer@example.test','Acceptance-123').account;
+ new Repository(db).create('companionIdentity',viewer.id,{role:'student',status:'verified',studentNumber:'VIEWER001'});
  issueCode(db,'123456@bnbu.edu.cn');
  const mail=db.prepare('SELECT body FROM mail_outbox WHERE recipient=?').get('123456@bnbu.edu.cn') as {body:string};
  register(db,{email:'123456@bnbu.edu.cn',password:'Acceptance-123',code:mail.body.match(/\d{6}/)![0]});
@@ -40,6 +41,7 @@ it('入班独立学号用于搜索，邮箱验证不推导学号，尊重角色�
  verifyOwnEmail(db,existing,code);
  expect(searchStudents(db,viewer,'654321').students).toEqual([]);
  repo.create('companionIdentity',existing.id,{role:'student',status:'verified',studentNumber:'654321'});
+ db.prepare("DELETE FROM security_rate_events WHERE category='student-search'").run();
  expect(searchStudents(db,viewer,'654321').students[0].id).toBe(existing.id);
  expect(()=>verifyOwnEmail(db,existing,code)).toThrow();
  } finally {db.close()}

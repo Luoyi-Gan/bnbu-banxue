@@ -58,7 +58,8 @@ describe("API、持久化和跨角色联动", () => {
     expect(repo.all('post')).toHaveLength(count);
     const post = run(a, 'post.create', { title: '正常话题', body: '正文', board: '校园' });
     expect(repo.get(post.id).data.status).toBe('visible');
-    expect(snapshot(db, b.account).entities.some(item => item.id === post.id)).toBe(true);
+    expect(snapshot(db, b.account).entities.some(item => item.id === post.id)).toBe(false);
+    expect(communityView(db,b.token).posts.some(item=>item.id===post.id)).toBe(true);
     expect(() => run(b, 'comment.create', { postId: post.id, body: '违规词评论' })).toThrow('请修改');
     expect(repo.all('comment')).toHaveLength(0);
     const comment = run(b, 'comment.create', { postId: post.id, body: '正常评论' });
@@ -142,15 +143,15 @@ describe("API、持久化和跨角色联动", () => {
     run(a,"room.create",{type:"study",title:"学习",body:"说明",time:"周末",place:"图书馆",capacity:3});
     run(a,"preferences.preview",{enabled:false,id:b.id});
     const person = (who: typeof a) => snapshot(db,who.account).people.find(p=>p.id===a.id);
-    expect(person(b)).toMatchObject({name:a.account.name,organization:""});
-    expect(person(teacher)).toMatchObject({organization:"计算机学院"});
-    expect(person(admin)).toMatchObject({organization:"计算机学院"});
+    expect(person(b)).toBeUndefined();
+    expect(person(teacher)).toBeUndefined();
+    expect(person(admin)).toBeUndefined();
     expect(snapshot(db,b.account).entities.some(e=>e.kind==='preferences' && e.ownerId===a.id)).toBe(false);
     expect(() => run(a,"preferences.preview",{enabled:"false"})).toThrow();
     run(a,"profile.save",{nickname:"本人昵称",avatar:""});
-    expect(person(b)?.organization).toBe("");
+    expect(person(b)).toBeUndefined();
     run(a,"preferences.preview",{enabled:true});
-    expect(person(b)?.organization).toBe("计算机学院");
+    expect(person(b)).toBeUndefined();
   });
   it("展示资料同步到社区作者和评论，并遵守资料预览开关", () => {
     const {a,b,repo,run,db} = setup();
@@ -158,14 +159,13 @@ describe("API、持久化和跨角色联动", () => {
     const post = repo.create("post",a.id,{title:"校园分享",body:"正文",board:"校园",status:"visible"});
     repo.create("comment",a.id,{postId:post.id,body:"评论",status:"visible"});
     run(a,"profile.save",{nickname:"新昵称",avatar});
-    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toMatchObject({nickname:"新昵称",avatar});
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toBeUndefined();
     const shown = communityView(db,b.token).posts.find(p=>p.id===post.id)!;
     expect(shown).toMatchObject({author:"新昵称",authorAvatar:avatar});
     expect(shown.comments[0]).toMatchObject({author:"新昵称",authorAvatar:avatar});
     expect(communityView(db,a.token).account).toMatchObject({nickname:"新昵称",avatar});
     run(a,"preferences.preview",{enabled:false});
-    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toMatchObject({name:a.account.name,organization:""});
-    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)?.avatar).toBeUndefined();
+    expect(snapshot(db,b.account).people.find(p=>p.id===a.id)).toBeUndefined();
     expect(communityView(db,b.token).posts.find(p=>p.id===post.id)).toMatchObject({author:a.account.name,authorAvatar:""});
     expect(communityView(db,a.token).posts.find(p=>p.id===post.id)).toMatchObject({author:"新昵称",authorAvatar:avatar});
   });
@@ -426,10 +426,11 @@ describe("API、持久化和跨角色联动", () => {
     const author = await read(f.a),
       reader = await read(f.b);
     expect(author.posts[0].likes).toBe(1);
-    expect(author.posts[0].comments).toHaveLength(1);
+    expect(author.posts[0].comments).toHaveLength(0);
     expect(author.savedPosts).toEqual([]);
     expect(reader.savedPosts).toEqual([post.id]);
-    expect(reader.posts[0].comments).toHaveLength(1);
+    expect(reader.posts[0].comments).toHaveLength(0);
+    expect((await (await fetch(url+`/posts/${post.id}`,{headers:{Cookie:`bnbu_session=${f.b.token}`}})).json()).post.comments).toHaveLength(1);
     f.run(f.reviewer, "content.review", {
       id: post.id,
       status: "hidden",

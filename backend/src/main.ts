@@ -18,7 +18,8 @@ import {
 } from "./auth";
 import { openDatabase, type Database } from "./database";
 import { execute, executeMailboxImport, snapshot } from "./commands";
-import { communityView } from "./community-view";
+import {communityFeed,communityPostDetail} from './community-page';
+import {moderationPage} from './community-moderation-page';
 import { searchRooms, roomDetail } from './room-search';
 import { Repository, type Fields } from "./repository";
 
@@ -71,6 +72,8 @@ import { accountSecurityGate } from "./accounts/account-gate";
 
 import { recognize } from "./timetable";
 import { student } from "./community";
+import {ownStudentIdentity,requestStudentIdentity,listStudentIdentityRequests,reviewStudentIdentity} from './student-identity-workflow';
+import {requestPasswordReset,completePasswordReset} from './password-reset';
 import { sendVerification } from "./mail-delivery";
 import { checkSchoolIdentity } from "./identity";
 
@@ -93,12 +96,11 @@ export function createApiServer(
         const id = pathname === '/api/rooms' ? null : decodeURIComponent(pathname.slice('/api/rooms/'.length));
         return send(response, 200, id === null ? searchRooms(db, actor, requestUrl.searchParams) : roomDetail(db, actor, id));
       }
-      if (request.method === "GET" && pathname === "/api/community")
-        return send(
-          response,
-          200,
-          communityView(db, cookieToken(request) ?? ""),
-        );
+      if (request.method === "GET" && pathname === "/api/community") return send(response,200,communityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
+      if(request.method==='GET' && pathname==='/api/community/feed') return send(response,200,communityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
+      if(request.method==='GET' && pathname==='/api/admin/community/moderation') return send(response,200,moderationPage(db,authenticate(db,cookieToken(request)),requestUrl.searchParams));
+      const communityDetail=request.method==='GET' && /^\/api\/community\/posts\/([^/]+)$/.exec(pathname);
+      if(communityDetail) return send(response,200,communityPostDetail(db,cookieToken(request)??'',decodeURIComponent(communityDetail[1]),Number(requestUrl.searchParams.get('page'))||1));
       if (request.method === "GET" && pathname === "/api/health")
         return send(response, 200, {
           ok: true,
@@ -150,6 +152,7 @@ export function createApiServer(
               db,
               input.email,
               options.localOutbox === true,
+              request.socket.remoteAddress ?? 'unknown',
             ),
           );
         }
@@ -157,18 +160,20 @@ export function createApiServer(
         if (pathname === "/api/auth/email/request") {
           const actor=authenticate(db,cookieToken(request));
           demand(actor.status!=="banned","账号已封禁。",403);
-          return send(response,200,await sendVerification(db,actor.email,options.localOutbox===true));
+          return send(response,200,await sendVerification(db,actor.email,options.localOutbox===true,request.socket.remoteAddress ?? 'unknown'));
         }
         if (pathname === "/api/auth/register")
           return send(response, 201, register(db, input));
+        if (pathname === '/api/auth/password-reset/request') return send(response,200,await requestPasswordReset(db,input.identifier,request.socket.remoteAddress ?? 'unknown',options.localOutbox===true));
+        if (pathname === '/api/auth/password-reset/complete') return send(response,200,completePasswordReset(db,input));
         if (
           pathname === "/api/auth/login" ||
           pathname === "/api/auth/admin-login" || pathname === "/api/auth/sign-in"
         ) {
           const result =
-            pathname === "/api/auth/sign-in" ? loginUnified(db,input.identifier,input.password) : pathname === "/api/auth/admin-login"
-              ? loginAdministrator(db, input.loginName, input.password)
-              : login(db, input.email, input.password);
+            pathname === "/api/auth/sign-in" ? loginUnified(db,input.identifier,input.password,request.socket.remoteAddress ?? 'unknown') : pathname === "/api/auth/admin-login"
+              ? loginAdministrator(db, input.loginName, input.password,request.socket.remoteAddress ?? 'unknown')
+              : login(db, input.email, input.password,request.socket.remoteAddress ?? 'unknown');
           response.setHeader(
             "Set-Cookie",
             `bnbu_session=${result.token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`,
@@ -213,6 +218,8 @@ export function createApiServer(
             await checkSchoolIdentity(authenticate(db, token)),
           );
         }
+        if (pathname === '/api/identity/request') return send(response,200,await requestStudentIdentity(db,authenticate(db,token),input));
+        if (pathname === '/api/identity/review') return send(response,200,reviewStudentIdentity(db,authenticate(db,token),input));
         if (pathname === "/api/auth/logout") {
           db.prepare("DELETE FROM sessions WHERE token_hash=?").run(
             digest(token!),
@@ -251,6 +258,8 @@ export function createApiServer(
         return send(response, 200, {
           account: authenticate(db, cookieToken(request)),
         });
+      if (request.method === 'GET' && pathname === '/api/identity/me') return send(response,200,ownStudentIdentity(db,authenticate(db,cookieToken(request))));
+      if (request.method === 'GET' && pathname === '/api/identity/requests') return send(response,200,listStudentIdentityRequests(db,authenticate(db,cookieToken(request)),new URL(request.url!,'http://localhost').searchParams));
       if (request.method === "GET" && pathname === "/api/accounts/administrators")
         return send(
           response,
@@ -297,7 +306,7 @@ export function createApiServer(
           ),
         );
       }
-      if (request.method === "GET" && pathname === "/api/students/search") return send(response,200,searchStudents(db,authenticate(db,cookieToken(request)),new URL(request.url!,"http://localhost").searchParams.get("number") ?? ""));
+      if (request.method === "GET" && pathname === "/api/students/search") return send(response,200,searchStudents(db,authenticate(db,cookieToken(request)),new URL(request.url!,"http://localhost").searchParams.get("number") ?? "",request.socket.remoteAddress ?? 'unknown'));
       const hoverMatch = request.method === "GET" && /^\/api\/people\/([^/]+)\/hover$/.exec(pathname);
       if (hoverMatch) {
         const url = new URL(request.url!, "http://localhost");

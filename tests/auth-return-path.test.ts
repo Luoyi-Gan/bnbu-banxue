@@ -15,5 +15,5 @@ it('登录按真实身份进入原端，并拦截不匹配的返回路径',()=>{
  expect(roleLoginPath('/v2/admin/moderation',['student'])).toBe('/v2')
  expect(roleLoginPath('/v2/community',['reviewer'])).toBe('/v2/admin')
  expect(roleLoginPath('/v2/community',['student'])).toBe('/v2/community')
- expect(roleLoginPath('https://evil.example',[])).toBe('/workspace')
+ expect(roleLoginPath('https://evil.example',[])).toBe('/v2/identity')
 })

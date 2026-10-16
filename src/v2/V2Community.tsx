@@ -59,35 +59,40 @@ function DiscoveryFeed({ posts, liked, saved, viewerId, onOpen, onLike, onSave }
   </div>
 }
 
-function CommunityHotLists({ posts, hotLists, board, onBoard, onOpen }: { posts: Post[]; hotLists?: {eligiblePostCount: number; overall: string[]; byBoard: Record<string, string[]>}; board: string; onBoard: (board: string) => void; onOpen: (id: string) => void }) {
+function CommunityHotLists({ posts, hotLists, board, onBoard, onOpen }: { posts: Pick<Post,'id'|'title'|'board'|'author'|'status'>[]; hotLists?: {eligiblePostCount: number; overall: string[]; byBoard: Record<string, string[]>}; board: string; onBoard: (board: string) => void; onOpen: (id: string) => void }) {
   const eligibleCount = hotLists?.eligiblePostCount ?? posts.filter(post => post.status === 'visible').length
   const open = eligibleCount > 75
   const activeIds = board === '全部' ? hotLists?.overall : hotLists?.byBoard[board]
   const byId = new Map(posts.filter(post => post.status === 'visible').map(post => [post.id, post]))
-  const ranked = (activeIds ?? []).slice(0, 10).map(id => byId.get(id)).filter((post): post is Post => Boolean(post))
+  const ranked = (activeIds ?? []).slice(0, 10).map(id => byId.get(id)).filter((post): post is Pick<Post,'id'|'title'|'board'|'author'|'status'> => Boolean(post))
   return <section className="v2-hot-list v2-panel" aria-label="社区热点榜"><div className="v2-hot-header"><span><Flame size={19}/><strong>热点榜</strong><small>最近 7 天 · 综合热度</small></span><span className="v2-hot-count">公开帖子 {eligibleCount} 篇</span></div>
     {open && hotLists ? <><div className="v2-hot-tabs" aria-label="热点榜话题">{boards.map(item => <button type="button" key={item} className={board === item ? 'is-active' : ''} aria-pressed={board === item} onClick={() => onBoard(item)}>{item === '全部' ? '综合' : item}</button>)}</div>{ranked.length ? <ol className="v2-hot-rows">{ranked.map((post, index) => <li key={post.id}><button type="button" onClick={() => onOpen(post.id)}><span className={`v2-hot-rank rank-${index + 1}`}>{index + 1}</span><span><strong>{post.title}</strong><small>{post.board} · {post.author}</small></span><ArrowRight size={15}/></button></li>)}</ol> : <p className="v2-hot-empty">该话题最近 7 天暂无有效互动。</p>}</> : <p className="v2-hot-empty">{open ? '热点榜数据暂不可用。' : '全社区公开帖子超过 75 篇后开放综合榜和话题榜。'}</p>}
   </section>
 }
 
 export function V2Community() {
-  const state = useCommunityBackend()
-  const studentName = state.account.nickname || state.account.name
   const location = useLocation()
   const navigate = useNavigate()
   const [board, setBoard] = useState('全部')
   const [hotBoard, setHotBoard] = useState('全部')
   const [query, setQuery] = useState('')
+  const [sort,setSort]=useState<'recommended'|'newest'>('recommended')
+  const state = useCommunityBackend({board,query,sort})
+  const studentName = state.account.nickname || state.account.name
   const [compose, setCompose] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
   const [draftImages, setDraftImages] = useState<string[]>([])
   const [imageError, setImageError] = useState('')
   const [processingImages, setProcessingImages] = useState(false)
   useEffect(() => { if (new URLSearchParams(location.search).get('compose') === '1') setCompose(true) }, [location.search])
+  const linkedPost=new URLSearchParams(location.search).get('item')
+  useEffect(()=>{if(linkedPost) void state.loadPost(linkedPost)
+    // Loading a linked post is tied to the URL, not to feed refreshes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[linkedPost])
   const closeCompose = () => { setCompose(false); setDraftImages([]); setImageError(''); if (new URLSearchParams(location.search).has('compose')) navigate('/v2/community', { replace: true }) }
-  const canSee = (post: Post) => state.posts.some(item => item.id === post.id)
-  const visible = state.posts.filter(canSee).filter((post) => (board === '全部' || post.board === board) && `${post.title} ${post.body} ${post.author}`.toLowerCase().includes(query.toLowerCase()))
-  const current = state.posts.find((post) => post.id === (selected ?? new URLSearchParams(location.search).get('item')) && canSee(post))
+  const visible = state.posts
+  const current = state.detailPost?.id === (selected ?? new URLSearchParams(location.search).get('item')) ? state.detailPost : null
   const openPost = (id: string) => { setSelected(id); void state.recordOpen(id) }
   const addImages = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
@@ -115,8 +120,9 @@ export function V2Community() {
   return <div className="v2-page v2-community-page">
     <PageHeading eyebrow="CAMPUS / COMMUNITY" title="校园社区" description="先看内容，再决定要不要参与讨论。" action={<button type="button" className="v2-button v2-button-primary v2-community-compose-desktop" onClick={() => setCompose(true)}><Plus size={17}/> 发布帖子</button>}/>
     <div className="v2-social-layout">
-      <section className="v2-social-main"><CommunityHotLists posts={state.posts} hotLists={state.hotLists} board={hotBoard} onBoard={setHotBoard} onOpen={openPost}/><div className="v2-social-filter v2-panel"><AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索话题或关键词"/><div className="v2-filter-pills" aria-label="内容分类">{boards.map((item) => <button type="button" aria-pressed={board === item} className={board === item ? 'is-active' : ''} onClick={() => setBoard(item)} key={item}>{item}</button>)}</div></div>
-        <DiscoveryFeed key={`${query}|${board}`} posts={visible} liked={state.likedPosts} saved={state.savedPosts} viewerId={state.account.id} onOpen={openPost} onLike={toggleLike} onSave={toggleSave}/>
+      <section className="v2-social-main"><CommunityHotLists posts={state.hotPosts ?? []} hotLists={state.hotLists} board={hotBoard} onBoard={setHotBoard} onOpen={openPost}/><div className="v2-social-filter v2-panel"><AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索标题、正文、话题或作者"/><div className="v2-filter-pills" aria-label="内容分类">{boards.map((item) => <button type="button" aria-pressed={board === item} className={board === item ? 'is-active' : ''} onClick={() => setBoard(item)} key={item}>{item}</button>)}</div><div className="v2-filter-pills" aria-label="帖子排序"><button type="button" className={sort==='recommended'?'is-active':''} aria-pressed={sort==='recommended'} onClick={()=>setSort('recommended')}>为你推荐</button><button type="button" className={sort==='newest'?'is-active':''} aria-pressed={sort==='newest'} onClick={()=>setSort('newest')}>最新发布</button></div></div>
+        <DiscoveryFeed key={`${query}|${board}|${sort}`} posts={visible} liked={state.likedPosts} saved={state.savedPosts} viewerId={state.account.id} onOpen={openPost} onLike={toggleLike} onSave={toggleSave}/>
+        {state.hasMore && <button type="button" className="v2-button v2-button-secondary" onClick={()=>void state.loadMore()}>加载更多帖子</button>}
         {(!visible.length || state.error) && <Empty icon={MessageCircle} title={state.error || "暂无帖子"} description="换个分类或搜索词再看看。"/>}
       </section>
       <aside className="v2-social-aside"><div className="v2-panel v2-social-profile"><DisplayAvatar className="v2-social-avatar is-self" name={studentName} avatar={state.account.avatar} personId={state.account.id}/><div><strong>{studentName}</strong><small>分享你眼中的校园</small></div><button type="button" onClick={() => setCompose(true)}>发布 <ArrowRight size={14}/></button></div><div className="v2-panel"><span className="v2-eyebrow">CAMPUS VOICES</span><h3>让校园故事被看见</h3><p>照片、经历或问题，都可以成为下一段交流的开始。</p><span className="v2-social-aside-note"><Camera size={16}/> 最多 9 张图片 · 文字检查通过后直接发布</span></div></aside>

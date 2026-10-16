@@ -83,4 +83,16 @@ CREATE TABLE post_views (
  open_id TEXT NOT NULL,viewed_at TEXT NOT NULL,PRIMARY KEY(viewer_id,open_id)
 );
 CREATE INDEX post_views_post_time ON post_views(post_id,viewed_at);
+`},{version:11,sql:`
+CREATE TABLE password_reset_challenges (
+ id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),identifier TEXT NOT NULL,
+ email TEXT NOT NULL,code_hash TEXT NOT NULL,expires_at BIGINT NOT NULL,
+ attempts INTEGER NOT NULL DEFAULT 0,sent_at BIGINT NOT NULL,consumed_at BIGINT
+);
+CREATE INDEX password_reset_account ON password_reset_challenges(account_id,sent_at);
+CREATE TABLE security_rate_events(category TEXT NOT NULL,subject TEXT NOT NULL,origin TEXT NOT NULL,occurred_at BIGINT NOT NULL);
+CREATE INDEX security_rate_window ON security_rate_events(category,occurred_at,subject,origin);
+`},{version:12,sql:`
+CREATE UNIQUE INDEX verified_student_number_unique ON entities ((data::jsonb->>'studentNumber'))
+WHERE kind='companionIdentity' AND data::jsonb->>'role'='student' AND data::jsonb->>'status'='verified' AND data::jsonb->>'studentNumber' IS NOT NULL;
 `}];

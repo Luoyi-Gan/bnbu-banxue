@@ -8,13 +8,13 @@ type Person = ReturnType<Repository['people']>[number];
 export function projectDisplayPeople(actor:Account,people:Person[],visibleIds:Set<string>,preferences:Entity[],profiles:Entity[]) {
   const hidden=new Set(preferences.filter(item=>item.data.profilePreview===false).map(item=>item.ownerId));
   const current=new Map(profiles.map(item=>[item.ownerId,item.data]));
-  return people.filter(person=>has(actor,'operator','superadmin') || visibleIds.has(person.id)).map(person=>{
+  return people.filter(person=>visibleIds.has(person.id)).map(person=>{
     const preview=person.id===actor.id || !hidden.has(person.id) || has(actor,'teacher','reviewer','operator','superadmin');
     const profile=preview ? current.get(person.id) : undefined;
     const display={
       nickname:typeof profile?.nickname==='string' ? profile.nickname : undefined,
       avatar:typeof profile?.avatar==='string' ? profile.avatar : undefined,
     };
-    return has(actor,'superadmin') ? {...person,...display} : {id:person.id,name:person.name,organization:preview ? person.organization : '',...display};
+    return has(actor,'superadmin') ? {...person,...display} : {id:person.id,name:person.name,organization:person.id===actor.id ? person.organization : '',...display};
   });
 }

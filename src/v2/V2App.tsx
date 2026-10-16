@@ -21,6 +21,8 @@ import { V2Sports } from './V2Sports'
 import { useSportsHomeScroll } from './useSportsHomeScroll'
 import { V2CampusExplore } from './V2CampusExplorer'
 import { V2Auth } from './V2Auth'
+import { V2Identity } from './V2Identity'
+import { V2ForgotPassword } from './V2ForgotPassword'
 import { useOriginalSession } from './useOriginalSession'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { DisplayAvatar } from './DisplayAvatar'
@@ -128,9 +130,12 @@ function V2Routes() {
   }, [authorized, requestedRole, state.role, setState])
   if (location.pathname === '/v2/login') return <V2Auth mode="login"/>
   if (location.pathname === '/v2/register') return <V2Auth mode="register"/>
+  if (location.pathname === '/v2/forgot-password') return <V2ForgotPassword/>
   if (!session) return <p role="status">正在核对登录状态…</p>
   if (session.anonymous) return <Navigate to="/v2/login" state={{returnTo: location.pathname + location.search + location.hash}} replace/>
   if (session.error) return <p role="alert">{session.error}</p>
+  if (location.pathname === '/v2/identity') return <V2Identity/>
+  if (session.account?.roles.length===0) return <Navigate to="/v2/identity" replace/>
   if (!authorized) return <Navigate to="/v2/login" state={{returnTo:location.pathname + location.search, roleMismatch:true}} replace/>
   if (state.role !== requestedRole) return <p role="status">正在切换本人已授权身份…</p>
   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>

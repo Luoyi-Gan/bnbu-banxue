@@ -10,6 +10,7 @@ function viewInput(input: Fields) {
 }
 
 export function recordPostView(db: Database, repo: Repository, actor: Account, input: Fields) {
+  demand(actor.roles.length>0,'请先完成校园身份核验。',403);
   const { postId, openId } = viewInput(input);
   const post = repo.get(postId, 'post');
   demand(post.data.status === 'visible', '帖子当前不可查看。', 403);
@@ -20,6 +21,7 @@ export function recordPostView(db: Database, repo: Repository, actor: Account, i
 }
 
 export async function recordPostgresPostView(repo: PostgresRepository, actor: Account, input: Fields) {
+  demand(actor.roles.length>0,'请先完成校园身份核验。',403);
   const { postId, openId } = viewInput(input);
   const post = await repo.get(postId, 'post');
   demand(post.data.status === 'visible', '帖子当前不可查看。', 403);

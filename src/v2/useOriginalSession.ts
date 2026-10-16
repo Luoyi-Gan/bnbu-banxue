@@ -3,7 +3,7 @@ import { api, ApiError, type LiveAccount } from '../live/api'
 
 export function useOriginalSession(pathname: string, navigationKey: string) {
   const [session, setSession] = useState<{path: string; navigationKey: string; account: LiveAccount | null; error: string; anonymous: boolean} | null>(null)
-  const authPage = pathname === '/v2/login' || pathname === '/v2/register'
+  const authPage = pathname === '/v2/login' || pathname === '/v2/register' || pathname === '/v2/forgot-password'
   useEffect(() => {
     if (authPage) return
     let active = true, generation = 0

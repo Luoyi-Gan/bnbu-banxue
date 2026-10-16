@@ -1,6 +1,7 @@
 import {demand, type Account} from './auth';
 import type {Database} from './database';
 import {Repository, type Entity, type Fields} from './repository';
+import {takeStudentSearch} from './security-rate';
 export function studentNumber(db: Database, actor: Account): string | null {
   return recordedStudentNumber(actor,new Repository(db).all('companionIdentity'));
 }
@@ -11,10 +12,12 @@ export function recordedStudentNumber(actor: Account, records: Entity[]): string
   const number=identities[0].data.studentNumber;
   return typeof number==='string' && number.trim() ? number.trim() : null;
 }
-export function searchStudents(db: Database, actor: Account, query: string) {
+export function searchStudents(db: Database, actor: Account, query: string, origin='local') {
   validateStudentSearch(actor,query);
   const repo = new Repository(db);
   const identities=repo.all('companionIdentity'),preferences=repo.all('preferences'),profiles=repo.all('profile');
+  demand(recordedStudentNumber(actor,identities),'仅已核验学生可按学号查找。',403);
+  takeStudentSearch(db,actor.id,origin);
   const ids=new Set(identities.filter(i=>i.data.studentNumber===query.trim()).map(i=>i.ownerId));
   return {students:[...ids].flatMap(id=>{
     const row=db.prepare("SELECT id,email,name,organization,status,roles FROM accounts WHERE id=? AND login_kind='PERSONAL'").get(id) as (Omit<Account,'roles'>&{roles:string})|undefined;
