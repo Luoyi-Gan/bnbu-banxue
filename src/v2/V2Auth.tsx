@@ -2,7 +2,6 @@ import {api,type LiveAccount} from '../live/api';
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
   Eye,
   EyeOff,
   LockKeyhole,
@@ -30,6 +29,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
   const [code, setCode] = useState("");
   const [step, setStep] = useState<1 | 2>(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [recoveryOpen, setRecoveryOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [codeBusy, setCodeBusy] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -48,6 +48,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
     setPassword("");
     setConfirmPassword("");
     setCode("");
+    setRecoveryOpen(false);
   }, [mode]);
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -167,14 +168,14 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
               {mode === "login"
                 ? "输入账号和密码，继续你的校园生活。"
                 : step === 1
-                  ? "填写邮箱与验证码，再设置登录密码。"
-                  : "提交后由账号服务核验验证码并建立账号。"}
+                  ? "先收取验证码，再设置密码并提交核验。"
+                  : "验证码会在提交注册时由账号服务核验。"}
             </p>
           </div>
           {mode === "register" && (
             <div className="v2-auth-steps" aria-label="注册进度">
               <span className="is-current">
-                <span>{step > 1 ? <Check size={13} /> : "1"}</span>填写验证码
+                <span>1</span>填写验证码
               </span>
               <i />
               <span className={step === 2 ? "is-current" : ""}>
@@ -324,6 +325,10 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
               {!busy && <ArrowRight size={18} />}
             </button>
           </form>
+          {mode === "login" && <div className="v2-auth-recovery">
+            <button type="button" className="v2-auth-text-action" aria-expanded={recoveryOpen} onClick={() => setRecoveryOpen(value => !value)}>忘记密码？</button>
+            {recoveryOpen && <div className="v2-info-box" role="status"><strong>通过已验证邮箱找回</strong><p>一次性找回挑战需要由账号服务发送和核验。当前前端已保留入口，服务端找回流程尚未接通，暂不能提交重置请求。</p></div>}
+          </div>}
           <p className="v2-auth-switch">
             {mode === "login" ? "还没有账号？" : "已有账号？"}{" "}
             <Link to={mode === "login" ? "/v2/register" : "/v2/login"}>

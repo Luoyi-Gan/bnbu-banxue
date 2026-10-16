@@ -1,11 +1,9 @@
-import { api } from '../live/api'
 import { ArrowRight, CalendarDays, MessageCircle, Search, UsersRound, X } from 'lucide-react'
 import { gsap } from 'gsap'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { liveSearch } from './liveSearch'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
-import { DisplayAvatar } from './DisplayAvatar'
 
 
 
@@ -17,14 +15,6 @@ export function StudentSearch() {
   const location = useLocation()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [students, setStudents] = useState<{id:string;name:string;organization:string;nickname?:string;avatar?:string}[]>([])
-  const [studentError, setStudentError] = useState('')
-  useEffect(() => {
-    let active = true; setStudents([]); setStudentError('');
-    if (!open || !query.trim()) return;
-    const timer = setTimeout(() => { void api<{students:{id:string;name:string;organization:string;nickname?:string;avatar?:string}[]}>('/api/students/search?number='+encodeURIComponent(query.trim())).then(result => {if(active) setStudents(result.students)}).catch(error => {if(active) setStudentError(error instanceof Error ? error.message : '学号查询失败')}) },300);
-    return () => {active=false;clearTimeout(timer)}
-  },[query,open])
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -87,15 +77,13 @@ export function StudentSearch() {
     <button ref={triggerRef} type="button" className="v2-icon-button v2-student-search-trigger" aria-label="搜索校园" aria-expanded={open} aria-keyshortcuts="/ Meta+K Control+K" onClick={() => setOpen(true)}><Search size={19}/></button>
     <div className="v2-student-search-field" aria-hidden={!open}>
       <Search size={18} aria-hidden="true"/>
-      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder="搜索校园内容或输入完整学号" aria-label="搜索校园内容" tabIndex={open ? 0 : -1}/>
+      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder="搜索活动、帖子或队伍" aria-label="搜索校园内容" tabIndex={open ? 0 : -1}/>
       {query && <button type="button" className="v2-student-search-clear" aria-label="清除搜索词" onClick={() => { setQuery(''); inputRef.current?.focus() }}><X size={15}/></button>}
       <button type="button" className="v2-student-search-close" aria-label="关闭搜索" onClick={closeToTrigger}><X size={18}/></button>
     </div>
     <div ref={panelRef} className="v2-student-search-panel" aria-hidden={!open} inert={!open}>
       <div className="v2-student-search-panel-inner">
-        <div className="v2-student-search-heading"><strong>{normalized ? '搜索结果' : '推荐看看'}</strong><small>{normalized ? `${results.length + students.length} 条匹配` : '校园里正在发生'}</small></div>
-        {students.map(person => <div className="v2-student-search-result" key={person.id}><span className="v2-student-search-art"><DisplayAvatar className="v2-search-person-avatar" name={person.nickname || person.name} avatar={person.avatar} personId={person.id} lookupNumber={query.trim()}/></span><span className="v2-student-search-result-copy"><strong>{person.nickname || person.name}</strong><small>{person.organization || '学生'}</small></span></div>)}
-        {studentError && <p role="alert">{studentError}</p>}
+        <div className="v2-student-search-heading"><strong>{normalized ? '搜索结果' : '推荐看看'}</strong><small>{normalized ? `${results.length} 条匹配` : '校园里正在发生'}</small></div>
         {results.length ? results.map((item) => {
           const Icon = resultIcons[item.kind]
           return <Link to={item.path} className="v2-student-search-result" key={`${item.kind}-${item.id}`} onClick={close}>
@@ -103,7 +91,8 @@ export function StudentSearch() {
             <span className="v2-student-search-result-copy"><strong>{item.title}</strong><small>{item.meta}</small></span>
             <ArrowRight size={16} aria-hidden="true"/>
           </Link>
-        }) : <div className="v2-student-search-empty">{students.length ? '以上为学号匹配结果。' : live.error || (!live.data ? '正在读取校园内容…' : '没有找到相关内容。试试更短的关键词。')}</div>}
+        }) : <div className="v2-student-search-empty">{live.error || (!live.data ? '正在读取校园内容…' : '没有找到相关内容。试试更短的关键词。')}</div>}
+        <p className="v2-student-search-empty">按完整学号找人将在校方身份核验与搜索限速接通后开放。</p>
         <div className="v2-student-search-footer"><span>按 Enter 打开首条结果 · Esc 关闭</span><button type="button" onClick={() => choose('/v2/activities')}>浏览全部活动 <ArrowRight size={14}/></button></div>
       </div>
     </div>

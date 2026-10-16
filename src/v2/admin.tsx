@@ -39,21 +39,89 @@ export function AdminVerifications() {
   const [note, setNote] = useState('')
   const items = verifications.filter((item) => (filter === 'all' || item.status === filter) && (kind === 'all' || item.kind === kind))
   const current = verifications.find((item) => item.id === selected)
-  const decide = async (item: Verification, approve: boolean) => { if (await live.mutate('certification.review', {id: item.id, approve, reason: note.trim()})) {setSelected(null); setNote('')} }
-  return <div className="v2-page"><PageHeading eyebrow="IDENTITY REVIEW" title="认证审核" description="核验学生、社团成员、官方机构及校友身份。"/><AdminAlumniReview live={live}/>{live.error && <p role="alert" className="v2-info-box">{live.error}</p>}<section className="v2-panel v2-list-panel"><SectionHeading title="认证申请" detail={`${items.length} 条结果`}/><div className="v2-toolbar"><div className="v2-filter-pills">{([['pending', '待审核'], ['approved', '已通过'], ['rejected', '已驳回'], ['all', '全部']] as const).map(([key, label]) => <button type="button" className={filter === key ? 'is-active' : ''} onClick={() => setFilter(key)} key={key}>{label}</button>)}</div><select value={kind} onChange={(event) => setKind(event.target.value as typeof kind)} aria-label="认证类型"><option value="all">全部类型</option><option value="student">学生</option><option value="club">学生社团成员</option><option value="official">官方机构</option></select></div><div className="v2-row-list">{items.map((item) => <button type="button" className="v2-verification-row" onClick={() => { setSelected(item.id); setNote(item.status === 'approved' ? '' : item.reviewNote) }} key={item.id}><span className="v2-notice-icon"><ShieldCheck size={20}/></span><span><small>{kindName[item.kind]} · {item.date}</small><strong>{item.organization}</strong><em>{item.name} · {item.note}</em></span><span className={`v2-status-chip ${item.status === 'approved' ? 'is-success' : item.status === 'pending' ? 'is-pending' : ''}`}>{statusName[item.status]}</span><ChevronRight size={17}/></button>)}</div>{!items.length && <Empty icon={ShieldCheck} title="当前筛选下没有申请"/>}</section>{current && <Drawer title={current.organization} eyebrow={`${kindName[current.kind]}认证 · ${statusName[current.status]}`} onClose={() => setSelected(null)}><div className="v2-fact-list"><span>申请人：{current.name}</span><span>提交时间：{current.date}</span></div><p className="v2-detail-lead">{current.note}</p>{current.status === 'pending' ? <><label className="v2-drawer-label">审核备注<textarea rows={4} value={note} onChange={(event) => setNote(event.target.value)} placeholder="可填写通过说明或驳回原因"/></label><div className="v2-detail-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => decide(current, false)}><X size={16}/> 驳回</button><button type="button" className="v2-button v2-button-primary" onClick={() => decide(current, true)}><Check size={16}/> 通过</button></div></> : <div className="v2-info-box">审核备注：{current.reviewNote || '无'}{current.kind === 'club' && current.status === 'approved' && <><label className="v2-drawer-label">撤销原因<textarea value={note} onChange={(event) => setNote(event.target.value)} required/></label><button type="button" disabled={!note.trim()} className="v2-button v2-button-secondary" onClick={() => decide(current, false)}>撤销社团成员认证</button></>}</div>}</Drawer>}</div>
+  const decide = async (item: Verification, approve: boolean) => { if (item.kind === 'student') return; if (await live.mutate('certification.review', {id: item.id, approve, reason: note.trim()})) {setSelected(null); setNote('')} }
+  return <div className="v2-page"><PageHeading eyebrow="IDENTITY REVIEW" title="认证审核" description="核验学生、社团成员、官方机构及校友身份。"/><AdminAlumniReview live={live}/>{live.error && <p role="alert" className="v2-info-box">{live.error}</p>}<section className="v2-panel v2-list-panel"><SectionHeading title="认证申请" detail={`${items.length} 条结果`}/><div className="v2-toolbar"><div className="v2-filter-pills">{([['pending', '待审核'], ['approved', '已通过'], ['rejected', '已驳回'], ['all', '全部']] as const).map(([key, label]) => <button type="button" className={filter === key ? 'is-active' : ''} onClick={() => setFilter(key)} key={key}>{label}</button>)}</div><select value={kind} onChange={(event) => setKind(event.target.value as typeof kind)} aria-label="认证类型"><option value="all">全部类型</option><option value="student">学生</option><option value="club">学生社团成员</option><option value="official">官方机构</option></select></div><div className="v2-row-list">{items.map((item) => <button type="button" className="v2-verification-row" onClick={() => { setSelected(item.id); setNote(item.status === 'approved' ? '' : item.reviewNote) }} key={item.id}><span className="v2-notice-icon"><ShieldCheck size={20}/></span><span><small>{kindName[item.kind]} · {item.date}</small><strong>{item.organization}</strong><em>{item.name} · {item.note}</em></span><span className={`v2-status-chip ${item.status === 'approved' ? 'is-success' : item.status === 'pending' ? 'is-pending' : ''}`}>{statusName[item.status]}</span><ChevronRight size={17}/></button>)}</div>{!items.length && <Empty icon={ShieldCheck} title="当前筛选下没有申请"/>}</section>{current && <Drawer title={current.organization} eyebrow={`${kindName[current.kind]}认证 · ${statusName[current.status]}`} onClose={() => setSelected(null)}><div className="v2-fact-list"><span>申请人：{current.name}</span><span>提交时间：{current.date}</span></div><p className="v2-detail-lead">{current.note}</p>{current.kind === 'student' && <div className="v2-info-box" role="status">学生身份须依据校方在读学籍结果核验。当前申请记录只有自填资料，校方核验及可追溯授权流程尚未接通，不能在此通过或驳回。</div>}{current.status === 'pending' ? <><label className="v2-drawer-label">审核备注<textarea rows={4} value={note} onChange={(event) => setNote(event.target.value)} placeholder="可填写通过说明或驳回原因"/></label><div className="v2-detail-actions"><button type="button" className="v2-button v2-button-secondary" disabled={current.kind === 'student' || live.busy || !note.trim()} onClick={() => decide(current, false)}><X size={16}/> 驳回</button><button type="button" className="v2-button v2-button-primary" disabled={current.kind === 'student' || live.busy} onClick={() => decide(current, true)}><Check size={16}/> 通过</button></div></> : <div className="v2-info-box">审核备注：{current.reviewNote || '无'}{current.kind === 'club' && current.status === 'approved' && <><label className="v2-drawer-label">撤销原因<textarea value={note} onChange={(event) => setNote(event.target.value)} required/></label><button type="button" disabled={!note.trim()} className="v2-button v2-button-secondary" onClick={() => decide(current, false)}>撤销社团成员认证</button></>}</div>}</Drawer>}</div>
 }
 
-type ModerationItem = { id: string; kind: 'post' | 'comment'; title: string; body: string; author: string; status: 'visible' | 'pending' | 'hidden'; parentId?: string }
+type ModerationItem = {
+  id: string
+  kind: 'post' | 'comment'
+  title: string
+  body: string
+  author: string
+  status: 'visible' | 'pending' | 'hidden'
+  parentExcerpt?: string
+  adjacentExcerpt?: string
+}
+
+const moderationStatus = { pending: '待审核', visible: '展示中', hidden: '已下架' }
+
 export function AdminModeration() {
   const live = useWorkspaceBackend(10000)
   const [reason, setReason] = useState('')
   const [status, setStatus] = useState<'pending' | 'visible' | 'hidden' | 'all'>('pending')
   const [kind, setKind] = useState<'all' | 'post' | 'comment'>('all')
+  const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
   const [selected, setSelected] = useState<string | null>(null)
-  const all: ModerationItem[] = (live.data?.entities ?? []).filter(e => e.kind === 'post' || e.kind === 'comment').map(e => ({id:e.id, kind:e.kind as 'post' | 'comment', title:e.kind === 'post' ? String(e.data.title) : '评论 · ' + String(live.data?.entities.find(p=>p.id===e.data.postId)?.data.title ?? '原帖子'), body:String(e.data.body), author:live.data?.people.find(p=>p.id===e.ownerId)?.name ?? '已注销用户', status:e.data.status as ModerationItem['status']}))
-  const items = all.filter((item) => (status === 'all' || item.status === status) && (kind === 'all' || item.kind === kind))
-  const current = all.find((item) => item.id === selected)
-  const moderate = async (item: ModerationItem, next: 'visible' | 'hidden') => {if (await live.mutate('content.review', {id:item.id,status:next,reason})) {setSelected(null);setReason('')}}
+  const entities = live.data?.entities ?? []
+  const posts = new Map(entities.filter(e => e.kind === 'post').map(e => [e.id, e]))
+  const people = new Map((live.data?.people ?? []).map(person => [person.id, person.name]))
+  const visibleComments = new Map<string, { id: string; body: string }[]>()
+  for (const entity of entities) {
+    if (entity.kind !== 'comment' || entity.data.status !== 'visible') continue
+    const postId = String(entity.data.postId)
+    if (!visibleComments.has(postId)) visibleComments.set(postId, [])
+    visibleComments.get(postId)!.push({ id: entity.id, body: String(entity.data.body ?? '') })
+  }
+  const all: ModerationItem[] = entities.filter(e => e.kind === 'post' || e.kind === 'comment').map(e => {
+    const parent = e.kind === 'comment' ? posts.get(String(e.data.postId)) : undefined
+    const adjacent = e.kind === 'comment' ? (visibleComments.get(String(e.data.postId)) ?? []).filter(comment => comment.id !== e.id).slice(-2) : []
+    return {
+      id: e.id,
+      kind: e.kind as ModerationItem['kind'],
+      title: e.kind === 'post' ? String(e.data.title) : '评论 · ' + String(parent?.data.title ?? '原帖子'),
+      body: String(e.data.body),
+      author: people.get(e.ownerId ?? '') ?? '已注销用户',
+      status: e.data.status as ModerationItem['status'],
+      parentExcerpt: parent ? String(parent.data.body ?? '').slice(0, 240) : undefined,
+      adjacentExcerpt: adjacent.map(comment => comment.body.slice(0, 120)).join(' / '),
+    }
+  })
+  const items = all.filter(item => (status === 'all' || item.status === status) && (kind === 'all' || item.kind === kind) && `${item.title} ${item.body} ${item.author}`.toLowerCase().includes(query.trim().toLowerCase()))
+  const pageCount = Math.max(1, Math.ceil(items.length / 50))
+  const currentPage = Math.min(page, pageCount)
+  const shown = items.slice((currentPage - 1) * 50, currentPage * 50)
+  const current = all.find(item => item.id === selected)
+  const moderate = async (item: ModerationItem, next: 'visible' | 'hidden') => {
+    const latest = live.data?.entities.find(entity => entity.id === item.id)
+    if (!latest || latest.data.status !== item.status) return
+    const action = next === 'visible' ? item.status === 'hidden' ? '恢复展示' : '通过审核' : item.status === 'pending' ? '驳回' : '下架'
+    const message = `请确认${action}\n对象：${item.title}（${item.id}）\n原状态：${moderationStatus[item.status]}\n新状态：${moderationStatus[next]}\n影响：${next === 'visible' ? '内容将公开展示' : '内容将停止公开展示'}\n原因：${reason.trim() || '通过审核，无需填写'}`
+    if (!window.confirm(message)) return
+    if (await live.mutate('content.review', { id: item.id, status: next, reason: reason.trim() })) { setSelected(null); setReason('') }
+  }
   if (!live.data) return <p role={live.error ? 'alert' : 'status'}>{live.error || '正在读取审核队列…'}</p>
-  return <div className="v2-page"><PageHeading eyebrow="CONTENT REVIEW" title="内容审核" description="统一查看社区帖子与评论的发布状态。"/><section className="v2-panel v2-list-panel"><SectionHeading title="审核队列" detail={`${items.length} 条内容`}/><div className="v2-toolbar"><div className="v2-filter-pills">{([['pending', '待审核'], ['visible', '已展示'], ['hidden', '已下架'], ['all', '全部']] as const).map(([key, label]) => <button type="button" className={status === key ? 'is-active' : ''} onClick={() => setStatus(key)} key={key}>{label}</button>)}</div><select value={kind} onChange={(event) => setKind(event.target.value as typeof kind)} aria-label="内容类型"><option value="all">帖子与评论</option><option value="post">帖子</option><option value="comment">评论</option></select></div><div className="v2-row-list">{items.map((item) => <button type="button" className="v2-verification-row" key={item.id} onClick={() => {setSelected(item.id);setReason('')}}><span className="v2-notice-icon"><Newspaper size={19}/></span><span><small>{item.kind === 'post' ? '帖子' : '评论'} · {item.author}</small><strong>{item.title}</strong><em>{item.body}</em></span><span className={`v2-status-chip ${item.status === 'visible' ? 'is-success' : item.status === 'pending' ? 'is-pending' : ''}`}>{item.status === 'pending' ? '待审' : item.status === 'visible' ? '展示中' : '已下架'}</span><ChevronRight size={17}/></button>)}</div>{!items.length && <Empty icon={FileCheck2} title="当前队列没有内容"/>}</section>{current && <Drawer title={current.title} eyebrow={`${current.kind === 'post' ? '帖子' : '评论'} · ${current.author}`} onClose={() => setSelected(null)}><p className="v2-detail-lead">{current.body}</p><label className="v2-drawer-label">处理原因（通过审核可不填）<textarea maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} placeholder="通过审核可留空；驳回、下架或恢复须填写原因"/></label>{live.error && <p role="alert">{live.error}</p>}<div className="v2-detail-actions">{current.status !== 'hidden' && <button type="button" className="v2-button v2-button-secondary" disabled={live.busy || !reason.trim()} onClick={() => moderate(current, 'hidden')}><X size={16}/> {current.status === 'pending' ? '驳回' : '下架'}</button>}{current.status !== 'visible' && <button type="button" className="v2-button v2-button-primary" disabled={live.busy || (current.status === 'hidden' && !reason.trim())} onClick={() => moderate(current, 'visible')}><Check size={16}/> {current.status === 'hidden' ? '恢复展示' : '通过审核'}</button>}</div></Drawer>}</div>
+  return <div className="v2-page">
+    <PageHeading eyebrow="CONTENT REVIEW" title="内容审核" description="查看帖子与评论的发布状态及评论语境。"/>
+    <section className="v2-panel v2-list-panel">
+      <SectionHeading title="审核队列" detail={`${items.length} 条内容 · 每页最多 50 条`}/>
+      <div className="v2-toolbar">
+        <div className="v2-filter-pills">{([['pending', '待审核'], ['visible', '已展示'], ['hidden', '已下架'], ['all', '全部']] as const).map(([key, label]) => <button type="button" className={status === key ? 'is-active' : ''} onClick={() => {setStatus(key); setPage(1)}} key={key}>{label}</button>)}</div>
+        <select value={kind} onChange={event => {setKind(event.target.value as typeof kind); setPage(1)}} aria-label="内容类型"><option value="all">帖子与评论</option><option value="post">帖子</option><option value="comment">评论</option></select>
+        <input type="search" value={query} onChange={event => {setQuery(event.target.value); setPage(1)}} placeholder="按标题、正文或作者搜索" aria-label="搜索审核内容"/>
+      </div>
+      <div className="v2-row-list">{shown.map(item => <button type="button" className="v2-verification-row" key={item.id} onClick={() => {setSelected(item.id); setReason('')}}><span className="v2-notice-icon"><Newspaper size={19}/></span><span><small>{item.kind === 'post' ? '帖子' : '评论'} · {item.author}</small><strong>{item.title}</strong><em>{item.body}</em></span><span className={`v2-status-chip ${item.status === 'visible' ? 'is-success' : item.status === 'pending' ? 'is-pending' : ''}`}>{moderationStatus[item.status]}</span><ChevronRight size={17}/></button>)}</div>
+      {!shown.length && <Empty icon={FileCheck2} title="当前队列没有内容"/>}
+      {pageCount > 1 && <div className="v2-detail-actions"><button type="button" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>上一页</button><span>第 {currentPage} / {pageCount} 页</span><button type="button" disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>下一页</button></div>}
+      <p className="v2-form-note">当前服务仍通过工作区返回完整内容；服务端筛选、分页、版本重核和批量审核待接通。</p>
+    </section>
+    {current && <Drawer title={current.title} eyebrow={`${current.kind === 'post' ? '帖子' : '评论'} · ${current.author}`} onClose={() => setSelected(null)}>
+      {current.kind === 'comment' && <div className="v2-info-box"><strong>所属帖子正文</strong><p>{current.parentExcerpt || '原帖子正文暂不可见'}</p>{current.adjacentExcerpt && <><strong>相邻可见评论</strong><p>{current.adjacentExcerpt}</p></>}</div>}
+      <p className="v2-detail-lead">{current.body}</p>
+      <label className="v2-drawer-label">处理原因（通过审核可不填）<textarea maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} placeholder="驳回、下架或恢复须填写原因"/></label>
+      {live.error && <p role="alert">{live.error}</p>}
+      <div className="v2-detail-actions">{current.status !== 'hidden' && <button type="button" className="v2-button v2-button-secondary" disabled={live.busy || !reason.trim()} onClick={() => moderate(current, 'hidden')}><X size={16}/> {current.status === 'pending' ? '驳回' : '下架'}</button>}{current.status !== 'visible' && <button type="button" className="v2-button v2-button-primary" disabled={live.busy || (current.status === 'hidden' && !reason.trim())} onClick={() => moderate(current, 'visible')}><Check size={16}/> {current.status === 'hidden' ? '恢复展示' : '通过审核'}</button>}</div>
+    </Drawer>}
+  </div>
 }
