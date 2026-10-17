@@ -38,7 +38,7 @@ import { SportsProgressCard } from "../v2/SportsProgressCard";
 import { MailResolution } from "./MailResolution";
 import { Modal, PageHeading } from "../v2/ui";
 import { DisplayAvatar } from "../v2/DisplayAvatar";
-import brandIcon from "../assets/brand/brand-app-icon-a.svg";
+const brandIcon = "/huitongli-app-icon.png";
 import "../v2/v2.css";
 import "../v2/aRedesign.css";
 import "./live.css";

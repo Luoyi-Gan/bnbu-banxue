@@ -23,7 +23,7 @@ export function TeacherCoffee() {
   const [tab, setTab] = useState('bookings'), [feedback, setFeedback] = useState(''), [showHistory, setShowHistory] = useState(false)
   const [dialog, setDialog] = useState<{ kind: 'cancel' | 'move'; id: string } | null>(null)
   const bookings = data.bookings.filter(b => slots.some(s => s.id === b.slotId) && (showHistory || b.status === 'confirmed'))
-  async function run(action: string, input: Record<string, unknown>) { if (await live.mutate(action, input)) {setFeedback('已保存到伴学后台。'); setDialog(null)} }
+  async function run(action: string, input: Record<string, unknown>) { if (await live.mutate(action, input)) {setFeedback('已保存到会同里后台。'); setDialog(null)} }
   function addSlot(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const form = new FormData(event.currentTarget); void run('coffee.slot.create', {startAt: new Date(String(form.get('start'))).toISOString(), endAt: new Date(String(form.get('end'))).toISOString(), location: String(form.get('location')), capacity: Number(form.get('capacity'))}) }
   return <div className="v2-page"><PageHeading eyebrow="TEACHER · COFFEE CHAT" title="Coffee Chat" description="先看看哪些同学预约了与你交流。"/>
     <div className="v2-filter-pills"><button className={tab === 'bookings' ? 'is-active' : ''} onClick={() => setTab('bookings')}>预约学生</button><button className={tab === 'slots' ? 'is-active' : ''} onClick={() => setTab('slots')}>开放时段</button></div>
@@ -65,7 +65,7 @@ export function TeacherProfile() {
     event.preventDefault()
     const f = new FormData(event.currentTarget)
     setMessage('')
-    if (await live.mutate('coffee.profile', {nickname: String(f.get('nickname')).trim(), bio: String(f.get('bio')).trim(), topics: String(f.get('topics')).trim(), location: String(f.get('location')).trim()})) setMessage('资料已保存到伴学后台。')
+    if (await live.mutate('coffee.profile', {nickname: String(f.get('nickname')).trim(), bio: String(f.get('bio')).trim(), topics: String(f.get('topics')).trim(), location: String(f.get('location')).trim()})) setMessage('资料已保存到会同里后台。')
   }
   return <div className="v2-page"><PageHeading eyebrow="TEACHER PROFILE" title="个人资料" description="维护学生预约前可以查看的介绍。"/>{!account ? <p role={live.error ? 'alert' : 'status'}>{live.error || '正在读取本人资料…'}</p> : <form key={account.id} className="v2-panel v2-form v2-teacher-panel" onSubmit={save}><label>教师标识<input value={account.id} readOnly/></label><label>学院<input value={account.organization} readOnly/></label><label>教师资格<input value="已授权教师；体育资格以体育平台核验为准" readOnly/></label><label>展示名称<input name="nickname" defaultValue={String(profile?.data.nickname ?? account.name)} maxLength={20} required/></label><label>个人介绍<textarea name="bio" defaultValue={String(profile?.data.bio ?? '')} maxLength={1000}/></label><label>交流主题（用顿号分隔）<input name="topics" defaultValue={String(profile?.data.topics ?? '')} maxLength={200} required/></label><label>默认交流地点<input name="location" defaultValue={String(profile?.data.location ?? '')} maxLength={100} required/></label><button disabled={live.busy} className="v2-button v2-button-primary">保存资料</button><p role="status">{live.error || message}</p><p className="v2-form-note">体育资格不能通过编辑资料取得。已开放时段的地点以时段记录为准。</p></form>}</div>
 }

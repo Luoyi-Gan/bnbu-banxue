@@ -1,0 +1,39 @@
+--- a/src/v2/V2App.tsx
++++ b/src/v2/V2App.tsx
+@@ -4,8 +4,7 @@
+ import { Bell, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
+ import { useEffect, useRef, useState, type ReactNode } from 'react'
+ import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+-import brandIcon from '../assets/brand/brand-app-icon.svg'
+-const studentBrandIcon = '/huitongli-app-icon.png'
++const brandIcon = '/huitongli-app-icon.png'
+ import { V2Provider } from './store'
+ import { useV2 } from './useV2'
+ import { TeacherCoffee, TeacherProfile, TeacherSchedule, TeacherMessages, TeacherSports } from './TeacherPortal'
+@@ -70,7 +69,7 @@
+   const displayAvatar = typeof studentProfile?.avatar === 'string' ? studentProfile.avatar : ''
+   const ownPreferences = live.data?.entities.find(item => item.kind === 'preferences' && item.ownerId === live.data?.account.id)?.data
+   const sidebarItems = parseSidebarItems(ownPreferences?.sidebarItems) ?? defaultSidebarItems
+-  const shellBrandIcon = admin || teacher ? brandIcon : studentBrandIcon
++  const shellBrandIcon = brandIcon
+   const sports = location.pathname === '/v2/teacher/sports'
+   const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+   const teacherNav = [
+@@ -83,7 +82,7 @@
+   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
+   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
+   const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
+-  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? (admin || teacher ? '伴学' : '会同里')
++  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '会同里'
+   const service = new URLSearchParams(location.search).get('service')
+   const sidebarMatch = (id: typeof sidebarItems[number]) => {
+     if (id === 'home') return location.pathname === '/v2'
+@@ -106,7 +105,7 @@
+   }, [roleMenu])
+   return <div className={`v2-app${sports ? ' v2-app-sports' : ''}${!admin && !teacher ? ' v2-app-student' : ''}`}>
+     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
+-      <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>{admin || teacher ? '伴学' : '会同里'}</strong><small>BNBU CAMPUS</small></span></Link>
++      <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>会同里</strong><small>BNBU CAMPUS</small></span></Link>
+       <div className="v2-nav-label">{admin ? '管理' : teacher ? '教师' : '我的导航'}</div>
+       {admin || teacher ? <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span></NavLink>)}</nav> : <nav className="v2-side-nav v2-student-sidebar-nav">{sidebarItems.map(id => { const entry = studentSidebarById[id]; const Icon = entry.icon; return <NavLink key={id} to={entry.path} className={`v2-side-link${sidebarActiveId === id ? ' is-active' : ''}`}><Icon size={19}/><span>{entry.label}</span>{id === 'conversations' && unread > 0 && <b>{unread}</b>}</NavLink> })}</nav>}
+       <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>{live.data ? '校园生活，随时相伴' : live.error ? '服务暂不可用' : '正在连接服务'}</span></div>{!admin && !teacher && <button type="button" className="v2-sidebar-customize-trigger" onClick={() => setCustomizingSidebar(true)}><Settings2 size={18}/> 侧栏设置</button>}{!admin && !teacher && <a className="reference-font-credit" href="/fonts/NOTICE.html" target="_blank" rel="noreferrer">字体与许可</a>}</div>
