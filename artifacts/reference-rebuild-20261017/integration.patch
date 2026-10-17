@@ -1,0 +1,116 @@
+--- a/src/v2/V2App.tsx
++++ b/src/v2/V2App.tsx
+@@ -1,3 +1,4 @@
++import { ReferenceHome, ReferenceDiscover, ReferenceCampus, ReferenceMe, ReferenceSports, ReferenceWelcome } from './reference/pages'
+ import { AdminMailActivities } from './AdminMailActivities'
+ import { AdminCommunityKeywords } from './AdminCommunityKeywords'
+ import { Bell, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
+@@ -11,10 +12,9 @@
+ import { canAccessPortal, portalHome } from './portalAccess'
+ import { StudentSearch } from './StudentSearch'
+ import { AdminDashboard, AdminModeration, AdminVerifications } from './admin'
+-import { V2Activities, V2Community, V2Home, V2Messages, V2Partners, V2Teams } from './student'
+-import { V2AI, V2Campus, V2Me, V2Settings } from './services'
++import { V2Activities, V2Community, V2Messages, V2Partners, V2Teams } from './student'
++import { V2AI, V2Settings } from './services'
+ import { V2Alumni } from './V2Alumni'
+-import { V2Sports } from './V2Sports'
+ import { V2Schedule } from './V2Schedule'
+ import { V2CoffeeChat } from './V2CoffeeChat'
+ import { PageHeading } from './ui'
+@@ -140,6 +140,7 @@
+   useEffect(() => {
+     if (authorized && state.role !== requestedRole) setState(current => ({...current, role: requestedRole}))
+   }, [authorized, requestedRole, state.role, setState])
++  if (location.pathname === '/v2/welcome') return <ReferenceWelcome/>
+   if (location.pathname === '/v2/login') return <V2Auth mode="login"/>
+   if (location.pathname === '/v2/register') return <V2Auth mode="register"/>
+   if (location.pathname === '/v2/forgot-password') return <V2ForgotPassword/>
+@@ -152,9 +153,9 @@
+   if (state.role !== requestedRole) return <p role="status">正在切换本人已授权身份…</p>
+   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>
+   return <V2Shell accountName={session.account!.name}><Routes>
+-    <Route path="/v2" element={<V2Home/>}/>
++    <Route path="/v2" element={<ReferenceHome/>}/>
+     <Route path="/v2/alumni" element={<V2Alumni/>}/>
+-    <Route path="/v2/sports" element={<V2Sports/>}/>
++    <Route path="/v2/sports" element={<ReferenceSports/>}/>
+     <Route path="/v2/schedule" element={<V2Schedule/>}/>
+     <Route path="/v2/coffee" element={<div className="v2-page reference-coffee-page"><PageHeading eyebrow="A LITTLE CONVERSATION" title="Coffee Chat" description="和老师聊聊，每一种可能。"/><V2CoffeeChat/></div>}/>
+     <Route path="/v2/teacher" element={<Navigate to={portalHome.teacher} replace/>}/>
+@@ -165,17 +166,17 @@
+     <Route path="/v2/teacher/schedule" element={<TeacherSchedule/>}/>
+     <Route path="/v2/teacher/messages" element={<TeacherMessages/>}/>
+     <Route path="/v2/teacher/sports" element={<TeacherSports/>}/>
+-    <Route path="/v2/activities" element={<V2Activities/>}/>
++    <Route path="/v2/activities" element={<ReferenceDiscover/>}/>
+     <Route path="/v2/activities/:id" element={<V2Activities/>}/>
+     <Route path="/v2/community" element={<V2Community/>}/>
+     <Route path="/v2/partners" element={<V2Partners/>}/>
+     <Route path="/v2/partners/teams" element={<V2Teams/>}/>
+     <Route path="/v2/messages" element={<V2Messages/>}/>
+-    <Route path="/v2/campus" element={<V2Campus/>}/>
++    <Route path="/v2/campus" element={<ReferenceCampus/>}/>
+     <Route path="/v2/organizations" element={<CampusOrganizations/>}/>
+     <Route path="/v2/campus/explore" element={<V2CampusExplore/>}/>
+     <Route path="/v2/ai" element={<V2AI/>}/>
+-    <Route path="/v2/me" element={<V2Me/>}/>
++    <Route path="/v2/me" element={<ReferenceMe/>}/>
+     <Route path="/v2/settings" element={<V2Settings/>}/>
+     <Route path="/v2/admin" element={<AdminDashboard/>}/>
+     <Route path="/v2/admin/verifications" element={<AdminVerifications/>}/>
+--- a/src/main.tsx
++++ b/src/main.tsx
+@@ -6,6 +6,7 @@
+ import './styles/redesign.css'
+ import './v2/referenceStudent.css'
+ import './v2/campusReference.css'
++import './v2/reference/reference.css'
+ 
+ createRoot(document.getElementById('root')!).render(
+   <StrictMode>
+--- a/BUSINESS_RULES.md
++++ b/BUSINESS_RULES.md
+@@ -11,6 +11,14 @@
+ 2026-10-15 补充：上述三类管理员均可删除屏蔽词；删除后该词立即退出后续检查和管理员词库列表，同词可重新添加，删除操作保留审计。帖子作者可删除本人帖子，审核员及超级管理员可删除任意帖子；管理员删除他人帖子须填写原因。删除使帖子及其评论停止在社区和校友经验列表公开，不能通过普通审核恢复，保留原帖、评论、互动、举报和处置记录供必要的审核追溯。下架与恢复仍由审核员或超级管理员执行并填写原因；页面须明确提示缺少原因或职责，不以无说明的禁用按钮代替反馈。
+ 
+ ## 2026-10-16 下一阶段统一改造规则
++
++### 2026-10-17 参考图完整页面重构
++
++- 用户追加授权完全依照六张参考图重构学生端页面。首页、发现、校园、体育打卡、我的采用独立页面组件与统一视觉；此前页面排列、卡片数量和旧展示限制让位于本轮参考图布局。
++- 根入口 `/` 展示 `/v2/welcome` 校园启动页，开始探索进入已有学生入口并按登录状态跳转。直接打开学生各功能页仍沿用原身份检查。
++- 首页补充校园动态与组织推荐；校园页展示本人已保存课表、组织、社区、搭子和 Coffee Chat；个人页展示资料、真实关系统计、近期参与/关注、周日历与功能列表。课表仅按已保存星期和周次展示，不推定实际到课。
++- 发现页面提供精选卡片与列表、搜索、时间/地点/既有类别筛选。活动仍使用现有分类与参与标记，不虚构报名人数、学分与报名状态；组织操作沿用关注，不称作正式加入。
++- 体育页按图片布局显示已有授权学时、记录与同步入口。地图、GPS、计时和运动提交缺少现有接口时不模拟已实现，不改变既有体育平台职责。现有资料编辑、课表导入修正、认证、活动详情与发布管理入口继续可用。
+ 
+ ### 2026-10-17 六张校园生活参考图（最新呈现要求）
+ 
+--- a/docs/ADMIN_COMPLETION.md
++++ b/docs/ADMIN_COMPLETION.md
+@@ -1,4 +1,15 @@
+ # 最新版替换与业务流程交接
++
++## 2026-10-17 参考图完整页面重构
++
++- 已接入独立的启动页及首页、发现、校园、体育打卡、我的五页组件。模块顺序、摄影区域、字体、快捷入口、日历和体育进度布局按用户六张参考图重建。
++- 使用既有工作区、社区、课表与体育投影；收藏、关注、封面设置沿用既有命令。未新增业务状态流程。根入口进入启动页，开始探索继续原身份验证。
++- 校园课表限制本人记录；体育源不可用显示缺失状态，不将失联当作零学时；组织关注与活动参与不改称正式加入或报名。收藏计数遵循内容公开状态。
++- 本地验证：Lint、生产构建通过；完整 Vitest 52 个文件通过、2 个跳过，274 项通过、39 项跳过。最后视觉微调后另行复跑构建与五项专属测试。
++- 浏览器验证：启动页进入首页；发现搜索/清除筛选；个人周日历切换、资料编辑入口、课表入口；体育同步与说明弹窗。手机宽度 390px（内容区 375px）样例检查无横向溢出，个人页下半部分也已检查。
++- 有内容的截图来自显式标注的隔离测试样例；样例 HTML 不写入后端，不能作为真实校园业务数据或交互验收。实际账号页面另外留存。未进行生产、真实手机或 GPS 运动验收。
++- 证据及存档说明见 `docs/REFERENCE_REBUILD_20261017.md`。
++
+ 
+ ## 名录、身份、找回密码与社区分页（2026-10-16）
+ 
+--- a/src/app/App.tsx
++++ b/src/app/App.tsx
+@@ -4,6 +4,7 @@
+ 
+ export function App() {
+   const { pathname } = useLocation()
++  if (pathname === '/') return <Navigate to="/v2/welcome" replace />
+   if (pathname === '/workspace' || pathname.startsWith('/workspace/')) return <ConnectedApp />
+   if (pathname !== '/v2' && !pathname.startsWith('/v2/')) return <Navigate to="/workspace" replace />
+   return <V2App />
