@@ -63,11 +63,13 @@ it('学生完整看板只使用可用源的授权投影，源失败时隐藏旧�
  expect(failed).not.toContain('>630<');
 });
 
-it('新版学生体育打卡只保留留白结构，不展示数据或操作', () => {
+it('学生体育页显示授权进度和独立模拟入口，未知进度保持占位', () => {
   const page = renderToStaticMarkup(<MemoryRouter><V2Sports/></MemoryRouter>);
   expect(page).toContain('体育打卡');
-  expect(page).toContain('v2-sports-empty-space');
-  for (const text of ['sports-hero', '运动提交趋势', '运动记录', '已确认学时', '刷新体育数据']) expect(page).not.toContain(text);
+  expect(page).toContain('运动记录');
+  expect(page).toContain('/student/huitongli-checkin.html');
+  expect(page).toContain('进度待同步');
+  expect(page).not.toContain('aria-valuenow="0"');
 });
 
 it('教师体育页面加载和读取失败时保留看板，失败后可以重试', () => {
