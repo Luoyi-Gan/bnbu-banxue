@@ -209,6 +209,12 @@ export function* governancePolicy(
     const data = {aiIconChoice, aiCustomIcon};
     return previous ? (yield* effect(repo.save(previous, data))) : (yield* effect(repo.create("preferences", actor.id, data)));
   }
+  if (action === "preferences.profilebackground") {
+    student(actor);
+    const profileBackground = enumField(input, "choice", ["campus", "evening", "walkway", "services"]);
+    const previous = (yield* effect(repo.all("preferences"))).find(p => p.ownerId === actor.id);
+    return previous ? (yield* effect(repo.save(previous, {profileBackground}))) : (yield* effect(repo.create("preferences", actor.id, {profileBackground})));
+  }
   if (action === "preferences.searchable") {
     student(actor);
     demand(typeof input.enabled === "boolean", "搜索开关必须为布尔值。");

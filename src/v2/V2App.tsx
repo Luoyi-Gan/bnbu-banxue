@@ -1,6 +1,6 @@
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
-import { Mail, CalendarDays, Coffee, ChevronDown, Compass, Footprints, GraduationCap, House, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldAlert, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { Bell, Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, House, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldAlert, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -37,7 +37,7 @@ const studentNav = [
   { path: '/v2', label: '首页', icon: House, end: true },
   { path: '/v2/activities', label: '发现', icon: Compass },
   { path: '/v2/campus', label: '校园', icon: UsersRound },
-  { path: '/v2/sports', label: '打卡', icon: Footprints },
+  { path: '/v2/messages', label: '会话', icon: MessageCircle },
   { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const studentMore = [
@@ -46,7 +46,6 @@ const studentMore = [
   { path: '/v2/alumni', label: '校友同行', icon: UsersRound },
   { path: '/v2/campus/explore', label: '校园探索', icon: MapPinned },
   { path: '/v2/ai', label: '校园 AI', icon: Sparkles },
-  { path: '/v2/messages', label: '消息', icon: MessageCircle },
 ]
 const adminNav = [
   { path: '/v2/admin', label: '运营总览', icon: LayoutDashboard, end: true },
@@ -71,7 +70,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const displayAvatar = typeof studentProfile?.avatar === 'string' ? studentProfile.avatar : ''
   const shellBrandIcon = admin || teacher ? brandIcon : studentBrandIcon
   const sports = location.pathname === '/v2/teacher/sports'
-  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/alumni', '/v2/organizations'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const studentSectionActive = (path: string, isActive: boolean) => (path === '/v2/messages' ? isActive && new URLSearchParams(location.search).get('view') !== 'notifications' : isActive) || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/alumni', '/v2/organizations', '/v2/sports'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
@@ -82,7 +81,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
   const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
-  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
+  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
   useEffect(() => { setMobileMenu(false); setRoleMenu(false) }, [location.pathname, location.search])
   useEffect(() => {
     if (!roleMenu) return
@@ -96,8 +95,8 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
       <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
       <div className="v2-nav-label">{admin ? '管理' : teacher ? '教师' : '校园'}</div>
-      <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${(admin || teacher ? isActive : studentSectionActive(path, isActive)) ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav>
-      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">更多服务</div><nav className="v2-side-nav">{studentMore.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '消息' && unread + unreadNotices > 0 && <b>{unread + unreadNotices}</b>}</NavLink>)}</nav></>}
+      <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${(admin || teacher ? isActive : studentSectionActive(path, isActive)) ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span>{label === '会话' && unread > 0 && <b>{unread}</b>}</NavLink>)}</nav>
+      {!admin && !teacher && <><div className="v2-nav-label v2-nav-label-secondary">更多服务</div><nav className="v2-side-nav">{studentMore.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span></NavLink>)}</nav></>}
       <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>{live.data ? '本地服务已连接' : live.error ? '本地服务连接失败' : '正在连接本地服务'}</span></div></div>
     </aside>
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
@@ -105,9 +104,9 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
       <header className="v2-topbar">
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>BNBU 伴学</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
         <div className="v2-top-actions">
-          {!admin && !teacher && <NavLink to="/v2/messages" className={({ isActive }) => `v2-icon-button v2-header-messages${isActive ? ' is-active' : ''}`} aria-label={unread + unreadNotices > 0 ? `消息，${unread + unreadNotices} 条未读` : live.data ? '消息，暂无未读' : '消息，通知状态暂不可用'} title={`消息 · 聊天 ${unread} 条未读，${live.data ? `通知 ${unreadNotices} 条未读` : '通知状态暂不可用'}`}><MessageCircle size={19} aria-hidden="true"/>{unread + unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unread + unreadNotices > 99 ? '99+' : unread + unreadNotices}</span>}</NavLink>}
+          {!admin && !teacher && <NavLink to="/v2/messages?view=notifications" className={`v2-icon-button v2-header-messages${location.pathname === '/v2/messages' && new URLSearchParams(location.search).get('view') === 'notifications' ? ' is-active' : ''}`} aria-label={unreadNotices > 0 ? `通知，${unreadNotices} 条未读` : live.data ? '通知，暂无未读' : '通知状态暂不可用'} title={live.data ? `通知 · ${unreadNotices} 条未读` : '通知状态暂不可用'}><Bell size={19} aria-hidden="true"/>{unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unreadNotices > 99 ? '99+' : unreadNotices}</span>}</NavLink>}
           {!admin && !teacher && <StudentSearch/>}
-          <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><DisplayAvatar className="v2-role-avatar" name={displayName} avatar={displayAvatar} personId={live.data?.account.id}/><strong>{displayName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu">{(admin || teacher) && <span>{admin ? '管理员账号' : '教师账号'}</span>}{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}{!admin && !teacher && <><Link to="/v2/me?tab=profile" onClick={() => setRoleMenu(false)}>账号与个人资料</Link><Link to="/v2/settings">设置</Link></>}<Link to="/v2/login" onClick={() => setRoleMenu(false)}>登录 / 注册</Link></div>}</div>
+          {!admin && !teacher ? <Link to="/v2/settings" className="v2-role-button" aria-label="进入设置"><DisplayAvatar className="v2-role-avatar" name={displayName} avatar={displayAvatar} personId={live.data?.account.id}/><strong>{displayName}</strong></Link> : <div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><DisplayAvatar className="v2-role-avatar" name={displayName} avatar={displayAvatar} personId={live.data?.account.id}/><strong>{displayName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu"><span>{admin ? '管理员账号' : '教师账号'}</span>{teacher && <Link to="/v2/teacher/profile">个人资料</Link>}<Link to="/v2/login" onClick={() => setRoleMenu(false)}>登录 / 注册</Link></div>}</div>}
         </div>
       </header>
       <main className="v2-main">{children}</main>
