@@ -7,7 +7,7 @@ import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, typ
 import './timetable.css'
 
 const stages: Record<RecognitionStage, string> = { preparing: '准备图片', recognizing: '识别课程信息', organizing: '整理一周课表' }
-export function StudentTimetable() {
+export function StudentTimetable({ idPrefix = 'timetable' }: { idPrefix?: string } = {}) {
   const live = useWorkspaceBackend()
   const record = live.data?.entities.find(e => e.kind === 'timetable' && e.ownerId === live.data?.account.id)
   const table = record ? {...record.data, updatedAt: record.updatedAt} as unknown as Timetable : undefined
@@ -97,8 +97,8 @@ export function StudentTimetable() {
     {sample && <div className="v2-info-box">示例模式 · 以下课程为虚构内容。<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>退出示例</button></div>}
     <section className="v2-panel v2-timetable-calendar">
       <SectionHeading title="一周课程" detail="按星期查看；单 / 双周和上课周次以课程标注为准。" action={<button className="v2-text-button" onClick={() => setDay(campusWeekday())}>回到今天</button>}/>
-      <div className="v2-weekdays" role="tablist" aria-label="选择星期">{weekDays.map((label, index) => <button key={label} type="button" role="tab" aria-selected={day === index + 1} aria-controls="timetable-day" id={`weekday-${index + 1}`} className={day === index + 1 ? 'is-active' : ''} onClick={() => setDay(index + 1)}><span>{label}</span><small>{today === index + 1 ? '今天' : `${lessons.filter(item => item.weekday === index + 1).length} 节`}</small></button>)}</div>
-      <div id="timetable-day" role="tabpanel" aria-labelledby={`weekday-${day}`} className="v2-timetable-day"><header><h3>{weekDays[day - 1]}{day === today ? ' · 今天' : ''}</h3><span>{shown.length} 条课程安排</span></header>
+      <div className="v2-weekdays" role="tablist" aria-label="选择星期">{weekDays.map((label, index) => <button key={label} type="button" role="tab" aria-selected={day === index + 1} aria-controls={`${idPrefix}-day`} id={`${idPrefix}-weekday-${index + 1}`} className={day === index + 1 ? 'is-active' : ''} onClick={() => setDay(index + 1)}><span>{label}</span><small>{today === index + 1 ? '今天' : `${lessons.filter(item => item.weekday === index + 1).length} 节`}</small></button>)}</div>
+      <div id={`${idPrefix}-day`} role="tabpanel" aria-labelledby={`${idPrefix}-weekday-${day}`} className="v2-timetable-day"><header><h3>{weekDays[day - 1]}{day === today ? ' · 今天' : ''}</h3><span>{shown.length} 条课程安排</span></header>
         {shown.map(item => <button key={item.id} type="button" className="v2-course-card" onClick={() => { setSelected(item.id); setError('') }}><span className="v2-course-time"><strong>{item.startTime || item.period || '时间待核对'}</strong><small>{item.endTime || (item.startTime ? '结束时间待核对' : '')}</small></span><span className="v2-course-body"><strong>{item.name}</strong><span><MapPin size={14}/>{item.location || '地点未识别'}</span>{item.teacher && <span><UserRound size={14}/>{item.teacher}</span>}<small>{item.weeks || '周次未识别'}{item.period && item.startTime ? ` · ${item.period}` : ''}</small></span>{item.needsReview && <em>待核对</em>}</button>)}
         {!shown.length && <Empty icon={table || sample ? BookOpen : CalendarDays} title={table || sample ? `${weekDays[day - 1]}暂无课程记录` : '还没有个人课表'} description={table || sample ? '可切换其他星期查看课程；安排以学校课表为准。' : '点击“导入课表”，上传完整清晰的课表照片。'}/>}
       </div>

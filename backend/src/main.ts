@@ -19,6 +19,7 @@ import {
 import { openDatabase, type Database } from "./database";
 import { execute, executeMailboxImport, snapshot } from "./commands";
 import {communityFeed,communityPostDetail} from './community-page';
+import {discoverHotPage} from './discover-hot-page';
 import {moderationPage} from './community-moderation-page';
 import { searchRooms, roomDetail } from './room-search';
 import { Repository, type Fields } from "./repository";
@@ -97,6 +98,7 @@ export function createApiServer(
         return send(response, 200, id === null ? searchRooms(db, actor, requestUrl.searchParams) : roomDetail(db, actor, id));
       }
       if (request.method === "GET" && pathname === "/api/community") return send(response,200,communityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
+      if (request.method === 'GET' && pathname === '/api/discover/hot') return send(response,200,discoverHotPage(db,cookieToken(request)??''));
       if(request.method==='GET' && pathname==='/api/community/feed') return send(response,200,communityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
       if(request.method==='GET' && pathname==='/api/admin/community/moderation') return send(response,200,moderationPage(db,authenticate(db,cookieToken(request)),requestUrl.searchParams));
       const communityDetail=request.method==='GET' && /^\/api\/community\/posts\/([^/]+)$/.exec(pathname);

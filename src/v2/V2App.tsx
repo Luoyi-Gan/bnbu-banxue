@@ -1,6 +1,6 @@
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
-import { Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, House, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, PersonStanding, ShieldAlert, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
+import { Mail, CalendarDays, Coffee, ChevronDown, Compass, Footprints, GraduationCap, House, LayoutDashboard, MapPinned, Menu, MessageCircle, Newspaper, ShieldAlert, ShieldCheck, Sparkles, UserRound, UsersRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import brandIcon from '../assets/brand/brand-app-icon.svg'
@@ -20,6 +20,8 @@ import { V2CampusExplore } from './V2CampusExplorer'
 import { V2Auth } from './V2Auth'
 import { V2Identity } from './V2Identity'
 import { V2ForgotPassword } from './V2ForgotPassword'
+import { FloatingTimetable } from './FloatingTimetable'
+import { CampusOrganizations } from './CampusOrganizations'
 import { useOriginalSession } from './useOriginalSession'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { DisplayAvatar } from './DisplayAvatar'
@@ -35,7 +37,7 @@ const studentNav = [
   { path: '/v2', label: '首页', icon: House, end: true },
   { path: '/v2/activities', label: '发现', icon: Compass },
   { path: '/v2/campus', label: '校园', icon: UsersRound },
-  { path: '/v2/sports', label: '打卡', icon: PersonStanding },
+  { path: '/v2/sports', label: '打卡', icon: Footprints },
   { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const studentMore = [
@@ -69,7 +71,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const displayAvatar = typeof studentProfile?.avatar === 'string' ? studentProfile.avatar : ''
   const shellBrandIcon = admin || teacher ? brandIcon : studentBrandIcon
   const sports = location.pathname === '/v2/teacher/sports'
-  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/alumni', '/v2/organizations'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
@@ -80,7 +82,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
   const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
-  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
+  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : [...nav, ...(!admin ? studentMore : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
   useEffect(() => { setMobileMenu(false); setRoleMenu(false) }, [location.pathname, location.search])
   useEffect(() => {
     if (!roleMenu) return
@@ -113,6 +115,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     {!admin && !teacher && <nav className="v2-mobile-nav" aria-label="手机主导航">{studentNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => studentSectionActive(path, isActive) ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label="手机教师导航">{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label="手机管理导航">{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
+    {!admin && !teacher && <FloatingTimetable/>}
   </div>
 }
 
@@ -155,6 +158,7 @@ function V2Routes() {
     <Route path="/v2/partners/teams" element={<V2Teams/>}/>
     <Route path="/v2/messages" element={<V2Messages/>}/>
     <Route path="/v2/campus" element={<V2Campus/>}/>
+    <Route path="/v2/organizations" element={<CampusOrganizations/>}/>
     <Route path="/v2/campus/explore" element={<V2CampusExplore/>}/>
     <Route path="/v2/ai" element={<V2AI/>}/>
     <Route path="/v2/me" element={<V2Me/>}/>
