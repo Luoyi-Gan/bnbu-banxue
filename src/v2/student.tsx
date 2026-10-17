@@ -25,9 +25,25 @@ import { useCommunityBackend } from './useCommunityBackend'
 import { CampusOrganizations } from './CampusOrganizations'
 import { DiscoverCommunity } from './DiscoverCommunity'
 import { DiscoverHotList } from './DiscoverHotList'
+import { sportsProgressLabel } from '../../shared/v2/sportsProgress'
+import type { Workspace } from '../live/api'
 import './partnerFilters.css'
 
 const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+
+function HomeSportsRing({ sports, sportsStatus }: Pick<Workspace, 'sports' | 'sportsStatus'>) {
+  const progress = sportsStatus === 'available' && sports?.role === 'student' ? sports.progress : null
+  const percent = progress?.percent
+  const measured = typeof percent === 'number' && Number.isFinite(percent)
+  const value = measured ? Math.min(100, Math.max(0, percent)) : null
+  const status = progress ? sportsProgressLabel(progress) : sportsStatus === 'not-enrolled' ? '未加入班级' : '进度暂不可用'
+  return <div className="v2-editorial-sports-summary" aria-label={`体育打卡：${value === null ? status : `本学期完成 ${Math.floor(value)}%`}`}>
+    <div className="v2-editorial-sports-ring" role={value === null ? undefined : 'progressbar'} aria-label={value === null ? undefined : '本学期体育打卡完成率'} aria-valuemin={value === null ? undefined : 0} aria-valuemax={value === null ? undefined : 100} aria-valuenow={value ?? undefined}>
+      <svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="25"/>{value !== null && value > 0 && <circle className="v2-editorial-sports-ring-fill" cx="30" cy="30" r="25" pathLength="100" strokeDasharray={`${value} 100`}/>}</svg>
+      <strong>{value === null ? '—' : `${Math.floor(value)}%`}</strong>
+    </div><span><strong>体育打卡</strong><small>{status}</small></span>
+  </div>
+}
 
 export function V2Home() {
   const live = useWorkspaceBackend(30000)
@@ -41,10 +57,10 @@ export function V2Home() {
   const name = String(live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data.nickname ?? live.data?.account.name ?? '同学')
   return <div className="v2-page v2-home v2-editorial-home">
     <header className="v2-editorial-today"><div><span className="v2-eyebrow">TODAY / {today}</span><h2>{greeting}，{name}</h2><p>把今天的校园生活，过得有声有色。</p></div><Link to="/v2/me?tab=events">我的日程 <ArrowRight size={16}/></Link></header>
-    <div className="v2-editorial-hero" role="img" aria-label="校园建筑与树木的淡色照片" style={{backgroundImage: `linear-gradient(90deg,rgba(244,240,235,.38),rgba(244,240,235,.70)),url(${campusHomeImage})`}}/>
+    <div className="v2-editorial-hero" role="img" aria-label="校园建筑与树木的照片" style={{backgroundImage: `linear-gradient(180deg,rgba(244,240,235,.04) 0%,rgba(244,240,235,.08) 55%,rgba(244,240,235,.70) 100%),url(${campusHomeImage})`}}/>
     {live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人安排…</p>}
     <section className="v2-editorial-section"><SectionHeading title="接下来" action={<Link to="/v2/me?tab=events">全部日程 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-agenda">{next ? <Link to={next.path}><time>{next.startAt ? formatWhen(next.startAt) : next.time}</time><span><strong>{next.title}</strong><small>{next.location}</small></span><em>{next.label}</em><ArrowRight size={16}/></Link> : <p>暂无待进行的安排。<Link to="/v2/activities">看看最近的活动 <ArrowRight size={14}/></Link></p>}</div></section>
-    <div className="v2-editorial-summary"><Link to="/v2/me?tab=events"><CalendarDays size={19}/><span><strong>{schedule.length}</strong><small>近期安排</small></span><ArrowRight size={15}/></Link><Link to="/v2/partners/teams"><UsersRound size={19}/><span><strong>{roomRequests}</strong><small>待处理申请</small></span><ArrowRight size={15}/></Link><Link to="/v2/messages"><Megaphone size={19}/><span><strong>{live.data?.notifications.filter(item => !item.readAt).length ?? 0}</strong><small>未读通知</small></span><ArrowRight size={15}/></Link></div>
+    <div className="v2-editorial-summary"><Link to="/v2/me?tab=events"><CalendarDays size={19}/><span><strong>{schedule.length}</strong><small>近期安排</small></span><ArrowRight size={15}/></Link><Link to="/v2/partners/teams"><UsersRound size={19}/><span><strong>{roomRequests}</strong><small>待处理申请</small></span><ArrowRight size={15}/></Link><HomeSportsRing sports={live.data?.sports} sportsStatus={live.data?.sportsStatus}/></div>
     <section className="v2-editorial-section"><SectionHeading title="为你推荐" action={<Link to="/v2/activities">更多活动 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-recommendations">{activities.map(item => <Link to={`/v2/activities/${item.id}`} key={item.id} className="v2-editorial-recommendation"><div className="v2-editorial-recommendation-image" style={item.image ? {backgroundImage: `url(${item.image})`} : undefined}/><span className="v2-eyebrow">{item.category} · {formatWhen(item.startAt)}</span><strong>{item.title}</strong><small>{item.location}</small></Link>)}{live.data && !activities.length && <p>暂无近期活动，稍后再来看看。</p>}</div></section>
     <Link className="v2-editorial-campus-link" to="/v2/campus">校园、社群与更多可能 <ArrowRight size={16}/></Link>
   </div>
