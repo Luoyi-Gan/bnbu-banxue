@@ -1,9 +1,10 @@
+import { sportsSummary } from './sportsSummary'
 import { NativeSportsCheckin } from './NativeSportsCheckin'
 import { useState } from 'react'
 import { ChevronRight, Clock3, Footprints, Info, RefreshCw, ShieldCheck } from 'lucide-react'
 import { useWorkspaceBackend } from '../useWorkspaceBackend'
-import { Header, EmptyNote } from '../reference/components'
-import { sportsSummary } from '../reference/model'
+import { SportsHeader as Header, SportsEmptyNote as EmptyNote } from './sportsPresentation'
+
 import { sportsHours, sportsProgressLabel } from '../../../shared/v2/sportsProgress'
 import { recordGroup, recordGroups } from '../../live/sportsDashboardModel'
 import { Modal } from '../ui'

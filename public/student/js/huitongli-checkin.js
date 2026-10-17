@@ -5,12 +5,14 @@ import {buildLocalPreviewWorkspace} from './local-preview.js';
 import {loadSession,saveSession,formatTimer} from './session.js';
 import {clearProofDrafts} from './checkin-drafts.js';
 import {esc} from './ui.js';
+import {decorateHuitongliCheckin,sampleEvidence,safePreviewHtml} from './huitongli-presentation.js';
 import {SPORT_OPTIONS} from './sports-catalog.js';
 const owner='HUITONGLI-SPORTS-DEMO-V1', recordsKey='huitongli.sports.demo.records.v1';
 const workspace=buildLocalPreviewWorkspace();
 workspace.student.id=owner;workspace.student.localOwnerId=owner;workspace.student.name='会同里同学';
 workspace.checkInTimeWindow={...workspace.checkInTimeWindow,dateRangeStart:'2020-01-01',dateRangeEnd:'2099-12-31',semesterDeadline:'2099-12-31'};
 let saved=[];try{saved=JSON.parse(localStorage.getItem(recordsKey)||'[]')}catch{/* Keep fixtures if storage is unavailable. */}
+workspace.records.forEach(record=>{record.proofFiles=[sampleEvidence()];record.proofPhotoCount=1;record.proofVideoCount=0;record.proofSummary='校园示例凭证';});
 workspace.records=[...(Array.isArray(saved)?saved:[]),...workspace.records];
 const viewport=document.getElementById('huitongli-checkin');
 function dialogHtml(d){return `<div class="dialog-scrim"><section class="dialog" role="dialog" aria-modal="true" aria-label="${esc(d.title||'提示')}"><h2 class="dialog-title">${esc(d.title||'提示')}</h2>${d.body?`<p class="dialog-body">${esc(d.body)}</p>`:''}${d.contentHtml||''}<div class="dialog-actions">${(d.buttons||[{label:'关闭',action:'dialog.close'}]).map(b=>`<button class="text-btn" data-action="${esc(b.action)}">${esc(b.label)}</button>`).join('')}</div></section></div>`}
@@ -21,13 +23,9 @@ const app={
  showDialog(d){this.state.dialog=d;this.render()},closeDialog(){this.state.dialog=null;this.render()},
  render(){
   const active=loadSession(owner);if(active&&['active','paused'].includes(active.phase)&&!active.maximumDurationSeconds){active.maximumDurationSeconds=7200;saveSession(owner,active)}
-  viewport.innerHTML=renderCheckIn(this).replaceAll('审核阶段暂不可用','模拟 · 未送审').replaceAll('预计计入','模拟预计时长').replaceAll('提交打卡','提交模拟记录').replace('提交成功','模拟提交完成').replace('记录已提交，审核状态与计入时长请查看打卡记录。','已生成本机模拟记录，不送交审核、不计入真实学时。')+(this.state.dialog?dialogHtml(this.state.dialog):'');
+  viewport.innerHTML=renderCheckIn(this).replaceAll('审核阶段暂不可用','模拟 · 未送审').replaceAll('预计计入','模拟预计时长').replaceAll('提交打卡','保存模拟记录').replaceAll('确认提交后才上传','确认后保存为本机模拟记录').replaceAll('现场照片','运动照片').replace('提交成功','模拟提交完成').replace('记录已提交，审核状态与计入时长请查看打卡记录。','已生成本机模拟记录，不送交审核、不计入真实学时。')+(this.state.dialog?dialogHtml(this.state.dialog):'');
   const session=loadSession(owner);
-  if(session&&['active','paused','finished'].includes(session.phase)){
-   const tools=document.createElement('div');tools.className='demo-tools';
-   tools.innerHTML=`${session.phase!=='finished'?'<button data-action="demo.advance">模拟增加 30 分钟</button>':''}<button data-action="demo.proof">添加示例凭证</button><label class="text-btn">选择本机照片<input type="file" accept="image/jpeg,image/png,image/webp" data-change="checkin.nativePhoto" aria-label="选择本机照片"></label><label class="text-btn">选择本机视频<input type="file" accept="video/mp4,video/webm" data-change="checkin.nativeVideo" aria-label="选择本机视频"></label>`;
-   viewport.querySelector('.checkin-body')?.prepend(tools);
-  }
+  decorateHuitongliCheckin(viewport,this,session);
   attachDraftVideoPreview(this);
   viewport.querySelector('.dialog button')?.focus();
  }
@@ -36,11 +34,11 @@ const actions={...checkinActions,
  'dialog.close':a=>a.closeDialog(),
  'demo.advance':a=>{const s=loadSession(owner);if(!s||!['active','paused'].includes(s.phase))return;s.accumulatedMs+=1800000;saveSession(owner,s);a.render()},
  'demo.proof':a=>{if(a.ui.checkin.drafts.filter(d=>d.type==='image').length>=6||a.ui.checkin.drafts.some(d=>d.id==='huitongli-example'))return;a.ui.checkin.drafts.push({id:'huitongli-example',type:'image',name:'校园运动示例.jpg',url:'/student/huitongli-demo-campus.jpg',size:0});a.render()},
- 'checkin.openProof':(a,el)=>a.showDialog({title:'模拟凭证预览',contentHtml:el.dataset.type==='video'?`<video class="demo-media" controls src="${esc(el.dataset.source)}"></video>`:`<img class="demo-media" alt="运动凭证" src="${esc(el.dataset.source)}">`}),
+ 'checkin.openProof':(a,el)=>a.showDialog({title:'运动凭证',contentHtml:safePreviewHtml(el.dataset.source,el.dataset.type)}),
  'checkin.submit':async a=>{
   const s=loadSession(owner),ui=a.ui.checkin;if(!s||s.phase!=='finished'||ui.finish.submitting)return;
   if(!ui.drafts.length||!s.details.description?.trim()){a.showDialog({title:'完善运动记录',body:'请添加至少一个凭证并填写运动说明。'});return}
-  ui.finish.submitting=true;
+  ui.finish.submitting=true;a.render();
   const proofFiles=await Promise.all(ui.drafts.map(async d=>({name:d.name||'运动凭证',fileName:d.name||'运动凭证',type:d.type==='video'?'video':'image',source:d.blob?await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(d.blob)}):d.url})));
   const record={...workspace.records.find(r=>r.id==='preview-record-valid-course'),id:crypto.randomUUID(),businessDate:new Date().toLocaleDateString('sv-SE'),sessionId:null,sportCode:s.details.sportType,serverStatus:'SUBMITTED',reviewResult:null,reviewPublicComment:'本机模拟记录，未送交审核',teacherPublicFeedback:null,hours:null,creditType:s.details.creditType,sportType:s.details.customSportName||SPORT_OPTIONS.find(o=>o.value===s.details.sportType)?.zh||s.details.sportType,submittedAt:new Date().toLocaleString('sv-SE'),startTime:new Date(s.startedAt).toISOString(),endTime:new Date(s.endedAt).toISOString(),actualDurationSeconds:Math.floor(s.activeDurationMillis/1000),note:s.details.description,proofFiles,proofPhotoCount:proofFiles.filter(p=>p.type==='image').length,proofVideoCount:proofFiles.filter(p=>p.type==='video').length,proofSummary:'本机模拟凭证'};
   const next=[record,...saved].slice(0,20);
