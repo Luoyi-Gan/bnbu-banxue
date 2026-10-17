@@ -1,0 +1,71 @@
+--- a/src/main.tsx
++++ b/src/main.tsx
+@@ -7,6 +7,7 @@
+ import './v2/referenceStudent.css'
+ import './v2/campusReference.css'
+ import './v2/reference/reference.css'
++import './v2/editorial/campusEditorial.css'
+ 
+ createRoot(document.getElementById('root')!).render(
+   <StrictMode>
+--- a/src/v2/student.tsx
++++ b/src/v2/student.tsx
+@@ -1,7 +1,6 @@
+ import { ArrowRight, BookOpen, Bookmark, CalendarDays, CarFront, ChevronRight, Clapperboard, Clock3, Dumbbell, MapPin, Megaphone, Plus, Search, SlidersHorizontal, UsersRound, X } from 'lucide-react'
+ import { useMemo, useState, type FormEvent } from 'react'
+ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+-import FlexCarousel from '../components/reactbits/FlexCarousel/FlexCarousel'
+ import { ActivityDiscovery, ActivityReactions } from './ActivityDiscovery'
+ import { CampusMap } from './CampusMap'
+ import { CampusBuildingPicker } from './V2CampusExplorer'
+@@ -104,7 +103,7 @@
+     <section className="v2-editorial-discover-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(16,30,27,.68),rgba(16,30,27,.08)),url(${scene.image})`}}><span>{scene.eyebrow}</span><strong>{scene.title}</strong><small>{scene.description}</small></section>
+     <nav className="v2-editorial-discover-links" aria-label="发现分类">{([['activities', '活动'], ['organizations', '社团组织'], ['community', '校园社区'], ['alumni', '校友']] as const).map(([key, label]) => <button type="button" key={key} className={section === key ? 'is-active' : ''} aria-current={section === key ? 'page' : undefined} onClick={() => {setSection(key); setQuery(''); setFilterOpen(false)}}>{label}</button>)}</nav>
+     <DiscoverHotList community={community}/>
+-    {section === 'activities' && featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map(event => ({src: event.image!, alt: event.isDefaultCover ? `${event.title}（校园通用照片，默认封面）` : event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}`}))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={index => navigate(`${activityBase}/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}{selectedFeatured.isDefaultCover && ' · 默认封面'}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`${activityBase}/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
++    {section === 'activities' && featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel">{selectedFeatured && <Link className="ce-featured-photo" to={`${activityBase}/${selectedFeatured.id}`}><img src={selectedFeatured.image} alt={selectedFeatured.isDefaultCover ? `${selectedFeatured.title}（校园通用照片，默认封面）` : selectedFeatured.title}/></Link>}<nav className="ce-featured-pagination" aria-label="精选活动切换">{featuredItems.map((event,index)=><button type="button" key={event.id} aria-label={`查看精选：${event.title}`} aria-pressed={featured===index} onClick={()=>setFeatured(index)}>{String(index+1).padStart(2,'0')}</button>)}</nav></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}{selectedFeatured.isDefaultCover && ' · 默认封面'}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`${activityBase}/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
+     {section === 'activities' && <section className="v2-panel v2-list-panel v2-activity-discovery-panel">
+       <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`} action={permitted && <button className="v2-button v2-button-primary" type="button" onClick={() => { setPublishError(''); setCreateOpen(true) }}><Plus size={17}/> 发起活动</button>}/>
+       {activeFilters.length > 0 && <div className="v2-active-filters" aria-label="已应用的筛选条件">{activeFilters.map((item) => <button type="button" key={item.label} aria-label={`清除${item.label}`} onClick={item.clear}>{item.label}<X size={13}/></button>)}<button type="button" className="v2-active-filters-reset" onClick={resetFilters}>清除全部</button></div>}
+--- a/public/fonts/NOTICE.html
++++ b/public/fonts/NOTICE.html
+@@ -3,7 +3,7 @@
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>伴学 · 字体与许可</title>
+-<style>body{font-family:system-ui,"Microsoft YaHei",sans-serif;max-width:720px;margin:60px auto;padding:0 24px;color:#213453;line-height:1.9;background:#f6f9fe}h1{font-size:28px}h2{font-size:20px;margin-top:32px}a{color:#087aff}small{color:#65758f}</style>
++<style>body{font-family:system-ui,"Microsoft YaHei",sans-serif;max-width:720px;margin:60px auto;padding:0 24px;color:#222522;line-height:1.9;background:#F8F7F3}h1{font-size:28px}h2{font-size:20px;margin-top:32px}a{color:#244B63}small{color:#65758f}</style>
+ <h1>字体与许可</h1>
+ <p>BNBU 伴学学生端使用霞鹜文楷与 MiSans，分别呈现校园标题和日常阅读内容。</p>
+ <h2>MiSans</h2>
+@@ -13,5 +13,5 @@
+ <p>校园标题使用基于 LXGW WenKai v1.520 Medium 的网页字集，内部名为 BNBU WenKai。保留常用简体汉字、标点与界面文字，其他字符由系统字体补充。</p>
+ <p>Copyright 2021–2025 LXGW. Copyright 2020 The Klee Project Authors. 字体按 SIL Open Font License 1.1 使用和分发，字形设计归原作者所有。</p>
+ <p><a href="https://github.com/lxgw/LxgwWenKai">霞鹜文楷项目</a> · <a href="/fonts/lxgw-wenkai/OFL.txt">SIL Open Font License 1.1</a></p>
+-<p><a href="/v2">返回伴学首页</a></p>
++<h2>Campus Editorial Serif 与 Inter</h2><p>栏目标题采用思源宋体 SemiBold 子集，内部名称为 Campus Editorial Serif；英文与数字采用 Inter Variable。两者遵循 SIL OFL 1.1，版权归原作者。</p><p><a href="/fonts/editorial/SourceHanSerif-OFL.txt">思源宋体许可</a> · <a href="/fonts/editorial/Inter-OFL.txt">Inter 许可</a> · <a href="/fonts/editorial/manifest.json">字体来源与校验记录</a></p><p><a href="/v2">返回伴学首页</a></p>
+ </html>
+--- a/BUSINESS_RULES.md
++++ b/BUSINESS_RULES.md
+@@ -11,6 +11,10 @@
+ 2026-10-15 补充：上述三类管理员均可删除屏蔽词；删除后该词立即退出后续检查和管理员词库列表，同词可重新添加，删除操作保留审计。帖子作者可删除本人帖子，审核员及超级管理员可删除任意帖子；管理员删除他人帖子须填写原因。删除使帖子及其评论停止在社区和校友经验列表公开，不能通过普通审核恢复，保留原帖、评论、互动、举报和处置记录供必要的审核追溯。下架与恢复仍由审核员或超级管理员执行并填写原因；页面须明确提示缺少原因或职责，不以无说明的禁用按钮代替反馈。
+ 
+ ## 2026-10-16 下一阶段统一改造规则
++
++### 2026-10-17 Campus Editorial 视觉规范
++
++用户确认学生端采用 Campus Editorial 校园人文编辑风。以暖纸色、灰蓝、苔绿与陶土色，文楷品牌标题、宋体栏目、MiSans 正文、Inter 数字统一表现。此次仅调整前端样式、布局与字体，后端、API、业务流程与数据结构沿用现有约束。具体 Design Tokens、组件规范与检查记录见 `docs/CAMPUS_EDITORIAL_20261017.md`。此前相冲突的视觉配色和样式规范以此为准。
+ 
+ ### 2026-10-17 本地模拟数据预览
+ 
+--- a/docs/ADMIN_COMPLETION.md
++++ b/docs/ADMIN_COMPLETION.md
+@@ -2560,3 +2560,8 @@
+ - 验证：build、lint 通过；vitest --maxWorkers=2 为 51 文件/269 测试通过、2 文件/39 测试跳过。旧留白体育断言已按现行规则更新，首次并发安全测试超时在定向和全量复跑通过。
+ - 本地浏览器检查五个主页面，390 像素外框内容区 375 像素无横向溢出；320 外框内容区 305 像素的初始最小宽度问题已修复并复查；桌面 1280 外框内容区 1265 像素无横向溢出。发现筛选展开与今天筛选反馈正常；浏览器捕获错误为空。
+ - 使用本地验收账号，未验证学校实际账号、物理手机或真实运动记录。截图及本轮差异见 artifacts/campus-reference-20261017，存档边界见 docs/CAMPUS_REFERENCE_20261017.md。
++
++## 2026-10-17 Campus Editorial 学生端视觉交接
++
++统一学生端 Design Tokens、字体、摄影卡片、双列论坛、Coffee Chat 卡片、体育指标与共用导航/表单。改动限于前端视觉与精选活动切换表现，后端/API/业务流程/数据结构未修改。设计审查、组件规范、响应式与可访问性抽查、独立复核及限制见 [Campus Editorial 记录](CAMPUS_EDITORIAL_20261017.md)。Lint/build通过；全量测试275通过39跳过1超时，该文件单独重跑6项通过。当前工作区混合文件本轮增量随 integration.patch 本地归档，验证仅覆盖本地浏览器。
++补充：全量测试使用 --maxWorkers=2 复跑，276通过、39跳过，53文件通过、2文件跳过。

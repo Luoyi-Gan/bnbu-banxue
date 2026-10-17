@@ -1,0 +1,16 @@
+/* Campus Editorial: the only new student theme entrypoint. */
+@font-face{font-family:'Campus Editorial Serif';src:url('/fonts/editorial/CampusEditorialSerif.woff2') format('woff2');font-style:normal;font-weight:600;font-display:swap}
+@font-face{font-family:'Inter';src:url('/fonts/editorial/InterVariable.woff2') format('woff2');font-style:normal;font-weight:100 900;font-display:swap;unicode-range:U+0000-024F,U+2000-206F,U+20A0-20CF}
+body:has(.v2-app-student),.v2-app.v2-app-student,.ref-welcome {
+  --ce-paper:#F8F7F3;--ce-ink:#222522;--ce-blue:#244B63;--ce-moss:#667B69;--ce-clay:#B86F4C;
+  --ce-muted:#62665F;--ce-line:#DCDDD5;--ce-surface:#FFFEFA;--ce-wash:#EEEEE7;--ce-clay-ink:#914F32;
+  --ce-brand:'BNBU WenKai','KaiTi',serif;
+  --ce-heading:'Campus Editorial Serif','Source Han Serif SC','Songti SC',serif;
+  --ce-body:'Inter','MiSans','Microsoft YaHei',sans-serif;--ce-number:'Inter','MiSans',sans-serif;
+  --ce-space-1:4px;--ce-space-2:8px;--ce-space-3:12px;--ce-space-4:16px;--ce-space-5:20px;--ce-space-6:24px;--ce-space-8:32px;--ce-space-12:48px;
+  --ce-radius-sm:8px;--ce-radius:12px;--ce-gutter:20px;--ce-content:1120px;
+  --v2-canvas:var(--ce-paper);--v2-surface:var(--ce-surface);--v2-ink:var(--ce-ink);--v2-muted:var(--ce-muted);
+  --v2-blue:var(--ce-blue);--v2-action:var(--ce-blue);--v2-accent-ink:var(--ce-blue);--v2-accent-soft:var(--ce-wash);--v2-soft:var(--ce-wash);--v2-line:var(--ce-line);--v2-shadow:none;
+  --ui-canvas:var(--ce-paper);--ui-surface:var(--ce-surface);--ui-ink:var(--ce-ink);--ui-muted:var(--ce-muted);--ui-accent:var(--ce-blue);--ui-accent-soft:var(--ce-wash);--ui-line:var(--ce-line);
+  --reference-font:var(--ce-body);--reference-display:var(--ce-brand);
+}

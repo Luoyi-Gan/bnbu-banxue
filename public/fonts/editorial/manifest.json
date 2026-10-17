@@ -1,0 +1,27 @@
+{
+  "sources": {
+    "SourceHanSerifSC-SemiBold.otf": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/OTF/SimplifiedChinese/SourceHanSerifSC-SemiBold.otf",
+    "SourceHanSerif-OFL.txt": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/release/LICENSE.txt",
+    "InterVariable.woff2": "https://raw.githubusercontent.com/rsms/inter/master/docs/font-files/InterVariable.woff2",
+    "Inter-OFL.txt": "https://raw.githubusercontent.com/rsms/inter/master/LICENSE.txt"
+  },
+  "note": "思源宋体 SemiBold 的 GB2312 与项目文字子集，内部字体名已改为 Campus Editorial Serif；Inter 文件保持原样。",
+  "files": {
+    "CampusEditorialSerif.woff2": {
+      "bytes": 3472644,
+      "sha256": "9e9b181b805cd0de61d3b10a7bb19c9e77b306ad6362575653523d8f0427e766"
+    },
+    "Inter-OFL.txt": {
+      "bytes": 4380,
+      "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+    },
+    "InterVariable.woff2": {
+      "bytes": 352240,
+      "sha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3"
+    },
+    "SourceHanSerif-OFL.txt": {
+      "bytes": 4463,
+      "sha256": "9ff5bb567e1b92c801fc1069e5fbf992ff8efccacb9db94e5959a5b3ba9bb903"
+    }
+  }
+}
