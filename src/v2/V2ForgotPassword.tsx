@@ -1,7 +1,7 @@
 import {useState,type FormEvent} from 'react'
 import {Link,useNavigate} from 'react-router-dom'
 import {api} from '../live/api'
-import brandIcon from '../assets/brand/brand-app-icon-a.svg'
+const brandIcon = '/huitongli-app-icon.png'
 import './auth.css'
 import './editorialAuth.css'
 
@@ -21,7 +21,7 @@ export function V2ForgotPassword() {
     } catch(cause) {setError(cause instanceof Error?cause.message:'操作未完成，请稍后重试。')}
     finally {setBusy(false)}
   }
-  return <div className="v2-auth-page v2-auth-flow"><header className="v2-auth-header"><Link className="v2-auth-brand" to="/v2"><img src={brandIcon} alt=""/><span>伴学 <small>BNBU CAMPUS</small></span></Link><Link className="v2-auth-back" to="/v2/login">返回登录</Link></header><main className="v2-auth-layout"><section className="v2-auth-intro"><span className="v2-auth-eyebrow">BNBU / ACCOUNT</span><h1>找回密码</h1><p>通过当前已验证的邮箱设置新密码。成功后，旧登录会话自动失效。</p></section><section className="v2-auth-card"><div className="v2-auth-card-head"><h2>找回密码</h2><p>{sent?'输入邮件中的六位验证码，并设置新密码。':'填写个人邮箱或独立管理登录账号。'}</p></div>
+  return <div className="v2-auth-page v2-auth-flow"><header className="v2-auth-header"><Link className="v2-auth-brand" to="/v2"><img src={brandIcon} alt=""/><span>会同里 <small>BNBU CAMPUS</small></span></Link><Link className="v2-auth-back" to="/v2/login">返回登录</Link></header><main className="v2-auth-layout"><section className="v2-auth-intro"><span className="v2-auth-eyebrow">BNBU / ACCOUNT</span><h1>找回密码</h1><p>通过当前已验证的邮箱设置新密码。成功后，旧登录会话自动失效。</p></section><section className="v2-auth-card"><div className="v2-auth-card-head"><h2>找回密码</h2><p>{sent?'输入邮件中的六位验证码，并设置新密码。':'填写个人邮箱或独立管理登录账号。'}</p></div>
     {message && <p role="status" className="v2-info-box">{message}</p>}{error && <p role="alert" className="v2-info-box">{error}</p>}
     <form className="v2-auth-form" onSubmit={submit}><label>邮箱或管理登录账号<input value={identifier} onChange={event=>setIdentifier(event.target.value)} required maxLength={254} autoComplete="username" readOnly={sent}/></label>
       {sent && <><label>六位验证码<input value={code} onChange={event=>setCode(event.target.value)} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required autoComplete="one-time-code"/></label><label>新密码<input type="password" value={password} onChange={event=>setPassword(event.target.value)} minLength={8} maxLength={128} required autoComplete="new-password"/></label><label>确认新密码<input type="password" value={confirm} onChange={event=>setConfirm(event.target.value)} minLength={8} maxLength={128} required autoComplete="new-password"/></label></>}

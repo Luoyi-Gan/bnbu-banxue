@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import brandIcon from "../assets/brand/brand-app-icon-a.svg";
+const brandIcon = "/huitongli-app-icon.png";
 import { authApi, AuthServiceError } from "./authApi";
 import { roleLoginPath } from "./authReturnPath";
 import "./auth.css";
@@ -130,7 +130,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
         <Link className="v2-auth-brand" to="/v2">
           <img src={brandIcon} alt="" />
           <span>
-            伴学 <small>BNBU CAMPUS</small>
+            会同里 <small>BNBU CAMPUS</small>
           </span>
         </Link>
         <Link className="v2-auth-back" to="/v2">
@@ -139,7 +139,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
         </Link>
       </header>
       <main className="v2-auth-layout">
-        <section className="v2-auth-intro" aria-label="伴学校园生活">
+        <section className="v2-auth-intro" aria-label="会同里校园生活">
           <span className="v2-auth-eyebrow">BNBU / CAMPUS</span>
           <div>
             <span className="v2-auth-index">01 — 03</span>
@@ -152,7 +152,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
           </div>
           <div className="v2-auth-intro-footer">
             <span>为每一次参与，留好位置。</span>
-            <span>伴学 · 校园生活助手</span>
+            <span>会同里 · 校园生活助手</span>
           </div>
         </section>
         <section className="v2-auth-card" aria-labelledby="auth-title">
@@ -161,7 +161,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
               {mode === "login" ? "WELCOME BACK" : "CREATE ACCOUNT"}
             </span>
             <h2 id="auth-title">
-              {mode === "login" ? "登录伴学" : "注册伴学"}
+              {mode === "login" ? "登录会同里" : "注册会同里"}
             </h2>
             <p>
               {mode === "login"
@@ -340,7 +340,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) {
         </section>
       </main>
       <footer className="v2-auth-footer">
-        <span>BNBU CAMPUS · 伴学</span>
+        <span>BNBU CAMPUS · 会同里</span>
         <span>清晰连接校园生活</span>
       </footer>
     </div>

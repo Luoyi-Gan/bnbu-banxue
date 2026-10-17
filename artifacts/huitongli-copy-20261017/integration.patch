@@ -1,0 +1,77 @@
+--- a/src/v2/services.tsx
++++ b/src/v2/services.tsx
+@@ -130,7 +130,7 @@
+     {tab === 'teams' && <section className="v2-panel v2-list-panel"><SectionHeading title="我的组队" action={<Link to="/v2/partners/teams">管理全部 <ArrowRight size={15}/></Link>}/>{myRooms.map((room) => <Link className="v2-saved-row" to="/v2/partners/teams" key={room.id}><UsersRound size={20}/><span><strong>{room.title}</strong><small>{room.owner === actorId ? '我发起' : '已加入'} · {room.time}</small></span><ChevronRight size={16}/></Link>)}</section>}
+     {tab === 'saved' && <section className="v2-panel v2-list-panel"><SectionHeading title="我的收藏"/>{saved.map(e => <Link className="v2-saved-row" key={e.id} to={e.kind === 'activity' ? `/v2/activities/${e.id}` : e.kind === 'room' ? `/v2/partners?item=${e.id}` : '/v2/community'}><Bookmark size={20}/><span><strong>{String(e.data.title)}</strong><small>{e.kind === 'activity' ? '校园活动' : e.kind === 'room' ? '搭子队伍' : '社区帖子'}</small></span><ChevronRight size={16}/></Link>)}{live.data && !saved.length && <Empty icon={Bookmark} title="还没有收藏"/>}</section>}
+     {tab === 'verification' && <section className="v2-panel v2-list-panel"><SectionHeading title="身份认证" detail="按本人全部认证记录核对"/>{live.data && <p className="v2-form-note">{certifications.canPublishActivity ? '已有有效学生社团成员认证，可按活动规则发起活动。' : '当前没有有效学生社团成员认证，暂不能发起活动。'}</p>}{certifications.records.map(record => <div className="v2-verification-summary" key={record.id}><ShieldCheck size={24}/><div><strong>{record.kindLabel} · {record.statusLabel}</strong><p>{record.organization} · {record.note}</p>{record.reviewNote && <small>审核备注：{record.reviewNote}</small>}</div></div>)}{live.data && !certifications.records.length && <div className="v2-verification-summary"><ShieldCheck size={24}/><div><strong>尚无认证记录</strong><p>提交身份资料后，由有审核职责的管理员处理。</p></div></div>}<button type="button" className="v2-button v2-button-primary" disabled={!live.data} onClick={() => setVerifyOpen(true)}>提交认证申请 <ArrowRight size={16}/></button></section>}
+-    {verifyOpen && <Modal title="提交身份认证" onClose={() => setVerifyOpen(false)}><form className="v2-form" onSubmit={apply}><label>认证类型<select value={verifyKind} onChange={(event) => setVerifyKind(event.target.value as 'student' | 'club' | 'official')}><option value="student">学生</option><option value="club">学生社团成员</option><option value="official">官方机构</option></select></label><label>学院或组织名称<input name="organization" required placeholder="例如：工商管理学院"/></label><label>申请说明<textarea name="note" required rows={4} placeholder="说明你的身份、所属社团和成员资格"/></label>{live.error && <p role="alert">{live.error}</p>}<p className="v2-form-note">申请会保存到伴学后台，认证不自动授予管理职责。</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setVerifyOpen(false)}>取消</button><button type="submit" disabled={live.busy} className="v2-button v2-button-primary">提交申请</button></div></form></Modal>}
++    {verifyOpen && <Modal title="提交身份认证" onClose={() => setVerifyOpen(false)}><form className="v2-form" onSubmit={apply}><label>认证类型<select value={verifyKind} onChange={(event) => setVerifyKind(event.target.value as 'student' | 'club' | 'official')}><option value="student">学生</option><option value="club">学生社团成员</option><option value="official">官方机构</option></select></label><label>学院或组织名称<input name="organization" required placeholder="例如：工商管理学院"/></label><label>申请说明<textarea name="note" required rows={4} placeholder="说明你的身份、所属社团和成员资格"/></label>{live.error && <p role="alert">{live.error}</p>}<p className="v2-form-note">申请会保存到会同里后台，认证不自动授予管理职责。</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setVerifyOpen(false)}>取消</button><button type="submit" disabled={live.busy} className="v2-button v2-button-primary">提交申请</button></div></form></Modal>}
+   </div>
+ }
+ 
+--- a/src/v2/student.tsx
++++ b/src/v2/student.tsx
+@@ -108,7 +108,7 @@
+     {section === 'activities' && <section className="v2-panel v2-list-panel v2-activity-discovery-panel">
+       <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`}/>
+       {activeFilters.length > 0 && <div className="v2-active-filters" aria-label="已应用的筛选条件">{activeFilters.map((item) => <button type="button" key={item.label} aria-label={`清除${item.label}`} onClick={item.clear}>{item.label}<X size={13}/></button>)}<button type="button" className="v2-active-filters-reset" onClick={resetFilters}>清除全部</button></div>}
+-      <p className="activity-discovery-note">点赞与收藏保存到伴学后台 · 点赞标记反映本人状态</p>
++      <p className="activity-discovery-note">点赞与收藏保存到会同里后台 · 点赞标记反映本人状态</p>
+       {filtered.length ? <ActivityDiscovery live={live} key={JSON.stringify([query, category, period, hostFilter, statusFilter, sort])} items={filtered} basePath={activityBase}/> : <div className="v2-filter-empty"><Empty icon={Search} title={all.length ? '没有匹配的活动' : '目前没有可展示的活动'} description={all.length ? '试试其他分类或清除搜索条件。' : '有新活动发布后，会显示在这里。'}/>{activeFilters.length > 0 && <button type="button" className="v2-button v2-button-secondary" onClick={resetFilters}>清除筛选</button>}</div>}</section>}
+     {section === 'organizations' && <CampusOrganizations embedded externalQuery={query} externalCategory={organizationCategory}/>}
+     {section === 'community' && <DiscoverCommunity community={community}/>}
+--- a/src/v2/V2CoffeeChat.tsx
++++ b/src/v2/V2CoffeeChat.tsx
+@@ -98,7 +98,7 @@
+       })}</div> : <Empty icon={Coffee} title="暂时没有可查看的时段" description="稍后再来看看。"/>}
+       {!isBooked && <label className="v2-form">想交流的问题<textarea maxLength={500} value={topic} onChange={event => setTopic(event.target.value)} placeholder="请填写交流主题或问题"/></label>}<div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{slot?.location ?? teacher.location}</span><small>{slot ? `${slotDate(slot.startAt)} · ${slot.timeLabel}` : '请先选择一个时段'}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} disabled={live.busy || !slot || (!isBooked && (!topic.trim() || !teacher.enabled || slot.closed || Date.parse(slot.startAt) <= Date.now() || occupied(state, slot.id) >= slot.capacity))} onClick={updateBooking}>{isBooked ? '取消预约' : '确认预约'} <ArrowRight size={15}/></button></div>
+       {(live.error || feedback) && <p className="v2-coffee-feedback" role="status">{live.error || feedback}</p>}
+-      <p className="v2-form-note">预约保存到伴学后台，实际到场情况不由预约状态推定。</p>
++      <p className="v2-form-note">预约保存到会同里后台，实际到场情况不由预约状态推定。</p>
+     </div>
+   }
+ 
+--- a/src/v2/V2Messages.tsx
++++ b/src/v2/V2Messages.tsx
+@@ -35,7 +35,7 @@
+     <header className="inbox-chat-heading">
+       <button type="button" className="inbox-back" aria-label="返回会话列表" onClick={onBack}><ArrowLeft size={21}/></button>
+       <span className="inbox-avatar"><UsersRound size={21}/></span>
+-      <div><h2>{conversation.title}</h2><p>队伍会话 · 已连接伴学后台</p></div>
++      <div><h2>{conversation.title}</h2><p>队伍会话 · 已连接会同里后台</p></div>
+     </header>
+     <div className="inbox-message-history" ref={messages} role="log" aria-label={`${conversation.title}的消息`} aria-live="polite" onScroll={event => {
+       const target = event.currentTarget
+--- a/public/fonts/NOTICE.html
++++ b/public/fonts/NOTICE.html
+@@ -2,10 +2,10 @@
+ <html lang="zh-CN">
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+-<title>伴学 · 字体与许可</title>
++<title>会同里 · 字体与许可</title>
+ <style>body{font-family:system-ui,"Microsoft YaHei",sans-serif;max-width:720px;margin:60px auto;padding:0 24px;color:#213453;line-height:1.9;background:#f6f9fe}h1{font-size:28px}h2{font-size:20px;margin-top:32px}a{color:#087aff}small{color:#65758f}</style>
+ <h1>字体与许可</h1>
+-<p>BNBU 伴学学生端使用霞鹜文楷与 MiSans，分别呈现校园标题和日常阅读内容。</p>
++<p>会同里学生端使用霞鹜文楷与 MiSans，分别呈现校园标题和日常阅读内容。</p>
+ <h2>MiSans</h2>
+ <p>本软件使用了小米科技有限责任公司提供的 MiSans 字体。项目内的 Regular、Semibold WOFF2 文件直接来自小米官方字体包，文件未经修改。</p>
+ <p><a href="https://hyperos.mi.com/font/zh/">MiSans 官方网站</a> · <a href="/fonts/misans/License.pdf">MiSans 字体知识产权许可协议</a></p>
+@@ -13,5 +13,5 @@
+ <p>校园标题使用基于 LXGW WenKai v1.520 Medium 的网页字集，内部名为 BNBU WenKai。保留常用简体汉字、标点与界面文字，其他字符由系统字体补充。</p>
+ <p>Copyright 2021–2025 LXGW. Copyright 2020 The Klee Project Authors. 字体按 SIL Open Font License 1.1 使用和分发，字形设计归原作者所有。</p>
+ <p><a href="https://github.com/lxgw/LxgwWenKai">霞鹜文楷项目</a> · <a href="/fonts/lxgw-wenkai/OFL.txt">SIL Open Font License 1.1</a></p>
+-<p><a href="/v2">返回伴学首页</a></p>
++<p><a href="/v2">返回会同里首页</a></p>
+ </html>
+--- a/src/v2/V2App.tsx
++++ b/src/v2/V2App.tsx
+@@ -83,7 +83,7 @@
+   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
+   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
+   const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
+-  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
++  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? (admin || teacher ? '伴学' : '会同里')
+   const service = new URLSearchParams(location.search).get('service')
+   const sidebarMatch = (id: typeof sidebarItems[number]) => {
+     if (id === 'home') return location.pathname === '/v2'

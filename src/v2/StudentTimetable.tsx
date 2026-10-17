@@ -103,7 +103,7 @@ export function StudentTimetable({ idPrefix = 'timetable' }: { idPrefix?: string
         {!shown.length && <Empty icon={table || sample ? BookOpen : CalendarDays} title={table || sample ? `${weekDays[day - 1]}暂无课程记录` : '还没有个人课表'} description={table || sample ? '可切换其他星期查看课程；安排以学校课表为准。' : '点击“导入课表”，上传完整清晰的课表照片。'}/>}
       </div>
     </section>
-    <div className="v2-timetable-footnote"><span>{table && !sample ? `来源：${table.fileName} · 更新于 ${new Date(table.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '识别后自动按星期归类；未识别清楚的内容保留待核对。'}</span><small>个人课表保存到伴学后台，示例课表不会保存。</small></div>
+    <div className="v2-timetable-footnote"><span>{table && !sample ? `来源：${table.fileName} · 更新于 ${new Date(table.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '识别后自动按星期归类；未识别清楚的内容保留待核对。'}</span><small>个人课表保存到会同里后台，示例课表不会保存。</small></div>
     {importOpen && <Modal title="导入我的课表" onClose={closeImport}>
       {stage ? <div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading ? '正在演示识别过程' : '正在识别课表'}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{label}</li>)}</ol><p>识别完成后自动显示课表，原有课表在识别成功前保留。</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy ? '正在保存' : '取消识别'}</button></div> : <div className="v2-timetable-import">
         <p>请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。</p>
