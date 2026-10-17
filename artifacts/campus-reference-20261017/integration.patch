@@ -1,0 +1,203 @@
+diff --git a/BUSINESS_RULES.md b/BUSINESS_RULES.md
+index 7b8f393..1a2f3a8 100644
+--- a/BUSINESS_RULES.md
++++ b/BUSINESS_RULES.md
+@@ -12,6 +12,12 @@
+ 
+ ## 2026-10-16 下一阶段统一改造规则
+ 
++### 2026-10-17 六张校园生活参考图（最新呈现要求）
++
++- 本轮按用户新提供的六张图片调整学生端为暖白底色、校园实景、深色文字与绿色体育进度，手机主导航采用“首页、发现、校园、打卡、我的”。此项替代下文此前蓝白风格与手机导航排列；侧栏保留原偏好标识，发现入口直达活动发现，日程通过首页、校园服务与个人入口访问。
++- 首页提前展示今日安排、体育进度、未读通知与最近两项安排，推荐活动最多两项；只使用当前账号已授权的数据。图片中的示例人数、课程、学时、GPS、配速及日期不作为业务事实。
++- 参考图中的运动开始操作以现有体育平台实际能力为准，伴学继续展示已有进度与记录，不虚构地图定位和运动提交；未实现的校园服务不增加空按钮。Coffee Chat 沿用已有师生及校友预约规则。
++
+ ### 2026-10-17 参考图前端改造（最新呈现要求）
+ 
+ - 用户要求以提供的学生端页面关系图调整现有前端，统一蓝白卡片与校园照片。按同轮最新字体指示，霞鹜文楷用于品牌、欢迎语与页面大标题；MiSans 用于正文、活动卡片、导航、按钮、表单与数字。字体文件随前端提供，并保留来源、许可与署名。手机主导航调整为首页、活动、打卡、社区、我的；活动发现、校园服务、会话、设置和全局课表继续通过直接入口访问。侧栏既有偏好标识与保存协议沿用，活动入口展示我的安排。
+diff --git a/docs/ADMIN_COMPLETION.md b/docs/ADMIN_COMPLETION.md
+index f018a7d..72e7339 100644
+--- a/docs/ADMIN_COMPLETION.md
++++ b/docs/ADMIN_COMPLETION.md
+@@ -2530,3 +2530,13 @@ SQLite 定向回归覆盖关键词删除权限、发布检查变化、重复词
+ - 本地验证：前端类型检查及生产构建、变更 TS/TSX 的 ESLint、7 文件 22 项定向测试、git diff --check 通过；保留原有大于 500 kB 分包提示。字体结构读取、MiSans 原文件一致性与许可 PDF 格式检查通过。
+ - 浏览器验证使用独立内存数据库和原有后端代码，示例内容明确标为示例；验证了日程添加及取消参与、活动详情返回、通知已读和分类返回、帖子真实发布与详情、Coffee Chat 预约成功。普通本地库核对空状态；没有向原本地库写入示例活动或帖子。390×780 CSS px 与 1280×900 CSS px 检查布局，截图保存在 `artifacts/student-reference-20261017/`。
+ - 体育展示读取本人既有授权进度与可用记录，未知值显示“—”；现有服务没有提供开始运动、上传凭证或审核写入能力，因此本次没有制作假提交或假成功页面。非零体育进度、图片上传、真实触屏设备、弱网与生产环境不在本轮浏览器验收范围。后端源码、数据库结构和业务权限未修改。
++
++
++### 2026-10-17 六张校园生活参考图前端调整
++
++- 首页采用校园轮播、今日安排/体育进度/未读通知、最近两项安排、最多两项未来活动与校园服务；手机导航为首页、发现、校园、打卡、我的。
++- 暖白底色、深色文字、绿色进度；发现页整行搜索、无内容热度榜收起；校园页紧凑入口、公开组织及搭子摘要；个人主页入口改为列表。
++- 图片示例数据未写入业务。保留未知体育进度与不可用提示，未新增运动写入或 GPS 能力。组织摘要跳转带关键词的现有列表。
++- 验证：build、lint 通过；vitest --maxWorkers=2 为 51 文件/269 测试通过、2 文件/39 测试跳过。旧留白体育断言已按现行规则更新，首次并发安全测试超时在定向和全量复跑通过。
++- 本地浏览器检查五个主页面，390 像素外框内容区 375 像素无横向溢出；320 外框内容区 305 像素的初始最小宽度问题已修复并复查；桌面 1280 外框内容区 1265 像素无横向溢出。发现筛选展开与今天筛选反馈正常；浏览器捕获错误为空。
++- 使用本地验收账号，未验证学校实际账号、物理手机或真实运动记录。截图及本轮差异见 artifacts/campus-reference-20261017，存档边界见 docs/CAMPUS_REFERENCE_20261017.md。
+diff --git a/src/main.tsx b/src/main.tsx
+index 8411dfd..89d003c 100644
+--- a/src/main.tsx
++++ b/src/main.tsx
+@@ -5,6 +5,7 @@ import { App } from './app/App'
+ import './styles/base.css'
+ import './styles/redesign.css'
+ import './v2/referenceStudent.css'
++import './v2/campusReference.css'
+ 
+ createRoot(document.getElementById('root')!).render(
+   <StrictMode>
+diff --git a/src/v2/CampusOrganizations.tsx b/src/v2/CampusOrganizations.tsx
+index a843d17..0f76af5 100644
+--- a/src/v2/CampusOrganizations.tsx
++++ b/src/v2/CampusOrganizations.tsx
+@@ -1,13 +1,14 @@
+ import { UsersRound } from 'lucide-react'
+ import { useState } from 'react'
+-import { Link } from 'react-router-dom'
++import { Link, useSearchParams } from 'react-router-dom'
+ import { AnimatedSearchField } from './AnimatedSearchField'
+ import { useWorkspaceBackend } from './useWorkspaceBackend'
+ import { Empty, PageHeading } from './ui'
+ 
+ export function CampusOrganizations({ embedded = false, externalQuery, externalCategory }: { embedded?: boolean; externalQuery?: string; externalCategory?: string }) {
+   const live = useWorkspaceBackend()
+-  const [query, setQuery] = useState('')
++  const [params] = useSearchParams()
++  const [query, setQuery] = useState(() => params.get('q') ?? '')
+   const [category, setCategory] = useState('全部')
+   const organizations = (live.data?.entities ?? []).filter(item => item.kind === 'organization' && item.data.status === 'approved' && item.data.visibility === 'visible').map(item => ({
+     id: item.id,
+diff --git a/src/v2/V2App.tsx b/src/v2/V2App.tsx
+index 92366a0..a5fe195 100644
+--- a/src/v2/V2App.tsx
++++ b/src/v2/V2App.tsx
+@@ -1,6 +1,6 @@
+ import { AdminMailActivities } from './AdminMailActivities'
+ import { AdminCommunityKeywords } from './AdminCommunityKeywords'
+-import { Bell, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Plus, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
++import { Bell, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
+ import { useEffect, useRef, useState, type ReactNode } from 'react'
+ import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+ import brandIcon from '../assets/brand/brand-app-icon.svg'
+@@ -41,9 +41,9 @@ import './editorial.css'
+ 
+ const studentNav = [
+   { path: '/v2', label: '首页', icon: House, end: true },
+-  { path: '/v2/schedule', label: '活动', icon: CalendarDays },
+-  { path: '/v2/sports', label: '打卡', icon: Plus },
+-  { path: '/v2/community', label: '社区', icon: MessageCircle },
++  { path: '/v2/activities', label: '发现', icon: Compass },
++  { path: '/v2/campus', label: '校园', icon: UsersRound },
++  { path: '/v2/sports', label: '打卡', icon: Footprints },
+   { path: '/v2/me', label: '我的', icon: UserRound },
+ ]
+ const adminNav = [
+@@ -72,7 +72,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName:
+   const sidebarItems = parseSidebarItems(ownPreferences?.sidebarItems) ?? defaultSidebarItems
+   const shellBrandIcon = admin || teacher ? brandIcon : studentBrandIcon
+   const sports = location.pathname === '/v2/teacher/sports'
+-  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/schedule' && location.pathname.startsWith('/v2/activities'))
++  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+   const teacherNav = [
+     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
+     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
+@@ -114,7 +114,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName:
+     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
+     <div className="v2-workspace">
+       <header className="v2-topbar">
+-        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>BNBU 伴学</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
++        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>BnBu · 伴学</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
+         <div className="v2-top-actions">
+           {!admin && !teacher && <NavLink to="/v2/messages?view=notifications" className={`v2-icon-button v2-header-messages${location.pathname === '/v2/messages' && new URLSearchParams(location.search).get('view') === 'notifications' ? ' is-active' : ''}`} aria-label={unreadNotices > 0 ? `通知，${unreadNotices} 条未读` : live.data ? '通知，暂无未读' : '通知状态暂不可用'} title={live.data ? `通知 · ${unreadNotices} 条未读` : '通知状态暂不可用'}><Bell size={19} aria-hidden="true"/>{unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unreadNotices > 99 ? '99+' : unreadNotices}</span>}</NavLink>}
+           {!admin && !teacher && <StudentSearch/>}
+diff --git a/src/v2/services.tsx b/src/v2/services.tsx
+index 831b08e..fd4b935 100644
+--- a/src/v2/services.tsx
++++ b/src/v2/services.tsx
+@@ -1,3 +1,5 @@
++import { CampusConnections } from './CampusConnections'
++import { CampusAssistantLink, CampusServiceLinks } from './CampusReferenceHome'
+ import { StudentTimetable } from './StudentTimetable'
+ import { StudentCoffeeChanges } from './TeacherPortal'
+ import { useWorkspaceBackend } from './useWorkspaceBackend'
+@@ -38,7 +40,7 @@ export function V2Campus() {
+     {path:'/v2/sports', title:'运动打卡', copy:'查看本学期运动进度', icon:CalendarDays},
+     {path:'/v2/ai', title:'校园 AI', copy:'查询校园信息与资料', icon:Sparkles},
+   ]
+-  return <div className="v2-page v2-editorial-campus"><PageHeading eyebrow="CAMPUS LIFE" title="校园生活" description="让每一种兴趣，都找到归属。"/><div className="v2-editorial-campus-photo" style={{backgroundImage:`linear-gradient(90deg,#162e56b3,#162e5610),url(${campusPhoto})`}}><span>校园 · 社群 · 连接</span><strong>让相遇从这里开始。</strong></div><div className="v2-editorial-campus-links">{entries.map(({path,title,copy,icon:Icon}) => <Link key={path} to={path}><Icon size={23}/><strong>{title}</strong><small>{copy}</small><ArrowRight size={17}/></Link>)}</div><Link to="/v2/campus/explore" className="v2-campus-explore-entry" style={{backgroundImage:`linear-gradient(90deg,#162e56d9,#162e5620),url(${mapPreview})`}}><span>校园地图</span><strong>探索校园</strong><small>查看楼栋与附近活动</small><span className="v2-campus-explore-cta"><MapPinned size={17}/> 打开地图 <ArrowRight size={16}/></span></Link></div>
++  return <div className="v2-page v2-editorial-campus"><PageHeading eyebrow="CAMPUS LIFE" title="校园" description="让每一种兴趣，都找到归属。"/><div className="v2-editorial-campus-photo" style={{backgroundImage:`linear-gradient(90deg,#162e56b3,#162e5610),url(${campusPhoto})`}}><span>校园 · 社群 · 连接</span><strong>让相遇从这里开始。</strong></div><div className="v2-editorial-campus-links">{entries.map(({path,title,copy,icon:Icon}) => <Link key={path} to={path}><Icon size={23}/><strong>{title}</strong><small>{copy}</small><ArrowRight size={17}/></Link>)}</div><CampusConnections/><Link to="/v2/campus/explore" className="v2-campus-explore-entry" style={{backgroundImage:`linear-gradient(90deg,#162e56d9,#162e5620),url(${mapPreview})`}}><span>校园地图</span><strong>探索校园</strong><small>查看楼栋与附近活动</small><span className="v2-campus-explore-cta"><MapPinned size={17}/> 打开地图 <ArrowRight size={16}/></span></Link><section className="campus-home-section"><SectionHeading title="校园服务" detail="常用功能"/><CampusServiceLinks/></section><CampusAssistantLink/></div>
+ }
+ 
+ export function V2AI() {
+diff --git a/src/v2/student.tsx b/src/v2/student.tsx
+index 592eabd..d0abd27 100644
+--- a/src/v2/student.tsx
++++ b/src/v2/student.tsx
+@@ -13,7 +13,6 @@ import { AnimatedSearchField } from './AnimatedSearchField'
+ import { filterActivityItems, type ActivityPeriod, type ActivitySort, type ActivityStatus } from './activityFilters'
+ import { liveActivities } from './liveActivities'
+ import campusHomeImage from '../assets/campus/home-background.jpg'
+-import campusEveningImage from '../assets/campus/night-walkway.jpg'
+ import campusServicesImage from '../assets/campus/campus-services.jpg'
+ import campusSunsetImage from '../assets/campus/evening-campus.jpg'
+ import { DisplayAvatar } from './DisplayAvatar'
+@@ -29,7 +28,7 @@ import { DiscoverHotList } from './DiscoverHotList'
+ import './partnerFilters.css'
+ 
+ const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+-export { V2Home } from './V2DiscoveryHome'
++export { CampusReferenceHome as V2Home } from './CampusReferenceHome'
+ 
+ export function V2Activities() {
+   const live = useWorkspaceBackend()
+@@ -78,7 +77,7 @@ export function V2Activities() {
+   const featuredItems = all.filter(event => event.local?.status === 'published' && event.image && Date.parse(event.startAt) > Date.now()).slice(0, 7)
+   const selectedFeatured = featuredItems[featured] ?? featuredItems[0]
+   const scene = {
+-    activities: {image: campusEveningImage, eyebrow: 'DISCOVER / 01', title: '在活动中，遇见新的可能。', description: '走进讲座、比赛和校园活动，找到下一次值得参与的相遇。'},
++    activities: {image: campusHomeImage, eyebrow: 'DISCOVER / 01', title: '在活动中，遇见新的可能。', description: '走进讲座、比赛和校园活动，找到下一次值得参与的相遇。'},
+     organizations: {image: campusServicesImage, eyebrow: 'DISCOVER / 02', title: '和有共同兴趣的人一起出发。', description: '发现社团组织，了解他们正在做的事，加入喜欢的校园生活。'},
+     community: {image: campusHomeImage, eyebrow: 'DISCOVER / 03', title: '听见校园里的真实声音。', description: '阅读同学们的故事与提问，分享此刻的想法。'},
+     alumni: {image: campusSunsetImage, eyebrow: 'DISCOVER / 04', title: '从这里，走向更远的地方。', description: '看看校友的经历，让未来的方向更清晰。'},
+diff --git a/src/v2/studentSidebarCatalog.ts b/src/v2/studentSidebarCatalog.ts
+index 1b78f83..c7a868a 100644
+--- a/src/v2/studentSidebarCatalog.ts
++++ b/src/v2/studentSidebarCatalog.ts
+@@ -5,7 +5,7 @@ export type SidebarEntry = { id: SidebarItemId; label: string; path: string; ico
+ 
+ export const studentSidebarCatalog: SidebarEntry[] = [
+   {id: 'home', label: '首页', path: '/v2', icon: House, kind: 'core'},
+-  {id: 'discover', label: '活动安排', path: '/v2/schedule', icon: CalendarDays, kind: 'core'},
++  {id: 'discover', label: '发现', path: '/v2/activities', icon: CalendarDays, kind: 'core'},
+   {id: 'campus', label: '校园', path: '/v2/campus', icon: UsersRound, kind: 'core'},
+   {id: 'conversations', label: '会话', path: '/v2/messages', icon: MessageCircle, kind: 'core'},
+   {id: 'me', label: '我的', path: '/v2/me', icon: UserRound, kind: 'core'},
+diff --git a/tests/sports-companion.test.tsx b/tests/sports-companion.test.tsx
+index 2b75442..2f1db9e 100644
+--- a/tests/sports-companion.test.tsx
++++ b/tests/sports-companion.test.tsx
+@@ -63,11 +63,20 @@ it('学生完整看板只使用可用源的授权投影，源失败时隐藏旧
+  expect(failed).not.toContain('>630<');
+ });
+ 
+-it('新版学生体育打卡只保留留白结构，不展示数据或操作', () => {
+-  const page = renderToStaticMarkup(<MemoryRouter><V2Sports/></MemoryRouter>);
+-  expect(page).toContain('体育打卡');
+-  expect(page).toContain('v2-sports-empty-space');
+-  for (const text of ['sports-hero', '运动提交趋势', '运动记录', '已确认学时', '刷新体育数据']) expect(page).not.toContain(text);
++it('新版体育页在未知进度时显示占位，不生成零进度或运动提交能力', () => {
++  const backend = {data: null, error: '', busy: false, mutate: vi.fn().mockResolvedValue(false), refresh: vi.fn().mockResolvedValue()};
++  const hook = vi.spyOn(workspaceBackend, 'useWorkspaceBackend').mockReturnValue(backend);
++  const render = () => renderToStaticMarkup(<MemoryRouter><V2Sports/></MemoryRouter>);
++  const loading = render();
++  expect(loading).toContain('本学期进度');
++  expect(loading).toContain('>—<');
++  expect(loading).not.toContain('aria-valuenow="0"');
++  expect(loading).not.toContain('GPS');
++  expect(loading).not.toContain('开始打卡');
++  hook.mockReturnValue({...backend, data: {sportsStatus:'not-enrolled',sports:null} as Workspace});
++  expect(render()).toContain('暂无已加入的体育课程');
++  hook.mockReturnValue({...backend, data: {sportsStatus:'unavailable',sports:null} as Workspace});
++  expect(render()).toContain('体育进度暂不可用');
+ });
+ 
+ it('教师体育页面加载和读取失败时保留看板，失败后可以重试', () => {
