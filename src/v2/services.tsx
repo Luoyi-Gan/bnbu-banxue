@@ -1,10 +1,12 @@
+import { CampusConnections } from './CampusConnections'
+import { CampusAssistantLink, CampusServiceLinks } from './CampusReferenceHome'
 import { StudentTimetable } from './StudentTimetable'
 import { StudentCoffeeChanges } from './TeacherPortal'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { liveActivities } from './liveActivities'
 import { liveStudentSchedule } from './liveStudentSchedule'
 import { ArrowLeft, ArrowRight, BookOpen, Bookmark, CalendarDays, ChevronRight, Coffee, GraduationCap, ImagePlus, MapPinned, MessageCircle, Network, Send, ShieldCheck, Sparkles, UsersRound } from 'lucide-react'
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import yellowIcon from '../assets/companion-yellow.png'
 import kittyIcon from '../assets/companion-kitty.png'
@@ -14,50 +16,31 @@ import profileCampus from '../assets/campus/home-background.jpg'
 import profileWalkway from '../assets/campus/night-walkway.jpg'
 import profileServices from '../assets/campus/campus-services.jpg'
 import { useV2 } from './useV2'
-import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
-import { AnimatedSearchField } from './AnimatedSearchField'
-import { V2CoffeeChat } from './V2CoffeeChat'
+import { Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { V2RelationshipGraph } from './V2RelationshipGraph'
 import { StudentProfile } from './StudentProfile'
 import { DisplayAvatar } from './DisplayAvatar'
 import { studentCertifications } from './studentCertifications'
 
-const serviceCards = [
-  { id: 'teaching', title: '教学支持', copy: '课堂、课表与教学服务入口', icon: BookOpen, tone: 'blue' },
-  { id: 'academic', title: '学术讨论', copy: '课程、研究与项目交流', icon: GraduationCap, tone: 'purple' },
-  { id: 'organizations', title: '校园组织', copy: '发现并加入校园社群', icon: UsersRound, tone: 'green' },
-  { id: 'coffee', title: 'Coffee Chat', copy: '预约老师的一对一交流', icon: Coffee, tone: 'orange' },
-  { id: 'alumni', title: '校友故事', copy: '从校园走向更多可能', icon: Network, tone: 'pink' },
-]
-
 export function V2Campus() {
-  const live = useWorkspaceBackend()
-  const [campusSearch, setCampusSearch] = useSearchParams()
-  const requestedService = campusSearch.get('service')
-  const next = liveStudentSchedule(live.data)[0]
-  const organizations = (live.data?.entities ?? []).filter(e => e.kind === 'organization' && e.data.status === 'approved' && e.data.visibility === 'visible').map(e => ({id: e.id, name: String(e.data.name), category: String(e.data.category), description: String(e.data.description), contact: String(e.data.contact), color: '#0865D1'}))
-  const follows = live.data?.relations.filter(r => r.kind === 'follow').map(r => r.entityId) ?? []
-  const [selected, setSelected] = useState<string | null>(() => serviceCards.some(card => card.id === requestedService) ? requestedService : null)
-  useEffect(() => { setSelected(requestedService && serviceCards.some(card => card.id === requestedService) ? requestedService : null) }, [requestedService])
-  const closeService = () => {
-    setSelected(null)
-    if (requestedService) { const next = new URLSearchParams(campusSearch); next.delete('service'); setCampusSearch(next, {replace: true}) }
-  }
-  const [organizationQuery, setOrganizationQuery] = useState('')
-  const [organizationCategory, setOrganizationCategory] = useState('全部')
-  const item = serviceCards.find((card) => card.id === selected)
-  const organizationCategories = ['全部', ...new Set(organizations.map((org) => org.category))]
-  const filteredOrganizations = organizations.filter((org) => (organizationCategory === '全部' || org.category === organizationCategory) && `${org.name} ${org.category} ${org.description}`.toLocaleLowerCase().includes(organizationQuery.trim().toLocaleLowerCase()))
-  return <div className="v2-page v2-editorial-campus"><PageHeading eyebrow="CAMPUS / CONNECTION" title="校园" description="在校园里，找到志同道合的同学。"/><div className="v2-editorial-campus-photo" style={{backgroundImage: `linear-gradient(90deg,rgba(18,31,26,.60),rgba(18,31,26,.03)),url(${campusPhoto})`}}><span>校园 · 社群 · 连接</span><strong>让相遇从这里开始。</strong></div><section className="v2-editorial-section"><SectionHeading title="我的下一步" action={<Link to="/v2/me?tab=events">我的日程 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-agenda">{next ? <Link to={next.path}><time>{next.startAt ? new Date(next.startAt).toLocaleString('zh-CN',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}) : next.time}</time><span><strong>{next.title}</strong><small>{next.location}</small></span><em>{next.label}</em><ArrowRight size={16}/></Link> : <p>目前没有待进行的安排。<Link to="/v2/me?tab=timetable">查看我的课表 <ArrowRight size={14}/></Link></p>}</div></section><section className="v2-editorial-section"><SectionHeading title="校园生活"/><div className="v2-editorial-campus-links"><Link to="/v2/partners"><UsersRound size={22}/><strong>找搭子</strong><small>一起学习、运动与探索</small><ArrowRight size={16}/></Link><Link to="/v2/community"><MessageCircle size={22}/><strong>校园社区</strong><small>分享见闻，交流想法</small><ArrowRight size={16}/></Link><Link to="/v2/organizations"><GraduationCap size={22}/><strong>社团组织</strong><small>认识校园里的同行者</small><ArrowRight size={16}/></Link><button type="button" onClick={() => setSelected('coffee')}><Coffee size={22}/><strong>Coffee Chat</strong><small>与老师约一次交流</small><ArrowRight size={16}/></button><Link to="/v2/sports"><CalendarDays size={22}/><strong>体育打卡</strong><small>查看体育服务入口</small><ArrowRight size={16}/></Link></div></section><section className="v2-editorial-section"><SectionHeading title="校园服务"/><Link to="/v2/campus/explore" className="v2-campus-explore-entry" style={{ backgroundImage: `linear-gradient(90deg,rgba(24,38,32,.86),rgba(24,38,32,.12)),url(${mapPreview})` }}><span className="v2-eyebrow">校园地图</span><strong>探索校园</strong><small>查看楼栋与附近活动</small><span className="v2-campus-explore-cta"><MapPinned size={17}/> 打开地图 <ArrowRight size={16}/></span></Link><div className="v2-service-grid">{serviceCards.map(({ icon: Icon, ...card }, index) => card.id === 'organizations' ? <Link to="/v2/organizations" className={`v2-service-card tone-${card.tone}`} key={card.id}><span><Icon size={23}/></span><strong>{card.title}</strong><small>{card.copy}</small><ArrowRight size={17}/></Link> : <button type="button" className={`v2-service-card tone-${card.tone}`} key={card.id} style={{ animationDelay: `${index * 60}ms` }} onClick={() => setSelected(card.id)}><span><Icon size={23}/></span><strong>{card.title}</strong><small>{card.copy}</small><ArrowRight size={17}/></button>)}</div></section>
-    <Link to="/v2/ai" className="v2-editorial-ai-link"><Sparkles size={19}/><span><strong>校园 AI 助手</strong><small>活动、社团与校园信息，可以在这里提问</small></span><ArrowRight size={17}/></Link>
-    {item && <Drawer title={item.title} eyebrow="CAMPUS SERVICE" onClose={closeService} wide={item.id === 'organizations' || item.id === 'coffee'}>
-      {item.id === 'teaching' && <><p className="v2-detail-lead">课堂与教学信息的快捷入口。</p><div className="v2-service-detail-grid"><div><CalendarDays size={20}/><strong>本周课程</strong><p>在日历里查看个人活动与学习安排。</p><Link to="/v2/me?tab=events">查看我的日程 <ArrowRight size={14}/></Link></div><div><ShieldCheck size={20}/><strong>课堂签到</strong><p>本轮仅展示教学服务结构；此处没有接入学校签到接口。</p></div></div></>}
-      {item.id === 'academic' && <><p className="v2-detail-lead">从一个问题开始，找到愿意一起讨论的人。</p><div className="v2-service-detail-grid"><div><MessageCircle size={20}/><strong>学习社区</strong><p>发布课程与项目问题，等待同学参与。</p><Link to="/v2/community">进入学习讨论 <ArrowRight size={14}/></Link></div><div><UsersRound size={20}/><strong>学习搭子</strong><p>发起小组，交流笔记与项目想法。</p><Link to="/v2/partners">寻找学习搭子 <ArrowRight size={14}/></Link></div></div></>}
-      {item.id === 'organizations' && <>{live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取公开社团…</p>}<p className="v2-detail-lead">选择感兴趣的组织，活动和社群会逐渐串联起来。</p><div className="v2-directory-tools"><AnimatedSearchField value={organizationQuery} onChange={setOrganizationQuery} placeholder="搜索组织、类别或关键词"/><span>{filteredOrganizations.length} 个组织</span></div><div className="v2-filter-pills v2-directory-filters">{organizationCategories.map((category) => <button type="button" key={category} className={organizationCategory === category ? 'is-active' : ''} onClick={() => setOrganizationCategory(category)}>{category}</button>)}</div><div className="v2-organization-grid v2-filtered-list" key={`${organizationQuery}|${organizationCategory}`}>{filteredOrganizations.map((org) => <article key={org.id}><span className="v2-org-mark" style={{ background: org.color }}>{org.name.slice(0, 2)}</span><div><strong>{org.name}</strong><small>{org.category} · {org.contact}</small><p>{org.description}</p></div><button type="button" className={`v2-button ${follows.includes(org.id) ? 'v2-button-secondary' : 'v2-button-primary'}`} disabled={live.busy} onClick={() => void live.mutate('relation.set', {id: org.id, kind: 'follow', enabled: !follows.includes(org.id)})}>{follows.includes(org.id) ? '已关注' : '关注'}</button></article>)}</div>{live.data && !filteredOrganizations.length && <Empty icon={UsersRound} title="没有匹配的组织" description="试试其他类别或关键词。"/>}</>}
-      {item.id === 'coffee' && <V2CoffeeChat/>}
-      {item.id === 'alumni' && <><p className="v2-detail-lead">校友故事从校园活动延伸到真实的交流。</p><div className="v2-service-detail-grid"><div><GraduationCap size={20}/><strong>校友分享活动</strong><p>听一听从 BNBU 出发的成长经历。</p><Link to="/v2/activities/alumni-founder-talk">查看 Founder Stories <ArrowRight size={14}/></Link></div><div><Coffee size={20}/><strong>寻找交流机会</strong><p>也可以先预约老师的 Coffee Chat。</p><button type="button" onClick={() => setSelected('coffee')}>查看 Coffee Chat <ArrowRight size={14}/></button></div></div></>}
-    </Drawer>}
-  </div>
+  const [params] = useSearchParams()
+  const service = params.get('service')
+  if (service === 'coffee') return <Navigate to="/v2/coffee" replace/>
+  if (service === 'academic') return <Navigate to="/v2/community?board=学习" replace/>
+  if (service === 'alumni') return <Navigate to="/v2/alumni" replace/>
+  if (service === 'organizations') return <Navigate to="/v2/organizations" replace/>
+  if (service === 'teaching') return <div className="v2-page"><PageHeading eyebrow="MY CLASSES" title="我的课表" description="查看、导入和核对本人的课程安排。"/><StudentTimetable/></div>
+  const entries = [
+    {path:'/v2/partners', title:'找搭子', copy:'一起学习、运动与探索', icon:UsersRound},
+    {path:'/v2/community', title:'校园社区', copy:'分享见闻，交流想法', icon:MessageCircle},
+    {path:'/v2/organizations', title:'社团组织', copy:'认识校园里的同行者', icon:GraduationCap},
+    {path:'/v2/coffee', title:'Coffee Chat', copy:'选择老师，预约交流', icon:Coffee},
+    {path:'/v2/alumni', title:'校友同行', copy:'了解经历与交流机会', icon:Network},
+    {path:'/v2/campus?service=teaching', title:'我的课表', copy:'导入、查看与修正课程', icon:BookOpen},
+    {path:'/v2/sports', title:'运动打卡', copy:'查看本学期运动进度', icon:CalendarDays},
+    {path:'/v2/ai', title:'校园 AI', copy:'查询校园信息与资料', icon:Sparkles},
+  ]
+  return <div className="v2-page v2-editorial-campus"><PageHeading eyebrow="CAMPUS LIFE" title="校园" description="让每一种兴趣，都找到归属。"/><div className="v2-editorial-campus-photo" style={{backgroundImage:`linear-gradient(90deg,#162e56b3,#162e5610),url(${campusPhoto})`}}><span>校园 · 社群 · 连接</span><strong>让相遇从这里开始。</strong></div><div className="v2-editorial-campus-links">{entries.map(({path,title,copy,icon:Icon}) => <Link key={path} to={path}><Icon size={23}/><strong>{title}</strong><small>{copy}</small><ArrowRight size={17}/></Link>)}</div><CampusConnections/><Link to="/v2/campus/explore" className="v2-campus-explore-entry" style={{backgroundImage:`linear-gradient(90deg,#162e56d9,#162e5620),url(${mapPreview})`}}><span>校园地图</span><strong>探索校园</strong><small>查看楼栋与附近活动</small><span className="v2-campus-explore-cta"><MapPinned size={17}/> 打开地图 <ArrowRight size={16}/></span></Link><section className="campus-home-section"><SectionHeading title="校园服务" detail="常用功能"/><CampusServiceLinks/></section><CampusAssistantLink/></div>
 }
 
 export function V2AI() {
@@ -147,7 +130,7 @@ export function V2Me() {
     {tab === 'teams' && <section className="v2-panel v2-list-panel"><SectionHeading title="我的组队" action={<Link to="/v2/partners/teams">管理全部 <ArrowRight size={15}/></Link>}/>{myRooms.map((room) => <Link className="v2-saved-row" to="/v2/partners/teams" key={room.id}><UsersRound size={20}/><span><strong>{room.title}</strong><small>{room.owner === actorId ? '我发起' : '已加入'} · {room.time}</small></span><ChevronRight size={16}/></Link>)}</section>}
     {tab === 'saved' && <section className="v2-panel v2-list-panel"><SectionHeading title="我的收藏"/>{saved.map(e => <Link className="v2-saved-row" key={e.id} to={e.kind === 'activity' ? `/v2/activities/${e.id}` : e.kind === 'room' ? `/v2/partners?item=${e.id}` : '/v2/community'}><Bookmark size={20}/><span><strong>{String(e.data.title)}</strong><small>{e.kind === 'activity' ? '校园活动' : e.kind === 'room' ? '搭子队伍' : '社区帖子'}</small></span><ChevronRight size={16}/></Link>)}{live.data && !saved.length && <Empty icon={Bookmark} title="还没有收藏"/>}</section>}
     {tab === 'verification' && <section className="v2-panel v2-list-panel"><SectionHeading title="身份认证" detail="按本人全部认证记录核对"/>{live.data && <p className="v2-form-note">{certifications.canPublishActivity ? '已有有效学生社团成员认证，可按活动规则发起活动。' : '当前没有有效学生社团成员认证，暂不能发起活动。'}</p>}{certifications.records.map(record => <div className="v2-verification-summary" key={record.id}><ShieldCheck size={24}/><div><strong>{record.kindLabel} · {record.statusLabel}</strong><p>{record.organization} · {record.note}</p>{record.reviewNote && <small>审核备注：{record.reviewNote}</small>}</div></div>)}{live.data && !certifications.records.length && <div className="v2-verification-summary"><ShieldCheck size={24}/><div><strong>尚无认证记录</strong><p>提交身份资料后，由有审核职责的管理员处理。</p></div></div>}<button type="button" className="v2-button v2-button-primary" disabled={!live.data} onClick={() => setVerifyOpen(true)}>提交认证申请 <ArrowRight size={16}/></button></section>}
-    {verifyOpen && <Modal title="提交身份认证" onClose={() => setVerifyOpen(false)}><form className="v2-form" onSubmit={apply}><label>认证类型<select value={verifyKind} onChange={(event) => setVerifyKind(event.target.value as 'student' | 'club' | 'official')}><option value="student">学生</option><option value="club">学生社团成员</option><option value="official">官方机构</option></select></label><label>学院或组织名称<input name="organization" required placeholder="例如：工商管理学院"/></label><label>申请说明<textarea name="note" required rows={4} placeholder="说明你的身份、所属社团和成员资格"/></label>{live.error && <p role="alert">{live.error}</p>}<p className="v2-form-note">申请会保存到伴学后台，认证不自动授予管理职责。</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setVerifyOpen(false)}>取消</button><button type="submit" disabled={live.busy} className="v2-button v2-button-primary">提交申请</button></div></form></Modal>}
+    {verifyOpen && <Modal title="提交身份认证" onClose={() => setVerifyOpen(false)}><form className="v2-form" onSubmit={apply}><label>认证类型<select value={verifyKind} onChange={(event) => setVerifyKind(event.target.value as 'student' | 'club' | 'official')}><option value="student">学生</option><option value="club">学生社团成员</option><option value="official">官方机构</option></select></label><label>学院或组织名称<input name="organization" required placeholder="例如：工商管理学院"/></label><label>申请说明<textarea name="note" required rows={4} placeholder="说明你的身份、所属社团和成员资格"/></label>{live.error && <p role="alert">{live.error}</p>}<p className="v2-form-note">申请会保存到会同里后台，认证不自动授予管理职责。</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setVerifyOpen(false)}>取消</button><button type="submit" disabled={live.busy} className="v2-button v2-button-primary">提交申请</button></div></form></Modal>}
   </div>
 }
 

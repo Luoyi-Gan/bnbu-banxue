@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, MapPin, Plus, Search, Star, UsersRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { roomTypeName, type Room, type RoomReview } from '../../shared/v2/model'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
@@ -20,7 +20,9 @@ export function V2Teams() {
   const roomReviews: RoomReview[] = entities.filter(e => e.kind === 'roomReview').map(e => ({id: e.id, roomId: String(e.data.roomId), from: e.ownerId!, to: String(e.data.targetId), stars: Number(e.data.stars), tags: e.data.tags as string[], comment: String(e.data.comment), date: e.createdAt}))
   const state = {rooms, roomReviews, applications: applications.filter(a => a.ownerId === studentName).map(a => ({id: a.id, roomId: String(a.data.roomId), status: String(a.data.status), roomSummary: a.data.roomSummary as {title: string; status: string; visibility: string}}))}
   const [tab, setTab] = useState<'ongoing' | 'finished'>('ongoing')
-  const [selected, setSelected] = useState<string | null>(null)
+  const [params, setParams] = useSearchParams()
+  const selected = params.get('item')
+  const setSelected = (id: string | null) => { const next = new URLSearchParams(params); if (id) next.set('item', id); else next.delete('item'); setParams(next) }
   const [ending, setEnding] = useState<string | null>(null)
   const [reviewRoom, setReviewRoom] = useState<string | null>(null)
   const [reviewMember, setReviewMember] = useState('')

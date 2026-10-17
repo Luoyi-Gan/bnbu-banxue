@@ -63,11 +63,20 @@ it('学生完整看板只使用可用源的授权投影，源失败时隐藏旧�
  expect(failed).not.toContain('>630<');
 });
 
-it('新版学生体育打卡只保留留白结构，不展示数据或操作', () => {
-  const page = renderToStaticMarkup(<MemoryRouter><V2Sports/></MemoryRouter>);
-  expect(page).toContain('体育打卡');
-  expect(page).toContain('v2-sports-empty-space');
-  for (const text of ['sports-hero', '运动提交趋势', '运动记录', '已确认学时', '刷新体育数据']) expect(page).not.toContain(text);
+it('新版体育页在未知进度时显示占位，不生成零进度或运动提交能力', () => {
+  const backend = {data: null, error: '', busy: false, mutate: vi.fn().mockResolvedValue(false), refresh: vi.fn().mockResolvedValue()};
+  const hook = vi.spyOn(workspaceBackend, 'useWorkspaceBackend').mockReturnValue(backend);
+  const render = () => renderToStaticMarkup(<MemoryRouter><V2Sports/></MemoryRouter>);
+  const loading = render();
+  expect(loading).toContain('本学期进度');
+  expect(loading).toContain('>—<');
+  expect(loading).not.toContain('aria-valuenow="0"');
+  expect(loading).not.toContain('GPS');
+  expect(loading).not.toContain('开始打卡');
+  hook.mockReturnValue({...backend, data: {sportsStatus:'not-enrolled',sports:null} as Workspace});
+  expect(render()).toContain('暂无已加入的体育课程');
+  hook.mockReturnValue({...backend, data: {sportsStatus:'unavailable',sports:null} as Workspace});
+  expect(render()).toContain('体育进度暂不可用');
 });
 
 it('教师体育页面加载和读取失败时保留看板，失败后可以重试', () => {

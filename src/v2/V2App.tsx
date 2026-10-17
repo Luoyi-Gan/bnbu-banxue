@@ -1,20 +1,22 @@
+import { ReferenceHome, ReferenceDiscover, ReferenceCampus, ReferenceMe, ReferenceSports, ReferenceWelcome } from './reference/pages'
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
-import { Bell, Mail, CalendarDays, Coffee, ChevronDown, Compass, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound, UsersRound } from 'lucide-react'
+import { Bell, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import brandIcon from '../assets/brand/brand-app-icon.svg'
-import studentBrandIcon from '../assets/brand/brand-app-icon-a.svg'
+const brandIcon = '/huitongli-app-icon.png'
 import { V2Provider } from './store'
 import { useV2 } from './useV2'
 import { TeacherCoffee, TeacherProfile, TeacherSchedule, TeacherMessages, TeacherSports } from './TeacherPortal'
 import { canAccessPortal, portalHome } from './portalAccess'
 import { StudentSearch } from './StudentSearch'
 import { AdminDashboard, AdminModeration, AdminVerifications } from './admin'
-import { V2Activities, V2Community, V2Home, V2Messages, V2Partners, V2Teams } from './student'
-import { V2AI, V2Campus, V2Me, V2Settings } from './services'
+import { V2Activities, V2Community, V2Messages, V2Partners, V2Teams } from './student'
+import { V2AI, V2Settings } from './services'
 import { V2Alumni } from './V2Alumni'
-import { V2Sports } from './V2Sports'
+import { V2Schedule } from './V2Schedule'
+import { V2CoffeeChat } from './V2CoffeeChat'
+import { PageHeading } from './ui'
 import { useSportsHomeScroll } from './useSportsHomeScroll'
 import { V2CampusExplore } from './V2CampusExplorer'
 import { V2Auth } from './V2Auth'
@@ -40,7 +42,7 @@ const studentNav = [
   { path: '/v2', label: '首页', icon: House, end: true },
   { path: '/v2/activities', label: '发现', icon: Compass },
   { path: '/v2/campus', label: '校园', icon: UsersRound },
-  { path: '/v2/messages', label: '会话', icon: MessageCircle },
+  { path: '/v2/sports', label: '打卡', icon: Footprints },
   { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const adminNav = [
@@ -67,9 +69,9 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const displayAvatar = typeof studentProfile?.avatar === 'string' ? studentProfile.avatar : ''
   const ownPreferences = live.data?.entities.find(item => item.kind === 'preferences' && item.ownerId === live.data?.account.id)?.data
   const sidebarItems = parseSidebarItems(ownPreferences?.sidebarItems) ?? defaultSidebarItems
-  const shellBrandIcon = admin || teacher ? brandIcon : studentBrandIcon
+  const shellBrandIcon = brandIcon
   const sports = location.pathname === '/v2/teacher/sports'
-  const studentSectionActive = (path: string, isActive: boolean) => (path === '/v2/messages' ? isActive && new URLSearchParams(location.search).get('view') !== 'notifications' : isActive) || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/alumni', '/v2/organizations', '/v2/sports'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
@@ -80,12 +82,13 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
   const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
-  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '伴学'
+  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '会同里'
   const service = new URLSearchParams(location.search).get('service')
   const sidebarMatch = (id: typeof sidebarItems[number]) => {
     if (id === 'home') return location.pathname === '/v2'
     if (id === 'conversations') return location.pathname === '/v2/messages' && new URLSearchParams(location.search).get('view') !== 'notifications'
-    if (id === 'coffee' || id === 'teaching' || id === 'academic') return location.pathname === '/v2/campus' && service === id
+    if (id === 'coffee') return location.pathname === '/v2/coffee'
+    if (id === 'teaching' || id === 'academic') return location.pathname === '/v2/campus' && service === id
     if (id === 'campus') return false
     const path = studentSidebarById[id].path
     return location.pathname === path || location.pathname.startsWith(`${path}/`)
@@ -102,15 +105,15 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   }, [roleMenu])
   return <div className={`v2-app${sports ? ' v2-app-sports' : ''}${!admin && !teacher ? ' v2-app-student' : ''}`}>
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
-      <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
+      <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>会同里</strong><small>BNBU CAMPUS</small></span></Link>
       <div className="v2-nav-label">{admin ? '管理' : teacher ? '教师' : '我的导航'}</div>
       {admin || teacher ? <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span></NavLink>)}</nav> : <nav className="v2-side-nav v2-student-sidebar-nav">{sidebarItems.map(id => { const entry = studentSidebarById[id]; const Icon = entry.icon; return <NavLink key={id} to={entry.path} className={`v2-side-link${sidebarActiveId === id ? ' is-active' : ''}`}><Icon size={19}/><span>{entry.label}</span>{id === 'conversations' && unread > 0 && <b>{unread}</b>}</NavLink> })}</nav>}
-      <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>{live.data ? '本地服务已连接' : live.error ? '本地服务连接失败' : '正在连接本地服务'}</span></div>{!admin && !teacher && <button type="button" className="v2-sidebar-customize-trigger" onClick={() => setCustomizingSidebar(true)}><Settings2 size={18}/> 侧栏设置</button>}</div>
+      <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>{live.data ? '校园生活，随时相伴' : live.error ? '服务暂不可用' : '正在连接服务'}</span></div>{!admin && !teacher && <button type="button" className="v2-sidebar-customize-trigger" onClick={() => setCustomizingSidebar(true)}><Settings2 size={18}/> 侧栏设置</button>}{!admin && !teacher && <a className="reference-font-credit" href="/fonts/NOTICE.html" target="_blank" rel="noreferrer">字体与许可</a>}</div>
     </aside>
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
     <div className="v2-workspace">
       <header className="v2-topbar">
-        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>BNBU 伴学</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
+        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>会同里</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
         <div className="v2-top-actions">
           {!admin && !teacher && <NavLink to="/v2/messages?view=notifications" className={`v2-icon-button v2-header-messages${location.pathname === '/v2/messages' && new URLSearchParams(location.search).get('view') === 'notifications' ? ' is-active' : ''}`} aria-label={unreadNotices > 0 ? `通知，${unreadNotices} 条未读` : live.data ? '通知，暂无未读' : '通知状态暂不可用'} title={live.data ? `通知 · ${unreadNotices} 条未读` : '通知状态暂不可用'}><Bell size={19} aria-hidden="true"/>{unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unreadNotices > 99 ? '99+' : unreadNotices}</span>}</NavLink>}
           {!admin && !teacher && <StudentSearch/>}
@@ -136,6 +139,7 @@ function V2Routes() {
   useEffect(() => {
     if (authorized && state.role !== requestedRole) setState(current => ({...current, role: requestedRole}))
   }, [authorized, requestedRole, state.role, setState])
+  if (location.pathname === '/v2/welcome') return <ReferenceWelcome/>
   if (location.pathname === '/v2/login') return <V2Auth mode="login"/>
   if (location.pathname === '/v2/register') return <V2Auth mode="register"/>
   if (location.pathname === '/v2/forgot-password') return <V2ForgotPassword/>
@@ -148,9 +152,11 @@ function V2Routes() {
   if (state.role !== requestedRole) return <p role="status">正在切换本人已授权身份…</p>
   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>
   return <V2Shell accountName={session.account!.name}><Routes>
-    <Route path="/v2" element={<V2Home/>}/>
+    <Route path="/v2" element={<ReferenceHome/>}/>
     <Route path="/v2/alumni" element={<V2Alumni/>}/>
-    <Route path="/v2/sports" element={<V2Sports/>}/>
+    <Route path="/v2/sports" element={<ReferenceSports/>}/>
+    <Route path="/v2/schedule" element={<V2Schedule/>}/>
+    <Route path="/v2/coffee" element={<div className="v2-page reference-coffee-page"><PageHeading eyebrow="A LITTLE CONVERSATION" title="Coffee Chat" description="和老师聊聊，每一种可能。"/><V2CoffeeChat/></div>}/>
     <Route path="/v2/teacher" element={<Navigate to={portalHome.teacher} replace/>}/>
     <Route path="/v2/teacher/activities" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
     <Route path="/v2/teacher/activities/:id" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
@@ -159,17 +165,17 @@ function V2Routes() {
     <Route path="/v2/teacher/schedule" element={<TeacherSchedule/>}/>
     <Route path="/v2/teacher/messages" element={<TeacherMessages/>}/>
     <Route path="/v2/teacher/sports" element={<TeacherSports/>}/>
-    <Route path="/v2/activities" element={<V2Activities/>}/>
+    <Route path="/v2/activities" element={<ReferenceDiscover/>}/>
     <Route path="/v2/activities/:id" element={<V2Activities/>}/>
     <Route path="/v2/community" element={<V2Community/>}/>
     <Route path="/v2/partners" element={<V2Partners/>}/>
     <Route path="/v2/partners/teams" element={<V2Teams/>}/>
     <Route path="/v2/messages" element={<V2Messages/>}/>
-    <Route path="/v2/campus" element={<V2Campus/>}/>
+    <Route path="/v2/campus" element={<ReferenceCampus/>}/>
     <Route path="/v2/organizations" element={<CampusOrganizations/>}/>
     <Route path="/v2/campus/explore" element={<V2CampusExplore/>}/>
     <Route path="/v2/ai" element={<V2AI/>}/>
-    <Route path="/v2/me" element={<V2Me/>}/>
+    <Route path="/v2/me" element={<ReferenceMe/>}/>
     <Route path="/v2/settings" element={<V2Settings/>}/>
     <Route path="/v2/admin" element={<AdminDashboard/>}/>
     <Route path="/v2/admin/verifications" element={<AdminVerifications/>}/>

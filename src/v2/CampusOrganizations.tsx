@@ -1,13 +1,14 @@
 import { UsersRound } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AnimatedSearchField } from './AnimatedSearchField'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Empty, PageHeading } from './ui'
 
 export function CampusOrganizations({ embedded = false, externalQuery, externalCategory }: { embedded?: boolean; externalQuery?: string; externalCategory?: string }) {
   const live = useWorkspaceBackend()
-  const [query, setQuery] = useState('')
+  const [params] = useSearchParams()
+  const [query, setQuery] = useState(() => params.get('q') ?? '')
   const [category, setCategory] = useState('全部')
   const organizations = (live.data?.entities ?? []).filter(item => item.kind === 'organization' && item.data.status === 'approved' && item.data.visibility === 'visible').map(item => ({
     id: item.id,

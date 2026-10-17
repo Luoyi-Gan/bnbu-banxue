@@ -1,8 +1,9 @@
-import { ArrowLeft, ArrowUp, Bell, ChevronRight, MessageCircle, UsersRound } from 'lucide-react'
+import { ArrowLeft, ArrowUp, Bell, CalendarDays, ChevronRight, Coffee, MessageCircle, UsersRound } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { liveConversations, type LiveConversation } from './liveConversations'
-import { Empty, PageHeading, SectionHeading } from './ui'
+import { Empty, Modal, PageHeading, SectionHeading } from './ui'
+import { noticeCategories, noticeCategory, noticeDestination } from './notificationPresentation'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { notificationPreferences, showNoticeBadge } from './notificationPreferences'
 import { DisplayAvatar } from './DisplayAvatar'
@@ -34,7 +35,7 @@ function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened
     <header className="inbox-chat-heading">
       <button type="button" className="inbox-back" aria-label="返回会话列表" onClick={onBack}><ArrowLeft size={21}/></button>
       <span className="inbox-avatar"><UsersRound size={21}/></span>
-      <div><h2>{conversation.title}</h2><p>队伍会话 · 已连接伴学后台</p></div>
+      <div><h2>{conversation.title}</h2><p>队伍会话 · 已连接会同里后台</p></div>
     </header>
     <div className="inbox-message-history" ref={messages} role="log" aria-label={`${conversation.title}的消息`} aria-live="polite" onScroll={event => {
       const target = event.currentTarget
@@ -66,6 +67,10 @@ export function V2Messages() {
   const view = params.get('view') === 'notifications' ? 'notifications' : 'conversations'
   const selected = params.get('conversation')
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const category = noticeCategories.find(item => item === params.get('category')) ?? '全部'
+  const setCategory = (value: string) => setParams({view:'notifications',category:value})
+  const notice = live.data?.notifications.find(item => item.id === params.get('notice'))
+  const destination = notice ? noticeDestination(notice, live.data) : null
   const readAttempt = useRef('')
   const active = conversations.find(item => item.id === selected)
   const opened = Boolean(selected && active && view === 'conversations')
@@ -97,7 +102,7 @@ export function V2Messages() {
     if (await live.mutate('message.send', {roomId: id, body})) setDrafts(value => value[id]?.trim() === body ? {...value, [id]: ''} : value)
   }
   return <div className={`v2-page v2-messages-page${opened ? ' is-chat-open' : ''}`}>
-    <PageHeading eyebrow="MESSAGES" title="消息" description="每一次交流，都让校园里的连接更近一点。"/>
+    <PageHeading eyebrow="MESSAGES" title={view === 'notifications' ? '通知中心' : '我的会话'} description={view === 'notifications' ? '校园里的新消息，都在这里。' : '每一次交流，都让校园里的连接更近一点。'}/>
     <nav className="inbox-tabs" aria-label="消息分类">
       <button type="button" aria-pressed={view === 'conversations'} onClick={() => setParams({})}><MessageCircle size={17}/>会话{unreadMessages > 0 && <b>{unreadMessages}</b>}</button>
       <button type="button" aria-pressed={view === 'notifications'} onClick={() => setParams({ view: 'notifications' })}><Bell size={17}/>通知{badgeNotices > 0 && <b>{badgeNotices}</b>}</button>
@@ -106,10 +111,12 @@ export function V2Messages() {
       <SectionHeading title="校园通知" detail={live.data ? `${notices.length} 条通知` : '正在读取'} action={<button type="button" className="v2-text-button" disabled={!unreadNotices || live.busy} onClick={() => void live.mutate('notification.readmany', {ids: notices.filter(item => !item.readAt).map(item => item.id)})}>全部标为已读</button>}/>
       {live.error && <p role="alert">{live.error}</p>}
       {!live.data && !live.error && <p role="status">正在读取本人通知…</p>}
-      {notices.map(item => <Link className={`inbox-notice${showNoticeBadge(live.data, item) ? ' is-unread' : ''}`} to="?view=notifications" key={item.id} onClick={event => {event.preventDefault(); if (!item.readAt) void live.mutate('notification.read', {id: item.id})}}>
-        <span className="inbox-avatar"><Bell size={20}/></span><div><strong>校园通知{showNoticeBadge(live.data, item) && <i aria-label="未读"/>}</strong><p>{item.body}</p><time>{new Date(item.createdAt).toLocaleString('zh-CN')}</time></div><ChevronRight size={17}/>
-      </Link>)}
-      {live.data && !notices.length && <Empty icon={Bell} title="暂无通知"/>}
+      <div className="reference-notice-filters" aria-label="通知筛选">{noticeCategories.map(name => <button key={name} aria-pressed={category === name} className={category === name ? 'is-active' : ''} onClick={() => setCategory(name)}>{name} <small>{notices.filter(item => name === '全部' || noticeCategory(item.event) === name).length}</small></button>)}</div>
+      {notices.filter(item => category === '全部' || noticeCategory(item.event) === category).map(item => {const kind = noticeCategory(item.event); const Icon = kind === '活动' ? CalendarDays : kind === '交流' ? Coffee : kind === '社区' ? MessageCircle : Bell; return <button type="button" className={`inbox-notice reference-notice${showNoticeBadge(live.data, item) ? ' is-unread' : ''}`} key={item.id} onClick={() => {setParams({view:'notifications',category,notice:item.id}); if (!item.readAt) void live.mutate('notification.read', {id:item.id})}}>
+        <span className={`reference-icon tone-${kind === '交流' ? 'orange' : kind === '社区' ? 'purple' : 'blue'}`}><Icon size={21}/></span><span className="reference-notice-copy"><strong>{kind}通知{showNoticeBadge(live.data, item) && <i aria-label="未读"/>}</strong><p>{item.body}</p><time>{new Date(item.createdAt).toLocaleString('zh-CN')}</time></span><ChevronRight size={17}/>
+      </button>})}
+      {live.data && !notices.some(item => category === '全部' || noticeCategory(item.event) === category) && <Empty icon={Bell} title="暂无此类通知"/>}
+      {notice && <Modal title={`${noticeCategory(notice.event)}通知`} onClose={() => setParams({view:'notifications',category})}><time className="v2-form-note">{new Date(notice.createdAt).toLocaleString('zh-CN')}</time><p className="reference-notice-body">{notice.body}</p>{live.error && <p role="alert">{live.error}</p>}{destination && <Link className="v2-button v2-button-primary" to={destination.path} state={{from:`/v2/messages?view=notifications&category=${encodeURIComponent(category)}`}}>{destination.label}<ChevronRight size={16}/></Link>}</Modal>}
     </section> : <div className="inbox-workspace">
       <aside className="inbox-list" aria-label="会话列表">
         {!live.data && !live.error && <p role="status">正在读取本人会话…</p>}

@@ -9,12 +9,12 @@ export function liveStudentSchedule(data: Workspace | null, now = Date.now()): S
     if (e.kind === 'activity' && d.status === 'published' && data.relations.some(r => r.entityId === e.id && r.kind === 'participate') && Date.parse(String(d.endAt ?? d.startAt)) > now)
       items.push({id: e.id, kind: 'activity', title: String(d.title), time: '', startAt: String(d.startAt), location: String(d.location), path: `/v2/activities/${e.id}`, label: '已标记参与'})
     if (e.kind === 'room' && d.isMember && d.status === 'open' && d.visibility === 'visible')
-      items.push({id: e.id, kind: 'room', title: String(d.title), time: String(d.time || '时间待商定'), location: String(d.place), path: '/v2/partners/teams', label: '我的搭子'})
+      items.push({id: e.id, kind: 'room', title: String(d.title), time: String(d.time || '时间待商定'), location: String(d.place), path: `/v2/partners/teams?item=${encodeURIComponent(e.id)}`, label: '我的搭子'})
     if (e.kind === 'coffeeBooking' && e.ownerId === actor && d.status === 'confirmed') {
       const slot = data.entities.find(s => s.kind === 'coffeeSlot' && s.id === d.slotId)
       if (!slot || Date.parse(String(slot.data.endAt)) <= now) continue
       const teacher = data.people.find(p => p.id === d.teacherId)
-      items.push({id: e.id, kind: 'coffee', title: `与${teacher?.name ?? '老师'}的 Coffee Chat`, time: '', startAt: String(slot.data.startAt), location: String(slot.data.location), path: '/v2/campus', label: d.proposedSlotId ? 'Coffee Chat · 改期待确认' : 'Coffee Chat'})
+      items.push({id: e.id, kind: 'coffee', title: `与${teacher?.name ?? '老师'}的 Coffee Chat`, time: '', startAt: String(slot.data.startAt), location: String(slot.data.location), path: `/v2/coffee?teacher=${encodeURIComponent(String(d.teacherId))}&slot=${encodeURIComponent(String(d.slotId))}`, label: d.proposedSlotId ? 'Coffee Chat · 改期待确认' : 'Coffee Chat'})
     }
   }
   for (const b of data.alumni.bookings) {
