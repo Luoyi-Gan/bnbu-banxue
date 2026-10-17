@@ -1,0 +1,12 @@
+@font-face{font-family:MiSans;src:url('/fonts/misans/MiSans-Regular.woff2') format('woff2');font-display:swap}
+@font-face{font-family:WenKai;src:url('/fonts/lxgw-wenkai/BNBUWenKai-Medium.woff2') format('woff2');font-display:swap}
+:root{--font-family:MiSans,sans-serif;--color-primary:#168575;--color-on-primary:#fff;--color-primary-container:#e9f3ee;--color-on-primary-container:#21594b;--color-background:#faf9f6;--color-surface:#fff;--color-on-surface:#252c28;--color-on-background:#252c28;--color-on-surface-variant:#647369;--color-outline-variant:#e2e7df;--color-surface-variant:#f0f3ed;--color-secondary:#a47750}
+html,body{height:auto;min-height:100%;overflow:auto;background:var(--color-background);font-family:var(--font-family)}
+body{margin:0}.demo-notice{padding:12px 20px;background:#eaf1eb;color:#456653;font-size:12px;line-height:1.7;border-bottom:1px solid #dce6dc}
+.tab-host{height:auto;overflow:visible;padding:0 20px}.tab-host>.checkin-root{padding:20px 0 28px;min-height:660px;max-width:640px}
+.checkin-root h1,.checkin-root h2{font-family:WenKai,MiSans,sans-serif}.checkin-root .swiss-panel{border:1px solid #e2e7df;border-radius:12px;box-shadow:none;background:#fff}
+.checkin-root .checkin-dock{position:static;margin-top:auto;padding:20px 0;background:transparent;border:0;backdrop-filter:none}.checkin-root .checkin-cta{background:#168575;color:#fff;box-shadow:none}
+.checkin-root .category-btn.active{background:#e9f3ee;color:#21594b}.demo-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.demo-tools button{border:1px solid #cbdccc;background:#f1f6ee;border-radius:8px;padding:10px;color:#315c47;font:inherit;font-size:12px;min-height:44px}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid #244b63;outline-offset:3px}.dialog-scrim{position:fixed;inset:0;z-index:100}.dialog{max-height:85vh;overflow:auto}.demo-media{width:100%;max-height:55vh;object-fit:contain}.checkin-root .checkin-summary-time{font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+.tab-host>.checkin-root{min-height:0}.checkin-body{gap:16px}.checkin-root .checkin-dock{padding:12px 0}.checkin-sport-hero{padding-top:0}
