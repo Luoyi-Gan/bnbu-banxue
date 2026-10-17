@@ -1,5 +1,5 @@
 import { ArrowRight, BookOpen, Bookmark, CalendarDays, CarFront, ChevronRight, Clapperboard, Clock3, Dumbbell, MapPin, Megaphone, Plus, Search, SlidersHorizontal, UsersRound, X } from 'lucide-react'
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import FlexCarousel from '../components/reactbits/FlexCarousel/FlexCarousel'
 import { ActivityDiscovery, ActivityReactions } from './ActivityDiscovery'
@@ -32,6 +32,11 @@ import type { Workspace } from '../live/api'
 import './partnerFilters.css'
 
 const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+const homeSlides = [
+  { image: campusHomeImage, label: '校园建筑与树木' },
+  { image: campusSunsetImage, label: '傍晚的校园' },
+  { image: campusServicesImage, label: '校园公共空间' },
+]
 
 function HomeSportsRing({ sports, sportsStatus }: Pick<Workspace, 'sports' | 'sportsStatus'>) {
   const progress = sportsStatus === 'available' && sports?.role === 'student' ? sports.progress : null
@@ -49,6 +54,14 @@ function HomeSportsRing({ sports, sportsStatus }: Pick<Workspace, 'sports' | 'sp
 
 export function V2Home() {
   const live = useWorkspaceBackend(30000)
+  const [slide, setSlide] = useState(0)
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setInterval(() => {
+      if (!document.hidden) setSlide(current => (current + 1) % homeSlides.length)
+    }, 5000)
+    return () => window.clearInterval(timer)
+  }, [])
   const schedule = liveStudentSchedule(live.data)
   const next = schedule[0]
   const activities = liveActivities(live.data).filter(item => Date.parse(item.endAt ?? item.startAt) > Date.now() && (!item.local || item.local.status === 'published')).slice(0, 2)
@@ -58,7 +71,7 @@ export function V2Home() {
   const today = `${new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(now)}，${new Intl.DateTimeFormat('zh-CN', { weekday: 'long' }).format(now)}`
   const name = String(live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data.nickname ?? live.data?.account.name ?? '同学')
   return <div className="v2-page v2-home v2-editorial-home">
-    <div className="v2-editorial-hero" style={{backgroundImage: `url(${campusHomeImage})`}}><header className="v2-editorial-today"><span className="v2-eyebrow">TODAY / {today}</span><h2>{greeting}，{name}</h2><p>把今天的校园生活，过得有声有色。</p></header></div>
+    <div className="v2-editorial-hero" role="group" aria-label="校园照片轮播">{homeSlides.map((item, index) => <div key={item.label} className={`v2-editorial-hero-slide${slide === index ? ' is-active' : ''}`} style={{backgroundImage: `url(${item.image})`}} role="img" aria-label={item.label} aria-hidden={slide !== index}/>)}<header className={`v2-editorial-today${slide === 0 ? '' : ' is-on-dark'}`}><span className="v2-eyebrow">TODAY / {today}</span><h2>{greeting}，{name}</h2><p>把今天的校园生活，过得有声有色。</p></header><div className="v2-editorial-hero-controls" aria-label="切换校园照片">{homeSlides.map((item, index) => <button key={item.label} type="button" aria-label={`显示第 ${index + 1} 张照片：${item.label}`} aria-current={slide === index ? 'true' : undefined} className={slide === index ? 'is-active' : ''} onClick={() => setSlide(index)}/>)}</div></div>
     {live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人安排…</p>}
     <section className="v2-editorial-section"><SectionHeading title="接下来" action={<Link to="/v2/me?tab=events">全部日程 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-agenda">{next ? <Link to={next.path}><time>{next.startAt ? formatWhen(next.startAt) : next.time}</time><span><strong>{next.title}</strong><small>{next.location}</small></span><em>{next.label}</em><ArrowRight size={16}/></Link> : <p>暂无待进行的安排。<Link to="/v2/activities">看看最近的活动 <ArrowRight size={14}/></Link></p>}</div></section>
     <div className="v2-editorial-summary"><Link to="/v2/me?tab=events"><CalendarDays size={19}/><span><strong>{schedule.length}</strong><small>近期安排</small></span><ArrowRight size={15}/></Link><Link to="/v2/partners/teams"><UsersRound size={19}/><span><strong>{roomRequests}</strong><small>待处理申请</small></span><ArrowRight size={15}/></Link><HomeSportsRing sports={live.data?.sports} sportsStatus={live.data?.sportsStatus}/></div>

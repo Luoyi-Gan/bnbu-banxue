@@ -44,10 +44,19 @@ body:has(.v2-app.v2-app-student) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-pi
 .v2-app.v2-app-student .v2-student-search-panel{box-shadow:0 18px 42px rgba(54,45,31,.15)}
 
 /* Home */
-.v2-editorial-hero{display:grid;place-items:center;min-height:260px;margin:0 0 26px;border-radius:8px;background-color:#e8e1d8;background-size:cover;background-position:center 42%}
-.v2-editorial-today{max-width:90%;margin:0;padding:16px 22px;border-radius:4px;background:rgba(255,253,249,.78);box-shadow:0 8px 32px rgba(24,31,29,.08);text-align:center}
+.v2-editorial-hero{position:relative;display:grid;place-items:center start;min-height:260px;overflow:hidden;margin:0 0 26px;border-radius:8px;background-color:#e8e1d8}
+.v2-editorial-hero-slide{position:absolute;inset:0;background-size:cover;background-position:center 42%;opacity:0;transition:opacity .8s ease}
+.v2-editorial-hero-slide.is-active{opacity:1}
+.v2-editorial-today{position:relative;z-index:1;width:max-content;max-width:75%;margin-left:6%;padding:0;background:none;box-shadow:none;text-align:left;text-shadow:0 1px 2px #fff,0 0 10px #fff,0 0 20px rgba(255,255,255,.95)}
+.v2-editorial-today .v2-eyebrow{color:#3a4340}
 .v2-editorial-today h2{margin:9px 0 2px;font-family:Georgia,"Songti SC",serif;font-size:30px;font-weight:600;letter-spacing:-.045em}
-.v2-editorial-today p{margin:0;color:var(--v2-muted);font-size:13px}
+.v2-editorial-today p{margin:0;color:#354e51;font-size:13px}
+.v2-editorial-today.is-on-dark,.v2-editorial-today.is-on-dark .v2-eyebrow,.v2-editorial-today.is-on-dark p{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 13px rgba(0,0,0,.85)}
+.v2-editorial-hero-controls{position:absolute;right:15px;bottom:14px;z-index:2;display:flex;gap:8px}
+.v2-editorial-hero-controls button{width:21px;height:21px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer}
+.v2-editorial-hero-controls button:after{content:"";display:block;width:8px;height:8px;margin:auto;border:1px solid rgba(255,255,255,.95);border-radius:50%;background:rgba(23,42,42,.42);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.v2-editorial-hero-controls button.is-active:after{background:#fff}
+.v2-editorial-hero-controls button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .v2-editorial-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:35px}
 .v2-editorial-summary>a{display:flex;align-items:center;gap:14px;min-height:86px;padding:16px 18px;border:1px solid var(--v2-line);border-radius:5px;background:var(--v2-surface);color:var(--v2-ink)}
 .v2-editorial-summary>a>svg:first-child{color:#ab8d72}
@@ -211,8 +220,8 @@ body:has(.v2-app.v2-app-student) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-pi
   .v2-app.v2-app-student .v2-mobile-nav a.is-active{color:#202520;font-weight:750}
   .v2-app.v2-app-student .v2-mobile-nav a.is-active svg{fill:none;stroke:#202520;stroke-width:2.2}
   .v2-editorial-hero{min-height:220px;border-radius:6px}
-  .v2-editorial-today{padding:12px 15px}
-  .v2-editorial-today h2{font-size:22px}
+  .v2-editorial-today{max-width:75%}
+  .v2-editorial-today h2{font-size:26px}
   .v2-editorial-summary{gap:6px;margin-bottom:29px}
   .v2-editorial-summary>a{flex-direction:column;align-items:flex-start;gap:7px;min-height:100px;padding:12px 10px}
   .v2-editorial-summary>a>svg:last-child{display:none}
@@ -263,6 +272,7 @@ body:has(.v2-app.v2-app-student) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-pi
   .v2-profile-background-picker{grid-template-columns:repeat(2,minmax(0,1fr))}
   .v2-sports-empty-space{min-height:calc(100dvh - 180px)}
 }
+@media(prefers-reduced-motion:reduce){.v2-editorial-hero-slide{transition:none}}
 @media(max-width:420px){
   .v2-discover-search input{font-size:11px}
   .v2-discover-posts,.v2-discover-alumni{grid-template-columns:1fr}
