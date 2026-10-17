@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/v2/me?tab=teams",
+    "content": "\t\t3 container 模拟数据说明\n\t\t\t4 text 本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n\t\t\t26 heading 我的组队, Value: 1\n\t\t\t32 heading 我的组队, Value: 2\n\t\t\t38 link Description: 周末摄影小队 我发起 · 本周末 15:00, Value: 127.0.0.1:4174/v2/partners/teams"
+  },
+  {
+    "path": "/v2/coffee",
+    "content": "\t\t3 container 模拟数据说明\n\t\t\t4 text 本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n\t\t\t33 heading Coffee Chat, Value: 1\n\t\t\t35 text 和老师聊聊，每一种可能。\n\t\t\t36 text 选择老师与时段，让一次谈话更有准备。 COFFEE CHAT 和老师聊聊，找到新的思路。 从学院、研究兴趣和可预约时间开始探索。\n\t\t\t37 button (collapsed) Description: 搜索老师、学院或研究方向, Secondary Actions: Expand\n\t\t\t\t39 text 搜索老师、学院或研究方向\n\t\t\t40 text 1  位老师\n\t\t\t48 button 陈老师 其他 · 学业规划 技术项目\n\t\t\t\t49 text 陈老师"
+  },
+  {
+    "path": "/v2/alumni?view=bookings",
+    "content": "\t\t3 container 模拟数据说明\n\t\t\t4 text 本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n\t\t\t34 heading 校友同行, Value: 1\n\t\t\t42 heading 交流通知, Value: 2\n\t\t\t\t45 text 模拟交流通知：校友交流预约已确认，请提前准备想讨论的问题。 10月17日 16:50\n\t\t\t47 heading 我的申请与预约, Value: 2\n\t\t\t\t48 text 我的申请与预约\n\t\t\t\t50 text 取消原因（已确认预约必填）\n\t\t\t\t51 text field (settable) 取消原因（已确认预约必填）\n\t\t\t\t53 heading 与李同学的 Coffee Chat, Value: 3\n\t\t\t\t55 text 10月19日 16:00  —  10月19日 17:00 校园咖啡厅 如何准备第一份实习？ 已确认 模拟预约\n\t\t\t\t56 button 取消预约"
+  },
+  {
+    "path": "/v2/messages?view=notifications",
+    "content": "\t\t3 container 模拟数据说明\n\t\t\t4 text 本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n\t\t\t33 heading 通知中心, Value: 1\n\t\t\t45 heading 校园通知, Value: 2\n\t\t\t65 button 活动通知 未读 模拟通知：校园夜跑计划即将开始，请查看活动安排。 2026/10/17 16:47:36\n\t\t\t\t70 text 模拟通知：校园夜跑计划即将开始，请查看活动安排。\n\t\t\t73 button 活动通知 未读 模拟通知：计算机前沿技术分享会即将开始，请查看活动安排。 2026/10/17 16:47:36\n\t\t\t\t78 text 模拟通知：计算机前沿技术分享会即将开始，请查看活动安排。\n\t\t\t81 button 活动通知 未读 模拟通知：秋日校园摄影展即将开始，请查看活动安排。 2026/10/17 16:47:36\n\t\t\t\t86 text 模拟通知：秋日校园摄影展即将开始，请查看活动安排。"
+  },
+  {
+    "path": "/v2/community",
+    "content": "\t\t\t\t\t64 button 秋日校园，收藏这一束阳光 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t\t66 text 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t81 text 李同学\n\t\t\t\t\t86 button 分享我的自习路线 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t\t88 text 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t101 text 王同学\n\t\t\t\t\t106 button 傍晚的球场很热闹 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t\t108 text 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t123 text 李同学\n\t\t\t\t\t128 button 技术分享会精彩回顾 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t\t130 text 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t143 text 王同学\n\t\t\t\t\t148 button 我的第一场志愿活动 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t\t150 text 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t165 text 李同学\n\t\t\t\t\t170 button 周末一起练英语 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t\t172 text 模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！\n\t\t\t\t\t185 text 李同学\n\t\t\t\t\t190 button 第一份实习，从整理校园项目开始 模拟经验分享：整理项目目标、自己负责的工作和成果，准备简历与面试。\n\t\t\t\t\t\t192 text 模拟经验分享：整理项目目标、自己负责的工作和成果，准备简历与面试。"
+  },
+  {
+    "path": "/v2/schedule",
+    "content": "\t\t3 container 模拟数据说明\n\t\t\t4 text 本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n\t\t\t33 heading 我的安排, Value: 1\n\t\t\t77 link Description: 校园活动 秋日校园摄影展 校园广场, Value: 127.0.0.1:4174/v2/activities/preview-event-0\n\t\t\t78 heading 今日日程, Value: 2\n\t\t\t81 link Description: 19:00 秋日校园摄影展 校园广场 已标记参与, Value: 127.0.0.1:4174/v2/activities/preview-event-0\n\t\t\t82 heading 时间待商定, Value: 2\n\t\t\t87 link Description: 周末摄影小队 本周末 15:00 · 校园广场, Value: 127.0.0.1:4174/v2/partners/teams?item=preview-room-2"
+  }
+]
