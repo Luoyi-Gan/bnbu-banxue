@@ -11,58 +11,47 @@ import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { AnimatedSearchField } from './AnimatedSearchField'
 import { filterActivityItems, type ActivityPeriod, type ActivitySort, type ActivityStatus } from './activityFilters'
-import { liveStudentSchedule } from './liveStudentSchedule'
 import { liveActivities } from './liveActivities'
 import campusHomeImage from '../assets/campus/home-background.jpg'
-import campusEveningImage from '../assets/campus/night-walkway.jpg'
+import campusServicesImage from '../assets/campus/campus-services.jpg'
+import campusSunsetImage from '../assets/campus/evening-campus.jpg'
 import { DisplayAvatar } from './DisplayAvatar'
 import { displayPerson } from './displayPerson'
 import { PartnerLocationField, type PartnerPlace } from './PartnerLocationField'
 import { PartnerScopedLocationField } from './PartnerScopedLocationField'
 import { emptyPartnerFilters, type PartnerDetails, type PartnerFilters } from './partnerFilters'
 import { usePartnerRooms } from './usePartnerRooms'
+import { useCommunityBackend } from './useCommunityBackend'
+import { CampusOrganizations } from './CampusOrganizations'
+import { DiscoverCommunity } from './DiscoverCommunity'
+import { DiscoverHotList } from './DiscoverHotList'
 import './partnerFilters.css'
 
 const formatWhen = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
-
-export function V2Home() {
-  const live = useWorkspaceBackend(30000)
-  const schedule = liveStudentSchedule(live.data)
-  const next = schedule[0]
-  const activities = liveActivities(live.data).filter(item => Date.parse(item.endAt ?? item.startAt) > Date.now() && (!item.local || item.local.status === 'published')).slice(0, 2)
-  const roomRequests = live.data?.entities.filter(e => e.kind === 'roomApplication' && e.data.status === 'pending' && live.data?.entities.some(r => r.kind === 'room' && r.id === e.data.roomId && r.ownerId === live.data?.account.id)).length ?? 0
-  const now = new Date()
-  const greeting = now.getHours() < 11 ? '早上好' : now.getHours() < 18 ? '下午好' : '晚上好'
-  const today = `${new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(now)}，${new Intl.DateTimeFormat('zh-CN', { weekday: 'long' }).format(now)}`
-  const name = String(live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data.nickname ?? live.data?.account.name ?? '同学')
-  return <div className="v2-page v2-home v2-editorial-home">
-    <section className="v2-editorial-hero" style={{backgroundImage: `linear-gradient(90deg,rgba(17,24,21,.48),rgba(17,24,21,.04)),url(${campusHomeImage})`}}><span className="v2-eyebrow">BNBU · CAMPUS LIFE</span><h1>在这里，<br/>遇见更大的校园生活。</h1><Link to="/v2/activities">开始探索 <ArrowRight size={17}/></Link><small>01 / CAMPUS</small></section>
-    <header className="v2-editorial-today"><div><span className="v2-eyebrow">TODAY / {today}</span><h2>{greeting}，{name}</h2><p>把今天的校园生活，过得有声有色。</p></div><Link to="/v2/me?tab=events">我的日程 <ArrowRight size={16}/></Link></header>
-    {live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取本人安排…</p>}
-    <div className="v2-editorial-summary"><Link to="/v2/me?tab=events"><CalendarDays size={19}/><span><strong>{schedule.length}</strong><small>近期安排</small></span><ArrowRight size={15}/></Link><Link to="/v2/partners/teams"><UsersRound size={19}/><span><strong>{roomRequests}</strong><small>待处理申请</small></span><ArrowRight size={15}/></Link><Link to="/v2/messages"><Megaphone size={19}/><span><strong>{live.data?.notifications.filter(item => !item.readAt).length ?? 0}</strong><small>未读通知</small></span><ArrowRight size={15}/></Link></div>
-    <section className="v2-editorial-section"><SectionHeading title="接下来" action={<Link to="/v2/me?tab=events">全部日程 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-agenda">{next ? <Link to={next.path}><time>{next.startAt ? formatWhen(next.startAt) : next.time}</time><span><strong>{next.title}</strong><small>{next.location}</small></span><em>{next.label}</em><ArrowRight size={16}/></Link> : <p>暂无待进行的安排。<Link to="/v2/activities">看看最近的活动 <ArrowRight size={14}/></Link></p>}</div></section>
-    <section className="v2-editorial-section"><SectionHeading title="为你推荐" action={<Link to="/v2/activities">更多活动 <ArrowRight size={14}/></Link>}/><div className="v2-editorial-recommendations">{activities.map(item => <Link to={`/v2/activities/${item.id}`} key={item.id} className="v2-editorial-recommendation"><div className="v2-editorial-recommendation-image" style={item.image ? {backgroundImage: `url(${item.image})`} : undefined}/><span className="v2-eyebrow">{item.category} · {formatWhen(item.startAt)}</span><strong>{item.title}</strong><small>{item.location}</small></Link>)}{live.data && !activities.length && <p>暂无近期活动，稍后再来看看。</p>}</div></section>
-    <Link className="v2-editorial-campus-link" to="/v2/campus">校园、社群与更多可能 <ArrowRight size={16}/></Link>
-  </div>
-}
-
-
+export { CampusReferenceHome as V2Home } from './CampusReferenceHome'
 
 export function V2Activities() {
   const live = useWorkspaceBackend()
   const actorId = live.data?.account.id ?? ''
   const state = {role: live.data?.account.roles.includes('student') ? 'student' : '', participatingActivities: live.data?.relations.filter(r => r.kind === 'participate').map(r => r.entityId) ?? []}
   const owns = (item: {ownerId?: string}) => item.ownerId === actorId
+  const routeLocation = useLocation()
   const activityBase = state.role === 'teacher' ? '/v2/teacher/activities' : '/v2/activities'
   const { id } = useParams()
   const navigate = useNavigate()
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(() => new URLSearchParams(window.location.search).get('q') ?? '')
   const [category, setCategory] = useState('全部')
   const [period, setPeriod] = useState<ActivityPeriod>('全部时间')
   const [hostFilter, setHostFilter] = useState('全部主办方')
   const [statusFilter, setStatusFilter] = useState<ActivityStatus>('全部状态')
   const [sort, setSort] = useState<ActivitySort>('推荐顺序')
   const [filterOpen, setFilterOpen] = useState(false)
+  const [section, setSection] = useState<'activities' | 'organizations' | 'community' | 'alumni'>('activities')
+  const [organizationCategory, setOrganizationCategory] = useState('全部')
+  const [communityBoard, setCommunityBoard] = useState('全部')
+  const [communitySort, setCommunitySort] = useState<'recommended' | 'newest'>('recommended')
+  const [alumniYear, setAlumniYear] = useState('全部')
+  const community = useCommunityBackend({board: section === 'community' ? communityBoard : '全部', query: section === 'community' ? query : '', sort: section === 'community' ? communitySort : 'recommended'})
   const [createOpen, setCreateOpen] = useState(false)
   const [publishError, setPublishError] = useState('')
   const [activityBuilding, setActivityBuilding] = useState<CampusBuilding | null>(null)
@@ -71,6 +60,8 @@ export function V2Activities() {
   const [featured, setFeatured] = useState(0)
   const all = useMemo(() => liveActivities(live.data), [live.data])
   const categories = ['全部', ...new Set(all.map((event) => event.category))]
+  const organizationCategories = ['全部', ...new Set((live.data?.entities ?? []).filter(item => item.kind === 'organization' && item.data.status === 'approved' && item.data.visibility === 'visible').map(item => String(item.data.category ?? '')))]
+  const alumniYears = ['全部', ...new Set((live.data?.alumni.profiles ?? []).filter(item => item.status === 'approved').map(item => String(item.graduationYear)))]
   const hostsList = ['全部主办方', ...new Set(all.filter((event) => event.local?.status !== 'draft').map((event) => event.host))]
   const filtered = filterActivityItems(all, { query, category, period, host: hostFilter, status: statusFilter, sort }, actorId)
   const activeFilters = [
@@ -85,6 +76,14 @@ export function V2Activities() {
   const active = all.find((item) => item.id === id && (!item.local || item.local.status === 'published' || owns(item.local)))
   const featuredItems = all.filter(event => event.local?.status === 'published' && event.image && Date.parse(event.startAt) > Date.now()).slice(0, 7)
   const selectedFeatured = featuredItems[featured] ?? featuredItems[0]
+  const scene = {
+    activities: {image: campusHomeImage, eyebrow: 'DISCOVER / 01', title: '在活动中，遇见新的可能。', description: '走进讲座、比赛和校园活动，找到下一次值得参与的相遇。'},
+    organizations: {image: campusServicesImage, eyebrow: 'DISCOVER / 02', title: '和有共同兴趣的人一起出发。', description: '发现社团组织，了解他们正在做的事，加入喜欢的校园生活。'},
+    community: {image: campusHomeImage, eyebrow: 'DISCOVER / 03', title: '听见校园里的真实声音。', description: '阅读同学们的故事与提问，分享此刻的想法。'},
+    alumni: {image: campusSunsetImage, eyebrow: 'DISCOVER / 04', title: '从这里，走向更远的地方。', description: '看看校友的经历，让未来的方向更清晰。'},
+  }[section]
+  const searchPlaceholder = {activities: '搜索活动、地点或主办方', organizations: '搜索组织、类别或关键词', community: '搜索帖子', alumni: '搜索校友、专业或经历'}[section]
+  const filterCount = section === 'activities' ? activeFilters.length - Number(Boolean(query.trim())) : section === 'organizations' ? Number(organizationCategory !== '全部') : section === 'community' ? Number(communityBoard !== '全部') + Number(communitySort !== 'recommended') : Number(alumniYear !== '全部')
   const create = async (form: FormEvent<HTMLFormElement>) => {
     form.preventDefault()
     const data = new FormData(form.currentTarget)
@@ -93,33 +92,28 @@ export function V2Activities() {
     if (await live.mutate('activity.create', {title: String(data.get('title') ?? ''), description: String(data.get('description') ?? ''), startAt: new Date(String(data.get('date'))).toISOString(), location, capacity: Number(data.get('capacity'))})) {setCreateOpen(false); setActivityBuilding(null); setPublishError('')}
   }
   const changeVisibility = (eventId: string) => live.mutate('activity.visibility', {id: eventId, publish: all.find(e => e.id === eventId)?.local?.status !== 'published'})
-  return <div className="v2-page v2-activities"><PageHeading eyebrow="DISCOVER / CAMPUS" title="发现" description="活动、社群与同行者，从这里开始。" action={permitted && <button className="v2-button v2-button-primary" type="button" onClick={() => { setPublishError(''); setCreateOpen(true) }}><Plus size={17}/> 发起活动</button>}/>
+  if (id && !active) return <div className="v2-page"><PageHeading eyebrow="ACTIVITY" title="活动详情"/>{live.error ? <p role="alert">{live.error}</p> : !live.data ? <p role="status">正在读取活动…</p> : <Empty icon={CalendarDays} title="活动已停止公开或暂不可用" description="请返回查看其他校园活动。"/>}<Link to={routeLocation.state?.from ?? activityBase} className="v2-button v2-button-secondary">返回活动</Link></div>
+  return <div className="v2-page v2-activities"><header className="v2-discover-top"><div><span className="v2-eyebrow">DISCOVER / CAMPUS</span><h1>发现</h1><p>活动与校园故事，从这里开始。</p></div><div className="v2-toolbar v2-activity-toolbar"><label className="v2-discover-search"><Search size={18}/><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={searchPlaceholder} aria-label={searchPlaceholder}/></label><button type="button" className={`v2-activity-filter-toggle${filterOpen ? ' is-open' : ''}`} aria-expanded={filterOpen} aria-controls="v2-discover-filter-popover" onClick={() => setFilterOpen(value => !value)}><SlidersHorizontal size={17}/> 筛选{filterCount > 0 && <b>{filterCount}</b>}</button>
+      {filterOpen && <div id="v2-discover-filter-popover" className="v2-discover-filter-popover" role="group" aria-label={`${section === 'activities' ? '活动' : section === 'organizations' ? '社团组织' : section === 'community' ? '校园社区' : '校友'}筛选条件`}>
+        {section === 'activities' && <div className="v2-activity-filter-grid"><fieldset><legend>活动分类</legend><div className="v2-activity-filter-options">{categories.map(item => <button type="button" key={item} className={category === item ? 'is-active' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div></fieldset><fieldset><legend>活动时间</legend><div className="v2-activity-filter-options">{(['全部时间', '今天', '本周', '下周'] as ActivityPeriod[]).map(item => <button type="button" key={item} className={period === item ? 'is-active' : ''} onClick={() => setPeriod(item)}>{item}</button>)}</div></fieldset><fieldset><legend>活动状态</legend><div className="v2-activity-filter-options">{(['全部状态', '未结束', '我主办'] as ActivityStatus[]).map(item => <button type="button" key={item} className={statusFilter === item ? 'is-active' : ''} onClick={() => setStatusFilter(item)}>{item}</button>)}</div></fieldset><label>主办方<select value={hostFilter} onChange={event => setHostFilter(event.target.value)}>{hostsList.map(item => <option key={item}>{item}</option>)}</select></label><label>排序<select value={sort} onChange={event => setSort(event.target.value as ActivitySort)}>{(['推荐顺序', '时间最近'] as ActivitySort[]).map(item => <option key={item}>{item}</option>)}</select></label><button type="button" className="v2-discover-filter-reset" onClick={resetFilters}>重置活动筛选</button></div>}
+        {section === 'organizations' && <fieldset><legend>组织分类</legend><div className="v2-activity-filter-options">{organizationCategories.map(item => <button type="button" key={item} className={organizationCategory === item ? 'is-active' : ''} onClick={() => setOrganizationCategory(item)}>{item}</button>)}</div></fieldset>}
+        {section === 'community' && <><fieldset><legend>社区话题</legend><div className="v2-activity-filter-options">{['全部', '校园', '学习', '生活', '活动', '互助', '校友升学', '校友就业'].map(item => <button type="button" key={item} className={communityBoard === item ? 'is-active' : ''} onClick={() => setCommunityBoard(item)}>{item}</button>)}</div></fieldset><label>排序<select value={communitySort} onChange={event => setCommunitySort(event.target.value as 'recommended' | 'newest')}><option value="recommended">个人推荐</option><option value="newest">最新发布</option></select></label></>}
+        {section === 'alumni' && <fieldset><legend>毕业年份</legend><div className="v2-activity-filter-options">{alumniYears.map(item => <button type="button" key={item} className={alumniYear === item ? 'is-active' : ''} onClick={() => setAlumniYear(item)}>{item}</button>)}</div></fieldset>}
+      </div>}</div></header>
     {live.error && <p role="alert">{live.error}</p>}{!live.data && !live.error && <p role="status">正在读取活动…</p>}
-    <nav className="v2-editorial-discover-links" aria-label="发现更多"><span>活动</span><Link to="/v2/campus">社团组织</Link><Link to="/v2/community">校园社区</Link><Link to="/v2/partners">找搭子</Link><Link to="/v2/alumni">校友</Link></nav>
-    {featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map((event) => ({ src: event.image!, alt: event.isDefaultCover ? `${event.title}（校园通用照片，默认封面）` : event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}` }))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={(index) => navigate(`${activityBase}/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}{selectedFeatured.isDefaultCover && ' · 默认封面'}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`${activityBase}/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
-    {!featuredItems.length && <section className="v2-editorial-discover-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(16,30,27,.60),rgba(16,30,27,.08)),url(${campusEveningImage})`}}><span>DISCOVER / 01</span><strong>发现校园的更多可能。</strong><small>活动 · 社群 · 讲座 · 志愿</small></section>}
-    <section className="v2-panel v2-list-panel v2-activity-discovery-panel">
-      <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`} />
-      <div className="v2-toolbar v2-activity-toolbar">
-        <AnimatedSearchField value={query} onChange={setQuery} placeholder="搜索活动、地点或主办方"/>
-        <button type="button" className={`v2-activity-filter-toggle${filterOpen ? ' is-open' : ''}`} aria-expanded={filterOpen} aria-controls="v2-activity-filter-panel" onClick={() => setFilterOpen((value) => !value)}><SlidersHorizontal size={17}/> 筛选{activeFilters.length > 0 && <b>{activeFilters.length}</b>}</button>
-      </div>
-      <div id="v2-activity-filter-panel" className={`v2-activity-filter-panel${filterOpen ? ' is-open' : ''}`} aria-hidden={!filterOpen} inert={!filterOpen}>
-        <div className="v2-activity-filter-inner">
-          <div className="v2-activity-filter-grid">
-            <fieldset><legend>活动时间</legend><div className="v2-activity-filter-options">{(['全部时间', '今天', '本周', '下周'] as ActivityPeriod[]).map((item) => <button type="button" key={item} className={period === item ? 'is-active' : ''} onClick={() => setPeriod(item)}>{item}</button>)}</div></fieldset>
-            <fieldset><legend>活动状态</legend><div className="v2-activity-filter-options">{(['全部状态', '未结束', '我主办'] as ActivityStatus[]).map((item) => <button type="button" key={item} className={statusFilter === item ? 'is-active' : ''} onClick={() => setStatusFilter(item)}>{item}</button>)}</div></fieldset>
-            <label>主办方<select value={hostFilter} onChange={(event) => setHostFilter(event.target.value)}>{hostsList.map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label>排序<select value={sort} onChange={(event) => setSort(event.target.value as ActivitySort)}>{(['推荐顺序', '时间最近'] as ActivitySort[]).map((item) => <option key={item}>{item}</option>)}</select></label>
-          </div>
-          <div className="v2-activity-filter-footer"><span>可组合多个条件，结果会立即更新</span><button type="button" onClick={resetFilters}>重置全部</button></div>
-        </div>
-      </div>
-      <div className="v2-filter-pills" aria-label="活动分类">{categories.map((item) => <button type="button" key={item} aria-pressed={category === item} className={category === item ? 'is-active' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
+    <section className="v2-editorial-discover-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(16,30,27,.68),rgba(16,30,27,.08)),url(${scene.image})`}}><span>{scene.eyebrow}</span><strong>{scene.title}</strong><small>{scene.description}</small></section>
+    <nav className="v2-editorial-discover-links" aria-label="发现分类">{([['activities', '活动'], ['organizations', '社团组织'], ['community', '校园社区'], ['alumni', '校友']] as const).map(([key, label]) => <button type="button" key={key} className={section === key ? 'is-active' : ''} aria-current={section === key ? 'page' : undefined} onClick={() => {setSection(key); setQuery(''); setFilterOpen(false)}}>{label}</button>)}</nav>
+    <DiscoverHotList community={community}/>
+    {section === 'activities' && featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map(event => ({src: event.image!, alt: event.isDefaultCover ? `${event.title}（校园通用照片，默认封面）` : event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}`}))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={index => navigate(`${activityBase}/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}{selectedFeatured.isDefaultCover && ' · 默认封面'}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`${activityBase}/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
+    {section === 'activities' && <section className="v2-panel v2-list-panel v2-activity-discovery-panel">
+      <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`}/>
       {activeFilters.length > 0 && <div className="v2-active-filters" aria-label="已应用的筛选条件">{activeFilters.map((item) => <button type="button" key={item.label} aria-label={`清除${item.label}`} onClick={item.clear}>{item.label}<X size={13}/></button>)}<button type="button" className="v2-active-filters-reset" onClick={resetFilters}>清除全部</button></div>}
-      <p className="activity-discovery-note">点赞与收藏保存到伴学后台 · 点赞标记反映本人状态</p>
-      {filtered.length ? <ActivityDiscovery live={live} key={JSON.stringify([query, category, period, hostFilter, statusFilter, sort])} items={filtered} basePath={activityBase}/> : <div className="v2-filter-empty"><Empty icon={Search} title={all.length ? '没有匹配的活动' : '目前没有可展示的活动'} description={all.length ? '试试其他分类或清除搜索条件。' : '有新活动发布后，会显示在这里。'}/>{activeFilters.length > 0 && <button type="button" className="v2-button v2-button-secondary" onClick={resetFilters}>清除筛选</button>}</div>}</section>
-    {active && <Drawer title={active.title} eyebrow={`${active.category} · ${active.host}`} onClose={() => navigate(activityBase)} wide>
+      <p className="activity-discovery-note">点赞与收藏保存到会同里后台 · 点赞标记反映本人状态</p>
+      {filtered.length ? <ActivityDiscovery live={live} key={JSON.stringify([query, category, period, hostFilter, statusFilter, sort])} items={filtered} basePath={activityBase}/> : <div className="v2-filter-empty"><Empty icon={Search} title={all.length ? '没有匹配的活动' : '目前没有可展示的活动'} description={all.length ? '试试其他分类或清除搜索条件。' : '有新活动发布后，会显示在这里。'}/>{activeFilters.length > 0 && <button type="button" className="v2-button v2-button-secondary" onClick={resetFilters}>清除筛选</button>}</div>}</section>}
+    {section === 'organizations' && <CampusOrganizations embedded externalQuery={query} externalCategory={organizationCategory}/>}
+    {section === 'community' && <DiscoverCommunity community={community}/>}
+    {section === 'alumni' && <section className="v2-discover-inline-panel" aria-label="校友"><div className="v2-discover-panel-heading"><h2>校友同行</h2></div><p className="v2-discover-panel-intro">从校园里的经历出发，看看学长学姐分享的方向与故事。</p><div className="v2-discover-alumni">{(live.data?.alumni.profiles ?? []).filter(item => item.status === 'approved' && (alumniYear === '全部' || String(item.graduationYear) === alumniYear) && `${item.name} ${item.major} ${item.experience}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).slice(0, 4).map(item => <article key={item.id}><strong>{item.name}</strong><small>{item.graduationYear} 届 · {item.major}</small><p>{item.experience}</p></article>)}</div>{live.data && !(live.data.alumni.profiles ?? []).some(item => item.status === 'approved' && (alumniYear === '全部' || String(item.graduationYear) === alumniYear) && `${item.name} ${item.major} ${item.experience}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())) && <p className="v2-discover-panel-intro">没有匹配的公开校友资料。</p>}</section>}
+    {active && <Drawer title={active.title} eyebrow={`${active.category} · ${active.host}`} onClose={() => routeLocation.state?.from ? navigate(routeLocation.state.from) : navigate(activityBase)} wide>
       <div className="v2-detail-art" role="img" aria-label={active.isDefaultCover ? '校园通用照片，默认封面' : `${active.title}封面`} style={active.image ? { backgroundImage: `url(${active.image})` } : undefined}/>
       <p className="v2-detail-lead">{active.subtitle}{active.isDefaultCover && ' · 默认封面'}</p>
       <ActivityReactions live={live} item={active}/>

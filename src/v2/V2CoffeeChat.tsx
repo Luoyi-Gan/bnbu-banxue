@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import { DisplayAvatar } from './DisplayAvatar'
 import { coffeeSlotStatus } from './coffeeSlotStatus'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
@@ -15,8 +16,8 @@ import { Empty } from './ui'
 
 
 const teacherPhotos = [campusServicesPhoto, campusHomePhoto, campusEveningPhoto, campusNightPhoto]
-const facultyOptions = ['全部', 'FST', 'FBM', 'FHSS', 'SCC', '创新创业']
-const facultyOf = (department: string) => department === '理工科技学院' ? 'FST' : department === '工商管理学院' ? 'FBM' : department === '人文社科学院' ? 'FHSS' : department === '通识教育学院' ? 'SCC' : '创新创业'
+const facultyOptions = ['全部', 'FST', 'FBM', 'FHSS', 'SCC', '创新创业', '其他']
+const facultyOf = (department: string) => department === '理工科技学院' ? 'FST' : department === '工商管理学院' ? 'FBM' : department === '人文社科学院' ? 'FHSS' : department === '通识教育学院' ? 'SCC' : department.includes('创新创业') ? '创新创业' : '其他'
 const slotDate = (value: string) => new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' }).format(new Date(value))
 const slotEnd = (value: string) => new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value))
 
@@ -38,8 +39,9 @@ export function V2CoffeeChat() {
   const state = {coffeeBookings: bookings.map(b => String(b.data.slotId))}
   const occupied = (_unused: unknown, id: string) => coffeeSlots.find(s => s.id === id)?.occupied ?? 0
   const [topic, setTopic] = useState('')
-  const [teacherId, setTeacherId] = useState<string | null>(null)
-  const [slotId, setSlotId] = useState<string | null>(null)
+  const [params, setParams] = useSearchParams()
+  const [teacherId, setTeacherId] = useState<string | null>(() => params.get('teacher'))
+  const [slotId, setSlotId] = useState<string | null>(() => params.get('slot'))
   const [query, setQuery] = useState('')
   const [faculty, setFaculty] = useState('全部')
   const [feedback, setFeedback] = useState('')
@@ -64,6 +66,7 @@ export function V2CoffeeChat() {
   const goBack = () => {
     setTeacherId(null)
     setSlotId(null)
+    if (params.has('teacher')) setParams({})
     setFeedback('')
   }
   const updateBooking = async () => {
@@ -93,9 +96,9 @@ export function V2CoffeeChat() {
           <span className="v2-coffee-slot-status">{mine ? <><Check size={13}/> 已预约</> : label}</span>
         </button>
       })}</div> : <Empty icon={Coffee} title="暂时没有可查看的时段" description="稍后再来看看。"/>}
-      {!isBooked && <label className="v2-form">想交流的问题<textarea maxLength={500} value={topic} onChange={event => setTopic(event.target.value)} placeholder="请填写交流主题或问题"/></label>}<div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{slot?.location ?? teacher.location}</span><small>{slot ? `${slotDate(slot.startAt)} · ${slot.timeLabel}` : '请先选择一个时段'}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} disabled={live.busy || !slot || (!isBooked && (!teacher.enabled || slot.closed || Date.parse(slot.startAt) <= Date.now() || occupied(state, slot.id) >= slot.capacity))} onClick={updateBooking}>{isBooked ? '取消预约' : '确认预约'} <ArrowRight size={15}/></button></div>
+      {!isBooked && <label className="v2-form">想交流的问题<textarea maxLength={500} value={topic} onChange={event => setTopic(event.target.value)} placeholder="请填写交流主题或问题"/></label>}<div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{slot?.location ?? teacher.location}</span><small>{slot ? `${slotDate(slot.startAt)} · ${slot.timeLabel}` : '请先选择一个时段'}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} disabled={live.busy || !slot || (!isBooked && (!topic.trim() || !teacher.enabled || slot.closed || Date.parse(slot.startAt) <= Date.now() || occupied(state, slot.id) >= slot.capacity))} onClick={updateBooking}>{isBooked ? '取消预约' : '确认预约'} <ArrowRight size={15}/></button></div>
       {(live.error || feedback) && <p className="v2-coffee-feedback" role="status">{live.error || feedback}</p>}
-      <p className="v2-form-note">预约保存到伴学后台，实际到场情况不由预约状态推定。</p>
+      <p className="v2-form-note">预约保存到会同里后台，实际到场情况不由预约状态推定。</p>
     </div>
   }
 

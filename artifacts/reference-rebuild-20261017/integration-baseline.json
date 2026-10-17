@@ -1,0 +1,22 @@
+{
+  "src/v2/V2App.tsx": {
+    "before_normalized_sha256": "b6c4bbfa0b999a7cb74375099617c77a2c7cfa9110c367b2d63cb0d88f91e5fa",
+    "after_normalized_sha256": "fc0d4da9b3a0002a4cdb9038071a788791250ffccbd0deaa7117a8c181044a3c"
+  },
+  "src/main.tsx": {
+    "before_normalized_sha256": "850aeb2ff63be011db233a35c0075a5063cdd4fb39b467ead869becfbaf8801c",
+    "after_normalized_sha256": "02bbfb622d8cb358f7f55f351bf2a21757d7be75824650f2fbfc3dda4deb5968"
+  },
+  "BUSINESS_RULES.md": {
+    "before_normalized_sha256": "4eb6faeefb70dde2c4b7c397f62c05dc957c3424d32585537a20ad3ec6ea3460",
+    "after_normalized_sha256": "3df4c02eed56c875da6c94bb9f9a55004cdbdc5109f0320e653720db3d1a411b"
+  },
+  "docs/ADMIN_COMPLETION.md": {
+    "before_normalized_sha256": "545987dd87718eb8d420f423e4ccf257da3d7ea0ec1c3fe5c1946f62a6467a54",
+    "after_normalized_sha256": "b270b3a79d002f5a3313db12024593633cff3488e661b86849f651cc282da701"
+  },
+  "src/app/App.tsx": {
+    "before_normalized_sha256": "76c8ada7e42e217b3325a755af7b5a90e06af3fe77942318eb14ca86d1882ee6",
+    "after_normalized_sha256": "b5624f906f643b17d17e72481751ef2c4fb20ce832873773903b603616f349d9"
+  }
+}

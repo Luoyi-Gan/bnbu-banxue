@@ -15,6 +15,7 @@ import {
   type StudentTimetable,
   type TimetableLesson,
 } from "../../shared/v2/timetableModel";
+import { parseSidebarItems } from "../../shared/v2/sidebarLayout";
 
 export function* governancePolicy(
   repo: BusinessRepository,
@@ -208,6 +209,19 @@ export function* governancePolicy(
     demand(aiIconChoice !== "custom" || !!aiCustomIcon, "请先上传自己的图片。");
     const data = {aiIconChoice, aiCustomIcon};
     return previous ? (yield* effect(repo.save(previous, data))) : (yield* effect(repo.create("preferences", actor.id, data)));
+  }
+  if (action === "preferences.profilebackground") {
+    student(actor);
+    const profileBackground = enumField(input, "choice", ["campus", "evening", "walkway", "services"]);
+    const previous = (yield* effect(repo.all("preferences"))).find(p => p.ownerId === actor.id);
+    return previous ? (yield* effect(repo.save(previous, {profileBackground}))) : (yield* effect(repo.create("preferences", actor.id, {profileBackground})));
+  }
+  if (action === "preferences.sidebarnav") {
+    student(actor);
+    const sidebarItems = parseSidebarItems(input.items);
+    demand(sidebarItems !== null, "侧栏必须保留五个主入口，且不能包含重复或未知功能。");
+    const previous = (yield* effect(repo.all("preferences"))).find(p => p.ownerId === actor.id);
+    return previous ? (yield* effect(repo.save(previous, {sidebarItems}))) : (yield* effect(repo.create("preferences", actor.id, {sidebarItems})));
   }
   if (action === "preferences.searchable") {
     student(actor);

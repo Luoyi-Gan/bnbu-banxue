@@ -97,7 +97,14 @@ export async function api<T>(path: string, body?: unknown, signal?: AbortSignal)
     throw new ApiError(response.status, "账号接口尚未返回有效身份，暂不展示业务数据。");
   return data as T;
 }
-export const loadWorkspace = () => api<Workspace>("/api/workspace");
+export const loadWorkspace = async () => {
+  const data = await api<Workspace>("/api/workspace");
+  if (Boolean(import.meta.hot) && typeof window !== 'undefined') {
+    const { withPreviewSports } = await import('../v2/preview/localPreview');
+    return withPreviewSports(data, true, window.location.hostname);
+  }
+  return data;
+};
 export const sportsChangedEvent = "bnbu:sports-updated";
 export const workspaceChangedEvent = "bnbu:workspace-updated";
 const uncertainRequests = new Map<string, string>();

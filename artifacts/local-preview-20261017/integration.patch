@@ -1,0 +1,47 @@
+--- a/src/app/App.tsx
++++ b/src/app/App.tsx
+@@ -1,11 +1,12 @@
+ import { Navigate, useLocation } from 'react-router-dom'
+ import { V2App } from '../v2/V2App'
+ import { ConnectedApp } from '../live/ConnectedApp'
++import { LocalPreviewNotice } from '../v2/preview/LocalPreviewNotice'
+ 
+ export function App() {
+   const { pathname } = useLocation()
+   if (pathname === '/') return <Navigate to="/v2/welcome" replace />
+   if (pathname === '/workspace' || pathname.startsWith('/workspace/')) return <ConnectedApp />
+   if (pathname !== '/v2' && !pathname.startsWith('/v2/')) return <Navigate to="/workspace" replace />
+-  return <V2App />
++  return <>{Boolean(import.meta.hot) && <LocalPreviewNotice/>}<V2App /></>
+ }
+--- a/BUSINESS_RULES.md
++++ b/BUSINESS_RULES.md
+@@ -11,6 +11,12 @@
+ 2026-10-15 补充：上述三类管理员均可删除屏蔽词；删除后该词立即退出后续检查和管理员词库列表，同词可重新添加，删除操作保留审计。帖子作者可删除本人帖子，审核员及超级管理员可删除任意帖子；管理员删除他人帖子须填写原因。删除使帖子及其评论停止在社区和校友经验列表公开，不能通过普通审核恢复，保留原帖、评论、互动、举报和处置记录供必要的审核追溯。下架与恢复仍由审核员或超级管理员执行并填写原因；页面须明确提示缺少原因或职责，不以无说明的禁用按钮代替反馈。
+ 
+ ## 2026-10-16 下一阶段统一改造规则
++
++### 2026-10-17 本地模拟数据预览
++
++- 用户要求所有界面新增模拟数据，避免默认展示为空。本轮允许在独立 `data/browser-acceptance.sqlite` 的既有验收账号内补齐课程、活动、组织、社区、搭子、消息、通知、预约及 AI 示例；这些内容用于界面体验，不代表学校业务事实。
++- 数据通过显式命令 `node scripts/seed-preview.mjs` 写入，先备份，再以固定模拟标识更新；不在注册或启动时自动注入。模拟记录共享现有工作区与操作约束，页面显示本地模拟标识。
++- 体育学时与运动记录仅对本机开发服务、指定验收账号且资料已标记的情况模拟展示；生产构建排除该模拟逻辑，不新增运动提交接口。搜索无匹配、用户主动清空或操作后形成的空状态继续如实呈现。
+ 
+ ### 2026-10-17 参考图完整页面重构
+ 
+--- a/docs/ADMIN_COMPLETION.md
++++ b/docs/ADMIN_COMPLETION.md
+@@ -1,4 +1,13 @@
+ # 最新版替换与业务流程交接
++
++## 2026-10-17 本地模拟数据
++
++- 独立验收库已补齐 62 条固定标识模拟实体：8 活动、4 组织、7 帖子、6 评论、5 队伍、10 消息、2 份课表（每份 21 条课程）、教师资料与 5 时段、2 预约、校友状态、认证、个人资料及 AI 示例。另有每个学生 4 条通知。
++- 体育只读展示 16/24 学时与 8 条模拟运动记录；本机开发环境、账号白名单和资料标记共同限制。生产产物检索确认无模拟体育记录代码。
++- 页面检查覆盖首页、发现/活动详情、校园、我的/收藏/组队、体育、社区、搭子、Coffee Chat、校友预约、会话、通知、日程和 AI。校友预约的空通知已补齐。
++- Lint、构建通过；276 测试通过、39 跳过。模拟边界新增两项测试。脚本重复执行不重复创建固定标识实体。
++- 初始数据库备份保留在 `data/preview-backups/before-preview-1792226856314.sqlite`，备份及账号文件不提交。说明见 `docs/LOCAL_PREVIEW_20261017.md`。
++
+ 
+ ## 2026-10-17 参考图完整页面重构
+ 

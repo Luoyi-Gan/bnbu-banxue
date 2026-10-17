@@ -1,0 +1,40 @@
+--- a/src/v2/student.tsx
++++ b/src/v2/student.tsx
+@@ -106,7 +106,7 @@
+     <DiscoverHotList community={community}/>
+     {section === 'activities' && featuredItems.length > 0 && <section className="v2-featured-events"><div className="v2-featured-carousel"><FlexCarousel items={featuredItems.map(event => ({src: event.image!, alt: event.isDefaultCover ? `${event.title}（校园通用照片，默认封面）` : event.title, title: event.title, subtitle: `${event.category} · ${formatWhen(event.startAt)}`}))} preset="liquid" intro="rise" fit="natural" cardHeight={0.6} gap={12} radius={16} squeeze={0.2} focusOnClick={false} focusOnHover focusScale={1} captions onChange={setFeatured} onSelect={index => navigate(`${activityBase}/${featuredItems[index].id}`)}/></div>{selectedFeatured && <div className="v2-featured-copy"><span className="v2-eyebrow">本周精选 · {selectedFeatured.category}</span><h2>{selectedFeatured.title}</h2><p>{selectedFeatured.subtitle}{selectedFeatured.isDefaultCover && ' · 默认封面'}</p><div><span><CalendarDays size={15}/>{formatWhen(selectedFeatured.startAt)}</span><span><MapPin size={15}/>{selectedFeatured.location}</span></div><Link className="v2-button v2-button-light" to={`${activityBase}/${selectedFeatured.id}`}>查看活动 <ArrowRight size={16}/></Link></div>}</section>}
+     {section === 'activities' && <section className="v2-panel v2-list-panel v2-activity-discovery-panel">
+-      <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`} action={permitted && <button className="v2-button v2-button-primary" type="button" onClick={() => { setPublishError(''); setCreateOpen(true) }}><Plus size={17}/> 发起活动</button>}/>
++      <SectionHeading title="所有活动" detail={`${filtered.length} 个结果`}/>
+       {activeFilters.length > 0 && <div className="v2-active-filters" aria-label="已应用的筛选条件">{activeFilters.map((item) => <button type="button" key={item.label} aria-label={`清除${item.label}`} onClick={item.clear}>{item.label}<X size={13}/></button>)}<button type="button" className="v2-active-filters-reset" onClick={resetFilters}>清除全部</button></div>}
+       <p className="activity-discovery-note">点赞与收藏保存到伴学后台 · 点赞标记反映本人状态</p>
+       {filtered.length ? <ActivityDiscovery live={live} key={JSON.stringify([query, category, period, hostFilter, statusFilter, sort])} items={filtered} basePath={activityBase}/> : <div className="v2-filter-empty"><Empty icon={Search} title={all.length ? '没有匹配的活动' : '目前没有可展示的活动'} description={all.length ? '试试其他分类或清除搜索条件。' : '有新活动发布后，会显示在这里。'}/>{activeFilters.length > 0 && <button type="button" className="v2-button v2-button-secondary" onClick={resetFilters}>清除筛选</button>}</div>}</section>}
+--- a/src/v2/V2App.tsx
++++ b/src/v2/V2App.tsx
+@@ -5,7 +5,7 @@
+ import { useEffect, useRef, useState, type ReactNode } from 'react'
+ import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+ import brandIcon from '../assets/brand/brand-app-icon.svg'
+-import studentBrandIcon from '../assets/brand/brand-app-icon-a.svg'
++const studentBrandIcon = '/huitongli-app-icon.png'
+ import { V2Provider } from './store'
+ import { useV2 } from './useV2'
+ import { TeacherCoffee, TeacherProfile, TeacherSchedule, TeacherMessages, TeacherSports } from './TeacherPortal'
+@@ -106,7 +106,7 @@
+   }, [roleMenu])
+   return <div className={`v2-app${sports ? ' v2-app-sports' : ''}${!admin && !teacher ? ' v2-app-student' : ''}`}>
+     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label="新版主导航">
+-      <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>伴学</strong><small>BNBU CAMPUS</small></span></Link>
++      <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>{admin || teacher ? '伴学' : '会同里'}</strong><small>BNBU CAMPUS</small></span></Link>
+       <div className="v2-nav-label">{admin ? '管理' : teacher ? '教师' : '我的导航'}</div>
+       {admin || teacher ? <nav className="v2-side-nav">{nav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => `v2-side-link${isActive ? ' is-active' : ''}`}><Icon size={19}/><span>{label}</span></NavLink>)}</nav> : <nav className="v2-side-nav v2-student-sidebar-nav">{sidebarItems.map(id => { const entry = studentSidebarById[id]; const Icon = entry.icon; return <NavLink key={id} to={entry.path} className={`v2-side-link${sidebarActiveId === id ? ' is-active' : ''}`}><Icon size={19}/><span>{entry.label}</span>{id === 'conversations' && unread > 0 && <b>{unread}</b>}</NavLink> })}</nav>}
+       <div className="v2-sidebar-bottom"><div className="v2-demo-indicator"><span className="v2-pulse-dot"/><span>{live.data ? '校园生活，随时相伴' : live.error ? '服务暂不可用' : '正在连接服务'}</span></div>{!admin && !teacher && <button type="button" className="v2-sidebar-customize-trigger" onClick={() => setCustomizingSidebar(true)}><Settings2 size={18}/> 侧栏设置</button>}{!admin && !teacher && <a className="reference-font-credit" href="/fonts/NOTICE.html" target="_blank" rel="noreferrer">字体与许可</a>}</div>
+@@ -114,7 +114,7 @@
+     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label="关闭导航" onClick={() => setMobileMenu(false)}/>}
+     <div className="v2-workspace">
+       <header className="v2-topbar">
+-        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>BnBu · 伴学</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
++        <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label="打开导航"><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>会同里</span>}<div><span className="v2-breadcrumb">BNBU / {admin ? '管理' : teacher ? '教师' : '校园'}</span><strong>{title}</strong></div></div>
+         <div className="v2-top-actions">
+           {!admin && !teacher && <NavLink to="/v2/messages?view=notifications" className={`v2-icon-button v2-header-messages${location.pathname === '/v2/messages' && new URLSearchParams(location.search).get('view') === 'notifications' ? ' is-active' : ''}`} aria-label={unreadNotices > 0 ? `通知，${unreadNotices} 条未读` : live.data ? '通知，暂无未读' : '通知状态暂不可用'} title={live.data ? `通知 · ${unreadNotices} 条未读` : '通知状态暂不可用'}><Bell size={19} aria-hidden="true"/>{unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unreadNotices > 99 ? '99+' : unreadNotices}</span>}</NavLink>}
+           {!admin && !teacher && <StudentSearch/>}

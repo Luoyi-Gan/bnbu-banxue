@@ -38,7 +38,7 @@ import { SportsProgressCard } from "../v2/SportsProgressCard";
 import { MailResolution } from "./MailResolution";
 import { Modal, PageHeading } from "../v2/ui";
 import { DisplayAvatar } from "../v2/DisplayAvatar";
-import brandIcon from "../assets/brand/brand-app-icon-a.svg";
+const brandIcon = "/huitongli-app-icon.png";
 import "../v2/v2.css";
 import "../v2/aRedesign.css";
 import "./live.css";
@@ -370,7 +370,7 @@ export function ConnectedApp() {
   if (!data)
     return (
       <main className="live-loading">
-        <h1>连接伴学</h1>
+        <h1>连接会同里</h1>
         <p role={error ? "alert" : "status"}>
           {error || "正在获取账号与校园数据…"}
         </p>
@@ -490,7 +490,7 @@ export function ConnectedApp() {
         ["notifications", "消息通知", Bell],
         ["profile", "个人资料", CalendarDays],
       ] as [string, string, LucideIcon][]);
-  const moduleTitle = nav.find((n) => n[0] === module)?.[1] ?? "伴学";
+  const moduleTitle = nav.find((n) => n[0] === module)?.[1] ?? "会同里";
   const coffeeSlots = all("coffeeSlot"),
     coffeeBookings = all("coffeeBooking");
   const slotLabel = (id: unknown) => {
@@ -586,7 +586,7 @@ export function ConnectedApp() {
         <Link to="/workspace" className="v2-brand">
           <img src={brandIcon} alt="" />
           <span>
-            <strong>伴学</strong>
+            <strong>会同里</strong>
             <small>BNBU CAMPUS</small>
           </span>
         </Link>

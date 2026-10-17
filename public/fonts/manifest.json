@@ -1,0 +1,29 @@
+{
+  "sources": {
+    "MiSans": "https://hyperos.mi.com/font-download/MiSans.zip",
+    "MiSansLicense": "https://hyperos.mi.com/font/zh/download/",
+    "WenKai": "https://github.com/lxgw/LxgwWenKai/releases/tag/v1.520"
+  },
+  "files": {
+    "lxgw-wenkai/BNBUWenKai-Medium.woff2": {
+      "bytes": 1641864,
+      "sha256": "0c570b3a9da8e6d77a91ac6ed65cb970e4cfdad99a1e675eb9e8140b9578d729"
+    },
+    "lxgw-wenkai/OFL.txt": {
+      "bytes": 4448,
+      "sha256": "5c0f0d98a8b71a401063c9a9e814e608fef6824fefab0c2ab73fe0955a5551b1"
+    },
+    "misans/License.pdf": {
+      "bytes": 79535,
+      "sha256": "4a93a27cd2bd81b3b5ecfd0a853144a876fa26938a93a68443c67d74172fcb86"
+    },
+    "misans/MiSans-Regular.woff2": {
+      "bytes": 4858624,
+      "sha256": "d704c1a932c0bd7e8a071d276cd81c0ed0c9fecfa26ac234f4bed0559fe1cb2d"
+    },
+    "misans/MiSans-Semibold.woff2": {
+      "bytes": 5034212,
+      "sha256": "78227c6ec59566785c65ac0b5312328bfa2f879918f3d7403725785615a9a8f6"
+    }
+  }
+}

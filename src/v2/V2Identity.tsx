@@ -1,7 +1,7 @@
 import {useEffect,useState,type FormEvent} from 'react'
 import {Link} from 'react-router-dom'
 import {api} from '../live/api'
-import brandIcon from '../assets/brand/brand-app-icon-a.svg'
+const brandIcon = '/huitongli-app-icon.png'
 import './auth.css'
 import './editorialAuth.css'
 
@@ -22,7 +22,7 @@ export function V2Identity() {
     } catch(cause) { setError(cause instanceof Error?cause.message:'申请未完成，请重试。') }
     finally {setBusy(false)}
   }
-  return <div className="v2-auth-page v2-auth-flow"><header className="v2-auth-header"><Link className="v2-auth-brand" to="/v2"><img src={brandIcon} alt=""/><span>伴学 <small>BNBU CAMPUS</small></span></Link><Link className="v2-auth-back" to="/v2/login">切换账号</Link></header><main className="v2-auth-layout"><section className="v2-auth-intro"><span className="v2-auth-eyebrow">BNBU / IDENTITY</span><h1>核验校园身份</h1><p>学生身份由校方在读记录或审核员核对的正式证明确认。</p></section><section className="v2-auth-card"><div className="v2-auth-card-head"><h2>学生身份</h2><p>提交的信息用于与学校正式记录核对，填写本身不会授予权限。</p></div>
+  return <div className="v2-auth-page v2-auth-flow"><header className="v2-auth-header"><Link className="v2-auth-brand" to="/v2"><img src={brandIcon} alt=""/><span>会同里 <small>BNBU CAMPUS</small></span></Link><Link className="v2-auth-back" to="/v2/login">切换账号</Link></header><main className="v2-auth-layout"><section className="v2-auth-intro"><span className="v2-auth-eyebrow">BNBU / IDENTITY</span><h1>核验校园身份</h1><p>学生身份由校方在读记录或审核员核对的正式证明确认。</p></section><section className="v2-auth-card"><div className="v2-auth-card-head"><h2>学生身份</h2><p>提交的信息用于与学校正式记录核对，填写本身不会授予权限。</p></div>
     {error && <p role="alert" className="v2-info-box">{error}</p>}
     {!state && !error && <p role="status">正在读取身份状态…</p>}
     {state?.status==='verified' && !state.request && <div className="v2-info-box" role="status"><strong>身份已核验</strong><p>当前账号可以进入校园服务。</p></div>}
