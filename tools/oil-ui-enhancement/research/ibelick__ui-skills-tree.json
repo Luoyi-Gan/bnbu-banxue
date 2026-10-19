@@ -1,0 +1,2911 @@
+{
+  "sha": "747a47fdb6b405e5cbf268f7c410123930455157",
+  "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/747a47fdb6b405e5cbf268f7c410123930455157",
+  "tree": [
+    {
+      "path": ".dev.vars.example",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c3890293cb16909305d2997dfd55776a4adf24fd",
+      "size": 288,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c3890293cb16909305d2997dfd55776a4adf24fd"
+    },
+    {
+      "path": ".env.example",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82958071a9cc2afea61fb412cfbe5c7d5b7206ce",
+      "size": 78,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/82958071a9cc2afea61fb412cfbe5c7d5b7206ce"
+    },
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "93cf5befa16e7091170e91a99464dbbdf96f13a6",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/93cf5befa16e7091170e91a99464dbbdf96f13a6"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "989e62fbfd136659235a90d7ee695112e0fd9fce",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/989e62fbfd136659235a90d7ee695112e0fd9fce"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "decf44b9e947e15c703d7eb5bf9cd0a85191296a",
+      "size": 807,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/decf44b9e947e15c703d7eb5bf9cd0a85191296a"
+    },
+    {
+      "path": ".github/workflows/update-github-metadata.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8dc8d29f23708839e8aa3ce1da3c648adfbc710",
+      "size": 1300,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e8dc8d29f23708839e8aa3ce1da3c648adfbc710"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "351e63b1f285d9227f5553311df8b13354dbbbfe",
+      "size": 325,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/351e63b1f285d9227f5553311df8b13354dbbbfe"
+    },
+    {
+      "path": ".prettierignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f1f6de99301aeb457a021a6ea04a69a7a52ae4a9",
+      "size": 25,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f1f6de99301aeb457a021a6ea04a69a7a52ae4a9"
+    },
+    {
+      "path": ".prettierrc.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4dd99c10439860488aa995c904b33bf146345079",
+      "size": 187,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/4dd99c10439860488aa995c904b33bf146345079"
+    },
+    {
+      "path": ".vscode",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0c33c7c3c06928c95be8c68f9f15a508c844a3dc",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/0c33c7c3c06928c95be8c68f9f15a508c844a3dc"
+    },
+    {
+      "path": ".vscode/extensions.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "22a15055d638988eb33bb61536d27f623df92e4a",
+      "size": 87,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/22a15055d638988eb33bb61536d27f623df92e4a"
+    },
+    {
+      "path": ".vscode/launch.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6422097621fd7c1b1ccc6daa670c46aed7ef5b7",
+      "size": 207,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d6422097621fd7c1b1ccc6daa670c46aed7ef5b7"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7e8447cf1ce71d68f5380d5b300922f9c8223a9e",
+      "size": 1652,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/7e8447cf1ce71d68f5380d5b300922f9c8223a9e"
+    },
+    {
+      "path": "DESIGN.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79602d6511f8b664248de9bfa31d17e82bf81038",
+      "size": 4451,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/79602d6511f8b664248de9bfa31d17e82bf81038"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cac7c466df604fc44527fd89d9662626bab57354",
+      "size": 1072,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/cac7c466df604fc44527fd89d9662626bab57354"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f7277a7b0dc540a601f47bfaf1d307c2f5b81f8",
+      "size": 2751,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1f7277a7b0dc540a601f47bfaf1d307c2f5b81f8"
+    },
+    {
+      "path": "SECURITY.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6a8bf434537ee30830089547b88ed6bf7ec4ca5",
+      "size": 3001,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d6a8bf434537ee30830089547b88ed6bf7ec4ca5"
+    },
+    {
+      "path": "astro.config.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac7a799387b23d609bf6f6c84ee87ced9d802993",
+      "size": 1185,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ac7a799387b23d609bf6f6c84ee87ced9d802993"
+    },
+    {
+      "path": "bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6155addcb1ce86b90c184a4840162a0c94a34312",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/6155addcb1ce86b90c184a4840162a0c94a34312"
+    },
+    {
+      "path": "bin/ui-skills",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "6bc9e121b26238e7f6394ce72d36b5f91d03ac29",
+      "size": 408,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6bc9e121b26238e7f6394ce72d36b5f91d03ac29"
+    },
+    {
+      "path": "bin/ui-skills.js",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "4fb289b2f487403a5bbada044febb06e6f397717",
+      "size": 837,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/4fb289b2f487403a5bbada044febb06e6f397717"
+    },
+    {
+      "path": "bin/ui-skills.ts",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "8a32050937279667b81eb46404763ed95d1a7c62",
+      "size": 6891,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8a32050937279667b81eb46404763ed95d1a7c62"
+    },
+    {
+      "path": "migrations",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "14cf54618aa8a9dcec118fcb26e9e3989c814986",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/14cf54618aa8a9dcec118fcb26e9e3989c814986"
+    },
+    {
+      "path": "migrations/0001_auth.sql",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03eed375586f965bf31a73b20c5e30d0f9def652",
+      "size": 1581,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/03eed375586f965bf31a73b20c5e30d0f9def652"
+    },
+    {
+      "path": "migrations/0002_library.sql",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80f85112a349c0027b36f3dad90a146eb31e44d6",
+      "size": 1061,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/80f85112a349c0027b36f3dad90a146eb31e44d6"
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "918de0af74044fd7e60403301f59b01e7f687500",
+      "size": 280535,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/918de0af74044fd7e60403301f59b01e7f687500"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7698a6643dc9abad4f05ba6c51e452bf25d539d",
+      "size": 2498,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c7698a6643dc9abad4f05ba6c51e452bf25d539d"
+    },
+    {
+      "path": "public",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "08e1f7f146158eb5230ec4235fac55b70eeea0dc",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/08e1f7f146158eb5230ec4235fac55b70eeea0dc"
+    },
+    {
+      "path": "public/UI-OG-X.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0bf1bad698f9ecc223ac5a29c40a72acf1f2c6b",
+      "size": 89514,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f0bf1bad698f9ecc223ac5a29c40a72acf1f2c6b"
+    },
+    {
+      "path": "public/UI-OG-X.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b983adeb2db0b0b702a0eb15f5b0e70fbfa4488",
+      "size": 8388,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1b983adeb2db0b0b702a0eb15f5b0e70fbfa4488"
+    },
+    {
+      "path": "public/UI-OG.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74222eacd1fb7b4d9c407730f54078e2d1e6a8e1",
+      "size": 89531,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/74222eacd1fb7b4d9c407730f54078e2d1e6a8e1"
+    },
+    {
+      "path": "public/UI-OG.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e453a9f0cbd9e201de3b313458e422c356afb08",
+      "size": 8464,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/4e453a9f0cbd9e201de3b313458e422c356afb08"
+    },
+    {
+      "path": "public/_headers",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "56a1e46c6e44a2c6b29783041d8f7e2891b687bc",
+      "size": 2302,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/56a1e46c6e44a2c6b29783041d8f7e2891b687bc"
+    },
+    {
+      "path": "public/_redirects",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0425ef2e6ea019850620314b4e7b19d6814ebbe0",
+      "size": 73,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0425ef2e6ea019850620314b4e7b19d6814ebbe0"
+    },
+    {
+      "path": "public/analytics",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f1683cabeab801e9d01bec32f2e1b54c6c4c9b55",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/f1683cabeab801e9d01bec32f2e1b54c6c4c9b55"
+    },
+    {
+      "path": "public/analytics/stonks.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "73491eaad39b546c3e3099b5035f2605362f26b7",
+      "size": 13221,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/73491eaad39b546c3e3099b5035f2605362f26b7"
+    },
+    {
+      "path": "public/designmd-ogimage-x.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9e450cceaa18668eb54b08621d6506a9497a7d2",
+      "size": 103365,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b9e450cceaa18668eb54b08621d6506a9497a7d2"
+    },
+    {
+      "path": "public/designmd-ogimage.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7eb2b651167550496eecc6da99da84a0a299bb3",
+      "size": 103082,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b7eb2b651167550496eecc6da99da84a0a299bb3"
+    },
+    {
+      "path": "public/fonts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8ad986203a81d36f798eaf278aae6e57437a02db",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/8ad986203a81d36f798eaf278aae6e57437a02db"
+    },
+    {
+      "path": "public/fonts/InterVariable.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "96d96536f17c827fe935f0b2d19ae95eaf55b07a",
+      "size": 351380,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/96d96536f17c827fe935f0b2d19ae95eaf55b07a"
+    },
+    {
+      "path": "public/mcp.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf7e422c8e96fa4e355e120d4c396de51c973464",
+      "size": 225,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/bf7e422c8e96fa4e355e120d4c396de51c973464"
+    },
+    {
+      "path": "public/uiskills-favicon-dark.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05525371a6cbd6d44e4c7ea0310af0f444312d96",
+      "size": 274,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/05525371a6cbd6d44e4c7ea0310af0f444312d96"
+    },
+    {
+      "path": "public/uiskills-favicon-light.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "913a677a7263b039f15bcae00a8ea31ca0cf6376",
+      "size": 274,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/913a677a7263b039f15bcae00a8ea31ca0cf6376"
+    },
+    {
+      "path": "public/uiskills-logo-dark.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c65c72befdbc15af10f15f342a4a6d80b442d5d8",
+      "size": 1370,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c65c72befdbc15af10f15f342a4a6d80b442d5d8"
+    },
+    {
+      "path": "public/uiskills-logo-light.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b147364a5a17e59fc19d3f0baa919670b88799ea",
+      "size": 1372,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b147364a5a17e59fc19d3f0baa919670b88799ea"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cb3c7d54ce5bad0dc2a56572b02bc429e2cf4d45",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/cb3c7d54ce5bad0dc2a56572b02bc429e2cf4d45"
+    },
+    {
+      "path": "scripts/check-agent-skills-digests.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d4c77ce573a358aea08d096811577a874f2e866",
+      "size": 1231,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8d4c77ce573a358aea08d096811577a874f2e866"
+    },
+    {
+      "path": "scripts/check-publisher-skills.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "143beece846f0eb2c7598538c3083f9d0fa39a3e",
+      "size": 6230,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/143beece846f0eb2c7598538c3083f9d0fa39a3e"
+    },
+    {
+      "path": "scripts/check-registry-skills.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "baef0067b6c92653cce2876f5661b030738d36b1",
+      "size": 3270,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/baef0067b6c92653cce2876f5661b030738d36b1"
+    },
+    {
+      "path": "scripts/precompute-agent-skills-digests.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb4975491ddbc205c728b56fa4883ed8450f8187",
+      "size": 3507,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/bb4975491ddbc205c728b56fa4883ed8450f8187"
+    },
+    {
+      "path": "scripts/setup-auth-dev.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41bb37458af3f20fd7ba7873e1b991c9e946b0b4",
+      "size": 2081,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/41bb37458af3f20fd7ba7873e1b991c9e946b0b4"
+    },
+    {
+      "path": "scripts/sync-stonks.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14a8b21c242b7fda7d3a39a9941d83fe73bbcdd6",
+      "size": 1538,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/14a8b21c242b7fda7d3a39a9941d83fe73bbcdd6"
+    },
+    {
+      "path": "scripts/update-github-metadata.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2a9513f375a328ddc4e11097440dc35b67b4387",
+      "size": 1998,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e2a9513f375a328ddc4e11097440dc35b67b4387"
+    },
+    {
+      "path": "scripts/write-assetsignore.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8c7314019d07a4a4ab7bc9d5c377cced1143bfc",
+      "size": 498,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a8c7314019d07a4a4ab7bc9d5c377cced1143bfc"
+    },
+    {
+      "path": "skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7d625b0e6b32781304c73ba6eb5986f091856834",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/7d625b0e6b32781304c73ba6eb5986f091856834"
+    },
+    {
+      "path": "skills/baseline-ui",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e7c069cfe930e7a5fe4d6fe3314d5daefd5b7ebb",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e7c069cfe930e7a5fe4d6fe3314d5daefd5b7ebb"
+    },
+    {
+      "path": "skills/baseline-ui/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "98477ee0f2e9cc7506453ee5aa9f88d1d033ab2f",
+      "size": 3419,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/98477ee0f2e9cc7506453ee5aa9f88d1d033ab2f"
+    },
+    {
+      "path": "skills/component-canvas",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5d15af298e62c72c66deb930fdc291a435f258d3",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/5d15af298e62c72c66deb930fdc291a435f258d3"
+    },
+    {
+      "path": "skills/component-canvas/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b692a37cc106fb1c42c1377faf405bd7c34a0f17",
+      "size": 8900,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b692a37cc106fb1c42c1377faf405bd7c34a0f17"
+    },
+    {
+      "path": "skills/create-design-md",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "de05c748f722fc3aa4447f12a2b24e5375c4fdfb",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/de05c748f722fc3aa4447f12a2b24e5375c4fdfb"
+    },
+    {
+      "path": "skills/create-design-md/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1aa15726985929fe8d95624767cdc9a524418925",
+      "size": 16208,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1aa15726985929fe8d95624767cdc9a524418925"
+    },
+    {
+      "path": "skills/fixing-accessibility",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e825388bce62e4456ed3b2b899c9bc58f5873c5b",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e825388bce62e4456ed3b2b899c9bc58f5873c5b"
+    },
+    {
+      "path": "skills/fixing-accessibility/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2dcd7004645277488a142be152878b7310437e1",
+      "size": 4718,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e2dcd7004645277488a142be152878b7310437e1"
+    },
+    {
+      "path": "skills/fixing-metadata",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2906fa056416dff36892d1ff17c37de3090625b6",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/2906fa056416dff36892d1ff17c37de3090625b6"
+    },
+    {
+      "path": "skills/fixing-metadata/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c3009290827a5204e92f95d240d490d2d53c55c",
+      "size": 4439,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3c3009290827a5204e92f95d240d490d2d53c55c"
+    },
+    {
+      "path": "skills/fixing-motion-performance",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "76e5757bd2eb8ff38ff667eca9b665cbd707a386",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/76e5757bd2eb8ff38ff667eca9b665cbd707a386"
+    },
+    {
+      "path": "skills/fixing-motion-performance/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d22f2ecdd3305f73cf202cb9b5a0e4c1d3700e5",
+      "size": 5565,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/7d22f2ecdd3305f73cf202cb9b5a0e4c1d3700e5"
+    },
+    {
+      "path": "skills/improve-ui",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "dfe1caace864e8a5db1719c4440633cd7f2f7e83",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/dfe1caace864e8a5db1719c4440633cd7f2f7e83"
+    },
+    {
+      "path": "skills/improve-ui/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c3ed42a578d3c0ca798ddd122fe0886e9c9acbc0",
+      "size": 7830,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c3ed42a578d3c0ca798ddd122fe0886e9c9acbc0"
+    },
+    {
+      "path": "skills/improve-ui/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e9d9fd6ae0302e152d041930ab5eb6839f3ba1b5",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e9d9fd6ae0302e152d041930ab5eb6839f3ba1b5"
+    },
+    {
+      "path": "skills/improve-ui/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54b7aa85c942d5daf7d07fdd445ecb4d5ad5b963",
+      "size": 386,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/54b7aa85c942d5daf7d07fdd445ecb4d5ad5b963"
+    },
+    {
+      "path": "skills/improve-ui/references",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "80b3387239c80a36553c10bc88063e77b18ed599",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/80b3387239c80a36553c10bc88063e77b18ed599"
+    },
+    {
+      "path": "skills/improve-ui/references/plan-template.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e08b3dd0b3a3a4c40a3861e0326e1159558ff7b7",
+      "size": 1590,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e08b3dd0b3a3a4c40a3861e0326e1159558ff7b7"
+    },
+    {
+      "path": "skills/ui-skills-root",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c69abe581f52417464d79446834e348adffb14fb",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/c69abe581f52417464d79446834e348adffb14fb"
+    },
+    {
+      "path": "skills/ui-skills-root/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c40d8458a67aa859d4ce50589d22f36f14123fb9",
+      "size": 1448,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c40d8458a67aa859d4ce50589d22f36f14123fb9"
+    },
+    {
+      "path": "src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2c87bfdf40408d313182d967aaf6ee5365e5689d",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/2c87bfdf40408d313182d967aaf6ee5365e5689d"
+    },
+    {
+      "path": "src/config",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f2ef598a52ffadb9415d1c20577fcfd2b546c0df",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/f2ef598a52ffadb9415d1c20577fcfd2b546c0df"
+    },
+    {
+      "path": "src/config/features.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "653a44e412ec17f96872af9a70538dfb8f9791ba",
+      "size": 36,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/653a44e412ec17f96872af9a70538dfb8f9791ba"
+    },
+    {
+      "path": "src/content",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "841a4ca46ff2f75bfcb77321de7a50377dd1cfc9",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/841a4ca46ff2f75bfcb77321de7a50377dd1cfc9"
+    },
+    {
+      "path": "src/content/design-md",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e770439d4e5cd66518ebbd7fa6d689519858cce2",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e770439d4e5cd66518ebbd7fa6d689519858cce2"
+    },
+    {
+      "path": "src/content/design-md/amplitude.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "50b0bf8b8d018d9e96a0dad55a988e48b0c9bb54",
+      "size": 7698,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/50b0bf8b8d018d9e96a0dad55a988e48b0c9bb54"
+    },
+    {
+      "path": "src/content/design-md/ant-design.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75d091b8b81e811372c7d43bf69894af44c23fe1",
+      "size": 21175,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/75d091b8b81e811372c7d43bf69894af44c23fe1"
+    },
+    {
+      "path": "src/content/design-md/atlassian.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "235ed5a560ee307ca17fa220de72253462483781",
+      "size": 80760,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/235ed5a560ee307ca17fa220de72253462483781"
+    },
+    {
+      "path": "src/content/design-md/clerk.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "549a82f7f94a2a166223690f8c6c41b9859ed5b2",
+      "size": 18586,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/549a82f7f94a2a166223690f8c6c41b9859ed5b2"
+    },
+    {
+      "path": "src/content/design-md/culture-amp.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79d193670a3ac640319268fd819ee9d717093026",
+      "size": 83441,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/79d193670a3ac640319268fd819ee9d717093026"
+    },
+    {
+      "path": "src/content/design-md/dsfr.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1a029287d30b3c781808db6deddea56c33abb5e1",
+      "size": 163115,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1a029287d30b3c781808db6deddea56c33abb5e1"
+    },
+    {
+      "path": "src/content/design-md/executor.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8edf08ec3fe75fe9609fe4a7ff02bcf00f8c0657",
+      "size": 22633,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8edf08ec3fe75fe9609fe4a7ff02bcf00f8c0657"
+    },
+    {
+      "path": "src/content/design-md/firecrawl.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb2f0d7036297351791a9ebe751bfc5009f97990",
+      "size": 17412,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/cb2f0d7036297351791a9ebe751bfc5009f97990"
+    },
+    {
+      "path": "src/content/design-md/heygen-hyperframes.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c13bbd281a5a4ee1f668392fc32eb5e62339f12",
+      "size": 10928,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6c13bbd281a5a4ee1f668392fc32eb5e62339f12"
+    },
+    {
+      "path": "src/content/design-md/juspay.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "869a097dbcd67d8b9b25f9b1f5a64865bc1dd849",
+      "size": 42263,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/869a097dbcd67d8b9b25f9b1f5a64865bc1dd849"
+    },
+    {
+      "path": "src/content/design-md/mintlify.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f719d00e1b987a085214a06bae0be672e6c40315",
+      "size": 9652,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f719d00e1b987a085214a06bae0be672e6c40315"
+    },
+    {
+      "path": "src/content/design-md/nuxt.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17baf81fb0c66b2561b20297e64a61dc1b88e91e",
+      "size": 9941,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/17baf81fb0c66b2561b20297e64a61dc1b88e91e"
+    },
+    {
+      "path": "src/content/design-md/open-food-facts.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6dcdc5cc626541c311a17419de9af39747aadbcb",
+      "size": 40086,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6dcdc5cc626541c311a17419de9af39747aadbcb"
+    },
+    {
+      "path": "src/content/design-md/oxidecomputer.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7423524ec5025588d31493d6f0c8c9eb390ca4f6",
+      "size": 29843,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/7423524ec5025588d31493d6f0c8c9eb390ca4f6"
+    },
+    {
+      "path": "src/content/design-md/quiverai.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "31e47a5320e1b52cbcca3f896758b73521deb8b1",
+      "size": 8572,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/31e47a5320e1b52cbcca3f896758b73521deb8b1"
+    },
+    {
+      "path": "src/content/design-md/unicef.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "828b52957d111b0caa6756e3620333cae9cbe1ab",
+      "size": 24161,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/828b52957d111b0caa6756e3620333cae9cbe1ab"
+    },
+    {
+      "path": "src/content/design-md/vercel.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6907a0ad7e34c5695daf146b5dd8abc7813a6ae5",
+      "size": 33064,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6907a0ad7e34c5695daf146b5dd8abc7813a6ae5"
+    },
+    {
+      "path": "src/content/design-md/voltagent.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef8212ca77834295e7dd4042199682b859ce1d80",
+      "size": 27877,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ef8212ca77834295e7dd4042199682b859ce1d80"
+    },
+    {
+      "path": "src/data",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "dc0c96aa5e3995124a05bd2f0312ded0ee6dfd10",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/dc0c96aa5e3995124a05bd2f0312ded0ee6dfd10"
+    },
+    {
+      "path": "src/data/agent-skills-digests.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef2ac40de171e672f6f81d345ab370829a03fe0c",
+      "size": 46154,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ef2ac40de171e672f6f81d345ab370829a03fe0c"
+    },
+    {
+      "path": "src/data/agents.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65357091238e8536c1c8d8dabe2e4e8aa04a696d",
+      "size": 14358,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/65357091238e8536c1c8d8dabe2e4e8aa04a696d"
+    },
+    {
+      "path": "src/data/collections.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "13f47f34977fcfefae5f822f24d23d14b7bbc537",
+      "size": 50392,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/13f47f34977fcfefae5f822f24d23d14b7bbc537"
+    },
+    {
+      "path": "src/data/component-libraries.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "635b2e263b9c261ef392ab9af160a5f715171bac",
+      "size": 27943,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/635b2e263b9c261ef392ab9af160a5f715171bac"
+    },
+    {
+      "path": "src/data/design-md-index.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8b65749b1a4b4613a79f0432f5b37fc69cfc0b7a",
+      "size": 9624,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8b65749b1a4b4613a79f0432f5b37fc69cfc0b7a"
+    },
+    {
+      "path": "src/data/design-md.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f7cd503b99bde416580129568b264331030ef81",
+      "size": 395,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1f7cd503b99bde416580129568b264331030ef81"
+    },
+    {
+      "path": "src/data/directory-links.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32e19df8751ef8566a95951b302a2d9d102c45a8",
+      "size": 475,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/32e19df8751ef8566a95951b302a2d9d102c45a8"
+    },
+    {
+      "path": "src/data/featured-skills.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44306ac422ded932452867d41962e1c4b034c5c6",
+      "size": 638,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/44306ac422ded932452867d41962e1c4b034c5c6"
+    },
+    {
+      "path": "src/data/github-metadata.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06e65c0d79a4c647e837e2806520d2154472c7c1",
+      "size": 13830,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/06e65c0d79a4c647e837e2806520d2154472c7c1"
+    },
+    {
+      "path": "src/data/github-resources.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "90fc0195573ba9a66ccd0c1db502a3a4e33f8b4c",
+      "size": 798,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/90fc0195573ba9a66ccd0c1db502a3a4e33f8b4c"
+    },
+    {
+      "path": "src/data/icon-libraries.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6d7a4b73b2be4fd969522a3ecd8eb427f9dec13d",
+      "size": 4172,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6d7a4b73b2be4fd969522a3ecd8eb427f9dec13d"
+    },
+    {
+      "path": "src/data/jobs.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ba7527cafee50ea32845989e374cdeac51a8a15d",
+      "size": 3195,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ba7527cafee50ea32845989e374cdeac51a8a15d"
+    },
+    {
+      "path": "src/data/playbook-demos.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "790435be0ebcd451f30498acd11ed5d5b83ec980",
+      "size": 1484,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/790435be0ebcd451f30498acd11ed5d5b83ec980"
+    },
+    {
+      "path": "src/data/playbook.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f8af86bd5f8d2b0856dfba6f92d8f8069919ea3",
+      "size": 18732,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2f8af86bd5f8d2b0856dfba6f92d8f8069919ea3"
+    },
+    {
+      "path": "src/data/registry.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6b63f1dcc4abfb0b12b407212504542d304fef6",
+      "size": 260088,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d6b63f1dcc4abfb0b12b407212504542d304fef6"
+    },
+    {
+      "path": "src/data/skills.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0f428b8ed1a3bd231f0500e8b1f34623195af99",
+      "size": 1068,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d0f428b8ed1a3bd231f0500e8b1f34623195af99"
+    },
+    {
+      "path": "src/data/topics.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1df710055f84257ce2489bba28cb7bbbe48e9423",
+      "size": 8293,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1df710055f84257ce2489bba28cb7bbbe48e9423"
+    },
+    {
+      "path": "src/db",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e4c4c499e2e9b3aa33c8bdef59ec70ae99501503",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e4c4c499e2e9b3aa33c8bdef59ec70ae99501503"
+    },
+    {
+      "path": "src/db/schema.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd2347ebc8d9b4b3d971278c08e73d2085313568",
+      "size": 4504,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/fd2347ebc8d9b4b3d971278c08e73d2085313568"
+    },
+    {
+      "path": "src/env.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb76d4ae514eb2ea7c8e9e413b12ef86ba3dae1c",
+      "size": 807,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/eb76d4ae514eb2ea7c8e9e413b12ef86ba3dae1c"
+    },
+    {
+      "path": "src/layouts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "128ae5c3216f1bde28998f8bf99c83d07ff60852",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/128ae5c3216f1bde28998f8bf99c83d07ff60852"
+    },
+    {
+      "path": "src/layouts/Layout.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "066295efcdaf6af3f10de41c74097b34fc49973d",
+      "size": 11352,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/066295efcdaf6af3f10de41c74097b34fc49973d"
+    },
+    {
+      "path": "src/lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d96debb34d9468c9644c0f6d29918d6a54e6689d",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/d96debb34d9468c9644c0f6d29918d6a54e6689d"
+    },
+    {
+      "path": "src/lib/agent-discovery.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20bf1fba193ebea0cd9ce518f1cf3272907ff3c7",
+      "size": 4125,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/20bf1fba193ebea0cd9ce518f1cf3272907ff3c7"
+    },
+    {
+      "path": "src/lib/agent-skills-discovery.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2fa8af42dc1f613ca7bcd52dd4d5ed0a2dc8c1c0",
+      "size": 7905,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2fa8af42dc1f613ca7bcd52dd4d5ed0a2dc8c1c0"
+    },
+    {
+      "path": "src/lib/auth-actions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b4734725027490c6a1c68ffef01c1c7d82fe91c",
+      "size": 1272,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1b4734725027490c6a1c68ffef01c1c7d82fe91c"
+    },
+    {
+      "path": "src/lib/auth-client.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b6f39059ccd9225e3083dffd12950a6308fcc5df",
+      "size": 179,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b6f39059ccd9225e3083dffd12950a6308fcc5df"
+    },
+    {
+      "path": "src/lib/auth-config.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "841615473e142eb440b358e3a055c3f09308e0f4",
+      "size": 2710,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/841615473e142eb440b358e3a055c3f09308e0f4"
+    },
+    {
+      "path": "src/lib/auth-response.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52accfab4480f1f5d1cdce18c425bfbb7cae7011",
+      "size": 405,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/52accfab4480f1f5d1cdce18c425bfbb7cae7011"
+    },
+    {
+      "path": "src/lib/auth.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38635182873497918c949c4e23169b63373f939b",
+      "size": 3198,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/38635182873497918c949c4e23169b63373f939b"
+    },
+    {
+      "path": "src/lib/cache-headers.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b8bfa33c95b0c5249a12fb24c2fb1fc43806aac",
+      "size": 1951,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5b8bfa33c95b0c5249a12fb24c2fb1fc43806aac"
+    },
+    {
+      "path": "src/lib/cn.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5d7db70177b94ff769fc8623b8e878d514dd3096",
+      "size": 116,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5d7db70177b94ff769fc8623b8e878d514dd3096"
+    },
+    {
+      "path": "src/lib/code-highlighter.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ccb54f9d43a479a15f225a706693fa3683ae9548",
+      "size": 5224,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ccb54f9d43a479a15f225a706693fa3683ae9548"
+    },
+    {
+      "path": "src/lib/collection-catalog.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a69d44f5a480788a7b19bff05734fab1a77c28d9",
+      "size": 1180,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a69d44f5a480788a7b19bff05734fab1a77c28d9"
+    },
+    {
+      "path": "src/lib/design-md-foundations.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57f5afd824b7735966621f6cc2f52985c70d4fed",
+      "size": 11929,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/57f5afd824b7735966621f6cc2f52985c70d4fed"
+    },
+    {
+      "path": "src/lib/format-stars.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ba205f0267effb8fd90aae4b13ad7a51de44c97",
+      "size": 282,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1ba205f0267effb8fd90aae4b13ad7a51de44c97"
+    },
+    {
+      "path": "src/lib/jobs-api.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "20d9c5c3d4d28ff9496223c2845cf0915696e821",
+      "size": 5426,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/20d9c5c3d4d28ff9496223c2845cf0915696e821"
+    },
+    {
+      "path": "src/lib/library-client.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d98826dd22e19d0a426bd414bf51b5acfb6d5bd",
+      "size": 3091,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0d98826dd22e19d0a426bd414bf51b5acfb6d5bd"
+    },
+    {
+      "path": "src/lib/library-http.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d17e58fd43279df605090b0ac47d33d38b03298f",
+      "size": 5216,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d17e58fd43279df605090b0ac47d33d38b03298f"
+    },
+    {
+      "path": "src/lib/library-skill.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e3fb2c1d8d640a790e0fdbdfd8086d294f13c5a",
+      "size": 386,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5e3fb2c1d8d640a790e0fdbdfd8086d294f13c5a"
+    },
+    {
+      "path": "src/lib/library-store.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dbf649fcd41673a61e1f91382b2e0356c4155119",
+      "size": 9969,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/dbf649fcd41673a61e1f91382b2e0356c4155119"
+    },
+    {
+      "path": "src/lib/library-types.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "504ac9b4d97d6d549b68601528b2c56bacf9edb6",
+      "size": 1971,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/504ac9b4d97d6d549b68601528b2c56bacf9edb6"
+    },
+    {
+      "path": "src/lib/library-view.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c4e339a1cdb5f7d207dd0e46806b661fd7a4395b",
+      "size": 810,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c4e339a1cdb5f7d207dd0e46806b661fd7a4395b"
+    },
+    {
+      "path": "src/lib/markdown-negotiation.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6c5c5e6e0b72129f2de43b12003ac7e8bfaede09",
+      "size": 3778,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6c5c5e6e0b72129f2de43b12003ac7e8bfaede09"
+    },
+    {
+      "path": "src/lib/mcp-server.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9576813dffcfd0d5269d406b37b02047190f8bed",
+      "size": 6200,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/9576813dffcfd0d5269d406b37b02047190f8bed"
+    },
+    {
+      "path": "src/lib/oauth-discovery.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a067315d9bd12303a769544f8702c571085b1df2",
+      "size": 4931,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a067315d9bd12303a769544f8702c571085b1df2"
+    },
+    {
+      "path": "src/lib/oauth-validation.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d501e42e25b97313774547a030255e8754c9c40f",
+      "size": 782,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d501e42e25b97313774547a030255e8754c9c40f"
+    },
+    {
+      "path": "src/lib/remote-skill.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03064209b5abc5fb79512dfcfdbbd53fd8135db7",
+      "size": 4176,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/03064209b5abc5fb79512dfcfdbbd53fd8135db7"
+    },
+    {
+      "path": "src/lib/render-skill-markdown.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e15bde76aecb317476d546cb04023e471831cae",
+      "size": 2222,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/4e15bde76aecb317476d546cb04023e471831cae"
+    },
+    {
+      "path": "src/lib/serialize-json-ld.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2991f1d2c920f729e3e906880c30f90dbdd12e7a",
+      "size": 322,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2991f1d2c920f729e3e906880c30f90dbdd12e7a"
+    },
+    {
+      "path": "src/lib/session-client.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "506e1b206667f96714932a1bfce17b30fbb06690",
+      "size": 547,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/506e1b206667f96714932a1bfce17b30fbb06690"
+    },
+    {
+      "path": "src/lib/skill-catalog.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd4e145fc25642c38f7555ed82f20b96d2de54f8",
+      "size": 2538,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/cd4e145fc25642c38f7555ed82f20b96d2de54f8"
+    },
+    {
+      "path": "src/lib/ui-skills-cli.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9677ac3a2360bd35ff5a6743f9e1df6876bcaf1",
+      "size": 1491,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e9677ac3a2360bd35ff5a6743f9e1df6876bcaf1"
+    },
+    {
+      "path": "src/lib/webmcp-tools.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "04d14630d13d9ea44c14cb59b4e7012dfc34fd78",
+      "size": 4870,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/04d14630d13d9ea44c14cb59b4e7012dfc34fd78"
+    },
+    {
+      "path": "src/middleware.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a53b717478f30afe99d6a8c6517b7f4a99012766",
+      "size": 3223,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a53b717478f30afe99d6a8c6517b7f4a99012766"
+    },
+    {
+      "path": "src/pages",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f723748833766f96fc33989deddb51890dd06ae9",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/f723748833766f96fc33989deddb51890dd06ae9"
+    },
+    {
+      "path": "src/pages/.well-known",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9e7a2549212c64ed5ba41af963ae88bc64837f8c",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/9e7a2549212c64ed5ba41af963ae88bc64837f8c"
+    },
+    {
+      "path": "src/pages/.well-known/agent-skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e36d1d636b09a7ea7f20243e6e25c4947b2b2f83",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e36d1d636b09a7ea7f20243e6e25c4947b2b2f83"
+    },
+    {
+      "path": "src/pages/.well-known/agent-skills/[skill]",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f2dd5808419efedd37e668fc68ac8ee759209c09",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/f2dd5808419efedd37e668fc68ac8ee759209c09"
+    },
+    {
+      "path": "src/pages/.well-known/agent-skills/[skill]/SKILL.md.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e5dc592e1733f21d6861111ec91d5eca59914f0",
+      "size": 1486,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8e5dc592e1733f21d6861111ec91d5eca59914f0"
+    },
+    {
+      "path": "src/pages/.well-known/agent-skills/index.json.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2deb0446c33565fd54b527dd5fd8db5caec12497",
+      "size": 725,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2deb0446c33565fd54b527dd5fd8db5caec12497"
+    },
+    {
+      "path": "src/pages/.well-known/api-catalog.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "526ddf0bab228a2a7d80cf2c946c00800a72804d",
+      "size": 1066,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/526ddf0bab228a2a7d80cf2c946c00800a72804d"
+    },
+    {
+      "path": "src/pages/.well-known/jwks.json.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61a1a19f99eb0fd95d6cc6015000e75b26fcc317",
+      "size": 361,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/61a1a19f99eb0fd95d6cc6015000e75b26fcc317"
+    },
+    {
+      "path": "src/pages/.well-known/mcp",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "859f7c9a67d1928c8c9b4ea310ecd43e23eae6e2",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/859f7c9a67d1928c8c9b4ea310ecd43e23eae6e2"
+    },
+    {
+      "path": "src/pages/.well-known/mcp/server-card.json.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4400b179b3b0aadc8991a366caadd6196c0c55b5",
+      "size": 547,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/4400b179b3b0aadc8991a366caadd6196c0c55b5"
+    },
+    {
+      "path": "src/pages/.well-known/oauth-authorization-server.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa52f4bb5c14fdf7fd7a4a941adc0abe1dbbdf9a",
+      "size": 499,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/aa52f4bb5c14fdf7fd7a4a941adc0abe1dbbdf9a"
+    },
+    {
+      "path": "src/pages/.well-known/oauth-protected-resource.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "532b31eac7993d8f861fd7aa1a6613c086346f8b",
+      "size": 495,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/532b31eac7993d8f861fd7aa1a6613c086346f8b"
+    },
+    {
+      "path": "src/pages/.well-known/openid-configuration.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e2b380ac6f218bdc1a73cc2f4a8e059ac6e1ce3",
+      "size": 477,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5e2b380ac6f218bdc1a73cc2f4a8e059ac6e1ce3"
+    },
+    {
+      "path": "src/pages/404.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84103fd5b4097286dec13e5199bde5ad75766364",
+      "size": 1147,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/84103fd5b4097286dec13e5199bde5ad75766364"
+    },
+    {
+      "path": "src/pages/account",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "eb1e54dfbad8a380394402ba5c161fa05b5a2898",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/eb1e54dfbad8a380394402ba5c161fa05b5a2898"
+    },
+    {
+      "path": "src/pages/account/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "adb7e208c51c5ee88126cc10210ce399b78bb834",
+      "size": 395,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/adb7e208c51c5ee88126cc10210ce399b78bb834"
+    },
+    {
+      "path": "src/pages/agent",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "335624876ba4c97daecf6cb42c2b3371547b404d",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/335624876ba4c97daecf6cb42c2b3371547b404d"
+    },
+    {
+      "path": "src/pages/agent/[id].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b69f8febcc4660801c33ee8eb7a750d388bdd3a8",
+      "size": 251,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b69f8febcc4660801c33ee8eb7a750d388bdd3a8"
+    },
+    {
+      "path": "src/pages/agent/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f4eb5b187d02cb6f8b3acbb23b17045f2f38de85",
+      "size": 79,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f4eb5b187d02cb6f8b3acbb23b17045f2f38de85"
+    },
+    {
+      "path": "src/pages/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "529bc14d4bc80f37b2395847b7dd6638a413dfed",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/529bc14d4bc80f37b2395847b7dd6638a413dfed"
+    },
+    {
+      "path": "src/pages/agents/[id].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "259ee745d49ab93d9d698969c11d506a5d4d7fe4",
+      "size": 9850,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/259ee745d49ab93d9d698969c11d506a5d4d7fe4"
+    },
+    {
+      "path": "src/pages/agents/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ccc8b13313b46b9473d0d4ee7cd26c8400db74b6",
+      "size": 2745,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ccc8b13313b46b9473d0d4ee7cd26c8400db74b6"
+    },
+    {
+      "path": "src/pages/api",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "58e306f3755de38f53ed3977e1f84263b98d584b",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/58e306f3755de38f53ed3977e1f84263b98d584b"
+    },
+    {
+      "path": "src/pages/api/auth",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "edc473b621f71a0ee368cb084e99fdae24a7c9f0",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/edc473b621f71a0ee368cb084e99fdae24a7c9f0"
+    },
+    {
+      "path": "src/pages/api/auth/[...all].ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0274f2c44a8554ee12673b51e9b2638efe5fe09f",
+      "size": 610,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0274f2c44a8554ee12673b51e9b2638efe5fe09f"
+    },
+    {
+      "path": "src/pages/api/library",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0e3f6eb5dedd5c8bbdbf4ebae22212e50e1f2635",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/0e3f6eb5dedd5c8bbdbf4ebae22212e50e1f2635"
+    },
+    {
+      "path": "src/pages/api/library/[...path].ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61511889271593f24c0e06168c2b4c76bd8517ff",
+      "size": 42,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/61511889271593f24c0e06168c2b4c76bd8517ff"
+    },
+    {
+      "path": "src/pages/api/library/index.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f149d9906f083e290d55877789520ab769e64e99",
+      "size": 971,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f149d9906f083e290d55877789520ab769e64e99"
+    },
+    {
+      "path": "src/pages/auth.md.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a7d5efcbca4ee9033a5c65373cc43ffda0dff65",
+      "size": 447,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0a7d5efcbca4ee9033a5c65373cc43ffda0dff65"
+    },
+    {
+      "path": "src/pages/authors",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c7a66a24451f5aeb662212e9181aace6da5e803c",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/c7a66a24451f5aeb662212e9181aace6da5e803c"
+    },
+    {
+      "path": "src/pages/authors/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95217a4a10a23f153e255a4ba7318388828bc286",
+      "size": 2520,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/95217a4a10a23f153e255a4ba7318388828bc286"
+    },
+    {
+      "path": "src/pages/cli.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e70a947d91418d4089ae8a87e4eb76b23892a59",
+      "size": 3077,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6e70a947d91418d4089ae8a87e4eb76b23892a59"
+    },
+    {
+      "path": "src/pages/collections",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a27eff8b3304c27ec0f09e260ecc19b007419107",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/a27eff8b3304c27ec0f09e260ecc19b007419107"
+    },
+    {
+      "path": "src/pages/collections/[slug].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddf265ec73f650d77e74ba4ca3fa24ae27d645e0",
+      "size": 8493,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ddf265ec73f650d77e74ba4ca3fa24ae27d645e0"
+    },
+    {
+      "path": "src/pages/collections/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e867540a69669ed2a76da0c11804631501d694c6",
+      "size": 2366,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e867540a69669ed2a76da0c11804631501d694c6"
+    },
+    {
+      "path": "src/pages/components",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e1acb5703b0cb79b7cb8669300bf3db4cbb0a7af",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e1acb5703b0cb79b7cb8669300bf3db4cbb0a7af"
+    },
+    {
+      "path": "src/pages/components/[collection].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aae9ecdd99119d46d1ac7987363d46d0f82609cf",
+      "size": 2885,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/aae9ecdd99119d46d1ac7987363d46d0f82609cf"
+    },
+    {
+      "path": "src/pages/components/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "50beb1183f237f9e740c0bace753ce65cb6545da",
+      "size": 3799,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/50beb1183f237f9e740c0bace753ce65cb6545da"
+    },
+    {
+      "path": "src/pages/design-md",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1d4f24832f0e448bd9e681fe69451db4d7471218",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/1d4f24832f0e448bd9e681fe69451db4d7471218"
+    },
+    {
+      "path": "src/pages/design-md/[slug].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9666b6df7d5b2413913aa2335b1ccbb2f6d25bd6",
+      "size": 6838,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/9666b6df7d5b2413913aa2335b1ccbb2f6d25bd6"
+    },
+    {
+      "path": "src/pages/design-md/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f94d19198f1e29e2b958c60ffc6dc8cd55d49ceb",
+      "size": 2979,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f94d19198f1e29e2b958c60ffc6dc8cd55d49ceb"
+    },
+    {
+      "path": "src/pages/design.md.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b64a78481e461badb814b65d0dd05fd1b006c901",
+      "size": 373,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b64a78481e461badb814b65d0dd05fd1b006c901"
+    },
+    {
+      "path": "src/pages/icons.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c0ffbda9ec28c02b5507ddf3702805cf18017cb2",
+      "size": 3084,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c0ffbda9ec28c02b5507ddf3702805cf18017cb2"
+    },
+    {
+      "path": "src/pages/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2dc6360dd5619074cb71e18568716867222a23e5",
+      "size": 6291,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2dc6360dd5619074cb71e18568716867222a23e5"
+    },
+    {
+      "path": "src/pages/jobs.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ccf3cd2db855482c83e6175911d0d4f88df73eeb",
+      "size": 2239,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ccf3cd2db855482c83e6175911d0d4f88df73eeb"
+    },
+    {
+      "path": "src/pages/jobs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "43dc1688aeb5a2c96348eab904b32e0f857cb8a7",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/43dc1688aeb5a2c96348eab904b32e0f857cb8a7"
+    },
+    {
+      "path": "src/pages/jobs/[id].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5c58fb828613dd88ad209eff3bea48734f8fbfd",
+      "size": 892,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e5c58fb828613dd88ad209eff3bea48734f8fbfd"
+    },
+    {
+      "path": "src/pages/jobs/post.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "457694927339211eb668e78470ebd4af9b875464",
+      "size": 1747,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/457694927339211eb668e78470ebd4af9b875464"
+    },
+    {
+      "path": "src/pages/jobs/post",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b1db9faceba26a8d7a55a641978d8027694ebb3a",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/b1db9faceba26a8d7a55a641978d8027694ebb3a"
+    },
+    {
+      "path": "src/pages/jobs/post/thank-you.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ad78f34cdf512dc161d5ead8d59076301b3c23c",
+      "size": 1417,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/9ad78f34cdf512dc161d5ead8d59076301b3c23c"
+    },
+    {
+      "path": "src/pages/library",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f049979aada6552e5abf2e62af2fc6daea8ce480",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/f049979aada6552e5abf2e62af2fc6daea8ce480"
+    },
+    {
+      "path": "src/pages/library/[slug].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23003f7ce011e731b43655d512dd5e672ff0ef6a",
+      "size": 5314,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/23003f7ce011e731b43655d512dd5e672ff0ef6a"
+    },
+    {
+      "path": "src/pages/library/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5672493f3a67c8688e5b8467b9a8002a44ccd67b",
+      "size": 2925,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5672493f3a67c8688e5b8467b9a8002a44ccd67b"
+    },
+    {
+      "path": "src/pages/llms.txt.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "300298fe2b678018fbe5639328c00f3c1a322408",
+      "size": 1228,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/300298fe2b678018fbe5639328c00f3c1a322408"
+    },
+    {
+      "path": "src/pages/login.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a81f7640e73fe1023a517ff84d06a80be2bd5faf",
+      "size": 4192,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a81f7640e73fe1023a517ff84d06a80be2bd5faf"
+    },
+    {
+      "path": "src/pages/mcp.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65f98b05d67dbe53704f5dd3c4591be167513048",
+      "size": 157,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/65f98b05d67dbe53704f5dd3c4591be167513048"
+    },
+    {
+      "path": "src/pages/mcp",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0896940f65943665dfb01dc185360d7d95acb9ef",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/0896940f65943665dfb01dc185360d7d95acb9ef"
+    },
+    {
+      "path": "src/pages/mcp/docs.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16cd3110bdca5ddd58456f25fa7ef96ce2e13d2d",
+      "size": 2915,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/16cd3110bdca5ddd58456f25fa7ef96ce2e13d2d"
+    },
+    {
+      "path": "src/pages/mcp/rpc.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edba9d7a93cc131ce71749ba15da6bb4b05a006e",
+      "size": 160,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/edba9d7a93cc131ce71749ba15da6bb4b05a006e"
+    },
+    {
+      "path": "src/pages/mcp/server.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e6d5d5dcf128f9f1d80c6660de16cb094a69b76",
+      "size": 76,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1e6d5d5dcf128f9f1d80c6660de16cb094a69b76"
+    },
+    {
+      "path": "src/pages/oauth",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "781773a33dc4c3eb7de72202e70b25a0b5fcffa7",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/781773a33dc4c3eb7de72202e70b25a0b5fcffa7"
+    },
+    {
+      "path": "src/pages/oauth/authorize.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "56f69d8f7e3998bbf3858ef68b42e98621657433",
+      "size": 953,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/56f69d8f7e3998bbf3858ef68b42e98621657433"
+    },
+    {
+      "path": "src/pages/oauth/claim.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e6bca44efe9ec0520ad1cbc6e7cb071b1f3df6d",
+      "size": 815,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3e6bca44efe9ec0520ad1cbc6e7cb071b1f3df6d"
+    },
+    {
+      "path": "src/pages/oauth/register.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cf7d09b0276f1492b1214a81dc87423dbe6a0f0e",
+      "size": 1605,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/cf7d09b0276f1492b1214a81dc87423dbe6a0f0e"
+    },
+    {
+      "path": "src/pages/oauth/revoke.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f5c3d326e1fde3dc7a1633bece99361201ff14a",
+      "size": 350,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6f5c3d326e1fde3dc7a1633bece99361201ff14a"
+    },
+    {
+      "path": "src/pages/oauth/token.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a3d6431e2c534e67f754046c533403bbbf8a812",
+      "size": 2674,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3a3d6431e2c534e67f754046c533403bbbf8a812"
+    },
+    {
+      "path": "src/pages/oauth/userinfo.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a682d79e0619857157d59fc8ad73829ac684ae6",
+      "size": 272,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6a682d79e0619857157d59fc8ad73829ac684ae6"
+    },
+    {
+      "path": "src/pages/playbook",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e978df0d49837273905e65ebf6d1e3334839392f",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e978df0d49837273905e65ebf6d1e3334839392f"
+    },
+    {
+      "path": "src/pages/playbook/[slug].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44be0fd5b984c6bbb5792c4867cb7a426b695216",
+      "size": 7974,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/44be0fd5b984c6bbb5792c4867cb7a426b695216"
+    },
+    {
+      "path": "src/pages/playbook/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93e398dde8edc6bb8ddf1a435a9d4bbf561aa8f2",
+      "size": 2183,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/93e398dde8edc6bb8ddf1a435a9d4bbf561aa8f2"
+    },
+    {
+      "path": "src/pages/robots.txt.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bc0c79144160406a6a7760ac25b5802a330280d2",
+      "size": 672,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/bc0c79144160406a6a7760ac25b5802a330280d2"
+    },
+    {
+      "path": "src/pages/sitemap.xml.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2e5c7b97f8d8e67f5703cb245103316c4d48907",
+      "size": 3150,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c2e5c7b97f8d8e67f5703cb245103316c4d48907"
+    },
+    {
+      "path": "src/pages/skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4bbb2bb9276a1f57c6e7a7824b0789d080b7727a",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/4bbb2bb9276a1f57c6e7a7824b0789d080b7727a"
+    },
+    {
+      "path": "src/pages/skills/[...slug].astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c16d6e784a963070aab197de3748a5722db0814d",
+      "size": 26720,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c16d6e784a963070aab197de3748a5722db0814d"
+    },
+    {
+      "path": "src/pages/skills/[...slug]",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "777910288f8372ee0e78750eaf1e430b85531742",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/777910288f8372ee0e78750eaf1e430b85531742"
+    },
+    {
+      "path": "src/pages/skills/[...slug]/llms.txt.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2410557efc4bb33c8084e0c6fa27d72c2970f35d",
+      "size": 1118,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2410557efc4bb33c8084e0c6fa27d72c2970f35d"
+    },
+    {
+      "path": "src/pages/skills/index.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "30d3279e349695a21454104e63c4ec812f9b3ded",
+      "size": 6950,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/30d3279e349695a21454104e63c4ec812f9b3ded"
+    },
+    {
+      "path": "src/pages/skills/new.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee74bfa3369897aba29d7c63d896d7731c770d93",
+      "size": 2088,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ee74bfa3369897aba29d7c63d896d7731c770d93"
+    },
+    {
+      "path": "src/pages/skills/registry.json.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "55312fef5fafceee39f8910ca7469f9fe3fb4241",
+      "size": 503,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/55312fef5fafceee39f8910ca7469f9fe3fb4241"
+    },
+    {
+      "path": "src/pages/skills/registry.txt.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "99dfc8c731ed15af77c4c0475464d8f3fed2aeac",
+      "size": 646,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/99dfc8c731ed15af77c4c0475464d8f3fed2aeac"
+    },
+    {
+      "path": "src/pages/skills/topics.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9675eaf29fd482b632f271621cb5ca96c2bf3cc",
+      "size": 3010,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f9675eaf29fd482b632f271621cb5ca96c2bf3cc"
+    },
+    {
+      "path": "src/styles",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e0dd3edcbc89a6bf67ee68762ac373aac15e885b",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/e0dd3edcbc89a6bf67ee68762ac373aac15e885b"
+    },
+    {
+      "path": "src/styles/global.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bfb2082f5e05895955d61410b4289b3e7ae9de9e",
+      "size": 9735,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/bfb2082f5e05895955d61410b4289b3e7ae9de9e"
+    },
+    {
+      "path": "src/ui",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c79bfbae7b71bf00856ff727ce4c0ed77a570d2e",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/c79bfbae7b71bf00856ff727ce4c0ed77a570d2e"
+    },
+    {
+      "path": "src/ui/account-menu.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a016adc7bafa83983cad8a207cc0d90ea9b620a8",
+      "size": 3891,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a016adc7bafa83983cad8a207cc0d90ea9b620a8"
+    },
+    {
+      "path": "src/ui/agent-access-start.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "784345e51a1481a0e27ce75d133811618da92f90",
+      "size": 4365,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/784345e51a1481a0e27ce75d133811618da92f90"
+    },
+    {
+      "path": "src/ui/agent-start-here.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8537ecaa2d7eb7b6f75e867fc49a85903d1231f1",
+      "size": 1099,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8537ecaa2d7eb7b6f75e867fc49a85903d1231f1"
+    },
+    {
+      "path": "src/ui/badge.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6e0f75b88c52a056d4e6d2d0e590605e343a291",
+      "size": 480,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e6e0f75b88c52a056d4e6d2d0e590605e343a291"
+    },
+    {
+      "path": "src/ui/breadcrumbs.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "293ff074780cc69e4cb535c2e94ec11a09fd2448",
+      "size": 1402,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/293ff074780cc69e4cb535c2e94ec11a09fd2448"
+    },
+    {
+      "path": "src/ui/button.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d5b2a161600e9b7f54799074ec58f8f22483f01",
+      "size": 1572,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1d5b2a161600e9b7f54799074ec58f8f22483f01"
+    },
+    {
+      "path": "src/ui/button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a0d949526d0c22b3f9bfbaa05a039e08d7a8e45",
+      "size": 1774,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/4a0d949526d0c22b3f9bfbaa05a039e08d7a8e45"
+    },
+    {
+      "path": "src/ui/card.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75b4dc6d2f5132375b3ee1ca896342b0a70711ed",
+      "size": 472,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/75b4dc6d2f5132375b3ee1ca896342b0a70711ed"
+    },
+    {
+      "path": "src/ui/code-block.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "de15a6a94693bd78a983964299617cb0a2a9de31",
+      "size": 3850,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/de15a6a94693bd78a983964299617cb0a2a9de31"
+    },
+    {
+      "path": "src/ui/collection-card.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44c0de8611aa792642d2417c2dd361c8dcff72ca",
+      "size": 572,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/44c0de8611aa792642d2417c2dd361c8dcff72ca"
+    },
+    {
+      "path": "src/ui/collection-menu.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc5fe01b17d9831edfa4609dde234f7841c0a2ee",
+      "size": 7698,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/cc5fe01b17d9831edfa4609dde234f7841c0a2ee"
+    },
+    {
+      "path": "src/ui/command-dialog.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f7648161f0926e672c9c49d6273dd1ef47eae453",
+      "size": 14743,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f7648161f0926e672c9c49d6273dd1ef47eae453"
+    },
+    {
+      "path": "src/ui/command.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb48d14f143e8b2ee4cdb73c08fb55982ac91674",
+      "size": 2870,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/eb48d14f143e8b2ee4cdb73c08fb55982ac91674"
+    },
+    {
+      "path": "src/ui/component-collection-nav.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3414053dd0372bd42410e730d0054e91b9d92c00",
+      "size": 754,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3414053dd0372bd42410e730d0054e91b9d92c00"
+    },
+    {
+      "path": "src/ui/component-library-directory.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dffc8aa4326a9bdda5e6f41232f22d07af99269f",
+      "size": 5268,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/dffc8aa4326a9bdda5e6f41232f22d07af99269f"
+    },
+    {
+      "path": "src/ui/copy-button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36e01ea6e22ff34ddd21ff67612fa75abb801af2",
+      "size": 2445,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/36e01ea6e22ff34ddd21ff67612fa75abb801af2"
+    },
+    {
+      "path": "src/ui/create-collection-button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aab5ca906b759dd2c0aa0a33055da28f60295758",
+      "size": 4806,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/aab5ca906b759dd2c0aa0a33055da28f60295758"
+    },
+    {
+      "path": "src/ui/cta-section.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec9638ffdea710765a94bc631fde93d96816e65c",
+      "size": 4774,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ec9638ffdea710765a94bc631fde93d96816e65c"
+    },
+    {
+      "path": "src/ui/delete-collection-button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "454ed3b7d8a1b49e136ecb9327e3f16c22f11542",
+      "size": 4010,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/454ed3b7d8a1b49e136ecb9327e3f16c22f11542"
+    },
+    {
+      "path": "src/ui/design-md-foundations.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09752832a3ab339a62ff9d684419d1f6d5ba25ae",
+      "size": 11996,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/09752832a3ab339a62ff9d684419d1f6d5ba25ae"
+    },
+    {
+      "path": "src/ui/design-md-item.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "174a5a73ae964d6bead91a42aa7c2e58dfacb49d",
+      "size": 510,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/174a5a73ae964d6bead91a42aa7c2e58dfacb49d"
+    },
+    {
+      "path": "src/ui/edit-collection-button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "47854d5c04d8ab625a2c2aec3ad1af1ec57a634a",
+      "size": 4734,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/47854d5c04d8ab625a2c2aec3ad1af1ec57a634a"
+    },
+    {
+      "path": "src/ui/expandable-code-block.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "510b9041846418b2ddab2856a759d4e97ac09ece",
+      "size": 2626,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/510b9041846418b2ddab2856a759d4e97ac09ece"
+    },
+    {
+      "path": "src/ui/footer.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8ce33336d3f39fb400a3d796c15999c93343b35a",
+      "size": 6982,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8ce33336d3f39fb400a3d796c15999c93343b35a"
+    },
+    {
+      "path": "src/ui/icon-library-actions.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "652316f930d988243b2f4e99cebd21d7ff367e78",
+      "size": 2097,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/652316f930d988243b2f4e99cebd21d7ff367e78"
+    },
+    {
+      "path": "src/ui/icon-library-directory.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea49242b5eb7a7c8f2c2c8c49dc57b444c5c36d2",
+      "size": 3144,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ea49242b5eb7a7c8f2c2c8c49dc57b444c5c36d2"
+    },
+    {
+      "path": "src/ui/input.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da684c85bcf2b6f134f85c15a37fafbf7fff56fc",
+      "size": 875,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/da684c85bcf2b6f134f85c15a37fafbf7fff56fc"
+    },
+    {
+      "path": "src/ui/job-detail.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67b1c8aa2f9d110324c688207e12b5f2e683176f",
+      "size": 2676,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/67b1c8aa2f9d110324c688207e12b5f2e683176f"
+    },
+    {
+      "path": "src/ui/job-item.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b66e26c734557de5ebce0d24dd690214eccf619",
+      "size": 802,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1b66e26c734557de5ebce0d24dd690214eccf619"
+    },
+    {
+      "path": "src/ui/job-post-form.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8d587b3cda3a8bf6641074f7d92ddfd1a9594668",
+      "size": 11073,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8d587b3cda3a8bf6641074f7d92ddfd1a9594668"
+    },
+    {
+      "path": "src/ui/jobs-list.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "242919c62990e5b401b9c68635313d90745a077d",
+      "size": 4853,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/242919c62990e5b401b9c68635313d90745a077d"
+    },
+    {
+      "path": "src/ui/keyboard-shortcut.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70ecf82fca0460cea0838d65e58dc0f389bec050",
+      "size": 701,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/70ecf82fca0460cea0838d65e58dc0f389bec050"
+    },
+    {
+      "path": "src/ui/latest-jobs.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85feb341ff0049a3b53a5316018669428823e93a",
+      "size": 2260,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/85feb341ff0049a3b53a5316018669428823e93a"
+    },
+    {
+      "path": "src/ui/library-collection-card.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d69244e46fcbf88225267bd9f4964b82263e68c",
+      "size": 3888,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/7d69244e46fcbf88225267bd9f4964b82263e68c"
+    },
+    {
+      "path": "src/ui/library-skill-row.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0ca9d475601a74a1d738aff719e732415c1e8849",
+      "size": 1148,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0ca9d475601a74a1d738aff719e732415c1e8849"
+    },
+    {
+      "path": "src/ui/menu.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5c5a38b97dc57bde58d2b7cfd53eeb0051d3ccd1",
+      "size": 2088,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5c5a38b97dc57bde58d2b7cfd53eeb0051d3ccd1"
+    },
+    {
+      "path": "src/ui/newsletter-input.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb27591f735732da1cec862820993a2b1c8168ac",
+      "size": 7077,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/bb27591f735732da1cec862820993a2b1c8168ac"
+    },
+    {
+      "path": "src/ui/playbook-card.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0538ff5be059bc43a951621515efb0f7bfd79099",
+      "size": 627,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0538ff5be059bc43a951621515efb0f7bfd79099"
+    },
+    {
+      "path": "src/ui/playbook-demo.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6c84bfe6c0855c8df6a1e63a7fd2d898f4ade74",
+      "size": 309,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a6c84bfe6c0855c8df6a1e63a7fd2d898f4ade74"
+    },
+    {
+      "path": "src/ui/playbook",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4df947c4ea3db151f11b41c0609c9a55fb0108a1",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/4df947c4ea3db151f11b41c0609c9a55fb0108a1"
+    },
+    {
+      "path": "src/ui/playbook/aspect-ratio-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b843bac5207f841398c5b3d34f4b2ee3b46ad4cf",
+      "size": 2561,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b843bac5207f841398c5b3d34f4b2ee3b46ad4cf"
+    },
+    {
+      "path": "src/ui/playbook/breathing-room-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "961a45683d572d921ce122f51bc903b33851aacd",
+      "size": 684,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/961a45683d572d921ce122f51bc903b33851aacd"
+    },
+    {
+      "path": "src/ui/playbook/color-means-link-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1109c62065e5d2bbf065bda249b6bf8a12a74235",
+      "size": 1433,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1109c62065e5d2bbf065bda249b6bf8a12a74235"
+    },
+    {
+      "path": "src/ui/playbook/concentric-radius-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e6a8e6ca4d1fa73b52e9cc6c14f5cae9aba9033",
+      "size": 1604,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1e6a8e6ca4d1fa73b52e9cc6c14f5cae9aba9033"
+    },
+    {
+      "path": "src/ui/playbook/demo-card.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "668728a4d08d9b537b4588a1297478574a1ecbcc",
+      "size": 3983,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/668728a4d08d9b537b4588a1297478574a1ecbcc"
+    },
+    {
+      "path": "src/ui/playbook/demo-registry.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25bab1008b6d137f3ed4a1ef91403023b9b48327",
+      "size": 5223,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/25bab1008b6d137f3ed4a1ef91403023b9b48327"
+    },
+    {
+      "path": "src/ui/playbook/demo-router.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "afef5066c6f0bc920f4d34647d1bd337ea76dab7",
+      "size": 451,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/afef5066c6f0bc920f4d34647d1bd337ea76dab7"
+    },
+    {
+      "path": "src/ui/playbook/destructive-dialog-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "761ed7cd47854236ed0d1605fb9a29ea6d91d6d1",
+      "size": 2167,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/761ed7cd47854236ed0d1605fb9a29ea6d91d6d1"
+    },
+    {
+      "path": "src/ui/playbook/ease-out-enter-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d01eaebc71ba08238f5fe3bbb1d757aee1df6111",
+      "size": 3031,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d01eaebc71ba08238f5fe3bbb1d757aee1df6111"
+    },
+    {
+      "path": "src/ui/playbook/empty-state-cta-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23c00862cf3d4bff2c9358a482ba05037a3f851e",
+      "size": 1449,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/23c00862cf3d4bff2c9358a482ba05037a3f851e"
+    },
+    {
+      "path": "src/ui/playbook/focus-ring-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7d67e35b916a2af53ef8214ada7032b1252b95b",
+      "size": 887,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b7d67e35b916a2af53ef8214ada7032b1252b95b"
+    },
+    {
+      "path": "src/ui/playbook/heading-line-height-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dbe3fdffc4b9779fbb7d0d5711caa07e95fadcf",
+      "size": 637,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8dbe3fdffc4b9779fbb7d0d5711caa07e95fadcf"
+    },
+    {
+      "path": "src/ui/playbook/icon-state-crossfade-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "709604474a362fbfe95abe9a8c667ad3601df9ce",
+      "size": 2700,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/709604474a362fbfe95abe9a8c667ad3601df9ce"
+    },
+    {
+      "path": "src/ui/playbook/icon-stroke-weight-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4d71b6ddb411dd7a7152e3db4c21378656f55d83",
+      "size": 1109,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/4d71b6ddb411dd7a7152e3db4c21378656f55d83"
+    },
+    {
+      "path": "src/ui/playbook/image-outline-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "49503c849cdae521289b0b6eb2b2ced9bf4de51f",
+      "size": 1645,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/49503c849cdae521289b0b6eb2b2ced9bf4de51f"
+    },
+    {
+      "path": "src/ui/playbook/inline-error-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19af75e5d8607a77245fe3b395986c1493b6cb20",
+      "size": 1584,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/19af75e5d8607a77245fe3b395986c1493b6cb20"
+    },
+    {
+      "path": "src/ui/playbook/inset-cta-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ccaedd436e054c7ced7f6c28736ef53bf0febc7",
+      "size": 1109,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3ccaedd436e054c7ced7f6c28736ef53bf0febc7"
+    },
+    {
+      "path": "src/ui/playbook/interruptible-transition-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8ec5b64649daf122051f94d9fae7cd97b0abd17a",
+      "size": 1769,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8ec5b64649daf122051f94d9fae7cd97b0abd17a"
+    },
+    {
+      "path": "src/ui/playbook/label-form-fields-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8145bd8d29bc8cc002ff667d42f3460edab4592c",
+      "size": 954,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8145bd8d29bc8cc002ff667d42f3460edab4592c"
+    },
+    {
+      "path": "src/ui/playbook/label-morph-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c9a6cbf2a21704e61790bc354cc3f228202b6fe0",
+      "size": 3069,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c9a6cbf2a21704e61790bc354cc3f228202b6fe0"
+    },
+    {
+      "path": "src/ui/playbook/line-clamp-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cfc45a3b3d584e8427683791e7546543ba5fa596",
+      "size": 849,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/cfc45a3b3d584e8427683791e7546543ba5fa596"
+    },
+    {
+      "path": "src/ui/playbook/line-measure-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "271947bd2f39b42f9cdacf60fc12f409fdf364d1",
+      "size": 874,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/271947bd2f39b42f9cdacf60fc12f409fdf364d1"
+    },
+    {
+      "path": "src/ui/playbook/menu-exit-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ee329d4d2bd418c7b508ad9e05de1ac71f74434",
+      "size": 2786,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1ee329d4d2bd418c7b508ad9e05de1ac71f74434"
+    },
+    {
+      "path": "src/ui/playbook/modal-scrim-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "994adf2726e42e8e2d8c80db682dd8e2f3574d14",
+      "size": 2861,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/994adf2726e42e8e2d8c80db682dd8e2f3574d14"
+    },
+    {
+      "path": "src/ui/playbook/motion-restraint-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09a17e2c4cfd6f88f2353f86307bd7f50291bf2a",
+      "size": 2194,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/09a17e2c4cfd6f88f2353f86307bd7f50291bf2a"
+    },
+    {
+      "path": "src/ui/playbook/no-glow-cta-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c291e723cd4f1297c19df5b154cd40dd177b31c",
+      "size": 757,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3c291e723cd4f1297c19df5b154cd40dd177b31c"
+    },
+    {
+      "path": "src/ui/playbook/one-accent-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "02471df7a33f5c14351582ff47b6f6ed7915337c",
+      "size": 1370,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/02471df7a33f5c14351582ff47b6f6ed7915337c"
+    },
+    {
+      "path": "src/ui/playbook/optical-alignment-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d8bde5a00b0c76e9c4551e5914e2167c5399c34e",
+      "size": 977,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d8bde5a00b0c76e9c4551e5914e2167c5399c34e"
+    },
+    {
+      "path": "src/ui/playbook/outline-icons-default-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c111f88901ce437a582b887267c5efefa03432a",
+      "size": 3145,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2c111f88901ce437a582b887267c5efefa03432a"
+    },
+    {
+      "path": "src/ui/playbook/popover-origin-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cda9061d5b8d5faddf018011c57c23b8d09a687",
+      "size": 1978,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6cda9061d5b8d5faddf018011c57c23b8d09a687"
+    },
+    {
+      "path": "src/ui/playbook/replay-button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ce339a63e46846ec7cf5eb5d9f983b33a7b579a",
+      "size": 1535,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1ce339a63e46846ec7cf5eb5d9f983b33a7b579a"
+    },
+    {
+      "path": "src/ui/playbook/same-path-motion-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89f103dfebc5907ad174a2f1ce38ce153e07d006",
+      "size": 1714,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/89f103dfebc5907ad174a2f1ce38ce153e07d006"
+    },
+    {
+      "path": "src/ui/playbook/scale-enter-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b5b7bfe4543f8371919a659998795d787d620abc",
+      "size": 2547,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b5b7bfe4543f8371919a659998795d787d620abc"
+    },
+    {
+      "path": "src/ui/playbook/scale-on-press-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23540681907f72ed0b3bbb3f2fdcff6e07587bd1",
+      "size": 521,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/23540681907f72ed0b3bbb3f2fdcff6e07587bd1"
+    },
+    {
+      "path": "src/ui/playbook/scroll-edge-fade-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5457dcd24b233685cfd86b50703b1ee2b44a3239",
+      "size": 1118,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5457dcd24b233685cfd86b50703b1ee2b44a3239"
+    },
+    {
+      "path": "src/ui/playbook/scroll-peek-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "86b2717d67a21d2cb63aa36c838d998d172b5bce",
+      "size": 1790,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/86b2717d67a21d2cb63aa36c838d998d172b5bce"
+    },
+    {
+      "path": "src/ui/playbook/sentence-case-labels-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44f128d78d2e87d3df25b555e94dec6baa857daa",
+      "size": 1180,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/44f128d78d2e87d3df25b555e94dec6baa857daa"
+    },
+    {
+      "path": "src/ui/playbook/shadow-elevation-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77e0138dfa92703de9fd0963aa8b3f96addff5a1",
+      "size": 1345,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/77e0138dfa92703de9fd0963aa8b3f96addff5a1"
+    },
+    {
+      "path": "src/ui/playbook/skeleton-loading-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b0222d7cb3f803b658a0319570f9781611d4c67",
+      "size": 1077,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/6b0222d7cb3f803b658a0319570f9781611d4c67"
+    },
+    {
+      "path": "src/ui/playbook/soft-truncate-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5f86fb857ef7744d1459d62dfaeceb0c0b1cdbbc",
+      "size": 922,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/5f86fb857ef7744d1459d62dfaeceb0c0b1cdbbc"
+    },
+    {
+      "path": "src/ui/playbook/space-not-lines-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91e8fb6d8da05e8de09bcb08ae57ef9a17744476",
+      "size": 1244,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/91e8fb6d8da05e8de09bcb08ae57ef9a17744476"
+    },
+    {
+      "path": "src/ui/playbook/spring-vs-ease-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "528e6ce7d1b0c5945044086aea1ac035ae7ae68e",
+      "size": 1298,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/528e6ce7d1b0c5945044086aea1ac035ae7ae68e"
+    },
+    {
+      "path": "src/ui/playbook/stagger-enter-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c48196d3b9aaf10b4772a22a5e5645ab90c2139d",
+      "size": 1822,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c48196d3b9aaf10b4772a22a5e5645ab90c2139d"
+    },
+    {
+      "path": "src/ui/playbook/status-not-color-alone-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e59d86fa5fa6b8f80b4acd0d9fcf1c8bb3d0ddbf",
+      "size": 1511,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e59d86fa5fa6b8f80b4acd0d9fcf1c8bb3d0ddbf"
+    },
+    {
+      "path": "src/ui/playbook/subtle-exit-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa96670e44811b101484672166342226fd0d9b84",
+      "size": 2916,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/aa96670e44811b101484672166342226fd0d9b84"
+    },
+    {
+      "path": "src/ui/playbook/switch.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67ff3ec28fe4dd3c8bf79c16ac87c8082fd680af",
+      "size": 1371,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/67ff3ec28fe4dd3c8bf79c16ac87c8082fd680af"
+    },
+    {
+      "path": "src/ui/playbook/tabular-nums-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1f45be8d97ffcffed797d56e11ad92ba77a02d7",
+      "size": 949,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/b1f45be8d97ffcffed797d56e11ad92ba77a02d7"
+    },
+    {
+      "path": "src/ui/playbook/text-balance-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "feb0dc5acbc0926e3dc6fedee53fe3939c9f2da3",
+      "size": 899,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/feb0dc5acbc0926e3dc6fedee53fe3939c9f2da3"
+    },
+    {
+      "path": "src/ui/playbook/text-contrast-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74fc6918f35b7cde56c2bc2f5ee54a4c4907b820",
+      "size": 972,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/74fc6918f35b7cde56c2bc2f5ee54a4c4907b820"
+    },
+    {
+      "path": "src/ui/playbook/tooltip-warm-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "864caef2ff4b5b8505f5afa19fce5e54148c500a",
+      "size": 3020,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/864caef2ff4b5b8505f5afa19fce5e54148c500a"
+    },
+    {
+      "path": "src/ui/playbook/touch-target-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc9bb2f0fd6d3393c1bae2e05cf3bb88cef11fe9",
+      "size": 1702,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/dc9bb2f0fd6d3393c1bae2e05cf3bb88cef11fe9"
+    },
+    {
+      "path": "src/ui/playbook/tracking-by-size-demo.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f3d14c083b87f69e8b34d845ee70203b169b2a5",
+      "size": 593,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3f3d14c083b87f69e8b34d845ee70203b169b2a5"
+    },
+    {
+      "path": "src/ui/promo-banner.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa80bb3fccf659eeeedd6d370ffe8f72b9f9a71d",
+      "size": 7389,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/aa80bb3fccf659eeeedd6d370ffe8f72b9f9a71d"
+    },
+    {
+      "path": "src/ui/related-directory-links.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "43bd0969db86b7ec95438f02385fac0ab6784172",
+      "size": 1073,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/43bd0969db86b7ec95438f02385fac0ab6784172"
+    },
+    {
+      "path": "src/ui/select-field.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c9085299bae5a891e904c59a6376a997c79701c",
+      "size": 3833,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/8c9085299bae5a891e904c59a6376a997c79701c"
+    },
+    {
+      "path": "src/ui/skill-card.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e50ae9bc55b6c09f5ccbe841c8ecf21e1e68a5b2",
+      "size": 1799,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e50ae9bc55b6c09f5ccbe841c8ecf21e1e68a5b2"
+    },
+    {
+      "path": "src/ui/skill-content-card.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d7b932ad57e1ece921ce45f6220d20a014b636b",
+      "size": 4605,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1d7b932ad57e1ece921ce45f6220d20a014b636b"
+    },
+    {
+      "path": "src/ui/skill-favorite.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17fbe09748100022eafe4a24b928b2b02d7ee187",
+      "size": 10251,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/17fbe09748100022eafe4a24b928b2b02d7ee187"
+    },
+    {
+      "path": "src/ui/skill-file-list.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "004bc163ab8650b98e5aa99afebd226b01723eb9",
+      "size": 2895,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/004bc163ab8650b98e5aa99afebd226b01723eb9"
+    },
+    {
+      "path": "src/ui/skill-item.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a291ee7b05b36f1432be065e3aa8b24f8af342d",
+      "size": 2282,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/2a291ee7b05b36f1432be065e3aa8b24f8af342d"
+    },
+    {
+      "path": "src/ui/skill-nav.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed8a8b56dc178c0e55d91ee7e2fb7e97c0e1572a",
+      "size": 1683,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ed8a8b56dc178c0e55d91ee7e2fb7e97c0e1572a"
+    },
+    {
+      "path": "src/ui/text-morph.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f8ea8dd6935c469e280ca99d1b4aad9c217a122d",
+      "size": 1990,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f8ea8dd6935c469e280ca99d1b4aad9c217a122d"
+    },
+    {
+      "path": "src/ui/tooltip.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cfbc8158c6aa2d8b3f112aacda544074d07485e0",
+      "size": 1141,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/cfbc8158c6aa2d8b3f112aacda544074d07485e0"
+    },
+    {
+      "path": "src/ui/topic-tag.astro",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9c9cbe3da5eaf39500fb7ad350661d05e1e47b0",
+      "size": 497,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f9c9cbe3da5eaf39500fb7ad350661d05e1e47b0"
+    },
+    {
+      "path": "src/ui/unsave-skill-button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3fca97bd99ce552a2d002c412fe64f82b09f9f59",
+      "size": 3186,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/3fca97bd99ce552a2d002c412fe64f82b09f9f59"
+    },
+    {
+      "path": "src/ui/webmcp-tools.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "43cab13b85ba6e67ac0ad4bd8b4d7b7df0c1ffaf",
+      "size": 381,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/43cab13b85ba6e67ac0ad4bd8b4d7b7df0c1ffaf"
+    },
+    {
+      "path": "tests",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ccdcf900ce245f2427ed11d877c24299c7d19e6f",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/ccdcf900ce245f2427ed11d877c24299c7d19e6f"
+    },
+    {
+      "path": "tests/agent-discovery.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25586d8020dc8de16045bba0cc5220cd5f1d2874",
+      "size": 3614,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/25586d8020dc8de16045bba0cc5220cd5f1d2874"
+    },
+    {
+      "path": "tests/agents.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "81bad024989258a7d17c3388a809df672be002df",
+      "size": 1798,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/81bad024989258a7d17c3388a809df672be002df"
+    },
+    {
+      "path": "tests/auth-d1.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f101995b3457daff9a366286773d4a4a5afe4c8f",
+      "size": 10639,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f101995b3457daff9a366286773d4a4a5afe4c8f"
+    },
+    {
+      "path": "tests/auth.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c876ba344706d88dd13417d5304cee0ba4218f74",
+      "size": 6957,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c876ba344706d88dd13417d5304cee0ba4218f74"
+    },
+    {
+      "path": "tests/cache-headers.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77a62eb79549c40b6faf87e71da73609664451f5",
+      "size": 1110,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/77a62eb79549c40b6faf87e71da73609664451f5"
+    },
+    {
+      "path": "tests/catalog-curation.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f26e52448bc8d87280621d25e5a9be5045b832e8",
+      "size": 6255,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/f26e52448bc8d87280621d25e5a9be5045b832e8"
+    },
+    {
+      "path": "tests/cli.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e00e6c8f43d935b040af485be30c3bacd0b54db3",
+      "size": 4354,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e00e6c8f43d935b040af485be30c3bacd0b54db3"
+    },
+    {
+      "path": "tests/code-highlighter.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "60b0bf0506b0406b4e7470de8f5381feb5f9bcd0",
+      "size": 2495,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/60b0bf0506b0406b4e7470de8f5381feb5f9bcd0"
+    },
+    {
+      "path": "tests/component-libraries.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "04800799d8be1982c893137d477ac1e6372fedfd",
+      "size": 1331,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/04800799d8be1982c893137d477ac1e6372fedfd"
+    },
+    {
+      "path": "tests/external.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "46c9e953fea0affe8c2b91f351d62fc6bb460434",
+      "size": 3368,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/46c9e953fea0affe8c2b91f351d62fc6bb460434"
+    },
+    {
+      "path": "tests/fixtures",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "497b579f84940d59bb8bcd4de5135757217b36db",
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/trees/497b579f84940d59bb8bcd4de5135757217b36db"
+    },
+    {
+      "path": "tests/fixtures/auth.wrangler.jsonc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "729bdbb36d63f7877f05738c4984cd3d1c766c57",
+      "size": 292,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/729bdbb36d63f7877f05738c4984cd3d1c766c57"
+    },
+    {
+      "path": "tests/library-d1.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b33e56a1eba5303b6db3a33907abaca65154681",
+      "size": 2985,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/7b33e56a1eba5303b6db3a33907abaca65154681"
+    },
+    {
+      "path": "tests/library.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2d7b0a5326821396c7107ffacb6711fbd75df7c",
+      "size": 6631,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/d2d7b0a5326821396c7107ffacb6711fbd75df7c"
+    },
+    {
+      "path": "tests/markdown-negotiation.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e141c35da7715c4af914ad33a0bec39d259b9f58",
+      "size": 4189,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/e141c35da7715c4af914ad33a0bec39d259b9f58"
+    },
+    {
+      "path": "tests/oauth-discovery.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6889d99be02c1f12b46ac4f7ac294e4e4c11eb5",
+      "size": 4484,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/c6889d99be02c1f12b46ac4f7ac294e4e4c11eb5"
+    },
+    {
+      "path": "tests/oauth-validation.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b2335d842071d2bd71e45c3765b6b3014c292b7",
+      "size": 1226,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/1b2335d842071d2bd71e45c3765b6b3014c292b7"
+    },
+    {
+      "path": "tests/playbook.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0accb15f0aaf7640a8326a7fbdba729a866f6d36",
+      "size": 1806,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0accb15f0aaf7640a8326a7fbdba729a866f6d36"
+    },
+    {
+      "path": "tests/routes.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0149243ffaca5273abd5c3e894147c292ff21f38",
+      "size": 4727,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/0149243ffaca5273abd5c3e894147c292ff21f38"
+    },
+    {
+      "path": "tests/skills-mcp-discovery.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc850f2720810b65b0b45077d054598cb3fadd81",
+      "size": 4049,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/dc850f2720810b65b0b45077d054598cb3fadd81"
+    },
+    {
+      "path": "tests/smoke.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0bde53c7161b1773007736b4421596d0304157e",
+      "size": 14374,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/a0bde53c7161b1773007736b4421596d0304157e"
+    },
+    {
+      "path": "tests/ui-skills-cli.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "99029917dbf772caf2395963f2504dbce7f0e716",
+      "size": 943,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/99029917dbf772caf2395963f2504dbce7f0e716"
+    },
+    {
+      "path": "tests/webmcp-tools.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "895217b7adf8195d2669aae79306269c0a38c1ff",
+      "size": 1409,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/895217b7adf8195d2669aae79306269c0a38c1ff"
+    },
+    {
+      "path": "tsconfig.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee6500dc4e2b5f0b50e513dd65785c81238c5eb4",
+      "size": 235,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/ee6500dc4e2b5f0b50e513dd65785c81238c5eb4"
+    },
+    {
+      "path": "wrangler.jsonc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "afc9c99396b77993db6395ae6a12ac2ddc02afcb",
+      "size": 1207,
+      "url": "https://api.github.com/repos/ibelick/ui-skills/git/blobs/afc9c99396b77993db6395ae6a12ac2ddc02afcb"
+    }
+  ],
+  "truncated": false
+}

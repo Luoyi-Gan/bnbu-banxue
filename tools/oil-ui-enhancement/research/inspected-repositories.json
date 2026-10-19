@@ -1,0 +1,360 @@
+[
+  {
+    "repository": "greensock/gsap-skills",
+    "stars": 16615,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-07-29T17:36:08Z",
+    "commit": "aed9cfd3277740755f6bfc1155c7aa645403b760",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "skills/gsap-core/SKILL.md",
+      "skills/gsap-frameworks/SKILL.md",
+      "skills/gsap-performance/SKILL.md",
+      "skills/gsap-plugins/SKILL.md",
+      "skills/gsap-react/SKILL.md",
+      "skills/gsap-scrolltrigger/SKILL.md",
+      "skills/gsap-timeline/SKILL.md",
+      "skills/gsap-utils/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "jakubkrehel/skills",
+    "stars": 8031,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-10-13T02:06:04Z",
+    "commit": "4c66b1fa86e9ab70187b43d7da9b6fdb29f2ef63",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "skills/better-accessibility/SKILL.md",
+      "skills/better-colors/SKILL.md",
+      "skills/better-interface/SKILL.md",
+      "skills/better-layout/SKILL.md",
+      "skills/better-typography/SKILL.md",
+      "skills/better-ui/SKILL.md",
+      "skills/better-writing/SKILL.md",
+      "skills/break/SKILL.md",
+      "skills/build-design/SKILL.md",
+      "skills/explain-interface/SKILL.md",
+      "skills/interface-review/SKILL.md",
+      "skills/state-machine/SKILL.md",
+      "skills/technical-drawing/SKILL.md",
+      "skills/variant/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "ibelick/ui-skills",
+    "stars": 9857,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-10-17T15:07:15Z",
+    "commit": "747a47fdb6b405e5cbf268f7c410123930455157",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "skills/baseline-ui/SKILL.md",
+      "skills/component-canvas/SKILL.md",
+      "skills/create-design-md/SKILL.md",
+      "skills/fixing-accessibility/SKILL.md",
+      "skills/fixing-metadata/SKILL.md",
+      "skills/fixing-motion-performance/SKILL.md",
+      "skills/improve-ui/SKILL.md",
+      "skills/ui-skills-root/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "kylezantos/design-motion-principles",
+    "stars": 1354,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-05-30T23:17:35Z",
+    "commit": "4a9ca879f24a361f4dca4174fe2da0f67b5ddee3",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "skills/design-motion-principles/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "Leonxlnx/taste-skill",
+    "stars": 98927,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-10-18T23:13:35Z",
+    "commit": "a9c73c3d5dbf401e3e47f86e7b41f29ede1687df",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "skills/brandkit/SKILL.md",
+      "skills/brutalist-skill/SKILL.md",
+      "skills/gpt-tasteskill/SKILL.md",
+      "skills/image-to-code-skill/SKILL.md",
+      "skills/imagegen-frontend-mobile/SKILL.md",
+      "skills/imagegen-frontend-web/SKILL.md",
+      "skills/minimalist-skill/SKILL.md",
+      "skills/redesign-skill/SKILL.md",
+      "skills/soft-skill/SKILL.md",
+      "skills/stitch-skill/SKILL.md",
+      "skills/taste-skill-v1/SKILL.md",
+      "skills/taste-skill-v2-experimental/SKILL.md",
+      "skills/taste-skill/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "nextlevelbuilder/ui-ux-pro-max-skill",
+    "stars": 137295,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-10-15T02:04:34Z",
+    "commit": "56ea9cf174ed86786187daa9de0e6247cb0747e4",
+    "truncated": false,
+    "paths": [
+      ".claude/skills/banner-design/SKILL.md",
+      ".claude/skills/brand/SKILL.md",
+      ".claude/skills/design-system/SKILL.md",
+      ".claude/skills/design/SKILL.md",
+      ".claude/skills/slides/SKILL.md",
+      ".claude/skills/ui-styling/LICENSE.txt",
+      ".claude/skills/ui-styling/SKILL.md",
+      ".claude/skills/ui-ux-pro-max/SKILL.md",
+      ".claude/skills/ui-ux-pro-max/data/google-font-licenses.json",
+      "LICENSE",
+      "cli/assets/data/google-font-licenses.json",
+      "cli/assets/skills/banner-design/SKILL.md",
+      "cli/assets/skills/brand/SKILL.md",
+      "cli/assets/skills/design-system/SKILL.md",
+      "cli/assets/skills/design/SKILL.md",
+      "cli/assets/skills/slides/SKILL.md",
+      "cli/assets/skills/ui-styling/LICENSE.txt",
+      "cli/assets/skills/ui-styling/SKILL.md",
+      "src/ui-ux-pro-max/data/google-font-licenses.json"
+    ],
+    "error": null
+  },
+  {
+    "repository": "vercel-labs/agent-skills",
+    "stars": 32611,
+    "license_api": null,
+    "pushed_at": "2026-10-14T17:58:45Z",
+    "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+    "truncated": false,
+    "paths": [
+      "skills/composition-patterns/SKILL.md",
+      "skills/deploy-to-vercel/SKILL.md",
+      "skills/react-best-practices/SKILL.md",
+      "skills/react-native-skills/SKILL.md",
+      "skills/react-view-transitions/SKILL.md",
+      "skills/vercel-cli-with-tokens/SKILL.md",
+      "skills/vercel-optimize/SKILL.md",
+      "skills/web-design-guidelines/SKILL.md",
+      "skills/writing-guidelines/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "anthropics/skills",
+    "stars": 182027,
+    "license_api": null,
+    "pushed_at": "2026-10-09T18:45:52Z",
+    "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+    "truncated": false,
+    "paths": [
+      "skills/academy-guide/LICENSE.txt",
+      "skills/academy-guide/SKILL.md",
+      "skills/algorithmic-art/LICENSE.txt",
+      "skills/algorithmic-art/SKILL.md",
+      "skills/brand-guidelines/LICENSE.txt",
+      "skills/brand-guidelines/SKILL.md",
+      "skills/canvas-design/LICENSE.txt",
+      "skills/canvas-design/SKILL.md",
+      "skills/claude-api/LICENSE.txt",
+      "skills/claude-api/SKILL.md",
+      "skills/discernment-nudge/LICENSE.txt",
+      "skills/discernment-nudge/SKILL.md",
+      "skills/doc-coauthoring/SKILL.md",
+      "skills/docx/LICENSE.txt",
+      "skills/docx/SKILL.md",
+      "skills/frontend-design/LICENSE.txt",
+      "skills/frontend-design/SKILL.md",
+      "skills/internal-comms/LICENSE.txt",
+      "skills/internal-comms/SKILL.md",
+      "skills/mcp-builder/LICENSE.txt",
+      "skills/mcp-builder/SKILL.md",
+      "skills/pdf/LICENSE.txt",
+      "skills/pdf/SKILL.md",
+      "skills/pptx/LICENSE.txt",
+      "skills/pptx/SKILL.md",
+      "skills/skill-creator/LICENSE.txt",
+      "skills/skill-creator/SKILL.md",
+      "skills/slack-gif-creator/LICENSE.txt",
+      "skills/slack-gif-creator/SKILL.md",
+      "skills/theme-factory/LICENSE.txt",
+      "skills/theme-factory/SKILL.md",
+      "skills/web-artifacts-builder/LICENSE.txt",
+      "skills/web-artifacts-builder/SKILL.md",
+      "skills/webapp-testing/LICENSE.txt",
+      "skills/webapp-testing/SKILL.md",
+      "skills/xlsx/LICENSE.txt",
+      "skills/xlsx/SKILL.md",
+      "template/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "nateherkai/scroll-craft",
+    "stars": 3643,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-09-30T13:31:42Z",
+    "commit": "75d81f74e83692add18cd7a8a8e078b8a887a579",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "plugins/nateherk-design/skills/scroll-craft/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "Jakubantalik/transitions.dev",
+    "stars": 5408,
+    "license_api": {
+      "key": "other",
+      "name": "Other",
+      "spdx_id": "NOASSERTION",
+      "url": null,
+      "node_id": "MDc6TGljZW5zZTA="
+    },
+    "pushed_at": "2026-10-17T13:09:38Z",
+    "commit": "7ec0b0b0b8beb15788a9de68a40ec6be2d5e84b5",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "agent/skill/SKILL.md",
+      "refine/.agents/skills/refine-live/SKILL.md",
+      "skills/transitions-dev/LICENSE.txt",
+      "skills/transitions-dev/SKILL.md",
+      "skills/transitions-polish/LICENSE.txt",
+      "skills/transitions-polish/SKILL.md",
+      "skills/transitions-ui-generation/LICENSE.txt",
+      "skills/transitions-ui-generation/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "iart-ai/motion-skills",
+    "stars": 889,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-10-14T14:10:05Z",
+    "commit": "bb5a3ce666110855a3437de2f70e9968c408e005",
+    "truncated": false,
+    "paths": [
+      "LICENSE"
+    ],
+    "error": null
+  },
+  {
+    "repository": "remotion-dev/skills",
+    "stars": 5335,
+    "license_api": null,
+    "pushed_at": "2026-10-16T08:09:18Z",
+    "commit": "1441a11e95db35443bd76bb318386c0d3ca00053",
+    "truncated": false,
+    "paths": [
+      "skills/remotion-best-practices/SKILL.md",
+      "skills/remotion-captions/SKILL.md",
+      "skills/remotion-create/SKILL.md",
+      "skills/remotion-docs/SKILL.md",
+      "skills/remotion-interactivity/SKILL.md",
+      "skills/remotion-maps/SKILL.md",
+      "skills/remotion-markup/SKILL.md",
+      "skills/remotion-multimedia/SKILL.md",
+      "skills/remotion-render/SKILL.md",
+      "skills/remotion-saas/SKILL.md",
+      "skills/remotion-studio/SKILL.md",
+      "skills/remotion-upgrade/SKILL.md"
+    ],
+    "error": null
+  },
+  {
+    "repository": "emilkowalski/skills",
+    "stars": 47415,
+    "license_api": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "pushed_at": "2026-10-11T13:58:36Z",
+    "commit": "2d228630ba1446365f614a108cb8252f1feda202",
+    "truncated": false,
+    "paths": [
+      "LICENSE",
+      "skills/animate-expo/SKILL.md",
+      "skills/animate/SKILL.md",
+      "skills/animation-performance/SKILL.md",
+      "skills/animation-vocabulary/SKILL.md",
+      "skills/apple-design/SKILL.md",
+      "skills/ask-sonner/SKILL.md",
+      "skills/break-ui/SKILL.md",
+      "skills/emil-design-eng/SKILL.md",
+      "skills/find-animation-opportunities/SKILL.md",
+      "skills/improve-animations/SKILL.md",
+      "skills/mobile-native/SKILL.md",
+      "skills/pick-ui-library/SKILL.md",
+      "skills/prototype/SKILL.md",
+      "skills/review-animations/SKILL.md",
+      "skills/write-swift/SKILL.md"
+    ],
+    "error": null
+  }
+]

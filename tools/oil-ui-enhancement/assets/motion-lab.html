@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oil UI 本地增强 · 交互演示台</title>
+<link rel="stylesheet" href="motion-tokens.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f8f5;color:#23372e;font:16px/1.65 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1060px;margin:60px auto;padding:0 24px}h1{font-size:34px;line-height:1.3;margin:12px 0}h2{font-size:21px;margin:0 0 14px}p{margin:10px 0;color:#536358}button,input{font:inherit}button{border:1px solid #bdd0c3;border-radius:10px;background:#fff;color:#254d38;padding:10px 18px;cursor:pointer;min-height:44px}button.primary{background:#28563c;color:white;border-color:#28563c}button:disabled{cursor:wait;opacity:.65}button:active{transform:translateY(1px)}:focus-visible{outline:3px solid #5277ae;outline-offset:4px}.badge{display:inline-block;border:1px solid #c3d2c5;border-radius:6px;padding:3px 9px;font-size:13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px}.panel{padding:26px;background:white;border:1px solid #dde5da;border-radius:16px}.controls{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.note{font-size:14px}.sample{padding:18px 0;border-top:1px solid #e0e7dd;margin-top:16px}.sample strong{display:block;font-size:18px}.sample span{font-size:14px;color:#536358}label{display:block;margin:18px 0 8px}input[type=text]{display:block;width:100%;padding:11px 13px;border:1px solid #a9bcae;border-radius:8px}.check{display:flex;align-items:center;gap:8px}input[type=checkbox]{width:20px;height:20px;accent-color:#28563c}.status{min-height:60px;padding-top:14px;color:#325a40}.status.error{color:#923f2e}.progress{height:4px;background:#e4ece4;overflow:hidden;margin:18px 0}.progress:before{content:"";display:block;width:35%;height:100%;background:#477555;animation:progress 850ms ease-in-out infinite alternate}.progress[hidden]{display:none}@keyframes progress{to{transform:translateX(180%)}}dialog{border:1px solid #c5d4c8;border-radius:18px;max-width:440px;width:calc(100% - 32px);padding:28px;color:#23372e;animation:ui-motion-enter var(--motion-panel) var(--motion-enter) both}dialog::backdrop{background:#14231c88}dialog p{margin-bottom:24px}.details{overflow:hidden;padding-top:18px}.token-list{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:14px}.token-list dt{font-weight:600}.token-list dd{margin:0;color:#536358}.state{font-size:14px;min-height:24px}.footer{margin:24px 0 50px;font-size:14px}.reduced .ui-motion-enter,.reduced dialog,.reduced .progress:before{animation:none}.reduced button:active{transform:none}@media(prefers-reduced-motion:reduce){dialog,.progress:before{animation:none}button:active{transform:none}}@media(max-width:700px){main{margin-top:28px}.grid{grid-template-columns:1fr}h1{font-size:28px}.panel{padding:22px}}
+</style>
+</head>
+<body><main>
+<span class="badge">Oil UI · 本地增强</span>
+<h1>让每个状态，都有清楚的回应。</h1>
+<p>这里演示弹窗焦点、可中断的模拟提交与减少动态。所有数据只用于本地演示。</p>
+<label class="check"><input id="reduced" type="checkbox">在本页减少动态</label><p class="state" id="motion-state" aria-live="polite"></p>
+<div class="grid">
+<section class="panel"><h2>弹窗与空间连续</h2><p>打开校园安排，关闭后回到发起按钮。</p><div class="sample"><strong>校园摄影漫步</strong><span>16:30—17:30 · 图书馆前集合</span></div><div class="controls"><button class="primary" id="open">查看安排</button><button id="expand" aria-expanded="false" aria-controls="details">展开更多</button></div><div id="details" class="details" hidden><div class="ui-motion-enter"><strong>参与标记</strong><p class="note">此处展示模拟安排详情。参与标记不代表正式报名或到场。</p></div></div></section>
+<section class="panel"><h2>提交、失败与恢复</h2><p>主动触发成功或失败，检查输入保留与重复操作。</p><form id="form"><label for="title">安排名称</label><input id="title" name="title" type="text" value="校园摄影漫步" required maxlength="50"><label class="check"><input id="fail" type="checkbox">让本次模拟请求失败</label><div class="controls"><button id="save" class="primary">模拟保存</button><button id="cancel" type="button" disabled>取消请求</button></div><div class="progress" id="progress" hidden aria-hidden="true"></div><div class="status" id="status" role="status" aria-live="polite">尚未提交。</div></form></section>
+<section class="panel"><h2>动效令牌</h2><dl class="token-list"><dt>按压反馈</dt><dd>140ms，轻微位移</dd><dt>浮层</dt><dd>200ms，短距离进入</dd><dt>面板</dt><dd>280ms，先快后缓</dd><dt>减少动态</dt><dd>保留结果，移除位移和循环装饰</dd></dl><p class="note">这些是可调整起点。实际页面优先沿用项目已有令牌。</p></section>
+<section class="panel"><h2>观察重点</h2><p>按 Tab 找到按钮，按 Enter 打开弹窗，再按 Escape 返回。模拟失败后输入应保留，取消后旧请求不再写入结果。</p><p class="note">这个独立演示不连接会同里账号、课表或体育接口。</p></section>
+</div><p class="footer">本地模拟 · 关闭页面即结束；没有真实保存操作。</p>
+</main>
+<dialog id="dialog" aria-labelledby="dialog-title"><h2 id="dialog-title">校园摄影漫步</h2><p>16:30—17:30<br>图书馆前集合</p><span class="badge">本地模拟 · 参与标记</span><p>带上相机或手机，一起记录校园的光线。</p><button id="close" class="primary" autofocus>返回首页</button></dialog>
+<script>
+const $=id=>document.getElementById(id);
+const media=matchMedia('(prefers-reduced-motion: reduce)');
+function motionState(){const reduced=media.matches||$('reduced').checked;document.body.classList.toggle('reduced',reduced);$('motion-state').textContent=reduced?'已减少动态，所有内容和操作继续可用。':'使用正常动态，跟随系统的减少动态设置。';}
+media.addEventListener('change',motionState);$('reduced').addEventListener('change',motionState);motionState();
+$('open').addEventListener('click',()=>$('dialog').showModal());$('close').addEventListener('click',()=>$('dialog').close());$('dialog').addEventListener('close',()=>$('open').focus());
+$('expand').addEventListener('click',()=>{const open=$('expand').getAttribute('aria-expanded')==='true';$('expand').setAttribute('aria-expanded',String(!open));$('details').hidden=open;$('expand').textContent=open?'展开更多':'收起更多';});
+let pending=null;
+function settle(text,error=false){$('status').textContent=text;$('status').classList.toggle('error',error);$('save').disabled=false;$('cancel').disabled=true;$('progress').hidden=true;pending=null;}
+$('form').addEventListener('submit',event=>{event.preventDefault();if(pending)return;const title=$('title').value.trim();if(!title){$('title').setCustomValidity('请输入安排名称');$('title').reportValidity();return;}const fail=$('fail').checked;const request={title,fail,id:null};pending=request;$('save').disabled=true;$('cancel').disabled=false;$('progress').hidden=false;$('status').classList.remove('error');$('status').textContent='正在处理模拟请求…';request.id=setTimeout(()=>{if(pending!==request)return;settle(request.fail?'模拟请求失败，输入已保留，可以重试。':'模拟保存完成：'+request.title+'。未写入业务数据。',request.fail);},900);});
+$('title').addEventListener('input',()=>$('title').setCustomValidity(''));
+$('cancel').addEventListener('click',()=>{if(pending)clearTimeout(pending.id);settle('已取消模拟请求，输入已保留。');});
+addEventListener('pagehide',()=>{if(pending)clearTimeout(pending.id);});
+</script></body></html>

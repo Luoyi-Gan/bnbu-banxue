@@ -1,0 +1,356 @@
+{
+  "sha": "75d81f74e83692add18cd7a8a8e078b8a887a579",
+  "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/75d81f74e83692add18cd7a8a8e078b8a887a579",
+  "tree": [
+    {
+      "path": ".claude-plugin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a55bb33c492bf303eb06e7e0f9a530cba54fdff7",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/a55bb33c492bf303eb06e7e0f9a530cba54fdff7"
+    },
+    {
+      "path": ".claude-plugin/marketplace.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0567d57012e5755e1cd77c422a92b1a327e74a4f",
+      "size": 600,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/0567d57012e5755e1cd77c422a92b1a327e74a4f"
+    },
+    {
+      "path": ".env.example",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9880365be94bc9799297a989138a6c6d8b2e8490",
+      "size": 734,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/9880365be94bc9799297a989138a6c6d8b2e8490"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1897e7bb07db5eb4b9f727359cd4c281e99e4d0b",
+      "size": 569,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/1897e7bb07db5eb4b9f727359cd4c281e99e4d0b"
+    },
+    {
+      "path": "EXAMPLES.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "947c2415aa6e9c0c351bd1ad95b027372ace86da",
+      "size": 37262,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/947c2415aa6e9c0c351bd1ad95b027372ace86da"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d24ab435093a0c0dd35f31f68224ee276c9cc2ef",
+      "size": 1066,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/d24ab435093a0c0dd35f31f68224ee276c9cc2ef"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19bf0aba561de2448799651157c742e3f4dfa994",
+      "size": 12897,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/19bf0aba561de2448799651157c742e3f4dfa994"
+    },
+    {
+      "path": "media",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f2e931c021868d79f8a550f1281344a421ab8d5a",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/f2e931c021868d79f8a550f1281344a421ab8d5a"
+    },
+    {
+      "path": "media/ais.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf53ba41369b1d29f96875712723dececb8c4585",
+      "size": 2230276,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/bf53ba41369b1d29f96875712723dececb8c4585"
+    },
+    {
+      "path": "media/nateherk.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a9832b45bffa60872877b246bb8e57dc23cf863",
+      "size": 3457022,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/0a9832b45bffa60872877b246bb8e57dc23cf863"
+    },
+    {
+      "path": "media/perkform.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb9c1467f36483cf63a37a1266debeaf7ab54e4b",
+      "size": 904084,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/bb9c1467f36483cf63a37a1266debeaf7ab54e4b"
+    },
+    {
+      "path": "plugins",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cbbd9e114efd14580aeb97cddebf813711707b3e",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/cbbd9e114efd14580aeb97cddebf813711707b3e"
+    },
+    {
+      "path": "plugins/nateherk-design",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ce1d09ec4e98e09e46f891602d740c8781f35cfd",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/ce1d09ec4e98e09e46f891602d740c8781f35cfd"
+    },
+    {
+      "path": "plugins/nateherk-design/.claude-plugin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "13f95a323c64e51b8304a61bf15fdff56cae03a4",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/13f95a323c64e51b8304a61bf15fdff56cae03a4"
+    },
+    {
+      "path": "plugins/nateherk-design/.claude-plugin/plugin.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b277f6573136a4b5f8515bdc796f8d64782fe96b",
+      "size": 494,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/b277f6573136a4b5f8515bdc796f8d64782fe96b"
+    },
+    {
+      "path": "plugins/nateherk-design/skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "badd53871208979c290cfbc774bab8c4d0928d2f",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/badd53871208979c290cfbc774bab8c4d0928d2f"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1093fb06f2978f2e366a25945a27d0220e377735",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/1093fb06f2978f2e366a25945a27d0220e377735"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/CHANGELOG.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e811e8cabe6047aec1e3484b3f4cafb99a5a7349",
+      "size": 35142,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/e811e8cabe6047aec1e3484b3f4cafb99a5a7349"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac879a75e6b8a07cf1c431d421623bb954d3caba",
+      "size": 24993,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/ac879a75e6b8a07cf1c431d421623bb954d3caba"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/engine",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3909ef8c233b4fff0f94e4bf87848ede060c8af9",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/3909ef8c233b4fff0f94e4bf87848ede060c8af9"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/engine/scrollcraft.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62ee4f84e249f24f0939673cbf98befd0e2f3d09",
+      "size": 19769,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/62ee4f84e249f24f0939673cbf98befd0e2f3d09"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/engine/scrollcraft.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "439bc30ef4eb6721506a76ca990e2b8681b380d4",
+      "size": 62176,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/439bc30ef4eb6721506a76ca990e2b8681b380d4"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ba73cdc4e7eef8451048a873de9ef9b2abde9d89",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/ba73cdc4e7eef8451048a873de9ef9b2abde9d89"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/approved-collection.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b9232e30c0a950ca016fa24a1f98b1e72fab79b",
+      "size": 11650,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/1b9232e30c0a950ca016fa24a1f98b1e72fab79b"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/assets.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9385dd73e70ad112c4e1106d8ed34cacf41b786a",
+      "size": 13194,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/9385dd73e70ad112c4e1106d8ed34cacf41b786a"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/device-diag.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ead92bbeda5959e413aafb754bcaffae6dd8df15",
+      "size": 9149,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/ead92bbeda5959e413aafb754bcaffae6dd8df15"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/devices.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "720a3c653448c76b6dad19dffb71e10e9d37b1af",
+      "size": 26648,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/720a3c653448c76b6dad19dffb71e10e9d37b1af"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/feel.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a95f973cd90b04c58c9afa526edacd815c762e47",
+      "size": 13181,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/a95f973cd90b04c58c9afa526edacd815c762e47"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/hero-depth.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2545730357bf0b549a2ae28380ed3028ade13b35",
+      "size": 6260,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/2545730357bf0b549a2ae28380ed3028ade13b35"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/taste.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d9e986939b34c2452d83b6f4f61a41f1c405f39c",
+      "size": 14874,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/d9e986939b34c2452d83b6f4f61a41f1c405f39c"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/template.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e03f96ef21b61c26b97e3a3ba7ffcf3220628e1",
+      "size": 6418,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/5e03f96ef21b61c26b97e3a3ba7ffcf3220628e1"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/uniqueness.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec7b8b3c9337a226104c7742b9953d3ff7f30596",
+      "size": 23527,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/ec7b8b3c9337a226104c7742b9953d3ff7f30596"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/verify.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ff5e1c63cb9fad5c27ad1b36bba9286409c051b",
+      "size": 24189,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/1ff5e1c63cb9fad5c27ad1b36bba9286409c051b"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/worldflight.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bda0ae3ddce1b133cbbd80ee5a0bd8d8be92c0f8",
+      "size": 16155,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/bda0ae3ddce1b133cbbd80ee5a0bd8d8be92c0f8"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/worlds.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea54a350a0cede1d29718df7a4789cb2fae14b79",
+      "size": 8046,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/ea54a350a0cede1d29718df7a4789cb2fae14b79"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6f32ffedcf276a6b37a45b7747e572a4596b04f8",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/6f32ffedcf276a6b37a45b7747e572a4596b04f8"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/doctor.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "613100c84ed8bc91caa9e38f3054c7017098d1c3",
+      "size": 7281,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/613100c84ed8bc91caa9e38f3054c7017098d1c3"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/encode.sh",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa4858dd2d79fde631bd394cae77af2223d5b711",
+      "size": 3222,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/fa4858dd2d79fde631bd394cae77af2223d5b711"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/kie.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dde564fafca2e00e1b79645ca7e9229742f549f1",
+      "size": 7780,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/dde564fafca2e00e1b79645ca7e9229742f549f1"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/serve.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b51701f864078ed68220c34180245f567ac91047",
+      "size": 3206,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/b51701f864078ed68220c34180245f567ac91047"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/shoot.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7962f765cc5bac9de2f232167db60471980b3843",
+      "size": 33472,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/7962f765cc5bac9de2f232167db60471980b3843"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/workspace.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9481d64b1468f91b021b4ac0099af8d55eb3e9e",
+      "size": 3707,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/e9481d64b1468f91b021b4ac0099af8d55eb3e9e"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/worldflight-assert.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28802ee9074e3c4cd4b65f83e500b04cce90255c",
+      "size": 13115,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/28802ee9074e3c4cd4b65f83e500b04cce90255c"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0bd48098228c77c007a22f781eff3792cb58a6e7",
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/trees/0bd48098228c77c007a22f781eff3792cb58a6e7"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/templates/FINGERPRINTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4798d63e93b5336df2c2af2d8bf612a79f19ca4",
+      "size": 2387,
+      "url": "https://api.github.com/repos/nateherkai/scroll-craft/git/blobs/d4798d63e93b5336df2c2af2d8bf612a79f19ca4"
+    }
+  ],
+  "truncated": false
+}

@@ -1,0 +1,2 @@
+# Preserve upstream Git blob hashes, including original whitespace.
+references/upstream/** -text -whitespace

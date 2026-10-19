@@ -1,0 +1,93 @@
+{
+  "sha": "bb5a3ce666110855a3437de2f70e9968c408e005",
+  "url": "https://api.github.com/repos/iart-ai/motion-skills/git/trees/bb5a3ce666110855a3437de2f70e9968c408e005",
+  "tree": [
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a61b911146037f2ef312f67e9b45de6c99b7f870",
+      "size": 1064,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/a61b911146037f2ef312f67e9b45de6c99b7f870"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4778296bee0a912c2ada4133d6a2fbbac30d554",
+      "size": 5595,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/d4778296bee0a912c2ada4133d6a2fbbac30d554"
+    },
+    {
+      "path": "showcase.gif",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4b829fa8b28d9503c70c0815211be66b3b4a9efc",
+      "size": 3651648,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/4b829fa8b28d9503c70c0815211be66b3b4a9efc"
+    },
+    {
+      "path": "showcase.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c373e4688aebd7bfcdd5ec310d07481c6b8da9d",
+      "size": 18777,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/3c373e4688aebd7bfcdd5ec310d07481c6b8da9d"
+    },
+    {
+      "path": "tools",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1f177708ba6039e72b89eeba08972192189cd78b",
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/trees/1f177708ba6039e72b89eeba08972192189cd78b"
+    },
+    {
+      "path": "tools/showcase-to-gif.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d9e3d686a2542b4ad2c45471fe93089e5b86d671",
+      "size": 3005,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/d9e3d686a2542b4ad2c45471fe93089e5b86d671"
+    },
+    {
+      "path": "tools/verify",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "49930af3c8260b7d38924a9711a50b99a32cb66d",
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/trees/49930af3c8260b7d38924a9711a50b99a32cb66d"
+    },
+    {
+      "path": "tools/verify/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3b0a78352725fab6bba6f4969abe4f29ef6f5487",
+      "size": 2028,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/3b0a78352725fab6bba6f4969abe4f29ef6f5487"
+    },
+    {
+      "path": "tools/verify/contact-sheet.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "d0032c4d920b8e3369898bb754f96c8ed8afe0d9",
+      "size": 851,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/d0032c4d920b8e3369898bb754f96c8ed8afe0d9"
+    },
+    {
+      "path": "tools/verify/probe-mp4.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "5e9d0b3ea4ed5cf8d3471ea2f9c6159276a09273",
+      "size": 1514,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/5e9d0b3ea4ed5cf8d3471ea2f9c6159276a09273"
+    },
+    {
+      "path": "tools/verify/seek-shot.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "2020ad13d269aa5b41708ee02d7eabc40b9c3a2d",
+      "size": 1095,
+      "url": "https://api.github.com/repos/iart-ai/motion-skills/git/blobs/2020ad13d269aa5b41708ee02d7eabc40b9c3a2d"
+    }
+  ],
+  "truncated": false
+}

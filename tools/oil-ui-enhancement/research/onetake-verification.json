@@ -1,0 +1,11 @@
+{
+  "verified_at_utc": "2026-10-19T03:54:56.394027+00:00",
+  "commit": "415758128aa45cc54340df40d8109363447f582e",
+  "files_checked": 110,
+  "differences_except_discovery_description": [],
+  "motion_library_test_exit": 0,
+  "passing_assertions": 58,
+  "ffmpeg_on_path": null,
+  "ffprobe_on_path": null,
+  "description_adaptation": "Only description shortened to 319 characters for Codex schema; licensed body unchanged."
+}
