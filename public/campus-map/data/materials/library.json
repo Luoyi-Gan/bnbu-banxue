@@ -1,0 +1,21 @@
+{
+  "version": "BNBU-PBR-20261016",
+  "rules": "Photo evidence selects materials; material examples are not surveyed construction specifications. Preserve existing geometry, source UVs and source textures. Red brick, roof tile and foliage are library reserves until their exact locations are confirmed.",
+  "materials": [
+    {"id":"BNBU_01_White_Plaster","label":"白色涂层外墙","color":"#d9dbd4","roughness":0.75,"metalness":0,"asset":"white_plaster_02","repeat_m":1,"assignment":"Photo-observed pale walls and trims; restrained scan microstructure"},
+    {"id":"BNBU_02_Red_Brick","label":"红砖（待定位）","color":"#9e5542","roughness":0.85,"metalness":0,"assignment":"Reserve only; never replace ochre teaching ceramic with red brick"},
+    {"id":"BNBU_03_Facade_Glass","label":"建筑玻璃","color":"#a4bec2","roughness":0.11,"metalness":0,"ior":1.52,"transmission":1,"assignment":"Existing glazing only; Blender transmission, runtime analytic depth and cached reflection"},
+    {"id":"BNBU_04_Concrete","label":"混凝土","color":"#b7b9b2","roughness":0.85,"metalness":0,"assignment":"Uncoated structural concrete; procedural microfinish"},
+    {"id":"BNBU_05_Asphalt","label":"沥青","color":"#505b60","roughness":0.9,"metalness":0,"asset":"asphalt_02","repeat_m":3,"assignment":"Existing campus asphalt surfaces"},
+    {"id":"BNBU_06_Paving_Stone","label":"石材铺装","color":"#c4bb9e","roughness":0.7,"metalness":0,"assignment":"Existing paving; metre-scale joints and microfinish"},
+    {"id":"BNBU_07_Grass","label":"草坪","color":"#59784b","roughness":0.9,"metalness":0,"asset":"grass_ground","repeat_m":2.51,"assignment":"Existing planted surfaces; generic scan tinted to photo palette"},
+    {"id":"BNBU_08_Foliage","label":"树叶（材质预留）","color":"#426c35","roughness":0.9,"metalness":0,"assignment":"Reserve for evidenced vegetation geometry"},
+    {"id":"BNBU_09_Metal","label":"金属窗框","color":"#536b72","roughness":0.3,"metalness":1,"assignment":"Existing metal mullions, rails and roof perimeter frames"},
+    {"id":"BNBU_10_Rubber_Track","label":"橡胶运动场","color":"#a36556","roughness":0.85,"metalness":0,"assignment":"Existing sport surface polygons; preserve original track markings"},
+    {"id":"BNBU_11_Roof_Tile","label":"屋顶瓦（待定位）","color":"#8b6554","roughness":0.7,"metalness":0,"assignment":"Reserve only; existing flat roofs stay membrane surfaces"},
+    {"id":"BNBU_12_Water","label":"湖面","color":"#365d50","roughness":0.18,"metalness":0,"ior":1.333,"transmission":0.9,"assignment":"Existing shoreline; filtered ripple normals and cached reflections"},
+    {"id":"BNBU_13_Ochre_Ceramic","label":"暖色陶砖","color":"#c4a16a","roughness":0.72,"metalness":0,"assignment":"Teaching ochre facade; estimated 0.12 x 0.24 m joints"},
+    {"id":"BNBU_14_Roof_Membrane","label":"平屋面","color":"#8e9693","roughness":0.82,"metalness":0,"assignment":"Existing flat roof areas; subdued seams and raised existing edges"},
+    {"id":"BNBU_15_PV","label":"光伏面板","color":"#13212d","roughness":0.29,"metalness":0,"assignment":"Registered PV coverage only; no additional panel zones"}
+  ]
+}

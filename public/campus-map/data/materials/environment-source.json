@@ -1,0 +1,14 @@
+{
+  "asset": "overcast_soil_puresky",
+  "source": "https://polyhaven.com/a/overcast_soil_puresky",
+  "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/overcast_soil_puresky_1k.hdr",
+  "license": "CC0",
+  "authors": [
+    "Jarod Guest",
+    "Sergej Majboroda"
+  ],
+  "sha256": "2dbbbbb1323a8e8989db2e8306bd13099b215539e5adba41b85738a250a7904e",
+  "bytes": 1195816,
+  "purpose": "Generic lighting environment, not a photograph of campus",
+  "apiRequest": "https://api.polyhaven.com/files/overcast_soil_puresky returned 403; direct HDR download succeeded"
+}

@@ -20,3 +20,10 @@
 @keyframes v2-explorer-reveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@keyframes v2-explorer-fade{from{opacity:0}to{opacity:1}}@keyframes v2-explorer-rise{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
 @media(max-width:760px){.v2-explore-page{min-height:calc(100dvh - 130px);padding-bottom:90px}.v2-campus-explorer{grid-template-columns:1fr;grid-template-rows:minmax(310px,1fr) minmax(220px,auto);height:auto;min-height:650px}.v2-explore-page>.v2-campus-explorer{height:calc(100dvh - 250px);min-height:620px}.v2-explorer-panel{max-height:320px;border-left:0;border-top:1px solid #e3eaf5;padding:17px}.v2-explorer-panel-head h2{font-size:20px}.v2-explorer-select{margin:12px 0}.v2-explorer-intro{min-height:100px}.v2-explorer-source{padding-top:9px}.v2-explorer-map-top{top:10px;left:10px;right:10px}.v2-explorer-map-top>span,.v2-explorer-map-top>button{padding:8px;font-size:10px}.v2-map-picker-layer{padding:8px}.v2-map-picker-dialog{height:calc(100dvh - 16px)}.v2-map-picker-dialog .v2-campus-explorer{grid-template-rows:minmax(210px,48%) minmax(0,1fr)}.v2-map-picker-dialog .v2-explorer-panel{max-height:none}}
 @media(prefers-reduced-motion:reduce){.v2-map-picker-scrim,.v2-map-picker-dialog,.v2-explorer-selection{animation:none}}
+
+/* The migrated viewer supplies search, gestures and camera controls. */
+.v2-explorer-map-top,.v2-explorer-hint{display:none}
+@media(max-width:760px){
+  .v2-campus-explorer,.v2-explore-page>.v2-campus-explorer{height:auto;grid-template-rows:clamp(460px,65dvh,620px) auto}
+  .v2-map-picker-dialog .v2-campus-explorer{height:100%;grid-template-rows:minmax(300px,58%) minmax(0,1fr)}
+}

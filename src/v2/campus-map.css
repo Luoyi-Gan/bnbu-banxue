@@ -15,3 +15,7 @@
 @keyframes campus-spin{to{transform:rotate(360deg)}}@keyframes campus-backdrop-in{from{opacity:0}to{opacity:1}}
 @media(max-width:600px){.campus-map-anchor{height:460px}.campus-map-header{padding:12px}.campus-map-footer{padding:12px}.campus-map-picker{align-items:flex-start;flex-direction:column}.campus-map-picker select{max-width:100%;width:100%}}
 @media(prefers-reduced-motion:reduce){.campus-map-panel[popover],.campus-map-backdrop{transition:none;animation:none}}
+
+.campus-map-tools,.campus-map-legend,.campus-map-gesture{display:none}
+.campus-map-anchor{height:650px}
+@media(max-width:600px){.campus-map-anchor{height:720px}}
