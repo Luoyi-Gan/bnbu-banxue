@@ -1,0 +1,77 @@
+[
+  {
+    "file": "a.png",
+    "target": "C:\\Users\\23328\\Desktop\\BNBU-Companion\\design\\oil-ui-home\\round-01\\a.html",
+    "name": "校园画报",
+    "state": null,
+    "size": "390x844",
+    "zoom": 1,
+    "animationWaitMs": 0,
+    "issues": [],
+    "lint": []
+  },
+  {
+    "file": "b.png",
+    "target": "C:\\Users\\23328\\Desktop\\BNBU-Companion\\design\\oil-ui-home\\round-01\\b.html",
+    "name": "今日手帐",
+    "state": null,
+    "size": "390x844",
+    "zoom": 1,
+    "animationWaitMs": 0,
+    "issues": [],
+    "lint": []
+  },
+  {
+    "file": "c.png",
+    "target": "C:\\Users\\23328\\Desktop\\BNBU-Companion\\design\\oil-ui-home\\round-01\\c.html",
+    "name": "校园窗口",
+    "state": null,
+    "size": "390x844",
+    "zoom": 1,
+    "animationWaitMs": 0,
+    "issues": [],
+    "lint": []
+  },
+  {
+    "file": "sheet.png",
+    "width": 1250,
+    "height": 924,
+    "columns": 3,
+    "items": [
+      {
+        "naturalWidth": 390,
+        "naturalHeight": 844,
+        "width": 390,
+        "height": 844,
+        "labelHeight": 32,
+        "x": 24,
+        "y": 24,
+        "label": "校园画报",
+        "labelY": 876
+      },
+      {
+        "naturalWidth": 390,
+        "naturalHeight": 844,
+        "width": 390,
+        "height": 844,
+        "labelHeight": 32,
+        "x": 430,
+        "y": 24,
+        "label": "今日手帐",
+        "labelY": 876
+      },
+      {
+        "naturalWidth": 390,
+        "naturalHeight": 844,
+        "width": 390,
+        "height": 844,
+        "labelHeight": 32,
+        "x": 836,
+        "y": 24,
+        "label": "校园窗口",
+        "labelY": 876
+      }
+    ],
+    "issues": []
+  }
+]
