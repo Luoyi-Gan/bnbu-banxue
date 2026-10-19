@@ -30,6 +30,7 @@ export function StudentSportsPage() {
     {live.error && <p className="movement-error" role="alert">{live.error}</p>}
     {inRecords && <div className="movement-record-sources" aria-label="运动记录来源"><button type="button" aria-pressed={view==='records'} onClick={()=>setView('records')}>本机模拟</button><button type="button" aria-pressed={view==='synced'} onClick={()=>setView('synced')}>平台同步</button></div>}
     <div className="movement-grid">
+      <div className="movement-exercise" hidden={view==='synced'}><NativeSportsCheckin mode={view==='exercise'?'exercise':'records'} onViewChange={onNativeView} onPhaseChange={setPhase}/></div>
       {!inRecords&&!focused&&<section className="movement-progress movement-progress-refined" aria-label="学期进度">
         <header><div><h2>学期进度</h2><p>{progress?.semester || '本学期'} · {progress?.course || '体育课程信息待同步'}</p></div><span className="movement-badge">{progress?sportsProgressLabel(progress):!live.data?'同步中':live.data.sportsStatus==='not-enrolled'?'未加入班级':'暂不可用'}</span></header>
         <div className="movement-progress-overview">
@@ -41,7 +42,6 @@ export function StudentSportsPage() {
         </div>
         <footer><span><ShieldCheck size={14}/>学时以体育平台核算为准</span><button type="button" onClick={()=>void refresh()} disabled={refreshing} aria-label="同步体育进度"><RefreshCw size={14} className={refreshing?'is-refreshing':''}/>{refreshing?'同步中':'同步'}</button></footer>
       </section>}
-      <div className="movement-exercise" hidden={view==='synced'}><NativeSportsCheckin mode={view==='exercise'?'exercise':'records'} onViewChange={onNativeView} onPhaseChange={setPhase}/></div>
     </div>
     {view==='synced'&&<section className="movement-records" id="movement-records"><header><h2>已同步的运动</h2><span>{hasRecords?`${filtered.length} 条记录`:'等待同步'}</span></header><div className="movement-tabs" aria-label="记录状态筛选">{[{key:'all',label:'全部'},{key:'attention',label:'待处理'},...recordGroups].map(group=><button type="button" key={group.key} aria-pressed={filter===group.key} onClick={()=>setFilter(group.key)}>{group.label}</button>)}</div><div className="movement-list">{filtered.map(item=>{const state=recordGroup(item.data.status);return <button type="button" key={item.id} onClick={()=>setSelected(item.id)} className="movement-record"><span className="movement-record-icon"><Footprints size={22}/></span><span className="movement-record-copy"><strong>{String(item.data.sportName??item.data.sport??'运动记录')}</strong><small>{dateLabel(item.createdAt)}</small></span><span className={`movement-state state-${state}`}>{recordGroups.find(g=>g.key===state)?.label}</span><ChevronRight size={16}/></button>})}</div>{!filtered.length&&<EmptyNote>{hasRecords?'当前分类没有运动记录。':'体育平台记录同步后将在这里展示。'}</EmptyNote>}<p className="movement-record-note">有效记录与计入学时分别核算，课程要求及每日、每周上限以体育平台为准。</p></section>}
     {info&&<Modal title="运动说明" onClose={()=>setInfo(false)}><p>学期进度与平台同步记录来自本人已授权的体育数据。有效记录不一定全部计入学时，课程要求及每日、每周上限以体育平台为准。未同步的数据保持“—”。</p><p>运动操作及本机模拟记录仅用于前端体验；运动与凭证保存在当前浏览器，不送交审核，不计入真实学时。</p></Modal>}
