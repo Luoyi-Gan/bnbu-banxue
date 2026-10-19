@@ -1,0 +1,27 @@
+[
+  {
+    "phase": "04",
+    "run": 1,
+    "result": "passed"
+  },
+  {
+    "phase": "05",
+    "run": 1,
+    "result": "passed"
+  },
+  {
+    "phase": "05",
+    "run": 2,
+    "result": "passed"
+  },
+  {
+    "phase": "05",
+    "run": 3,
+    "result": "passed"
+  },
+  {
+    "phase": "06",
+    "run": 1,
+    "result": "passed"
+  }
+]

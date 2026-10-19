@@ -1,0 +1,14 @@
+{
+  "result": "passed",
+  "checks": [
+    "Login client-side empty-field feedback, no authentication attempt",
+    "Existing password step renders without completing registration or sending email",
+    "/v2/activities: timetable separated from toolbar controls at 320/390/720",
+    "/v2/campus: timetable separated from toolbar controls at 320/390/720",
+    "/v2/me: timetable separated from toolbar controls at 320/390/720",
+    "/v2/me?tab=timetable: timetable separated from toolbar controls at 320/390/720",
+    "/v2/community: timetable separated from toolbar controls at 320/390/720",
+    "/v2/schedule: timetable separated from toolbar controls at 320/390/720",
+    "Single visible community publish entry opens and dismisses the existing form"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "screens": [
+    {
+      "id": "campus",
+      "role": "student",
+      "url": "/v2/campus",
+      "family": "campus",
+      "title": "校园",
+      "actual_url": "http://127.0.0.1:4174/v2/campus"
+    },
+    {
+      "id": "me",
+      "role": "student",
+      "url": "/v2/me",
+      "family": "campus",
+      "title": "我的",
+      "actual_url": "http://127.0.0.1:4174/v2/me"
+    },
+    {
+      "id": "schedule",
+      "role": "student",
+      "url": "/v2/schedule",
+      "family": "directory",
+      "title": "我的安排",
+      "actual_url": "http://127.0.0.1:4174/v2/schedule"
+    },
+    {
+      "id": "community",
+      "role": "student",
+      "url": "/v2/community",
+      "family": "directory",
+      "title": "校园社区",
+      "actual_url": "http://127.0.0.1:4174/v2/community"
+    },
+    {
+      "id": "coffee",
+      "role": "student",
+      "url": "/v2/coffee",
+      "family": "directory",
+      "title": "Coffee Chat",
+      "actual_url": "http://127.0.0.1:4174/v2/coffee"
+    },
+    {
+      "id": "settings",
+      "role": "student",
+      "url": "/v2/settings",
+      "family": "workbench",
+      "title": "设置",
+      "actual_url": "http://127.0.0.1:4174/v2/settings"
+    },
+    {
+      "id": "teacher-coffee",
+      "role": "teacher",
+      "url": "/v2/teacher/coffee",
+      "family": "staff",
+      "title": "Coffee Chat",
+      "actual_url": "http://127.0.0.1:4174/v2/teacher/coffee"
+    },
+    {
+      "id": "admin-overview",
+      "role": "admin",
+      "url": "/v2/admin",
+      "family": "staff",
+      "title": "运营工作台",
+      "actual_url": "http://127.0.0.1:4174/v2/admin"
+    },
+    {
+      "id": "login",
+      "role": "public",
+      "url": "/v2/login",
+      "family": "entry",
+      "title": "让校园生活\n从这里开始。",
+      "actual_url": "http://127.0.0.1:4174/v2/login"
+    },
+    {
+      "id": "identity",
+      "role": "student",
+      "url": "/v2/identity",
+      "family": "entry",
+      "title": "核验校园身份",
+      "actual_url": "http://127.0.0.1:4174/v2/identity"
+    }
+  ],
+  "overflow": [],
+  "page_errors": [],
+  "scope": "Current V2 routes, local acceptance data",
+  "result": "passed"
+}

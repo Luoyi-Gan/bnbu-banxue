@@ -1,0 +1,368 @@
+{
+  "screens": [
+    {
+      "id": "home",
+      "role": "student",
+      "url": "/v2",
+      "family": "campus",
+      "title": "会同里",
+      "actual_url": "http://127.0.0.1:4174/v2"
+    },
+    {
+      "id": "discover",
+      "role": "student",
+      "url": "/v2/activities",
+      "family": "campus",
+      "title": "发现",
+      "actual_url": "http://127.0.0.1:4174/v2/activities"
+    },
+    {
+      "id": "campus",
+      "role": "student",
+      "url": "/v2/campus",
+      "family": "campus",
+      "title": "校园",
+      "actual_url": "http://127.0.0.1:4174/v2/campus"
+    },
+    {
+      "id": "me",
+      "role": "student",
+      "url": "/v2/me",
+      "family": "campus",
+      "title": "我的",
+      "actual_url": "http://127.0.0.1:4174/v2/me"
+    },
+    {
+      "id": "schedule",
+      "role": "student",
+      "url": "/v2/schedule",
+      "family": "directory",
+      "title": "我的安排",
+      "actual_url": "http://127.0.0.1:4174/v2/schedule"
+    },
+    {
+      "id": "activity",
+      "role": "student",
+      "url": "/v2/activities/preview-event-2",
+      "family": "detail",
+      "title": "发现",
+      "actual_url": "http://127.0.0.1:4174/v2/activities/preview-event-2"
+    },
+    {
+      "id": "manage-activities",
+      "role": "student",
+      "url": "/v2/activities?view=manage",
+      "family": "directory",
+      "title": "发现",
+      "actual_url": "http://127.0.0.1:4174/v2/activities?view=manage"
+    },
+    {
+      "id": "organizations",
+      "role": "student",
+      "url": "/v2/organizations",
+      "family": "directory",
+      "title": "社团组织",
+      "actual_url": "http://127.0.0.1:4174/v2/organizations"
+    },
+    {
+      "id": "community",
+      "role": "student",
+      "url": "/v2/community",
+      "family": "directory",
+      "title": "校园社区",
+      "actual_url": "http://127.0.0.1:4174/v2/community"
+    },
+    {
+      "id": "partners",
+      "role": "student",
+      "url": "/v2/partners",
+      "family": "directory",
+      "title": "找搭子",
+      "actual_url": "http://127.0.0.1:4174/v2/partners"
+    },
+    {
+      "id": "teams",
+      "role": "student",
+      "url": "/v2/partners/teams",
+      "family": "directory",
+      "title": "我的组队",
+      "actual_url": "http://127.0.0.1:4174/v2/partners/teams"
+    },
+    {
+      "id": "coffee",
+      "role": "student",
+      "url": "/v2/coffee",
+      "family": "directory",
+      "title": "Coffee Chat",
+      "actual_url": "http://127.0.0.1:4174/v2/coffee"
+    },
+    {
+      "id": "alumni",
+      "role": "student",
+      "url": "/v2/alumni",
+      "family": "directory",
+      "title": "校友同行",
+      "actual_url": "http://127.0.0.1:4174/v2/alumni"
+    },
+    {
+      "id": "alumni-people",
+      "role": "student",
+      "url": "/v2/alumni?view=people",
+      "family": "directory",
+      "title": "校友同行",
+      "actual_url": "http://127.0.0.1:4174/v2/alumni?view=people"
+    },
+    {
+      "id": "alumni-bookings",
+      "role": "student",
+      "url": "/v2/alumni?view=bookings",
+      "family": "directory",
+      "title": "校友同行",
+      "actual_url": "http://127.0.0.1:4174/v2/alumni?view=bookings"
+    },
+    {
+      "id": "messages",
+      "role": "student",
+      "url": "/v2/messages",
+      "family": "workbench",
+      "title": "我的会话",
+      "actual_url": "http://127.0.0.1:4174/v2/messages"
+    },
+    {
+      "id": "notifications",
+      "role": "student",
+      "url": "/v2/messages?view=notifications",
+      "family": "workbench",
+      "title": "通知中心",
+      "actual_url": "http://127.0.0.1:4174/v2/messages?view=notifications"
+    },
+    {
+      "id": "settings",
+      "role": "student",
+      "url": "/v2/settings",
+      "family": "workbench",
+      "title": "设置",
+      "actual_url": "http://127.0.0.1:4174/v2/settings"
+    },
+    {
+      "id": "ai",
+      "role": "student",
+      "url": "/v2/ai",
+      "family": "workbench",
+      "title": "问问奶蛙",
+      "actual_url": "http://127.0.0.1:4174/v2/ai"
+    },
+    {
+      "id": "me-profile",
+      "role": "student",
+      "url": "/v2/me?tab=profile",
+      "family": "profile",
+      "title": "个人资料",
+      "actual_url": "http://127.0.0.1:4174/v2/me?tab=profile"
+    },
+    {
+      "id": "me-saved",
+      "role": "student",
+      "url": "/v2/me?tab=saved",
+      "family": "profile",
+      "title": "我的收藏",
+      "actual_url": "http://127.0.0.1:4174/v2/me?tab=saved"
+    },
+    {
+      "id": "me-events",
+      "role": "student",
+      "url": "/v2/me?tab=events",
+      "family": "profile",
+      "title": "我的活动",
+      "actual_url": "http://127.0.0.1:4174/v2/me?tab=events"
+    },
+    {
+      "id": "me-teams",
+      "role": "student",
+      "url": "/v2/me?tab=teams",
+      "family": "profile",
+      "title": "我的组队",
+      "actual_url": "http://127.0.0.1:4174/v2/me?tab=teams"
+    },
+    {
+      "id": "me-verification",
+      "role": "student",
+      "url": "/v2/me?tab=verification",
+      "family": "profile",
+      "title": "身份认证",
+      "actual_url": "http://127.0.0.1:4174/v2/me?tab=verification"
+    },
+    {
+      "id": "me-network",
+      "role": "student",
+      "url": "/v2/me?tab=network",
+      "family": "profile",
+      "title": "校园关系",
+      "actual_url": "http://127.0.0.1:4174/v2/me?tab=network"
+    },
+    {
+      "id": "me-timetable",
+      "role": "student",
+      "url": "/v2/me?tab=timetable",
+      "family": "profile",
+      "title": "我的课表",
+      "actual_url": "http://127.0.0.1:4174/v2/me?tab=timetable"
+    },
+    {
+      "id": "teaching",
+      "role": "student",
+      "url": "/v2/campus?service=teaching",
+      "family": "directory",
+      "title": "我的课表",
+      "actual_url": "http://127.0.0.1:4174/v2/campus?service=teaching"
+    },
+    {
+      "id": "academic",
+      "role": "student",
+      "url": "/v2/campus?service=academic",
+      "family": "directory",
+      "title": "校园社区",
+      "actual_url": "http://127.0.0.1:4174/v2/community?board=%E5%AD%A6%E4%B9%A0"
+    },
+    {
+      "id": "explore",
+      "role": "student",
+      "url": "/v2/campus/explore",
+      "family": "directory",
+      "title": "校园探索",
+      "actual_url": "http://127.0.0.1:4174/v2/campus/explore"
+    },
+    {
+      "id": "sports",
+      "role": "student",
+      "url": "/v2/sports",
+      "family": "directory",
+      "title": "体育打卡",
+      "actual_url": "http://127.0.0.1:4174/v2/sports"
+    },
+    {
+      "id": "teacher-coffee",
+      "role": "teacher",
+      "url": "/v2/teacher/coffee",
+      "family": "staff",
+      "title": "Coffee Chat",
+      "actual_url": "http://127.0.0.1:4174/v2/teacher/coffee"
+    },
+    {
+      "id": "teacher-schedule",
+      "role": "teacher",
+      "url": "/v2/teacher/schedule",
+      "family": "staff",
+      "title": "日程信息",
+      "actual_url": "http://127.0.0.1:4174/v2/teacher/schedule"
+    },
+    {
+      "id": "teacher-messages",
+      "role": "teacher",
+      "url": "/v2/teacher/messages",
+      "family": "staff",
+      "title": "消息与通知",
+      "actual_url": "http://127.0.0.1:4174/v2/teacher/messages"
+    },
+    {
+      "id": "teacher-profile",
+      "role": "teacher",
+      "url": "/v2/teacher/profile",
+      "family": "staff",
+      "title": "个人资料",
+      "actual_url": "http://127.0.0.1:4174/v2/teacher/profile"
+    },
+    {
+      "id": "teacher-sports",
+      "role": "teacher",
+      "url": "/v2/teacher/sports",
+      "family": "staff",
+      "title": "teacher-sports",
+      "actual_url": "http://127.0.0.1:4174/v2/teacher/sports"
+    },
+    {
+      "id": "admin-overview",
+      "role": "admin",
+      "url": "/v2/admin",
+      "family": "staff",
+      "title": "运营工作台",
+      "actual_url": "http://127.0.0.1:4174/v2/admin"
+    },
+    {
+      "id": "admin-verifications",
+      "role": "admin",
+      "url": "/v2/admin/verifications",
+      "family": "staff",
+      "title": "认证审核",
+      "actual_url": "http://127.0.0.1:4174/v2/admin/verifications"
+    },
+    {
+      "id": "admin-moderation",
+      "role": "admin",
+      "url": "/v2/admin/moderation",
+      "family": "staff",
+      "title": "社区内容管理",
+      "actual_url": "http://127.0.0.1:4174/v2/admin/moderation"
+    },
+    {
+      "id": "admin-keywords",
+      "role": "admin",
+      "url": "/v2/admin/keywords",
+      "family": "staff",
+      "title": "社区屏蔽词",
+      "actual_url": "http://127.0.0.1:4174/v2/admin/keywords"
+    },
+    {
+      "id": "admin-mail-activities",
+      "role": "admin",
+      "url": "/v2/admin/mail-activities",
+      "family": "staff",
+      "title": "学校活动发布",
+      "actual_url": "http://127.0.0.1:4174/v2/admin/mail-activities"
+    },
+    {
+      "id": "welcome",
+      "role": "public",
+      "url": "/v2/welcome",
+      "family": "entry",
+      "title": "会同里",
+      "actual_url": "http://127.0.0.1:4174/v2/welcome"
+    },
+    {
+      "id": "login",
+      "role": "public",
+      "url": "/v2/login",
+      "family": "entry",
+      "title": "让校园生活\n从这里开始。",
+      "actual_url": "http://127.0.0.1:4174/v2/login"
+    },
+    {
+      "id": "register",
+      "role": "public",
+      "url": "/v2/register",
+      "family": "entry",
+      "title": "让校园生活\n从这里开始。",
+      "actual_url": "http://127.0.0.1:4174/v2/register"
+    },
+    {
+      "id": "forgot-password",
+      "role": "public",
+      "url": "/v2/forgot-password",
+      "family": "entry",
+      "title": "找回密码",
+      "actual_url": "http://127.0.0.1:4174/v2/forgot-password"
+    },
+    {
+      "id": "identity",
+      "role": "student",
+      "url": "/v2/identity",
+      "family": "entry",
+      "title": "核验校园身份",
+      "actual_url": "http://127.0.0.1:4174/v2/identity"
+    }
+  ],
+  "overflow": [],
+  "page_errors": [],
+  "scope": "Current V2 routes, local acceptance data",
+  "result": "passed"
+}

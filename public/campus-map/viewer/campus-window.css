@@ -1,0 +1,10 @@
+/* Host application theme; map geometry, data and camera controls are unchanged. */
+@font-face{font-family:MiSans;src:url('/fonts/misans/MiSans-Regular.woff2') format('woff2');font-display:swap}
+@font-face{font-family:CampusWenKai;src:url('/fonts/lxgw-wenkai/BNBUWenKai-Medium.woff2') format('woff2');font-display:swap}
+:root{--map-blue:#426575;--map-blue-dark:#345361;--map-ink:#263c35;--map-muted:#65726a;--map-line:#e4e7df;--map-soft:#f0f2ec;--map-shadow:0 6px 24px #263c3514;font-family:MiSans,'Microsoft YaHei',sans-serif}
+body,button,input,select{font-family:MiSans,'Microsoft YaHei',sans-serif}
+.panel,.detail,.map-tools-panel{background:#faf9f6f5;border-color:#e4e7df;border-radius:6px;box-shadow:var(--map-shadow)}
+button,input,select{border-color:#d5dcd2;border-radius:6px}
+.brand-symbol{background:#426575}
+.detail h2,.tools-heading h2{font-family:CampusWenKai,'KaiTi',serif;font-weight:500}
+button:focus-visible,input:focus-visible,select:focus-visible{outline-color:#426575}
