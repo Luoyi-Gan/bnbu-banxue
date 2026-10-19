@@ -1,4 +1,5 @@
 import { ReferenceHome, ReferenceDiscover, ReferenceCampus, ReferenceMe, ReferenceSports, ReferenceWelcome } from './reference/pages'
+import { CampusWindowHome } from './reference/CampusWindowHome'
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
 import { Bell, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
@@ -71,7 +72,8 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const sidebarItems = parseSidebarItems(ownPreferences?.sidebarItems) ?? defaultSidebarItems
   const shellBrandIcon = brandIcon
   const sports = location.pathname === '/v2/teacher/sports'
-  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const windowPreview = Boolean(import.meta.hot) && location.pathname === '/v2/design/campus-window'
+  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2' && windowPreview) || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
@@ -85,7 +87,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '会同里'
   const service = new URLSearchParams(location.search).get('service')
   const sidebarMatch = (id: typeof sidebarItems[number]) => {
-    if (id === 'home') return location.pathname === '/v2'
+    if (id === 'home') return location.pathname === '/v2' || windowPreview
     if (id === 'conversations') return location.pathname === '/v2/messages' && new URLSearchParams(location.search).get('view') !== 'notifications'
     if (id === 'coffee') return location.pathname === '/v2/coffee'
     if (id === 'teaching' || id === 'academic') return location.pathname === '/v2/campus' && service === id
@@ -153,6 +155,7 @@ function V2Routes() {
   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>
   return <V2Shell accountName={session.account!.name}><Routes>
     <Route path="/v2" element={<ReferenceHome/>}/>
+    {Boolean(import.meta.hot) && <Route path="/v2/design/campus-window" element={<CampusWindowHome/>}/>}
     <Route path="/v2/alumni" element={<V2Alumni/>}/>
     <Route path="/v2/sports" element={<ReferenceSports/>}/>
     <Route path="/v2/schedule" element={<V2Schedule/>}/>

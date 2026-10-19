@@ -1,0 +1,24 @@
+{
+  "preview": "http://127.0.0.1:4174/v2/design/campus-window",
+  "scope": "Local acceptance fixtures only; existing homepage retained.",
+  "checks": [
+    "Next arrangement opens its real object route and browser Back returns to preview.",
+    "Existing search focus/Escape and global timetable remain operable.",
+    "Save is read back after reload; simulated failure preserves state; original fixture relation restored.",
+    "Manual photo selection pauses autoplay; runtime reduced-motion disables animation and autoplay controls.",
+    "mobile: 390x844, no horizontal overflow; primary arrangement visible.",
+    "narrow: 320x780, no horizontal overflow; primary arrangement visible.",
+    "desktop: 1440x900, no horizontal overflow; primary arrangement visible.",
+    "zoom-layout: 720x450, no horizontal overflow; primary arrangement visible.",
+    "Browser-only empty/error/retry states; unknown sports remains unknown, with no fake zero progress.",
+    "Original homepage is retained; anonymous preview access requires the existing login."
+  ],
+  "screenshots": [
+    "mobile.png",
+    "mobile-first.png",
+    "desktop.png",
+    "desktop-first.png"
+  ],
+  "page_errors": [],
+  "result": "passed"
+}
