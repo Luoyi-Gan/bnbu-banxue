@@ -3,8 +3,6 @@
   --cw-paper:#faf9f6;--cw-title:"BNBU WenKai","LXGW WenKai","KaiTi",serif;
   padding:0 28px 42px;background:var(--cw-paper);color:var(--cw-ink);font-size:15px;max-width:1120px;
 }
-.cw-home .cw-preview-note {min-height:32px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:#536960;border-bottom:1px solid var(--cw-line);padding:4px 0}
-.cw-home .cw-preview-note a {display:flex;align-items:center;gap:5px;white-space:nowrap;min-height:32px}
 .cw-home .cw-header {height:78px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .v2-app.v2-app-student .cw-home .cw-header h1 {margin:0;font:500 30px/1.2 var(--cw-title);letter-spacing:3px;color:var(--cw-ink)}
 .cw-home .cw-header nav {display:flex;align-items:center;gap:6px}
@@ -127,8 +125,6 @@
 }
 @media(max-width:640px) {
   .ref-page.cw-home {padding:0 20px 35px}
-  .cw-home .cw-preview-note {font-size:11px;min-height:28px}
-  .cw-home .cw-preview-note a {min-height:28px}
   .cw-home .cw-header {height:66px}
   .v2-app.v2-app-student .cw-home .cw-header h1 {font-size:26px}
   .cw-home .cw-header nav {gap:0}
@@ -168,7 +164,7 @@
   .cw-home .ref-org-invite strong {font-size:18px}
   .cw-home .ref-org-invite span {font-size:13px}
   .v2-app.v2-app-student:has(.cw-home) {position:relative}
-  .v2-app.v2-app-student:has(.ref-page.cw-home) .v2-floating-timetable-trigger {position:absolute;top:48px;left:auto;right:152px;bottom:auto;width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;color:#426575}
+  .v2-app.v2-app-student:has(.ref-page.cw-home) .v2-floating-timetable-trigger {position:absolute;top:11px;left:auto;right:152px;bottom:auto;width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;color:#426575}
   .v2-app.v2-app-student:has(.cw-home) .v2-floating-timetable-trigger>span {display:none}
 }
 @media(max-width:360px) {

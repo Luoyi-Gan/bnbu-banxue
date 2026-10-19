@@ -5,7 +5,8 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import type { LiveEntity, Workspace } from '../../live/api'
 import * as workspaceHook from '../useWorkspaceBackend'
 import * as communityHook from '../useCommunityBackend'
-import { ReferenceHome, ReferenceCampus, ReferenceMe, ReferenceDiscover, ReferenceSports } from './pages'
+import { ReferenceCampus, ReferenceMe, ReferenceDiscover, ReferenceSports } from './pages'
+import { CampusWindowHome } from './CampusWindowHome'
 import { campusDate, ownLessons, sportsSummary, weekDates } from './model'
 import type { Post } from '../../../shared/v2/model'
 
@@ -49,7 +50,7 @@ it('个人主页不把关注称为加入，不把参与标记称为正式报名'
   expect(html).toContain('我的日历');expect(html).toContain('更多功能')
 })
 it('有内容的五页结构可渲染，运动页不提供虚构GPS或开始提交',()=>{
-  const pages={home:<ReferenceHome/>,discover:<ReferenceDiscover/>,campus:<ReferenceCampus/>,me:<ReferenceMe/>,sports:<ReferenceSports/>}
+  const pages={home:<CampusWindowHome/>,discover:<ReferenceDiscover/>,campus:<ReferenceCampus/>,me:<ReferenceMe/>,sports:<ReferenceSports/>}
   for(const [name,page] of Object.entries(pages)) {
     const html=renderToStaticMarkup(<MemoryRouter>{page}</MemoryRouter>)
     expect(html).toContain('ref-page')

@@ -77,7 +77,7 @@ function ScheduleTime({ item }: { item: StudentScheduleItem }) {
   </time>
 }
 
-/** Development preview: shares the existing authenticated workspace and object routes. */
+/** Student homepage using the existing authenticated workspace and object routes. */
 export function CampusWindowHome() {
   const live = useWorkspaceBackend(30000)
   const community = useCommunityBackend()
@@ -93,10 +93,8 @@ export function CampusWindowHome() {
   const { percent } = sportsSummary(data)
   const sportsNote = !data ? '读取中' : data.sportsStatus === 'not-enrolled' ? '尚未入班' : percent === null ? '待同步' : '本学期'
   const events = filterActivityItems(liveActivities(data), { query: '', category: '全部', period: '全部时间', host: '全部主办方', status: '未结束', sort: '时间最近' }, data?.account.id ?? '').slice(0, 2)
-  const simulated = data?.entities.some(entity => entity.ownerId === data.account.id && entity.data.previewFixture === true)
 
   return <div className="ref-page cw-home">
-    <div className="cw-preview-note"><span>03 · 校园窗口{simulated ? ' · 本地模拟数据' : ' · 首页预览'}</span><Link to="/v2">当前首页 <ArrowRight size={13}/></Link></div>
     <header className="cw-header"><h1>会同里</h1><nav aria-label="首页工具">
       <StudentSearch/>
       <Link to="/v2/messages?view=notifications" className="cw-notification" aria-label={`通知${unread ? `，${unread}条未读` : ''}`}><Bell size={22}/>{!!unread && <i/>}</Link>
