@@ -1,7 +1,7 @@
 import { uiTemplate, uiText, useUiLanguage , uiLocale } from './uiLanguage'
 import { Bookmark, Heart } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import type { ActivityItem } from './activityFilters'
 import { setActivityReaction, type ActivityReaction } from './activityReactions'
 import { coverRatio } from './discoveryLayout'
@@ -11,9 +11,10 @@ import type { useWorkspaceBackend } from './useWorkspaceBackend'
 import './activityDiscovery.css'
 
 function ActivityCover({ item, path }: { item: ActivityItem; path: string }) { useUiLanguage();
+  const location=useLocation()
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
-  return <Link to={path} className={`discovery-cover activity-discovery-cover${item.image && !loaded && !failed ? ' is-loading' : ''}`} style={{ aspectRatio: coverRatio(item.id) }} aria-label={uiTemplate(["查看活动：",""],item.title)}>
+  return <Link to={path} state={{from:location.pathname+location.search}} className={`discovery-cover activity-discovery-cover${item.image && !loaded && !failed ? ' is-loading' : ''}`} style={{ aspectRatio: coverRatio(item.id) }} aria-label={uiTemplate(["查看活动：",""],item.title)}>
     {item.image && !failed?<img src={item.image} alt={item.isDefaultCover?uiText('校园通用照片，默认封面'):''} loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setFailed(true)}/>:<span className="discovery-text-cover"><small>{uiText(item.category)}</small><strong>{item.title}</strong><span>{failed?uiText('封面暂不可用'):item.subtitle}</span></span>}
     <span className="activity-discovery-category">{uiText(item.category)}{item.isDefaultCover && ' · 默认封面'}</span>
   </Link>
@@ -33,17 +34,18 @@ export function ActivityReactions({ item, compact = false, only, live }: { item:
 }
 
 export function ActivityDiscovery({ items, basePath, live }: { items: ActivityItem[]; basePath: string; live?: ReturnType<typeof useWorkspaceBackend> }) { useUiLanguage();
+  const location=useLocation()
   const { state, persistenceError } = useV2()
   return <>
     {persistenceError && <p className="activity-discovery-note" role="alert">{uiText("本机保存失败，请检查浏览器存储空间。")}</p>}
     <DiscoveryMasonry items={items} renderItem={item => <article className="discovery-card activity-discovery-card" key={item.id} data-activity-id={item.id}>
       <ActivityCover key={item.image ?? item.id} item={item} path={`${basePath}/${item.id}`}/>
       <div className="activity-discovery-save"><ActivityReactions live={live} item={item} compact only="savedActivities"/></div>
-      <Link className="discovery-title" to={`${basePath}/${item.id}`}>{item.title}</Link>
+      <Link className="discovery-title" to={`${basePath}/${item.id}`} state={{from:location.pathname+location.search}}>{item.title}</Link>
       <p className="activity-discovery-when"><time dateTime={item.startAt}>{new Intl.DateTimeFormat(uiLocale(), { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(item.startAt))}</time></p>
       <p className="activity-discovery-location" title={item.location}>{item.location}</p>
-      <div className="discovery-meta"><span className="discovery-author" title={`主办方：${item.host}`}><span className="discovery-avatar" aria-hidden="true">{item.host.slice(0, 1)}</span><span>{item.host}</span></span><ActivityReactions item={item} compact only="likedActivities"/></div>
-      {(live ? live.data?.relations.some(r => r.entityId === item.id && r.kind === 'participate') : state.participatingActivities.includes(item.id)) && <span className="activity-discovery-participating">{"已标记参与"}</span>}
+      <div className="discovery-meta"><span className="discovery-author" title={uiTemplate(['主办方：',''],item.host)}><span className="discovery-avatar" aria-hidden="true">{item.host.slice(0, 1)}</span><span>{item.host}</span></span><ActivityReactions live={live} item={item} compact only="likedActivities"/></div>
+      {(live ? live.data?.relations.some(r => r.entityId === item.id && r.kind === 'participate') : state.participatingActivities.includes(item.id)) && <span className="activity-discovery-participating">{uiText('已标记参与')}</span>}
     </article>}/>
   </>
 }

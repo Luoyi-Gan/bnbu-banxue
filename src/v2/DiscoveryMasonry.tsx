@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { discoveryColumns } from './discoveryLayout'
 import './communityFeed.css'
 
-export function DiscoveryMasonry<T extends { id: string }>({ items, renderItem, itemLabel = '活动' }: { items: T[]; renderItem: (item: T) => ReactNode; itemLabel?: string }) { useUiLanguage();
+export function DiscoveryMasonry<T extends { id: string }>({ items, renderItem, itemLabel = '活动', hasMore:serverHasMore=false,onLoadMore,busy=false }: { items: T[]; renderItem: (item: T) => ReactNode; itemLabel?: string;hasMore?:boolean;onLoadMore?:()=>void;busy?:boolean }) { useUiLanguage();
   const container = useRef<HTMLDivElement>(null)
   const sentinel = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(360)
@@ -30,6 +30,6 @@ export function DiscoveryMasonry<T extends { id: string }>({ items, renderItem, 
     <div className="discovery-columns" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
       {discoveryColumns(items.slice(0, limit), columns, (width - (columns - 1) * 16) / columns).map((column, index) => <div className="discovery-column" key={index}>{column.map(renderItem)}</div>)}
     </div>
-    <div className="discovery-end" ref={sentinel}>{hasMore?<button type="button" className="v2-text-button" onClick={() => setLimit(value => value + 6)}>{uiText("加载更多")}{uiText(itemLabel)}</button>:uiTemplate(["已经看完当前",""],itemLabel)}</div>
+    <div className="discovery-end" ref={sentinel}>{hasMore||serverHasMore?<button type="button" className="v2-text-button" disabled={busy} onClick={() => hasMore?setLimit(value => value + 6):onLoadMore?.()}>{uiText("加载更多")}</button>:uiTemplate(["已经看完当前",""],uiText(itemLabel))}</div>
   </div>
 }

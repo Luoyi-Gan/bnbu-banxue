@@ -1,29 +1,17 @@
 import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
-import { ArrowRight, Bookmark, Camera, Eye, Flame, Heart, ImagePlus, MessageCircle, Plus, Search, X } from 'lucide-react'
+import { ArrowRight, Flame, ImagePlus, MessageCircle, Plus, Search, X } from 'lucide-react'
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
-import { createPortal } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { prepareCommunityImage } from './communityImages'
 import { type Post } from '../../shared/v2/model'
 import { Empty, Modal, PageHeading } from './ui'
 import { useCommunityBackend } from './useCommunityBackend'
-import { DisplayAvatar } from './DisplayAvatar'
 
-import { photosForPost as photosFor } from './postPresentation'
+import { CommunityDiscoveryFeed } from './CommunityDiscoveryFeed'
 import { CommunityPostDetail } from './CommunityPostDetail'
-import campusPhoto from '../assets/campus/home-background.jpg'
 import './communityFeed.css'
 
 const boards = ['全部', '校园', '学习', '生活', '活动', '互助', '校友升学', '校友就业']
-
-function DiscoveryFeed({ posts, liked, saved, viewerId, onOpen, onLike, onSave }: { posts: Post[]; liked: string[]; saved: string[]; viewerId: string; onOpen: (id: string) => void; onLike: (id: string) => void; onSave: (id: string) => void }) { useUiLanguage();
-  return <div className="reference-community-feed">{posts.map(post => <article key={post.id} className="reference-post">
-    <header><DisplayAvatar className="reference-post-avatar" name={post.author} avatar={post.authorAvatar} personId={post.ownerId}/><span><strong>{post.author}</strong><small>{post.board} · {post.status === 'pending'?uiText('待审核'):uiText('校园分享')}</small></span><button onClick={() => onOpen(post.id)} aria-label={uiTemplate(["查看帖子：",""],post.title)}><ArrowRight size={18}/></button></header>
-    <button className="reference-post-copy" onClick={() => onOpen(post.id)}><strong>{post.title}</strong><p>{post.body}</p></button>
-    {photosFor(post).length > 0 && <button className="reference-post-photos" aria-label={uiTemplate(["查看","的图片"],post.title)} onClick={() => onOpen(post.id)}>{photosFor(post).slice(0,3).map((src,index) => <img key={index} src={src} alt={uiTemplate(["帖子图片 ",""],index+1)} loading="lazy"/>)}</button>}
-    <footer><button className={liked.includes(post.id)?'is-liked':''} aria-label={uiTemplate(["","：",""],uiText(liked.includes(post.id) ? '取消点赞' : '点赞'),post.title)} aria-pressed={liked.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onLike(post.id)}><Heart size={17} fill={liked.includes(post.id)?'currentColor':'none'}/>{post.likes}</button><button onClick={() => onOpen(post.id)} aria-label={uiTemplate(["评论：",""],post.title)}><MessageCircle size={17}/> {uiText("讨论")}</button><button aria-label={uiTemplate(["","：",""],uiText(saved.includes(post.id) ? '取消收藏' : '收藏'),post.title)} aria-pressed={saved.includes(post.id)} disabled={post.status !== 'visible'} onClick={() => onSave(post.id)}><Bookmark size={17} fill={saved.includes(post.id)?'currentColor':'none'}/>{saved.includes(post.id)?uiText('已收藏'):uiText('收藏')}</button>{post.ownerId === viewerId && typeof post.viewCount === 'number' && <span><Eye size={15}/> {post.viewCount}</span>}</footer>
-  </article>)}</div>
-}
 
 function CommunityHotLists({ posts, hotLists, board, onBoard, onOpen }: { posts: Pick<Post,'id'|'title'|'board'|'author'|'status'>[]; hotLists?: {eligiblePostCount: number; overall: string[]; byBoard: Record<string, string[]>}; board: string; onBoard: (board: string) => void; onOpen: (id: string) => void }) { useUiLanguage();
   const eligibleCount = hotLists?.eligiblePostCount ?? posts.filter(post => post.status === 'visible').length
@@ -44,7 +32,6 @@ export function V2Community() { useUiLanguage();
   const [query, setQuery] = useState('')
   const [sort,setSort]=useState<'recommended'|'newest'>('recommended')
   const state = useCommunityBackend({board,query,sort})
-  const studentName = state.account.nickname || state.account.name
   const [compose, setCompose] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
   const [draftImages, setDraftImages] = useState<string[]>([])
@@ -87,17 +74,13 @@ export function V2Community() { useUiLanguage();
   const toggleSave = (id: string) => { void state.mutate('relation.set', { id, kind: 'save', enabled: !state.savedPosts.includes(id) }) }
   const toggleLike = (id: string) => { void state.mutate('relation.set', { id, kind: 'like', enabled: !state.likedPosts.includes(id) }) }
   return <div className="v2-page v2-community-page">
-    <PageHeading eyebrow="CAMPUS / COMMUNITY" title={uiText("校园社区")} description={uiText("浏览同学分享，或发布你的校园日常。")} action={<button type="button" className="v2-button v2-button-primary v2-community-compose-desktop" onClick={() => setCompose(true)}><Plus size={17}/> {uiText("发布帖子")}</button>}/>
-    <section className="reference-community-hero" style={{backgroundImage:`linear-gradient(90deg,#193b59bb,#193b5920),url(${campusPhoto})`}}><span>{uiText("校园日常")}</span></section>
+    <PageHeading eyebrow="CAMPUS / COMMUNITY" title={uiText("校园社区")} description={uiText("浏览同学分享，或发布你的校园日常。")} action={<button type="button" className="v2-button v2-button-primary v2-community-compose-action" onClick={() => setCompose(true)}><Plus size={17}/> {uiText("发布帖子")}</button>}/>
     <div className="v2-social-layout">
       <section className="v2-social-main">{(state.hotLists?.eligiblePostCount ?? 0) > 75 && <CommunityHotLists posts={state.hotPosts ?? []} hotLists={state.hotLists} board={hotBoard} onBoard={setHotBoard} onOpen={openPost}/>}<div className="v2-social-filter v2-panel"><div className="reference-community-tools"><div aria-label={uiText("帖子排序")}><button type="button" className={sort==='recommended'?'is-active':''} aria-pressed={sort==='recommended'} onClick={()=>setSort('recommended')}>{uiText("推荐")}</button><button type="button" className={sort==='newest'?'is-active':''} aria-pressed={sort==='newest'} onClick={()=>setSort('newest')}>{uiText("最新")}</button></div><label><Search size={16}/><input aria-label={uiText("搜索帖子")} placeholder={uiText("搜索帖子")} value={query} onChange={event => setQuery(event.target.value)}/></label></div><div className="v2-filter-pills" aria-label={uiText("内容分类")}>{boards.map((item) => <button type="button" aria-pressed={board === item} className={board === item?'is-active':''} onClick={() => setBoard(item)} key={item}>{item}</button>)}</div></div>
-        <DiscoveryFeed key={`${query}|${board}|${sort}`} posts={visible} liked={state.likedPosts} saved={state.savedPosts} viewerId={state.account.id} onOpen={openPost} onLike={toggleLike} onSave={toggleSave}/>
-        {state.hasMore && <button type="button" className="v2-button v2-button-secondary" onClick={()=>void state.loadMore()}>{uiText("加载更多帖子")}</button>}
+        <CommunityDiscoveryFeed hasMore={state.hasMore} onLoadMore={()=>void state.loadMore()} busy={state.busy} key={`${query}|${board}|${sort}`} posts={visible} liked={state.likedPosts} saved={state.savedPosts} viewerId={state.account.id} onOpen={openPost} onLike={toggleLike} onSave={toggleSave}/>
         {(!visible.length || state.error) && <Empty icon={MessageCircle} title={state.error || (state.account.id ? "暂无帖子" : "正在读取帖子…")} description={uiText("换个分类或搜索词再看看。")}/>}
       </section>
-      <aside className="v2-social-aside"><div className="v2-panel v2-social-profile"><DisplayAvatar className="v2-social-avatar is-self" name={studentName} avatar={state.account.avatar} personId={state.account.id}/><div><strong>{studentName}</strong><small>{uiText("分享你眼中的校园")}</small></div><button type="button" onClick={() => setCompose(true)}>{uiText("发布")}<ArrowRight size={14}/></button></div><div className="v2-panel"><span className="v2-eyebrow">CAMPUS VOICES</span><h3>{uiText("让校园故事被看见")}</h3><p>{uiText("照片、经历或问题，都可以成为下一段交流的开始。")}</p><span className="v2-social-aside-note"><Camera size={16}/> {uiText("最多 9 张图片 · 文字检查通过后直接发布")}</span></div></aside>
     </div>
-    {createPortal(<button type="button" className="v2-community-compose v2-a-community-compose" aria-label={uiText("发布帖子")} onClick={() => setCompose(true)}><span className="v2-community-compose-circle"><Plus size={26}/></span></button>, document.body)}
     {compose && <Modal title={uiText("发布社区帖子")} onClose={closeCompose}><form className="v2-form v2-social-compose" onSubmit={publish}><label>{uiText("话题标题")}<input name="title" required maxLength={80} value={draftTitle} onChange={event => setDraftTitle(event.target.value)} placeholder={uiText("想和同学聊什么？")}/></label><label>{uiText("选择分区")}<select name="board" value={draftBoard} onChange={event => setDraftBoard(event.target.value)}>{boards.slice(1).filter((item) => !item.startsWith('校友')).map((item) => <option value={item} key={item}>{item}</option>)}</select></label><label>{uiText("正文")}<textarea name="body" required rows={6} maxLength={1000} value={draftBody} onChange={event => setDraftBody(event.target.value)} placeholder={uiText("分享一点具体的经历或问题")}/><small className="reference-word-count">{draftBody.length} / 1000</small></label><div className="v2-image-uploader"><div className="v2-image-uploader-head"><strong>{uiText("添加图片")}</strong><span>{draftImages.length} {uiText("/ 9 张")}</span></div><div className="v2-upload-grid">{draftImages.map((src, index) => <div className="v2-upload-thumb" key={`${index}-${src.slice(-24)}`}><img src={src} alt={uiTemplate(["待发布图片 ",""],index + 1)}/><button type="button" aria-label={uiTemplate(["移除第 "," 张图片"],index + 1)} onClick={() => setDraftImages((items) => items.filter((_, number) => number !== index))}><X size={13}/></button></div>)}{draftImages.length < 9 && <label className="v2-upload-add"><ImagePlus size={22}/><span>{processingImages?uiText('处理中…'):uiText('添加照片')}</span><input type="file" accept="image/*" multiple onChange={addImages} disabled={processingImages}/></label>}</div>{(imageError || state.error) && <p className="v2-upload-error" role="alert">{imageError || state.error}</p>}<small>{uiText("最多 9 张，图片会压缩后上传保存。")}</small></div><p className="v2-form-note">{uiText("文字检查通过后直接公开；命中屏蔽词时请修改。")}</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={closeCompose}>{uiText("取消")}</button><button type="submit" className="v2-button v2-button-primary" disabled={processingImages || state.busy || !draftTitle.trim() || !draftBody.trim()}>{uiText("发布帖子")}</button></div></form></Modal>}
     {current && <CommunityPostDetail key={current.id} live={state} id={current.id} onClose={() => { setSelected(null); if (location.search) navigate('/v2/community', { replace: true }) }}/>}
   </div>

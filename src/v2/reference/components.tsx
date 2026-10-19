@@ -16,8 +16,8 @@ import campus from '../../assets/campus/home-background.jpg'
 import coffeePhoto from '../../assets/campus/campus-services.jpg'
 
 export type Live = ReturnType<typeof useWorkspaceBackend>
-export function Header({title,brand=false,back,settings=false}:{title:string;brand?:boolean;back?:string;settings?:boolean}) { useUiLanguage();
-  return <header className={`ref-header${brand?' ref-brand':''}`}><div>{back && <Link to={back} aria-label={uiText("返回")}><ArrowLeft size={21}/></Link>}<h1>{uiText(title)}</h1></div><nav aria-label={uiText("页面工具")}>{settings?<Link to="/v2/settings" aria-label={uiText("设置")}><Settings size={21}/></Link>:<StudentSearch/>}<Link to="/v2/messages?view=notifications" aria-label={uiText("通知")}><Bell size={21}/></Link></nav></header>
+export function Header({title,brand=false,back,settings=false,search=true}:{title:string;brand?:boolean;back?:string;settings?:boolean;search?:boolean}) { useUiLanguage();
+  return <header className={`ref-header${brand?' ref-brand':''}`}><div>{back && <Link to={back} aria-label={uiText("返回")}><ArrowLeft size={21}/></Link>}<h1>{uiText(title)}</h1></div><nav aria-label={uiText("页面工具")}>{settings?<Link to="/v2/settings" aria-label={uiText("设置")}><Settings size={21}/></Link>:search&&<StudentSearch/>}<Link to="/v2/messages?view=notifications" aria-label={uiText("通知")}><Bell size={21}/></Link></nav></header>
 }
 export function Section({title,hint,to,children}:{title:string;hint?:string;to?:string;children:ReactNode}) { useUiLanguage();
   return <section className="ref-section"><header><h2>{uiText(title)}</h2>{hint && <span>{uiText(hint)}</span>}{to && <Link to={to}>{uiText("更多")}<ChevronRight size={14}/></Link>}</header>{children}</section>
@@ -32,13 +32,13 @@ export type Shortcut = {label:string;path:string;icon:LucideIcon;tone?:string}
 export function Shortcuts({items}:{items:Shortcut[]}) { const language=useUiLanguage();
   return <nav className="ref-shortcuts" aria-label={uiText("功能入口")}>{items.map(({label,path,icon:Icon,tone},i)=><Link key={path} to={path}><span className={`ref-icon tone-${tone ?? ['green','blue','orange','pink'][i%4]}`}><Icon size={23}/></span><strong>{language==='en'?(label==='社团组织'?'Clubs':label==='校友交流'?'Alumni':uiText(label)):uiText(label)}</strong></Link>)}</nav>
 }
-export function Services() { useUiLanguage();
+export function Services({exclude=[]}:{exclude?:string[]}={}) { useUiLanguage();
   return <Shortcuts items={[
     {label:'我的课表',path:'/v2/me?tab=timetable',icon:BookOpen}, {label:'校园日程',path:'/v2/schedule',icon:CalendarDays},
     {label:'校园地图',path:'/v2/campus/explore',icon:MapPin}, {label:'校友交流',path:'/v2/alumni',icon:Coffee},
     {label:'我的收藏',path:'/v2/me?tab=saved',icon:Heart}, {label:'我的会话',path:'/v2/messages',icon:MessageCircle},
     {label:'个人认证',path:'/v2/me?tab=verification',icon:UsersRound}, {label:'更多服务',path:'/v2/campus',icon:Compass},
-  ]}/>
+  ].filter(item=>!exclude.includes(item.path))}/>
 }
 export function AssistantBanner() { useUiLanguage(); return <Link to="/v2/ai" className="ref-assistant"><div><strong>{uiText("与 AI 一起，更好地校园生活")}</strong><p>{uiText("校园问答、信息查询、学习与生活")}</p></div><img src={companion} alt=""/><ChevronRight size={18}/></Link>}
 export function CoffeeBanner() { useUiLanguage(); return <Link to="/v2/coffee" className="ref-coffee" style={{backgroundImage:`linear-gradient(90deg,#27251ddd,#27251d35),url(${coffeePhoto})`}}><strong>{uiText("和老师聊一聊，每一种可能")}</strong><span>{uiText("分享想法，听听不同的经验")}<ArrowRight size={16}/></span></Link>}
@@ -54,7 +54,7 @@ export function EventCard({item,live,row=false}:{item:ActivityItem;live:Live;row
 }
 export function Organizations({live}:{live:Live}) { useUiLanguage();
   const items=live.data?.entities.filter(item=>item.kind==='organization'&&item.data.status==='approved'&&item.data.visibility==='visible').slice(0,4)??[]
-  return <>{items.length?<div className="ref-organizations">{items.map((item,i)=>{const followed=live.data?.relations.some(r=>r.kind==='follow'&&r.entityId===item.id);return <article key={item.id}><Link to={`/v2/organizations?q=${encodeURIComponent(String(item.data.name??''))}`}><div className={`ref-org-cover cover-${i}`}><UsersRound size={29}/></div><h3>{String(item.data.name??'校园组织')}</h3><p>{String(item.data.category??'社团组织')}</p></Link><button type="button" disabled={live.busy} onClick={()=>void live.mutate('relation.set',{id:item.id,kind:'follow',enabled:!followed})}>{followed?uiText('已关注'):uiText('关注')}</button></article>})}</div>:<EmptyNote to="/v2/organizations">{live.data?uiText('公开组织将在这里与你相遇。'):uiText('正在读取校园组织…')}</EmptyNote>}<Link to="/v2/organizations" className="ref-org-invite" style={{backgroundImage:`linear-gradient(90deg,#152c24db,#152c2445),url(${campus})`}}><strong>{uiText("发现组织，遇见志同道合的同学")}</strong><span>{uiText("发现更多可能，让校园生活更丰富")}<ArrowRight size={15}/></span></Link></>
+  return <>{items.length?<div className="ref-organizations">{items.map((item,i)=>{const followed=live.data?.relations.some(r=>r.kind==='follow'&&r.entityId===item.id);return <article key={item.id}><Link to={`/v2/organizations?q=${encodeURIComponent(String(item.data.name??''))}`}><div className={`ref-org-cover cover-${i}`}><UsersRound size={29}/></div><h3>{String(item.data.name??'校园组织')}</h3><p>{String(item.data.category??'社团组织')}</p></Link><button type="button" disabled={live.busy} onClick={()=>void live.mutate('relation.set',{id:item.id,kind:'follow',enabled:!followed})}>{followed?uiText('已关注'):uiText('关注')}</button></article>})}</div>:<EmptyNote to="/v2/organizations">{live.data?uiText('公开组织将在这里与你相遇。'):uiText('正在读取校园组织…')}</EmptyNote>}</>
 }
 export function Stories({community,compact=false}:{community:ReturnType<typeof useCommunityBackend>;compact?:boolean}) { useUiLanguage();
   const [selected,setSelected]=useState<string|null>(null)

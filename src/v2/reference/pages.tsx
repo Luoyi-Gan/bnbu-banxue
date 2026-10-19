@@ -1,5 +1,5 @@
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from '../uiLanguage'
-import { ArrowRight, Bell, BookOpen, CalendarDays, ChevronRight, Coffee, Compass, MessageCircle, Search, ShieldCheck, Sun, UsersRound } from 'lucide-react'
+import { ArrowRight, Bell, BookOpen, CalendarDays, ChevronRight, Coffee, ShieldCheck, Sun, UsersRound } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useWorkspaceBackend } from '../useWorkspaceBackend'
@@ -7,14 +7,15 @@ import { useCommunityBackend } from '../useCommunityBackend'
 import { liveActivities } from '../liveActivities'
 import { liveStudentSchedule } from '../liveStudentSchedule'
 import { showNoticeBadge } from '../notificationPreferences'
-import { filterActivityItems, type ActivityPeriod, type ActivitySort } from '../activityFilters'
+import { filterActivityItems } from '../activityFilters'
 import { V2Campus, V2Me } from '../services'
 import { V2Activities } from '../student'
+import { DiscoveryPage } from '../DiscoveryPage'
 import { StudentTimetable } from '../StudentTimetable'
 import { DisplayAvatar } from '../DisplayAvatar'
 import { Modal } from '../ui'
 import { campusWeekday } from '../../../shared/v2/timetableModel'
-import { Header, Section, EmptyNote, Ring, Shortcuts, Services, AssistantBanner, CoffeeBanner, Agenda, EventCard, Organizations, Stories, Partners, Feedback, type Live } from './components'
+import { Header, Section, EmptyNote, Ring, Services, AssistantBanner, CoffeeBanner, Agenda, EventCard, Organizations, Stories, Partners, Feedback, type Live } from './components'
 import { campusDate, ownLessons, sportsSummary, when } from './model'
 import campus from '../../assets/campus/home-background.jpg'
 import sunset from '../../assets/campus/evening-campus.jpg'
@@ -41,21 +42,8 @@ export function ReferenceHome() { useUiLanguage();
 }
 
 export function ReferenceDiscover() { useUiLanguage();
-  const [params,setParams]=useSearchParams()
-  if(params.get('view')==='manage')return <V2Activities/>
-  return <DiscoveryContent key={`${params.get('category')??'all'}:${params.get('q')??''}`} initialQuery={params.get('q') ?? ''} initialCategory={params.get('category') ?? '全部'} onManage={()=>setParams({view:'manage'})}/>
-}
-function DiscoveryContent({initialQuery,initialCategory,onManage}:{initialQuery:string;initialCategory:string;onManage:()=>void}) { useUiLanguage();
-  const live=useWorkspaceBackend()
-  const [query,setQuery]=useState(initialQuery),[category,setCategory]=useState(initialCategory),[list,setList]=useState(false)
-  const [period,setPeriod]=useState<ActivityPeriod>('全部时间'),[sort,setSort]=useState<ActivitySort>('时间最近'),[location,setLocation]=useState('全部地点')
-  const all=liveActivities(live.data)
-  const categories=['全部',...new Set(all.filter(a=>a.local?.status==='published').map(a=>a.category))]
-  const locations=['全部地点',...new Set(all.filter(a=>a.local?.status==='published').map(a=>a.location).filter(Boolean))]
-  const filtered=filterActivityItems(all,{query,category,period,sort,host:'全部主办方',status:'全部状态'},live.data?.account.id??'').filter(a=>location==='全部地点'||a.location===location)
-  const hasFilters=!!query||category!=='全部'||period!=='全部时间'||location!=='全部地点'
-  const canCreate=live.data?.entities.some(e=>e.kind==='certification'&&e.ownerId===live.data?.account.id&&e.data.kind==='club'&&e.data.status==='approved')
-  return <div className="ref-page ref-discover cw-pages"><Header title={uiText("发现")}/><div className="ref-page-body"><label className="ref-search"><Search size={18}/><input type="search" placeholder={uiText("搜索活动、组织、地点…")} aria-label={uiText("搜索校园活动")} value={query} onChange={e=>{setQuery(e.target.value);setList(true)}}/></label>{!list&&!hasFilters&&<><Link to="/v2/activities?view=manage" className="ref-discover-hero" style={{backgroundImage:`linear-gradient(0deg,#14271dc9,transparent 85%),url(${campus})`}}><strong>{uiText("在校园，")}<br/>{uiText("遇见更大的自己。")}</strong><span>{uiText("活动 · 组织 · 社团 · 分享 · 相遇")}<ArrowRight size={17}/></span></Link><Shortcuts items={[{label:'活动',path:'/v2/activities?view=manage',icon:CalendarDays,tone:'pink'},{label:'社团组织',path:'/v2/organizations',icon:UsersRound,tone:'blue'},{label:'校园社区',path:'/v2/community',icon:MessageCircle},{label:'校友交流',path:'/v2/alumni',icon:Coffee,tone:'orange'}]}/></>}<div className="ref-discover-heading"><h2>{list||hasFilters?uiText('校园活动'):uiText('推荐活动')}</h2><button type="button" onClick={()=>setList(v=>!v)}>{list?uiText('精选视图'):uiText('全部活动')} <ChevronRight size={14}/></button></div><div className="ref-category-tabs" aria-label={uiText("活动类别")}>{categories.map(c=><button type="button" aria-pressed={c===category} key={c} onClick={()=>{setCategory(c);setList(true)}}>{uiText(c)}</button>)}</div>{(list||hasFilters)&&<div className="ref-filters"><label><span>{uiText("时间")}</span><select aria-label={uiText("活动时间")} value={period} onChange={e=>setPeriod(e.target.value as ActivityPeriod)}>{['全部时间','今天','本周','下周'].map(x=><option value={x} key={x}>{uiText(x)}</option>)}</select></label><label><span>{uiText("地点")}</span><select aria-label={uiText("活动地点")} value={location} onChange={e=>setLocation(e.target.value)}>{locations.map(x=><option value={x} key={x}>{uiText(x)}</option>)}</select></label><label><span>{uiText("排序")}</span><select aria-label={uiText("活动排序")} value={sort} onChange={e=>setSort(e.target.value as ActivitySort)}><option value={"时间最近"}>{uiText("时间最近")}</option><option value={"推荐顺序"}>{uiText("推荐顺序")}</option></select></label></div>}<Feedback live={live}/><div className={list||hasFilters?'ref-event-list':'ref-event-feed'}>{filtered.slice(0,list||hasFilters?50:3).map(item=><EventCard key={item.id} item={item} live={live} row={list || hasFilters}/>)}</div>{!filtered.length&&<EmptyNote>{!live.data?uiText('正在读取活动…'):hasFilters?uiText('没有符合条件的活动，试试其他筛选。'):uiText('暂时没有公开活动。新的校园消息会在这里出现。')}</EmptyNote>}{hasFilters&&<button className="ref-text-button" type="button" onClick={()=>{setQuery('');setCategory('全部');setPeriod('全部时间');setLocation('全部地点')}}>{uiText("清除筛选")}</button>}{(canCreate||all.some(a=>a.local?.ownerId===live.data?.account.id))&&<button className="ref-text-button" onClick={onManage}>{uiText("发布与管理我的活动")}<ArrowRight size={15}/></button>}</div></div>
+  const [params]=useSearchParams()
+  return params.get('view')==='manage'?<V2Activities/>:<DiscoveryPage/>
 }
 
 function TimetablePreview({live}:{live:Live}) { useUiLanguage();
@@ -69,14 +57,14 @@ export function ReferenceCampus() { useUiLanguage();
 }
 function CampusContent() { useUiLanguage();
   const live=useWorkspaceBackend(),community=useCommunityBackend()
-  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Shortcuts items={[{label:'社团组织',path:'/v2/organizations',icon:UsersRound},{label:'找搭子',path:'/v2/partners',icon:Compass,tone:'orange'},{label:'校园社区',path:'/v2/community',icon:MessageCircle,tone:'blue'},{label:'Coffee Chat',path:'/v2/coffee',icon:Coffee,tone:'orange'}]}/><Section title={uiText("推荐组织")} to="/v2/organizations"><Organizations live={live}/></Section><Section title={uiText("校园社区")} to="/v2/community"><Stories community={community} compact/></Section><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat" to="/v2/coffee"><CoffeeBanner/></Section><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services/></Section><AssistantBanner/></div></div>
+  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("推荐组织")} to="/v2/organizations"><Organizations live={live}/></Section><Section title={uiText("校园社区")} to="/v2/community"><Stories community={community} compact/></Section><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services exclude={['/v2/me?tab=timetable']}/></Section><AssistantBanner/></div></div>
 }
 
 export function ReferenceMe() { useUiLanguage();
   const [params]=useSearchParams()
   const tab=params.get('tab')
-  if(tab==='timetable')return <div className="ref-page ref-subpage cw-pages"><Header title={uiText("我的课表")} back="/v2/me"/><div className="ref-page-body"><StudentTimetable/></div></div>
-  if(tab&&tab!=='overview')return <div className="ref-page ref-subpage cw-pages"><Header title={({events:'我的活动',teams:'我的组队',saved:'我的收藏',network:'校园关系',verification:'身份认证',profile:'个人资料'} as Record<string,string>)[tab] ?? uiText('我的')} back="/v2/me"/><div className="ref-legacy-details"><V2Me/></div></div>
+  if(tab==='timetable')return <div className="ref-page ref-subpage cw-pages"><Header title={uiText("我的课表")} back="/v2/me"/><div className="ref-page-body"><StudentTimetable embedded/></div></div>
+  if(tab&&tab!=='overview')return <div className="ref-page ref-subpage cw-pages"><Header title={({events:'我的活动',teams:'我的组队',saved:'我的收藏',network:'校园关系',verification:'身份认证',profile:'个人资料'} as Record<string,string>)[tab] ?? uiText('我的')} back="/v2/me"/><div className="ref-legacy-details"><V2Me embedded/></div></div>
   return <ProfileContent/>
 }
 function ProfileContent() { const language=useUiLanguage();

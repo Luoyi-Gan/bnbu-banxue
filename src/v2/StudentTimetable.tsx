@@ -8,7 +8,7 @@ import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, typ
 import './timetable.css'
 
 const stages: Record<RecognitionStage, string> = { preparing: '准备图片', recognizing: '识别课程信息', organizing: '整理一周课表' }
-export function StudentTimetable({ idPrefix = 'timetable' }: { idPrefix?: string } = {}) { useUiLanguage();
+export function StudentTimetable({ idPrefix = 'timetable', embedded=false }: { idPrefix?: string;embedded?:boolean } = {}) { useUiLanguage();
   const live = useWorkspaceBackend()
   const record = live.data?.entities.find(e => e.kind === 'timetable' && e.ownerId === live.data?.account.id)
   const table = record ? {...record.data, updatedAt: record.updatedAt} as unknown as Timetable : undefined
@@ -92,7 +92,7 @@ export function StudentTimetable({ idPrefix = 'timetable' }: { idPrefix?: string
     } catch (failure) { setError(failure instanceof Error ? failure.message : '保存失败') }
   }
   return <section className="v2-timetable" aria-label={uiText("我的课表")}>
-    <div className="v2-panel v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div><h2>{uiText("我的课表")}</h2><p>{table?uiTemplate(["已导入 "," 条课程安排"],table.lessons.length):uiText('上传一张课表照片，查看一周的课程安排。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table?uiText('重新导入'):uiText('导入课表')}</button></div>
+    <div className="v2-panel v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div>{!embedded&&<h2>{uiText("我的课表")}</h2>}<p>{table?uiTemplate(["已导入 "," 条课程安排"],table.lessons.length):uiText('上传一张课表照片，查看一周的课程安排。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table?uiText('重新导入'):uiText('导入课表')}</button></div>
     {message && <p className="v2-timetable-message" role="status">{message}</p>}
     {live.error && <p role="alert" className="v2-info-box">{uiText(live.error)}</p>}
     {sample && <div className="v2-info-box">{uiText("示例模式 · 以下课程为虚构内容。")}<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>{uiText("退出示例")}</button></div>}

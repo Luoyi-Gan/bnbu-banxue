@@ -1,0 +1,685 @@
+[
+  {
+    "buttons": [
+      "搜索校园",
+      "关闭搜索",
+      "浏览全部活动",
+      "一",
+      "二",
+      "三",
+      "四",
+      "五",
+      "六",
+      "日",
+      "已关注",
+      "已关注",
+      "已关注",
+      "关注",
+      "秋日校园，收藏这一束阳光模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！王王同学"
+    ],
+    "headings": [
+      "校园",
+      "推荐组织",
+      "校园社区",
+      "找搭子",
+      "Coffee Chat",
+      "校园服务"
+    ],
+    "links": [
+      {
+        "href": "/v2/activities/preview-event-0",
+        "text": "秋日校园摄影展活动 · 校园广场"
+      },
+      {
+        "href": "/v2/activities/preview-event-1",
+        "text": "计算机前沿技术分享会活动 · 教学楼 A101"
+      },
+      {
+        "href": "/v2/activities/preview-event-2",
+        "text": "校园夜跑计划活动 · 东区操场"
+      },
+      {
+        "href": "/v2/messages?view=notifications",
+        "text": "通知"
+      },
+      {
+        "href": "/v2/me?tab=timetable",
+        "text": "完整课表"
+      },
+      {
+        "href": "/v2/me?tab=timetable",
+        "text": "08:0009:50高等数学教 A101 · 张老师1–16周"
+      },
+      {
+        "href": "/v2/me?tab=timetable",
+        "text": "11:0011:50数据结构教 B302 · 李老师1–16周"
+      },
+      {
+        "href": "/v2/me?tab=timetable",
+        "text": "14:0015:50大学英语教 C201 · 陈老师1–16周"
+      },
+      {
+        "href": "/v2/organizations",
+        "text": "更多"
+      },
+      {
+        "href": "/v2/organizations?q=%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8D%8F%E4%BC%9A",
+        "text": "计算机协会学术"
+      },
+      {
+        "href": "/v2/organizations?q=%E6%91%84%E5%BD%B1%E7%A4%BE",
+        "text": "摄影社艺术"
+      },
+      {
+        "href": "/v2/organizations?q=%E7%BE%BD%E6%AF%9B%E7%90%83%E7%A4%BE",
+        "text": "羽毛球社运动"
+      },
+      {
+        "href": "/v2/organizations?q=%E5%BF%97%E6%84%BF%E8%80%85%E5%8D%8F%E4%BC%9A",
+        "text": "志愿者协会公益"
+      },
+      {
+        "href": "/v2/organizations",
+        "text": "发现组织，遇见志同道合的同学发现更多可能，让校园生活更丰富"
+      },
+      {
+        "href": "/v2/community",
+        "text": "更多"
+      },
+      {
+        "href": "/v2/partners",
+        "text": "更多"
+      },
+      {
+        "href": "/v2/partners?item=preview-room-4",
+        "text": "校园搭子周末市区拼车学校南门本周末 15:00"
+      },
+      {
+        "href": "/v2/partners?item=preview-room-0",
+        "text": "校园搭子高数学习搭子图书馆本周末 15:00"
+      },
+      {
+        "href": "/v2/coffee",
+        "text": "和老师聊一聊，每一种可能分享想法，听听不同的经验"
+      },
+      {
+        "href": "/v2/schedule",
+        "text": "校园日程"
+      },
+      {
+        "href": "/v2/campus/explore",
+        "text": "校园地图"
+      },
+      {
+        "href": "/v2/alumni",
+        "text": "校友交流"
+      },
+      {
+        "href": "/v2/me?tab=saved",
+        "text": "我的收藏"
+      },
+      {
+        "href": "/v2/messages",
+        "text": "我的会话"
+      },
+      {
+        "href": "/v2/me?tab=verification",
+        "text": "个人认证"
+      },
+      {
+        "href": "/v2/campus",
+        "text": "更多服务"
+      },
+      {
+        "href": "/v2/ai",
+        "text": "与 AI 一起，更好地校园生活校园问答、信息查询、学习与生活"
+      }
+    ],
+    "path": "/v2/campus"
+  },
+  {
+    "buttons": [
+      "发布帖子",
+      "推荐",
+      "最新",
+      "全部",
+      "校园",
+      "学习",
+      "生活",
+      "活动",
+      "互助",
+      "校友升学",
+      "校友就业",
+      "查看帖子：秋日校园，收藏这一束阳光",
+      "取消收藏：秋日校园，收藏这一束阳光",
+      "取消点赞：秋日校园，收藏这一束阳光",
+      "查看帖子：分享我的自习路线",
+      "取消收藏：分享我的自习路线",
+      "取消点赞：分享我的自习路线",
+      "查看帖子：我的第一场志愿活动",
+      "收藏：我的第一场志愿活动",
+      "点赞：我的第一场志愿活动",
+      "查看帖子：技术分享会精彩回顾",
+      "收藏：技术分享会精彩回顾",
+      "点赞：技术分享会精彩回顾",
+      "查看帖子：傍晚的球场很热闹",
+      "取消收藏：傍晚的球场很热闹",
+      "取消点赞：傍晚的球场很热闹",
+      "查看帖子：周末一起练英语",
+      "收藏：周末一起练英语",
+      "点赞：周末一起练英语",
+      "加载更多"
+    ],
+    "headings": [
+      "校园社区"
+    ],
+    "links": [],
+    "path": "/v2/community"
+  },
+  {
+    "buttons": [
+      "全部",
+      "升学",
+      "就业",
+      "已关注",
+      "已收藏",
+      "搜索校友经验",
+      "关闭搜索",
+      "查看经验：第一份实习，从整理校园项目开始",
+      "点赞：第一份实习，从整理校园项目开始",
+      "收藏：第一份实习，从整理校园项目开始"
+    ],
+    "headings": [
+      "校友同行"
+    ],
+    "links": [
+      {
+        "href": "/v2",
+        "text": "返回首页"
+      },
+      {
+        "href": "/v2/alumni?view=manage",
+        "text": "校友认证"
+      },
+      {
+        "href": "/v2/alumni",
+        "text": "经验发现"
+      },
+      {
+        "href": "/v2/alumni?view=people",
+        "text": "寻找校友"
+      },
+      {
+        "href": "/v2/alumni?view=bookings",
+        "text": "我的交流"
+      },
+      {
+        "href": "/v2/alumni?person=preview-alumni",
+        "text": "了解校友：李同学"
+      }
+    ],
+    "path": "/v2/alumni"
+  },
+  {
+    "buttons": [
+      "搜索老师、学院或研究方向",
+      "关闭搜索",
+      "全部",
+      "FST",
+      "FBM",
+      "FHSS",
+      "SCC",
+      "创新创业",
+      "其他",
+      "陈陈老师其他 · 学业规划技术项目"
+    ],
+    "headings": [
+      "Coffee Chat"
+    ],
+    "links": [],
+    "path": "/v2/coffee"
+  },
+  {
+    "buttons": [
+      "添加活动",
+      "校园日程",
+      "我的课表",
+      "上一周",
+      "今天",
+      "下一周",
+      "2026-10-19 星期一",
+      "2026-10-20 星期二",
+      "2026-10-21 星期三",
+      "2026-10-22 星期四",
+      "2026-10-23 星期五",
+      "2026-10-24 星期六",
+      "2026-10-25 星期日"
+    ],
+    "headings": [
+      "我的安排",
+      "今日日程",
+      "时间待商定"
+    ],
+    "links": [
+      {
+        "href": "/v2/activities/preview-event-3",
+        "text": "校园活动羽毛球交流赛体育馆"
+      },
+      {
+        "href": "/v2/partners/teams?item=preview-room-4",
+        "text": "周末市区拼车本周末 15:00 · 学校南门"
+      },
+      {
+        "href": "/v2/partners/teams?item=preview-room-0",
+        "text": "高数学习搭子本周末 15:00 · 图书馆"
+      },
+      {
+        "href": "/v2/partners/teams?item=preview-room-1",
+        "text": "羽毛球搭子本周末 15:00 · 体育馆"
+      },
+      {
+        "href": "/v2/partners/teams?item=preview-room-2",
+        "text": "周末摄影小队本周末 15:00 · 校园广场"
+      },
+      {
+        "href": "/v2/partners/teams?item=preview-room-3",
+        "text": "英语口语练习本周末 15:00 · 教学楼"
+      }
+    ],
+    "path": "/v2/schedule"
+  },
+  {
+    "buttons": [
+      "搜索校园",
+      "关闭搜索",
+      "浏览全部活动",
+      "上一张校园照片",
+      "下一张校园照片",
+      "暂停校园照片轮播",
+      "收藏：羽毛球交流赛",
+      "收藏：英语口语工作坊",
+      "秋日校园，收藏这一束阳光模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！王王同学",
+      "技术分享会精彩回顾模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！李李同学",
+      "分享我的自习路线模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！李李同学",
+      "傍晚的球场很热闹模拟校园动态。今天和同学一起探索校园，记录学习与生活里的小收获。欢迎分享你的故事！王王同学",
+      "已关注",
+      "已关注",
+      "已关注",
+      "关注"
+    ],
+    "headings": [
+      "会同里",
+      "羽毛球交流赛",
+      "校园新鲜事",
+      "校园随手可达",
+      "校园里的声音",
+      "一起，让校园更有意思"
+    ],
+    "links": [
+      {
+        "href": "/v2/activities/preview-event-0",
+        "text": "秋日校园摄影展活动 · 校园广场"
+      },
+      {
+        "href": "/v2/activities/preview-event-1",
+        "text": "计算机前沿技术分享会活动 · 教学楼 A101"
+      },
+      {
+        "href": "/v2/activities/preview-event-2",
+        "text": "校园夜跑计划活动 · 东区操场"
+      },
+      {
+        "href": "/v2/messages?view=notifications",
+        "text": "通知，4条未读"
+      },
+      {
+        "href": "/v2/settings",
+        "text": "个人设置"
+      },
+      {
+        "href": "/v2/activities/preview-event-3",
+        "text": "下一项安排羽毛球交流赛19:0010/20体育馆已标记参与"
+      },
+      {
+        "href": "/v2/partners/teams?item=preview-room-4",
+        "text": "待商定周末市区拼车学校南门 · 我的搭子本周末 15:00"
+      },
+      {
+        "href": "/v2/schedule",
+        "text": "今日安排0项"
+      },
+      {
+        "href": "/v2/messages?view=notifications",
+        "text": "未读通知4条"
+      },
+      {
+        "href": "/v2/sports",
+        "text": "体育进度67%本学期"
+      },
+      {
+        "href": "/v2/activities",
+        "text": "更多"
+      },
+      {
+        "href": "/v2/activities/preview-event-3",
+        "text": "学校活动"
+      },
+      {
+        "href": "/v2/activities/preview-event-3",
+        "text": "羽毛球交流赛"
+      },
+      {
+        "href": "/v2/activities/preview-event-4",
+        "text": "校园成员活动"
+      },
+      {
+        "href": "/v2/activities/preview-event-4",
+        "text": "英语口语工作坊"
+      },
+      {
+        "href": "/v2/campus",
+        "text": "更多"
+      },
+      {
+        "href": "/v2/me?tab=timetable",
+        "text": "我的课表"
+      },
+      {
+        "href": "/v2/schedule",
+        "text": "校园日程"
+      },
+      {
+        "href": "/v2/campus/explore",
+        "text": "校园地图"
+      },
+      {
+        "href": "/v2/alumni",
+        "text": "校友交流"
+      },
+      {
+        "href": "/v2/me?tab=saved",
+        "text": "我的收藏"
+      },
+      {
+        "href": "/v2/messages",
+        "text": "我的会话"
+      },
+      {
+        "href": "/v2/me?tab=verification",
+        "text": "个人认证"
+      },
+      {
+        "href": "/v2/campus",
+        "text": "更多服务"
+      },
+      {
+        "href": "/v2/ai",
+        "text": "与 AI 一起，更好地校园生活校园问答、信息查询、学习与生活"
+      },
+      {
+        "href": "/v2/community",
+        "text": "更多"
+      },
+      {
+        "href": "/v2/organizations",
+        "text": "更多"
+      },
+      {
+        "href": "/v2/organizations?q=%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8D%8F%E4%BC%9A",
+        "text": "计算机协会学术"
+      },
+      {
+        "href": "/v2/organizations?q=%E6%91%84%E5%BD%B1%E7%A4%BE",
+        "text": "摄影社艺术"
+      },
+      {
+        "href": "/v2/organizations?q=%E7%BE%BD%E6%AF%9B%E7%90%83%E7%A4%BE",
+        "text": "羽毛球社运动"
+      },
+      {
+        "href": "/v2/organizations?q=%E5%BF%97%E6%84%BF%E8%80%85%E5%8D%8F%E4%BC%9A",
+        "text": "志愿者协会公益"
+      },
+      {
+        "href": "/v2/organizations",
+        "text": "发现组织，遇见志同道合的同学发现更多可能，让校园生活更丰富"
+      },
+      {
+        "href": "/v2/campus/explore",
+        "text": "去校园走走"
+      }
+    ],
+    "path": "/v2"
+  },
+  {
+    "buttons": [
+      "发起组队",
+      "筛选条件展开",
+      "搜索队伍、地点或关键词",
+      "关闭搜索",
+      "全部",
+      "拼车",
+      "娱乐",
+      "学习",
+      "运动",
+      "清除筛选"
+    ],
+    "headings": [
+      "找搭子",
+      "搭子大厅"
+    ],
+    "links": [
+      {
+        "href": "/v2/partners/teams",
+        "text": "管理组队"
+      }
+    ],
+    "path": "/v2/partners"
+  },
+  {
+    "buttons": [
+      "会话5",
+      "通知4",
+      "打开会话：周末市区拼车",
+      "打开会话：高数学习搭子",
+      "打开会话：羽毛球搭子",
+      "打开会话：周末摄影小队",
+      "打开会话：英语口语练习"
+    ],
+    "headings": [
+      "我的会话",
+      "最近会话"
+    ],
+    "links": [],
+    "path": "/v2/messages"
+  },
+  {
+    "buttons": [
+      "运动说明",
+      "学期进度",
+      "运动记录"
+    ],
+    "headings": [
+      "运动"
+    ],
+    "links": [
+      {
+        "href": "/v2/messages?view=notifications",
+        "text": "通知"
+      }
+    ],
+    "path": "/v2/sports"
+  },
+  {
+    "buttons": [],
+    "headings": [
+      "设置",
+      "偏好设置",
+      "通用",
+      "应用与数据",
+      "使用说明"
+    ],
+    "links": [
+      {
+        "href": "/v2/me",
+        "text": "返回我的"
+      },
+      {
+        "href": "/v2/me?tab=profile",
+        "text": "王王同学个人资料与校园身份"
+      },
+      {
+        "href": "/v2/settings?section=privacy",
+        "text": "隐私与可见性学号搜索、资料预览"
+      },
+      {
+        "href": "/v2/settings?section=notifications",
+        "text": "消息与提醒组队通知及其他消息提醒"
+      },
+      {
+        "href": "/v2/settings?section=preview",
+        "text": "资料展示内容资料悬浮窗中的组队与活动"
+      },
+      {
+        "href": "/v2/settings?section=language",
+        "text": "语言中文 / English"
+      },
+      {
+        "href": "/v2/settings?section=appearance",
+        "text": "外观与显示主题、文字大小"
+      },
+      {
+        "href": "/v2/settings?section=campus",
+        "text": "校园使用偏好轮播、动效与课表快捷入口"
+      },
+      {
+        "href": "/v2/settings?section=account",
+        "text": "账号与安全账号信息、密码与登录"
+      },
+      {
+        "href": "/v2/settings?section=data",
+        "text": "演示数据管理本地演示记录"
+      },
+      {
+        "href": "/fonts/NOTICE.html",
+        "text": "字体与许可"
+      },
+      {
+        "href": "/v2/settings?section=policy",
+        "text": "隐私政策了解数据如何使用"
+      },
+      {
+        "href": "/v2/settings?section=help",
+        "text": "使用指南查看常见问题"
+      },
+      {
+        "href": "/v2/settings?section=about",
+        "text": "关于会同里版本与平台说明"
+      }
+    ],
+    "path": "/v2/settings"
+  },
+  {
+    "buttons": [
+      "搜索校园",
+      "关闭搜索",
+      "浏览全部活动",
+      "重新导入",
+      "回到今天",
+      "周一今天",
+      "周二3 节",
+      "周三3 节",
+      "周四3 节",
+      "周五3 节",
+      "周六3 节",
+      "周日3 节",
+      "08:0009:50高等数学教 A101张老师1–16周",
+      "11:0011:50数据结构教 B302李老师1–16周",
+      "14:0015:50大学英语教 C201陈老师1–16周"
+    ],
+    "headings": [
+      "我的课表",
+      "一周课程"
+    ],
+    "links": [
+      {
+        "href": "/v2/me",
+        "text": "返回"
+      },
+      {
+        "href": "/v2/activities/preview-event-0",
+        "text": "秋日校园摄影展活动 · 校园广场"
+      },
+      {
+        "href": "/v2/activities/preview-event-1",
+        "text": "计算机前沿技术分享会活动 · 教学楼 A101"
+      },
+      {
+        "href": "/v2/activities/preview-event-2",
+        "text": "校园夜跑计划活动 · 东区操场"
+      },
+      {
+        "href": "/v2/messages?view=notifications",
+        "text": "通知"
+      }
+    ],
+    "path": "/v2/me?tab=timetable"
+  },
+  {
+    "buttons": [
+      "搜索校园",
+      "关闭搜索",
+      "浏览全部活动"
+    ],
+    "headings": [
+      "我的收藏"
+    ],
+    "links": [
+      {
+        "href": "/v2/me",
+        "text": "返回"
+      },
+      {
+        "href": "/v2/activities/preview-event-0",
+        "text": "秋日校园摄影展活动 · 校园广场"
+      },
+      {
+        "href": "/v2/activities/preview-event-1",
+        "text": "计算机前沿技术分享会活动 · 教学楼 A101"
+      },
+      {
+        "href": "/v2/activities/preview-event-2",
+        "text": "校园夜跑计划活动 · 东区操场"
+      },
+      {
+        "href": "/v2/messages?view=notifications",
+        "text": "通知"
+      },
+      {
+        "href": "/v2/community",
+        "text": "秋日校园，收藏这一束阳光社区帖子"
+      },
+      {
+        "href": "/v2/community",
+        "text": "分享我的自习路线社区帖子"
+      },
+      {
+        "href": "/v2/community",
+        "text": "傍晚的球场很热闹社区帖子"
+      },
+      {
+        "href": "/v2/activities/preview-event-0",
+        "text": "秋日校园摄影展校园活动"
+      },
+      {
+        "href": "/v2/activities/preview-event-1",
+        "text": "计算机前沿技术分享会校园活动"
+      },
+      {
+        "href": "/v2/activities/preview-event-2",
+        "text": "校园夜跑计划校园活动"
+      }
+    ],
+    "path": "/v2/me?tab=saved"
+  }
+]

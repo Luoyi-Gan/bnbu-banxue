@@ -7,8 +7,9 @@ import { Link } from 'react-router-dom'
 export function PageHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description?: string; action?: ReactNode }) { useUiLanguage();
   return <header className="v2-page-heading"><div><span className="v2-eyebrow">{uiText(eyebrow)}</span><h1>{uiText(title)}</h1>{description && <p>{uiText(description)}</p>}</div>{action && <div className="v2-heading-action">{action}</div>}</header>
 }
-export function SectionHeading({ title, detail, action }: { title: string; detail?: string; action?: ReactNode }) { useUiLanguage();
-  return <div className="v2-section-heading"><div><h2>{uiText(title)}</h2>{detail && <p>{uiText(detail)}</p>}</div>{action}</div>
+export function SectionHeading({ title, detail, action, hideTitle=false }: { title: string; detail?: string; action?: ReactNode;hideTitle?:boolean }) { useUiLanguage();
+  if(hideTitle&&!detail&&!action)return null
+  return <div className="v2-section-heading"><div>{!hideTitle&&<h2>{uiText(title)}</h2>}{detail && <p>{uiText(detail)}</p>}</div>{action}</div>
 }
 export function Empty({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description?: string }) { useUiLanguage();
   return <div className="v2-empty"><Icon size={26}/><strong>{uiText(title)}</strong>{description && <p>{uiText(description)}</p>}</div>
