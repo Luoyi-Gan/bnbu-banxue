@@ -1,0 +1,101 @@
+[
+  {
+    "id": "popup-student-schedule-add",
+    "role": "student",
+    "url": "/v2/schedule",
+    "family": "overlay",
+    "title": "添加活动到我的安排",
+    "label": "添加活动到我的安排",
+    "before": false
+  },
+  {
+    "id": "popup-student-post",
+    "role": "student",
+    "url": "/v2/community",
+    "family": "overlay",
+    "title": "发布社区帖子",
+    "label": "发布社区帖子",
+    "before": false
+  },
+  {
+    "id": "popup-student-team",
+    "role": "student",
+    "url": "/v2/partners",
+    "family": "overlay",
+    "title": "发起组队",
+    "label": "发起组队",
+    "before": false
+  },
+  {
+    "id": "popup-student-import",
+    "role": "student",
+    "url": "/v2/me?tab=timetable",
+    "family": "overlay",
+    "title": "导入我的课表",
+    "label": "导入我的课表",
+    "before": false
+  },
+  {
+    "id": "popup-student-reset",
+    "role": "student",
+    "url": "/v2/settings",
+    "family": "overlay",
+    "title": "恢复新版演示数据？",
+    "label": "恢复新版演示数据？",
+    "before": false
+  },
+  {
+    "id": "popup-student-cover",
+    "role": "student",
+    "url": "/v2/me",
+    "family": "overlay",
+    "title": "选择主页封面",
+    "label": "选择主页封面",
+    "before": false
+  },
+  {
+    "id": "popup-student-ai-icon",
+    "role": "student",
+    "url": "/v2/ai",
+    "family": "overlay",
+    "title": "选择奶蛙的形象",
+    "label": "选择奶蛙的形象",
+    "before": false
+  },
+  {
+    "id": "popup-student-certification",
+    "role": "student",
+    "url": "/v2/me?tab=verification",
+    "family": "overlay",
+    "title": "提交身份认证",
+    "label": "提交身份认证",
+    "before": false
+  },
+  {
+    "id": "popup-teacher-move",
+    "role": "teacher",
+    "url": "/v2/teacher/coffee",
+    "family": "overlay",
+    "title": "提出改期",
+    "label": "提出改期",
+    "before": false
+  },
+  {
+    "id": "popup-teacher-cancel",
+    "role": "teacher",
+    "url": "/v2/teacher/coffee",
+    "family": "overlay",
+    "title": "取消预约",
+    "label": "取消预约",
+    "before": false
+  },
+  {
+    "id": "popup-admin-content",
+    "role": "admin",
+    "url": "/v2/admin/moderation",
+    "family": "overlay",
+    "title": "内容详情",
+    "label": "内容详情",
+    "before": false
+  }
+]

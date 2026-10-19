@@ -1,0 +1,858 @@
+{
+  "screens": [
+    {
+      "id": "home",
+      "role": "student",
+      "url": "/v2",
+      "family": "campus"
+    },
+    {
+      "id": "discover",
+      "role": "student",
+      "url": "/v2/activities",
+      "family": "campus"
+    },
+    {
+      "id": "campus",
+      "role": "student",
+      "url": "/v2/campus",
+      "family": "campus"
+    },
+    {
+      "id": "me",
+      "role": "student",
+      "url": "/v2/me",
+      "family": "campus"
+    },
+    {
+      "id": "schedule",
+      "role": "student",
+      "url": "/v2/schedule",
+      "family": "directory"
+    },
+    {
+      "id": "activity",
+      "role": "student",
+      "url": "/v2/activities/preview-event-2",
+      "family": "detail"
+    },
+    {
+      "id": "manage-activities",
+      "role": "student",
+      "url": "/v2/activities?view=manage",
+      "family": "directory"
+    },
+    {
+      "id": "organizations",
+      "role": "student",
+      "url": "/v2/organizations",
+      "family": "directory"
+    },
+    {
+      "id": "community",
+      "role": "student",
+      "url": "/v2/community",
+      "family": "directory"
+    },
+    {
+      "id": "coffee",
+      "role": "student",
+      "url": "/v2/coffee",
+      "family": "directory"
+    },
+    {
+      "id": "alumni",
+      "role": "student",
+      "url": "/v2/alumni",
+      "family": "directory"
+    },
+    {
+      "id": "teacher-coffee",
+      "role": "teacher",
+      "url": "/v2/teacher/coffee",
+      "family": "staff"
+    },
+    {
+      "id": "admin-overview",
+      "role": "admin",
+      "url": "/v2/admin",
+      "family": "staff"
+    },
+    {
+      "id": "welcome",
+      "role": "public",
+      "url": "/v2/welcome",
+      "family": "entry"
+    },
+    {
+      "id": "login",
+      "role": "public",
+      "url": "/v2/login",
+      "family": "entry"
+    }
+  ],
+  "overflow": [],
+  "errors": [],
+  "images": [
+    {
+      "id": "home",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "is-active",
+          "alt": "树荫下的校园建筑",
+          "width": 519,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "黄昏时的校园与水面",
+          "width": 519,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园公共空间与建筑",
+          "width": 519,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园夜跑计划封面",
+          "width": 105,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "羽毛球交流赛封面",
+          "width": 105,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 56,
+          "radius": "0px",
+          "fit": "contain",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "秋日校园，收藏这一束阳光",
+          "width": 151,
+          "radius": "5px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "技术分享会精彩回顾",
+          "width": 151,
+          "radius": "5px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "分享我的自习路线",
+          "width": 151,
+          "radius": "5px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "傍晚的球场很热闹",
+          "width": 151,
+          "radius": "5px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-org-invite",
+          "alt": null,
+          "width": 664,
+          "radius": "6px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "discover",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-discover-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "80px 6px 6px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园夜跑计划封面",
+          "width": 680,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "羽毛球交流赛封面",
+          "width": 680,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "英语口语工作坊封面",
+          "width": 680,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "campus",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园公共空间与建筑",
+          "width": 625,
+          "radius": "85px 5px 5px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-org-invite",
+          "alt": null,
+          "width": 688,
+          "radius": "6px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "秋日校园，收藏这一束阳光",
+          "width": 688,
+          "radius": "5px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-coffee",
+          "alt": null,
+          "width": 688,
+          "radius": "6px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 56,
+          "radius": "0px",
+          "fit": "contain",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "cw-profile-photo",
+          "alt": "个人主页校园封面",
+          "width": 432,
+          "radius": "100px 5px 5px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "schedule",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "reference-schedule-cover",
+          "alt": null,
+          "width": 680,
+          "radius": "70px 6px 6px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "activity",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "SECTION",
+          "classes": "v2-editorial-discover-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "16px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-detail-art",
+          "alt": null,
+          "width": 679,
+          "radius": "6px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "manage-activities",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "SECTION",
+          "classes": "v2-editorial-discover-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "16px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "organizations",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "community",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "SECTION",
+          "classes": "reference-community-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "60px 6px 6px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "coffee",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-teacher-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "60px 6px 6px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 678,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "alumni",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 216,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teacher-coffee",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 199,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "admin-overview",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 199,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "welcome",
+      "items": [
+        {
+          "tag": "MAIN",
+          "classes": "ref-welcome",
+          "alt": null,
+          "width": 680,
+          "radius": "0px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 38,
+          "radius": "50%",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    }
+  ],
+  "result": "passed"
+}

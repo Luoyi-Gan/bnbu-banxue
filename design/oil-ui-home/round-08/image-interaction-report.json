@@ -1,0 +1,42 @@
+{
+  "result": "passed",
+  "runs": [
+    {
+      "run": 1,
+      "result": "passed",
+      "checks": [
+        "manual slideshow with reduced motion",
+        "campus caption separated from courses at four widths",
+        "cover picker opens and cancels",
+        "teacher scene detail reachable",
+        "post media preserves full image",
+        "missing activity cover keeps a usable text entry"
+      ]
+    },
+    {
+      "run": 2,
+      "result": "passed",
+      "checks": [
+        "manual slideshow with reduced motion",
+        "campus caption separated from courses at four widths",
+        "cover picker opens and cancels",
+        "teacher scene detail reachable",
+        "post media preserves full image",
+        "missing activity cover keeps a usable text entry"
+      ]
+    },
+    {
+      "run": 3,
+      "result": "passed",
+      "checks": [
+        "manual slideshow with reduced motion",
+        "campus caption separated from courses at four widths",
+        "cover picker opens and cancels",
+        "teacher scene detail reachable",
+        "post media preserves full image",
+        "missing activity cover keeps a usable text entry"
+      ]
+    }
+  ],
+  "gallery": "15 pages; page switch, device switch and before comparison passed"
+}

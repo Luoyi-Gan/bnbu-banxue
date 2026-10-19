@@ -1,0 +1,1791 @@
+{
+  "screens": [
+    {
+      "id": "home",
+      "role": "student",
+      "url": "/v2",
+      "family": "campus"
+    },
+    {
+      "id": "discover",
+      "role": "student",
+      "url": "/v2/activities",
+      "family": "campus"
+    },
+    {
+      "id": "campus",
+      "role": "student",
+      "url": "/v2/campus",
+      "family": "campus"
+    },
+    {
+      "id": "me",
+      "role": "student",
+      "url": "/v2/me",
+      "family": "campus"
+    },
+    {
+      "id": "schedule",
+      "role": "student",
+      "url": "/v2/schedule",
+      "family": "directory"
+    },
+    {
+      "id": "activity",
+      "role": "student",
+      "url": "/v2/activities/preview-event-2",
+      "family": "detail"
+    },
+    {
+      "id": "manage-activities",
+      "role": "student",
+      "url": "/v2/activities?view=manage",
+      "family": "directory"
+    },
+    {
+      "id": "organizations",
+      "role": "student",
+      "url": "/v2/organizations",
+      "family": "directory"
+    },
+    {
+      "id": "community",
+      "role": "student",
+      "url": "/v2/community",
+      "family": "directory"
+    },
+    {
+      "id": "partners",
+      "role": "student",
+      "url": "/v2/partners",
+      "family": "directory"
+    },
+    {
+      "id": "teams",
+      "role": "student",
+      "url": "/v2/partners/teams",
+      "family": "directory"
+    },
+    {
+      "id": "coffee",
+      "role": "student",
+      "url": "/v2/coffee",
+      "family": "directory"
+    },
+    {
+      "id": "alumni",
+      "role": "student",
+      "url": "/v2/alumni",
+      "family": "directory"
+    },
+    {
+      "id": "alumni-people",
+      "role": "student",
+      "url": "/v2/alumni?view=people",
+      "family": "directory"
+    },
+    {
+      "id": "alumni-bookings",
+      "role": "student",
+      "url": "/v2/alumni?view=bookings",
+      "family": "directory"
+    },
+    {
+      "id": "messages",
+      "role": "student",
+      "url": "/v2/messages",
+      "family": "workbench"
+    },
+    {
+      "id": "notifications",
+      "role": "student",
+      "url": "/v2/messages?view=notifications",
+      "family": "workbench"
+    },
+    {
+      "id": "settings",
+      "role": "student",
+      "url": "/v2/settings",
+      "family": "workbench"
+    },
+    {
+      "id": "ai",
+      "role": "student",
+      "url": "/v2/ai",
+      "family": "workbench"
+    },
+    {
+      "id": "me-profile",
+      "role": "student",
+      "url": "/v2/me?tab=profile",
+      "family": "profile"
+    },
+    {
+      "id": "me-saved",
+      "role": "student",
+      "url": "/v2/me?tab=saved",
+      "family": "profile"
+    },
+    {
+      "id": "me-events",
+      "role": "student",
+      "url": "/v2/me?tab=events",
+      "family": "profile"
+    },
+    {
+      "id": "me-teams",
+      "role": "student",
+      "url": "/v2/me?tab=teams",
+      "family": "profile"
+    },
+    {
+      "id": "me-verification",
+      "role": "student",
+      "url": "/v2/me?tab=verification",
+      "family": "profile"
+    },
+    {
+      "id": "me-network",
+      "role": "student",
+      "url": "/v2/me?tab=network",
+      "family": "profile"
+    },
+    {
+      "id": "me-timetable",
+      "role": "student",
+      "url": "/v2/me?tab=timetable",
+      "family": "profile"
+    },
+    {
+      "id": "teaching",
+      "role": "student",
+      "url": "/v2/campus?service=teaching",
+      "family": "directory"
+    },
+    {
+      "id": "academic",
+      "role": "student",
+      "url": "/v2/campus?service=academic",
+      "family": "directory"
+    },
+    {
+      "id": "explore",
+      "role": "student",
+      "url": "/v2/campus/explore",
+      "family": "directory"
+    },
+    {
+      "id": "sports",
+      "role": "student",
+      "url": "/v2/sports",
+      "family": "directory"
+    },
+    {
+      "id": "teacher-coffee",
+      "role": "teacher",
+      "url": "/v2/teacher/coffee",
+      "family": "staff"
+    },
+    {
+      "id": "teacher-schedule",
+      "role": "teacher",
+      "url": "/v2/teacher/schedule",
+      "family": "staff"
+    },
+    {
+      "id": "teacher-messages",
+      "role": "teacher",
+      "url": "/v2/teacher/messages",
+      "family": "staff"
+    },
+    {
+      "id": "teacher-profile",
+      "role": "teacher",
+      "url": "/v2/teacher/profile",
+      "family": "staff"
+    },
+    {
+      "id": "teacher-sports",
+      "role": "teacher",
+      "url": "/v2/teacher/sports",
+      "family": "staff"
+    },
+    {
+      "id": "admin-overview",
+      "role": "admin",
+      "url": "/v2/admin",
+      "family": "staff"
+    },
+    {
+      "id": "admin-verifications",
+      "role": "admin",
+      "url": "/v2/admin/verifications",
+      "family": "staff"
+    },
+    {
+      "id": "admin-moderation",
+      "role": "admin",
+      "url": "/v2/admin/moderation",
+      "family": "staff"
+    },
+    {
+      "id": "admin-keywords",
+      "role": "admin",
+      "url": "/v2/admin/keywords",
+      "family": "staff"
+    },
+    {
+      "id": "admin-mail-activities",
+      "role": "admin",
+      "url": "/v2/admin/mail-activities",
+      "family": "staff"
+    },
+    {
+      "id": "welcome",
+      "role": "public",
+      "url": "/v2/welcome",
+      "family": "entry"
+    },
+    {
+      "id": "login",
+      "role": "public",
+      "url": "/v2/login",
+      "family": "entry"
+    },
+    {
+      "id": "register",
+      "role": "public",
+      "url": "/v2/register",
+      "family": "entry"
+    },
+    {
+      "id": "forgot-password",
+      "role": "public",
+      "url": "/v2/forgot-password",
+      "family": "entry"
+    },
+    {
+      "id": "identity",
+      "role": "student",
+      "url": "/v2/identity",
+      "family": "entry"
+    }
+  ],
+  "overflow": [],
+  "errors": [],
+  "images": [
+    {
+      "id": "home",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "is-active",
+          "alt": "树荫下的校园建筑",
+          "width": 660,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "黄昏时的校园与水面",
+          "width": 660,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园公共空间与建筑",
+          "width": 660,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园夜跑计划封面",
+          "width": 86,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "羽毛球交流赛封面",
+          "width": 86,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 56,
+          "radius": "0px",
+          "fit": "contain",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "秋日校园，收藏这一束阳光",
+          "width": 157,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "技术分享会精彩回顾",
+          "width": 157,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "分享我的自习路线",
+          "width": 157,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "傍晚的球场很热闹",
+          "width": 157,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-org-invite",
+          "alt": null,
+          "width": 680,
+          "radius": "3px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "discover",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-discover-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "0px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园夜跑计划封面",
+          "width": 680,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "羽毛球交流赛封面",
+          "width": 680,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "英语口语工作坊封面",
+          "width": 680,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "campus",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "校园公共空间与建筑",
+          "width": 664,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-org-invite",
+          "alt": null,
+          "width": 664,
+          "radius": "3px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "ref-story-photo",
+          "alt": "秋日校园，收藏这一束阳光",
+          "width": 664,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "ref-coffee",
+          "alt": null,
+          "width": 664,
+          "radius": "0px 24px 24px 0px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 56,
+          "radius": "0px",
+          "fit": "contain",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "cw-profile-photo",
+          "alt": "个人主页校园封面",
+          "width": 372,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "schedule",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "A",
+          "classes": "reference-schedule-cover",
+          "alt": null,
+          "width": 680,
+          "radius": "0px 0px 30px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "activity",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "SECTION",
+          "classes": "v2-editorial-discover-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "0px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-detail-art",
+          "alt": null,
+          "width": 679,
+          "radius": "6px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "manage-activities",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "SECTION",
+          "classes": "v2-editorial-discover-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "0px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 307,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "organizations",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "community",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "SECTION",
+          "classes": "reference-community-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "0px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 662,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 662,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 662,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 662,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 662,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 662,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 662,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "partners",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teams",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "coffee",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-teacher-hero",
+          "alt": null,
+          "width": 680,
+          "radius": "0px 35px 35px 0px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 100,
+          "radius": "4px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "alumni",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 202,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "alumni-people",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "alumni-bookings",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "messages",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "notifications",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "settings",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 26,
+          "radius": "50%",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "奶蛙",
+          "width": 32,
+          "radius": "50%",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me-profile",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me-saved",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-profile-header",
+          "alt": null,
+          "width": 0,
+          "radius": "18px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me-events",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-profile-header",
+          "alt": null,
+          "width": 0,
+          "radius": "18px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me-teams",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-profile-header",
+          "alt": null,
+          "width": 0,
+          "radius": "18px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me-verification",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-profile-header",
+          "alt": null,
+          "width": 0,
+          "radius": "18px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me-network",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "DIV",
+          "classes": "v2-profile-header",
+          "alt": null,
+          "width": 0,
+          "radius": "18px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "me-timetable",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teaching",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "academic",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "SECTION",
+          "classes": "reference-community-hero",
+          "alt": null,
+          "width": 664,
+          "radius": "0px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 646,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "帖子图片 1",
+          "width": 646,
+          "radius": "3px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "explore",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "sports",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 0,
+          "radius": "7px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teacher-coffee",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 187,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teacher-schedule",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 187,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teacher-messages",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 187,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teacher-profile",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 187,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "teacher-sports",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 187,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "admin-overview",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 195,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "admin-verifications",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 195,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "admin-moderation",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 195,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "admin-keywords",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 195,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "admin-mail-activities",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 36,
+          "radius": "9px",
+          "fit": "fill",
+          "failed": false
+        },
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 195,
+          "radius": "0px",
+          "fit": "cover",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "welcome",
+      "items": [
+        {
+          "tag": "MAIN",
+          "classes": "ref-welcome",
+          "alt": null,
+          "width": 680,
+          "radius": "0px",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "login",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 38,
+          "radius": "50%",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 38,
+          "radius": "50%",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "forgot-password",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 38,
+          "radius": "50%",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "items": [
+        {
+          "tag": "IMG",
+          "classes": "",
+          "alt": "",
+          "width": 38,
+          "radius": "50%",
+          "fit": "fill",
+          "failed": false
+        }
+      ]
+    }
+  ],
+  "result": "passed"
+}
