@@ -44,7 +44,7 @@ const studentNav = [
   { path: '/v2', label: '首页', icon: House, end: true },
   { path: '/v2/activities', label: '发现', icon: Compass },
   { path: '/v2/campus', label: '校园', icon: UsersRound },
-  { path: '/v2/sports', label: '打卡', icon: Footprints },
+  { path: '/v2/sports', label: '运动', icon: Footprints },
   { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const adminNav = [
@@ -84,7 +84,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
   const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
-  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '体育打卡' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '会同里'
+  const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '运动' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '会同里'
   const service = new URLSearchParams(location.search).get('service')
   const sidebarMatch = (id: typeof sidebarItems[number]) => {
     if (id === 'home') return location.pathname === '/v2'

@@ -23,7 +23,7 @@ export function StudentSportsPage() {
   const filtered = records.filter(item=>filter==='all'||(filter==='attention'?['pending','supplement'].includes(recordGroup(item.data.status)):recordGroup(item.data.status)===filter))
   const refresh = async()=>{if(refreshing)return;setRefreshing(true);try{await live.refresh()}finally{setRefreshing(false)}}
   return <div className="ref-page movement-page">
-    <Header title="体育打卡"/>
+    <Header title="运动"/>
     <div className="movement-heading"><div><span>MOVE · EVERY DAY</span><h2>每一次坚持，都算数。</h2><p>{progress?.semester || '本学期'} · {progress?.course || '体育课程信息待同步'}</p></div><button className="movement-icon" type="button" onClick={()=>setInfo(true)} aria-label="体育打卡说明"><Info size={21}/></button></div>
     {live.error && <p className="movement-error" role="alert">{live.error}</p>}
     <div className="movement-grid">
