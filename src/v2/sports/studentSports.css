@@ -11,4 +11,10 @@
 @media(max-width:360px){.v2-app.v2-app-student .movement-page{padding-inline:14px}.movement-page-header h1{font-size:25px}.movement-record-entry svg{display:none}.movement-page-header a,.movement-icon{width:34px}.movement-progress{padding:12px 14px}.movement-progress footer>span{max-width:170px;line-height:1.6}.movement-record-copy strong{font-size:13px}}
 @media(max-width:760px){.v2-app.v2-app-student[data-campus-route='/v2/sports']:has(.movement-page) .v2-floating-timetable-trigger{left:106px;right:auto;top:12px}.v2-app.v2-app-student[data-campus-route='/v2/sports']:has(.movement-page[data-movement-view='records'],.movement-page[data-movement-view='synced']) .v2-floating-timetable-trigger{left:150px}}
 @media(max-width:360px){.v2-app.v2-app-student[data-campus-route='/v2/sports']:has(.movement-page) .v2-floating-timetable-trigger{left:84px}.v2-app.v2-app-student[data-campus-route='/v2/sports']:has(.movement-page[data-movement-view='records'],.movement-page[data-movement-view='synced']) .v2-floating-timetable-trigger{left:125px}}
+.movement-shortcuts{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+.movement-shortcuts button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:8px 14px;border:1px solid #dce3d9;border-radius:6px;color:#426575;background:#fffefa;font:14px HuitongliSportsSans,sans-serif}
+.movement-progress-dialog .movement-progress{padding:0;border:0;background:transparent}
+.movement-progress-dialog .movement-progress header p{margin-top:0}
+.movement-progress-dialog .movement-progress-overview{margin-block:22px}
+.movement-progress-dialog button:focus-visible{outline:3px solid #426575;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.movement-page *{animation:none!important;transition:none!important}}

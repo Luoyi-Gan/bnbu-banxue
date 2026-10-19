@@ -1,0 +1,41 @@
+{
+  "runs": [
+    {
+      "run": 1,
+      "result": "passed",
+      "checks": [
+        "Progress absent on landing",
+        "Small button opens full progress",
+        "Sync remains usable",
+        "Modal focus cycle and Escape returns focus",
+        "320/393/1440 no overflow",
+        "Records and return remain usable"
+      ]
+    },
+    {
+      "run": 2,
+      "result": "passed",
+      "checks": [
+        "Progress absent on landing",
+        "Small button opens full progress",
+        "Sync remains usable",
+        "Modal focus cycle and Escape returns focus",
+        "320/393/1440 no overflow",
+        "Records and return remain usable"
+      ]
+    },
+    {
+      "run": 3,
+      "result": "passed",
+      "checks": [
+        "Progress absent on landing",
+        "Small button opens full progress",
+        "Sync remains usable",
+        "Modal focus cycle and Escape returns focus",
+        "320/393/1440 no overflow",
+        "Records and return remain usable"
+      ]
+    }
+  ],
+  "refreshFailureAndRetry": "passed"
+}
