@@ -11,7 +11,6 @@ import './v2/reference/campusWindowPages.css'
 import './v2/reference/campusWindowDetails.css'
 import './v2/reference/campusWindowStaff.css'
 import './v2/reference/campusWindowLayouts.css'
-import './v2/reference/campusMedia.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
