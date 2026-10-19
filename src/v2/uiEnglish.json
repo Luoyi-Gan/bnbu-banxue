@@ -277,7 +277,7 @@
   "再次点击“确认删除帖子”，帖子及评论将从社区隐藏。": "Click again on the \"Record Delete Post\" to hide the post and comments from the community.",
   "再次点击确认，帖子及评论将从社区隐藏。": "Click again to confirm that the posts and comments will be hidden from the community.",
   "再次输入密码": "Enter password again",
-  "写下你的评论": "Write a comment",
+  "写下你的评论": "Comment…",
   "准备图片": "Preparing image",
   "准备好后开始运动": "Start when you're ready",
   "出发地": "Departure",
@@ -760,7 +760,7 @@
   "提交的信息用于与学校正式记录核对，填写本身不会授予权限。": "The information submitted is used to cross-check with the official records of the school, and the writing itself does not confer authority.",
   "提交认证申请": "Submission of applications for accreditation",
   "提交记录数": "Number of records submitted",
-  "提交评论": "Submission of comments",
+  "提交评论": "Submit comment",
   "提交身份认证": "Submission of identification",
   "提交身份资料后，由有审核职责的管理员处理。": "Upon submission of identification information, it is processed by the administrator with the audit function.",
   "提交运动凭证": "Submission of campaign vouchers",
@@ -1237,7 +1237,7 @@
   "点赞与收藏保存到会同里后台 · 点赞标记反映本人状态": "..shows and collections to the backstage of the Console.",
   "点赞与收藏保存到会同里后台，不影响参与标记。": "Acclaims and collections are saved to the back of the meeting, without prejudice to participation marks.",
   "点赞与收藏保存在本机，不影响参与标记。": "Acclaims and collections are stored on this machine without prejudice to participating tags.",
-  "点赞标记仅反映本人状态": "The adornment mark only reflects the state of the person.",
+  "点赞标记仅反映本人状态": "This like mark reflects only your own status.",
   "热度榜": "Trending",
   "热点榜": "Trending",
   "热点榜数据暂不可用。": "The hotspot list data is not available for the time being.",
@@ -1904,5 +1904,10 @@
   "组织": "organizations",
   "活动管理": "Activity management",
   "返回发现": "Back to Discover",
-  "组织介绍与联系": "About & contact"
+  "组织介绍与联系": "About & contact",
+  "管理活动": "Manage activity",
+  "管理帖子": "Manage post",
+  "还没有评论，聊聊你的想法吧。": "No comments yet. Share your thoughts.",
+  "暂无公开评论": "No public comments yet.",
+  "了解{0} · 查看交流时段": "Meet {0} · View available times"
 }

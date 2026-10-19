@@ -1,9 +1,11 @@
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
-import { ArrowRight, BookOpen, Bookmark, CalendarDays, CarFront, ChevronRight, Clapperboard, Clock3, Dumbbell, MapPin, Megaphone, Plus, Search, SlidersHorizontal, UsersRound, X } from 'lucide-react'
+import { ArrowRight, BookOpen, Bookmark, CalendarDays, CarFront, ChevronRight, Clapperboard, Clock3, Dumbbell, MapPin, Plus, Search, SlidersHorizontal, UsersRound, X } from 'lucide-react'
 import { useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import FlexCarousel from '../components/reactbits/FlexCarousel/FlexCarousel'
 import { ActivityDiscovery, ActivityReactions } from './ActivityDiscovery'
+import { DiscoveryDetail, DetailPhoto } from './DiscoveryDetail'
+import {detailTimeRange} from './detailPresentation'
 import { CampusMap } from './CampusMap'
 import { CampusBuildingPicker } from './V2CampusExplorer'
 import type { CampusBuilding } from './campusLocations'
@@ -58,6 +60,7 @@ export function V2Activities() { useUiLanguage();
   const [publishError, setPublishError] = useState('')
   const [activityBuilding, setActivityBuilding] = useState<CampusBuilding | null>(null)
   const [activityPickerOpen, setActivityPickerOpen] = useState(false)
+  const [detailMapOpen,setDetailMapOpen]=useState(false)
   const permitted = live.data?.account.roles.includes('student') && live.data.entities.some(e => e.kind === 'certification' && e.ownerId === actorId && e.data.kind === 'club' && e.data.status === 'approved')
   const [featured, setFeatured] = useState(0)
   const all = useMemo(() => liveActivities(live.data), [live.data])
@@ -116,22 +119,19 @@ export function V2Activities() { useUiLanguage();
     {section === 'community' && <DiscoverCommunity community={community}/>}
     {section === 'alumni' && <section className="v2-discover-inline-panel" aria-label={uiText("校友")}><div className="v2-discover-panel-heading"><h2>{uiText("校友同行")}</h2></div><p className="v2-discover-panel-intro">{uiText("从校园里的经历出发，看看学长学姐分享的方向与故事。")}</p><div className="v2-discover-alumni">{(live.data?.alumni.profiles ?? []).filter(item => item.status === 'approved' && (alumniYear === '全部' || String(item.graduationYear) === alumniYear) && `${item.name} ${item.major} ${item.experience}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).slice(0, 4).map(item => <article key={item.id}><strong>{item.name}</strong><small>{item.graduationYear} {uiText("届 ·")}{item.major}</small><p>{item.experience}</p></article>)}</div>{live.data && !(live.data.alumni.profiles ?? []).some(item => item.status === 'approved' && (alumniYear === '全部' || String(item.graduationYear) === alumniYear) && `${item.name} ${item.major} ${item.experience}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())) && <p className="v2-discover-panel-intro">{uiText("没有匹配的公开校友资料。")}</p>}</section>}
     </>}
-    {active && <Drawer title={active.title} eyebrow={`${active.category} · ${active.host}`} onClose={() => routeLocation.state?.from ? navigate(routeLocation.state.from) : navigate(activityBase)} wide>
-      <div className="v2-detail-art" role="img" aria-label={active.isDefaultCover?uiText('校园通用照片，默认封面'):uiTemplate(["","封面"],active.title)} style={active.image?{ backgroundImage: `url(${active.image})` }:undefined}/>
-      <p className="v2-detail-lead">{active.subtitle}{active.isDefaultCover && ' · 默认封面'}</p>
-      <ActivityReactions live={live} item={active}/>
-      <section className="v2-event-detail-section"><h3>{uiText("活动介绍")}</h3><p>{active.description}</p>{active.local?.conditions && <p>{uiText("参与条件：")}{active.local.conditions}</p>}{active.local?.mailSourceId && <p>{uiText("来源：")}{active.subtitle}</p>}</section>
-      <section className="v2-event-detail-section"><h3>{uiText("活动信息")}</h3><div className="v2-event-facts">
-        <div><CalendarDays size={20}/><span><small>{uiText("时间")}</small><strong>{formatWhen(active.startAt)}{active.local?.endAt && <> {uiText("至")}{formatWhen(active.local.endAt)}</>}</strong></span></div>
-        <div><MapPin size={20}/><span><small>{uiText("地点")}</small><strong>{active.location}</strong></span></div>
-        <div><UsersRound size={20}/><span><small>{uiText("人数上限")}</small><strong>{active.capacity?uiTemplate([""," 人"],active.capacity):active.local?.mailSourceId?uiText('未提供'):uiText('未限定')}</strong></span></div>
-        <div><Megaphone size={20}/><span><small>{uiText("主办方")}</small><strong>{active.host}</strong></span></div>
-      </div></section>
-      {state.role === 'student' && <div className="v2-detail-actions"><button type="button" className={`v2-button ${state.participatingActivities.includes(active.id) ? 'v2-button-secondary' : 'v2-button-primary'}`} aria-pressed={state.participatingActivities.includes(active.id)} disabled={!state.participatingActivities.includes(active.id) && (active.local?.status === 'draft' || Date.parse(active.endAt ?? active.startAt) <= Date.now())} onClick={() => void live.mutate('relation.set', {id: active.id, kind: 'participate', enabled: !state.participatingActivities.includes(active.id)})}>{state.participatingActivities.includes(active.id)?uiText('取消参与标记'):uiText('标记参与')}</button><span className="v2-form-note">{state.participatingActivities.includes(active.id)?uiText('已保存参与标记。'):uiText('标记不占用活动名额。')}</span></div>}
-      <section className="v2-event-detail-section"><h3>{uiText("校园位置")}</h3><CampusMap key={active.id} location={active.location}/></section>
-      {active.local && owns(active.local) && <div className="v2-detail-actions"><span className="v2-status-chip">{uiText("我主办的活动")}</span><button type="button" className="v2-button v2-button-secondary" disabled={active.local.status === 'draft' && !permitted} onClick={() => changeVisibility(active.id)}>{active.local.status === 'published'?uiText('结束展示'):uiText('重新展示')}</button></div>}
-      {(publishError || live.error) && <p role="alert">{publishError || live.error}</p>}
-    </Drawer>}
+    {active&&<DiscoveryDetail title={active.title} onClose={()=>routeLocation.state?.from?navigate(routeLocation.state.from):navigate(activityBase)}
+      identity={<div className="note-detail-identity"><span className="note-detail-avatar" aria-hidden="true">{active.host.slice(0,1)}</span><span><strong>{active.host}</strong><small>{uiText('主办方')} · {uiText(active.category)}</small></span></div>}
+      media={<DetailPhoto key={active.id} src={active.image} alt={active.isDefaultCover?uiText('校园通用照片，默认封面'):uiTemplate(['','封面'],active.title)} caption={active.isDefaultCover?uiText('校园通用照片，默认封面'):undefined}/>}
+      actions={<><ActivityReactions live={live} item={active} showNote={false}/>{state.role==='student'&&<button type="button" className="note-detail-participate" aria-pressed={state.participatingActivities.includes(active.id)} disabled={live.busy||!state.participatingActivities.includes(active.id)&&(active.local?.status==='draft'||Date.parse(active.endAt??active.startAt)<=Date.now())} onClick={()=>void live.mutate('relation.set',{id:active.id,kind:'participate',enabled:!state.participatingActivities.includes(active.id)})}>{state.participatingActivities.includes(active.id)?uiText('取消参与标记'):uiText('标记参与')}</button>}</>}
+    >
+      <p className="note-detail-source">{uiText(active.subtitle)}</p>
+      <dl className="note-detail-facts"><div><CalendarDays size={18}/><dt>{uiText('时间')}</dt><dd>{detailTimeRange(active.startAt,active.local?.endAt)}</dd></div><div><MapPin size={18}/><dt>{uiText('地点')}</dt><dd>{active.location}</dd></div><div><UsersRound size={18}/><dt>{uiText('人数上限')}</dt><dd>{active.capacity?uiTemplate(['',' 人'],active.capacity):active.local?.mailSourceId?uiText('未提供'):uiText('未限定')}</dd></div></dl>
+      <section><h3>{uiText('活动介绍')}</h3><p className="note-detail-prose">{active.description}</p>{active.local?.conditions&&<p>{uiText('参与条件：')}{active.local.conditions}</p>}</section>
+      {state.role==='student'&&<p className="note-detail-status">{state.participatingActivities.includes(active.id)?uiText('已保存参与标记。'):uiText('标记不占用活动名额。')}</p>}
+      <details className="note-detail-map" onToggle={event=>setDetailMapOpen(event.currentTarget.open)}><summary>{uiText('校园位置')}</summary>{detailMapOpen&&<CampusMap key={active.id} location={active.location}/>}</details>
+      {active.local&&owns(active.local)&&<details className="note-detail-manage"><summary>{uiText('管理活动')}</summary><p>{uiText('我主办的活动')}</p><button type="button" disabled={active.local.status==='draft'&&!permitted} onClick={()=>changeVisibility(active.id)}>{active.local.status==='published'?uiText('结束展示'):uiText('重新展示')}</button></details>}
+      {(publishError||live.error)&&<p role="alert" className="note-detail-status">{publishError||live.error}</p>}
+    </DiscoveryDetail>}
     {createOpen && <Modal title={uiText("发起校园活动")} onClose={() => setCreateOpen(false)}><form className="v2-form" onSubmit={create}><label>{uiText("活动名称")}<input name="title" required maxLength={80} placeholder={uiText("例如：周末摄影漫步")}/></label><label>{uiText("活动介绍")}<textarea name="description" required rows={3} placeholder={uiText("告诉大家会发生什么")}/></label><div className="v2-form-two"><label>{uiText("开始时间")}<input name="date" type="datetime-local" required/></label><label>{uiText("人数上限")}<input name="capacity" type="number" min={1} defaultValue={20}/></label></div><div className="v2-activity-location"><strong>{uiText("活动地点")}</strong><button type="button" className={activityBuilding?'is-selected':''} onClick={() => setActivityPickerOpen(true)}><MapPin size={18}/><span>{activityBuilding?activityBuilding.name:uiText('打开 3D 地图选择楼栋')}</span><ChevronRight size={17}/></button>{activityBuilding && <label>{uiText("详细集合点（可选）")}<input name="locationDetail" maxLength={80} placeholder={uiText("例如：二层 202 室或大门口")}/></label>}</div><p className="v2-form-note">{uiText("仅已认证的学生社团成员可以发起活动。")}</p>{(publishError || live.error) && <p role="alert">{publishError || live.error}</p>}<div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setCreateOpen(false)}>{uiText("取消")}</button><button type="submit" disabled={live.busy || !permitted || !activityBuilding} className="v2-button v2-button-primary">{uiText("发布活动")}</button></div></form></Modal>}
     {activityPickerOpen && <CampusBuildingPicker onClose={() => setActivityPickerOpen(false)} onPick={(building) => { setActivityBuilding(building); setActivityPickerOpen(false) }}/>}
   </div>
