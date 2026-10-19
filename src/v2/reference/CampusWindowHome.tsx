@@ -1,4 +1,4 @@
-import { ArrowRight, Bell, ChevronRight, MapPin, Pause, Play } from 'lucide-react'
+import { ArrowRight, Bell, ChevronLeft, ChevronRight, MapPin, Pause, Play } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DisplayAvatar } from '../DisplayAvatar'
@@ -12,16 +12,8 @@ import { showNoticeBadge } from '../notificationPreferences'
 import type { StudentScheduleItem } from '../studentSchedule'
 import { AssistantBanner, EmptyNote, EventCard, Feedback, Organizations, Section, Services, Stories } from './components'
 import { campusDate, sportsSummary } from './model'
-import campus from '../../assets/campus/home-background.jpg'
-import evening from '../../assets/campus/evening-campus.jpg'
-import courtyard from '../../assets/campus/campus-services.jpg'
+import { campusPhotographs as photographs } from '../campusPhotographs'
 import './campusWindow.css'
-
-const photographs = [
-  { source: campus, alt: '树荫下的校园建筑' },
-  { source: evening, alt: '黄昏时的校园与水面' },
-  { source: courtyard, alt: '校园公共空间与建筑' },
-]
 
 function CampusWindow({ greeting, name }: { greeting: string; name: string }) {
   const [slide, setSlide] = useState(0)
@@ -58,10 +50,12 @@ function CampusWindow({ greeting, name }: { greeting: string; name: string }) {
       <span className="cw-name" title={name}>{name}</span>
     </div>
     <div className="cw-scene">
-      {photographs.map((photo, index) => <img key={photo.source} src={photo.source} alt={photo.alt} className={slide === index ? 'is-active' : ''} aria-hidden={slide !== index} fetchPriority={index === 0 ? 'high' : 'low'}/>)}
+      {photographs.map((photo, index) => (index === slide || index === (slide + 1) % photographs.length || index === (slide + photographs.length - 1) % photographs.length) && <img key={photo.source} src={photo.source} alt={photo.alt} style={{objectPosition:photo.position}} className={slide === index ? 'is-active' : ''} aria-hidden={slide !== index} decoding="async" fetchPriority={index === slide ? 'high' : 'low'}/>)}
       <div className="cw-photo-controls">
         <div role="group" aria-label="校园照片">
-          {photographs.map((photo, index) => <button type="button" key={photo.source} aria-label={`显示第 ${index + 1} 张校园照片`} aria-pressed={slide === index} onClick={() => { setSlide(index); setPaused(true) }}><span/></button>)}
+          <button type="button" aria-label="上一张校园照片" onClick={() => {setSlide(current => (current + photographs.length - 1) % photographs.length);setPaused(true)}}><ChevronLeft size={16}/></button>
+          <span className="cw-photo-count" aria-label={`第 ${slide + 1} 张，共 ${photographs.length} 张校园照片`}>{slide + 1} / {photographs.length}</span>
+          <button type="button" aria-label="下一张校园照片" onClick={() => {setSlide(current => (current + 1) % photographs.length);setPaused(true)}}><ChevronRight size={16}/></button>
         </div>
         {!reduced && <button type="button" aria-label={paused ? '播放校园照片轮播' : '暂停校园照片轮播'} onClick={() => setPaused(current => !current)}>{paused ? <Play size={16}/> : <Pause size={16}/>}</button>}
       </div>

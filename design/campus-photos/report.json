@@ -1,0 +1,43 @@
+{
+  "runs": [
+    {
+      "run": 1,
+      "result": "passed",
+      "checks": [
+        "12 images decode and cycle",
+        "first/last wrap both directions",
+        "only current and two adjacent images mounted",
+        "reduced motion does not auto advance",
+        "controls fit at 320/393/582/720/1440"
+      ]
+    },
+    {
+      "run": 2,
+      "result": "passed",
+      "checks": [
+        "12 images decode and cycle",
+        "first/last wrap both directions",
+        "only current and two adjacent images mounted",
+        "reduced motion does not auto advance",
+        "controls fit at 320/393/582/720/1440"
+      ]
+    },
+    {
+      "run": 3,
+      "result": "passed",
+      "checks": [
+        "12 images decode and cycle",
+        "first/last wrap both directions",
+        "only current and two adjacent images mounted",
+        "reduced motion does not auto advance",
+        "controls fit at 320/393/582/720/1440"
+      ]
+    }
+  ],
+  "page_errors": [],
+  "photos": 12,
+  "new_photos": 9,
+  "normal_motion": "pause/resume and manual navigation pauses autoplay: passed",
+  "gallery": "12 images; category filter, full image, next image, Escape, responsive: passed",
+  "result": "passed"
+}

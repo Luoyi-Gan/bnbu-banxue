@@ -21,6 +21,7 @@
 .cw-home .cw-scene>img.is-active {opacity:1}
 .cw-home .cw-photo-controls {position:absolute;top:0;right:0;display:flex;justify-content:flex-end;align-items:center;padding:0 4px;background:#173b48c9;border-radius:0 0 0 8px}
 .cw-home .cw-photo-controls>div {display:flex}
+.cw-home .cw-photo-count {display:grid;place-items:center;min-width:48px;color:#fff;font-size:12px;font-variant-numeric:tabular-nums}
 .cw-home .cw-photo-controls button {width:44px;height:44px;border:0;color:#fff;background:transparent;display:grid;place-items:center;padding:0}
 .cw-home .cw-photo-controls button>span {width:6px;height:6px;background:#ffffff8c;border:1px solid #fff;border-radius:50%;transition:width .18s ease}
 .cw-home .cw-photo-controls button[aria-pressed=true]>span {width:17px;background:#fff;border-radius:5px}
