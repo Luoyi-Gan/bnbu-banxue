@@ -1,3 +1,4 @@
+import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 import { api } from '../live/api'
 import { ArrowRight, CalendarDays, MessageCircle, Search, UsersRound, X } from 'lucide-react'
 import { gsap } from 'gsap'
@@ -11,7 +12,7 @@ import { DisplayAvatar } from './DisplayAvatar'
 
 const resultIcons = { event: CalendarDays, post: MessageCircle, room: UsersRound }
 
-export function StudentSearch() {
+export function StudentSearch() { useUiLanguage();
   const live = useWorkspaceBackend()
   const navigate = useNavigate()
   const location = useLocation()
@@ -84,27 +85,27 @@ export function StudentSearch() {
   const choose = (path: string) => { close(); navigate(path) }
 
   return <div ref={rootRef} className={`v2-student-search${open ? ' is-open' : ''}`} role="search">
-    <button ref={triggerRef} type="button" className="v2-icon-button v2-student-search-trigger" aria-label="搜索校园" aria-expanded={open} aria-keyshortcuts="/ Meta+K Control+K" onClick={() => setOpen(true)}><Search size={19}/></button>
+    <button ref={triggerRef} type="button" className="v2-icon-button v2-student-search-trigger" aria-label={uiText("搜索校园")} aria-expanded={open} aria-keyshortcuts="/ Meta+K Control+K" onClick={() => setOpen(true)}><Search size={19}/></button>
     <div className="v2-student-search-field" aria-hidden={!open}>
       <Search size={18} aria-hidden="true"/>
-      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder="搜索校园内容或输入完整学号" aria-label="搜索校园内容" tabIndex={open ? 0 : -1}/>
-      {query && <button type="button" className="v2-student-search-clear" aria-label="清除搜索词" onClick={() => { setQuery(''); inputRef.current?.focus() }}><X size={15}/></button>}
-      <button type="button" className="v2-student-search-close" aria-label="关闭搜索" onClick={closeToTrigger}><X size={18}/></button>
+      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder={uiText("搜索校园内容或输入完整学号")} aria-label={uiText("搜索校园内容")} tabIndex={open?0:-1}/>
+      {query && <button type="button" className="v2-student-search-clear" aria-label={uiText("清除搜索词")} onClick={() => { setQuery(''); inputRef.current?.focus() }}><X size={15}/></button>}
+      <button type="button" className="v2-student-search-close" aria-label={uiText("关闭搜索")} onClick={closeToTrigger}><X size={18}/></button>
     </div>
     <div ref={panelRef} className="v2-student-search-panel" aria-hidden={!open} inert={!open}>
       <div className="v2-student-search-panel-inner">
-        <div className="v2-student-search-heading"><strong>{normalized ? '搜索结果' : '推荐看看'}</strong><small>{normalized ? `${results.length + students.length} 条匹配` : '校园里正在发生'}</small></div>
-        {students.map(person => <div className="v2-student-search-result" key={person.id}><span className="v2-student-search-art"><DisplayAvatar className="v2-search-person-avatar" name={person.nickname || person.name} avatar={person.avatar} personId={person.id} lookupNumber={query.trim()}/></span><span className="v2-student-search-result-copy"><strong>{person.nickname || person.name}</strong><small>{person.organization || '学生'}</small></span></div>)}
+        <div className="v2-student-search-heading"><strong>{normalized?uiText('搜索结果'):uiText('推荐看看')}</strong><small>{normalized?uiTemplate([""," 条匹配"],results.length + students.length):uiText('校园里正在发生')}</small></div>
+        {students.map(person => <div className="v2-student-search-result" key={person.id}><span className="v2-student-search-art"><DisplayAvatar className="v2-search-person-avatar" name={person.nickname || person.name} avatar={person.avatar} personId={person.id} lookupNumber={query.trim()}/></span><span className="v2-student-search-result-copy"><strong>{person.nickname || person.name}</strong><small>{person.organization || uiText('学生')}</small></span></div>)}
         {studentError && <p role="alert">{studentError}</p>}
-        {results.length ? results.map((item) => {
+        {results.length?results.map((item) => {
           const Icon = resultIcons[item.kind]
           return <Link to={item.path} className="v2-student-search-result" key={`${item.kind}-${item.id}`} onClick={close}>
             <span className="v2-student-search-art">{item.image ? <img src={item.image} alt=""/> : <Icon size={20}/>}</span>
             <span className="v2-student-search-result-copy"><strong>{item.title}</strong><small>{item.meta}</small></span>
             <ArrowRight size={16} aria-hidden="true"/>
           </Link>
-        }) : <div className="v2-student-search-empty">{students.length ? '以上为学号匹配结果。' : live.error || (!live.data ? '正在读取校园内容…' : '没有找到相关内容。试试更短的关键词。')}</div>}
-        <div className="v2-student-search-footer"><span>按 Enter 打开首条结果 · Esc 关闭</span><button type="button" onClick={() => choose('/v2/activities')}>浏览全部活动 <ArrowRight size={14}/></button></div>
+        }):<div className="v2-student-search-empty">{students.length?uiText('以上为学号匹配结果。'):live.error || (!live.data ? '正在读取校园内容…' : '没有找到相关内容。试试更短的关键词。')}</div>}
+        <div className="v2-student-search-footer"><span>{uiText("按 Enter 打开首条结果 · Esc 关闭")}</span><button type="button" onClick={() => choose('/v2/activities')}>{uiText("浏览全部活动")}<ArrowRight size={14}/></button></div>
       </div>
     </div>
   </div>

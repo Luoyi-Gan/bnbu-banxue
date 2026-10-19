@@ -8,3 +8,10 @@ button,input,select{border-color:#d5dcd2;border-radius:6px}
 .brand-symbol{background:#426575}
 .detail h2,.tools-heading h2{font-family:CampusWenKai,'KaiTi',serif;font-weight:500}
 button:focus-visible,input:focus-visible,select:focus-visible{outline-color:#426575}
+
+html[data-companion-theme=dark] :is(.panel,dialog,.search-box,input,select,button,.campus-tools){background-color:#1d2926!important;color:#e3ece6!important;border-color:#516b60!important}
+html[data-companion-theme=dark] :is(.panel,dialog) :is(p,small,label){color:#afbeb5!important}
+html[lang=en] :is(.panel,dialog){font-family:MiSans,system-ui,sans-serif;line-height:1.6}
+html[lang=en] :is(button,label,summary){height:auto;white-space:normal;word-break:normal;overflow-wrap:break-word;line-height:1.5;letter-spacing:0}
+html[data-companion-text=large] :is(.panel,dialog) :is(button,label,p,input,select){font-size:16px!important;line-height:1.6}
+html[data-companion-motion=reduce] *{animation:none!important;transition:none!important}

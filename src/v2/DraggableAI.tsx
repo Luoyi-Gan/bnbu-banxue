@@ -1,3 +1,4 @@
+import { uiText, useUiLanguage } from './uiLanguage'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -12,7 +13,7 @@ function keepVisible(point: Point, element: HTMLAnchorElement): Point {
   }
 }
 
-export function DraggableAI({ src }: { src: string }) {
+export function DraggableAI({ src }: { src: string }) { useUiLanguage();
   const anchor = useRef<HTMLAnchorElement>(null)
   const drag = useRef<{ id: number; start: Point; origin: Point; moved: boolean } | null>(null)
   const suppressClick = useRef(false)
@@ -59,8 +60,8 @@ export function DraggableAI({ src }: { src: string }) {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
   }
   return <Link ref={anchor} to="/v2/ai" className={`v2-ai-float${dragging ? ' is-dragging' : ''}`}
-    aria-label="打开校园 AI" title="点击打开校园 AI，拖动调整位置" draggable={false}
-    style={position ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' } : undefined}
+    aria-label={uiText("打开校园 AI")} title={uiText("点击打开校园 AI，拖动调整位置")} draggable={false}
+    style={position?{ left: position.x, top: position.y, right: 'auto', bottom: 'auto' }:undefined}
     onPointerDown={start} onPointerMove={move} onPointerUp={finish} onPointerCancel={finish} onLostPointerCapture={finish}
     onDragStart={event => event.preventDefault()}
     onClick={event => { if (suppressClick.current && event.detail !== 0) { event.preventDefault(); suppressClick.current = false } }}>

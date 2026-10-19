@@ -2,6 +2,12 @@
 @font-face{font-family:WenKai;src:url('/fonts/lxgw-wenkai/BNBUWenKai-Medium.woff2') format('woff2');font-display:swap}
 :root{--font-family:MiSans,sans-serif;--color-primary:#426575;--color-on-primary:#fff;--color-primary-container:#e8eee9;--color-on-primary-container:#3e625b;--color-background:#faf9f6;--color-surface:#fffefa;--color-on-surface:#263c35;--color-on-background:#263c35;--color-on-surface-variant:#65726a;--color-outline-variant:#e4e7df;--color-surface-variant:#f0f2ec;--color-secondary:#a47750}
 html,body{height:auto;min-height:100%;overflow:auto;background:var(--color-background);font-family:var(--font-family)}
+html:root[data-theme=dark]{--color-background:#141c1b;--color-surface:#1d2926;--color-on-surface:#e3ece6;--color-on-background:#e3ece6;--color-on-surface-variant:#afbeb5;--color-outline-variant:#36453e;--color-surface-variant:#293d38;--color-surface-container-lowest:#141c1b;--color-surface-container-low:#1d2926;--color-surface-container:#293d38;--color-surface-container-high:#293d38;--color-surface-container-highest:#36453e;--color-primary:#9bc4d6;--color-primary-container:#293d38;--color-on-primary-container:#c0d7e2}
+html[data-theme=dark] .demo-notice{background:#293d38;color:#c0d7e2;border-color:#36453e}
+html[lang=en] :is(h1,h2,h3,.headline-large,.headline-medium,.headline-small){font-family:MiSans,sans-serif!important;letter-spacing:0!important;overflow-wrap:anywhere}
+html[lang=en] :is(button,label,.title-medium,.body-medium){white-space:normal;line-height:1.6}
+html[data-text-size=large] :is(p,label,button,input,textarea,.body-medium,.title-medium){font-size:17px!important;line-height:1.7!important}
+html[data-motion=reduce] *{animation:none!important;transition:none!important}
 body{margin:0}.demo-notice{padding:12px 20px;background:#eaf1eb;color:#456653;font-size:12px;line-height:1.7;border-bottom:1px solid #dce6dc}
 .tab-host{height:auto;overflow:visible;padding:0 20px}.tab-host>.checkin-root{padding:20px 0 28px;min-height:660px;max-width:640px}
 .checkin-root h1,.checkin-root h2{font-family:WenKai,MiSans,sans-serif}.checkin-root .swiss-panel{border:1px solid #e2e7df;border-radius:12px;box-shadow:none;background:#fff}
@@ -51,3 +57,10 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid #244b63;outline-
 .ht-active-evidence{border:1px solid #e4e7df;border-radius:6px;background:#fffefa;overflow:hidden}
 .ht-active-evidence>summary{padding:12px 16px;min-height:44px;font-size:14px;line-height:1.6;color:#426575;cursor:pointer}
 .ht-embedded .ht-active-evidence .checkin-evidence{border:0;border-top:1px solid #e4e7df;border-radius:0}
+
+html[data-theme=dark] .checkin-root :is(.swiss-panel,.checkin-preflight,.checkin-evidence,.ht-active-evidence,.checkin-record-row,.ht-file-options>label){background:#1d2926!important;color:#e3ece6!important;border-color:#36453e!important}
+html[data-theme=dark] .checkin-root :is(.checkin-note,.label-medium,.label-small,.ht-record-intro p,.ht-picker-heading span){color:#afbeb5!important}
+html[data-theme=dark] .checkin-root :is(.category-btn,.checkin-record-filters button,.sport-glyph,.ht-example){background:#293d38!important;color:#c0d7e2!important;border-color:#516b60!important}
+html[data-theme=dark] .checkin-root .category-btn.active{background:#35564c!important;color:#e3ece6!important}
+html[data-theme=dark] .checkin-root :is(input,textarea,select){background:#1d2926!important;color:#e3ece6!important;border-color:#596a60!important}
+html[data-theme=dark] .checkin-root .checkin-cta{background:#56839a!important;color:#fff!important}

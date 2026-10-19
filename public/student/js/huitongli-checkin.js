@@ -1,3 +1,4 @@
+import {setLanguage,tx} from './i18n.js';
 // Direct reuse of the bundled BNBU Sports screen. This adapter never enables API mode.
 import {renderCheckIn,checkinActions,checkinTick,restoreCheckinContinuity,attachDraftVideoPreview} from './screens/checkin.js';
 import {connectSlideEnd} from './checkin-slide-end.js';
@@ -18,7 +19,7 @@ const viewport=document.getElementById('huitongli-checkin');
 const embedded=new URLSearchParams(location.search).get('compact')==='1';
 document.body.classList.toggle('ht-embedded',embedded);
 if(embedded)document.querySelector('.demo-notice').textContent='本机模拟 · 不计入真实学时';
-function dialogHtml(d){return `<div class="dialog-scrim"><section class="dialog" role="dialog" aria-modal="true" aria-label="${esc(d.title||'提示')}"><h2 class="dialog-title">${esc(d.title||'提示')}</h2>${d.body?`<p class="dialog-body">${esc(d.body)}</p>`:''}${d.contentHtml||''}<div class="dialog-actions">${(d.buttons||[{label:'关闭',action:'dialog.close'}]).map(b=>`<button class="text-btn" data-action="${esc(b.action)}">${esc(b.label)}</button>`).join('')}</div></section></div>`}
+function dialogHtml(d){return `<div class="dialog-scrim"><section class="dialog" role="dialog" aria-modal="true" aria-label="${esc(d.title||tx('提示','Notice'))}"><h2 class="dialog-title">${esc(d.title||tx('提示','Notice'))}</h2>${d.body?`<p class="dialog-body">${esc(d.body)}</p>`:''}${d.contentHtml||''}<div class="dialog-actions">${(d.buttons||[{label:tx('关闭','Close'),action:'dialog.close'}]).map(b=>`<button class="text-btn" data-action="${esc(b.action)}">${esc(b.label)}</button>`).join('')}</div></section></div>`}
 const app={
  state:{workspace,authenticated:true,dialog:null},ui:{},overlay:{healthReminderAck:false},_viewport:viewport,
  isApiMode:()=>false,isLocalPreview:()=>true,isWriteAllowed:()=>true,hasActiveEnrollment:()=>true,screenKey:()=> 'tab-checkin',saveOverlay(){},
@@ -26,7 +27,7 @@ const app={
  showDialog(d){this.state.dialog=d;this.render()},closeDialog(){this.state.dialog=null;this.render()},
  render(){
   const active=loadSession(owner);if(active&&['active','paused'].includes(active.phase)&&!active.maximumDurationSeconds){active.maximumDurationSeconds=7200;saveSession(owner,active)}
-  viewport.innerHTML=renderCheckIn(this).replaceAll('审核阶段暂不可用','模拟 · 未送审').replaceAll('预计计入','模拟预计时长').replaceAll('提交打卡','保存模拟记录').replaceAll('确认提交后才上传','确认后保存为本机模拟记录').replaceAll('现场照片','运动照片').replace('提交成功','模拟提交完成').replace('记录已提交，审核状态与计入时长请查看打卡记录。','已生成本机模拟记录，不送交审核、不计入真实学时。')+(this.state.dialog?dialogHtml(this.state.dialog):'');
+  viewport.innerHTML=renderCheckIn(this).replaceAll('Ends automatically at','Automatically ends after').replaceAll('Estimated credit','Simulated duration').replaceAll('Captured proof stays on this device until submission. You can also capture after ending exercise.','Proof stays in this browser and is saved as a local simulated record.').replaceAll('Record submitted. View check-in records for review status and credited time.','Local simulated record saved. It is not submitted for review and earns no real sports hours.').replace('<h1>Submitted</h1>','<h1>Simulation saved</h1>').replaceAll('审核阶段暂不可用','模拟 · 未送审').replaceAll('预计计入','模拟预计时长').replaceAll('提交打卡','保存模拟记录').replaceAll('确认提交后才上传','确认后保存为本机模拟记录').replaceAll('现场照片','运动照片').replace('提交成功','模拟提交完成').replace('记录已提交，审核状态与计入时长请查看打卡记录。','已生成本机模拟记录，不送交审核、不计入真实学时。')+(this.state.dialog?dialogHtml(this.state.dialog):'');
   const session=loadSession(owner);
   decorateHuitongliCheckin(viewport,this,session);
   attachDraftVideoPreview(this);
@@ -38,15 +39,15 @@ const actions={...checkinActions,
  'dialog.close':a=>a.closeDialog(),
  'demo.advance':a=>{const s=loadSession(owner);if(!s||!['active','paused'].includes(s.phase))return;s.accumulatedMs+=1800000;saveSession(owner,s);a.render()},
  'demo.proof':a=>{if(a.ui.checkin.drafts.filter(d=>d.type==='image').length>=6||a.ui.checkin.drafts.some(d=>d.id==='huitongli-example'))return;a.ui.checkin.drafts.push({id:'huitongli-example',type:'image',name:'校园运动示例.jpg',url:'/student/huitongli-demo-campus.jpg',size:0});a.render()},
- 'checkin.openProof':(a,el)=>a.showDialog({title:'运动凭证',contentHtml:safePreviewHtml(el.dataset.source,el.dataset.type)}),
+ 'checkin.openProof':(a,el)=>a.showDialog({title:tx('运动凭证','Workout evidence'),contentHtml:safePreviewHtml(el.dataset.source,el.dataset.type)}),
  'checkin.submit':async a=>{
   const s=loadSession(owner),ui=a.ui.checkin;if(!s||s.phase!=='finished'||ui.finish.submitting)return;
-  if(!ui.drafts.length||!s.details.description?.trim()){a.showDialog({title:'完善运动记录',body:'请添加至少一个凭证并填写运动说明。'});return}
+  if(!ui.drafts.length||!s.details.description?.trim()){a.showDialog({title:tx('完善运动记录','Complete your workout record'),body:tx('请添加至少一个凭证并填写运动说明。','Add at least one piece of evidence and a workout description.')});return}
   ui.finish.submitting=true;a.render();
-  const proofFiles=await Promise.all(ui.drafts.map(async d=>({name:d.name||'运动凭证',fileName:d.name||'运动凭证',type:d.type==='video'?'video':'image',source:d.blob?await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(d.blob)}):d.url})));
+  const proofFiles=await Promise.all(ui.drafts.map(async d=>({name:d.name||tx('运动凭证','Workout evidence'),fileName:d.name||tx('运动凭证','Workout evidence'),type:d.type==='video'?'video':'image',source:d.blob?await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(d.blob)}):d.url})));
   const record={...workspace.records.find(r=>r.id==='preview-record-valid-course'),id:crypto.randomUUID(),businessDate:new Date().toLocaleDateString('sv-SE'),sessionId:null,sportCode:s.details.sportType,serverStatus:'SUBMITTED',reviewResult:null,reviewPublicComment:'本机模拟记录，未送交审核',teacherPublicFeedback:null,hours:null,creditType:s.details.creditType,sportType:s.details.customSportName||SPORT_OPTIONS.find(o=>o.value===s.details.sportType)?.zh||s.details.sportType,submittedAt:new Date().toLocaleString('sv-SE'),startTime:new Date(s.startedAt).toISOString(),endTime:new Date(s.endedAt).toISOString(),actualDurationSeconds:Math.floor(s.activeDurationMillis/1000),note:s.details.description,proofFiles,proofPhotoCount:proofFiles.filter(p=>p.type==='image').length,proofVideoCount:proofFiles.filter(p=>p.type==='video').length,proofSummary:'本机模拟凭证'};
   const next=[record,...saved].slice(0,20);
-  try{localStorage.setItem(recordsKey,JSON.stringify(next));saved=next}catch{ui.finish.submitting=false;a.showDialog({title:'本机保存空间不足',body:'请减少凭证大小后重试。记录尚未提交。'});return}
+  try{localStorage.setItem(recordsKey,JSON.stringify(next));saved=next}catch{ui.finish.submitting=false;a.showDialog({title:tx('本机保存空间不足','Not enough browser storage'),body:tx('请减少凭证大小后重试。记录尚未提交。','Use smaller evidence files and try again. The record has not been saved.')});return}
   workspace.records.unshift(record);s.phase='submitted';s.summary={duration:formatTimer(s.activeDurationMillis),sportType:record.sportType,creditType:s.details.creditType==='course'?'课程运动':'自主运动'};saveSession(owner,s);ui.drafts=[];ui.finish.submitting=false;await clearProofDrafts(owner,'pending').catch(()=>{});a.render();
  }
 };
@@ -54,7 +55,7 @@ app.actions=actions;
 connectSlideEnd(viewport,app);
 for(const [eventName,attr] of [['click','action'],['input','input'],['change','change']])viewport.addEventListener(eventName,event=>{
  const el=event.target.closest(`[data-${attr}]`);if(!el||el.disabled)return;
- const handler=actions[el.dataset[attr]];if(handler)Promise.resolve().then(()=>handler(app,el,event)).then(()=>{if(embedded)parent.postMessage({type:'huitongli-checkin-view',navigation:true,tab:app.ui.checkin?.tab||'exercise',phase:loadSession(owner)?.phase||'idle'},location.origin)}).catch(error=>{if(app.ui.checkin)app.ui.checkin.finish.submitting=false;app.showDialog({title:'操作未完成',body:error.message||'请重试'});});
+ const handler=actions[el.dataset[attr]];if(handler)Promise.resolve().then(()=>handler(app,el,event)).then(()=>{if(embedded)parent.postMessage({type:'huitongli-checkin-view',navigation:true,tab:app.ui.checkin?.tab||'exercise',phase:loadSession(owner)?.phase||'idle'},location.origin)}).catch(error=>{if(app.ui.checkin)app.ui.checkin.finish.submitting=false;app.showDialog({title:tx('操作未完成','Action not completed'),body:error.message||tx('请重试','Please try again')});});
 });
 window.addEventListener('keydown',event=>{
  if(!app.state.dialog)return;
@@ -64,6 +65,17 @@ window.addEventListener('keydown',event=>{
   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}
   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}
  }
+});
+window.addEventListener('message',event=>{
+ if(!embedded||event.origin!==location.origin||event.source!==parent||event.data?.type!=='huitongli-device-preferences')return;
+ const preferences=event.data;
+ setLanguage(preferences.language==='en'?'en':'zh');
+ document.documentElement.lang=preferences.language==='en'?'en':'zh-CN';
+ document.documentElement.dataset.theme=preferences.theme==='dark'?'dark':'light';
+ document.documentElement.dataset.textSize=preferences.textSize==='large'?'large':'standard';
+ document.documentElement.dataset.motion=preferences.reducedMotion?'reduce':'normal';
+ document.querySelector('.demo-notice').textContent=tx('前端模拟 · 运动与凭证仅保存在本机，不计入真实学时。','Simulation · Workouts and evidence stay in this browser and do not count toward real sports hours.');
+ app.render();
 });
 window.addEventListener('message',event=>{
  if(!embedded||event.origin!==location.origin||event.source!==parent||event.data?.type!=='huitongli-checkin-select-view'||!['exercise','records'].includes(event.data.tab))return;

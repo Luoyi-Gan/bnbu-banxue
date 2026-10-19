@@ -1,3 +1,4 @@
+import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 import { ArrowDown, ArrowUp, GripVertical, Plus, RotateCcw, EyeOff } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react'
 import { defaultSidebarItems, sidebarCampusIds, type SidebarItemId } from '../../shared/v2/sidebarLayout'
@@ -22,11 +23,20 @@ export function SidebarCustomizer({ initial, busy, error, onSave, onClose }: {
   error: string
   onSave: (items: SidebarItemId[]) => Promise<boolean>
   onClose: () => void
-}) {
+}) { useUiLanguage();
   const [items, setItems] = useState(initial)
   const [dragging, setDragging] = useState<SidebarItemId | null>(null)
   const itemsRef = useRef(initial)
   const listRef = useRef<HTMLDivElement>(null)
+  useEffect(()=>{
+    const previous=document.activeElement as HTMLElement|null
+    const dialog=listRef.current?.closest('[role=dialog]')
+    const controls=()=>Array.from(dialog?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')??[])
+    controls()[0]?.focus()
+    const trap=(event:KeyboardEvent)=>{if(event.key!=='Tab')return;const all=controls(),first=all[0],last=all.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}}
+    document.addEventListener('keydown',trap)
+    return()=>{document.removeEventListener('keydown',trap);if(previous?.isConnected)previous.focus()}
+  },[])
   const press = useRef<Press | null>(null)
   const dragItem = useRef<SidebarItemId | null>(null)
   const ghost = useRef<HTMLElement | null>(null)
@@ -159,28 +169,28 @@ export function SidebarCustomizer({ initial, busy, error, onSave, onClose }: {
     if (target) updateItems(reorder(current, id, target))
   }
 
-  return <Modal title="侧栏设置" onClose={onClose}>
+  return <Modal title={uiText("侧栏设置")} onClose={onClose}>
     <div className="v2-sidebar-customizer">
-      <p>长按把手后拖动排序；校园功能可随时添加或隐藏。五个主入口始终保留。</p>
-      <h3>侧栏中显示</h3>
-      <div className="v2-sidebar-sort-list" ref={listRef} aria-label="侧栏显示顺序">{items.map((id, index) => {
+      <p>{uiText("长按把手后拖动排序；校园功能可随时添加或隐藏。五个主入口始终保留。")}</p>
+      <h3>{uiText("侧栏中显示")}</h3>
+      <div className="v2-sidebar-sort-list" ref={listRef} aria-label={uiText("侧栏显示顺序")}>{items.map((id, index) => {
         const entry = studentSidebarById[id]
         const Icon = entry.icon
         return <div key={id} className={`v2-sidebar-sort-row${dragging === id ? ' is-dragging' : ''}`} data-sidebar-sort-id={id}>
-          <button type="button" className="v2-sidebar-drag-handle" aria-label={`长按拖动排序：${entry.label}`} onPointerDown={event => startDrag(event, id)} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onContextMenu={event => event.preventDefault()}><GripVertical size={18}/></button>
-          <Icon size={17} aria-hidden="true"/><span>{entry.label}</span>
-          <button type="button" className="v2-sidebar-order-button" aria-label={`上移${entry.label}`} disabled={index === 0} onClick={() => moveBy(id, -1)}><ArrowUp size={15}/></button>
-          <button type="button" className="v2-sidebar-order-button" aria-label={`下移${entry.label}`} disabled={index === items.length - 1} onClick={() => moveBy(id, 1)}><ArrowDown size={15}/></button>
-          {entry.kind === 'campus' && <button type="button" className="v2-sidebar-visibility-button" aria-label={`隐藏${entry.label}`} onClick={() => updateItems(itemsRef.current.filter(item => item !== id))}><EyeOff size={16}/></button>}
+          <button type="button" className="v2-sidebar-drag-handle" aria-label={uiTemplate(["长按拖动排序：",""],uiText(entry.label))} onPointerDown={event => startDrag(event, id)} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} onContextMenu={event => event.preventDefault()}><GripVertical size={18}/></button>
+          <Icon size={17} aria-hidden="true"/><span>{uiText(entry.label)}</span>
+          <button type="button" className="v2-sidebar-order-button" aria-label={uiTemplate(["上移",""],uiText(entry.label))} disabled={index === 0} onClick={() => moveBy(id, -1)}><ArrowUp size={15}/></button>
+          <button type="button" className="v2-sidebar-order-button" aria-label={uiTemplate(["下移",""],uiText(entry.label))} disabled={index === items.length - 1} onClick={() => moveBy(id, 1)}><ArrowDown size={15}/></button>
+          {entry.kind === 'campus' && <button type="button" className="v2-sidebar-visibility-button" aria-label={uiTemplate(["隐藏",""],uiText(entry.label))} onClick={() => updateItems(itemsRef.current.filter(item => item !== id))}><EyeOff size={16}/></button>}
         </div>
       })}</div>
-      {hidden.length > 0 && <><h3>可添加的校园功能</h3><div className="v2-sidebar-add-list">{hidden.map(id => {
+      {hidden.length > 0 && <><h3>{uiText("可添加的校园功能")}</h3><div className="v2-sidebar-add-list">{hidden.map(id => {
         const entry = studentSidebarById[id]
         const Icon = entry.icon
-        return <button type="button" key={id} onClick={() => updateItems([...itemsRef.current, id])}><Icon size={16}/><span>{entry.label}</span><Plus size={15}/></button>
+        return <button type="button" key={id} onClick={() => updateItems([...itemsRef.current, id])}><Icon size={16}/><span>{uiText(entry.label)}</span><Plus size={15}/></button>
       })}</div></>}
-      {error && <p role="alert" className="v2-sidebar-save-error">{error}</p>}
-      <div className="v2-form-actions v2-sidebar-customizer-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => updateItems([...defaultSidebarItems])}><RotateCcw size={15}/> 恢复默认</button><button type="button" className="v2-button v2-button-secondary" onClick={onClose}>取消</button><button type="button" className="v2-button v2-button-primary" disabled={!changed || busy} onClick={() => void onSave(items).then(saved => { if (saved) onClose() })}>{busy ? '保存中…' : '保存侧栏'}</button></div>
+      {error && <p role="alert" className="v2-sidebar-save-error">{uiText(error)}</p>}
+      <div className="v2-form-actions v2-sidebar-customizer-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => updateItems([...defaultSidebarItems])}><RotateCcw size={15}/> {uiText("恢复默认")}</button><button type="button" className="v2-button v2-button-secondary" onClick={onClose}>{uiText("取消")}</button><button type="button" className="v2-button v2-button-primary" disabled={!changed || busy} onClick={() => void onSave(items).then(saved => { if (saved) onClose() })}>{busy?uiText('保存中…'):uiText('保存侧栏')}</button></div>
     </div>
   </Modal>
 }

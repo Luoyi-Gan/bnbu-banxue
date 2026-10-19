@@ -1,8 +1,9 @@
+import {uiLocale} from '../uiLanguage'
 import type { Workspace } from '../../live/api'
 import { campusWeekday, lessonsForDay, type TimetableLesson } from '../../../shared/v2/timetableModel'
 
 export const campusDate = (date: Date | string = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date(date))
-export const when = (date: string) => new Intl.DateTimeFormat('zh-CN', {timeZone:'Asia/Shanghai',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(date))
+export const when = (date: string) => new Intl.DateTimeFormat(uiLocale(), {timeZone:'Asia/Shanghai',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(date))
 export function weekDates(now = new Date()) {
   const today = new Date(`${campusDate(now)}T12:00:00+08:00`)
   today.setDate(today.getDate() - campusWeekday(now) + 1)

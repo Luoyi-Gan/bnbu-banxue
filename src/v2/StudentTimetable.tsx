@@ -1,3 +1,4 @@
+import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { BookOpen, CalendarDays, Check, Clock3, ImagePlus, LoaderCircle, MapPin, Upload, UserRound } from 'lucide-react'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
@@ -7,7 +8,7 @@ import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, typ
 import './timetable.css'
 
 const stages: Record<RecognitionStage, string> = { preparing: '准备图片', recognizing: '识别课程信息', organizing: '整理一周课表' }
-export function StudentTimetable({ idPrefix = 'timetable' }: { idPrefix?: string } = {}) {
+export function StudentTimetable({ idPrefix = 'timetable' }: { idPrefix?: string } = {}) { useUiLanguage();
   const live = useWorkspaceBackend()
   const record = live.data?.entities.find(e => e.kind === 'timetable' && e.ownerId === live.data?.account.id)
   const table = record ? {...record.data, updatedAt: record.updatedAt} as unknown as Timetable : undefined
@@ -90,41 +91,41 @@ export function StudentTimetable({ idPrefix = 'timetable' }: { idPrefix?: string
       setDay(input.weekday); setSelected(null); setMessage('课程信息已更新。'); setError('')
     } catch (failure) { setError(failure instanceof Error ? failure.message : '保存失败') }
   }
-  return <section className="v2-timetable" aria-label="我的课表">
-    <div className="v2-panel v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div><h2>我的课表</h2><p>{table ? `已导入 ${table.lessons.length} 条课程安排` : '上传一张课表照片，查看一周的课程安排。'}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table ? '重新导入' : '导入课表'}</button></div>
+  return <section className="v2-timetable" aria-label={uiText("我的课表")}>
+    <div className="v2-panel v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div><h2>{uiText("我的课表")}</h2><p>{table?uiTemplate(["已导入 "," 条课程安排"],table.lessons.length):uiText('上传一张课表照片，查看一周的课程安排。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table?uiText('重新导入'):uiText('导入课表')}</button></div>
     {message && <p className="v2-timetable-message" role="status">{message}</p>}
-    {live.error && <p role="alert" className="v2-info-box">{live.error}</p>}
-    {sample && <div className="v2-info-box">示例模式 · 以下课程为虚构内容。<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>退出示例</button></div>}
+    {live.error && <p role="alert" className="v2-info-box">{uiText(live.error)}</p>}
+    {sample && <div className="v2-info-box">{uiText("示例模式 · 以下课程为虚构内容。")}<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>{uiText("退出示例")}</button></div>}
     <section className="v2-panel v2-timetable-calendar">
-      <SectionHeading title="一周课程" detail="按星期查看；单 / 双周和上课周次以课程标注为准。" action={<button className="v2-text-button" onClick={() => setDay(campusWeekday())}>回到今天</button>}/>
-      <div className="v2-weekdays" role="tablist" aria-label="选择星期">{weekDays.map((label, index) => <button key={label} type="button" role="tab" aria-selected={day === index + 1} aria-controls={`${idPrefix}-day`} id={`${idPrefix}-weekday-${index + 1}`} className={day === index + 1 ? 'is-active' : ''} onClick={() => setDay(index + 1)}><span>{label}</span><small>{today === index + 1 ? '今天' : `${lessons.filter(item => item.weekday === index + 1).length} 节`}</small></button>)}</div>
-      <div id={`${idPrefix}-day`} role="tabpanel" aria-labelledby={`${idPrefix}-weekday-${day}`} className="v2-timetable-day"><header><h3>{weekDays[day - 1]}{day === today ? ' · 今天' : ''}</h3><span>{shown.length} 条课程安排</span></header>
-        {shown.map(item => <button key={item.id} type="button" className="v2-course-card" onClick={() => { setSelected(item.id); setError('') }}><span className="v2-course-time"><strong>{item.startTime || item.period || '时间待核对'}</strong><small>{item.endTime || (item.startTime ? '结束时间待核对' : '')}</small></span><span className="v2-course-body"><strong>{item.name}</strong><span><MapPin size={14}/>{item.location || '地点未识别'}</span>{item.teacher && <span><UserRound size={14}/>{item.teacher}</span>}<small>{item.weeks || '周次未识别'}{item.period && item.startTime ? ` · ${item.period}` : ''}</small></span>{item.needsReview && <em>待核对</em>}</button>)}
-        {!shown.length && <Empty icon={table || sample ? BookOpen : CalendarDays} title={table || sample ? `${weekDays[day - 1]}暂无课程记录` : '还没有个人课表'} description={table || sample ? '可切换其他星期查看课程；安排以学校课表为准。' : '点击“导入课表”，上传完整清晰的课表照片。'}/>}
+      <SectionHeading title={uiText("一周课程")} detail={uiText("按星期查看；单 / 双周和上课周次以课程标注为准。")} action={<button className="v2-text-button" onClick={() => setDay(campusWeekday())}>{uiText("回到今天")}</button>}/>
+      <div className="v2-weekdays" role="tablist" aria-label={uiText("选择星期")}>{weekDays.map((label, index) => <button key={label} type="button" role="tab" aria-selected={day === index + 1} aria-controls={`${idPrefix}-day`} id={`${idPrefix}-weekday-${index + 1}`} className={day === index + 1?'is-active':''} onClick={() => setDay(index + 1)}><span>{uiText(label)}</span><small>{today === index + 1?uiText('今天'):uiTemplate([""," 节"],lessons.filter(item => item.weekday === index + 1).length)}</small></button>)}</div>
+      <div id={`${idPrefix}-day`} role="tabpanel" aria-labelledby={`${idPrefix}-weekday-${day}`} className="v2-timetable-day"><header><h3>{weekDays[day - 1]}{day === today?uiText(' · 今天'):''}</h3><span>{shown.length} {uiText("条课程安排")}</span></header>
+        {shown.map(item => <button key={item.id} type="button" className="v2-course-card" onClick={() => { setSelected(item.id); setError('') }}><span className="v2-course-time"><strong>{item.startTime || item.period || uiText('时间待核对')}</strong><small>{item.endTime || (item.startTime ? '结束时间待核对' : '')}</small></span><span className="v2-course-body"><strong>{item.name}</strong><span><MapPin size={14}/>{item.location || uiText('地点未识别')}</span>{item.teacher && <span><UserRound size={14}/>{item.teacher}</span>}<small>{item.weeks || uiText('周次未识别')}{item.period && item.startTime?` · ${item.period}`:''}</small></span>{item.needsReview && <em>{uiText("待核对")}</em>}</button>)}
+        {!shown.length && <Empty icon={table || sample?BookOpen:CalendarDays} title={table || sample?uiTemplate(["","暂无课程记录"],weekDays[day - 1]):uiText('还没有个人课表')} description={table || sample?uiText('可切换其他星期查看课程；安排以学校课表为准。'):uiText('点击“导入课表”，上传完整清晰的课表照片。')}/>}
       </div>
     </section>
-    <div className="v2-timetable-footnote"><span>{table && !sample ? `来源：${table.fileName} · 更新于 ${new Date(table.updatedAt).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}` : '识别后自动按星期归类；未识别清楚的内容保留待核对。'}</span><small>个人课表保存到会同里后台，示例课表不会保存。</small></div>
-    {importOpen && <Modal title="导入我的课表" onClose={closeImport}>
-      {stage ? <div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading ? '正在演示识别过程' : '正在识别课表'}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{label}</li>)}</ol><p>识别完成后自动显示课表，原有课表在识别成功前保留。</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy ? '正在保存' : '取消识别'}</button></div> : <div className="v2-timetable-import">
-        <p>请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。</p>
-        <label className="v2-timetable-upload"><input type="file" accept="image/jpeg,image/png,image/webp" aria-label="选择课表照片" onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = '' }}/>{preview ? <img src={preview} alt="待识别的课表照片"/> : <><ImagePlus size={32}/><strong>选择课表照片</strong><span>上传照片或课表截图</span></>}</label>
-        {readingPhoto && <p role="status">正在读取图片…</p>}
+    <div className="v2-timetable-footnote"><span>{table && !sample?uiTemplate(["来源："," · 更新于 ",""],table.fileName,new Date(table.updatedAt).toLocaleString(uiLocale(), { timeZone: 'Asia/Shanghai' })):uiText('识别后自动按星期归类；未识别清楚的内容保留待核对。')}</span><small>{uiText("个人课表保存到会同里后台，示例课表不会保存。")}</small></div>
+    {importOpen && <Modal title={uiText("导入我的课表")} onClose={closeImport}>
+      {stage?<div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading?uiText('正在演示识别过程'):uiText('正在识别课表')}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{uiText(label)}</li>)}</ol><p>{uiText("识别完成后自动显示课表，原有课表在识别成功前保留。")}</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy?uiText('正在保存'):uiText('取消识别')}</button></div>:<div className="v2-timetable-import">
+        <p>{uiText("请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。")}</p>
+        <label className="v2-timetable-upload"><input type="file" accept="image/jpeg,image/png,image/webp" aria-label={uiText("选择课表照片")} onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = '' }}/>{preview ? <img src={preview} alt={uiText("待识别的课表照片")}/> : <><ImagePlus size={32}/><strong>{uiText("选择课表照片")}</strong><span>{uiText("上传照片或课表截图")}</span></>}</label>
+        {readingPhoto && <p role="status">{uiText("正在读取图片…")}</p>}
         {file && <p className="v2-timetable-filename">{file.name} · {(file.size / 1024 / 1024).toFixed(1)} MB</p>}
-        {table && <p>识别成功后将替换当前课表；失败或取消保留原有记录。</p>}
-        {!recognitionPath && <div className="v2-info-box">图片识别服务尚未接入，当前照片不会上传。可先体验加载过程和示例课表。</div>}
+        {table && <p>{uiText("识别成功后将替换当前课表；失败或取消保留原有记录。")}</p>}
+        {!recognitionPath && <div className="v2-info-box">{uiText("图片识别服务尚未接入，当前照片不会上传。可先体验加载过程和示例课表。")}</div>}
         {(error || live.error) && <p role="alert">{error || live.error}</p>}
-        <button className="v2-button v2-button-primary" disabled={!file || readingPhoto} onClick={() => void start(false)}><Upload size={16}/>开始识别</button>
-        <button className="v2-button v2-button-secondary" onClick={() => void start(true)}>体验示例识别流程</button>
+        <button className="v2-button v2-button-primary" disabled={!file || readingPhoto} onClick={() => void start(false)}><Upload size={16}/>{uiText("开始识别")}</button>
+        <button className="v2-button v2-button-secondary" onClick={() => void start(true)}>{uiText("体验示例识别流程")}</button>
       </div>}
     </Modal>}
-    {current && <Drawer title={current.name} eyebrow={`${weekDays[current.weekday - 1]} · ${sample ? '示例课程' : '课程详情'}`} onClose={() => { setSelected(null); setError('') }}>
-      {sample ? <div className="v2-fact-list"><span><Clock3 size={17}/>{current.startTime} — {current.endTime}</span><span><MapPin size={17}/>{current.location || '未提供'}</span><span>{current.weeks || '周次未提供'}</span><p>示例内容不会保存到个人课表。</p></div> : <form className="v2-form" onSubmit={edit} key={current.id}>
-        <p>可以修正识别结果；没有明确时间或周次时，请保留为空，不推断学校安排。</p>
-        <label>课程名称<input name="name" required maxLength={100} defaultValue={current.name}/></label>
-        <label>上课星期<select name="weekday" defaultValue={current.weekday}>{weekDays.map((name, index) => <option value={index + 1} key={name}>{name}</option>)}</select></label>
-        <div className="v2-form-two"><label>开始时间<input type="time" name="startTime" defaultValue={current.startTime}/></label><label>结束时间<input type="time" name="endTime" defaultValue={current.endTime}/></label></div>
-        <label>节次<input name="period" maxLength={60} defaultValue={current.period}/></label><label>上课地点<input name="location" maxLength={100} defaultValue={current.location}/></label><label>任课老师<input name="teacher" maxLength={80} defaultValue={current.teacher}/></label><label>上课周次<input name="weeks" maxLength={100} defaultValue={current.weeks} placeholder="例如：1–16 周 / 单周"/></label><label>备注<textarea name="note" maxLength={300} defaultValue={current.note}/></label>
-        {(error || live.error) && <p role="alert">{error || live.error}</p>}<button disabled={live.busy} className="v2-button v2-button-primary">保存修正</button>
+    {current && <Drawer title={current.name} eyebrow={uiTemplate([""," · ",""],weekDays[current.weekday - 1],uiText(sample ? '示例课程' : '课程详情'))} onClose={() => { setSelected(null); setError('') }}>
+      {sample?<div className="v2-fact-list"><span><Clock3 size={17}/>{current.startTime} — {current.endTime}</span><span><MapPin size={17}/>{current.location || uiText('未提供')}</span><span>{current.weeks || uiText('周次未提供')}</span><p>{uiText("示例内容不会保存到个人课表。")}</p></div>:<form className="v2-form" onSubmit={edit} key={current.id}>
+        <p>{uiText("可以修正识别结果；没有明确时间或周次时，请保留为空，不推断学校安排。")}</p>
+        <label>{uiText("课程名称")}<input name="name" required maxLength={100} defaultValue={current.name}/></label>
+        <label>{uiText("上课星期")}<select name="weekday" defaultValue={current.weekday}>{weekDays.map((name, index) => <option value={index + 1} key={name}>{name}</option>)}</select></label>
+        <div className="v2-form-two"><label>{uiText("开始时间")}<input type="time" name="startTime" defaultValue={current.startTime}/></label><label>{uiText("结束时间")}<input type="time" name="endTime" defaultValue={current.endTime}/></label></div>
+        <label>{uiText("节次")}<input name="period" maxLength={60} defaultValue={current.period}/></label><label>{uiText("上课地点")}<input name="location" maxLength={100} defaultValue={current.location}/></label><label>{uiText("任课老师")}<input name="teacher" maxLength={80} defaultValue={current.teacher}/></label><label>{uiText("上课周次")}<input name="weeks" maxLength={100} defaultValue={current.weeks} placeholder={uiText("例如：1–16 周 / 单周")}/></label><label>{uiText("备注")}<textarea name="note" maxLength={300} defaultValue={current.note}/></label>
+        {(error || live.error) && <p role="alert">{error || live.error}</p>}<button disabled={live.busy} className="v2-button v2-button-primary">{uiText("保存修正")}</button>
       </form>}
     </Drawer>}
   </section>

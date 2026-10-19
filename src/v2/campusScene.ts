@@ -1,8 +1,10 @@
 import type { CampusBuilding } from './campusLocations'
+import {deviceAppearance,subscribeDevicePreferences} from './devicePreferences'
+import {uiText} from './uiLanguage'
 
 export function createCampusScene(host: HTMLDivElement, activityId: string | null, onReady: (buildings: CampusBuilding[]) => void, onSelect: (building: CampusBuilding) => void, onError: () => void) {
   const frame = document.createElement('iframe')
-  frame.title = 'BNBU 三维校园地图'
+  frame.title = uiText('BNBU 三维校园地图')
   frame.src = '/campus-map/viewer/index.html'
   frame.style.cssText = 'display:block;width:100%;height:100%;border:0'
   frame.setAttribute('allow', 'fullscreen')
@@ -10,6 +12,9 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
   let ready = false
   let buildings: CampusBuilding[] = []
   const command = (action: string, id?: string) => frame.contentWindow?.postMessage({ type: 'huitongli-map-command', action, id }, window.location.origin)
+  const appearance=()=>frame.contentWindow?.postMessage({type:'huitongli-map-appearance',...deviceAppearance()},window.location.origin)
+  frame.addEventListener('load',appearance)
+  const unsubscribe=subscribeDevicePreferences(appearance)
   const timeout = window.setTimeout(() => { if (!disposed && !ready) onError() }, 60000)
   const message = (event: MessageEvent) => {
     if (disposed || event.origin !== window.location.origin || event.source !== frame.contentWindow) return
@@ -31,6 +36,6 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
   return {
     focus: (id: string) => command('focus', id),
     overview: () => command('overview'),
-    dispose: () => { disposed = true; clearTimeout(timeout); window.removeEventListener('message', message); frame.remove() },
+    dispose: () => { disposed = true; clearTimeout(timeout); unsubscribe(); frame.removeEventListener('load',appearance);window.removeEventListener('message', message); frame.remove() },
   }
 }
