@@ -1,0 +1,41 @@
+.v2-app .v2-page.settings-page{max-width:800px;margin-inline:auto;padding:26px 32px 64px}
+.settings-heading{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.settings-heading>a{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--v2-line);border-radius:50%;color:var(--v2-ink)}
+.settings-heading h1{margin:0;font:500 30px/1.4 var(--cw-title,"BNBU WenKai",serif);letter-spacing:1px;color:var(--v2-ink)}
+.settings-heading h1:focus{outline:none}
+.settings-account{display:flex;align-items:center;gap:16px;padding:22px;background:var(--v2-accent-soft,#e8eee9);border:1px solid var(--v2-line);border-radius:12px;color:var(--v2-ink);margin-bottom:28px}
+.settings-avatar{display:grid;place-items:center;flex:none;width:56px;height:56px;border-radius:50%;background:#fffefa;color:#426575;font-size:24px;overflow:hidden}
+.settings-avatar img{width:100%;height:100%;object-fit:cover}
+.settings-account>span:not(.settings-avatar){display:grid;gap:5px;flex:1;min-width:0}
+.settings-account strong{font-size:19px;font-weight:600;overflow-wrap:anywhere}
+.settings-account small{font-size:13px;color:var(--v2-muted)}
+.settings-group{margin:0 0 24px}
+.settings-group>h2{font-size:13px;font-weight:500;letter-spacing:.04em;color:var(--v2-muted);margin:0 0 9px 13px}
+.settings-list{border:1px solid var(--v2-line);border-radius:12px;background:var(--v2-surface,#fffefa);overflow:hidden}
+.settings-entry{display:flex;align-items:center;gap:13px;min-height:76px;padding:16px 20px;color:var(--v2-ink);transition:background .16s}
+.settings-entry+.settings-entry{border-top:1px solid var(--v2-line)}
+.settings-entry:hover,.settings-account:hover{background:#eff2ed}
+.settings-entry>svg,.settings-account>svg{flex:none;color:var(--v2-muted)}
+.settings-entry-copy{display:grid;flex:1;min-width:0;gap:4px}
+.settings-entry strong,.settings-toggle strong{font-size:15px;font-weight:500;line-height:1.6}
+.settings-entry small,.settings-toggle small{font-size:13px;color:var(--v2-muted);line-height:1.6}
+.settings-icon{display:grid;place-items:center;flex:none;width:36px;height:36px;border-radius:10px;background:#eeefeb;color:#65726a}
+.settings-icon-privacy{background:#e7eee8;color:#486751}.settings-icon-notifications{background:#e6edf0;color:#426575}.settings-icon-preview{background:#f1ece2;color:#806b44}
+.settings-footer{text-align:center;color:var(--v2-muted);font-size:12px;margin:30px 0 0}
+.settings-description{font-size:14px;line-height:1.9;color:var(--v2-muted);margin:0 3px 20px}
+.settings-toggle{display:flex;align-items:center;gap:18px;justify-content:space-between;padding:21px 22px;cursor:pointer;min-height:92px}
+.settings-toggle+.settings-toggle{border-top:1px solid var(--v2-line)}
+.settings-toggle>span{display:grid;gap:5px}
+.settings-toggle input{appearance:none;position:relative;flex:none;width:44px;height:26px;border-radius:99px;background:#a8b5ad;cursor:pointer;transition:background .18s}
+.settings-toggle input:checked{background:#426575}
+.settings-toggle input:after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:transform .18s}
+.settings-toggle input:checked:after{transform:translateX(18px)}
+.settings-toggle input:disabled{opacity:.5;cursor:wait}
+.settings-save-state{display:flex;align-items:center;gap:6px;min-height:24px;margin:15px 4px;font-size:13px;line-height:1.7;color:var(--v2-muted)}
+.settings-feedback{display:flex;align-items:center;gap:12px;justify-content:space-between;border:1px solid #dbb9b2;background:#faf0ed;padding:14px;margin-bottom:18px;color:#873c35;font-size:14px}
+.settings-feedback button{min-height:44px;background:transparent;border:1px solid currentColor;border-radius:6px;color:inherit;padding:6px 12px;flex:none}
+.settings-data{padding:26px;color:var(--v2-muted)}
+.settings-data h2{font-size:18px;color:var(--v2-ink);margin:14px 0 8px}.settings-data p{font-size:14px;line-height:1.8;margin:0 0 24px}
+.settings-data>button{border:1px solid #d6b7af;border-radius:6px;background:transparent;color:#873c35;font:inherit;font-size:14px;min-height:44px;padding:10px 16px}
+@media(max-width:720px){.v2-app .v2-page.settings-page{padding:20px 20px 110px}.settings-heading{margin-bottom:22px}.settings-heading h1{font-size:28px}.settings-heading>a{width:40px;height:44px;border:0;margin-left:-8px}.settings-account{padding:20px 17px;gap:13px;margin-bottom:26px}.settings-entry{padding:15px;gap:12px}.settings-toggle{padding:20px 17px;gap:14px}.settings-data{padding:22px}}
+@media(prefers-reduced-motion:reduce){.settings-entry,.settings-toggle input,.settings-toggle input:after{transition:none}}

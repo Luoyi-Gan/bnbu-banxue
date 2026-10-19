@@ -134,19 +134,4 @@ export function V2Me() {
   </div>
 }
 
-export function V2Settings() {
-  const live = useWorkspaceBackend()
-  const preferences = live.data?.entities.find(e => e.kind === 'preferences' && e.ownerId === live.data?.account.id)?.data
-  const { reset } = useV2()
-  const [confirmReset, setConfirmReset] = useState(false)
-  const rows: Array<{ key: 'messages' | 'teams' | 'searchable' | 'profilePreview' | 'hoverRecentTeams' | 'hoverActiveTeams' | 'hoverActivities'; title: string; copy: string }> = [
-    { key: 'searchable', title: '允许通过学号搜索到我', copy: '关闭后别人无法通过学号找到你' },
-    { key: 'profilePreview', title: '展示资料预览', copy: '向其他学生展示昵称、头像与学院' },
-    { key: 'hoverRecentTeams', title: '悬浮窗展示近期组队', copy: '展示最近结束的公开队伍' },
-    { key: 'hoverActiveTeams', title: '悬浮窗展示正在组队', copy: '展示当前开放的公开队伍' },
-    { key: 'hoverActivities', title: '悬浮窗展示参与活动', copy: '展示当前保留参与标记的公开活动' },
-    { key: 'messages', title: '消息提醒', copy: '新私聊和组队消息显示提醒' },
-    { key: 'teams', title: '组队状态提醒', copy: '申请通过和队伍状态变化时显示提醒' },
-  ]
-  return <div className="v2-page"><PageHeading eyebrow="PREFERENCES" title="设置" description="管理资料展示、提醒和本地演示数据。"/><div className="v2-settings-grid"><section className="v2-panel v2-list-panel"><SectionHeading title="隐私与提醒"/>{live.error && <p role="alert">{live.error}</p>}{rows.map((row) => <label className="v2-toggle-row" key={row.key}><span><strong>{row.title}</strong><small>{row.copy}</small></span><input type="checkbox" checked={preferences?.[row.key] !== false} disabled={!live.data || live.busy} onChange={(event) => void live.mutate(row.key.startsWith('hover') ? 'preferences.hover' : row.key === 'profilePreview' ? 'preferences.preview' : row.key === 'searchable' ? 'preferences.searchable' : 'preferences.reminders', {key:row.key, enabled:event.target.checked})}/></label>)}</section><aside className="v2-panel v2-settings-aside"><span className="v2-eyebrow">DEMO CONTROL</span><h3>演示数据</h3><p>演示数据保存在当前浏览器中。恢复默认会重置本地操作记录。</p><button type="button" className="v2-button v2-button-secondary" onClick={() => setConfirmReset(true)}>恢复新版演示数据</button></aside></div>{confirmReset && <Modal title="恢复新版演示数据？" onClose={() => setConfirmReset(false)}><p className="v2-modal-copy">这会清除演示中的发布、申请和审核记录。</p><div className="v2-form-actions"><button type="button" className="v2-button v2-button-secondary" onClick={() => setConfirmReset(false)}>取消</button><button type="button" className="v2-button v2-button-primary" onClick={() => { reset(); setConfirmReset(false) }}>恢复默认</button></div></Modal>}</div>
-}
+export { SettingsPage as V2Settings } from './SettingsPage'
