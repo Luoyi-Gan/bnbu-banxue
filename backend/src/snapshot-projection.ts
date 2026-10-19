@@ -9,6 +9,7 @@ import type { SportsCompanion, SportsSourceStatus } from '../../shared/live/spor
 import type { RelationshipHistory } from '../../shared/v2/relationshipAdapter';
 import { activityMailboxConfigured } from './activity-mailbox';
 import { activityOcrConfigured } from './activity-screenshot-ocr';
+import {socialBlocked} from './community-social';
 export interface SnapshotSource {
  repo: Pick<Repository,'all'|'get'|'people'>;
  firstLoginOnly:boolean;studentNumber:string|null;sports:SportsCompanion|null;sportsStatus?:SportsSourceStatus;
@@ -56,9 +57,10 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
     manageKeywords = has(actor, "reviewer", "operator", "superadmin");
   const own = (ownerId: string | null) => ownerId === actor.id;
   const savedIds=new Set(source.relations.filter(row=>row.kind==='save').map(row=>String(row.entityId)));
+  const socialEdges=repo.all('socialEdge');
   const posts = repo
     .all("post")
-    .filter((p) => own(p.ownerId) || savedIds.has(p.id) && p.data.status === 'visible').slice(0,50);
+    .filter((p) => !socialBlocked(socialEdges,actor.id,p.ownerId)&&(own(p.ownerId) || savedIds.has(p.id) && p.data.status === 'visible')).slice(0,50);
   const rooms = repo
     .all("room")
     .filter((r) => own(r.ownerId) || savedIds.has(r.id) && r.data.visibility === 'visible' || strings(r.data.members).includes(actor.id)).slice(0,50);

@@ -16,6 +16,7 @@ export function StudentProfile() { useUiLanguage();
 function StudentProfileEditor({live}: {live: ReturnType<typeof useWorkspaceBackend>}) { useUiLanguage();
   const account = live.data!.account
   const profile = live.data!.entities.find(e => e.kind === 'profile' && e.ownerId === account.id)?.data
+  const [bio,setBio]=useState(String(profile?.bio??''))
   const navigate = useNavigate()
   const [nickname, setNickname] = useState(String(profile?.nickname ?? account.name))
   const [avatar, setAvatar] = useState(String(profile?.avatar ?? ''))
@@ -50,12 +51,13 @@ function StudentProfileEditor({live}: {live: ReturnType<typeof useWorkspaceBacke
     event.preventDefault()
     const name = nickname.trim()
     if (!name || name.length > 20) { setError('昵称需要填写 1–20 个字符。'); return }
-    if (await live.mutate('profile.save', {nickname: name, avatar})) navigate('/v2/me')
+    if (await live.mutate('profile.save', {nickname: name, avatar,bio})) navigate('/v2/me')
   }
   return <div className="v2-page"><Link className="v2-button v2-button-secondary" style={{ marginBottom: 16 }} to="/v2/me"><ArrowLeft size={17}/> {uiText("返回我的")}</Link><PageHeading eyebrow="MY PROFILE" title={uiText("个人资料")} description={uiText("设置头像与昵称，让同学更容易认识你。")}/>
     <form className="v2-profile-editor v2-panel v2-form" onSubmit={save}>
       <div className="v2-profile-photo-row"><DisplayAvatar className="v2-profile-avatar" name={nickname} avatar={avatar} personId={account.id}/><div><label className="v2-button v2-button-secondary">{loading?uiText('处理图片中…'):uiText('更换头像')}<input type="file" accept="image/jpeg,image/png,image/webp" aria-label={uiText("选择头像")} disabled={loading || live.busy} onChange={upload}/></label><p>{uiText("JPG、PNG、WebP，最大 5 MB；头像居中裁剪。")}</p>{avatar && <button type="button" className="v2-text-button" onClick={() => setAvatar('')}>{uiText("恢复默认头像")}</button>}</div></div>
       <label>{uiText("昵称")}<input value={nickname} maxLength={20} required onChange={event => setNickname(event.target.value)} placeholder={uiText("填写你的昵称")}/></label>
+      <label>{uiText("个人简介")}<textarea value={bio} maxLength={100} rows={3} onChange={event=>setBio(event.target.value)} placeholder={uiText("介绍你的兴趣与校园生活")}/><small>{bio.length}/100</small></label>
       <div className="v2-profile-facts"><div><span>{uiText("姓名")}</span><strong>{account.name}</strong></div><div><span>{uiText("学号")}</span><strong>{account.studentNumber ?? uiText('未验证学校邮箱')}</strong></div><div><span>{uiText("学院")}</span><strong>{account.organization}</strong></div><div><span>{uiText("身份")}</span><strong>{account.roles.includes('student')?uiText('已授权学生'):uiText('以账号授权为准')}</strong></div></div>
       {!account.studentNumber && account.email.endsWith('@bnbu.edu.cn') && <div className="v2-form-note"><p>{uiText("验证本人学校邮箱（学号采用入班时填写的资料）：")}{account.email}</p><button type="button" className="v2-button v2-button-secondary" disabled={loading} onClick={() => void verifyEmail(false)}>{uiText("获取验证码")}</button><input aria-label={uiText("邮箱验证码")} value={code} maxLength={6} onChange={event=>setCode(event.target.value)}/><button type="button" className="v2-button v2-button-secondary" disabled={loading || !code.trim()} onClick={() => void verifyEmail(true)}>{uiText("验证邮箱")}</button></div>}{verification && <p role="status">{verification}</p>}<p className="v2-form-note">{uiText("昵称用于展示；姓名、学号采用入班资料，后续由学校名单核对。当前修改保存到会同里后台。")}</p>
       {(error || live.error) && <p role="alert">{error || live.error}</p>}<div className="v2-form-actions"><Link to="/v2/me" className="v2-button v2-button-secondary">{uiText("取消")}</Link><button className="v2-button v2-button-primary" disabled={loading} type="submit">{uiText("保存资料")}</button></div>

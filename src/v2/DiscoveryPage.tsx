@@ -4,11 +4,10 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { ActivityDiscovery } from './ActivityDiscovery'
 import { AlumniDiscovery } from './AlumniDiscoveryFeed'
 import { CampusOrganizations } from './CampusOrganizations'
-import { DiscoverCommunity } from './DiscoverCommunity'
+import { CommunityHub } from './CommunityHub'
 import { filterActivityItems, type ActivityPeriod, type ActivitySort } from './activityFilters'
 import { liveActivities } from './liveActivities'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
-import { useCommunityBackend } from './useCommunityBackend'
 import { Header, EmptyNote, Feedback } from './reference/components'
 import { uiText, useUiLanguage } from './uiLanguage'
 import './discoveryPage.css'
@@ -60,12 +59,4 @@ function ActivityPanel({initialQuery,initialCategory}:{initialQuery:string;initi
   </>
 }
 
-function CommunityPanel(){
-  useUiLanguage()
-  const [query,setQuery]=useState(''),[board,setBoard]=useState('全部'),[sort,setSort]=useState<'recommended'|'newest'>('recommended')
-  const community=useCommunityBackend({query,board,sort})
-  return <><div className="campus-discovery-tools"><SearchField value={query} onChange={setQuery} label="搜索帖子"/><Link className="campus-discovery-manage" to="/v2/community?compose=1">{uiText('发布帖子')}</Link></div>
-    <div className="campus-discovery-filter-line"><nav className="campus-discovery-pills" aria-label={uiText('社区话题')}>{['全部','校园','学习','生活','活动','互助','校友升学','校友就业'].map(value=><button type="button" key={value} aria-pressed={board===value} onClick={()=>setBoard(value)}>{uiText(value)}</button>)}</nav><select className="campus-discovery-sort" aria-label={uiText('帖子排序')} value={sort} onChange={e=>setSort(e.target.value as 'recommended'|'newest')}><option value="recommended">{uiText('推荐')}</option><option value="newest">{uiText('最新')}</option></select></div>
-    <DiscoverCommunity key={`${query}|${board}|${sort}`} community={community}/>
-  </>
-}
+function CommunityPanel(){return <CommunityHub embedded/>}

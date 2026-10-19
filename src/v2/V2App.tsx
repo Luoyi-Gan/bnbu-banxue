@@ -79,7 +79,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const sidebarItems = parseSidebarItems(ownPreferences?.sidebarItems) ?? defaultSidebarItems
   const shellBrandIcon = brandIcon
   const sports = location.pathname === '/v2/teacher/sports'
-  const studentSectionActive = (path: string, isActive: boolean) => isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const studentSectionActive = (path: string, isActive: boolean) => location.pathname==='/v2/community'?path===(new URLSearchParams(location.search).get('person')==='me'?'/v2/me':'/v2/activities'):isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },

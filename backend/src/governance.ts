@@ -259,7 +259,7 @@ export function* governancePolicy(
       "头像须为不超过 5MB 的 JPG、PNG、WebP。",
     );
     const profile = (yield* effect(repo.all("profile"))).find((p) => p.ownerId === actor.id),
-      data = { nickname: textField(input, "nickname", 20), avatar };
+      data = { nickname: textField(input, "nickname", 20), avatar,...(input.bio!==undefined?{bio:textField(input,"bio",100,true)}:{}) };
     return profile
       ? (yield* effect(repo.save(profile, data)))
       : (yield* effect(repo.create("profile", actor.id, data)));

@@ -1,3 +1,5 @@
+import {requireSocialAccess} from './community-social';
+import {runSync,runAsync} from './storage/effects';
 import { demand, timestamp, type Account } from './auth';
 import type { Database } from './database';
 import { Repository, type Fields } from './repository';
@@ -13,6 +15,7 @@ export function recordPostView(db: Database, repo: Repository, actor: Account, i
   demand(actor.roles.length>0,'请先完成校园身份核验。',403);
   const { postId, openId } = viewInput(input);
   const post = repo.get(postId, 'post');
+  runSync(requireSocialAccess(repo,actor,post.ownerId));
   demand(post.data.status === 'visible', '帖子当前不可查看。', 403);
   const previous = db.prepare('SELECT post_id FROM post_views WHERE viewer_id=? AND open_id=?').get(actor.id, openId);
   demand(!previous || previous.post_id === postId, '打开记录标识已用于其他帖子。', 409);
@@ -24,6 +27,7 @@ export async function recordPostgresPostView(repo: PostgresRepository, actor: Ac
   demand(actor.roles.length>0,'请先完成校园身份核验。',403);
   const { postId, openId } = viewInput(input);
   const post = await repo.get(postId, 'post');
+  await runAsync(requireSocialAccess(repo,actor,post.ownerId));
   demand(post.data.status === 'visible', '帖子当前不可查看。', 403);
   const { rows } = await repo.client.query<{post_id:string}>('SELECT post_id FROM post_views WHERE viewer_id=$1 AND open_id=$2', [actor.id, openId]);
   demand(!rows[0] || rows[0].post_id === postId, '打开记录标识已用于其他帖子。', 409);

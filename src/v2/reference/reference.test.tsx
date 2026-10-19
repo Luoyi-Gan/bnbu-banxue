@@ -25,7 +25,7 @@ const posts:Post[]=[{id:'post-a',title:'秋日校园',body:'记录校园里平�
 beforeEach(()=>{
   vi.useFakeTimers();vi.setSystemTime(new Date('2026-10-17T10:00:00+08:00'))
   vi.spyOn(workspaceHook,'useWorkspaceBackend').mockReturnValue({data:fixture,error:'',busy:false,mutate:vi.fn().mockResolvedValue(true),refresh:vi.fn().mockResolvedValue(undefined)})
-  vi.spyOn(communityHook,'useCommunityBackend').mockReturnValue({account:{id:'student',name:'王同学'},posts,likedPosts:[],savedPosts:[],error:'',busy:false,detailPost:null,detailCommentsHasMore:false,detailCommentPage:1,mutate:vi.fn(),recordOpen:vi.fn(),loadMore:vi.fn(),loadPost:vi.fn()})
+  vi.spyOn(communityHook,'useCommunityBackend').mockReturnValue({account:{id:'student',name:'王同学'},posts,likedPosts:[],savedPosts:[],error:'',busy:false,loadingMore:false,refresh:vi.fn(),detailPost:null,detailCommentsHasMore:false,detailCommentPage:1,mutate:vi.fn(),recordOpen:vi.fn(),loadMore:vi.fn(),loadPost:vi.fn()})
 })
 afterEach(()=>{vi.restoreAllMocks();vi.useRealTimers()})
 
@@ -47,7 +47,7 @@ it('体育源不可用时隐藏旧投影，记录始终限制为授权身份',()
 })
 it('个人主页不把关注称为加入，不把参与标记称为正式报名',()=>{
   const html=renderToStaticMarkup(<MemoryRouter><ReferenceMe/></MemoryRouter>)
-  expect(html).toContain('关注组织');expect(html).toContain('标记参与');expect(html).not.toContain('报名成功')
+  expect(html).toContain('关注组织');expect(html).not.toContain('近期动态');expect(html).not.toContain('报名成功')
   expect(html).toContain('我的日历');expect(html).toContain('更多功能')
 })
 it('有内容的五页结构可渲染，运动进度与记录通过入口访问',()=>{

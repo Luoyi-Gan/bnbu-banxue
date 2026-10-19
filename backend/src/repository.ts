@@ -75,6 +75,15 @@ export function enumField<T extends string>(
 }
 export class Repository {
   constructor(public db: Database) {}
+  communityPostIndex(): Entity[] {
+    return (this.db.prepare("SELECT id,kind,owner_id,json_remove(data,'$.images','$.body') AS data,version,created_at,updated_at FROM entities WHERE kind='post' ORDER BY created_at DESC,id").all() as unknown as Row[]).map(decode);
+  }
+  communityCommentIndex(): Entity[] {
+    return (this.db.prepare("SELECT id,kind,owner_id,json_remove(data,'$.body') AS data,version,created_at,updated_at FROM entities WHERE kind='comment'").all() as unknown as Row[]).map(decode);
+  }
+  communityRelations(): {accountId:string;entityId:string;kind:string}[] {
+    return this.db.prepare("SELECT account_id AS accountId,entity_id AS entityId,kind FROM relations WHERE kind IN ('like','save','commentlike')").all() as {accountId:string;entityId:string;kind:string}[];
+  }
   activitySubscribers(id: string): string[] {
     return this.db.prepare("SELECT DISTINCT account_id FROM relations WHERE entity_id=? AND kind IN ('participate','save')").all(id).map(row=>String(row.account_id));
   }

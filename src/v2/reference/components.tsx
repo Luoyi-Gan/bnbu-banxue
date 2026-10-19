@@ -1,10 +1,10 @@
+import {CommunityDiscoveryFeed} from '../CommunityDiscoveryFeed'
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from '../uiLanguage'
 import { ArrowLeft, ArrowRight, Bell, BookOpen, CalendarDays, ChevronRight, Coffee, Compass, Heart, MapPin, MessageCircle, Settings, Sparkles, UsersRound, type LucideIcon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { Workspace } from '../../live/api'
 import { StudentSearch } from '../StudentSearch'
-import { DisplayAvatar } from '../DisplayAvatar'
 import { useWorkspaceBackend } from '../useWorkspaceBackend'
 import { useCommunityBackend } from '../useCommunityBackend'
 import { CommunityPostDetail } from '../CommunityPostDetail'
@@ -58,8 +58,8 @@ export function Organizations({live}:{live:Live}) { useUiLanguage();
 }
 export function Stories({community,compact=false}:{community:ReturnType<typeof useCommunityBackend>;compact?:boolean}) { useUiLanguage();
   const [selected,setSelected]=useState<string|null>(null)
-  const posts=community.posts.filter(p=>p.status==='visible').slice(0,compact?1:4)
-  return <>{community.error && <p role="alert" className="ref-feedback">{community.error}</p>}{posts.length?<div className={compact?'ref-community-preview':'ref-stories'}>{posts.map(post=><button type="button" key={post.id} onClick={()=>{setSelected(post.id);void community.recordOpen(post.id)}}>{post.images?.[0]?<img className="ref-story-photo" src={post.images[0]} alt={post.title} loading="lazy"/>:<span className="ref-story-text"><MessageCircle size={25}/><span>{post.board}</span></span>}<strong>{post.title}</strong><p>{post.body}</p><span className="ref-story-author"><DisplayAvatar className="ref-avatar" name={post.author} avatar={post.authorAvatar} personId={post.ownerId ?? post.id}/>{post.author}</span></button>)}</div>:<EmptyNote to="/v2/community">{uiText("同学们的校园故事，等你来分享。")}</EmptyNote>}{selected && community.detailPost?.id===selected && <CommunityPostDetail id={selected} live={community} onClose={()=>setSelected(null)}/>}</>
+  const posts=community.posts.filter(p=>p.status==='visible').slice(0,compact?2:4)
+  return <>{community.error&&<p role="alert" className="ref-feedback">{community.error}</p>}{posts.length?<div className="community-hub community-summary-feed"><CommunityDiscoveryFeed posts={posts} liked={community.likedPosts} saved={community.savedPosts} viewerId={community.account.id} busy={community.busy} onOpen={id=>{setSelected(id);void community.recordOpen(id)}} onLike={id=>void community.mutate('relation.set',{id,kind:'like',enabled:!community.likedPosts.includes(id)})} onSave={id=>void community.mutate('relation.set',{id,kind:'save',enabled:!community.savedPosts.includes(id)})}/></div>:<EmptyNote to="/v2/community">{uiText('同学们的校园故事，等你来分享。')}</EmptyNote>}{selected && community.detailPost?.id===selected && <CommunityPostDetail id={selected} live={community} onClose={()=>setSelected(null)}/>}</>
 }
 export function Partners({data}:{data:Workspace|null}) { useUiLanguage();
   const rooms=data?.entities.filter(item=>item.kind==='room'&&item.data.status==='open'&&item.data.visibility==='visible').slice(0,2)??[]

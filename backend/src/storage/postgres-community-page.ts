@@ -1,7 +1,9 @@
+import {filterCommunityCandidates,requireSocialAccess,communitySocialRead,communityCounts,communityHotForViewer} from '../community-social';
+import {runAsync} from './effects';
 import type {PoolClient} from 'pg';
 import {demand,type Account} from '../auth';
 import {projectCommunity} from '../community-view';
-import {rankCommunity,rankHotSummaries,type CommunityCandidate,type CommunityMetrics,type CommunitySignals} from '../community-ranking';
+import {rankCommunity,type CommunityCandidate,type CommunityMetrics,type CommunitySignals} from '../community-ranking';
 import {projectDisplayPeople} from '../display-people';
 import type {Entity} from '../repository';
 import type {AlumniData} from '../../../shared/v2/alumniModel';
@@ -34,7 +36,7 @@ async function signals(client:PoolClient,actorId:string,cutoff:string):Promise<C
 }
 async function candidates(client:PoolClient,actor:Account,withBody:boolean) {
   const body=withBody?"COALESCE(p.data::jsonb->>'body','')":"''";
-  const result=await client.query<{id:string;ownerId:string|null;createdAt:string;title:string;body:string;board:string;status:string;author:string}>(`SELECT p.id,p.owner_id AS "ownerId",p.created_at AS "createdAt",COALESCE(p.data::jsonb->>'title','') AS title,${body} AS body,COALESCE(p.data::jsonb->>'board','') AS board,p.data::jsonb->>'status' AS status,CASE WHEN (SELECT data::jsonb->>'profilePreview' FROM entities WHERE kind='preferences' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1)='false' THEN COALESCE(a.name,'已注销用户') ELSE COALESCE((SELECT data::jsonb->>'nickname' FROM entities WHERE kind='profile' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1),a.name,'已注销用户') END AS author FROM entities p LEFT JOIN accounts a ON a.id=p.owner_id WHERE p.kind='post' AND (p.data::jsonb->>'status'='visible' OR (p.owner_id=$1 AND p.data::jsonb->>'status'='pending'))`,[actor.id]);
+  const result=await client.query<{id:string;ownerId:string|null;createdAt:string;title:string;body:string;board:string;status:string;author:string}>(`SELECT p.id,p.data::jsonb->>'alumniId' AS "alumniId",p.owner_id AS "ownerId",p.created_at AS "createdAt",COALESCE(p.data::jsonb->>'title','') AS title,${body} AS body,COALESCE(p.data::jsonb->>'board','') AS board,p.data::jsonb->>'status' AS status,CASE WHEN (SELECT data::jsonb->>'profilePreview' FROM entities WHERE kind='preferences' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1)='false' THEN COALESCE(a.name,'已注销用户') ELSE COALESCE((SELECT data::jsonb->>'nickname' FROM entities WHERE kind='profile' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1),a.name,'已注销用户') END AS author FROM entities p LEFT JOIN accounts a ON a.id=p.owner_id WHERE p.kind='post' AND (p.data::jsonb->>'status'='visible' OR (p.owner_id=$1 AND p.data::jsonb->>'status'='pending'))`,[actor.id]);
   return result.rows as CommunityCandidate[];
 }
 async function projection(client:PoolClient,actor:Account,entities:Entity[]) {
@@ -47,11 +49,12 @@ async function projection(client:PoolClient,actor:Account,entities:Entity[]) {
   const [likeRows,viewRows,relations,alumni]=await Promise.all([
     client.query<CountRow>("SELECT entity_id AS id,count(*) AS count FROM relations WHERE kind='like' AND entity_id=ANY($1::text[]) GROUP BY entity_id",[postIds]),
     client.query<CountRow>('SELECT post_id AS id,count(*) AS count FROM post_views WHERE post_id=ANY($1::text[]) GROUP BY post_id',[postIds.filter(id=>entities.find(item=>item.id===id)?.ownerId===actor.id)]),
-    client.query<{entityId:string;kind:string}>("SELECT entity_id AS \"entityId\",kind FROM relations WHERE account_id=$1 AND kind IN ('like','save')",[actor.id]),
+    client.query<{entityId:string;kind:string}>("SELECT entity_id AS \"entityId\",kind FROM relations WHERE account_id=$1 AND kind IN ('like','save','commentlike')",[actor.id]),
     repo.all('alumniState'),
   ]);
   const alumniState=alumni[0]?.data.value as AlumniData|undefined;
-  return projectCommunity({account:actor,entities,people,relations:relations.rows,alumni:{profiles:alumniState?.profiles??[]}},map(likeRows.rows),{allViews:map(viewRows.rows),recentViews:new Map(),recentLikes:new Map()});
+  const facts=await runAsync(communityCounts(repo,postIds));
+  return projectCommunity({account:actor,entities,people,relations:relations.rows,alumni:{profiles:alumniState?.profiles??[]}},map(likeRows.rows),{allViews:map(viewRows.rows),recentViews:new Map(),recentLikes:new Map()},facts);
 }
 export async function postgresCommunityFeed(db:PostgresDatabase,token:string,params:URLSearchParams) {
   return db.transaction(async client=>{
@@ -61,10 +64,11 @@ export async function postgresCommunityFeed(db:PostgresDatabase,token:string,par
     demand(query.length<=100,'搜索词过长。');
     const page=Math.max(1,Math.min(100000,Number(params.get('page'))||1)),pageSize=Math.max(1,Math.min(50,Number(params.get('limit'))||20));
     const cutoff7=new Date(Date.now()-7*86_400_000).toISOString(),cutoff30=new Date(Date.now()-30*86_400_000).toISOString();
-    const [all,engagement,personal]=await Promise.all([candidates(client,actor,Boolean(query)),metrics(client,cutoff7),signals(client,actor.id,cutoff30)]);
+    const [candidatesList,engagement,personal]=await Promise.all([candidates(client,actor,Boolean(query)),metrics(client,cutoff7),signals(client,actor.id,cutoff30)]);
+    const all=await runAsync(filterCommunityCandidates(new PostgresRepository(client),actor,candidatesList,params));
     const ordered=rankCommunity(all,{board,query,sort},personal,engagement),selected=ordered.slice((page-1)*pageSize,page*pageSize);
-    const hot=rankHotSummaries(all,engagement),hotIds=[...new Set([...hot.overall,...Object.values(hot.byBoard).flat()])];
-    const hotPosts=hotIds.flatMap(id=>{const item=all.find(post=>post.id===id);return item?[{id:item.id,title:item.title,board:item.board,author:item.author,status:item.status}]:[]});
+    const hot=await runAsync(communityHotForViewer(new PostgresRepository(client),actor,candidatesList,engagement)),hotIds=[...new Set([...hot.overall,...Object.values(hot.byBoard).flat()])];
+    const hotPosts=hotIds.flatMap(id=>{const item=candidatesList.find(post=>post.id===id);return item?[{id:item.id,title:item.title,board:item.board,author:item.author,status:item.status}]:[]});
     const rows=selected.length?(await client.query<{id:string;kind:string;owner_id:string|null;data:string;version:number;created_at:string;updated_at:string}>('SELECT * FROM entities WHERE id=ANY($1::text[])',[selected.map(item=>item.id)])).rows:[];
     const entityMap=new Map((await Promise.all(rows.map(decodePostgresEntity))).map(item=>[item.id,item]));
     const entities=selected.flatMap(item=>{const entity=entityMap.get(item.id);return entity?[entity]:[]});
@@ -77,10 +81,13 @@ export async function postgresCommunityPostDetail(db:PostgresDatabase,token:stri
     await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
     const actor=await new PostgresAuth(db).authenticate(token,client);community(actor);
     const repo=new PostgresRepository(client),post=await repo.get(id,'post');
+    await runAsync(requireSocialAccess(repo,actor,post.ownerId));
     demand(post.data.status==='visible'||post.ownerId===actor.id&&post.data.status==='pending','帖子当前不可查看。',403);
     const rows=(await client.query<{id:string;kind:string;owner_id:string|null;data:string;version:number;created_at:string;updated_at:string}>("SELECT * FROM entities WHERE kind='comment' AND data::jsonb->>'postId'=$1 AND (data::jsonb->>'status'='visible' OR (owner_id=$2 AND data::jsonb->>'status'='pending')) ORDER BY created_at,id LIMIT 51 OFFSET $3",[id,actor.id,(Math.max(1,page)-1)*50])).rows;
     const entities=[post,...await Promise.all(rows.slice(0,50).map(decodePostgresEntity))];
     const view=await projection(client,actor,entities);
-    return {post:view.posts[0],commentsHasMore:rows.length>50,commentPage:page,liked:view.likedPosts.includes(id),saved:view.savedPosts.includes(id),alumniProfiles:view.alumniProfiles};
+    return {post:view.posts[0],features:{postViews:true},commentsHasMore:rows.length>50,commentPage:page,liked:view.likedPosts.includes(id),saved:view.savedPosts.includes(id),alumniProfiles:view.alumniProfiles};
   });
 }
+
+export async function postgresCommunitySocial(db:PostgresDatabase,token:string,params:URLSearchParams){return db.transaction(async client=>{await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');const actor=await new PostgresAuth(db).authenticate(token,client);return runAsync(communitySocialRead(new PostgresRepository(client),actor,params));});}

@@ -23,6 +23,17 @@ export class PostgresRepository {
     await this.client.query('UPDATE notifications SET read_at=COALESCE(read_at,$1) WHERE id=$2 AND recipient_id=$3',[at,id,recipientId]);
   }
 
+  async communityPostIndex(): Promise<Entity[]> {
+    const rows=(await this.client.query<EntityRow>("SELECT id,kind,owner_id,(data::jsonb-'images'-'body')::text AS data,version,created_at,updated_at FROM entities WHERE kind='post' ORDER BY created_at DESC,id")).rows;
+    return Promise.all(rows.map(decodePostgresEntity));
+  }
+  async communityCommentIndex(): Promise<Entity[]> {
+    const rows=(await this.client.query<EntityRow>("SELECT id,kind,owner_id,(data::jsonb-'body')::text AS data,version,created_at,updated_at FROM entities WHERE kind='comment'")).rows;
+    return Promise.all(rows.map(decodePostgresEntity));
+  }
+  async communityRelations(): Promise<{accountId:string;entityId:string;kind:string}[]> {
+    return (await this.client.query<{accountId:string;entityId:string;kind:string}>("SELECT account_id AS \"accountId\",entity_id AS \"entityId\",kind FROM relations WHERE kind IN ('like','save','commentlike')")).rows;
+  }
   async all(kind: string): Promise<Entity[]> {
     const result = await this.client.query<EntityRow>('SELECT * FROM entities WHERE kind=$1 ORDER BY created_at DESC,id', [kind]);
     return Promise.all(result.rows.map(decodePostgresEntity));

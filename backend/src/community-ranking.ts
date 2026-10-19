@@ -1,4 +1,4 @@
-export type CommunityCandidate={id:string;ownerId:string|null;title:string;body:string;board:string;author:string;createdAt:string;status:string};
+export type CommunityCandidate={alumniId?:string;id:string;ownerId:string|null;title:string;body:string;board:string;author:string;createdAt:string;status:string};
 export type CommunityMetrics={views:ReadonlyMap<string,number>;likes:ReadonlyMap<string,number>;comments:ReadonlyMap<string,number>};
 export type CommunitySignals={board:ReadonlyMap<string,number>;viewed:ReadonlySet<string>};
 

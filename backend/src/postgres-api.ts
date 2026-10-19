@@ -7,7 +7,7 @@ import { PostgresAuth } from './storage/postgres-auth';
 import { PostgresEmail } from './storage/postgres-email';
 import type { PostgresDatabase } from './storage/postgres';
 import { executePostgres } from './storage/postgres-commands';
-import {postgresCommunityFeed,postgresCommunityPostDetail} from './storage/postgres-community-page';
+import {postgresCommunityFeed,postgresCommunityPostDetail,postgresCommunitySocial} from './storage/postgres-community-page';
 import {postgresDiscoverHotPage} from './storage/postgres-discover-hot-page';
 import {postgresModerationPage} from './storage/postgres-community-moderation-page';
 import { searchPostgresRooms, postgresRoomDetail } from './room-search';
@@ -63,6 +63,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if (request.method === 'GET' && pathname === '/api/identity/requests') return send(response,200,await postgresListStudentIdentityRequests(db,await auth.authenticate(cookieToken(request)),new URL(request.url!,'http://localhost').searchParams));
       if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityFeed(db,cookieToken(request) ?? '',requestUrl.searchParams));
       if (request.method === 'GET' && pathname === '/api/discover/hot') return send(response,200,await postgresDiscoverHotPage(db,cookieToken(request) ?? ''));
+      if(request.method==='GET' && pathname==='/api/community/social') return send(response,200,await postgresCommunitySocial(db,cookieToken(request)??'',requestUrl.searchParams));
       if(request.method==='GET' && pathname==='/api/community/feed') return send(response,200,await postgresCommunityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
       if(request.method==='GET' && pathname==='/api/admin/community/moderation') return send(response,200,await postgresModerationPage(db,await auth.authenticate(cookieToken(request)),requestUrl.searchParams));
       const communityDetail=request.method==='GET' && /^\/api\/community\/posts\/([^/]+)$/.exec(pathname);
