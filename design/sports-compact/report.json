@@ -1,0 +1,55 @@
+{
+  "runs": [
+    {
+      "run": 1,
+      "result": "passed",
+      "checks": [
+        "Single records entry and 2 source views",
+        "All 8 synchronized records, filter/detail/Escape",
+        "Local record proof and return to exercise",
+        "Toolbar at 320/393/582/720/1440",
+        "Course/sport selector and requirements",
+        "Start/pause/end; progress removed during session",
+        "Local save failure keeps evidence and description",
+        "Saved record reloads and is readable",
+        "No backend business commands"
+      ]
+    },
+    {
+      "run": 2,
+      "result": "passed",
+      "checks": [
+        "Single records entry and 2 source views",
+        "All 8 synchronized records, filter/detail/Escape",
+        "Local record proof and return to exercise",
+        "Toolbar at 320/393/582/720/1440",
+        "Course/sport selector and requirements",
+        "Start/pause/end; progress removed during session",
+        "Local save failure keeps evidence and description",
+        "Saved record reloads and is readable",
+        "No backend business commands"
+      ]
+    },
+    {
+      "run": 3,
+      "result": "passed",
+      "checks": [
+        "Single records entry and 2 source views",
+        "All 8 synchronized records, filter/detail/Escape",
+        "Local record proof and return to exercise",
+        "Toolbar at 320/393/582/720/1440",
+        "Course/sport selector and requirements",
+        "Start/pause/end; progress removed during session",
+        "Local save failure keeps evidence and description",
+        "Saved record reloads and is readable",
+        "No backend business commands"
+      ]
+    }
+  ],
+  "errors": [],
+  "geometry": [],
+  "mobileHeight": 849,
+  "navigation": "Rapid records / return / records keeps the final selected view",
+  "result": "passed",
+  "states": "Unknown progress, refresh error and retry passed"
+}

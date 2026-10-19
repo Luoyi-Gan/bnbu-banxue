@@ -15,6 +15,9 @@ let saved=[];try{saved=JSON.parse(localStorage.getItem(recordsKey)||'[]')}catch{
 workspace.records.forEach(record=>{record.proofFiles=[sampleEvidence()];record.proofPhotoCount=1;record.proofVideoCount=0;record.proofSummary='校园示例凭证';});
 workspace.records=[...(Array.isArray(saved)?saved:[]),...workspace.records];
 const viewport=document.getElementById('huitongli-checkin');
+const embedded=new URLSearchParams(location.search).get('compact')==='1';
+document.body.classList.toggle('ht-embedded',embedded);
+if(embedded)document.querySelector('.demo-notice').textContent='本机模拟 · 不计入真实学时';
 function dialogHtml(d){return `<div class="dialog-scrim"><section class="dialog" role="dialog" aria-modal="true" aria-label="${esc(d.title||'提示')}"><h2 class="dialog-title">${esc(d.title||'提示')}</h2>${d.body?`<p class="dialog-body">${esc(d.body)}</p>`:''}${d.contentHtml||''}<div class="dialog-actions">${(d.buttons||[{label:'关闭',action:'dialog.close'}]).map(b=>`<button class="text-btn" data-action="${esc(b.action)}">${esc(b.label)}</button>`).join('')}</div></section></div>`}
 const app={
  state:{workspace,authenticated:true,dialog:null},ui:{},overlay:{healthReminderAck:false},_viewport:viewport,
@@ -28,6 +31,7 @@ const app={
   decorateHuitongliCheckin(viewport,this,session);
   attachDraftVideoPreview(this);
   viewport.querySelector('.dialog button')?.focus();
+  if(embedded)parent.postMessage({type:'huitongli-checkin-view',tab:this.ui.checkin?.tab||'exercise',phase:session?.phase||'idle'},location.origin);
  }
 };
 const actions={...checkinActions,
@@ -50,7 +54,7 @@ app.actions=actions;
 connectSlideEnd(viewport,app);
 for(const [eventName,attr] of [['click','action'],['input','input'],['change','change']])viewport.addEventListener(eventName,event=>{
  const el=event.target.closest(`[data-${attr}]`);if(!el||el.disabled)return;
- const handler=actions[el.dataset[attr]];if(handler)Promise.resolve().then(()=>handler(app,el,event)).catch(error=>{if(app.ui.checkin)app.ui.checkin.finish.submitting=false;app.showDialog({title:'操作未完成',body:error.message||'请重试'});});
+ const handler=actions[el.dataset[attr]];if(handler)Promise.resolve().then(()=>handler(app,el,event)).then(()=>{if(embedded)parent.postMessage({type:'huitongli-checkin-view',navigation:true,tab:app.ui.checkin?.tab||'exercise',phase:loadSession(owner)?.phase||'idle'},location.origin)}).catch(error=>{if(app.ui.checkin)app.ui.checkin.finish.submitting=false;app.showDialog({title:'操作未完成',body:error.message||'请重试'});});
 });
 window.addEventListener('keydown',event=>{
  if(!app.state.dialog)return;
@@ -60,6 +64,13 @@ window.addEventListener('keydown',event=>{
   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}
   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}
  }
+});
+window.addEventListener('message',event=>{
+ if(!embedded||event.origin!==location.origin||event.source!==parent||event.data?.type!=='huitongli-checkin-select-view'||!['exercise','records'].includes(event.data.tab))return;
+ if(event.data.tab==='exercise'&&app.ui.checkin)app.ui.checkin.selectedRecordId=null;
+ if(app.ui.checkin?.tab===event.data.tab)return;
+ // Reuse the existing tab action so record filters and the current session retain their normal behavior.
+ const control=document.createElement('button');control.dataset.tab=event.data.tab;actions['checkin.tab'](app,control);
 });
 app.render();restoreCheckinContinuity(app).then(()=>app.render());
 setInterval(()=>checkinTick(app),1000);

@@ -38,6 +38,18 @@ export function decorateHuitongliCheckin(root, app, session) {
       advance.dataset.action = 'demo.advance';
       advance.textContent = '演示快进 · 增加 30 分钟';
       root.querySelector('.checkin-timer-stage')?.append(advance);
+      if(root.ownerDocument.body.classList.contains('ht-embedded')) {
+        const evidence=root.querySelector('.checkin-evidence');
+        if(evidence) {
+          const disclosure=document.createElement('details');
+          disclosure.className='ht-active-evidence';
+          const summary=document.createElement('summary');
+          summary.textContent=`添加运动凭证${app.ui.checkin.drafts.length?` · 已选 ${app.ui.checkin.drafts.length} 项`:''}`;
+          disclosure.open=Boolean(app.ui.checkin.huitongliEvidenceOpen);
+          disclosure.append(summary);evidence.before(disclosure);disclosure.append(evidence);
+          disclosure.addEventListener('toggle',()=>{app.ui.checkin.huitongliEvidenceOpen=disclosure.open});
+        }
+      }
     } else {
       const steps = document.createElement('ol');
       steps.className = 'ht-proof-steps';
