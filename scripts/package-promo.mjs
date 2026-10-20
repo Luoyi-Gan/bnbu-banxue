@@ -7,6 +7,7 @@ const dist = path.resolve('dist')
 const output = path.resolve(process.argv[2] || 'artifacts/promo-release')
 const prefix = '/huitongli-promo/'
 await fs.mkdir(output, { recursive: true })
+if ((await fs.readdir(output)).length) throw new Error('Choose a new empty release directory; never mix releases.')
 const files = new Map()
 async function collect(relative) {
   if (files.has(relative)) return
@@ -18,12 +19,16 @@ async function collect(relative) {
   const refs = relative.endsWith('.html')
     ? [...text.matchAll(/(?:src|href)="\/(assets\/[^"]+)"/g)].map(m => m[1])
     : [...text.matchAll(/["']\.\/([^"']+\.(?:js|css))["']/g)].map(m => 'assets/' + m[1])
+  refs.push(...[...text.matchAll(/["']\/(assets\/[^"']+)["']/g)].map(m => m[1]))
   for (const ref of refs) await collect(ref)
 }
 await collect('promo.html')
 for (const name of await fs.readdir(path.join(dist, 'promo'))) await collect('promo/' + name)
 for (const relative of [
   'huitongli-app-icon.png',
+  'fonts/NOTICE.html',
+  'fonts/misans/License.pdf',
+  'fonts/lxgw-wenkai/OFL.txt',
   'fonts/misans/MiSans-Regular.woff2',
   'fonts/misans/MiSans-Semibold.woff2',
   'fonts/lxgw-wenkai/BNBUWenKai-Medium.woff2',

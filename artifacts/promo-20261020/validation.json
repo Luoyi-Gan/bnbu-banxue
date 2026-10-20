@@ -4,33 +4,47 @@
     "desktop-1",
     "desktop-2",
     "desktop-3",
+    "desktop-4",
+    "desktop-5",
+    "desktop-6",
     "tablet-0",
     "tablet-1",
     "tablet-2",
     "tablet-3",
+    "tablet-4",
+    "tablet-5",
+    "tablet-6",
     "mobile-0",
     "mobile-1",
     "mobile-2",
     "mobile-3",
+    "mobile-4",
+    "mobile-5",
+    "mobile-6",
     "narrow-0",
     "narrow-1",
     "narrow-2",
-    "narrow-3"
+    "narrow-3",
+    "narrow-4",
+    "narrow-5",
+    "narrow-6"
   ],
   "errors": [],
   "checks": [
-    "static reading exposes four screenshots and stops WebGL",
+    "no video elements; HTML screens in every animated display",
+    "static reading exposes seven screenshots and stops WebGL",
     "chapter buttons navigate to correct scene",
     "four hand-held screens crossfade with matching destination links",
+    "all twelve module screens load and switch",
     "FAQ expands",
     "live reduced-motion change produces readable static chapters",
     "WebGL unavailable fallback",
     "Web CTA resolves to existing /v2 entry"
   ],
   "performance": {
-    "frames": 432,
+    "frames": 415,
     "medianMs": 7,
-    "p95Ms": 7.200000000000728,
-    "over33ms": 0
+    "p95Ms": 7.200000000004366,
+    "over33ms": 2
   }
 }

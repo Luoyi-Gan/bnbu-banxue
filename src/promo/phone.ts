@@ -1,3 +1,7 @@
+import { createRoot } from 'react-dom/client'
+import { createElement } from 'react'
+import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
+import { ProductScreen, type ScreenName } from './ProductScreen'
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
@@ -52,25 +56,20 @@ export function createPhone(host: HTMLElement, onFailure: () => void) {
   mesh(body, titanium)
   mesh(face(2.91, 6.07, .47), polished, 0, 0, .177)
   mesh(face(2.85, 6.01, .44), black, 0, 0, .184)
-  const blank = new THREE.DataTexture(new Uint8Array([250, 249, 246, 255]), 1, 1); blank.needsUpdate = true
-  const screenMaterial = new THREE.ShaderMaterial({
-    uniforms: { uFrom: { value: blank }, uTo: { value: blank }, uMix: { value: 0 }, uFromVideo: { value: 0 }, uToVideo: { value: 0 } },
-    vertexShader: 'varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-    fragmentShader: `
-      uniform sampler2D uFrom; uniform sampler2D uTo; uniform float uMix; uniform float uFromVideo; uniform float uToVideo; varying vec2 vUv;
-      void main(){
-        vec2 fromUv=clamp(vUv+vec2(0.0,uMix*0.025),0.0,1.0);
-        vec2 toUv=clamp(vUv-vec2(0.0,(1.0-uMix)*0.025),0.0,1.0);
-        vec4 a=texture2D(uFrom,fromUv),b=texture2D(uTo,toUv);
-        if(uFromVideo>0.5) a=sRGBTransferEOTF(a);
-        if(uToVideo>0.5) b=sRGBTransferEOTF(b);
-        gl_FragColor=mix(a,b,uMix);
-        #include <colorspace_fragment>
-      }`,
-    toneMapped: false,
-  })
   mesh(face(2.7, 5.86, .36), new THREE.MeshBasicMaterial({ color: '#faf9f6', toneMapped: false }), 0, 0, .19)
-  mesh(face(2.7, 5.48, .28), screenMaterial, 0, -.19, .195)
+  const htmlRenderer = new CSS3DRenderer()
+  Object.assign(htmlRenderer.domElement.style, { position: 'absolute', inset: '0', pointerEvents: 'none' })
+  host.appendChild(htmlRenderer.domElement)
+  const htmlScene = new THREE.Scene(), htmlPhone = new THREE.Group()
+  htmlScene.add(htmlPhone)
+  const display = document.createElement('div')
+  Object.assign(display.style, { width: '390px', height: '790px', overflow: 'hidden', borderRadius: '35px', background: '#faf9f6' })
+  const names: ScreenName[] = ['home', 'discover', 'forum', 'coffee', 'partners', 'sports', 'map']
+  const layers = names.map(name => { const el = document.createElement('div'); el.className = 'html-screen-layer'; Object.assign(el.style, { position: 'absolute', inset: '0', opacity: '0' }); display.appendChild(el); const root = createRoot(el); root.render(createElement(ProductScreen, { name })); return { el, root } })
+  const htmlScreen = new CSS3DObject(display)
+  htmlScreen.scale.set(2.7 / 390, 5.48 / 790, 1)
+  htmlScreen.position.set(0, -.19, .198)
+  htmlPhone.add(htmlScreen)
   const statusCanvas = document.createElement('canvas'); statusCanvas.width = 520; statusCanvas.height = 60
   const status = statusCanvas.getContext('2d')!
   status.fillStyle = '#20302d'; status.font = '600 25px Arial'; status.fillText('9:41', 23, 40)
@@ -97,7 +96,6 @@ export function createPhone(host: HTMLElement, onFailure: () => void) {
   }
   const key = new THREE.DirectionalLight('#ffffff', 3); key.position.set(-4, 6, 7); scene.add(key)
   const rim = new THREE.DirectionalLight('#d7e4ea', 2); rim.position.set(5, 2, -2); scene.add(rim)
-  const textures: THREE.Texture[] = []
   const shadowCanvas = document.createElement('canvas'); shadowCanvas.width = 256; shadowCanvas.height = 64
   const shadowContext = shadowCanvas.getContext('2d')!
   shadowContext.scale(4, 1)
@@ -108,65 +106,35 @@ export function createPhone(host: HTMLElement, onFailure: () => void) {
   const shadowMaterial = new THREE.MeshBasicMaterial({ map: shadowTexture, transparent: true, depthWrite: false })
   const shadowGeometry = new THREE.PlaneGeometry(4.3, .64)
   const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial); scene.add(shadow)
-  let disposed = false, active = 0, from = 0, to = 0, visible = true, reduce = false, videoReady = false, videoFailed = false
-  const video = document.createElement('video')
-  video.src = '/promo/discover.webm'; video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'none'
-  const videoTexture = new THREE.VideoTexture(video); videoTexture.colorSpace = THREE.SRGBColorSpace
-  const render = () => { if (!disposed && visible && !document.hidden) renderer.render(scene, camera) }
-  const syncScreen = () => {
-    const texture = (i: number) => i === 1 && active === 1 && videoReady && !videoFailed && !reduce ? videoTexture : textures[i] ?? blank
-    screenMaterial.uniforms.uFrom.value = texture(from)
-    screenMaterial.uniforms.uTo.value = texture(to)
-    screenMaterial.uniforms.uFromVideo.value = texture(from) === videoTexture ? 1 : 0
-    screenMaterial.uniforms.uToVideo.value = texture(to) === videoTexture ? 1 : 0
-  }
-  const syncVideo = () => {
-    const play = active === 1 && visible && !reduce && !document.hidden
-    if (play && !videoFailed) { void video.play().catch(() => { videoFailed = true; syncScreen(); render() }) }
-    else video.pause()
-    syncScreen()
-  }
-  video.addEventListener('loadeddata', () => { videoReady = true; syncVideo(); render() })
-  video.addEventListener('error', () => { videoReady = false; videoFailed = true; syncScreen(); render() })
-  const loader = new THREE.TextureLoader()
-  for (const [i, name] of ['home', 'discover', 'partners', 'map'].entries()) {
-    textures[i] = loader.load(`/promo/${name}.png`, texture => {
-      if (disposed) { texture.dispose(); return }
-      texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy())
-      syncScreen(); render()
-    }, undefined, onFailure)
-    textures[i].colorSpace = THREE.SRGBColorSpace
-  }
+  let disposed = false, visible = true, reduce = false
+  const render = () => { if (!disposed && visible && !document.hidden) { renderer.render(scene, camera); htmlRenderer.render(htmlScene, camera) } }
   const resize = () => {
     const { width, height } = host.getBoundingClientRect()
-    renderer.setSize(width, height); camera.aspect = width / height; camera.updateProjectionMatrix(); render()
+    renderer.setSize(width, height); htmlRenderer.setSize(width, height); camera.aspect = width / height; camera.updateProjectionMatrix(); render()
   }
   const observer = new ResizeObserver(resize); observer.observe(host); resize()
-  const visibility = () => { syncVideo(); render() }
+  const visibility = () => { display.style.visibility = document.hidden ? 'hidden' : 'visible'; render() }
   document.addEventListener('visibilitychange', visibility)
   const lost = (e: Event) => { e.preventDefault(); onFailure() }
   renderer.domElement.addEventListener('webglcontextlost', lost)
   return {
     update(p: PhonePose, fromScreen: number, toScreen: number, mix: number, float = 0) {
-      from = fromScreen; to = toScreen
-      const screen = mix > .5 ? to : from
       phone.position.set(p.x, p.y + float, 0)
       phone.rotation.set(p.rx, p.ry, p.rz)
       phone.scale.setScalar(p.scale)
       shadow.position.set(p.x, p.y - 3.3 * p.scale, -.5)
       shadow.scale.setScalar(p.scale)
-      if (screen !== active) { active = screen; syncVideo() }
-      screenMaterial.uniforms.uMix.value = mix
-      syncScreen()
+      htmlPhone.position.copy(phone.position); htmlPhone.rotation.copy(phone.rotation); htmlPhone.scale.copy(phone.scale)
+      layers.forEach(({ el }, i) => { const opacity = i === fromScreen ? 1 - mix : i === toScreen ? mix : 0; el.style.opacity = '1'; el.style.visibility = opacity > .001 ? 'visible' : 'hidden'; el.style.transform = 'translateY(' + (i === fromScreen ? -mix * 790 : (1 - mix) * 790) + 'px)'; el.classList.toggle('screen-running', opacity > .5 && !reduce && visible) })
       render()
     },
-    setVisible(value: boolean) { visible = value; syncVideo() },
-    setReduced(value: boolean) { if (reduce !== value) { reduce = value; syncVideo() } },
+    setVisible(value: boolean) { visible = value; display.style.visibility = value ? 'visible' : 'hidden' },
+    setReduced(value: boolean) { reduce = value },
     dispose() {
       disposed = true; observer.disconnect(); document.removeEventListener('visibilitychange', visibility)
-      video.pause(); video.removeAttribute('src'); video.load(); videoTexture.dispose()
+      queueMicrotask(() => layers.forEach(({ root }) => root.unmount())); htmlRenderer.domElement.remove()
       geometries.forEach(g => g.dispose()); new Set(materials).forEach(m => m.dispose())
-      textures.forEach(t => t.dispose()); blank.dispose(); statusTexture.dispose(); shadowTexture.dispose(); shadowMaterial.dispose(); shadowGeometry.dispose()
+      statusTexture.dispose(); shadowTexture.dispose(); shadowMaterial.dispose(); shadowGeometry.dispose()
       env.dispose(); renderer.dispose(); renderer.domElement.remove()
     },
   }

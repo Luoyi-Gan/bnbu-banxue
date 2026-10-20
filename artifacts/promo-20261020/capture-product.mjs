@@ -15,11 +15,4 @@ for(const [name,route] of [['home','/v2'],['discover','/v2/activities'],['partne
  await p.goto('http://127.0.0.1:4174'+route,{waitUntil:'domcontentloaded'});await p.waitForTimeout(name==='map'?12000:2800);await p.evaluate(()=>document.fonts.ready);if(name==='partners'||name==='map'){await p.evaluate(y=>window.scrollTo(0,y),name==='partners'?235:140);await p.waitForTimeout(300)}await p.screenshot({path:`public/promo/${name}.png`});console.log(name,await p.title(),(await p.locator('body').innerText()).slice(0,160));
 }
 
-if(process.env.PROMO_STILLS_ONLY){await b.close();process.exit(0)}
-const ctx=await b.newContext({viewport:{width:390,height:790},deviceScaleFactor:1,recordVideo:{dir:'artifacts/promo-20261020/video',size:{width:390,height:790}}});
-const v=await ctx.newPage();
-await v.route('**/api/**',r=>{const path=new URL(r.request().url()).pathname;return r.fulfill({json:path==='/api/auth/me'?{account}:path==='/api/workspace'?ws:{account,posts:[],likedPosts:[],savedPosts:[]}})});
-await v.goto('http://127.0.0.1:4174/v2/activities');await v.waitForTimeout(2200);
-await v.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>{const start=performance.now();function tick(now){const t=Math.min(1,(now-start)/7000);const q=t<.5?t*2:2-t*2;window.scrollTo(0,430*(.5-Math.cos(q*Math.PI)/2));if(t<1)requestAnimationFrame(tick);else resolve();}requestAnimationFrame(tick);});});
-await v.waitForTimeout(700);const path=await v.video().path();await ctx.close();await fs.copyFile(path,'public/promo/discover.webm');
 await b.close();
