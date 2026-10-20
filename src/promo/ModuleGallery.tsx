@@ -1,5 +1,7 @@
 import { ScreenPreview, type ScreenName } from './ProductScreen'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ChevronRight } from 'lucide-react'
 
 const modules = [
@@ -19,26 +21,48 @@ const modules = [
 
 export function ModuleGallery() {
   const [selected, setSelected] = useState(0)
+  const [staticMode, setStaticMode] = useState(false)
+  const journey = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const query = matchMedia('(prefers-reduced-motion: reduce), (max-height: 600px)')
+    const update = () => setStaticMode(query.matches)
+    update(); query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+  useEffect(() => {
+    if (staticMode || !journey.current) return
+    gsap.registerPlugin(ScrollTrigger)
+    const trigger = ScrollTrigger.create({ trigger: journey.current, start: 'top top', end: 'bottom bottom',
+      onUpdate: self => setSelected(Math.min(modules.length - 1, Math.floor(self.progress * modules.length))) })
+    return () => trigger.kill()
+  }, [staticMode])
   const active = modules[selected]
-  return <section id="modules" className="promo-modules" aria-labelledby="modules-title">
+  const copy = (item: typeof active, index: number) => <>
+    <p className="promo-eyebrow">{String(index + 1).padStart(2, '0')} / {item.name}</p>
+    <h3>{item.title}</h3><p>{item.text}</p>
+    <ul>{item.features.map(feature => <li key={feature}><ChevronRight size={15}/>{feature}</li>)}</ul>
+  </>
+  return <section id="modules" className="promo-modules promo-module-journey" aria-labelledby="modules-title">
     <div className="promo-modules-heading">
       <p className="promo-eyebrow">ONE CAMPUS. MANY POSSIBILITIES.</p>
-      <h2 id="modules-title">校园生活的每一面，<br /><em>都有一个入口。</em></h2>
-      <p>十二个模块，串起学习、交流、运动与日常。</p>
+      <h2 id="modules-title">校园生活的每一面，<br /><em>自然连在一起。</em></h2>
+      <p>向下探索，从一次交流，到属于你的校园日常。</p>
     </div>
-    <div className="promo-module-tabs" role="group" aria-label="浏览平台模块">
-      {modules.map((item, i) => <button key={item.name} aria-pressed={selected === i} aria-controls="module-detail" onClick={() => setSelected(i)}>{item.name}</button>)}
-    </div>
-    <div className="promo-module-stage">
-      <div className="promo-module-copy" id="module-detail" aria-live="polite" aria-atomic="true">
-        <p className="promo-eyebrow">{String(selected + 1).padStart(2, '0')} / {active.en}</p>
-        <h3>{active.title}</h3><p>{active.text}</p>
-        <ul>{active.features.map(feature => <li key={feature}><ChevronRight size={15}/>{feature}</li>)}</ul>
-      </div>
-      <div className="promo-module-device" aria-label={`${active.name}真实界面`}>
-        <div className="promo-module-status" aria-hidden="true"><span>9:41</span><i/><span>▰</span></div>
-        <div className="promo-module-screen">{modules.map((item, i) => <ScreenPreview key={item.name} name={item.screen as ScreenName} active={selected === i}/>)}</div>
-      </div>
-    </div>
+    {staticMode ? <div className="promo-modules-reading">{modules.map((item, index) => <article key={item.name} className="promo-module-copy">{copy(item, index)}</article>)}</div> :
+      <div className="promo-module-scroll" ref={journey}>
+        <div className="promo-module-sticky" data-module={selected}>
+          <div className="promo-module-track" aria-label={'当前模块：' + active.name}>
+            <span>探索校园生活</span><div aria-hidden="true">{modules.map((item, index) => <i key={item.name} className={index === selected ? 'is-current' : index < selected ? 'is-past' : ''}/>)}</div><span>{String(selected + 1).padStart(2, '0')} / 12</span>
+          </div>
+          <div className="promo-module-stage">
+            <div className="promo-module-copy" id="module-detail" key={active.name}>{copy(active, selected)}</div>
+            <div className="promo-module-device" aria-label={active.name + '功能演示'}>
+              <div className="promo-module-status" aria-hidden="true"><span>9:41</span><i/><span>▰</span></div>
+              <div className="promo-module-screen">{modules.map((item, i) => <ScreenPreview key={item.name} name={item.screen as ScreenName} active={selected === i}/>)}</div>
+            </div>
+          </div>
+          <p className="promo-module-next">{selected < modules.length - 1 ? '继续滚动 · ' + modules[selected + 1].name : '十二种可能，汇成你的校园生活。'}</p>
+        </div>
+      </div>}
   </section>
 }
