@@ -1,5 +1,5 @@
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
-import { ArrowLeft, ArrowRight, CalendarDays, LocateFixed, MapPin, RotateCcw, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CalendarDays, ChevronDown, ChevronUp, Layers, List, LocateFixed, MapPin, RotateCcw, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
@@ -11,6 +11,7 @@ import type { createCampusScene, CampusLocationStatus } from './campusScene'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { LocalPreviewNotice } from './preview/LocalPreviewNotice'
 import './campus-explorer.css'
+import './mapPresentation.css'
 
 type Scene = ReturnType<typeof createCampusScene>
 
@@ -47,6 +48,14 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
   const [attempt, setAttempt] = useState(0)
   const [buildings, setBuildings] = useState<CampusBuilding[]>([])
   const [selected, setSelected] = useState<CampusBuilding | null>(null)
+  const [dockOpen,setDockOpen]=useState(false)
+  const [buildingInfo,setBuildingInfo]=useState<Record<string,{phase?:string;levels?:number;height_m?:number;height_status?:string;area_m2?:number}>>({})
+  useEffect(()=>{
+    if(mode!=='explore')return
+    const controller=new AbortController()
+    void fetch('/campus-map/data/processed/viewer-campus.json',{signal:controller.signal}).then(response=>{if(!response.ok)throw Error();return response.json()}).then(value=>{if(Array.isArray(value.buildings))setBuildingInfo(Object.fromEntries(value.buildings.map((building:{id:string})=>[building.id,building])))}).catch(()=>{})
+    return()=>controller.abort()
+  },[mode])
   const [position, setPosition] = useState<CampusLocationStatus>({ state: 'idle' })
   const locationMessages = {
     idle: '位置仅用于当前地图，离开后清除。', locating: '正在获取位置，请允许浏览器定位…', refining: '正在提高定位精度，可随时取消。', located: '',
@@ -86,18 +95,23 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
   return <div className={`v2-campus-explorer ${mode === 'pick' ? 'is-picker' : 'is-immersive'}`}>
       <div className="v2-explorer-map">
       <div className="v2-explorer-canvas" ref={canvas}/>
-      {mode === 'explore' && <div className="v2-map-location-control">
-        <button type="button" disabled={status !== 'ready'} aria-pressed={position.state === 'located'} onClick={() => scene.current?.locate()}><LocateFixed size={18}/>{uiText(position.state === 'located' ? '清除位置' : ['locating', 'refining'].includes(position.state) ? '取消定位' : '定位我的位置')}</button>
-        <p role="status">{position.state === 'located' ? uiTemplate([(position.accuracy ?? 0) > 300 ? '已标记大致位置 · 误差约 ' : '已标记我的位置 · 精度约 ', ' 米'], position.accuracy) : uiText(locationMessages[position.state])}</p>
-      </div>}
       {status !== 'ready' && <div className="v2-explorer-status" role="status">{status === 'loading'?<><span className="campus-map-spinner"/>{uiText("正在加载 3D 校园模型…")}</>:<><strong>{uiText("地图暂时无法显示")}</strong><p>{uiText("可重试，或使用右侧楼栋列表选择地点。")}</p><button type="button" onClick={() => { setStatus('loading'); setAttempt((value) => value + 1) }}>{uiText("重新加载")}</button></>}</div>}
       {mode === 'pick' && <><div className="v2-explorer-map-top"><span><MapPin size={16}/> BNBU 3D CAMPUS</span><button type="button" onClick={() => { scene.current?.overview(); setSelected(null) }} disabled={status !== 'ready'}><RotateCcw size={16}/> {uiText("全校视角")}</button></div><span className="v2-explorer-hint">{uiText("拖动旋转 · 滚轮缩放 · 点击楼栋")}</span></>}
     </div>
+    {mode==='explore'&&<>
+      <button className="map-p0-layers" aria-label={uiText('地图图层')} disabled={status!=='ready'} onClick={()=>scene.current?.tool('open-map-settings')}><Layers size={20}/></button>
+      <section className="map-p0-dock" aria-label={uiText('校园探索工具')}>
+        <header><button className="map-p0-dock-heading" onClick={()=>setDockOpen(value=>!value)} aria-expanded={dockOpen} aria-controls="map-p0-dock-content"><MapPin size={19}/><span><strong>{uiText('探索 BNBU 校园')}</strong><small>{uiText('搜索或点选建筑，查看地点详情')}</small></span>{dockOpen?<ChevronDown size={16}/>:<ChevronUp size={16}/>}</button><button className="map-p0-locate" disabled={status!=='ready'} aria-pressed={position.state==='located'} onClick={()=>scene.current?.locate()}><LocateFixed size={17}/>{uiText(position.state==='located'?'清除位置':['locating','refining'].includes(position.state)?'取消定位':'定位')}</button></header>
+        <div className="map-p0-main-actions"><button disabled={status!=='ready'} onClick={()=>{setDockOpen(value=>!value)}}><List size={18}/>{uiText('建筑列表')}</button><button disabled={status!=='ready'} onClick={()=>{scene.current?.overview();setSelected(null);setDockOpen(false)}}><RotateCcw size={18}/>{uiText('全校视角')}</button></div>
+        {dockOpen&&<div id="map-p0-dock-content" className="map-p0-dock-content"><label>{uiText('选择校内楼栋')}<select aria-label={uiText('探索建筑列表')} value={selected?.id??''} onChange={event=>{scene.current?.focus(event.target.value);setDockOpen(false)}}><option value="">{uiText('选择楼栋')}</option>{buildings.filter(item=>!item.name.startsWith('未命名')).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></label><div className="map-p0-extra-actions"><button onClick={()=>scene.current?.dragMode('pan')}>{uiText('平移')}</button><button onClick={()=>scene.current?.dragMode('rotate')}>{uiText('旋转')}</button><button onClick={()=>scene.current?.tool('top')}>{uiText('俯视')}</button><button onClick={()=>scene.current?.tool('open-render-studio')}>{uiText('光影')}</button><button onClick={()=>scene.current?.tool('open-campus-tools')}>{uiText('图层与资料')}</button></div><p className="map-p0-position-note" role="status">{position.state==='located'?uiTemplate(['定位精度约 ',' 米'],Math.round(position.accuracy??0)):uiText(locationMessages[position.state])}</p></div>}
+        {!dockOpen&&!['idle','located'].includes(position.state)&&<p className="map-p0-position-note" role="status">{uiText(locationMessages[position.state])}</p>}
+      </section>
+    </>}
     {(mode === 'pick' || selected || status === 'error') && <aside className={`v2-explorer-panel${selected ? ' has-selection' : ''}`}>
       {mode === 'explore' && selected && <button type="button" className="v2-explorer-close" aria-label={uiText('关闭地点详情')} onClick={() => setSelected(null)}><X size={20}/></button>}
       <div className="v2-explorer-panel-head"><div><span className="v2-eyebrow">{mode === 'pick'?'SELECT A BUILDING':'EXPLORE BNBU'}</span><h2>{mode === 'pick'?uiText('选择校内地点'):uiText('校园探索')}</h2><p>{mode === 'pick'?uiText('点击地图上的楼栋，确认后带入地点。'):uiText('点击楼栋，查看这里计划中的活动与组队。')}</p></div>{mode === 'pick' && <button ref={closeButton} type="button" className="v2-explorer-close" aria-label={uiText("关闭地图")} onClick={onClose}><X size={20}/></button>}</div>
       <label className="v2-explorer-select">{uiText("楼栋列表")}<select value={selected?.id ?? ''} onChange={(event) => { if (status === 'ready') scene.current?.focus(event.target.value); else setSelected(buildings.find((item) => item.id === event.target.value) ?? null) }} disabled={status === 'loading'}><option value="">{uiText("选择楼栋")}</option>{buildings.filter((item) => !item.name.startsWith('未命名')).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-      {selected?<div className="v2-explorer-selection" key={selected.id}><div className="v2-explorer-building"><span><LocateFixed size={21}/></span><div><small>{uiText("当前楼栋")}</small><strong>{selected.name}</strong></div></div>{mode === 'pick' ? <p>{uiText("楼栋级定位。具体入口与集合点可在详细说明中补充。")}</p> : <>{live.error ? <p role="alert" className="v2-explorer-empty">{uiText(live.error)}</p> : !live.data ? <p role="status">{uiText("正在读取活动与组队…")}</p> : <><BuildingActivities items={liveActivities(live.data)} buildingId={selected.id}/>{scheduled.length > 0 && <><div className="v2-explorer-section-title"><strong>{uiText("正在组队")}</strong><small>{scheduled.length} {uiText("项")}</small></div><div className="v2-explorer-events">{scheduled.map((item) => <Link key={`${item.kind}-${item.id}`} to={item.path}><span>{item.kind}</span><strong>{item.title}</strong><small><CalendarDays size={13}/>{item.when} · {item.place}</small><ArrowRight size={16}/></Link>)}</div></>}</>}</>}</div>:<div className="v2-explorer-intro"><MapPin size={27}/><strong>{uiText("从一栋楼开始探索")}</strong><p>{uiText("在地图上点选楼栋，或从列表中选择。")}</p></div>}
+      {selected?<div className="v2-explorer-selection" key={selected.id}><div className="v2-explorer-building"><span><LocateFixed size={21}/></span><div><small>{uiText("当前楼栋")}</small><strong>{selected.name}</strong></div></div>{mode==='explore'&&<div className="map-p0-building-facts"><span>{uiText(buildingInfo[selected.id]?.phase==='1'?'一期':buildingInfo[selected.id]?.phase==='2'?'二期':'校内建筑')}</span>{buildingInfo[selected.id]?.levels!=null&&<span>{buildingInfo[selected.id].levels} {uiText('层（地图记录）')}</span>}<p>{uiText('楼栋级位置，具体入口与现场通行情况请以实地为准。')}</p></div>}{mode === 'pick' ? <p>{uiText("楼栋级定位。具体入口与集合点可在详细说明中补充。")}</p> : <>{live.error ? <p role="alert" className="v2-explorer-empty">{uiText(live.error)}</p> : !live.data ? <p role="status">{uiText("正在读取活动与组队…")}</p> : <><BuildingActivities items={liveActivities(live.data)} buildingId={selected.id}/>{scheduled.length > 0 && <><div className="v2-explorer-section-title"><strong>{uiText("正在组队")}</strong><small>{scheduled.length} {uiText("项")}</small></div><div className="v2-explorer-events">{scheduled.map((item) => <Link key={`${item.kind}-${item.id}`} to={item.path}><span>{item.kind}</span><strong>{item.title}</strong><small><CalendarDays size={13}/>{item.when} · {item.place}</small><ArrowRight size={16}/></Link>)}</div></>}</>}</>}</div>:<div className="v2-explorer-intro"><MapPin size={27}/><strong>{uiText("从一栋楼开始探索")}</strong><p>{uiText("在地图上点选楼栋，或从列表中选择。")}</p></div>}
       {mode === 'pick' && <div className="v2-explorer-actions"><button type="button" className="v2-button v2-button-secondary" onClick={onClose}>{uiText("取消")}</button><button type="button" className="v2-button v2-button-primary" disabled={!selected} onClick={() => selected && onPick?.(selected)}>{uiText("确认这栋楼")}<ArrowRight size={15}/></button></div>}
       <small className="v2-explorer-source">{uiText("BNBU 3D Model · S1.214 · 建筑体量含估算，位置以现场为准")}</small>
       {mode === 'explore' && Boolean(import.meta.hot) && <LocalPreviewNotice/>}
@@ -111,7 +125,7 @@ export function V2CampusExplore() { useUiLanguage();
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = before }
   }, [])
-  return <div className="v2-explore-immersive"><InteractiveCampus mode="explore"/><Link className="v2-explore-back" to="/v2/campus"><ArrowLeft size={20}/><span>{uiText('返回')}</span></Link></div>
+  return <div className="v2-explore-immersive"><InteractiveCampus mode="explore"/><Link className="v2-explore-back" to="/v2/campus" aria-label={uiText('返回校园')}><ArrowLeft size={20}/><span>{uiText('返回')}</span></Link></div>
 }
 
 export function CampusBuildingPicker({ onPick, onClose }: { onPick: (building: CampusBuilding) => void; onClose: () => void }) { useUiLanguage();

@@ -38,7 +38,7 @@ for (const file of ['viewer/index.html', 'viewer/campus-icon.svg', 'viewer/refer
 const bridge = `
 const notifyHost = value => parent.postMessage(value, location.origin);
 const originalChoose = choose;
-choose = function(building, move=true) { originalChoose(building,move); if(building) notifyHost({type:'huitongli-map-selected',id:building.id}); };
+choose = function(building, move=true) { originalChoose(building,move); if(building) { if(new URLSearchParams(location.search).get('surface')==='explore')document.getElementById('search-results').hidden=true; notifyHost({type:'huitongli-map-selected',id:building.id}); } };
 window.addEventListener('message',event=>{
   if(event.origin!==location.origin||event.source!==parent||event.data?.type!=='huitongli-map-command'||!startupReady)return;
   if(event.data.action==='focus')choose(data.buildings.find(b=>b.id===event.data.id));
@@ -51,8 +51,14 @@ const plugin = { name: 'huitongli-map', setup(builder) {
     if (args.path.includes('node_modules')) return
     let contents = await fs.readFile(args.path, 'utf8')
     if (args.path === path.join(source, 'viewer/app.js')) {
+      if(!contents.includes('renderer.toneMappingExposure=.85;'))throw Error('Map exposure adapter source no longer matches')
       contents = contents.replace('function fail(e){', "function fail(e){parent.postMessage({type:'huitongli-map-error'},location.origin);")
+      contents = contents.replace('renderer.toneMappingExposure=.85;', "renderer.toneMappingExposure=new URLSearchParams(location.search).get('surface')==='explore'?.94:.85;")
       contents = contents.replace('init();', `${bridge}\ninit().then(()=>{if(startupReady)notifyHost({type:'huitongli-map-ready',buildings:${JSON.stringify(catalog)}});});`)
+    }
+    if (args.path.endsWith('map-explorer.js')) {
+      if(!contents.includes('const budget=labelBudget(zoomLevel,width,height);'))throw Error('Map label budget adapter source no longer matches')
+      contents=contents.replace('const budget=labelBudget(zoomLevel,width,height);', "const budget=new URLSearchParams(location.search).get('surface')==='explore'?Math.min(labelBudget(zoomLevel,width,height),(width<760?[5,8,12,16]:[8,12,18,24])[zoomLevel]):labelBudget(zoomLevel,width,height);")
     }
     if (args.path.endsWith('campus-tools.js')) {
       contents = adaptCampusLocation(contents, path.resolve('scripts/campus-map-location.mjs').replaceAll('\\', '/'))
@@ -82,9 +88,10 @@ html = html.replace('href="/privacy.html"', 'href="/campus-map/viewer/privacy.ht
 // Viewer-only services must never reach Companion's business backend.
 const bootstrap = `<script>const originalFetch=window.fetch.bind(window);window.fetch=(input,options)=>{const url=new URL(typeof input==='string'?input:input.url,location.href);if(url.origin===location.origin&&url.pathname.startsWith('/api/'))return Promise.resolve(new Response('{}',{status:503,headers:{'Content-Type':'application/json'}}));return originalFetch(input,options)};</script>`
 const css = `<style>[data-tools-tab="comments"],[data-tools-panel="comments"],#refresh-places,#download-offline,#install-campus,#auto-refresh-places,#maintenance-state,#qa-tools,section:has(>label>#auto-refresh-places){display:none!important}</style>`
-html = html.replace('</head>', bootstrap + css + '</head>')
+html = html.replace('</head>', bootstrap + css + '<script>if(new URLSearchParams(location.search).get("surface")==="explore")document.documentElement.classList.add("companion-explore")</script><link rel="stylesheet" href="/campus-map/viewer/explore-presentation.css"></head>')
 html = html.replace('</head>', '<link rel="stylesheet" href="/campus-map/viewer/campus-window.css"></head>')
 html = html.replace('</body>', '<script type="module" src="/campus-map/viewer/companion-preferences.js"></script></body>')
+html=html.replace('<footer>', '<footer id="map-startup-credit">').replace('</body>', '<script src="/campus-map/viewer/startup-credit.js"></script></body>')
 await fs.writeFile(path.join(destination,'viewer/index.html'), html)
 const reference = path.join(destination,'viewer/reference-map.html')
 await fs.writeFile(reference, (await fs.readFile(reference,'utf8')).replace(`${prefix}/viewer/vendor/reference-map.bundle.js`,`${prefix}/viewer/reference-map.js`))

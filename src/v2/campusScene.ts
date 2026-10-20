@@ -7,7 +7,7 @@ export type CampusLocationStatus = { state: CampusLocationState; accuracy?: numb
 export function createCampusScene(host: HTMLDivElement, activityId: string | null, onReady: (buildings: CampusBuilding[]) => void, onSelect: (building: CampusBuilding) => void, onError: () => void, options: { immersive?: boolean; onLocation?: (value: CampusLocationStatus) => void } = {}) {
   const frame = document.createElement('iframe')
   frame.title = uiText('BNBU 三维校园地图')
-  frame.src = '/campus-map/viewer/index.html'
+  frame.src = '/campus-map/viewer/index.html'+(options.immersive?'?surface=explore':'')
   frame.style.cssText = 'display:block;width:100%;height:100%;border:0'
   frame.setAttribute('allow', "fullscreen; geolocation 'self'")
   let disposed = false
@@ -19,7 +19,7 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
     appearance()
     if (options.immersive && frame.contentDocument) {
       const style = frame.contentDocument.createElement('style')
-      style.textContent = '.panel.explore,.panel.detail,#locate-user{display:none!important}'
+      style.textContent = '.panel.detail,#locate-user{display:none!important}'
       frame.contentDocument.head.appendChild(style)
     }
   }
@@ -51,6 +51,8 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
   return {
     locate: () => { if (ready) frame.contentDocument?.getElementById('locate-user')?.click() },
     focus: (id: string) => command('focus', id),
+    tool: (id: 'open-map-settings' | 'open-campus-tools' | 'open-render-studio' | 'top' | 'quick-reset') => {if(ready)frame.contentDocument?.getElementById(id)?.click()},
+    dragMode: (mode: 'pan'|'rotate') => {if(ready)frame.contentDocument?.querySelector<HTMLButtonElement>(`[data-drag-mode="${mode}"]`)?.click()},
     overview: () => command('overview'),
     dispose: () => { disposed = true; clearTimeout(timeout); unsubscribe(); frame.removeEventListener('load',loaded);window.removeEventListener('message', message); frame.remove() },
   }

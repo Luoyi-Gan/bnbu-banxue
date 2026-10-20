@@ -35,11 +35,14 @@ describe('migrated campus viewer', () => {
     vi.useFakeTimers()
     const target = new EventTarget()
     const postMessage = vi.fn(), remove = vi.fn(), ready = vi.fn(), select = vi.fn(), error = vi.fn()
-    const frame = { style: {}, setAttribute: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), contentWindow: { postMessage }, remove }
+    const toolClick=vi.fn(), modeClick=vi.fn()
+    const frame = { style: {}, setAttribute: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), contentWindow: { postMessage }, contentDocument:{getElementById:vi.fn(()=>({click:toolClick})),querySelector:vi.fn(()=>({click:modeClick}))}, remove }
     vi.stubGlobal('document', { createElement: () => frame })
     vi.stubGlobal('window', { location: { origin: 'http://localhost' }, matchMedia: () => ({matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()}), setTimeout, addEventListener: target.addEventListener.bind(target), removeEventListener: target.removeEventListener.bind(target) })
     const onLocation = vi.fn()
     const scene = createCampusScene({ appendChild: vi.fn() } as unknown as HTMLDivElement, 'way/1', ready, select, error, { onLocation })
+    scene.tool('top');scene.dragMode('rotate')
+    expect(toolClick).not.toHaveBeenCalled();expect(modeClick).not.toHaveBeenCalled()
     const send = (data: object, origin = 'http://localhost', source: object = frame.contentWindow) => {
       const event = new Event('message')
       Object.assign(event, { data, origin, source })
@@ -53,6 +56,10 @@ describe('migrated campus viewer', () => {
     expect(ready).not.toHaveBeenCalled()
     send(payload)
     expect(ready).toHaveBeenCalledWith(payload.buildings)
+    scene.tool('top');scene.dragMode('rotate')
+    expect(frame.contentDocument.getElementById).toHaveBeenCalledWith('top')
+    expect(frame.contentDocument.querySelector).toHaveBeenCalledWith('[data-drag-mode="rotate"]')
+    expect(toolClick).toHaveBeenCalledOnce();expect(modeClick).toHaveBeenCalledOnce()
     expect(postMessage).toHaveBeenCalledWith({type:'huitongli-map-command',action:'focus',id:'way/1'}, 'http://localhost')
     send({ type: 'huitongli-map-location', state: 'unknown' })
     send({ type: 'huitongli-map-location', state: 'located', accuracy: -1 })
