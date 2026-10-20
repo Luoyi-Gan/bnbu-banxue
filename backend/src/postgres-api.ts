@@ -1,3 +1,5 @@
+import {shopRead} from './shops';
+import {runAsync as runShopRead} from './storage/effects';
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { demand, ServiceError } from './auth';
@@ -58,6 +60,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if (request.method==='GET' && pathname==='/api/students/search') return send(response,200,await postgresStudentSearch(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('number') ?? '',request.socket.remoteAddress ?? 'unknown'));
       const hoverMatch=request.method==='GET' && /^\/api\/people\/([^/]+)\/hover$/.exec(pathname);
       if(hoverMatch) return send(response,200,await postgresPersonHover(db,cookieToken(request) ?? '',decodeURIComponent(hoverMatch[1]),new URL(request.url!,'http://localhost').searchParams.get('number') ?? undefined));
+      if(request.method==='GET' && pathname==='/api/shops')return send(response,200,await db.transaction(async client=>{
+        const actor=await auth.authenticate(cookieToken(request),client),repo=new PostgresRepository(client);
+        demand(!passwordChangeRequired(await repo.all('companionIdentity'),actor),'请先修改本人初始密码。',403);
+        return runShopRead(shopRead(repo,actor,new URL(request.url!,'http://localhost').searchParams));
+      }));
       if (request.method === 'GET' && pathname === '/api/workspace') return send(response,200,await postgresWorkspace(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/identity/me') return send(response,200,await postgresOwnStudentIdentity(db,await auth.authenticate(cookieToken(request))));
       if (request.method === 'GET' && pathname === '/api/identity/requests') return send(response,200,await postgresListStudentIdentityRequests(db,await auth.authenticate(cookieToken(request)),new URL(request.url!,'http://localhost').searchParams));

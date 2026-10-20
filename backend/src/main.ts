@@ -1,3 +1,5 @@
+import {shopRead} from './shops';
+import {runSync as runShopRead} from './storage/effects';
 import { searchStudents } from './student-search';
 import { randomUUID } from 'node:crypto';
 import { personHover } from './person-hover';
@@ -96,6 +98,11 @@ export function createApiServer(
         demand(actor.status !== 'banned', '账号已封禁。', 403);
         const id = pathname === '/api/rooms' ? null : decodeURIComponent(pathname.slice('/api/rooms/'.length));
         return send(response, 200, id === null ? searchRooms(db, actor, requestUrl.searchParams) : roomDetail(db, actor, id));
+      }
+      if(request.method==='GET' && pathname==='/api/shops'){
+        const actor=authenticate(db,cookieToken(request));
+        accountSecurityGate(new Repository(db),actor);
+        return send(response,200,runShopRead(shopRead(new Repository(db),actor,requestUrl.searchParams)));
       }
       if (request.method === "GET" && pathname === "/api/community") return send(response,200,communityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
       if (request.method === 'GET' && pathname === '/api/discover/hot') return send(response,200,discoverHotPage(db,cookieToken(request)??''));

@@ -54,7 +54,7 @@ export function ReferenceCampus() { useUiLanguage();
 }
 function CampusContent() { useUiLanguage();
   const live=useWorkspaceBackend()
-  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><AssistantBanner/></div></div>
+  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园探店")}><Link className="shop-campus-entry" to="/v2/shops"><div><strong>{uiText("校内外的小店与美食")}</strong><p>{uiText("看看同学的真实体验，分享文字与照片。")}</p></div><ChevronRight size={22}/></Link></Section><AssistantBanner/></div></div>
 }
 
 export function ReferenceMe() { useUiLanguage();

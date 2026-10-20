@@ -1,3 +1,4 @@
+import {ShopPage} from './ShopPage'
 import {PublicPrivacyPage} from './PrivacyPolicy'
 import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 import { useDevicePreferences } from './devicePreferences'
@@ -56,6 +57,7 @@ const adminNav = [
   { path: '/v2/admin/mail-activities', label: '邮件转活动', icon: Mail },
   { path: '/v2/admin/verifications', label: '认证审核', icon: ShieldCheck },
   { path: '/v2/admin/moderation', label: '社区内容', icon: Newspaper },
+  { path: '/v2/admin/shops', label: '店铺与点评', icon: Coffee },
   { path: '/v2/admin/keywords', label: '社区屏蔽词', icon: ShieldAlert },
 ]
 
@@ -79,7 +81,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const sidebarItems = parseSidebarItems(ownPreferences?.sidebarItems) ?? defaultSidebarItems
   const shellBrandIcon = brandIcon
   const sports = location.pathname === '/v2/teacher/sports'
-  const studentSectionActive = (path: string, isActive: boolean) => location.pathname==='/v2/community'?path===(new URLSearchParams(location.search).get('person')==='me'?'/v2/me':'/v2/activities'):isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const studentSectionActive = (path: string, isActive: boolean) => location.pathname==='/v2/community'?path===(new URLSearchParams(location.search).get('person')==='me'?'/v2/me':'/v2/activities'):isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni', '/v2/shops'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
@@ -101,7 +103,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     const path = studentSidebarById[id].path
     return location.pathname === path || location.pathname.startsWith(`${path}/`)
   }
-  const sidebarActiveId = sidebarItems.find(id => id !== 'campus' && sidebarMatch(id)) ?? (location.pathname === '/v2/campus' || ['/v2/community', '/v2/partners', '/v2/alumni', '/v2/organizations', '/v2/sports', '/v2/campus/explore'].some(path => location.pathname === path || location.pathname.startsWith(`${path}/`)) ? 'campus' : undefined)
+  const sidebarActiveId = sidebarItems.find(id => id !== 'campus' && sidebarMatch(id)) ?? (location.pathname === '/v2/campus' || ['/v2/community', '/v2/partners', '/v2/alumni', '/v2/organizations', '/v2/sports', '/v2/shops', '/v2/campus/explore'].some(path => location.pathname === path || location.pathname.startsWith(`${path}/`)) ? 'campus' : undefined)
   useEffect(() => { setMobileMenu(false); setRoleMenu(false) }, [location.pathname, location.search])
   useEffect(() => {
     if (!roleMenu) return
@@ -165,6 +167,8 @@ function V2Routes() { useUiLanguage();
   return <V2Shell accountName={session.account!.name}><Routes>
     <Route path="/v2" element={<CampusWindowHome/>}/>
     {Boolean(import.meta.hot) && <Route path="/v2/design/campus-window" element={<Navigate to="/v2" replace/>}/>}
+    <Route path="/v2/shops" element={<ShopPage/>}/>
+    <Route path="/v2/admin/shops" element={<ShopPage admin/>}/>
     <Route path="/v2/alumni" element={<V2Alumni/>}/>
     <Route path="/v2/sports" element={<ReferenceSports/>}/>
     <Route path="/v2/schedule" element={<V2Schedule/>}/>
