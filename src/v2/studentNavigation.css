@@ -12,3 +12,7 @@
   .v2-app.v2-app-student>.v2-mobile-nav a.is-active:nth-child(3)>svg{color:var(--v2-ink)}
   .v2-app.v2-app-student>.v2-workspace{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 }
+
+.student-timetable-launcher{position:fixed;left:236px;bottom:24px;z-index:71;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;border:1px solid var(--v2-line,#e3e6df);border-radius:24px;background:var(--v2-surface,#fffefa);color:var(--v2-action,#356f73);box-shadow:0 4px 16px #263c3518;font:inherit;font-size:13px;cursor:pointer}
+.student-timetable-launcher:hover,.student-timetable-launcher[aria-expanded=true]{background:var(--v2-soft,#f4f3ef)}
+@media(max-width:760px){.student-timetable-launcher{left:16px;bottom:calc(80px + env(safe-area-inset-bottom))}}
