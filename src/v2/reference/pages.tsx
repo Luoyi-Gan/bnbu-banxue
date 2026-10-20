@@ -1,5 +1,5 @@
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from '../uiLanguage'
-import { ArrowRight, Bell, BookOpen, CalendarDays, ChevronRight, Coffee, ShieldCheck, Sun } from 'lucide-react'
+import { ArrowRight, Bell, CalendarDays, ChevronRight, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useWorkspaceBackend } from '../useWorkspaceBackend'
@@ -9,18 +9,17 @@ import { liveStudentSchedule } from '../liveStudentSchedule'
 import { showNoticeBadge } from '../notificationPreferences'
 import { filterActivityItems } from '../activityFilters'
 import { V2Campus, V2Me } from '../services'
+import {OwnProfilePage} from '../OwnProfilePage'
+import {StudentProfile} from '../StudentProfile'
 import { V2Activities } from '../student'
 import { DiscoveryPage } from '../DiscoveryPage'
 import { StudentTimetable } from '../StudentTimetable'
-import { DisplayAvatar } from '../DisplayAvatar'
-import { Modal } from '../ui'
 import { campusWeekday } from '../../../shared/v2/timetableModel'
 import { Header, Section, EmptyNote, Ring, Services, AssistantBanner, CoffeeBanner, Agenda, EventCard, Organizations, Stories, Partners, Feedback, type Live } from './components'
 import { campusDate, ownLessons, sportsSummary } from './model'
 import campus from '../../assets/campus/home-background.jpg'
 import sunset from '../../assets/campus/evening-campus.jpg'
 import courtyard from '../../assets/campus/campus-services.jpg'
-import walkway from '../../assets/campus/night-walkway.jpg'
 
 const photos=[campus,sunset,courtyard]
 function PhotoHero() { useUiLanguage();
@@ -63,29 +62,10 @@ function CampusContent() { useUiLanguage();
 export function ReferenceMe() { useUiLanguage();
   const [params]=useSearchParams()
   const tab=params.get('tab')
+  if(tab==='profile')return <StudentProfile/>
   if(tab==='timetable')return <div className="ref-page ref-subpage cw-pages"><Header title={uiText("我的课表")} back="/v2/me"/><div className="ref-page-body"><StudentTimetable embedded/></div></div>
   if(tab&&tab!=='overview')return <div className="ref-page ref-subpage cw-pages"><Header title={({events:'我的活动',teams:'我的组队',saved:'我的收藏',network:'校园关系',verification:'身份认证',profile:'个人资料'} as Record<string,string>)[tab] ?? uiText('我的')} back="/v2/me"/><div className="ref-legacy-details"><V2Me embedded/></div></div>
-  return <ProfileContent/>
-}
-function ProfileContent() { const language=useUiLanguage();
-  const live=useWorkspaceBackend(),[backgroundOpen,setBackgroundOpen]=useState(false)
-  const data=live.data,id=data?.account.id,entities=data?.entities??[]
-  const profile=entities.find(e=>e.kind==='profile'&&e.ownerId===id)?.data
-  const preferences=entities.find(e=>e.kind==='preferences'&&e.ownerId===id)?.data
-  const backgrounds=[{key:'campus',label:'校园',image:campus},{key:'evening',label:'夕阳',image:sunset},{key:'walkway',label:'夜色',image:walkway},{key:'services',label:'校园空间',image:courtyard}]
-  const background=backgrounds.find(b=>b.key===preferences?.profileBackground)?.image??campus
-  const name=String(profile?.nickname||data?.account.name||'同学')
-  const participates=data?.relations.filter(r=>r.kind==='participate'&&entities.some(e=>e.id===r.entityId&&e.kind==='activity'&&e.data.status==='published'))??[]
-  const follows=data?.relations.filter(r=>r.kind==='follow'&&entities.some(e=>e.id===r.entityId&&e.kind==='organization'&&e.data.status==='approved'&&e.data.visibility==='visible'))??[]
-  const rooms=entities.filter(e=>e.kind==='room'&&(e.ownerId===id||e.data.isMember))
-  const saved=data?.relations.filter(r=>r.kind==='save'&&entities.some(e=>e.id===r.entityId&&(['activity','post','room'].includes(e.kind))&&(e.kind==='activity'?e.data.status==='published':e.kind==='post'?e.data.status==='visible':e.data.visibility==='visible')))??[]
-  const menu=[
-    {label:'笔记与草稿',copy:'笔记、收藏、赞过与创作草稿',path:'/v2/community?person=me',icon:BookOpen,tone:'blue'},
-    {label:'我的课表',copy:'查看、导入与核对课程',path:'/v2/me?tab=timetable',icon:BookOpen,tone:'blue'},
-    {label:'校友交流',copy:'查看预约与交流安排',path:'/v2/alumni?view=bookings',icon:Coffee,tone:'orange'},
-    {label:'身份认证',copy:'查看与管理认证资料',path:'/v2/me?tab=verification',icon:ShieldCheck,tone:'green'},
-  ]
-  return <div className="ref-page ref-me cw-pages"><section className="ref-profile-cover"><img className="cw-profile-photo" src={background} alt={uiText("个人主页校园封面")}/><Header title={uiText("我的")} settings/><Link className="ref-profile-identity" to="/v2/me?tab=profile"><DisplayAvatar className="ref-avatar" name={name} avatar={String(profile?.avatar??'')} personId={id}/><div><strong>{name}<ChevronRight size={17}/></strong><p>{data?.account.organization || uiText('个人资料')}</p>{data?.account.studentNumber&&<small>{uiText("学号")}{data.account.studentNumber}</small>}</div></Link><button className="ref-change-cover" onClick={()=>setBackgroundOpen(true)}>{uiText("更换封面")}</button></section><div className="ref-page-body cw-profile-body"><Feedback live={live}/><div className="ref-profile-stats">{[{label:'参与活动',value:participates.length,path:'/v2/me?tab=events'},{label:'关注组织',value:follows.length,path:'/v2/organizations'},{label:'参与队伍',value:rooms.length,path:'/v2/me?tab=teams'},{label:'我的收藏',value:saved.length,path:'/v2/me?tab=saved'}].map(item=><Link key={item.label} to={item.path}><strong>{data?item.value:'—'}</strong><span>{language==='en'?({'参与活动':'Activities','关注组织':'Following','参与队伍':'Teams','我的收藏':'Saved'}[item.label]):uiText(item.label)}</span></Link>)}</div><Section title={uiText("我的日历")} to="/v2/schedule"><Agenda data={data} calendar/></Section><Section title={uiText("更多功能")}><div className="ref-menu">{menu.map(({label,copy,path,icon:Icon,tone})=><Link key={path} to={path}><span className={`ref-icon tone-${tone}`}><Icon size={22}/></span><div><strong>{uiText(label)}</strong><small>{uiText(copy)}</small></div><ChevronRight size={16}/></Link>)}</div></Section></div>{backgroundOpen&&<Modal title={uiText("选择主页封面")} onClose={()=>setBackgroundOpen(false)}><div className="ref-cover-options">{backgrounds.map(b=><button key={b.key} disabled={live.busy} aria-pressed={preferences?.profileBackground===b.key} onClick={()=>void live.mutate('preferences.profilebackground',{choice:b.key}).then(ok=>{if(ok)setBackgroundOpen(false)})}><img src={b.image} alt=""/>{uiText(b.label)}</button>)}</div><Feedback live={live}/></Modal>}</div>
+  return <OwnProfilePage/>
 }
 
 export { StudentSportsPage as ReferenceSports } from '../sports/StudentSportsPage'

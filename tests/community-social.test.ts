@@ -214,6 +214,24 @@ it('社区简介使用本人资料保存，关闭资料预览后不向他人返�
   expect(communitySocial(db,b.token,new URLSearchParams(`person=${a.account.id}`)).profile).toMatchObject({bio:'',avatar:'',name:'author'})
 })
 
+it('本人封面和简介共同保存，旧偏好兼容且关闭预览不泄露自选背景',()=>{
+  const {db,a,b,repo,command,post}=fixture();post()
+  const image='data:image/webp;base64,UklGRg=='
+  const read=(token:string)=>communitySocial(db,token,new URLSearchParams({person:a.account.id})).profile
+  command(a,'profile.save',{nickname:'校园作者',avatar:'',bio:'记录校园的光',cover:image})
+  expect(read(a.token)).toMatchObject({cover:image,bio:'记录校园的光'})
+  expect(read(b.token)).toMatchObject({cover:image})
+  expect(()=>command(a,'profile.save',{nickname:'覆盖',avatar:'',bio:'未保存',cover:'https://external.invalid/image.webp'})).toThrow('背景')
+  expect(read(a.token)).toMatchObject({name:'校园作者',bio:'记录校园的光',cover:image})
+  command(a,'preferences.profilebackground',{choice:'flowers'})
+  expect(read(b.token)).toMatchObject({cover:'flowers',bio:'记录校园的光'})
+  command(a,'profile.save',{nickname:'校园作者',avatar:'',bio:'新的简介'})
+  expect(read(a.token)).toMatchObject({cover:'flowers',bio:'新的简介'})
+  repo.create('preferences',a.account.id,{profilePreview:false})
+  expect(read(b.token)).toMatchObject({name:'author',avatar:'',bio:'',cover:'lakeside'})
+  expect(read(a.token)).toMatchObject({cover:'flowers'})
+})
+
 it('关注与搜索筛选不改变全社区75帖热榜门槛，屏蔽作者不泄露到热榜',()=>{
   const {a,b,repo,command,post,read}=fixture(),id=post()
   for(let index=0;index<75;index++)repo.create('post',b.account.id,{title:`普通公开笔记${index}`,body:'正文',board:'校园',status:'visible'})

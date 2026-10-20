@@ -20,6 +20,7 @@ import { useV2 } from './useV2'
 import { Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { V2RelationshipGraph } from './V2RelationshipGraph'
 import { StudentProfile } from './StudentProfile'
+import {profileCoverSource} from './profileCovers'
 import { DisplayAvatar } from './DisplayAvatar'
 import { studentCertifications } from './studentCertifications'
 
@@ -112,7 +113,7 @@ export function V2Me({embedded=false}:{embedded?:boolean}={}) { useUiLanguage();
   const preferences = entities.find(e => e.kind === 'preferences' && e.ownerId === actorId)?.data
   const backgroundChoice = String(preferences?.profileBackground ?? 'campus')
   const backgrounds = [{key:'campus',label:'校园建筑',image:profileCampus},{key:'evening',label:'傍晚校园',image:campusPhoto},{key:'walkway',label:'夜间步道',image:profileWalkway},{key:'services',label:'校园空间',image:profileServices}]
-  const backgroundImage = backgrounds.find(item => item.key === backgroundChoice)?.image ?? profileCampus
+  const backgroundImage = profileCoverSource(profile?.cover??backgroundChoice)
   const displayName = String(profile?.nickname ?? live.data?.account.name ?? '同学')
   const myRooms = entities.filter(e => e.kind === 'room' && (e.ownerId === actorId || e.data.isMember)).map(e => ({id: e.id, owner: e.ownerId, title: String(e.data.title), time: String(e.data.time)}))
   const myEvents = activities.filter(e => e.local?.ownerId === actorId)
