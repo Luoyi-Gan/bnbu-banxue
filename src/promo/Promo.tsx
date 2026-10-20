@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 const chapters = [
   { tag: '01 / 新的一天', nav: '初见', title: <>新的一天，<br /><em>从会同里开始。</em></>, description: '先看看今天的安排，再决定下课后去哪儿。', detail: '课程、活动与想见的人，慢慢排进今天的生活。', screen: 'home', link: '/v2', action: '进入会同里', side: 'left' },
-  { tag: '02 / 下课以后', nav: '发现', title: <>下课之后，<br /><em>还有好戏。</em></>, description: '下课了。不急着回去，看看校园里正在发生什么。', detail: '浏览校园活动与社区内容，找到你想参与的下一件事。', screen: 'discover', link: '/v2/activities', action: '去发现', side: 'right' },
+  { tag: '02 / 下课以后', nav: '发现', title: <>下课之后，<br /><em>发现校园日常。</em></>, description: '下课了。不急着回去，看看校园里正在发生什么。', detail: '浏览校园活动与社区内容，找到你想参与的下一件事。', screen: 'discover', link: '/v2/activities', action: '去发现', side: 'right' },
   { tag: '03 / 想分享的时刻', nav: '论坛', title: <>刚刚的发现，<br /><em>想和大家聊聊。</em></>, description: '把日常写成一篇帖子，也看看同学们怎么说。', detail: '发布图文、浏览话题，点赞收藏与评论回复，让校园经验持续流动。', screen: 'forum', link: '/v2/community', action: '走进论坛', side: 'left' },
   { tag: '04 / 有些问题，想当面聊', nav: 'Coffee Chat', title: <>关于下一步，<br /><em>约位老师聊聊。</em></>, description: '从一条经验想到自己的方向，带着问题预约一次交流。', detail: '了解交流主题、查看开放时段，带着你的问题发起预约。', screen: 'coffee', link: '/v2/coffee', action: '看看 Coffee Chat', side: 'right' },
   { tag: '05 / 有了计划，找人同行', nav: '同行', title: <>你的「一起吗」，<br /><em>有人回应。</em></>, description: '聊完有了新想法。找个搭子，把计划变成一次出发。', detail: '按类型、地点与时间寻找队伍，或发起自己的组队。', screen: 'partners', link: '/v2/partners', action: '找个搭子', side: 'left' },
