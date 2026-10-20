@@ -16,3 +16,8 @@
 .student-timetable-launcher{position:fixed;left:236px;bottom:24px;z-index:71;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;border:1px solid var(--v2-line,#e3e6df);border-radius:24px;background:var(--v2-surface,#fffefa);color:var(--v2-action,#356f73);box-shadow:0 4px 16px #263c3518;font:inherit;font-size:13px;cursor:pointer}
 .student-timetable-launcher:hover,.student-timetable-launcher[aria-expanded=true]{background:var(--v2-soft,#f4f3ef)}
 @media(max-width:760px){.student-timetable-launcher{left:16px;bottom:calc(80px + env(safe-area-inset-bottom))}}
+
+.v2-title-with-back{display:flex;align-items:center;gap:10px}
+.v2-title-back{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px;height:40px;margin-left:-8px;border-radius:50%;color:inherit;letter-spacing:0}
+.v2-title-back:hover{background:var(--v2-soft)}
+.v2-title-back:focus-visible{outline:2px solid var(--v2-action);outline-offset:2px}

@@ -4,8 +4,8 @@ import { useEffect, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 
-export function PageHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description?: string; action?: ReactNode }) { useUiLanguage();
-  return <header className="v2-page-heading"><div><span className="v2-eyebrow">{uiText(eyebrow)}</span><h1>{uiText(title)}</h1>{description && <p>{uiText(description)}</p>}</div>{action && <div className="v2-heading-action">{action}</div>}</header>
+export function PageHeading({ eyebrow, title, description, action, back }: { eyebrow: string; title: string; description?: string; action?: ReactNode; back?: string }) { useUiLanguage();
+  return <header className="v2-page-heading"><div><span className="v2-eyebrow">{uiText(eyebrow)}</span><h1 className={back?"v2-title-with-back":undefined}>{back&&<Link className="v2-title-back" to={back} aria-label={uiText("返回校园")} title={uiText("返回校园")}><ArrowLeft size={22}/></Link>}{uiText(title)}</h1>{description && <p>{uiText(description)}</p>}</div>{action && <div className="v2-heading-action">{action}</div>}</header>
 }
 export function SectionHeading({ title, detail, action, hideTitle=false }: { title: string; detail?: string; action?: ReactNode;hideTitle?:boolean }) { useUiLanguage();
   if(hideTitle&&!detail&&!action)return null

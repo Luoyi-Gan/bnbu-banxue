@@ -168,7 +168,7 @@ function V2Routes() { useUiLanguage();
     <Route path="/v2/alumni" element={<V2Alumni/>}/>
     <Route path="/v2/sports" element={<ReferenceSports/>}/>
     <Route path="/v2/schedule" element={<V2Schedule/>}/>
-    <Route path="/v2/coffee" element={<div className="v2-page reference-coffee-page"><PageHeading eyebrow="A LITTLE CONVERSATION" title="Coffee Chat" description={"和老师聊聊，每一种可能。"}/><V2CoffeeChat/></div>}/>
+    <Route path="/v2/coffee" element={<div className="v2-page reference-coffee-page"><PageHeading back="/v2/campus" eyebrow="A LITTLE CONVERSATION" title="Coffee Chat" description={"和老师聊聊，每一种可能。"}/><V2CoffeeChat/></div>}/>
     <Route path="/v2/teacher" element={<Navigate to={portalHome.teacher} replace/>}/>
     <Route path="/v2/teacher/activities" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
     <Route path="/v2/teacher/activities/:id" element={<Navigate to="/v2/teacher/coffee" replace/>}/>
