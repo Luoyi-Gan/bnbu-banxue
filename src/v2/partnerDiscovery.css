@@ -1,0 +1,28 @@
+.v2-app.v2-app-student .partner-discovery{--partner-paper:#eef3ee}
+.v2-app.v2-app-student .partner-discovery>.v2-page-heading{margin-bottom:18px}.partner-discovery .v2-page-heading p{display:none}
+.partner-feed-controls .v2-toolbar{margin:0 0 10px}.partner-feed-controls .v2-toolbar>div{width:100%;max-width:none}
+.partner-discovery .v2-filter-pills{display:flex;gap:8px;overflow:auto;flex-wrap:nowrap;margin:0;padding:0 0 8px}
+.partner-discovery .v2-filter-pills button{flex:none;border:0;background:none;border-radius:22px;padding:9px 16px;min-height:40px;color:var(--v2-muted)}
+.partner-discovery .v2-filter-pills button.is-active{background:#e8f0e9;color:#2c5848}
+.v2-app.v2-app-student .partner-discovery .v2-partner-filter-panel{border:0;background:none;padding:0;box-shadow:none;margin:0 0 12px}
+.partner-discovery .v2-partner-filter-toggle{justify-content:flex-end;font-size:12px;min-height:36px;padding:0}.partner-discovery .v2-partner-filter-toggle>span{margin-left:6px}
+.v2-app.v2-app-student .partner-discovery .partner-feed-panel{padding:0;border:0;background:none;box-shadow:none}
+.partner-feed-panel>.v2-section-heading{margin:0 0 12px}.partner-feed-panel>.v2-section-heading h2{font-size:15px!important}.partner-feed-panel>.v2-section-heading p{font-size:11px}
+.v2-app.v2-app-student .partner-discovery .v2-room-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 14px;align-items:start}
+.v2-app.v2-app-student .partner-discovery .v2-room-card{display:flex;flex-direction:column;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible;animation:none}
+.partner-discovery .v2-room-card[data-room-type=carpool]{--partner-paper:#f3eee4}.partner-discovery .v2-room-card[data-room-type=entertainment]{--partner-paper:#f5eae7}.partner-discovery .v2-room-card[data-room-type=sport]{--partner-paper:#e8eff1}
+.partner-discovery .v2-room-card-top{padding:10px 12px 0;background:var(--partner-paper);border-radius:12px 12px 0 0;min-height:36px}
+.partner-discovery .v2-room-type{font-size:10px;padding:3px 6px;background:#ffffff85;color:var(--v2-ink)}
+.partner-discovery .v2-room-card-top button{display:grid;place-items:center;min-width:30px;min-height:30px;border:0;background:transparent}
+.v2-app.v2-app-student .partner-discovery .v2-room-open{padding:14px 12px 18px;min-height:145px;background:var(--partner-paper);border-radius:0 0 12px 12px;text-align:left}
+.v2-app.v2-app-student .partner-discovery .v2-room-open h3{font:600 19px/1.5 var(--reference-font,inherit);margin:0 0 10px;color:var(--v2-ink)}
+.partner-discovery .v2-room-open p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.7;margin:0;color:var(--v2-muted)}
+.partner-discovery .v2-room-facts{display:grid;gap:5px;padding:10px 2px 6px;margin:0}.partner-discovery .v2-room-facts span{display:flex;gap:5px;align-items:start;font-size:11px;line-height:1.5}.partner-discovery .v2-room-facts svg{flex:none;margin-top:1px}
+.partner-discovery .v2-room-footer{padding:6px 2px;border:0;font-size:11px;min-height:32px;color:var(--v2-muted)}.partner-discovery .v2-room-footer>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:760px){.v2-app.v2-app-student .partner-discovery .v2-room-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}.v2-app.v2-app-student .partner-discovery .v2-room-open h3{font-size:17px}.partner-discovery .v2-partner-heading-actions{display:flex;gap:8px}.partner-discovery .v2-partner-heading-actions .v2-button{width:auto;min-height:36px;padding:6px 10px;font-size:12px}}
+html[data-ui-theme=dark] .partner-discovery .v2-room-card{--partner-paper:#293932}
+
+.v2-app.v2-app-student .partner-discovery .v2-room-card{gap:0}
+.v2-app.v2-app-student .partner-discovery .v2-filter-pills button{border:0;border-radius:22px;background:transparent;box-shadow:none}
+.v2-app.v2-app-student .partner-discovery .v2-filter-pills button.is-active{background:#e8f0e9;color:#2c5848}
+.v2-app.v2-app-student .partner-discovery .v2-room-card-top,.v2-app.v2-app-student .partner-discovery .v2-room-open{margin:0;border:0}.v2-app.v2-app-student .partner-discovery .v2-room-footer{margin-top:0}
