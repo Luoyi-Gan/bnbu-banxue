@@ -111,6 +111,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     document.addEventListener('keydown', closeEscape)
     return () => { document.removeEventListener('pointerdown', closeOutside); document.removeEventListener('keydown', closeEscape) }
   }, [roleMenu])
+  if (location.pathname === '/v2/campus/explore') return <main>{children}</main>
   return <div data-campus-route={location.pathname} data-campus-tab={new URLSearchParams(location.search).get('tab') ?? ''} className={`v2-app${sports ? ' v2-app-sports' : ''}${!admin && !teacher ? ' v2-app-student' : ` v2-app-staff${teacher ? ' v2-app-teacher' : ' v2-app-admin'}`}`}>
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label={uiText("新版主导航")}>
       <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>{uiText("会同里")}</strong><small>BNBU CAMPUS</small></span></Link>
