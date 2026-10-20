@@ -3,6 +3,7 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import { adaptCampusLocation } from './campus-map-location.mjs'
 
 const source = path.resolve(process.argv[2] || '../BNBU 3D Model')
 const destination = path.resolve('public/campus-map')
@@ -54,6 +55,7 @@ const plugin = { name: 'huitongli-map', setup(builder) {
       contents = contents.replace('init();', `${bridge}\ninit().then(()=>{if(startupReady)notifyHost({type:'huitongli-map-ready',buildings:${JSON.stringify(catalog)}});});`)
     }
     if (args.path.endsWith('campus-tools.js')) {
+      contents = adaptCampusLocation(contents, path.resolve('scripts/campus-map-location.mjs').replaceAll('\\', '/'))
       contents = contents.replace("if('serviceWorker' in navigator)", 'if(false)')
       contents = contents.replace('actions.append(favorite,shareButton,comment)', 'actions.append(favorite,shareButton)')
       contents = contents.replace("directoryLink.href='/places/'", "directoryLink.hidden=true;directoryLink.href='/campus-map/data/processed/campus-places.json'")
@@ -81,10 +83,12 @@ html = html.replace('href="/privacy.html"', 'href="/campus-map/viewer/privacy.ht
 const bootstrap = `<script>const originalFetch=window.fetch.bind(window);window.fetch=(input,options)=>{const url=new URL(typeof input==='string'?input:input.url,location.href);if(url.origin===location.origin&&url.pathname.startsWith('/api/'))return Promise.resolve(new Response('{}',{status:503,headers:{'Content-Type':'application/json'}}));return originalFetch(input,options)};</script>`
 const css = `<style>[data-tools-tab="comments"],[data-tools-panel="comments"],#refresh-places,#download-offline,#install-campus,#auto-refresh-places,#maintenance-state,#qa-tools,section:has(>label>#auto-refresh-places){display:none!important}</style>`
 html = html.replace('</head>', bootstrap + css + '</head>')
+html = html.replace('</head>', '<link rel="stylesheet" href="/campus-map/viewer/campus-window.css"></head>')
+html = html.replace('</body>', '<script type="module" src="/campus-map/viewer/companion-preferences.js"></script></body>')
 await fs.writeFile(path.join(destination,'viewer/index.html'), html)
 const reference = path.join(destination,'viewer/reference-map.html')
 await fs.writeFile(reference, (await fs.readFile(reference,'utf8')).replace(`${prefix}/viewer/vendor/reference-map.bundle.js`,`${prefix}/viewer/reference-map.js`))
-await fs.writeFile(path.join(destination,'viewer/privacy.html'), '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>地图与本机数据</title><h1>地图与本机数据</h1><p>地图收藏、图层和视角保存在当前浏览器。只有主动点击定位才申请位置权限，关闭定位后停止跟踪。建筑尺寸含估算，地点现状以现场为准。</p><p>会同里的账号、活动与社区遵循 App 的现有权限与数据规则。</p><a href="/v2/campus/explore">返回校园探索</a></html>')
+await fs.writeFile(path.join(destination,'viewer/privacy.html'), '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>地图与本机数据</title><h1>地图与本机数据</h1><p>地图收藏、图层和视角保存在当前浏览器。只有主动点击定位才申请位置权限，并单次获取当前位置。位置仅保存在当前地图内存，清除或离开后移除，不上传至伴学后端；定位后的相机视角不写入本机视角存档。建筑尺寸含估算，地点现状以现场为准。</p><p>会同里的账号、活动与社区遵循 App 的现有权限与数据规则。</p><a href="/v2/campus/explore">返回校园探索</a></html>')
 copied.add('viewer/privacy.html')
 const entries = []
 for (const file of [...copied].sort()) {

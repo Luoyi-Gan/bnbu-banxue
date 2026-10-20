@@ -2070,5 +2070,17 @@
   "这里暂时没有即将开始的活动。": "No upcoming activities are scheduled here.",
   "结束时间待确认": "End time to be confirmed",
   "验证 @mail.bnbu.edu.cn 学校邮箱后，自动获得学生身份。": "Verify your @mail.bnbu.edu.cn school email to receive student access automatically.",
-  "使用 @mail.bnbu.edu.cn 邮箱注册并完成验证码验证，即可进入校园服务。": "Register with your @mail.bnbu.edu.cn email and verify the email code to access campus services."
+  "使用 @mail.bnbu.edu.cn 邮箱注册并完成验证码验证，即可进入校园服务。": "Register with your @mail.bnbu.edu.cn email and verify the email code to access campus services.",
+  "定位我的位置": "Locate me",
+  "清除位置": "Clear location",
+  "位置仅用于当前地图，离开后清除。": "Your location stays on this map and is cleared when you leave.",
+  "正在获取位置，请允许浏览器定位…": "Getting your location. Please allow location access\u2026",
+  "未获定位权限，请在浏览器的网站权限中允许位置访问后重试。": "Location access was denied. Allow it in site permissions and try again.",
+  "暂时无法获取位置，请检查设备定位服务后重试。": "Location is unavailable. Check your device location services and try again.",
+  "定位超时，请到信号较好的位置重试。": "Location timed out. Try again where the signal is better.",
+  "当前位置在校园地图范围外，继续显示校园视角。": "Your location is outside the campus map area. Keeping the campus view.",
+  "当前浏览器不支持定位。": "This browser does not support geolocation.",
+  "定位需要 HTTPS 或本机 localhost 安全环境。": "Location requires HTTPS or a local localhost context.",
+  "定位误差超过 300 米，暂不标记，请到信号较好的位置重试。": "Location accuracy exceeds 300 m. Try again where the signal is better.",
+  "已标记我的位置 · 精度约 {0} 米": "Location marked \u00b7 Accuracy about {0} m"
 }

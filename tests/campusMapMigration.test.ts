@@ -38,7 +38,8 @@ describe('migrated campus viewer', () => {
     const frame = { style: {}, setAttribute: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), contentWindow: { postMessage }, remove }
     vi.stubGlobal('document', { createElement: () => frame })
     vi.stubGlobal('window', { location: { origin: 'http://localhost' }, matchMedia: () => ({matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()}), setTimeout, addEventListener: target.addEventListener.bind(target), removeEventListener: target.removeEventListener.bind(target) })
-    const scene = createCampusScene({ appendChild: vi.fn() } as unknown as HTMLDivElement, 'way/1', ready, select, error)
+    const onLocation = vi.fn()
+    const scene = createCampusScene({ appendChild: vi.fn() } as unknown as HTMLDivElement, 'way/1', ready, select, error, { onLocation })
     const send = (data: object, origin = 'http://localhost', source: object = frame.contentWindow) => {
       const event = new Event('message')
       Object.assign(event, { data, origin, source })
@@ -46,10 +47,18 @@ describe('migrated campus viewer', () => {
     }
     const payload = { type: 'huitongli-map-ready', buildings: [{id:'way/1',name:'体育馆'}] }
     send(payload, 'https://other.example'); send(payload, 'http://localhost', {})
+    send({ type: 'huitongli-map-location', state: 'located', accuracy: 15 }, 'https://other.example')
+    send({ type: 'huitongli-map-location', state: 'located', accuracy: 15 }, 'http://localhost', {})
+    expect(onLocation).not.toHaveBeenCalled()
     expect(ready).not.toHaveBeenCalled()
     send(payload)
     expect(ready).toHaveBeenCalledWith(payload.buildings)
     expect(postMessage).toHaveBeenCalledWith({type:'huitongli-map-command',action:'focus',id:'way/1'}, 'http://localhost')
+    send({ type: 'huitongli-map-location', state: 'unknown' })
+    send({ type: 'huitongli-map-location', state: 'located', accuracy: -1 })
+    expect(onLocation).not.toHaveBeenCalled()
+    send({ type: 'huitongli-map-location', state: 'located', accuracy: 15, latitude: 22, longitude: 113 })
+    expect(onLocation).toHaveBeenLastCalledWith({ state: 'located', accuracy: 15 })
     send({type:'huitongli-map-selected',id:'unknown'})
     expect(select).not.toHaveBeenCalled()
     send({type:'huitongli-map-selected',id:'way/1'})

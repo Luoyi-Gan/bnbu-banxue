@@ -1,7 +1,7 @@
 {
   "source": "BNBU 3D Model",
   "sourceHead": "1d82bf9c74c3e7e37a761a910f22657f46e04e27",
-  "importedAt": "2026-10-19T01:53:57.164Z",
+  "importedAt": "2026-10-20T13:08:49.891Z",
   "files": [
     {
       "file": "data/materials/environment-source.json",
@@ -940,8 +940,8 @@
     },
     {
       "file": "viewer/campus.js",
-      "bytes": 941621,
-      "sha256": "ac751b1e8884b250b776fcc9d6999a4b408c7abf5194a1b093568fe568d7823f"
+      "bytes": 941792,
+      "sha256": "1aa1fdf39c09ef65861fc0025e22dd361ad66ac90dc67d97a4d371b680a7b914"
     },
     {
       "file": "viewer/chunks/esm-NUV22FAU.js",
@@ -955,8 +955,8 @@
     },
     {
       "file": "viewer/privacy.html",
-      "bytes": 463,
-      "sha256": "0f83538e6205b0faaaad04fe938c7d0b7cc5acd1f9ea0fa30d136da6c0243bfe"
+      "bytes": 610,
+      "sha256": "85be0d0f3572e7094e53980717394e8b331943d00e332ea8c357746f9443d8a4"
     },
     {
       "file": "viewer/reference-map.css",
@@ -998,6 +998,5 @@
       "bytes": 83263,
       "sha256": "bacba6a85a867fcf602f2ff88331b8acf7edf3fbd063a519888cfbff39970193"
     }
-  ],
-  "adaptationNote": "Viewer appearance settings adapted after import; runtime checksums refreshed for cloud release on 2026-10-20."
+  ]
 }

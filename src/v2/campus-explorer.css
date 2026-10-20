@@ -3,6 +3,12 @@
 .is-immersive>.v2-explorer-map{width:100%;height:100%}
 .v2-explore-back{position:absolute;z-index:4;top:calc(16px + env(safe-area-inset-top,0px));left:calc(16px + env(safe-area-inset-left,0px));display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:88px;min-height:44px;padding:0 16px;border:1px solid #ffffffb3;border-radius:24px;background:#fffffff0;box-shadow:0 4px 20px #18352d26;color:#203e35;font-size:14px;font-weight:600;text-decoration:none;backdrop-filter:blur(12px)}
 .v2-explore-back:hover{background:#fff}
+.v2-map-location-control{position:absolute;z-index:4;top:calc(16px + env(safe-area-inset-top,0px));right:calc(16px + env(safe-area-inset-right,0px));max-width:min(280px,calc(100% - 128px));text-align:right}
+.v2-map-location-control button{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 15px;border:1px solid #ffffffb3;border-radius:24px;background:#fffffff0;box-shadow:0 4px 20px #18352d26;color:#203e35;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
+.v2-map-location-control button[aria-pressed=true]{background:#e4f3e9;color:#236442}
+.v2-map-location-control button:disabled{opacity:.65;cursor:wait}
+.v2-map-location-control button:focus-visible{outline:3px solid #3478f6;outline-offset:3px}
+.v2-map-location-control p{margin:8px 0 0;padding:7px 10px;border-radius:10px;background:#fffffff0;color:#435e52;font-size:11px;line-height:1.6}
 .v2-explore-back:focus-visible{outline:3px solid #3478f6;outline-offset:4px}
 .is-immersive>.v2-explorer-panel{position:absolute;z-index:3;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(96px + env(safe-area-inset-bottom,0px));width:min(330px,calc(100% - 40px));max-height:calc(100% - 180px);padding:20px;border:1px solid #dce5e0;border-radius:18px;background:#fffffff2;box-shadow:0 12px 36px #18352d26;backdrop-filter:blur(12px)}
 .is-immersive .v2-explorer-panel>.v2-explorer-close{position:absolute;top:12px;right:12px;width:44px;height:44px;margin:0;z-index:1}
