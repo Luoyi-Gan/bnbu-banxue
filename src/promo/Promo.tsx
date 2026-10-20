@@ -1,3 +1,4 @@
+import { DownloadBoard } from './DownloadBoard'
 import { ScreenPreview, type ScreenName } from './ProductScreen'
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
@@ -139,7 +140,8 @@ export function Promo() {
       <a className="promo-nav-cta" href="/v2">打开会同里 <ArrowUpRight size={14} /></a>
     </header>
     <main>
-      <section ref={story} className="promo-story" aria-label="会同里产品故事">
+      <DownloadBoard />
+      <section id="product-story" ref={story} className="promo-story" aria-label="会同里产品故事">
         <div ref={stage} className="promo-stage" data-scene={active} data-held={active < 4} data-presentation={presentation}>
           <div className="promo-watermark" aria-hidden="true">HUITONGLI</div>
           <div className="promo-orbit" aria-hidden="true" />
