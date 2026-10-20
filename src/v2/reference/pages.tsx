@@ -56,7 +56,7 @@ export function ReferenceCampus() { useUiLanguage();
 }
 function CampusContent() { useUiLanguage();
   const live=useWorkspaceBackend()
-  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services exclude={['/v2/me?tab=timetable','/v2/campus']}/></Section><AssistantBanner/></div></div>
+  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><AssistantBanner/></div></div>
 }
 
 export function ReferenceMe() { useUiLanguage();
