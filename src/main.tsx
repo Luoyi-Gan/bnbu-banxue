@@ -12,6 +12,7 @@ import './v2/reference/campusWindowDetails.css'
 import './v2/reference/campusWindowStaff.css'
 import './v2/reference/campusWindowLayouts.css'
 import './v2/studentNavigation.css'
+import './v2/likeAppearance.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
