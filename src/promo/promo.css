@@ -51,3 +51,5 @@
 
 @media(max-width:759px){.promo-motion{flex-shrink:0;white-space:nowrap}.promo-chapters{gap:3px}.promo-chapters button{min-width:26px}.promo-chapters button i{width:8px}.promo-chapters button[aria-pressed=true] i{width:14px}}
 @media(max-width:380px){.promo-stage-footer{left:4%;right:4%;padding-left:8px;padding-right:8px}.promo-motion{gap:4px;font-size:9px}}
+.promo-held .promo-held-photo{transform-origin:46.5% 40.6%;transform:perspective(1400px) translate3d(var(--held-x,0px),var(--held-y,0px),0) rotateZ(var(--held-roll,0deg)) rotateY(var(--held-turn,0deg)) scale(var(--held-scale,1));will-change:transform}
+@media(prefers-reduced-motion:reduce){.promo-held .promo-held-photo{transform:none;will-change:auto}}

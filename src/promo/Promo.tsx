@@ -66,6 +66,16 @@ export function Promo() {
       if (current !== selected) { current = selected; setActive(selected) }
       const mobile = window.innerWidth < 760
       const tablet = window.innerWidth < 1100
+      // Pull back, sweep through the next screen, then settle at the same
+      // centered pose. Returning to identity keeps the 3D handoff aligned.
+      const heldTransition = index < 3 ? Math.max(0, Math.min(1, (local - .45) / .55)) : 0
+      const envelope = Math.sin(heldTransition * Math.PI) ** 2
+      const sweep = Math.sin(heldTransition * Math.PI * 2) * envelope
+      stageElement.style.setProperty('--held-x', `${sweep * (mobile ? 22 : tablet ? 34 : 48)}px`)
+      stageElement.style.setProperty('--held-y', `${envelope * (mobile ? 14 : 24)}px`)
+      stageElement.style.setProperty('--held-roll', `${sweep * (mobile ? 3 : 5)}deg`)
+      stageElement.style.setProperty('--held-turn', `${sweep * 7}deg`)
+      stageElement.style.setProperty('--held-scale', String(1 - envelope * .075))
       const poses = desktop.map((p, i) => mobile
         ? { x: i % 2 ? -.08 : .08, y: window.innerHeight >= 800 ? -1.35 : -1.45, rx: p.rx * .5, ry: p.ry * .65, rz: p.rz * .6, scale: window.innerHeight >= 800 ? .7 : .6 }
         : tablet ? { ...p, x: p.x * Math.min(.72, window.innerWidth / window.innerHeight * .7), scale: .68 } : p)
