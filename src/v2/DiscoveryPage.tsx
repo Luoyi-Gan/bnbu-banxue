@@ -13,7 +13,7 @@ import { uiText, useUiLanguage } from './uiLanguage'
 import './discoveryPage.css'
 
 const sectionIcons={activities:CalendarDays,organizations:UsersRound,community:House,alumni:MessageCircle}
-const sections=[['activities','活动','Activities'],['organizations','社团组织','Clubs'],['community','校园社区','Community'],['alumni','校友交流','Alumni']] as const
+const sections=[['community','校园社区','Community'],['activities','活动','Activities'],['organizations','社团组织','Clubs'],['alumni','校友交流','Alumni']] as const
 
 export function DiscoveryPage(){
   const language=useUiLanguage()
