@@ -1,6 +1,6 @@
 import { uiText, uiTemplate, useUiLanguage , uiLocale } from '../uiLanguage'
 import {useDevicePreferences} from '../devicePreferences'
-import { ArrowRight, Bell, ChevronLeft, ChevronRight, MapPin, Pause, Play } from 'lucide-react'
+import { ArrowRight, Bell, ChevronRight, MapPin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DisplayAvatar } from '../DisplayAvatar'
@@ -21,7 +21,6 @@ function CampusWindow({ greeting, name }: { greeting: string; name: string }) { 
   const device=useDevicePreferences()
   const stopAutoplay=!device.preferences.photoAutoplay||device.reducedMotion
   const [slide, setSlide] = useState(0)
-  const [paused, setPaused] = useState(false)
   const [reduced, setReduced] = useState(false)
   const [inView, setInView] = useState(true)
   const windowRef = useRef<HTMLElement>(null)
@@ -39,12 +38,12 @@ function CampusWindow({ greeting, name }: { greeting: string; name: string }) { 
     return () => query.removeEventListener('change', update)
   }, [])
   useEffect(() => {
-    if (paused || reduced || stopAutoplay || !inView) return
+    if (reduced || stopAutoplay || !inView) return
     const timer = window.setInterval(() => {
       if (document.visibilityState === 'visible') setSlide(current => (current + 1) % photographs.length)
     }, 6500)
     return () => window.clearInterval(timer)
-  }, [paused, reduced, stopAutoplay, inView])
+  }, [reduced, stopAutoplay, inView])
   const dateFormat = new Intl.DateTimeFormat(uiLocale(), { timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'short' })
   const date = new Date()
   return <section className="cw-window" aria-label={uiText("校园窗口")} ref={windowRef}>
@@ -55,14 +54,7 @@ function CampusWindow({ greeting, name }: { greeting: string; name: string }) { 
     </div>
     <div className="cw-scene">
       {photographs.map((photo, index) => (index === slide || (!stopAutoplay && (index === (slide + 1) % photographs.length || index === (slide + photographs.length - 1) % photographs.length))) && <img key={photo.source} src={photo.source} alt={uiText(photo.alt)} style={{objectPosition:photo.position}} className={slide === index?'is-active':''} aria-hidden={slide !== index} decoding="async" fetchPriority={index === slide?'high':'low'}/>)}
-      <div className="cw-photo-controls">
-        <div role="group" aria-label={uiText("校园照片")}>
-          <button type="button" aria-label={uiText("上一张校园照片")} onClick={() => {setSlide(current => (current + photographs.length - 1) % photographs.length);setPaused(true)}}><ChevronLeft size={16}/></button>
-          <span className="cw-photo-count" aria-label={uiTemplate(["第 "," 张，共 "," 张校园照片"],slide + 1,photographs.length)}>{slide + 1} / {photographs.length}</span>
-          <button type="button" aria-label={uiText("下一张校园照片")} onClick={() => {setSlide(current => (current + 1) % photographs.length);setPaused(true)}}><ChevronRight size={16}/></button>
-        </div>
-        {!reduced && !stopAutoplay && <button type="button" aria-label={paused?uiText('播放校园照片轮播'):uiText('暂停校园照片轮播')} onClick={() => setPaused(current => !current)}>{paused?<Play size={16}/>:<Pause size={16}/>}</button>}
-      </div>
+
     </div>
   </section>
 }

@@ -19,12 +19,6 @@
 .cw-home .cw-scene {position:absolute;left:180px;right:0;top:0;height:360px;overflow:hidden;border-radius:170px 0 8px 8px;background:#e0e8e6}
 .cw-home .cw-scene>img {position:absolute;width:100%;height:100%;inset:0;object-fit:cover;object-position:50% 48%;opacity:0;transition:opacity .65s ease}
 .cw-home .cw-scene>img.is-active {opacity:1}
-.cw-home .cw-photo-controls {position:absolute;top:0;right:0;display:flex;justify-content:flex-end;align-items:center;padding:0 4px;background:#173b48c9;border-radius:0 0 0 8px}
-.cw-home .cw-photo-controls>div {display:flex}
-.cw-home .cw-photo-count {display:grid;place-items:center;min-width:48px;color:#fff;font-size:12px;font-variant-numeric:tabular-nums}
-.cw-home .cw-photo-controls button {width:44px;height:44px;border:0;color:#fff;background:transparent;display:grid;place-items:center;padding:0}
-.cw-home .cw-photo-controls button>span {width:6px;height:6px;background:#ffffff8c;border:1px solid #fff;border-radius:50%;transition:width .18s ease}
-.cw-home .cw-photo-controls button[aria-pressed=true]>span {width:17px;background:#fff;border-radius:5px}
 .cw-home .cw-focus {position:relative;z-index:1;margin:-175px 40px 0 38%;padding:0}
 .cw-home .cw-next {display:block;padding:22px 25px;background:#fff;border-radius:6px 28px 6px 6px;border-bottom:3px solid #82afc0;box-shadow:0 6px 25px #25444b0c;animation:cw-arrive .28s ease-out}
 .cw-home .cw-next-top {display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#426575}
@@ -111,7 +105,6 @@
 .cw-home .cw-footer p {font-size:13px;color:var(--cw-muted);margin:10px 0}
 .cw-home .cw-footer>a {display:inline-flex;align-items:center;gap:7px;color:var(--cw-blue);font-size:14px;min-height:44px}
 .cw-home :is(button,a):focus-visible {outline:2px solid var(--cw-blue);outline-offset:4px}
-.cw-home .cw-photo-controls button:focus-visible {outline-color:#fff;outline-offset:-5px}
 @keyframes cw-arrive {from {opacity:.7;transform:translateY(7px)}to {opacity:1;transform:translateY(0)}}
 @media(max-width:1000px) {
   .cw-home .cw-content-grid {grid-template-columns:1fr}
@@ -135,8 +128,6 @@
   .cw-home .cw-hello {font-size:27px;letter-spacing:3px}
   .cw-home .cw-name {font-size:18px;line-height:1.5;max-height:105px;letter-spacing:2px;margin-top:9px}
   .cw-home .cw-scene {left:104px;right:0;top:14px;height:245px;border-top-left-radius:112px}
-  .cw-home .cw-photo-controls {right:0;padding:0}
-  .cw-home .cw-photo-controls button {width:44px;height:44px}
   .cw-home .cw-focus {margin:-18px 0 0}
   .cw-home .cw-next {padding:17px 19px 16px;margin-right:16px;border-radius:5px 25px 5px 5px}
   .v2-app.v2-app-student .cw-home .cw-next h2 {font-size:25px;line-height:1.4;margin:8px 0 12px}
@@ -179,7 +170,7 @@
   .cw-home .ref-event.is-row .ref-event-content {padding-right:23px}
 }
 @media(prefers-reduced-motion:reduce) {
-  .cw-home .cw-scene>img,.cw-home .cw-photo-controls button>span,.cw-home .cw-next-top>svg {transition:none}
+  .cw-home .cw-scene>img,.cw-home .cw-next-top>svg {transition:none}
   .cw-home .cw-next {animation:none}
   .cw-home .cw-next:hover .cw-next-top>svg {transform:none}
 }
