@@ -1,5 +1,20 @@
 # 会同里产品宣传页交接
 
+## 已上线：2026-10-20 17:32（北京时间）
+
+正式地址：https://www.bnbuplatform.cn/ 。部署源码提交 `2cad058`，发布目录 `/var/www/huitongli-promo/releases/20261020-2cad058`，`current` 软链接指向该目录。构建后使用 `package-promo.mjs` 收集29个文件（22,991,472字节），服务器 SHA256 校验全部通过。
+
+仅修改 `/etc/nginx/sites-available/bnbu-banxue.conf` 中 www 域名的精确首页路由，并新增 `/huitongli-promo/` 静态前缀；其余路径继续转发原4188业务服务。首页使用 root + try_files /promo.html =404，设置 no-store。静态资源 no-cache。没有重启业务容器或修改数据库。
+
+首次切换时根路径 alias 触发 Nginx index 拼接错误，首页短暂返回500，随后改为 root + try_files 并复核恢复200；该问题未改变其他业务路由。Nginx 配置校验通过，使用平滑 reload。
+
+线上验证：1440×900、845×952、390×844，21次故事场景检查、36次模块检查、页尾图标与外链、业务入口到 `/v2/login`；宣传页没有浏览器异常或失败资源。未登录访问业务页的 `/api/auth/me` 返回401为预期。9个业务入口的HTTP状态与响应体散列在发布前后相同；全部容器的启动时间、运行和健康状态一致。此检查不包含真实账号写入与真机安装验收。证据见 artifacts/promo-20261020/online-validation.json 和 online-*.png。
+
+回滚：将 `/etc/nginx/bnbu-banxue.before-promo-20261020-2cad058.conf` 复制回 `/etc/nginx/sites-available/bnbu-banxue.conf`，运行 `sudo nginx -t` 成功后 `sudo systemctl reload nginx`。首页恢复原 `/v2/login` 跳转；保留独立发布目录即可。
+
+下方“尚未上线”记录为历史连接阻塞状态，以本节为准。
+
+
 ## 看板 HTML 动画与稳定手持展示
 
 看板右侧改用已有 ScreenPreview / ProductScreen，展示首页安排和发现列表的 HTML/CSS 动画，继承离屏、后台暂停及减少动态处理。照片仅作为界面内校园素材。
