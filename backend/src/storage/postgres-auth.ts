@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { account, demand, digest, matchesPassword, normalizeEmail, ServiceError, timestamp, type AccountRow } from '../auth';
 import type { PostgresDatabase } from './postgres';
+import {ensurePostgresStudentEmailIdentity} from './postgres-student-email-identity';
 
 export class PostgresAuth {
   constructor(private readonly db: PostgresDatabase) {}
@@ -24,7 +25,7 @@ export class PostgresAuth {
       if (!rows.length) matchesPassword(password,'00000000000000000000000000000000:'+ '00'.repeat(64));
       demand(matching.length <= 1, '账号标识重复，请联系管理员调整管理登录账号。', 409);
       if (!matching.length) return null;
-      const row = matching[0];
+      const row = await ensurePostgresStudentEmailIdentity(client,matching[0]);
       if (row.login_kind === 'ADMIN') {
         if (row.status !== 'active') throw new ServiceError(403,'ACCOUNT_DISABLED','管理账号已停用。');
         const identity = await client.query("SELECT 1 FROM entities WHERE kind='companionIdentity' AND owner_id=$1 AND data::jsonb->>'role'='admin' AND data::jsonb->>'status'='verified'", [row.id]);
@@ -39,12 +40,13 @@ export class PostgresAuth {
     return result;
   }
 
-  async authenticate(token: string | undefined, client: Pick<PoolClient,'query'> = this.db.pool) {
+  async authenticate(token: string | undefined, client?: PoolClient): Promise<ReturnType<typeof account>> {
+    if(!client) return this.db.transaction(connection=>this.authenticate(token,connection));
     if (!token) throw new ServiceError(401,'UNAUTHENTICATED','请先登录。');
     const row = (await client.query<AccountRow>('SELECT a.* FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=$1 AND s.expires_at>$2',[digest(token),Date.now()])).rows[0];
     if (!row || row.login_kind === 'HISTORY') throw new ServiceError(401,'UNAUTHENTICATED','登录已过期，请重新登录。');
     if (row.login_kind === 'ADMIN' && row.status !== 'active') throw new ServiceError(403,'ACCOUNT_DISABLED','管理账号已停用。');
-    return account(row);
+    return account(await ensurePostgresStudentEmailIdentity(client,row));
   }
 
   async logout(token: string | undefined) {

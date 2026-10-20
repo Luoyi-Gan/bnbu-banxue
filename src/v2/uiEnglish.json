@@ -2068,5 +2068,7 @@
   "按已发布的活动时间展示": "Based on the published activity schedule",
   "这里暂时没有正在进行的活动。": "No activities are currently scheduled here.",
   "这里暂时没有即将开始的活动。": "No upcoming activities are scheduled here.",
-  "结束时间待确认": "End time to be confirmed"
+  "结束时间待确认": "End time to be confirmed",
+  "验证 @mail.bnbu.edu.cn 学校邮箱后，自动获得学生身份。": "Verify your @mail.bnbu.edu.cn school email to receive student access automatically.",
+  "使用 @mail.bnbu.edu.cn 邮箱注册并完成验证码验证，即可进入校园服务。": "Register with your @mail.bnbu.edu.cn email and verify the email code to access campus services."
 }

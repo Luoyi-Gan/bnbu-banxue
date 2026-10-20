@@ -1,6 +1,7 @@
 import { randomInt, randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
-import { demand, digest, hashPassword, normalizeEmail, ServiceError, timestamp, type Account } from '../auth';
+import { demand, digest, hashPassword, normalizeEmail, ServiceError, timestamp, type Account, type AccountRow } from '../auth';
+import {ensurePostgresStudentEmailIdentity} from './postgres-student-email-identity';
 import { deliverMessage } from '../mail-delivery';
 import type { PostgresDatabase } from './postgres';
 import { PostgresRepository } from './postgres-repository';
@@ -58,6 +59,7 @@ export class PostgresEmail {
       const id = randomUUID();
       await client.query('INSERT INTO accounts(id,email,password_hash,name,created_at) VALUES($1,$2,$3,$4,$5)',[id,email,passwordHash,email.split('@')[0].slice(0,20),timestamp()]);
       await new PostgresRepository(client).create('verifiedEmail',id,{email,source:'registration-code'});
+      await ensurePostgresStudentEmailIdentity(client,(await client.query<AccountRow>('SELECT * FROM accounts WHERE id=$1',[id])).rows[0]);
       return {registered:true};
     });
   }
@@ -68,6 +70,7 @@ export class PostgresEmail {
       const current = (await client.query<{email:string;status:string}>('SELECT email,status FROM accounts WHERE id=$1 FOR UPDATE',[actor.id])).rows[0];
       demand(current && current.email===actor.email && current.status!=='banned','账号状态已变化，请重新登录。',403);
       await new PostgresRepository(client).create('verifiedEmail',actor.id,{email:actor.email,source:'own-email-code'});
+      await ensurePostgresStudentEmailIdentity(client,(await client.query<AccountRow>('SELECT * FROM accounts WHERE id=$1',[actor.id])).rows[0]);
       return {verified:true};
     });
   }

@@ -2653,3 +2653,18 @@ SQLite 定向回归覆盖关键词删除权限、发布检查变化、重复词�
 - profile.save 增加 cover：六张校园预设或不超过五 MB 的 JPG/PNG/WebP 数据图，与头像、昵称、简介同次保存；兼容既有背景偏好。旧背景偏好操作同步已有 profile.cover。其他学生的社区投影继续遵守资料预览开关，自选背景与头像、昵称、简介一同受保护；学校身份不变。
 - 定向 18 项测试连续三轮通过，前后端类型检查及范围 lint 通过。实际浏览器文件选择、头像和背景保存刷新、简介编辑、取消、不支持文件提示及校园预设切换已验证。检查手机、桌面与英文深色窄屏。
 - 设计、范围、截图和验收限制见 design/own-profile/README.md；使用本地模拟账号，不代表生产或物理设备验收。
+
+
+### 2026-10-20 学生学校邮箱自动授权与部署
+
+用户最新确认：已验证的 `@mail.bnbu.edu.cn` 邮箱直接获得学生身份。本条覆盖历史中邮箱仅作为证明、必须经过在读名册或人工授权的限制，完整规则已在 BUSINESS_RULES.md 首部更新。
+
+SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功、本人补验证、密码登录和有效会话认证均自动授予 student 并保存 companionIdentity、通知及审计。已有待审或驳回申请同步转为 verified，来源为 verified-student-email；已有职责保留，重复请求不重复通知或身份。学号保留独立字段；无资料时不推导邮箱前缀，重复学号不写入新身份。封禁、已撤销身份、非个人账号、其他或相似域名、未证明当前邮箱归属均不自动授权。
+
+身份页说明已更新，符合域名的未验证账号可直接获取并确认验证码；已获得身份进入 /v2。其他邮箱仍使用原审核机制。
+
+验证：45 项本地针对测试通过，前端构建、后端构建、服务端类型检查、ESLint 通过。最初 Vitest 临时文件重命名受沙盒 EPERM 阻止，沙盒外重新运行通过。生产备份恢复到独立 PostgreSQL 检查库，17 项检查通过：六个并发请求只产生一份身份和授权审计，旧申请转为通过，其他职责保留，域名及邮箱证明边界，封禁与撤销拒绝，管理账号隔离，补验证、注册以及重复学号处理；检查库禁用外发邮件。
+
+正式发布目录 `/opt/bnbu-banxue/releases/huitongli-20261020-student-email`，镜像 `bnbu-banxue-api:huitongli-20261020-student-email`。发布过程中修正前端 Nginx 挂载路径：首次切换自动回滚成功，再从旧 Compose 读取实际配置文件路径后重新发布成功。数据库发布前备份在 `/opt/bnbu-banxue/backups/before-huitongli-20261020-student-email/database.dump`，上一目录为 `huitongli-20261020-auth`，可按其 Compose 回滚应用。
+
+线上 PostgreSQL 健康、演示账号登录、工作区、社区、会话及退出检查通过。公网 /v2、/v2/login、/v2/identity、/api/health 均 200，入口 HTML 与其 JS/CSS 哈希与本地构建一致。证据见 artifacts/student-email-release-20261020/public-verification.json 和 restored-database-verification.json。真实邮箱送达与用户手机操作不在本轮自动验证范围内；已有已验证账号下次刷新或登录时自动生效。

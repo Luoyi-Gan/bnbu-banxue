@@ -8,6 +8,7 @@ import {
 } from "node:crypto";
 import { transaction, type Database } from "./database";
 import {takeEmailSend,takeLoginAttempt} from './security-rate';
+import {ensureStudentEmailIdentity} from './student-email-identity';
 
 export class ServiceError extends Error {
   constructor(
@@ -182,6 +183,7 @@ export function register(
     );
     db.prepare("INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES(?,?,?,?,?,?)").run(randomUUID(), "verifiedEmail", registeredId, JSON.stringify({email, source:"registration-code"}), timestamp(), timestamp());
     db.prepare("DELETE FROM email_challenges WHERE email=?").run(email);
+    ensureStudentEmailIdentity(db,db.prepare('SELECT * FROM accounts WHERE id=?').get(registeredId) as AccountRow);
   });
   return { registered: true };
 }
@@ -254,7 +256,7 @@ function credentialLogin(
     now + 43_200_000,
     timestamp(),
   );
-  return { token, account: account(row) };
+  return { token, account: account(ensureStudentEmailIdentity(db,row)) };
 }
 export function authenticate(db: Database, token: string | undefined) {
   if (!token) throw new ServiceError(401, "UNAUTHENTICATED", "请先登录。");
@@ -269,7 +271,7 @@ export function authenticate(db: Database, token: string | undefined) {
     throw new ServiceError(401, "UNAUTHENTICATED", "登录已失效。");
   if (row.login_kind === "ADMIN" && row.status !== "active")
     throw new ServiceError(403, "ACCOUNT_DISABLED", "管理账号已停用。");
-  return account(row);
+  return account(ensureStudentEmailIdentity(db,row));
 }
 
 export function verifyOwnEmail(db: Database, actor: Account, code: unknown) {
@@ -281,6 +283,7 @@ export function verifyOwnEmail(db: Database, actor: Account, code: unknown) {
   transaction(db,()=>{
     db.prepare("INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES(?,?,?,?,?,?)").run(randomUUID(),'verifiedEmail',actor.id,JSON.stringify({email:actor.email,source:'own-email-code'}),timestamp(),timestamp());
     db.prepare('DELETE FROM email_challenges WHERE email=?').run(actor.email);
+    ensureStudentEmailIdentity(db,db.prepare('SELECT * FROM accounts WHERE id=?').get(actor.id) as AccountRow);
   });
   return {verified:true};
 }
