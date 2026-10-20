@@ -9,13 +9,13 @@ import { createPhone, type PhonePose } from './phone'
 gsap.registerPlugin(ScrollTrigger)
 
 const chapters = [
-  { tag: 'HI, HUITONGLI', nav: '初见', title: <>校园很大。<br />生活，<em>近一点。</em></>, description: '从今天的安排，到下一次相遇。', detail: '会同里，把你的校园生活放在一起。', screen: 'home', link: '/v2', action: '进入会同里', side: 'left' },
-  { tag: '01 / DISCOVER', nav: '发现', title: <>下课之后，<br /><em>还有好戏。</em></>, description: '一场活动，一个社团，一段值得分享的日常。', detail: '浏览校园活动与社区内容，找到你想参与的下一件事。', screen: 'discover', link: '/v2/activities', action: '去发现', side: 'right' },
-  { tag: '02 / COMMUNITY', nav: '论坛', title: <>校园里的声音，<br /><em>值得被听见。</em></>, description: '分享日常，认真提问，遇见有共鸣的人。', detail: '发布图文、浏览话题，点赞收藏与评论回复，让校园经验持续流动。', screen: 'forum', link: '/v2/community', action: '走进论坛', side: 'left' },
-  { tag: '03 / COFFEE CHAT', nav: 'Coffee Chat', title: <>有些答案，<br /><em>聊一聊就近了。</em></>, description: '选一位老师，约一段专属的交流时间。', detail: '了解交流主题、查看开放时段，带着你的问题发起预约。', screen: 'coffee', link: '/v2/coffee', action: '看看 Coffee Chat', side: 'right' },
-  { tag: '04 / TOGETHER', nav: '同行', title: <>你的「一起吗」，<br /><em>有人回应。</em></>, description: '拼车、自习、运动。把一个人的计划，变成同行。', detail: '按类型、地点与时间寻找队伍，或发起自己的组队。', screen: 'partners', link: '/v2/partners', action: '找个搭子', side: 'left' },
-  { tag: '05 / MOVE', nav: '运动', title: <>走出教室，<br /><em>把状态找回来。</em></>, description: '从一门体育课，到一次认真完成的运动。', detail: '查看体育课程、运动入口与记录。当前展示为本地模拟，不计入真实学时。', screen: 'sports', link: '/v2/sports', action: '打开运动', side: 'right' },
-  { tag: '06 / EXPLORE', nav: '探索', title: <>换个视角，<br /><em>认识校园。</em></>, description: '把熟悉的校园，放在手心转一转。', detail: '在 3D 地图里搜索楼栋、切换校区，查看地点与相关计划。', screen: 'map', link: '/v2/campus/explore', action: '探索校园', side: 'right' },
+  { tag: '01 / 新的一天', nav: '初见', title: <>新的一天，<br /><em>从会同里开始。</em></>, description: '先看看今天的安排，再决定下课后去哪儿。', detail: '课程、活动与想见的人，慢慢排进今天的生活。', screen: 'home', link: '/v2', action: '进入会同里', side: 'left' },
+  { tag: '02 / 下课以后', nav: '发现', title: <>下课之后，<br /><em>还有好戏。</em></>, description: '下课了。不急着回去，看看校园里正在发生什么。', detail: '浏览校园活动与社区内容，找到你想参与的下一件事。', screen: 'discover', link: '/v2/activities', action: '去发现', side: 'right' },
+  { tag: '03 / 想分享的时刻', nav: '论坛', title: <>刚刚的发现，<br /><em>想和大家聊聊。</em></>, description: '把日常写成一篇帖子，也看看同学们怎么说。', detail: '发布图文、浏览话题，点赞收藏与评论回复，让校园经验持续流动。', screen: 'forum', link: '/v2/community', action: '走进论坛', side: 'left' },
+  { tag: '04 / 有些问题，想当面聊', nav: 'Coffee Chat', title: <>关于下一步，<br /><em>约位老师聊聊。</em></>, description: '从一条经验想到自己的方向，带着问题预约一次交流。', detail: '了解交流主题、查看开放时段，带着你的问题发起预约。', screen: 'coffee', link: '/v2/coffee', action: '看看 Coffee Chat', side: 'right' },
+  { tag: '05 / 有了计划，找人同行', nav: '同行', title: <>你的「一起吗」，<br /><em>有人回应。</em></>, description: '聊完有了新想法。找个搭子，把计划变成一次出发。', detail: '按类型、地点与时间寻找队伍，或发起自己的组队。', screen: 'partners', link: '/v2/partners', action: '找个搭子', side: 'left' },
+  { tag: '06 / 给自己一点运动时间', nav: '运动', title: <>走出教室，<br /><em>把状态找回来。</em></>, description: '忙碌了一天，也留一点时间给球场和自己。', detail: '查看体育课程、运动入口与记录。当前展示为本地模拟，不计入真实学时。', screen: 'sports', link: '/v2/sports', action: '打开运动', side: 'right' },
+  { tag: '07 / 熟悉的校园，还有新发现', nav: '探索', title: <>换个视角，<br /><em>认识校园。</em></>, description: '下一次想去的地方，先在地图里看一看。', detail: '在 3D 地图里搜索楼栋、切换校区，查看地点与相关计划。', screen: 'map', link: '/v2/campus/explore', action: '探索校园', side: 'right' },
 ]
 const handChapters = [chapters[0], chapters[1], chapters[4], chapters[6]]
 const storyRange = chapters.length - .4
@@ -147,7 +147,7 @@ export function Promo() {
             </section>)}
           </div>
           {!staticMode && <div className="promo-stage-footer">
-            <div className="promo-scroll-label"><ArrowDown size={16} /><span>向下滚动，走进校园</span></div>
+            <div className="promo-scroll-label"><ArrowDown size={16} /><span>{active < chapters.length - 1 ? `继续下一幕 · ${chapters[active + 1].nav}` : '继续，看看校园的更多可能'}</span></div>
             <div className="promo-chapters" role="group" aria-label="选择产品场景">{chapters.map((chapter, i) => <button key={chapter.nav} onClick={() => jump(i)} aria-label={`查看${chapter.nav}`} aria-pressed={active === i}><span>0{i + 1}</span><i /></button>)}</div>
             <button className="promo-motion" onClick={() => setPaused(true)}><Pause size={13} /><span>静态阅读</span></button>
           </div>}
