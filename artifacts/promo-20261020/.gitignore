@@ -15,3 +15,6 @@
 !expanded-review.md
 !modules-desktop.png
 !modules-mobile.png
+!verify-overlap.mjs
+!overlap-regression.json
+!fixed-845.png

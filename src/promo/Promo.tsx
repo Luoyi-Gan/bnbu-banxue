@@ -32,6 +32,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 export function Promo() {
   const root = useRef<HTMLDivElement>(null), story = useRef<HTMLElement>(null), stage = useRef<HTMLDivElement>(null), canvas = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0), [reduced, setReduced] = useState(false), [paused, setPaused] = useState(false), [failed, setFailed] = useState(false)
+  const [presentation, setPresentation] = useState<'held' | 'handoff' | 'free'>('held')
   const [shortViewport, setShortViewport] = useState(false), [handScreen, setHandScreen] = useState(0)
   const [openQuestion, setOpenQuestion] = useState<number | null>(null)
   const pauseRef = useRef(false)
@@ -45,14 +46,18 @@ export function Promo() {
   }, [])
   useEffect(() => {
     if (!root.current || !story.current || !canvas.current || !stage.current || reduced || failed || paused || shortViewport) return
-    const stageElement = stage.current, canvasElement = canvas.current
-    const held = root.current.querySelector<HTMLElement>('.promo-held')!
-    const exitingHand = root.current.querySelector<HTMLElement>('.promo-exit-hand')!
+    const stageElement = stage.current
     let device: ReturnType<typeof createPhone>
     try { device = createPhone(canvas.current, () => setFailed(true)) } catch { setFailed(true); return }
     let visible = true, current = -1, disposed = false
     const motion = { progress: 0 }, float = { y: 0 }
-    const panels = gsap.utils.toArray<HTMLElement>('.promo-scene', root.current)
+    const heldPhoto = root.current.querySelector<HTMLElement>('.promo-held .promo-held-photo')!
+    const measureHeldPose = (): PhonePose => {
+      const pxPerUnit = stageElement.clientHeight / (2 * Math.tan(16 * Math.PI / 180) * 15)
+      return { x: (heldPhoto.offsetLeft + heldPhoto.offsetWidth * .465 - stageElement.clientWidth / 2) / pxPerUnit, y: (stageElement.clientHeight / 2 - heldPhoto.offsetTop - heldPhoto.offsetHeight * .406) / pxPerUnit, scale: heldPhoto.offsetWidth * .5254 / (2.88 * pxPerUnit), rx: 0, ry: 0, rz: 0 }
+    }
+    let heldPose = measureHeldPose()
+    let phase = ''
     const paint = () => {
       if (disposed || !stage.current) return
       const progress = motion.progress * storyRange
@@ -66,35 +71,26 @@ export function Promo() {
       const poses = desktop.map((p, i) => mobile
         ? { x: i % 2 ? -.08 : .08, y: window.innerHeight >= 800 ? -1.35 : -1.45, rx: p.rx * .5, ry: p.ry * .65, rz: p.rz * .6, scale: window.innerHeight >= 800 ? .7 : .6 }
         : tablet ? { ...p, x: p.x * Math.min(.72, window.innerWidth / window.innerHeight * .7), scale: .68 } : p)
-      poses[3] = mobile ? { ...poses[3], x: 0 } : { x: 0, y: -.1, rx: 0, ry: 0, rz: 0, scale: 1.03 }
+      poses[3] = heldPose
       const a = poses[index], b = poses[Math.min(chapters.length - 1, index + 1)]
       const pose = Object.fromEntries(Object.keys(a).map(key => [key, lerp(a[key as keyof PhonePose], b[key as keyof PhonePose], mix)])) as unknown as PhonePose
       pose.scale += Math.sin(mix * Math.PI) * (mobile ? .02 : .08)
       pose.ry += Math.sin(mix * Math.PI) * (mobile ? .08 : .42) * (index % 2 ? -1 : 1)
       if (pauseRef.current) { pose.rx = 0; pose.ry = 0; pose.rz = 0 }
       const handExit = index < 3 ? 0 : index === 3 ? mix : 1
-      held.style.opacity = String(1 - Math.min(1, handExit * 8))
-      exitingHand.style.opacity = String(handExit > 0 ? Math.max(0, 1 - handExit * 3) : 0)
-      exitingHand.style.transform = 'translateY(' + handExit * 500 + 'px)'
-      held.style.visibility = handExit < .999 ? 'visible' : 'hidden'
-      canvas.current!.style.opacity = String(Math.min(1, handExit * 8))
-      stage.current!.dataset.held = String(index < 3 || (index === 3 && mix < .5))
+      const nextPhase = handExit <= .001 ? 'held' : handExit >= .999 ? 'free' : 'handoff'
+      if (phase !== nextPhase) { phase = nextPhase; setPresentation(nextPhase) }
+      stageElement.style.setProperty('--held-alpha', String(1 - Math.min(1, handExit * 8)))
+      stageElement.style.setProperty('--device-alpha', String(Math.min(1, handExit * 8)))
+      stageElement.style.setProperty('--hand-alpha', String(handExit > 0 ? Math.max(0, 1 - handExit * 3) : 0))
+      stageElement.style.setProperty('--hand-y', handExit * 500 + 'px')
       device.setVisible(handExit > .001 && visible)
       device.setReduced(pauseRef.current)
       device.update(pose, index, Math.min(chapters.length - 1, index + 1), mix, pauseRef.current ? 0 : float.y * (mobile ? .45 : 1))
-      panels.forEach((el, i) => {
-        const opacity = i === index ? Math.max(0, 1 - mix * 2.2) : i === index + 1 ? Math.max(0, (mix - .5) * 2) : 0
-        el.style.opacity = String(opacity)
-        el.style.visibility = opacity > .01 ? 'visible' : 'hidden'
-        el.inert = selected !== i
-        el.setAttribute('aria-hidden', String(selected !== i))
-        el.style.transform = `translateY(${(1 - opacity) * 18}px)`
-      })
-      stage.current!.dataset.scene = String(selected)
       stage.current!.style.setProperty('--chapter-progress', String(motion.progress))
     }
     const ctx = gsap.context(() => {
-      gsap.to(motion, { progress: 1, ease: 'none', scrollTrigger: { trigger: story.current, start: 'top top', end: 'bottom bottom', scrub: .65, invalidateOnRefresh: true }, onUpdate: paint })
+      gsap.to(motion, { progress: 1, ease: 'none', scrollTrigger: { trigger: story.current, start: 'top top', end: 'bottom bottom', scrub: .35, invalidateOnRefresh: true }, onUpdate: paint })
       gsap.fromTo('.promo-nav', { y: -16, opacity: 0 }, { y: 0, opacity: 1, duration: .8, ease: 'power3.out' })
       gsap.utils.toArray<HTMLElement>('.promo-reveal').forEach(el => gsap.fromTo(el, { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 92%', once: true } }))
       gsap.fromTo('.promo-hand-visual', { y: 85, rotate: 5, scale: .96 }, { y: 0, rotate: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: '.promo-hands', start: 'top 85%', end: 'top 10%', scrub: .8 } })
@@ -106,16 +102,12 @@ export function Promo() {
     })
     intersection.observe(stage.current)
     const visibility = () => { if (document.hidden) bob.pause(); else if (visible) bob.resume() }
-    const resize = () => { paint(); ScrollTrigger.refresh() }
+    const resize = () => { heldPose = measureHeldPose(); paint(); ScrollTrigger.refresh() }
     document.addEventListener('visibilitychange', visibility)
     window.addEventListener('resize', resize)
     paint()
     return () => {
       disposed = true; bob.kill(); ctx.revert(); intersection.disconnect(); device.dispose()
-      panels.forEach(el => { el.removeAttribute('style'); el.removeAttribute('aria-hidden'); el.inert = false })
-      stageElement.dataset.scene = '0'
-      held.removeAttribute('style'); exitingHand.removeAttribute('style')
-      canvasElement.style.opacity = ''
       document.removeEventListener('visibilitychange', visibility); window.removeEventListener('resize', resize)
     }
   }, [reduced, failed, paused, shortViewport])
@@ -134,14 +126,14 @@ export function Promo() {
     </header>
     <main>
       <section ref={story} className="promo-story" aria-label="会同里产品故事">
-        <div ref={stage} className="promo-stage" data-scene="0">
+        <div ref={stage} className="promo-stage" data-scene={active} data-held={active < 4} data-presentation={presentation}>
           <div className="promo-watermark" aria-hidden="true">HUITONGLI</div>
           <div className="promo-orbit" aria-hidden="true" />
           <div ref={canvas} className="promo-canvas" />
           {!staticMode && <div className="promo-held" aria-hidden="true"><div className="promo-held-photo"><img src="/promo/hand-phone.png" width={1024} height={1536} alt=""/><div className="promo-held-display">{chapters.slice(0,4).map((chapter,i)=><ScreenPreview key={chapter.screen} name={chapter.screen as ScreenName} active={active===i}/>)}</div><span className="promo-held-clock">9:41</span></div></div>}
 <div className="promo-exit-hand" aria-hidden="true"><div className="promo-held-photo"><img src="/promo/hand-phone.png" width={1024} height={1536} alt=""/></div></div>
           <div className="promo-scenes">
-            {chapters.map((chapter, index) => <section id={`scene-${index}`} key={chapter.nav} className={`promo-scene promo-scene-${chapter.side}${index < 4 ? ' promo-scene-held' : ''}`} aria-label={chapter.nav}>
+            {chapters.map((chapter, index) => <section id={`scene-${index}`} key={chapter.nav} className={`promo-scene promo-scene-${chapter.side}${index < 4 ? ' promo-scene-held' : ''}`} aria-label={chapter.nav} aria-hidden={staticMode ? undefined : active !== index} inert={!staticMode && active !== index} style={staticMode ? undefined : { opacity: active === index ? 1 : 0, visibility: active === index ? 'visible' : 'hidden' }}>
               <div className="promo-copy">
                 <p className="promo-eyebrow"><span />{chapter.tag}</p>
                 {index === 0 ? <h1>{chapter.title}</h1> : <h2>{chapter.title}</h2>}
