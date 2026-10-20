@@ -35,9 +35,9 @@ describe('migrated campus viewer', () => {
     vi.useFakeTimers()
     const target = new EventTarget()
     const postMessage = vi.fn(), remove = vi.fn(), ready = vi.fn(), select = vi.fn(), error = vi.fn()
-    const frame = { style: {}, setAttribute: vi.fn(), contentWindow: { postMessage }, remove }
+    const frame = { style: {}, setAttribute: vi.fn(), addEventListener: vi.fn(), removeEventListener: vi.fn(), contentWindow: { postMessage }, remove }
     vi.stubGlobal('document', { createElement: () => frame })
-    vi.stubGlobal('window', { location: { origin: 'http://localhost' }, setTimeout, addEventListener: target.addEventListener.bind(target), removeEventListener: target.removeEventListener.bind(target) })
+    vi.stubGlobal('window', { location: { origin: 'http://localhost' }, matchMedia: () => ({matches:false,addEventListener:vi.fn(),removeEventListener:vi.fn()}), setTimeout, addEventListener: target.addEventListener.bind(target), removeEventListener: target.removeEventListener.bind(target) })
     const scene = createCampusScene({ appendChild: vi.fn() } as unknown as HTMLDivElement, 'way/1', ready, select, error)
     const send = (data: object, origin = 'http://localhost', source: object = frame.contentWindow) => {
       const event = new Event('message')
@@ -56,6 +56,7 @@ describe('migrated campus viewer', () => {
     expect(select).toHaveBeenCalledWith(payload.buildings[0])
     scene.dispose(); send(payload); vi.runAllTimers()
     expect(remove).toHaveBeenCalledOnce()
+    expect(frame.removeEventListener).toHaveBeenCalledWith('load',expect.any(Function))
     expect(ready).toHaveBeenCalledOnce()
     expect(error).not.toHaveBeenCalled()
   })

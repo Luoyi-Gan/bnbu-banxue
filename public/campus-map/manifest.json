@@ -950,8 +950,8 @@
     },
     {
       "file": "viewer/index.html",
-      "bytes": 15494,
-      "sha256": "419743062cc615d8a0b869b337091936c97d559a6aa584c998abf62330fc87c8"
+      "bytes": 15642,
+      "sha256": "3f775a5c66f6471f69b978e98e5b78be82c10f9132b8443e245af2a6b3673bfa"
     },
     {
       "file": "viewer/privacy.html",
@@ -998,5 +998,6 @@
       "bytes": 83263,
       "sha256": "bacba6a85a867fcf602f2ff88331b8acf7edf3fbd063a519888cfbff39970193"
     }
-  ]
+  ],
+  "adaptationNote": "Viewer appearance settings adapted after import; runtime checksums refreshed for cloud release on 2026-10-20."
 }

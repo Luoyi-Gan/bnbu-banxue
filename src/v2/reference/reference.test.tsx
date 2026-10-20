@@ -48,7 +48,7 @@ it('体育源不可用时隐藏旧投影，记录始终限制为授权身份',()
 it('个人主页不把关注称为加入，不把参与标记称为正式报名',()=>{
   const html=renderToStaticMarkup(<MemoryRouter><ReferenceMe/></MemoryRouter>)
   expect(html).toContain('关注组织');expect(html).not.toContain('近期动态');expect(html).not.toContain('报名成功')
-  expect(html).toContain('我的日历');expect(html).toContain('更多功能')
+  expect(html).toContain('我的日历');expect(html).toContain('我的课表')
 })
 it('有内容的五页结构可渲染，运动进度与记录通过入口访问',()=>{
   const pages={home:<CampusWindowHome/>,discover:<ReferenceDiscover/>,campus:<ReferenceCampus/>,me:<ReferenceMe/>,sports:<ReferenceSports/>}

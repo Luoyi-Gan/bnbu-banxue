@@ -153,7 +153,7 @@ function V2Routes() { useUiLanguage();
   if (location.pathname === '/v2/login') return <V2Auth mode="login"/>
   if (location.pathname === '/v2/register') return <V2Auth mode="register"/>
   if (location.pathname === '/v2/forgot-password') return <V2ForgotPassword/>
-  if (!session) return <p role="status">{uiText("正在核对登录状态…")}</p>
+  if (!session) return null
   if (session.anonymous) return <Navigate to="/v2/login" state={{returnTo: location.pathname + location.search + location.hash}} replace/>
   if (session.error) return <p role="alert">{session.error}</p>
   if (location.pathname === '/v2/identity') return <V2Identity/>

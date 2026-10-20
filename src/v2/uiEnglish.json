@@ -2060,5 +2060,9 @@
   "个人简介最多100字。": "Your bio can contain up to 100 characters.",
   "背景须为校园预设或不超过 5MB 的 JPG、PNG、WebP。": "Choose a campus cover or a JPG, PNG or WebP image up to 5 MB.",
   "我的笔记": "My notes",
-  "校园功能": "Campus shortcuts"
+  "校园功能": "Campus shortcuts",
+  "请使用本人邮箱注册或找回密码。校园身份需完成相应认证。": "Use your own email to register or reset your password. Campus identity requires verification.",
+  "验证码 10 分钟内有效，新密码为 8–128 个字符。": "The code is valid for 10 minutes. Your new password must contain 8–128 characters.",
+  "密码重置未完成，请稍后重试。": "Your password was not reset. Please try again later.",
+  "更换账号": "Use a different account"
 }

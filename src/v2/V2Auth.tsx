@@ -313,7 +313,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
           </p>
           <div className="v2-auth-demo">
             <span>
-              {uiText("本地账号与业务数据由后端保存。开发验证码使用本地收件箱，不代表真实邮箱或学校身份核验。")}</span>
+              {uiText("请使用本人邮箱注册或找回密码。校园身份需完成相应认证。")}</span>
           </div>
         </section>
       </main>
