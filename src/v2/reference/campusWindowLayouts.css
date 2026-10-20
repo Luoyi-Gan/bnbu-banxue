@@ -213,6 +213,8 @@ body:has(.v2-app.v2-app-student[data-campus-route='/v2/community']) .v2-a-commun
 
 .v2-app.v2-app-student .cw-home .cw-header h1{flex:none;white-space:nowrap}
 .v2-app.v2-app-student .cw-home .cw-header nav{gap:6px}
+.v2-app.v2-app-student .cw-home .cw-header nav>.v2-student-search:not(.is-open){display:flex;align-items:center;justify-content:center;width:44px;height:44px;min-width:44px;flex:none}
+.v2-app.v2-app-student .cw-home .cw-header nav>.v2-student-search>.v2-student-search-trigger{position:static;inset:auto;margin:0}
 .v2-app.v2-app-student .cw-home .cw-header nav :is(.v2-student-search-trigger,.cw-notification,.v2-floating-timetable-trigger.is-toolbar){display:inline-flex;align-items:center;justify-content:center;height:44px;min-height:44px;border:1px solid var(--cw-line);border-radius:10px;background:var(--v2-surface,#fff);color:var(--cw-ink);box-shadow:none;vertical-align:middle}
 .v2-app.v2-app-student .cw-home .cw-header nav :is(.v2-student-search-trigger,.cw-notification){width:44px;min-width:44px;padding:0}
 .v2-app.v2-app-student .cw-home .cw-header nav :is(.v2-student-search-trigger,.cw-notification,.v2-floating-timetable-trigger.is-toolbar)>svg{width:20px;height:20px;stroke-width:1.8}
