@@ -11,7 +11,6 @@ import { filterActivityItems } from '../activityFilters'
 import { V2Campus, V2Me } from '../services'
 import {OwnProfilePage} from '../OwnProfilePage'
 import {StudentProfile} from '../StudentProfile'
-import { V2Activities } from '../student'
 import { DiscoveryPage } from '../DiscoveryPage'
 import { StudentTimetable } from '../StudentTimetable'
 import { campusWeekday } from '../../../shared/v2/timetableModel'
@@ -41,8 +40,7 @@ export function ReferenceHome() { useUiLanguage();
 }
 
 export function ReferenceDiscover() { useUiLanguage();
-  const [params]=useSearchParams()
-  return params.get('view')==='manage'?<V2Activities/>:<DiscoveryPage/>
+  return <DiscoveryPage/>
 }
 
 function TimetablePreview({live}:{live:Live}) { useUiLanguage();

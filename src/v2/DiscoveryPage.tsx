@@ -1,6 +1,6 @@
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { ActivityDiscovery } from './ActivityDiscovery'
 import { AlumniDiscovery } from './AlumniDiscoveryFeed'
 import { CampusOrganizations } from './CampusOrganizations'
@@ -43,9 +43,8 @@ function ActivityPanel({initialQuery,initialCategory}:{initialQuery:string;initi
   const locations=['全部地点',...new Set(all.filter(a=>a.local?.status==='published').map(a=>a.location).filter(Boolean))]
   const filtered=filterActivityItems(all,{query,category,period,sort,host:'全部主办方',status:'全部状态'},live.data?.account.id??'').filter(a=>location==='全部地点'||a.location===location)
   const hasFilters=!!query||category!=='全部'||period!=='全部时间'||location!=='全部地点'
-  const canManage=live.data?.entities.some(e=>e.ownerId===live.data?.account.id&&((e.kind==='certification'&&e.data.kind==='club'&&e.data.status==='approved')||e.kind==='activity'))
   return <>
-    <div className="campus-discovery-tools"><SearchField value={query} onChange={setQuery} label="搜索活动、地点或主办方"/>{canManage&&<Link className="campus-discovery-manage" to="/v2/activities?view=manage">{uiText('发布与管理')}</Link>}</div>
+    <div className="campus-discovery-tools"><SearchField value={query} onChange={setQuery} label="搜索活动、地点或主办方"/></div>
     <div className="campus-discovery-filter-line"><nav className="campus-discovery-pills" aria-label={uiText('活动类别')}>{categories.map(c=><button type="button" key={c} aria-pressed={category===c} onClick={()=>setCategory(c)}>{uiText(c)}</button>)}</nav>
       <details className="campus-discovery-filters"><summary><SlidersHorizontal size={16}/>{uiText('筛选')}</summary><div className="campus-discovery-filter-fields">
         <label>{uiText('时间')}<select aria-label={uiText('活动时间')} value={period} onChange={e=>setPeriod(e.target.value as ActivityPeriod)}>{['全部时间','今天','本周','下周'].map(value=><option key={value} value={value}>{uiText(value)}</option>)}</select></label>
