@@ -86,3 +86,18 @@ html[data-ui-theme=dark] .campus-discovery{--v2-muted:#afbeb5;--v2-blue:#91b7ca}
   .campus-discovery .alumni-discovery-card .discovery-title{min-height:0}
 }
 @media(prefers-reduced-motion:reduce){.campus-discovery *{animation:none!important;transition:none!important}}
+
+/* Text tabs and in-page filter choices share the quiet campus palette. */
+.campus-discovery-sections{padding:0;background:none;border:0;border-bottom:1px solid var(--v2-line);border-radius:0;gap:12px}
+.campus-discovery-sections button{padding:10px 0 14px;border-radius:0;font-size:15px;background:none}
+.campus-discovery-sections button[aria-pressed=true]{background:none;box-shadow:none;color:var(--v2-ink)}
+.campus-discovery-sections button[aria-pressed=true]:after{content:'';display:block;position:absolute;bottom:0;left:calc(50% - 10px);width:20px;height:3px;border-radius:3px;background:var(--v2-action,#356f73)}
+.discovery-choice-row{display:grid;grid-template-columns:42px minmax(0,1fr);align-items:start;gap:12px;font-size:13px}.discovery-choice-row>span{padding-top:12px;color:var(--v2-muted)}
+.discovery-choice{min-width:0;border:1px solid var(--v2-line);border-radius:9px;background:var(--v2-canvas,#faf9f6)}
+.discovery-choice summary{justify-content:space-between;gap:10px;padding:0 12px;color:var(--v2-ink);font-size:13px}
+.discovery-choice summary svg{color:var(--v2-muted);transition:transform .15s}.discovery-choice[open] summary svg{transform:rotate(180deg)}
+.discovery-choice-options{max-height:220px;overflow:auto;padding:4px 6px 6px;border-top:1px solid var(--v2-line)}
+.campus-discovery-filter-fields .discovery-choice-options label{position:relative;display:flex;align-items:center;gap:8px;min-height:40px;padding:6px 8px;border-radius:6px;cursor:pointer;grid-template-columns:none}
+.discovery-choice-options label:has(input:checked){background:var(--v2-accent-soft,#edf4ee);color:var(--v2-action,#356f73)}.discovery-choice-options label:focus-within{outline:2px solid var(--v2-action);outline-offset:-2px}
+.discovery-choice-options input{position:absolute;opacity:0;width:1px;height:1px}.discovery-choice-options label>span{flex:1}.discovery-choice-options label:hover{background:var(--v2-soft)}
+.campus-discovery-filter-fields{max-height:65dvh;overflow:auto;gap:10px;padding:14px}

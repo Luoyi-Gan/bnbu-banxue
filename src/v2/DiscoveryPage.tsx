@@ -1,5 +1,5 @@
-import { Search, SlidersHorizontal } from 'lucide-react'
-import { useState } from 'react'
+import { Check, ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
+import { useId, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ActivityDiscovery } from './ActivityDiscovery'
 import { AlumniDiscovery } from './AlumniDiscoveryFeed'
@@ -33,6 +33,11 @@ function SearchField({value,onChange,label}:{value:string;onChange:(value:string
   return <label className="campus-discovery-search"><Search size={18}/><input type="search" value={value} onChange={e=>onChange(e.target.value)} aria-label={uiText(label)} placeholder={uiText(label)}/></label>
 }
 
+function FilterChoice({label,value,options,onChange}:{label:string;value:string;options:string[];onChange:(value:string)=>void}){
+  const id=useId(),root=useRef<HTMLDetailsElement>(null)
+  return <div className="discovery-choice-row"><span id={id}>{uiText(label)}</span><details className="discovery-choice" ref={root}><summary aria-labelledby={id} onKeyDown={event=>{if(event.key==='Escape'&&root.current){root.current.open=false}}}><span>{uiText(value)}</span><ChevronDown size={16}/></summary><div className="discovery-choice-options" role="radiogroup" aria-labelledby={id} onKeyDown={event=>{if(event.key==='Escape'&&root.current){root.current.open=false;root.current.querySelector('summary')?.focus()}}}>{options.map(option=><label key={option}><input type="radio" name={id} value={option} checked={value===option} onChange={()=>{onChange(option);if(root.current){root.current.open=false;root.current.querySelector('summary')?.focus()}}}/><span>{uiText(option)}</span>{value===option&&<Check size={15}/>}</label>)}</div></details></div>
+}
+
 function ActivityPanel({initialQuery,initialCategory}:{initialQuery:string;initialCategory:string}){
   useUiLanguage()
   const live=useWorkspaceBackend()
@@ -47,9 +52,9 @@ function ActivityPanel({initialQuery,initialCategory}:{initialQuery:string;initi
     <div className="campus-discovery-tools"><SearchField value={query} onChange={setQuery} label="搜索活动、地点或主办方"/></div>
     <div className="campus-discovery-filter-line"><nav className="campus-discovery-pills" aria-label={uiText('活动类别')}>{categories.map(c=><button type="button" key={c} aria-pressed={category===c} onClick={()=>setCategory(c)}>{uiText(c)}</button>)}</nav>
       <details className="campus-discovery-filters"><summary><SlidersHorizontal size={16}/>{uiText('筛选')}</summary><div className="campus-discovery-filter-fields">
-        <label>{uiText('时间')}<select aria-label={uiText('活动时间')} value={period} onChange={e=>setPeriod(e.target.value as ActivityPeriod)}>{['全部时间','今天','本周','下周'].map(value=><option key={value} value={value}>{uiText(value)}</option>)}</select></label>
-        <label>{uiText('地点')}<select aria-label={uiText('活动地点')} value={location} onChange={e=>setLocation(e.target.value)}>{locations.map(value=><option key={value} value={value}>{value==='全部地点'?uiText(value):value}</option>)}</select></label>
-        <label>{uiText('排序')}<select aria-label={uiText('活动排序')} value={sort} onChange={e=>setSort(e.target.value as ActivitySort)}>{['时间最近','推荐顺序'].map(value=><option key={value} value={value}>{uiText(value)}</option>)}</select></label>
+        <FilterChoice label="时间" value={period} options={['全部时间','今天','本周','下周']} onChange={value=>setPeriod(value as ActivityPeriod)}/>
+        <FilterChoice label="地点" value={location} options={locations} onChange={setLocation}/>
+        <FilterChoice label="排序" value={sort} options={['时间最近','推荐顺序']} onChange={value=>setSort(value as ActivitySort)}/>
       </div></details>
     </div>
     {hasFilters&&<button className="campus-discovery-clear" type="button" onClick={()=>{setQuery('');setCategory('全部');setPeriod('全部时间');setLocation('全部地点')}}>{uiText('清除筛选')}</button>}
