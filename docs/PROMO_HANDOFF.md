@@ -67,3 +67,17 @@ UI 捕获使用只读 acceptance SQLite 中标记 `previewFixture=1` 的演示�
 - 独立复审记录见 `artifacts/promo-20261020/independent-review.md`。审阅者未以正常速度完整观看录像，时间层面的主观“丝滑”仍需真实设备复核。
 
 DPR 上限 1.5；离开舞台或页面隐藏时停止视频与渲染；减少动态或 WebGL 失败时显示完整静态内容。生产 CDN、真实 iPhone/Safari、低端 Android 和真实业务登录不在本次本地验收范围内。
+
+## 独立部署准备（2026-10-20，尚未上线）
+
+用户授权部署到 `www.bnbuplatform.cn`，要求保留其他业务。外部 DNS 查询得到 `43.129.193.7`。本机 SSH 握手与直连 HTTPS 超时；通过当前本地 HTTP 代理的 HTTPS 请求也未成功。因此尚未读取现有 Nginx 配置，未执行任何远端修改。
+
+已新增 `scripts/package-promo.mjs`：构建后只收集宣传页及其 JS/CSS 依赖、字体、图标、截图与录像，将资源引用改为独立 `/huitongli-promo/` 前缀，生成 SHA256SUMS 和 manifest.json。不包含业务应用 bundle、后台或数据库。
+
+```powershell
+node scripts/package-promo.mjs artifacts/promo-20261020/release-20261020
+```
+
+本次发布包 14 个资源文件，共 18,718,148 字节，主要体积来自现有中文字体。本地独立 HTTP 服务加载成功，标题正确，WebGL canvas 出现，无页面异常或 HTTP 资源错误。压缩包位于本地忽略目录 `artifacts/promo-20261020/promo-20261020.tar.gz`，SHA256 为 `87659033980B5B17AA99FB1D9E9357900D271691EB70BBE9B4B718168643E1FF`。
+
+恢复连接后的步骤：先核查现有主站根路径、产品链接、隐私/许可页面和全部站点配置，记录业务 HTTP 与容器状态；备份配置；上传到独立版本目录并核对散列；只增加资源前缀和已授权首页入口；执行 nginx -t 后平滑 reload；复核宣传页、各业务入口/API 与容器启动时间。必须先确认根路径切换不会截断现有业务入口，产品 CTA 也需映射到实际可用地址。保留原配置与旧入口用于回滚，不停止或重建业务容器。
