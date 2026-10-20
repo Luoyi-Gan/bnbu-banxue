@@ -1,6 +1,7 @@
 import type { CampusBuilding } from './campusLocations'
 import {deviceAppearance,subscribeDevicePreferences} from './devicePreferences'
 import {uiText} from './uiLanguage'
+import type {Point} from './campusRouting'
 
 export type CampusLocationState = 'idle' | 'locating' | 'refining' | 'located' | 'denied' | 'unavailable' | 'timeout' | 'outside' | 'unsupported' | 'insecure' | 'imprecise'
 export type CampusLocationStatus = { state: CampusLocationState; accuracy?: number }
@@ -49,6 +50,9 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
   window.addEventListener('message', message)
   host.appendChild(frame)
   return {
+    layout: () => {if(ready&&!disposed)command('layout')},
+    dismissDetails: () => command('dismiss'),
+    route: (points:Point[]|null) => {if(ready&&!disposed)frame.contentWindow?.postMessage({type:'huitongli-map-command',action:'route',points},window.location.origin)},
     locate: () => { if (ready) frame.contentDocument?.getElementById('locate-user')?.click() },
     focus: (id: string) => command('focus', id),
     tool: (id: 'open-map-settings' | 'open-campus-tools' | 'open-render-studio' | 'top' | 'quick-reset') => {if(ready)frame.contentDocument?.getElementById(id)?.click()},

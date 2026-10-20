@@ -1,7 +1,7 @@
 {
   "source": "BNBU 3D Model",
   "sourceHead": "1d82bf9c74c3e7e37a761a910f22657f46e04e27",
-  "importedAt": "2026-10-20T17:37:28.799Z",
+  "importedAt": "2026-10-20T18:05:57.954Z",
   "files": [
     {
       "file": "data/materials/environment-source.json",
@@ -940,8 +940,8 @@
     },
     {
       "file": "viewer/campus.js",
-      "bytes": 942411,
-      "sha256": "cdd90ed7e30d10f58169b957d813c624fd2ed760617411143f251409ab9025eb"
+      "bytes": 946019,
+      "sha256": "abf3f1f913c9c4a9a30bd39f0db5bfeb7c93c5ca68e8265839ab3d1fc66ab204"
     },
     {
       "file": "viewer/chunks/esm-NUV22FAU.js",

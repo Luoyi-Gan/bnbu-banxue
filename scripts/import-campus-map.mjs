@@ -36,13 +36,22 @@ for (const file of ['data/materials/library.json','data/materials/sources.json',
 for (const file of ['viewer/index.html', 'viewer/campus-icon.svg', 'viewer/reference-map.html', 'viewer/reference-map.css', 'viewer/vendor/maplibre-gl.css', 'viewer/vendor/maplibre-gl-worker.mjs', 'viewer/vendor/THREE-LICENSE.txt', 'viewer/vendor/PINYIN-PRO-LICENSE.txt', 'viewer/vendor/MAPLIBRE-LICENSE.txt', 'data/processed/reference-map', ...['viewer-campus', 'campus-places', 'reference-places', 'surroundings'].map(name => `data/processed/${name}.json`)]) await copy(file)
 
 const bridge = `
+import {createCampusRouteOverlay} from ${JSON.stringify(path.resolve('scripts/campus-route-overlay.mjs').replaceAll('\\','/'))};
+let companionRouteOverlay;
 const notifyHost = value => parent.postMessage(value, location.origin);
 const originalChoose = choose;
 choose = function(building, move=true) { originalChoose(building,move); if(building) { if(new URLSearchParams(location.search).get('surface')==='explore')document.getElementById('search-results').hidden=true; notifyHost({type:'huitongli-map-selected',id:building.id}); } };
 window.addEventListener('message',event=>{
   if(event.origin!==location.origin||event.source!==parent||event.data?.type!=='huitongli-map-command'||!startupReady)return;
+  if(event.data.action==='layout')updateViewOffset();
+  if(event.data.action==='route'){
+    companionRouteOverlay??=createCampusRouteOverlay({THREE:{Group:THREE.Group,Vector3:THREE.Vector3,CurvePath:THREE.CurvePath,LineCurve3:THREE.LineCurve3,Mesh:THREE.Mesh,TubeGeometry:THREE.TubeGeometry,MeshBasicMaterial:THREE.MeshBasicMaterial,SphereGeometry:THREE.SphereGeometry,Box3:THREE.Box3},scene,camera,controls,invalidate:()=>renderLoop.invalidate(),padding:viewPadding});
+    if(event.data.points===null)companionRouteOverlay.clear();else companionRouteOverlay.show(event.data.points);
+    updateViewOffset();
+  }
+  if(event.data.action==='dismiss'){document.getElementById('close-detail')?.click();camera.clearViewOffset();renderLoop.invalidate();}
   if(event.data.action==='focus')choose(data.buildings.find(b=>b.id===event.data.id));
-  if(event.data.action==='overview'){selected=null;clearSelection();showOverview();focus('all',false);}
+  if(event.data.action==='overview'){selected=null;clearSelection();showOverview();camera.clearViewOffset();focus('all',false);}
 });
 `
 const plugin = { name: 'huitongli-map', setup(builder) {
@@ -51,6 +60,13 @@ const plugin = { name: 'huitongli-map', setup(builder) {
     if (args.path.includes('node_modules')) return
     let contents = await fs.readFile(args.path, 'utf8')
     if (args.path === path.join(source, 'viewer/app.js')) {
+      if(!contents.includes('function viewPadding(){'))throw Error('Map padding adapter source no longer matches')
+      contents=contents.replace('function viewPadding(){',`function viewPadding(){
+        if(new URLSearchParams(location.search).get('surface')==='explore'&&parent!==window){
+          const panels=[...parent.document.querySelectorAll('.map-p0-dock,.v2-explorer-panel,.map-p1-route')].map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
+          return innerWidth<900?{left:16,right:60,top:140,bottom:Math.max(140,...panels.map(r=>innerHeight-r.top+16))}:{left:16,right:Math.max(80,...panels.filter(r=>r.left>innerWidth/2).map(r=>r.width+40)),top:140,bottom:80};
+        }
+      `)
       if(!contents.includes('renderer.toneMappingExposure=.85;'))throw Error('Map exposure adapter source no longer matches')
       contents = contents.replace('function fail(e){', "function fail(e){parent.postMessage({type:'huitongli-map-error'},location.origin);")
       contents = contents.replace('renderer.toneMappingExposure=.85;', "renderer.toneMappingExposure=new URLSearchParams(location.search).get('surface')==='explore'?.94:.85;")

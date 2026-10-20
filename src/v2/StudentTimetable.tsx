@@ -5,6 +5,7 @@ import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Empty, Modal, SectionHeading } from './ui'
 import { campusWeekday, lessonsForDay, weekDays, type StudentTimetable as Timetable, type TimetableLesson } from '../../shared/v2/timetableModel'
 import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, type RecognitionStage } from './timetableAdapter'
+import {CampusLocationLink} from './CampusLocationLink'
 import './timetable.css'
 
 const stages: Record<RecognitionStage, string> = { preparing: '准备图片', recognizing: '识别课程信息', organizing: '整理一周课表' }
@@ -119,6 +120,7 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false }: { i
       </div>}
     </Modal>}
     {current && <Drawer title={current.name} eyebrow={uiTemplate([""," · ",""],weekDays[current.weekday - 1],uiText(sample ? '示例课程' : '课程详情'))} onClose={() => { setSelected(null); setError('') }}>
+      {current.location&&<CampusLocationLink place={current.location} onClick={()=>setSelected(null)}/>}
       {sample?<div className="v2-fact-list"><span><Clock3 size={17}/>{current.startTime} — {current.endTime}</span><span><MapPin size={17}/>{current.location || uiText('未提供')}</span><span>{current.weeks || uiText('周次未提供')}</span><p>{uiText("示例内容不会保存到个人课表。")}</p></div>:<form className="v2-form" onSubmit={edit} key={current.id}>
         <p>{uiText("可以修正识别结果；没有明确时间或周次时，请保留为空，不推断学校安排。")}</p>
         <label>{uiText("课程名称")}<input name="name" required maxLength={100} defaultValue={current.name}/></label>

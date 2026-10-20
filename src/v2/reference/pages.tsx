@@ -16,6 +16,7 @@ import { StudentTimetable } from '../StudentTimetable'
 import { campusWeekday } from '../../../shared/v2/timetableModel'
 import { Header, Section, EmptyNote, Ring, Services, AssistantBanner, CoffeeBanner, Agenda, EventCard, Organizations, Stories, Partners, Feedback, type Live } from './components'
 import { campusDate, ownLessons, sportsSummary } from './model'
+import {campusMapHref} from '../campusMapLinks'
 import campus from '../../assets/campus/home-background.jpg'
 import sunset from '../../assets/campus/evening-campus.jpg'
 import courtyard from '../../assets/campus/campus-services.jpg'
@@ -46,7 +47,7 @@ export function ReferenceDiscover() { useUiLanguage();
 function TimetablePreview({live}:{live:Live}) { useUiLanguage();
   const [day,setDay]=useState(campusWeekday())
   const lessons=ownLessons(live.data,day)
-  return <section className="ref-timetable-preview"><header><strong>{uiText("我的课程")}</strong><Link to="/v2/me?tab=timetable">{uiText("完整课表")}<ChevronRight size={14}/></Link></header><nav aria-label={uiText("选择课程星期")}>{['一','二','三','四','五','六','日'].map((label,i)=><button type="button" key={label} aria-pressed={day===i+1} onClick={()=>setDay(i+1)}>{uiText(label)}</button>)}</nav><div>{lessons.slice(0,3).map((lesson,i)=><Link to="/v2/me?tab=timetable" key={lesson.id} className={`ref-lesson lesson-${i}`}><time>{lesson.startTime || lesson.period}<small>{lesson.endTime}</small></time><span><strong>{lesson.name}</strong><small>{lesson.location || uiText('教室待确认')}</small></span></Link>)}{!lessons.length&&<EmptyNote to="/v2/me?tab=timetable" label={uiText("查看或导入课表")}>{live.data?uiText('这一天暂未记录课程。'):uiText('正在读取课表…')}</EmptyNote>}</div><p>{uiText("按已保存课表展示，请核对课程周次。")}</p></section>
+  return <section className="ref-timetable-preview"><header><strong>{uiText("我的课程")}</strong><Link to="/v2/me?tab=timetable">{uiText("完整课表")}<ChevronRight size={14}/></Link></header><nav aria-label={uiText("选择课程星期")}>{['一','二','三','四','五','六','日'].map((label,i)=><button type="button" key={label} aria-pressed={day===i+1} onClick={()=>setDay(i+1)}>{uiText(label)}</button>)}</nav><div>{lessons.slice(0,3).map((lesson,i)=><Link to={campusMapHref(lesson.location,'/v2/campus')} key={lesson.id} className={`ref-lesson lesson-${i}`} title={uiText('在地图中查看')}><time>{lesson.startTime || lesson.period}<small>{lesson.endTime}</small></time><span><strong>{lesson.name}</strong><small>{lesson.location || uiText('教室待确认')}</small></span></Link>)}{!lessons.length&&<EmptyNote to="/v2/me?tab=timetable" label={uiText("查看或导入课表")}>{live.data?uiText('这一天暂未记录课程。'):uiText('正在读取课表…')}</EmptyNote>}</div><p>{uiText("按已保存课表展示，请核对课程周次。")}</p></section>
 }
 export function ReferenceCampus() { useUiLanguage();
   const [params]=useSearchParams()

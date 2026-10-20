@@ -6,6 +6,7 @@ import FlexCarousel from '../components/reactbits/FlexCarousel/FlexCarousel'
 import { ActivityDiscovery, ActivityReactions } from './ActivityDiscovery'
 import { DiscoveryDetail, DetailPhoto } from './DiscoveryDetail'
 import {detailTimeRange} from './detailPresentation'
+import {CampusLocationLink} from './CampusLocationLink'
 import { CampusMap } from './CampusMap'
 import { CampusBuildingPicker } from './V2CampusExplorer'
 import type { CampusBuilding } from './campusLocations'
@@ -125,7 +126,7 @@ export function V2Activities() { useUiLanguage();
       actions={<><ActivityReactions live={live} item={active} showNote={false}/>{state.role==='student'&&<button type="button" className="note-detail-participate" aria-pressed={state.participatingActivities.includes(active.id)} disabled={live.busy||!state.participatingActivities.includes(active.id)&&(active.local?.status==='draft'||Date.parse(active.endAt??active.startAt)<=Date.now())} onClick={()=>void live.mutate('relation.set',{id:active.id,kind:'participate',enabled:!state.participatingActivities.includes(active.id)})}>{state.participatingActivities.includes(active.id)?uiText('取消参与标记'):uiText('标记参与')}</button>}</>}
     >
       <p className="note-detail-source">{uiText(active.subtitle)}</p>
-      <dl className="note-detail-facts"><div><CalendarDays size={18}/><dt>{uiText('时间')}</dt><dd>{detailTimeRange(active.startAt,active.local?.endAt)}</dd></div><div><MapPin size={18}/><dt>{uiText('地点')}</dt><dd>{active.location}</dd></div><div><UsersRound size={18}/><dt>{uiText('人数上限')}</dt><dd>{active.capacity?uiTemplate(['',' 人'],active.capacity):active.local?.mailSourceId?uiText('未提供'):uiText('未限定')}</dd></div></dl>
+      <dl className="note-detail-facts"><div><CalendarDays size={18}/><dt>{uiText('时间')}</dt><dd>{detailTimeRange(active.startAt,active.local?.endAt)}</dd></div><div><MapPin size={18}/><dt>{uiText('地点')}</dt><dd>{active.location}<CampusLocationLink place={active.location}/></dd></div><div><UsersRound size={18}/><dt>{uiText('人数上限')}</dt><dd>{active.capacity?uiTemplate(['',' 人'],active.capacity):active.local?.mailSourceId?uiText('未提供'):uiText('未限定')}</dd></div></dl>
       <section><h3>{uiText('活动介绍')}</h3><p className="note-detail-prose">{active.description}</p>{active.local?.conditions&&<p>{uiText('参与条件：')}{active.local.conditions}</p>}</section>
       {state.role==='student'&&<p className="note-detail-status">{state.participatingActivities.includes(active.id)?uiText('已保存参与标记。'):uiText('标记不占用活动名额。')}</p>}
       <details className="note-detail-map" onToggle={event=>setDetailMapOpen(event.currentTarget.open)}><summary>{uiText('校园位置')}</summary>{detailMapOpen&&<CampusMap key={active.id} location={active.location}/>}</details>

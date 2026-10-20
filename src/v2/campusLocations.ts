@@ -12,6 +12,7 @@ export const fallbackCampusBuildings: CampusBuilding[] = campusBuildings
 
 // Match only identifiable buildings. Generic outdoor names have no verified pin.
 export function resolveCampusLocation(location: string): string | null {
+  if(/校外|线上|在线|https?:\/\/|\bzoom\b|off[- ]campus|online/i.test(location))return null
   const name = location.split(' · ')[0].trim()
   const matches = campusBuildings.filter(building => building.name === name && !name.startsWith('未命名'))
   if (matches.length === 1) return matches[0].id
@@ -19,7 +20,7 @@ export function resolveCampusLocation(location: string): string | null {
   const code = location.toUpperCase().match(/\bT(29|[1-8])(?=$|[-\s\u4e00-\u9fff])/)
   if (code) return teaching[`T${code[1]}`]
   if (/sports? cent(?:er|re)|体育馆|体育中心/i.test(location)) return 'way/664082915'
-  if (/library|图书馆/i.test(location)) return 'way/1215983507'
+  if (/library|图书馆/i.test(location)) return /二期|phase\s*2/i.test(location)?'way/1459105119':'way/1215983507'
   if (/大学会堂|university hall/i.test(location)) return 'way/664082913'
   if (/演艺厅|performing arts/i.test(location)) return 'way/664082911'
   if (/东大门|east gate/i.test(location)) return 'way/1459105110'
