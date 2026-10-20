@@ -192,3 +192,23 @@ body:has(.v2-app.v2-app-student[data-campus-route='/v2/community']) .v2-a-commun
 @media(prefers-reduced-motion:reduce) {
   :is(.v2-app-student,.v2-app-staff) :is(.v2-button,.v2-filter-pills button,.v2-tabs button) {transition:none}
 }
+
+/* Timetable is part of the actual toolbar rather than an absolute overlay. */
+.v2-app.v2-app-student .v2-floating-timetable-trigger.is-toolbar{position:static!important;inset:auto!important;order:-1;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:auto!important;min-width:76px!important;min-height:44px;height:44px!important;padding:0 10px!important;border:1px solid var(--v2-line);border-radius:10px;background:var(--v2-surface);box-shadow:none;color:var(--v2-action);font:inherit;font-size:13px;white-space:nowrap;flex:none}
+.v2-app.v2-app-student .v2-floating-timetable-trigger.is-toolbar>span{display:inline!important}
+.v2-app.v2-app-student :is(.ref-header,.cw-header) nav{display:flex;align-items:center;gap:6px;flex:none}
+.v2-app.v2-app-student :is(.ref-header,.cw-header){gap:12px}
+.v2-app-student .v2-alumni-notices,.v2-app-student .v2-alumni-bookings-panel{padding:22px}
+.v2-alumni-notice{padding:14px 0;border-bottom:1px solid var(--v2-line)}
+.v2-alumni-notice:last-child{border-bottom:0}.v2-alumni-notice p{margin:0 0 10px;font-size:14px;line-height:1.7}
+.v2-alumni-notice footer{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--v2-muted);font-size:12px}
+.v2-alumni-bookings-list{display:grid;gap:16px}
+.v2-alumni-bookings-list>.v2-alumni-booking{margin:0;padding:18px;border:1px solid var(--v2-line);border-radius:14px;background:var(--v2-surface)}
+.v2-alumni-booking>header{display:flex;align-items:center;gap:12px}.v2-alumni-booking>header>div{flex:1;min-width:0}.v2-alumni-booking>header .v2-avatar{width:42px;height:42px;flex:none}.v2-alumni-booking>header small{font-size:11px;color:var(--v2-muted)}
+.v2-app-student .v2-alumni-booking>header h3{margin:4px 0 0;font-size:17px;line-height:1.4}.v2-alumni-booking>header .v2-status-chip{flex:none;font-size:11px}
+.v2-alumni-booking-meta{margin:18px 0}.v2-alumni-booking-meta p{display:flex;align-items:flex-start;gap:9px;font-size:13px;line-height:1.7;margin:8px 0}.v2-alumni-booking-meta svg{flex:none;margin-top:3px;color:var(--v2-muted)}
+.v2-alumni-booking-question{padding:12px 14px;border-radius:10px;background:var(--v2-bg,#f4f5f1)}.v2-alumni-booking-question small{font-size:11px;color:var(--v2-muted)}.v2-alumni-booking-question p{margin:6px 0 0;font-size:14px;line-height:1.7}
+.v2-alumni-booking>footer{display:flex;justify-content:flex-end;margin-top:14px}.v2-alumni-cancel-form{margin-top:16px}.v2-alumni-cancel-form textarea{width:100%;min-height:90px}.v2-alumni-cancel-form>div{display:flex;justify-content:flex-end;align-items:center;gap:14px;margin-top:12px}
+@media(max-width:600px){.v2-app-student .v2-alumni-notices,.v2-app-student .v2-alumni-bookings-panel{padding:16px}.v2-alumni-bookings-list>.v2-alumni-booking{padding:14px}.v2-alumni-booking>header{gap:8px}.v2-app-student .v2-alumni-booking>header h3{font-size:15px}}
+
+@media(max-width:380px){.v2-app-student .cw-home .cw-header{height:auto;min-height:112px;flex-wrap:wrap;gap:6px;padding:10px 0}.v2-app-student .cw-home .cw-header h1{flex:none;width:100%;white-space:nowrap}.v2-app-student .cw-home .cw-header nav{margin-left:auto}}

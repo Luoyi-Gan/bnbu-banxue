@@ -2082,5 +2082,13 @@
   "当前浏览器不支持定位。": "This browser does not support geolocation.",
   "定位需要 HTTPS 或本机 localhost 安全环境。": "Location requires HTTPS or a local localhost context.",
   "定位误差超过 300 米，暂不标记，请到信号较好的位置重试。": "Location accuracy exceeds 300 m. Try again where the signal is better.",
-  "已标记我的位置 · 精度约 {0} 米": "Location marked \u00b7 Accuracy about {0} m"
+  "已标记我的位置 · 精度约 {0} 米": "Location marked \u00b7 Accuracy about {0} m",
+  "取消定位": "Cancel location",
+  "正在提高定位精度，可随时取消。": "Refining your location. You can cancel at any time.",
+  "浏览器未返回位置，请检查系统定位权限，或在系统浏览器中重试。": "The browser returned no location. Check system permissions or try your system browser.",
+  "已获取位置但误差超过 1 公里，请到信号较好的位置重试。": "Location received, but accuracy exceeds 1 km. Try again where the signal is better.",
+  "已标记大致位置 · 误差约 {0} 米": "Approximate location marked \u00b7 Accuracy about {0} m",
+  "交流问题": "Discussion topic",
+  "保留预约": "Keep booking",
+  "确认取消": "Confirm cancellation"
 }

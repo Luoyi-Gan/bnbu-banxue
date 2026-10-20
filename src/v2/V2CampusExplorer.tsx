@@ -49,11 +49,11 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
   const [selected, setSelected] = useState<CampusBuilding | null>(null)
   const [position, setPosition] = useState<CampusLocationStatus>({ state: 'idle' })
   const locationMessages = {
-    idle: '位置仅用于当前地图，离开后清除。', locating: '正在获取位置，请允许浏览器定位…', located: '',
+    idle: '位置仅用于当前地图，离开后清除。', locating: '正在获取位置，请允许浏览器定位…', refining: '正在提高定位精度，可随时取消。', located: '',
     denied: '未获定位权限，请在浏览器的网站权限中允许位置访问后重试。',
-    unavailable: '暂时无法获取位置，请检查设备定位服务后重试。', timeout: '定位超时，请到信号较好的位置重试。',
+    unavailable: '暂时无法获取位置，请检查设备定位服务后重试。', timeout: '浏览器未返回位置，请检查系统定位权限，或在系统浏览器中重试。',
     outside: '当前位置在校园地图范围外，继续显示校园视角。', unsupported: '当前浏览器不支持定位。', insecure: '定位需要 HTTPS 或本机 localhost 安全环境。',
-    imprecise: '定位误差超过 300 米，暂不标记，请到信号较好的位置重试。',
+    imprecise: '已获取位置但误差超过 1 公里，请到信号较好的位置重试。',
   }
   const selectedId = selected?.id
   const scheduled = [
@@ -87,8 +87,8 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
       <div className="v2-explorer-map">
       <div className="v2-explorer-canvas" ref={canvas}/>
       {mode === 'explore' && <div className="v2-map-location-control">
-        <button type="button" disabled={status !== 'ready' || position.state === 'locating'} aria-pressed={position.state === 'located'} onClick={() => scene.current?.locate()}><LocateFixed size={18}/>{uiText(position.state === 'located' ? '清除位置' : position.state === 'locating' ? '正在定位…' : '定位我的位置')}</button>
-        <p role="status">{position.state === 'located' ? uiTemplate(['已标记我的位置 · 精度约 ', ' 米'], position.accuracy) : uiText(locationMessages[position.state])}</p>
+        <button type="button" disabled={status !== 'ready'} aria-pressed={position.state === 'located'} onClick={() => scene.current?.locate()}><LocateFixed size={18}/>{uiText(position.state === 'located' ? '清除位置' : ['locating', 'refining'].includes(position.state) ? '取消定位' : '定位我的位置')}</button>
+        <p role="status">{position.state === 'located' ? uiTemplate([(position.accuracy ?? 0) > 300 ? '已标记大致位置 · 误差约 ' : '已标记我的位置 · 精度约 ', ' 米'], position.accuracy) : uiText(locationMessages[position.state])}</p>
       </div>}
       {status !== 'ready' && <div className="v2-explorer-status" role="status">{status === 'loading'?<><span className="campus-map-spinner"/>{uiText("正在加载 3D 校园模型…")}</>:<><strong>{uiText("地图暂时无法显示")}</strong><p>{uiText("可重试，或使用右侧楼栋列表选择地点。")}</p><button type="button" onClick={() => { setStatus('loading'); setAttempt((value) => value + 1) }}>{uiText("重新加载")}</button></>}</div>}
       {mode === 'pick' && <><div className="v2-explorer-map-top"><span><MapPin size={16}/> BNBU 3D CAMPUS</span><button type="button" onClick={() => { scene.current?.overview(); setSelected(null) }} disabled={status !== 'ready'}><RotateCcw size={16}/> {uiText("全校视角")}</button></div><span className="v2-explorer-hint">{uiText("拖动旋转 · 滚轮缩放 · 点击楼栋")}</span></>}

@@ -2,7 +2,7 @@ import type { CampusBuilding } from './campusLocations'
 import {deviceAppearance,subscribeDevicePreferences} from './devicePreferences'
 import {uiText} from './uiLanguage'
 
-export type CampusLocationState = 'idle' | 'locating' | 'located' | 'denied' | 'unavailable' | 'timeout' | 'outside' | 'unsupported' | 'insecure' | 'imprecise'
+export type CampusLocationState = 'idle' | 'locating' | 'refining' | 'located' | 'denied' | 'unavailable' | 'timeout' | 'outside' | 'unsupported' | 'insecure' | 'imprecise'
 export type CampusLocationStatus = { state: CampusLocationState; accuracy?: number }
 export function createCampusScene(host: HTMLDivElement, activityId: string | null, onReady: (buildings: CampusBuilding[]) => void, onSelect: (building: CampusBuilding) => void, onError: () => void, options: { immersive?: boolean; onLocation?: (value: CampusLocationStatus) => void } = {}) {
   const frame = document.createElement('iframe')
@@ -31,7 +31,7 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
     const value = event.data
     if (!value || typeof value !== 'object') return
     if (value.type === 'huitongli-map-location') {
-      const states: CampusLocationState[] = ['idle', 'locating', 'located', 'denied', 'unavailable', 'timeout', 'outside', 'unsupported', 'insecure', 'imprecise']
+      const states: CampusLocationState[] = ['idle', 'locating', 'refining', 'located', 'denied', 'unavailable', 'timeout', 'outside', 'unsupported', 'insecure', 'imprecise']
       if (!states.includes(value.state)) return
       if (value.state === 'located' && (!Number.isFinite(value.accuracy) || value.accuracy < 0)) return
       options.onLocation?.({ state: value.state, ...(value.state === 'located' ? { accuracy: value.accuracy } : {}) })
