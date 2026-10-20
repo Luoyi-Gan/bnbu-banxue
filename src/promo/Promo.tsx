@@ -2,7 +2,7 @@ import { ScreenPreview, type ScreenName } from './ProductScreen'
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ArrowRight, ArrowUpRight, Plus, Minus } from 'lucide-react'
+import { ArrowUpRight, Plus, Minus } from 'lucide-react'
 import { ModuleGallery } from './ModuleGallery'
 import { createPhone, type PhonePose } from './phone'
 
@@ -152,7 +152,6 @@ export function Promo() {
                 {index === 0 ? <h1>{chapter.title}</h1> : <h2>{chapter.title}</h2>}
                 <p className="promo-description">{chapter.description}</p>
                 <p className="promo-detail">{chapter.detail}</p>
-                <a className={index === 0 ? 'promo-button' : 'promo-text-link'} href={chapter.link}>{chapter.action}<ArrowRight size={18} /></a>
                 {index === 0 && <span className="promo-web-note">为 BNBU 校园生活而来 · Web 即刻打开</span>}
               </div>
               {index < 4 && <aside className="promo-held-caption"><span>0{index + 1} / 校园生活</span><p>{chapter.detail}</p></aside>}
