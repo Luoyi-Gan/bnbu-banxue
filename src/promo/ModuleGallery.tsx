@@ -1,6 +1,6 @@
 import { ScreenPreview, type ScreenName } from './ProductScreen'
 import { useState } from 'react'
-import { ArrowUpRight, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 const modules = [
   { name: '论坛', en: 'COMMUNITY', screen: 'forum', title: '把校园日常，聊成共同话题。', text: '从一篇图文到一条回复，分享发现、提出问题，也收藏值得再看的经验。', features: ['图文发布与编辑', '话题浏览与搜索', '关注、评论与收藏'], route: '/v2/community' },
@@ -34,7 +34,6 @@ export function ModuleGallery() {
         <p className="promo-eyebrow">{String(selected + 1).padStart(2, '0')} / {active.en}</p>
         <h3>{active.title}</h3><p>{active.text}</p>
         <ul>{active.features.map(feature => <li key={feature}><ChevronRight size={15}/>{feature}</li>)}</ul>
-        <a className="promo-text-link" href={active.route}>打开{active.name}<ArrowUpRight size={18}/></a>
       </div>
       <div className="promo-module-device" aria-label={`${active.name}真实界面`}>
         <div className="promo-module-status" aria-hidden="true"><span>9:41</span><i/><span>▰</span></div>

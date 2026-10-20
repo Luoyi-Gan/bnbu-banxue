@@ -168,7 +168,6 @@ export function Promo() {
           <div className="promo-hand-tabs" role="group" aria-label="切换手持手机屏幕">
             {handChapters.map((chapter, i) => <button key={chapter.nav} onClick={() => setHandScreen(i)} aria-pressed={handScreen === i}>{['首页', '发现', '搭子', '地图'][i]}</button>)}
           </div>
-          <a className="promo-text-link" href={handChapters[handScreen].link}>打开{['首页', '发现', '找搭子', '校园地图'][handScreen]}<ArrowUpRight size={17}/></a>
         </div>
         <div className="promo-hand-visual">
           <img className="promo-hand-photo" src="/promo/hand-phone.png" width={1024} height={1536} alt="手持会同里手机界面" loading="lazy" />
