@@ -55,8 +55,8 @@ export function ReferenceCampus() { useUiLanguage();
   return params.has('service')?<V2Campus/>:<CampusContent/>
 }
 function CampusContent() { useUiLanguage();
-  const live=useWorkspaceBackend(),community=useCommunityBackend()
-  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("推荐组织")} to="/v2/organizations"><Organizations live={live}/></Section><Section title={uiText("校园社区")} to="/v2/community"><Stories community={community} compact/></Section><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services exclude={['/v2/me?tab=timetable']}/></Section><AssistantBanner/></div></div>
+  const live=useWorkspaceBackend()
+  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")} to="/v2/partners"><Partners data={live.data}/></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services exclude={['/v2/me?tab=timetable']}/></Section><AssistantBanner/></div></div>
 }
 
 export function ReferenceMe() { useUiLanguage();
