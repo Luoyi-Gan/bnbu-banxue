@@ -2,7 +2,7 @@ import { ScreenPreview, type ScreenName } from './ProductScreen'
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ArrowDown, ArrowRight, ArrowUpRight, Pause, Play, Plus, Minus } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Plus, Minus } from 'lucide-react'
 import { ModuleGallery } from './ModuleGallery'
 import { createPhone, type PhonePose } from './phone'
 
@@ -31,12 +31,10 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
 export function Promo() {
   const root = useRef<HTMLDivElement>(null), story = useRef<HTMLElement>(null), stage = useRef<HTMLDivElement>(null), canvas = useRef<HTMLDivElement>(null)
-  const [active, setActive] = useState(0), [reduced, setReduced] = useState(false), [paused, setPaused] = useState(false), [failed, setFailed] = useState(false)
+  const [active, setActive] = useState(0), [reduced, setReduced] = useState(false), [failed, setFailed] = useState(false)
   const [presentation, setPresentation] = useState<'held' | 'handoff' | 'free'>('held')
   const [shortViewport, setShortViewport] = useState(false), [handScreen, setHandScreen] = useState(0)
   const [openQuestion, setOpenQuestion] = useState<number | null>(null)
-  const pauseRef = useRef(false)
-  pauseRef.current = paused
   useEffect(() => {
     const query = matchMedia('(prefers-reduced-motion: reduce)')
     const short = matchMedia('(max-height: 540px)')
@@ -45,7 +43,7 @@ export function Promo() {
     return () => { query.removeEventListener('change', update); short.removeEventListener('change', update) }
   }, [])
   useEffect(() => {
-    if (!root.current || !story.current || !canvas.current || !stage.current || reduced || failed || paused || shortViewport) return
+    if (!root.current || !story.current || !canvas.current || !stage.current || reduced || failed || shortViewport) return
     const stageElement = stage.current
     let device: ReturnType<typeof createPhone>
     try { device = createPhone(canvas.current, () => setFailed(true)) } catch { setFailed(true); return }
@@ -76,7 +74,6 @@ export function Promo() {
       const pose = Object.fromEntries(Object.keys(a).map(key => [key, lerp(a[key as keyof PhonePose], b[key as keyof PhonePose], mix)])) as unknown as PhonePose
       pose.scale += Math.sin(mix * Math.PI) * (mobile ? .02 : .08)
       pose.ry += Math.sin(mix * Math.PI) * (mobile ? .08 : .42) * (index % 2 ? -1 : 1)
-      if (pauseRef.current) { pose.rx = 0; pose.ry = 0; pose.rz = 0 }
       const handExit = index < 3 ? 0 : index === 3 ? mix : 1
       const nextPhase = handExit <= .001 ? 'held' : handExit >= .999 ? 'free' : 'handoff'
       if (phase !== nextPhase) { phase = nextPhase; setPresentation(nextPhase) }
@@ -85,8 +82,7 @@ export function Promo() {
       stageElement.style.setProperty('--hand-alpha', String(handExit > 0 ? Math.max(0, 1 - handExit * 3) : 0))
       stageElement.style.setProperty('--hand-y', handExit * 500 + 'px')
       device.setVisible(handExit > .001 && visible)
-      device.setReduced(pauseRef.current)
-      device.update(pose, index, Math.min(chapters.length - 1, index + 1), mix, pauseRef.current ? 0 : float.y * (mobile ? .45 : 1))
+      device.update(pose, index, Math.min(chapters.length - 1, index + 1), mix, float.y * (mobile ? .45 : 1))
       stage.current!.style.setProperty('--chapter-progress', String(motion.progress))
     }
     const ctx = gsap.context(() => {
@@ -110,12 +106,12 @@ export function Promo() {
       disposed = true; bob.kill(); ctx.revert(); intersection.disconnect(); device.dispose()
       document.removeEventListener('visibilitychange', visibility); window.removeEventListener('resize', resize)
     }
-  }, [reduced, failed, paused, shortViewport])
+  }, [reduced, failed, shortViewport])
 
-  const staticMode = reduced || failed || paused || shortViewport
+  const staticMode = reduced || failed || shortViewport
   const jump = (index: number) => {
     if (staticMode) document.getElementById(`scene-${index}`)?.scrollIntoView({ behavior: 'auto' })
-    else if (story.current) window.scrollTo({ top: story.current.offsetTop + (story.current.offsetHeight - innerHeight) * index / storyRange, behavior: paused ? 'auto' : 'smooth' })
+    else if (story.current) window.scrollTo({ top: story.current.offsetTop + (story.current.offsetHeight - innerHeight) * index / storyRange, behavior: 'smooth' })
   }
   return <div ref={root} className={`promo${staticMode ? ' promo-static' : ''}`} id="top">
     <a className="promo-skip" href="#start">跳过动画，开始使用</a>
@@ -146,14 +142,8 @@ export function Promo() {
               {staticMode && <div className="promo-static-phone"><img src={`/promo/${chapter.screen}.png`} alt={`会同里${chapter.nav}页面，真实产品界面`} /></div>}
             </section>)}
           </div>
-          {!staticMode && <div className="promo-stage-footer">
-            <div className="promo-scroll-label"><ArrowDown size={16} /><span>{active < chapters.length - 1 ? `继续下一幕 · ${chapters[active + 1].nav}` : '继续，看看校园的更多可能'}</span></div>
-            <div className="promo-chapters" role="group" aria-label="选择产品场景">{chapters.map((chapter, i) => <button key={chapter.nav} onClick={() => jump(i)} aria-label={`查看${chapter.nav}`} aria-pressed={active === i}><span>0{i + 1}</span><i /></button>)}</div>
-            <button className="promo-motion" onClick={() => setPaused(true)}><Pause size={13} /><span>静态阅读</span></button>
-          </div>}
         </div>
       </section>
-      {paused && !reduced && !failed && !shortViewport && <button className="promo-resume" onClick={() => { setPaused(false); window.scrollTo({ top: 0, behavior: 'instant' }) }}><Play size={14} />恢复动态浏览</button>}
       <section className="promo-hands" aria-labelledby="hands-title">
         <div className="promo-hand-copy">
           <p className="promo-eyebrow">07 / IN YOUR HANDS</p>
