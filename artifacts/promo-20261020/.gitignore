@@ -1,0 +1,13 @@
+*
+!.gitignore
+!capture-product.mjs
+!capture-map.mjs
+!verify.mjs
+!record-review.mjs
+!hand-check.mjs
+!validation.json
+!independent-review.md
+!desktop-0.png
+!hand-desktop.png
+!hand-mobile.png
+!walkthrough.webm

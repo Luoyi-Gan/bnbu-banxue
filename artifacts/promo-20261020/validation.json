@@ -1,0 +1,36 @@
+{
+  "screens": [
+    "desktop-0",
+    "desktop-1",
+    "desktop-2",
+    "desktop-3",
+    "tablet-0",
+    "tablet-1",
+    "tablet-2",
+    "tablet-3",
+    "mobile-0",
+    "mobile-1",
+    "mobile-2",
+    "mobile-3",
+    "narrow-0",
+    "narrow-1",
+    "narrow-2",
+    "narrow-3"
+  ],
+  "errors": [],
+  "checks": [
+    "static reading exposes four screenshots and stops WebGL",
+    "chapter buttons navigate to correct scene",
+    "four hand-held screens crossfade with matching destination links",
+    "FAQ expands",
+    "live reduced-motion change produces readable static chapters",
+    "WebGL unavailable fallback",
+    "Web CTA resolves to existing /v2 entry"
+  ],
+  "performance": {
+    "frames": 432,
+    "medianMs": 7,
+    "p95Ms": 7.200000000000728,
+    "over33ms": 0
+  }
+}

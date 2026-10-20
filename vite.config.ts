@@ -4,6 +4,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
   plugins: [react()],
+  build: { rollupOptions: { input: { app: fileURLToPath(new URL('./index.html', import.meta.url)), promo: fileURLToPath(new URL('./promo.html', import.meta.url)) } } },
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: { host: '127.0.0.1', port: 4174, strictPort: true, watch: { ignored: ['**/docs/**', '**/data/**', '**/artifacts/**'] }, proxy: {
     ...(process.env.BNBU_SPORTS_ORIGIN ? { '/api/v1': { target: process.env.BNBU_SPORTS_ORIGIN, changeOrigin: false } } : {}),
