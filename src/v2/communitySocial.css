@@ -37,3 +37,5 @@ html[data-ui-theme=dark] :is(.note-detail-layer,.v2-modal-layer){--community-acc
 @media(max-width:760px){body:has(.community-hub.is-standalone) .v2-app.v2-app-student .v2-floating-timetable-trigger{top:auto;left:16px;right:auto;bottom:calc(88px + env(safe-area-inset-bottom));width:44px;height:44px;padding:0;justify-content:center}}
 
 html[data-ui-theme=dark] .social-note-identity .community-outline{color:#a0d1c9;border-color:#a0d1c9}html[data-ui-theme=dark] .note-detail-body .community-note-topic{color:#9cc9df}
+
+.community-shortcuts{flex-wrap:wrap;justify-content:flex-start;column-gap:20px;row-gap:4px}
