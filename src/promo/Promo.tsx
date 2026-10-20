@@ -73,13 +73,6 @@ export function Promo() {
       if (current !== selected) { current = selected; setActive(selected) }
       const mobile = window.innerWidth < 760
       const tablet = window.innerWidth < 1100
-      // Keep the held device steady while its screen changes. Reset these
-      // values on reverse scroll after the separate release transition.
-      stageElement.style.setProperty('--held-x', '0px')
-      stageElement.style.setProperty('--held-y', '0px')
-      stageElement.style.setProperty('--held-roll', '0deg')
-      stageElement.style.setProperty('--held-turn', '0deg')
-      stageElement.style.setProperty('--held-scale', '1')
       const poses = desktop.map((p, i) => mobile
         ? { x: i % 2 ? -.08 : .08, y: window.innerHeight >= 800 ? -1.35 : -1.45, rx: p.rx * .5, ry: p.ry * .65, rz: p.rz * .6, scale: window.innerHeight >= 800 ? .7 : .6 }
         : tablet ? { ...p, x: p.x * Math.min(.72, window.innerWidth / window.innerHeight * .7), scale: .68 } : p)
@@ -97,12 +90,6 @@ export function Promo() {
       const deviceAlpha = Math.max(0, Math.min(1, (handExit - .3) / .2))
       stageElement.style.setProperty('--held-alpha', String(heldAlpha))
       stageElement.style.setProperty('--device-alpha', String(deviceAlpha))
-      if (index === 3) {
-        const retreat = Math.min(1, handExit / .3)
-        stageElement.style.setProperty('--held-y', `${retreat * 95}px`)
-        stageElement.style.setProperty('--held-roll', `${retreat * -4}deg`)
-        stageElement.style.setProperty('--held-scale', String(1 - retreat * .06))
-      }
       device.setVisible(deviceAlpha > 0 && visible)
       device.update(pose, index, Math.min(chapters.length - 1, index + 1), mix, float.y * (mobile ? .45 : 1))
       stage.current!.style.setProperty('--chapter-progress', String(motion.progress))
@@ -111,7 +98,6 @@ export function Promo() {
       gsap.to(motion, { progress: 1, ease: 'none', scrollTrigger: { trigger: story.current, start: 'top top', end: 'bottom bottom', scrub: .35, invalidateOnRefresh: true }, onUpdate: paint })
       gsap.fromTo('.promo-nav', { y: -16, opacity: 0 }, { y: 0, opacity: 1, duration: .8, ease: 'power3.out' })
       gsap.utils.toArray<HTMLElement>('.promo-reveal').forEach(el => gsap.fromTo(el, { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 92%', once: true } }))
-      gsap.fromTo('.promo-hand-visual', { y: 85, rotate: 5, scale: .96 }, { y: 0, rotate: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: '.promo-hands', start: 'top 85%', end: 'top 10%', scrub: .8 } })
     }, root)
     const bob = gsap.to(float, { y: .055, duration: 2.8, yoyo: true, repeat: -1, ease: 'sine.inOut', onUpdate: () => { if (visible && !document.hidden) paint() } })
     const intersection = new IntersectionObserver(([entry]) => {
