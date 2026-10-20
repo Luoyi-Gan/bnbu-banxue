@@ -1,5 +1,5 @@
 import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
-import { ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, MapPin, Plus, Search, Star, UsersRound } from 'lucide-react'
+import { ArrowRight, Check, ChevronRight, Clock3, MapPin, Plus, Search, Star, UsersRound } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { roomTypeName, type Room, type RoomReview } from '../../shared/v2/model'
@@ -53,7 +53,7 @@ export function V2Teams() { useUiLanguage();
     const next = remaining(reviewing).find(item => item !== person)
     setReviewMember(next ?? ''); setStars(0); setTags([]); setReviewNote('')
   }
-  return <div className="v2-page"><Link to="/v2/partners" className="v2-button v2-button-secondary" style={{ marginBottom: 16 }}><ArrowLeft size={17}/> {uiText("返回找搭子")}</Link><PageHeading eyebrow="MY TEAMS" title={uiText("我的组队")} description={uiText("管理队伍、处理申请，并在完成后评价同行的伙伴。")} action={<Link className="v2-button v2-button-primary" to="/v2/partners"><Plus size={17}/> {uiText("发起新队伍")}</Link>}/>
+  return <div className="v2-page"><PageHeading back="/v2/partners" backLabel="返回找搭子" eyebrow="MY TEAMS" title={uiText("我的组队")} description={uiText("管理队伍、处理申请，并在完成后评价同行的伙伴。")} action={<Link className="v2-button v2-button-primary" to="/v2/partners"><Plus size={17}/> {uiText("发起新队伍")}</Link>}/>
     {live.error && <p role="alert" className="v2-info-box">{uiText(live.error)}</p>}{!live.data && !live.error && <p role="status">{uiText("正在读取本人队伍…")}</p>}
     <div className="v2-tabs"><button type="button" className={tab === 'ongoing'?'is-active':''} onClick={() => setTab('ongoing')}>{uiText("进行中 (")}{mine.filter((room) => room.status === 'open').length})</button><button type="button" className={tab === 'finished'?'is-active':''} onClick={() => setTab('finished')}>{uiText("已完成 (")}{mine.filter((room) => room.status === 'finished').length})</button></div>
     <section className="v2-panel v2-list-panel"><SectionHeading title={tab === 'ongoing'?uiText('正在进行的队伍'):uiText('已完成的队伍')}/>{shown.length?<div className="v2-row-list">{shown.map((room) => <button type="button" className="v2-team-row" key={room.id} onClick={() => setSelected(room.id)}><span className={`v2-room-type v2-room-${room.type}`}>{roomTypeName[room.type]}</span><span><strong>{room.title}</strong><small>{room.time} · {room.place} · {room.members.length}/{room.capacity} {uiText("人")}</small></span>{room.owner === studentName && room.requests.length > 0 && room.status === 'open' && <b>{room.requests.length} {uiText("待处理")}</b>}{room.status === 'finished' && remaining(room).length > 0 && <b>{uiText("待评价")}{remaining(room).length} {uiText("人")}</b>}<ChevronRight size={17}/></button>)}</div>:<Empty icon={UsersRound} title={tab === 'ongoing'?uiText('暂无进行中的队伍'):uiText('暂无已完成的队伍')} description={uiText("可以去搭子大厅发现新的计划。")}/>}</section>

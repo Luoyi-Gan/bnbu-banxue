@@ -1,7 +1,7 @@
 import { uiText, useUiLanguage } from './uiLanguage'
 import { UsersRound } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { AnimatedSearchField } from './AnimatedSearchField'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Empty, PageHeading } from './ui'
@@ -40,7 +40,7 @@ export function CampusOrganizations({ embedded = false, externalQuery, externalC
     {live.data && !shown.length && <Empty icon={UsersRound} title={uiText("没有匹配的组织")} description={uiText("试试其他类别或关键词。")}/>}
   </>
   if (embedded) return <section className="organization-discovery" aria-label={uiText("社团组织")}>{content}</section>
-  return <div className="v2-page v2-organizations-page"><PageHeading eyebrow="CAMPUS / ORGANIZATIONS" title={uiText("社团组织")} description={uiText("认识校园里的同行者。")} action={<Link className="v2-button v2-button-secondary" to="/v2/campus">{uiText("返回校园")}</Link>}/>{content}</div>
+  return <div className="v2-page v2-organizations-page"><PageHeading back="/v2/campus" eyebrow="CAMPUS / ORGANIZATIONS" title={uiText("社团组织")} description={uiText("认识校园里的同行者。")}/>{content}</div>
 }
 
 function OrganizationCover({id,name,image,category}:{id:string;name:string;image:string;category:string}){
