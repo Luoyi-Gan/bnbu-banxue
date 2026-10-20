@@ -18,6 +18,12 @@ const chapters = [
   { tag: '06 / 给自己一点运动时间', nav: '运动', title: <>走出教室，<br /><em>把状态找回来。</em></>, description: '忙碌了一天，也留一点时间给球场和自己。', detail: '查看体育课程、运动入口与记录。当前展示为本地模拟，不计入真实学时。', screen: 'sports', link: '/v2/sports', action: '打开运动', side: 'right' },
   { tag: '07 / 熟悉的校园，还有新发现', nav: '探索', title: <>换个视角，<br /><em>认识校园。</em></>, description: '下一次想去的地方，先在地图里看一看。', detail: '在 3D 地图里搜索楼栋、切换校区，查看地点与相关计划。', screen: 'map', link: '/v2/campus/explore', action: '探索校园', side: 'right' },
 ]
+const heldNotes = [
+  ['今天怎么安排', '课程与活动，一眼看清。'],
+  ['下课去哪里', '看看活动，发现新兴趣。'],
+  ['有话一起聊', '分享日常，接住同学的回应。'],
+  ['带着问题来', '看主题，选时段。'],
+]
 const handChapters = [chapters[0], chapters[1], chapters[4], chapters[6]]
 const storyRange = chapters.length - .4
 const desktop: PhonePose[] = [
@@ -67,16 +73,13 @@ export function Promo() {
       if (current !== selected) { current = selected; setActive(selected) }
       const mobile = window.innerWidth < 760
       const tablet = window.innerWidth < 1100
-      // Pull back, sweep through the next screen, then settle at the same
-      // centered pose. Returning to identity keeps the 3D handoff aligned.
-      const heldTransition = index < 3 ? Math.max(0, Math.min(1, (local - .45) / .55)) : 0
-      const envelope = Math.sin(heldTransition * Math.PI) ** 2
-      const sweep = Math.sin(heldTransition * Math.PI * 2) * envelope
-      stageElement.style.setProperty('--held-x', `${sweep * (mobile ? 22 : tablet ? 34 : 48)}px`)
-      stageElement.style.setProperty('--held-y', `${envelope * (mobile ? 14 : 24)}px`)
-      stageElement.style.setProperty('--held-roll', `${sweep * (mobile ? 3 : 5)}deg`)
-      stageElement.style.setProperty('--held-turn', `${sweep * 7}deg`)
-      stageElement.style.setProperty('--held-scale', String(1 - envelope * .075))
+      // Keep the held device steady while its screen changes. Reset these
+      // values on reverse scroll after the separate release transition.
+      stageElement.style.setProperty('--held-x', '0px')
+      stageElement.style.setProperty('--held-y', '0px')
+      stageElement.style.setProperty('--held-roll', '0deg')
+      stageElement.style.setProperty('--held-turn', '0deg')
+      stageElement.style.setProperty('--held-scale', '1')
       const poses = desktop.map((p, i) => mobile
         ? { x: i % 2 ? -.08 : .08, y: window.innerHeight >= 800 ? -1.35 : -1.45, rx: p.rx * .5, ry: p.ry * .65, rz: p.rz * .6, scale: window.innerHeight >= 800 ? .7 : .6 }
         : tablet ? { ...p, x: p.x * Math.min(.72, window.innerWidth / window.innerHeight * .7), scale: .68 } : p)
@@ -156,7 +159,7 @@ export function Promo() {
                 <p className="promo-detail">{chapter.detail}</p>
                 {index === 0 && <span className="promo-web-note">为 BNBU 校园生活而来 · Web 即刻打开</span>}
               </div>
-              {index < 4 && <aside className="promo-held-caption"><span>0{index + 1} / 校园生活</span><p>{chapter.detail}</p></aside>}
+              {index < 4 && <><aside className="promo-held-side-note"><span>0{index + 1} / 校园日常</span><p>{heldNotes[index][0]}</p></aside><aside className="promo-held-caption"><span>{chapter.nav}</span><p>{heldNotes[index][1]}</p></aside></>}
               {staticMode && <div className="promo-static-phone"><img src={`/promo/${chapter.screen}.png`} alt={`会同里${chapter.nav}页面，真实产品界面`} /></div>}
             </section>)}
           </div>

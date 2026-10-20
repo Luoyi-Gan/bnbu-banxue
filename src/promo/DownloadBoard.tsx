@@ -1,3 +1,4 @@
+import { ScreenPreview } from './ProductScreen'
 import { ArrowUpRight, Smartphone, Globe, ArrowDown } from 'lucide-react'
 
 export function DownloadBoard() {
@@ -13,8 +14,8 @@ export function DownloadBoard() {
         <p className="promo-download-note">Web 版现已可用 · 手机与电脑均可访问</p>
       </div>
       <div className="promo-download-preview" aria-label="会同里首页和活动界面预览">
-        <div className="promo-download-windowbar"><span className="promo-window-dots" aria-hidden="true">● ● ●</span><span>会同里 · 校园日常</span><span>界面预览</span></div>
-        <div className="promo-download-screens"><figure><figcaption>从今天的安排开始</figcaption><img src="/promo/home.png" alt="会同里首页，展示今天的安排与校园动态"/></figure><figure><figcaption>发现下一件想做的事</figcaption><img src="/promo/discover.png" alt="会同里发现页面，展示校园活动"/></figure></div>
+        <div className="promo-download-windowbar"><span className="promo-window-dots" aria-hidden="true">● ● ●</span><span>会同里 · 校园日常</span><span>功能演示</span></div>
+        <div className="promo-download-screens"><figure><figcaption>从今天的安排开始</figcaption><div className="promo-board-screen"><ScreenPreview name="home"/></div></figure><figure><figcaption>发现下一件想做的事</figcaption><div className="promo-board-screen"><ScreenPreview name="discover"/></div></figure></div>
         <div className="promo-download-preview-foot"><span>日常 · 交流 · 同行</span><span>HUITONGLI</span></div>
       </div>
     </div>
