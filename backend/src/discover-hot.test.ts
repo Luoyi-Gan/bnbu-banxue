@@ -19,12 +19,12 @@ describe('discover hot ranking', () => {
     expect(result.items[1]).toEqual({ id: 'activity-1', kind: 'activity', title: 'activity-1', subtitle: '校园' });
   });
 
-  it('keeps the community threshold while allowing public activities with real interactions', () => {
+  it('includes public posts below the former threshold with real interactions', () => {
     const posts = Array.from({ length: 75 }, (_, index) => candidate(`post-${index}`, 'post'));
     const result = rankDiscoverHot([...posts, candidate('activity-1', 'activity')], engagement({
       views: new Map([['post-0', 100]]), participates: new Map([['activity-1', 1]]),
     }));
     expect(result.publicPostCount).toBe(75);
-    expect(result.items.map(item => item.id)).toEqual(['activity-1']);
+    expect(result.items.map(item => item.id)).toEqual(['post-0', 'activity-1']);
   });
 });

@@ -2683,3 +2683,8 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 正式发布目录 `/opt/bnbu-banxue/releases/huitongli-20261020-student-email`，镜像 `bnbu-banxue-api:huitongli-20261020-student-email`。发布过程中修正前端 Nginx 挂载路径：首次切换自动回滚成功，再从旧 Compose 读取实际配置文件路径后重新发布成功。数据库发布前备份在 `/opt/bnbu-banxue/backups/before-huitongli-20261020-student-email/database.dump`，上一目录为 `huitongli-20261020-auth`，可按其 Compose 回滚应用。
 
 线上 PostgreSQL 健康、演示账号登录、工作区、社区、会话及退出检查通过。公网 /v2、/v2/login、/v2/identity、/api/health 均 200，入口 HTML 与其 JS/CSS 哈希与本地构建一致。证据见 artifacts/student-email-release-20261020/public-verification.json 和 restored-database-verification.json。真实邮箱送达与用户手机操作不在本轮自动验证范围内；已有已验证账号下次刷新或登录时自动生效。
+
+### 2026-10-21 社区热榜直接展示
+
+- 取消社区及发现热榜的 75 篇门槛；校园社区在帖子列表上方直接展示实际榜单，点击打开原帖，无排名时显示空状态。SQLite 与 PostgreSQL 共用的排行实现同步更新，保留公开资格、有效互动、排序与各榜十条上限。
+- 验证：四个测试文件共 27 项通过，CommunityHub ESLint 通过；本地浏览器确认七条实际榜单直接显示于帖子上方。

@@ -232,7 +232,7 @@ it('本人封面和简介共同保存，旧偏好兼容且关闭预览不泄露�
   expect(read(a.token)).toMatchObject({cover:'flowers'})
 })
 
-it('关注与搜索筛选不改变全社区75帖热榜门槛，屏蔽作者不泄露到热榜',()=>{
+it('关注与搜索筛选不改变全社区热榜范围，屏蔽作者不泄露到热榜',()=>{
   const {a,b,repo,command,post,read}=fixture(),id=post()
   for(let index=0;index<75;index++)repo.create('post',b.account.id,{title:`普通公开笔记${index}`,body:'正文',board:'校园',status:'visible'})
   command(b,'relation.set',{id,kind:'like',enabled:true})

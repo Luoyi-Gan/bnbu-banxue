@@ -17,7 +17,7 @@ export type DiscoverEngagement = {
 
 export function rankDiscoverHot(candidates: DiscoverCandidate[], engagement: DiscoverEngagement) {
   const publicPostCount = candidates.filter(item => item.kind === 'post' && item.status === 'visible').length;
-  const ranked = candidates.filter(item => item.kind === 'activity' ? item.status === 'published' : item.status === 'visible' && publicPostCount > 75)
+  const ranked = candidates.filter(item => item.kind === 'activity' ? item.status === 'published' : item.status === 'visible')
     .map(item => {
       const views = item.kind === 'post' ? engagement.views.get(item.id) ?? 0 : 0;
       const likes = engagement.likes.get(item.id) ?? 0;

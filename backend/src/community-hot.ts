@@ -11,7 +11,6 @@ export function hotLists(posts: Entity[], comments: Entity[], engagement: Engage
   const publicPosts = posts.filter(post => post.kind === 'post' && post.data.status === 'visible');
   const eligiblePostCount = publicPosts.length;
   const byBoard: Record<string, string[]> = {};
-  if (eligiblePostCount <= 75) return { eligiblePostCount, overall: [], byBoard };
   const cutoff = now - 7 * 24 * 60 * 60 * 1000;
   const recentComments = new Map<string, number>();
   for (const comment of comments) {
