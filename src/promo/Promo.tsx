@@ -200,6 +200,6 @@ export function Promo() {
         </div>
       </section>
     </main>
-    <footer className="promo-footer"><a className="promo-brand" href="#top">会同里<span className="promo-footer-en">HUITONGLI</span></a><p>校园生活，自然相连。</p><div><a href="/v2/privacy">隐私政策</a><a href="/fonts/NOTICE.html">字体许可</a><a href="#top">回到顶部 ↑</a></div><small>界面依据会同里现有前端以 HTML 复刻，动画与数据仅作功能演示。iPhone 为展示载体，当前使用入口为 Web 版。</small></footer>
+    <footer className="promo-footer"><a className="promo-brand" href="#top">会同里<span className="promo-footer-en">HUITONGLI</span></a><p>校园生活，自然相连。</p><div><a href="/v2/privacy">隐私政策</a><a href="/fonts/NOTICE.html">字体许可</a><a href="#top">回到顶部 ↑</a></div><small>界面依据会同里现有前端以 HTML 复刻，动画与数据仅作功能演示。iPhone 为展示载体，当前使用入口为 Web 版。</small><a className="promo-powered" href="https://verityai.cn/" target="_blank" rel="noopener noreferrer"><span>Powered by</span><img src="/promo/verity-ai-icon.svg" width={24} height={24} alt=""/><strong>VerityAI</strong><ArrowUpRight size={13}/></a></footer>
   </div>
 }
