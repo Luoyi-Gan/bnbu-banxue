@@ -80,18 +80,26 @@ export function Promo() {
         ? { x: i % 2 ? -.08 : .08, y: window.innerHeight >= 800 ? -1.35 : -1.45, rx: p.rx * .5, ry: p.ry * .65, rz: p.rz * .6, scale: window.innerHeight >= 800 ? .7 : .6 }
         : tablet ? { ...p, x: p.x * Math.min(.72, window.innerWidth / window.innerHeight * .7), scale: .68 } : p)
       poses[3] = heldPose
+      const travel = index === 3 ? Math.max(0, (mix - .3) / .7) : mix
       const a = poses[index], b = poses[Math.min(chapters.length - 1, index + 1)]
-      const pose = Object.fromEntries(Object.keys(a).map(key => [key, lerp(a[key as keyof PhonePose], b[key as keyof PhonePose], mix)])) as unknown as PhonePose
-      pose.scale += Math.sin(mix * Math.PI) * (mobile ? .02 : .08)
-      pose.ry += Math.sin(mix * Math.PI) * (mobile ? .08 : .42) * (index % 2 ? -1 : 1)
+      const pose = Object.fromEntries(Object.keys(a).map(key => [key, lerp(a[key as keyof PhonePose], b[key as keyof PhonePose], travel)])) as unknown as PhonePose
+      pose.scale += Math.sin(travel * Math.PI) * (mobile ? .02 : .08)
+      pose.ry += Math.sin(travel * Math.PI) * (mobile ? .08 : .42) * (index % 2 ? -1 : 1)
       const handExit = index < 3 ? 0 : index === 3 ? mix : 1
       const nextPhase = handExit <= .001 ? 'held' : handExit >= .999 ? 'free' : 'handoff'
       if (phase !== nextPhase) { phase = nextPhase; setPresentation(nextPhase) }
-      stageElement.style.setProperty('--held-alpha', String(1 - Math.min(1, handExit * 8)))
-      stageElement.style.setProperty('--device-alpha', String(Math.min(1, handExit * 8)))
-      stageElement.style.setProperty('--hand-alpha', String(handExit > 0 ? Math.max(0, 1 - handExit * 3) : 0))
-      stageElement.style.setProperty('--hand-y', handExit * 500 + 'px')
-      device.setVisible(handExit > .001 && visible)
+      // Sequential exit/reveal: the photographic and 3D phones never overlap.
+      const heldAlpha = Math.max(0, 1 - handExit / .3)
+      const deviceAlpha = Math.max(0, Math.min(1, (handExit - .3) / .2))
+      stageElement.style.setProperty('--held-alpha', String(heldAlpha))
+      stageElement.style.setProperty('--device-alpha', String(deviceAlpha))
+      if (index === 3) {
+        const retreat = Math.min(1, handExit / .3)
+        stageElement.style.setProperty('--held-y', `${retreat * 95}px`)
+        stageElement.style.setProperty('--held-roll', `${retreat * -4}deg`)
+        stageElement.style.setProperty('--held-scale', String(1 - retreat * .06))
+      }
+      device.setVisible(deviceAlpha > 0 && visible)
       device.update(pose, index, Math.min(chapters.length - 1, index + 1), mix, float.y * (mobile ? .45 : 1))
       stage.current!.style.setProperty('--chapter-progress', String(motion.progress))
     }
@@ -137,7 +145,6 @@ export function Promo() {
           <div className="promo-orbit" aria-hidden="true" />
           <div ref={canvas} className="promo-canvas" />
           {!staticMode && <div className="promo-held" aria-hidden="true"><div className="promo-held-photo"><img src="/promo/hand-phone.png" width={1024} height={1536} alt=""/><div className="promo-held-display">{chapters.slice(0,4).map((chapter,i)=><ScreenPreview key={chapter.screen} name={chapter.screen as ScreenName} active={active===i}/>)}</div><span className="promo-held-clock">9:41</span></div></div>}
-<div className="promo-exit-hand" aria-hidden="true"><div className="promo-held-photo"><img src="/promo/hand-phone.png" width={1024} height={1536} alt=""/></div></div>
           <div className="promo-scenes">
             {chapters.map((chapter, index) => <section id={`scene-${index}`} key={chapter.nav} className={`promo-scene promo-scene-${chapter.side}${index < 4 ? ' promo-scene-held' : ''}`} aria-label={chapter.nav} aria-hidden={staticMode ? undefined : active !== index} inert={!staticMode && active !== index} style={staticMode ? undefined : { opacity: active === index ? 1 : 0, visibility: active === index ? 'visible' : 'hidden' }}>
               <div className="promo-copy">
