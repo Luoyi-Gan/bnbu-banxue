@@ -1,0 +1,12 @@
+/* Arrange existing homepage components in the reference reading order. */
+.v2-app.v2-app-student .cw-home .cw-content-grid{display:flex;flex-direction:column;gap:0}
+.cw-home .cw-services{order:0}.cw-home .cw-recommendations{order:1}.cw-home .cw-stories{order:2}.cw-home .cw-organizations{order:3}.cw-home .cw-assistant{order:4}
+.v2-app.v2-app-student .cw-home .cw-focus{margin:16px 0 0;padding:0;max-width:none}
+.v2-app.v2-app-student .cw-home .cw-next{margin-right:0}
+.v2-app.v2-app-student .cw-home .cw-summary{gap:10px;margin:16px 0 0;padding:0;border:0;grid-template-columns:repeat(3,minmax(0,1fr))}
+.v2-app.v2-app-student .cw-home .cw-summary>a{border:0;padding:12px 14px;background:var(--v2-soft);border-radius:12px}
+.v2-app.v2-app-student .cw-home .cw-services .ref-section{margin-top:18px}
+.v2-app.v2-app-student .cw-home .cw-event-list{display:flex;flex-direction:column;gap:18px}
+.v2-app.v2-app-student .cw-home .cw-services .ref-shortcuts{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.cw-home .cw-recommendations,.cw-home .cw-stories{width:100%;min-width:0}
+@media(max-width:640px){.v2-app.v2-app-student .cw-home .cw-focus{margin-top:14px}.v2-app.v2-app-student .cw-home .cw-summary{gap:7px}.v2-app.v2-app-student .cw-home .cw-summary>a{padding:10px}.v2-app.v2-app-student .cw-home .cw-services .ref-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}}

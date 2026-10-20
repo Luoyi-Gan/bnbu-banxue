@@ -15,6 +15,7 @@ import './v2/studentNavigation.css'
 import './v2/likeAppearance.css'
 import './v2/partnerDiscovery.css'
 import './v2/ownProfileRefresh.css'
+import './v2/homeLayout.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

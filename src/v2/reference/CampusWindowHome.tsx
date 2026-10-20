@@ -112,10 +112,11 @@ export function CampusWindowHome() { useUiLanguage();
     </div>
 
     <div className="cw-content-grid">
+      <div className="cw-services"><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services exclude={['/v2/me?tab=timetable','/v2/campus','/v2/me?tab=saved']}/></Section></div>
       <div className="cw-recommendations"><Section title={uiText("校园新鲜事")} hint={uiText("为你推荐")} to="/v2/activities"><div className="cw-event-list">{events.map(item => <EventCard key={item.id} item={item} live={live} row/>)}</div>{!events.length && <EmptyNote to="/v2/activities">{data?uiText('下一场校园活动，等你来发现。'):uiText('正在读取校园活动…')}</EmptyNote>}</Section></div>
-      <div className="cw-services"><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services exclude={['/v2/me?tab=timetable','/v2/campus','/v2/me?tab=saved']}/></Section><AssistantBanner/></div>
       <div className="cw-stories"><Section title={uiText("校园里的声音")} hint={uiText("来自同学们的分享")} to="/v2/community"><Stories community={community}/></Section></div>
       <div className="cw-organizations"><Section title={uiText("一起，让校园更有意思")} hint={uiText("你可能感兴趣的组织")} to="/v2/organizations"><Organizations live={live}/></Section></div>
+      <div className="cw-assistant"><AssistantBanner/></div>
     </div>
     <footer className="cw-footer"><span>{uiText("会同里")}</span><p>{uiText("今天，也在校园里发现一点新的可能。")}</p><Link to="/v2/campus/explore">{uiText("去校园走走")}<ArrowRight size={15}/></Link></footer>
   </div>
