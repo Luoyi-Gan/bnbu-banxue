@@ -1,0 +1,30 @@
+/* Personal overview: compact identity, real activity summaries and tool tiles. */
+.v2-app.v2-app-student .own-profile{padding:0 24px 110px;max-width:1000px}
+.own-profile .own-profile-summary{padding:0!important;border-radius:20px;background:var(--v2-soft);overflow:hidden}
+.own-profile .community-profile-top{height:48px!important;min-height:48px;padding:0 12px;color:var(--v2-ink)!important;text-shadow:none!important;background:var(--v2-canvas)}
+.own-profile .community-profile-top nav a{color:var(--v2-ink)!important;background:none!important;width:36px;height:36px}
+.own-profile .community-profile-cover{margin:0;border-radius:16px 16px 0 0;height:130px}.own-profile .community-profile-cover>span{bottom:8px;right:14px;font-size:9px}.own-profile .community-profile-cover:after{background:linear-gradient(transparent,#163b4620)}
+.own-profile .community-profile-card{margin:0;padding:16px 16px 14px!important}
+.own-profile .community-profile-identity{align-items:center;gap:12px;padding-right:72px}
+.own-profile .community-profile-avatar{width:60px;height:60px;font-size:26px;border:0}
+.own-profile .community-profile-identity h1{font-family:inherit!important;font-size:20px!important;margin:0 0 3px}
+.own-profile .community-profile-bio{margin:4px 72px 10px!important;font-size:12px;line-height:1.65}
+.own-profile .community-profile-actions{position:absolute;right:14px;top:26px;max-width:none}
+.own-profile .community-profile-actions a:first-child{background:transparent;color:var(--v2-muted);border:1px solid #80878035;min-height:32px;padding:4px 10px;font-size:12px}
+.own-profile .community-profile-card .community-profile-statline{margin:12px 0 0}.own-profile .community-profile-statline>div{gap:26px}.own-profile .community-profile-statline strong{font-size:18px}.own-profile .community-profile-statline span{font-size:11px}
+.v2-app.v2-app-student .own-profile .cw-profile-body{display:block;padding:0}
+.own-profile .ref-section{margin-top:18px}.own-profile .ref-section>header{margin-bottom:10px}.own-profile .ref-section>header h2{font-family:inherit;font-size:16px;font-weight:650}.own-profile .ref-section>header>a{font-size:11px}
+.own-profile .own-campus-shortcuts{margin:0;padding:0;gap:8px;border:0}.own-profile .own-campus-shortcuts a{background:var(--v2-soft);border-radius:14px;padding:14px 4px;gap:3px}.own-profile .own-campus-shortcuts span{font-size:10px}
+.own-profile .cw-profile-body>.ref-section:nth-of-type(2){padding:14px;background:var(--v2-soft);border-radius:18px}
+.own-profile .ref-week{margin-bottom:10px}.own-profile .ref-week button{border-radius:12px}.own-profile .ref-empty{border-radius:12px;background:var(--v2-surface);padding:12px}
+.v2-app.v2-app-student .own-profile .cw-profile-body .ref-section:last-child .ref-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:none}
+.own-profile .ref-menu>a{position:relative;display:flex;align-items:flex-start;flex-direction:column;gap:12px;padding:14px;min-width:0;background:var(--v2-soft);border:0;border-radius:14px;min-height:108px}.own-profile .ref-menu .ref-icon{height:24px;width:24px;background:none;padding:0}.own-profile .ref-menu>a>svg{position:absolute;right:12px;top:16px;width:13px;height:13px;color:var(--v2-muted)}.own-profile .ref-menu strong{font-size:14px}.own-profile .ref-menu small{font-size:10px;line-height:1.6}
+@media(max-width:760px){.v2-app.v2-app-student .own-profile{padding:0 16px 110px}.own-profile .community-profile-cover{height:112px}.own-profile .community-profile-bio{margin-left:72px!important;margin-right:0!important}.v2-app.v2-app-student>.v2-mobile-nav{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));height:64px;padding:6px;border:1px solid #ffffff80;border-radius:24px;background:rgba(250,249,246,.78);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);box-shadow:0 6px 24px #243c3512}.v2-app.v2-app-student>.v2-mobile-nav a{min-width:0;flex:1;border-radius:18px}.v2-app.v2-app-student>.v2-mobile-nav a.is-active{background:#356f7309}}
+@media(max-width:760px){html[data-ui-theme=dark] .v2-app.v2-app-student>.v2-mobile-nav{background:rgba(27,35,31,.82);border-color:#ffffff20}}
+@supports not (backdrop-filter:blur(10px)){.v2-app.v2-app-student>.v2-mobile-nav{background:var(--v2-canvas)}}
+
+.v2-app.v2-app-student .own-profile{--v2-soft:#f2f3f1}
+.v2-app.v2-app-student .own-profile .ref-section>header h2{font-family:var(--reference-font,'MiSans',sans-serif);font-size:16px;letter-spacing:0;font-weight:650}
+.v2-app.v2-app-student .own-profile .ref-week button[aria-pressed=true]{background:#356f7317;border-radius:12px}
+.v2-app.v2-app-student .own-profile .ref-week button[aria-pressed=true] strong{background:transparent;color:#356f73;font-weight:700;border-radius:0}
+html[data-ui-theme=dark] .v2-app.v2-app-student .own-profile{--v2-soft:#25312b}
