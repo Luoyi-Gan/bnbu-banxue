@@ -101,3 +101,21 @@ html[data-ui-theme=dark] .campus-discovery{--v2-muted:#afbeb5;--v2-blue:#91b7ca}
 .discovery-choice-options label:has(input:checked){background:var(--v2-accent-soft,#edf4ee);color:var(--v2-action,#356f73)}.discovery-choice-options label:focus-within{outline:2px solid var(--v2-action);outline-offset:-2px}
 .discovery-choice-options input{position:absolute;opacity:0;width:1px;height:1px}.discovery-choice-options label>span{flex:1}.discovery-choice-options label:hover{background:var(--v2-soft)}
 .campus-discovery-filter-fields{max-height:65dvh;overflow:auto;gap:10px;padding:14px}
+
+/* Reference direction: icon tabs, soft green selection, and a single filter strip. */
+.campus-discovery-sections{display:flex;align-items:center;justify-content:space-between;gap:6px;border:0;padding:2px 0 8px;overflow:visible}
+.campus-discovery-sections button{display:flex;align-items:center;justify-content:center;gap:7px;flex:0 1 auto;min-height:42px;padding:8px 12px;border-radius:24px;color:var(--v2-muted);font-size:14px;white-space:nowrap}
+.campus-discovery-sections button svg{flex:none;stroke-width:1.8}
+.campus-discovery-sections button[aria-pressed=true]{background:#eaf4ee;color:#204e43}
+.campus-discovery-sections button[aria-pressed=true]:after{bottom:-5px;background:#2e7663;width:26px;height:3px;left:calc(50% - 13px)}
+.campus-discovery-search{border-radius:14px;box-shadow:0 2px 8px #263c3505;min-height:48px}
+.campus-discovery-filter-line{align-items:center;gap:8px;padding:6px 10px;border-radius:20px;background:#f2f4f1}
+.campus-discovery-filter-line>.campus-discovery-pills{padding:0;gap:5px;align-items:center;justify-content:space-between}
+.campus-discovery-filter-line .campus-discovery-pills button[aria-pressed=true]{background:#eaf4ee;color:#182e26}
+.campus-discovery-filters{align-self:center;padding-left:12px;margin-left:4px;border-left:1px solid var(--v2-line)}
+.campus-discovery-filters summary{min-height:36px}
+.campus-discovery .activity-discovery-when,.campus-discovery .activity-discovery-location{display:flex;align-items:center;gap:5px}
+.campus-discovery :is(.activity-discovery-when,.activity-discovery-location) svg{flex:none;color:var(--v2-muted)}
+.campus-discovery .activity-discovery-location>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:600px){.campus-discovery-sections{gap:3px}.campus-discovery-sections button{font-size:12px;padding:8px 6px;gap:5px}.campus-discovery-sections button svg{width:18px;height:18px}.campus-discovery-filter-line{padding:5px 7px;gap:4px}.campus-discovery-filter-line .campus-discovery-pills button{font-size:12px;padding-inline:9px}.campus-discovery-filters{padding-left:8px;margin-left:0}html[lang=en] .campus-discovery-sections{flex-wrap:wrap}html[lang=en] .campus-discovery-sections button{flex-basis:45%}}
+html[data-ui-theme=dark] .campus-discovery-sections button[aria-pressed=true],html[data-ui-theme=dark] .campus-discovery-filter-line .campus-discovery-pills button[aria-pressed=true]{background:#233d34;color:#c0dfd2}

@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
+import { CalendarDays, House, MessageCircle, UsersRound, Check, ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ActivityDiscovery } from './ActivityDiscovery'
@@ -12,6 +12,7 @@ import { Header, EmptyNote, Feedback } from './reference/components'
 import { uiText, useUiLanguage } from './uiLanguage'
 import './discoveryPage.css'
 
+const sectionIcons={activities:CalendarDays,organizations:UsersRound,community:House,alumni:MessageCircle}
 const sections=[['activities','活动','Activities'],['organizations','社团组织','Clubs'],['community','校园社区','Community'],['alumni','校友交流','Alumni']] as const
 
 export function DiscoveryPage(){
@@ -19,7 +20,7 @@ export function DiscoveryPage(){
   const [params,setParams]=useSearchParams()
   const section=sections.find(([key])=>key===params.get('section'))?.[0]??'activities'
   return <div className="ref-page cw-pages campus-discovery"><Header title={uiText('发现')} search={false}/>
-    <nav className="campus-discovery-sections" aria-label={uiText('发现分类')}>{sections.map(([key,label,enLabel])=><button key={key} type="button" aria-pressed={section===key} onClick={()=>setParams(key==='activities'?{}:{section:key})}>{language==='en'?enLabel:label}</button>)}</nav>
+    <nav className="campus-discovery-sections" aria-label={uiText('发现分类')}>{sections.map(([key,label,enLabel])=>{const Icon=sectionIcons[key];return <button key={key} type="button" aria-pressed={section===key} onClick={()=>setParams(key==='activities'?{}:{section:key})}><Icon size={20} aria-hidden="true"/><span>{language==='en'?enLabel:label}</span></button>})}</nav>
     <div className="campus-discovery-panel" key={section}>
       {section==='activities'&&<ActivityPanel initialQuery={params.get('q')??''} initialCategory={params.get('category')??'全部'}/>}
       {section==='organizations'&&<CampusOrganizations embedded/>}

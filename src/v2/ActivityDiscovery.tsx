@@ -1,5 +1,5 @@
 import { uiTemplate, uiText, useUiLanguage , uiLocale } from './uiLanguage'
-import { Bookmark, Heart } from 'lucide-react'
+import { Bookmark, Clock3, MapPin, Heart } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import type { ActivityItem } from './activityFilters'
@@ -42,8 +42,8 @@ export function ActivityDiscovery({ items, basePath, live }: { items: ActivityIt
       <ActivityCover key={item.image ?? item.id} item={item} path={`${basePath}/${item.id}`}/>
       <div className="activity-discovery-save"><ActivityReactions live={live} item={item} compact only="savedActivities"/></div>
       <Link className="discovery-title" to={`${basePath}/${item.id}`} state={{from:location.pathname+location.search}}>{item.title}</Link>
-      <p className="activity-discovery-when"><time dateTime={item.startAt}>{new Intl.DateTimeFormat(uiLocale(), { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(item.startAt))}</time></p>
-      <p className="activity-discovery-location" title={item.location}>{item.location}</p>
+      <p className="activity-discovery-when"><Clock3 size={14} aria-hidden="true"/><time dateTime={item.startAt}>{new Intl.DateTimeFormat(uiLocale(), { month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(item.startAt))}</time></p>
+      <p className="activity-discovery-location" title={item.location}><MapPin size={14} aria-hidden="true"/><span>{item.location}</span></p>
       <div className="discovery-meta"><span className="discovery-author" title={uiTemplate(['主办方：',''],item.host)}><span className="discovery-avatar" aria-hidden="true">{item.host.slice(0, 1)}</span><span>{item.host}</span></span><ActivityReactions live={live} item={item} compact only="likedActivities"/></div>
       {(live ? live.data?.relations.some(r => r.entityId === item.id && r.kind === 'participate') : state.participatingActivities.includes(item.id)) && <span className="activity-discovery-participating">{uiText('已标记参与')}</span>}
     </article>}/>
