@@ -211,4 +211,10 @@ body:has(.v2-app.v2-app-student[data-campus-route='/v2/community']) .v2-a-commun
 .v2-alumni-booking>footer{display:flex;justify-content:flex-end;margin-top:14px}.v2-alumni-cancel-form{margin-top:16px}.v2-alumni-cancel-form textarea{width:100%;min-height:90px}.v2-alumni-cancel-form>div{display:flex;justify-content:flex-end;align-items:center;gap:14px;margin-top:12px}
 @media(max-width:600px){.v2-app-student .v2-alumni-notices,.v2-app-student .v2-alumni-bookings-panel{padding:16px}.v2-alumni-bookings-list>.v2-alumni-booking{padding:14px}.v2-alumni-booking>header{gap:8px}.v2-app-student .v2-alumni-booking>header h3{font-size:15px}}
 
-@media(max-width:380px){.v2-app-student .cw-home .cw-header{height:auto;min-height:112px;flex-wrap:wrap;gap:6px;padding:10px 0}.v2-app-student .cw-home .cw-header h1{flex:none;width:100%;white-space:nowrap}.v2-app-student .cw-home .cw-header nav{margin-left:auto}}
+.v2-app.v2-app-student .cw-home .cw-header h1{flex:none;white-space:nowrap}
+.v2-app.v2-app-student .cw-home .cw-header nav{gap:6px}
+.v2-app.v2-app-student .cw-home .cw-header nav :is(.v2-student-search-trigger,.cw-notification,.v2-floating-timetable-trigger.is-toolbar){display:inline-flex;align-items:center;justify-content:center;height:44px;min-height:44px;border:1px solid var(--cw-line);border-radius:10px;background:var(--v2-surface,#fff);color:var(--cw-ink);box-shadow:none;vertical-align:middle}
+.v2-app.v2-app-student .cw-home .cw-header nav :is(.v2-student-search-trigger,.cw-notification){width:44px;min-width:44px;padding:0}
+.v2-app.v2-app-student .cw-home .cw-header nav :is(.v2-student-search-trigger,.cw-notification,.v2-floating-timetable-trigger.is-toolbar)>svg{width:20px;height:20px;stroke-width:1.8}
+.cw-home .v2-timetable-toolbar-slot{display:flex;align-items:center}
+@media(max-width:360px){.v2-app.v2-app-student .cw-home .cw-header{gap:8px}.v2-app.v2-app-student .cw-home .cw-header h1{font-size:24px;letter-spacing:1px}}

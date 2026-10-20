@@ -3,7 +3,6 @@ import {useDevicePreferences} from '../devicePreferences'
 import { ArrowRight, Bell, ChevronRight, MapPin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { DisplayAvatar } from '../DisplayAvatar'
 import { StudentSearch } from '../StudentSearch'
 import { useCommunityBackend } from '../useCommunityBackend'
 import { useWorkspaceBackend } from '../useWorkspaceBackend'
@@ -88,7 +87,6 @@ export function CampusWindowHome() { useUiLanguage();
     <header className="cw-header"><h1>{uiText("会同里")}</h1><nav aria-label={uiText("首页工具")}>
       <StudentSearch/>
       <Link to="/v2/messages?view=notifications" className="cw-notification" aria-label={uiTemplate(["通知",""],uiText(unread ? `，${unread}条未读` : ''))}><Bell size={22}/>{!!unread && <i/>}</Link>
-      <Link to="/v2/settings" className="cw-profile" aria-label={uiText("个人设置")}><DisplayAvatar name={name} avatar={String(profile?.data.avatar || '')} personId={data?.account.id || 'self'} className="cw-avatar"/></Link>
     </nav></header>
 
     <div className="cw-intro">

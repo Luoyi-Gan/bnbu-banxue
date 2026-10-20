@@ -8,7 +8,6 @@
 .cw-home .cw-header nav {display:flex;align-items:center;gap:6px}
 .cw-home .cw-header nav>a,.cw-home .cw-header .v2-student-search-trigger {position:relative;width:44px;height:44px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--cw-ink);box-shadow:none}
 .cw-home .cw-notification i {position:absolute;right:10px;top:8px;width:5px;height:5px;background:var(--cw-blue);border-radius:50%}
-.cw-home .cw-profile .cw-avatar {width:29px;height:29px;min-width:29px;border-radius:50%;background:#e4ece9;object-fit:cover;font-size:12px;display:grid;place-items:center;overflow:hidden}
 .cw-home .cw-window {height:390px;position:relative}
 .cw-home .cw-date {position:absolute;left:20px;top:40px;writing-mode:vertical-rl;color:var(--cw-muted);font-size:14px;letter-spacing:3px}
 .cw-home .cw-date-number {text-combine-upright:all;letter-spacing:0}
