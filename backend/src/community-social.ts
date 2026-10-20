@@ -19,6 +19,20 @@ export function validPostImages(value:unknown,original:unknown=[]){
 }
 
 export function* communitySocialPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields):Generator<unknown,Entity|undefined,unknown>{
+  if(action==='direct.send'){
+    demand(actor.roles.includes('student')&&actor.status==='active','账号当前不能发送私信。',403);
+    const targetId=textField(input,'targetId',100);
+    demand(targetId!==actor.id,'不能给自己发送私信。');
+    const target=yield* effect(repo.person(targetId));
+    demand(target.roles.includes('student')&&target.status==='active','用户当前不可私信。',403);
+    yield* requireSocialAccess(repo,actor,targetId);
+    yield* communitySocialRead(repo,actor,new URLSearchParams({person:targetId}));
+    const messages=yield* effect(repo.all('directMessage'));
+    demand(messages.filter(m=>m.ownerId===actor.id&&Date.parse(m.createdAt)>Date.now()-60000).length<20,'发送过于频繁，请稍后再试。',429);
+    const message=yield* effect(repo.create('directMessage',actor.id,{targetId,body:textField(input,'body',500)}));
+    yield* effect(repo.notify([targetId],null,'community.direct','你收到了一条校园私信。'));
+    return message;
+  }
   if(!['social.follow','social.block','social.dismiss','draft.save','draft.delete','post.update','comment.delete','comment.like'].includes(action))return;
   demand(actor.roles.includes('student'),'需要已授权学生身份。',403);
   if(['post.update','comment.like','social.follow'].includes(action))demand(actor.status==='active','账号当前不能发帖、评论或互动。',403);
@@ -102,10 +116,11 @@ export function* filterCommunityCandidates(repo:BusinessRepository,actor:Account
 export function* communitySocialRead(repo:BusinessRepository,actor:Account,params:URLSearchParams):Generator<unknown,Fields,unknown>{
   demand(actor.roles.length>0&&actor.status!=='banned','请先完成校园身份核验。',403);
   const edges=yield* effect(repo.all('socialEdge')),posts=yield* effect(repo.communityPostIndex()),relations=yield* effect(repo.communityRelations());
+  const privateMessages=(yield* effect(repo.all('directMessage'))).filter(m=>m.ownerId===actor.id||m.data.targetId===actor.id);
   const id=params.get('person')||actor.id,self=id===actor.id;
   const publicPosts=posts.filter(p=>p.data.status==='visible');
   const publicComments=(yield* effect(repo.communityCommentIndex())).filter(c=>c.data.status==='visible'&&publicPosts.some(p=>p.id===c.data.postId));
-  const canVisit=(personId:string)=>personId===actor.id||publicPosts.some(p=>p.ownerId===personId)||publicComments.some(c=>c.ownerId===personId)||edges.some(e=>['follow','block'].includes(String(e.data.kind))&&e.data.enabled===true&&((e.ownerId===actor.id&&e.data.targetId===personId)||(e.ownerId===personId&&e.data.targetId===actor.id)));
+  const canVisit=(personId:string)=>personId===actor.id||privateMessages.some(m=>m.ownerId===personId||m.data.targetId===personId)||publicPosts.some(p=>p.ownerId===personId)||publicComments.some(c=>c.ownerId===personId)||edges.some(e=>['follow','block'].includes(String(e.data.kind))&&e.data.enabled===true&&((e.ownerId===actor.id&&e.data.targetId===personId)||(e.ownerId===personId&&e.data.targetId===actor.id)));
   demand(canVisit(id),'用户当前不可访问。',404);
   const account=yield* effect(repo.person(id));
   demand(account.roles.includes('student')&&account.status!=='banned','用户当前不可访问。',404);
@@ -128,12 +143,20 @@ export function* communitySocialRead(repo:BusinessRepository,actor:Account,param
     const target=yield* effect(repo.person(personId));
     if(target.status==='banned')continue;
     const display=projection(target);
-    people.push({id:personId,name:display?.nickname||display?.name||target.name,avatar:display?.avatar??'',isFollowing:active.some(e=>e.ownerId===actor.id&&e.data.targetId===personId)});
+    people.push({id:personId,name:display?.nickname||display?.name||target.name,avatar:display?.avatar??'',self:personId===actor.id,isFollowing:active.some(e=>e.ownerId===actor.id&&e.data.targetId===personId)});
+  }
+  const messages=tab==='chat'&&!self?privateMessages.filter(m=>m.ownerId===id||m.data.targetId===id).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id)):[];
+  const conversations=[];
+  if(self&&tab==='inbox')for(const targetId of [...new Set(privateMessages.map(m=>m.ownerId===actor.id?String(m.data.targetId):m.ownerId!))]){
+    const target=yield* effect(repo.person(targetId));
+    if(target.status==='banned'||socialBlocked(edges,actor.id,targetId))continue;
+    const display=projection(target),last=privateMessages.filter(m=>m.ownerId===targetId||m.data.targetId===targetId).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||b.id.localeCompare(a.id))[0];
+    conversations.push({id:targetId,name:display?.nickname||display?.name||target.name,avatar:display?.avatar??'',body:String(last.data.body),createdAt:last.createdAt});
   }
   const drafts=self?(yield* effect(repo.all('postDraft'))).filter(d=>d.ownerId===actor.id&&d.data.status==='draft').map(d=>({id:d.id,title:d.data.title,updatedAt:d.updatedAt})):[];
   const dismissed=self?edges.filter(e=>e.ownerId===actor.id&&e.data.kind==='dismiss'&&e.data.enabled===true).flatMap(edge=>{const post=publicPosts.find(p=>p.id===edge.data.targetId&&!socialBlocked(edges,actor.id,p.ownerId));return post?[{id:post.id,title:String(post.data.title)}]:[]}):[];
   const reports=self&&tab==='reports'?(yield* effect(repo.all('report'))).filter(r=>r.ownerId===actor.id):[];
-  return {profile,people,dismissed,reports:reports.slice((page-1)*20,page*20).map(r=>({id:r.id,title:String((r.data.snapshot as Fields|undefined)?.title??'评论'),reason:r.data.reason,status:r.data.status,resolution:r.data.resolution,createdAt:r.createdAt})),hasMore:page*20<(tab==='reports'?reports.length:list.length),drafts:drafts.slice(0,50),draftCount:drafts.length,followingIds:edges.filter(e=>e.ownerId===actor.id&&e.data.kind==='follow'&&e.data.enabled===true).map(e=>e.data.targetId),...(self&&params.get('draft')?{draft:(yield* effect(repo.all('postDraft'))).find(d=>d.id===params.get('draft')&&d.ownerId===id&&d.data.status==='draft')??null}:{})};
+  return {profile,people,messages:messages.slice(-page*50).map(m=>({id:m.id,body:m.data.body,mine:m.ownerId===actor.id,createdAt:m.createdAt})),messagesHasMore:messages.length>page*50,conversations:conversations.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)),dismissed,reports:reports.slice((page-1)*20,page*20).map(r=>({id:r.id,title:String((r.data.snapshot as Fields|undefined)?.title??'评论'),reason:r.data.reason,status:r.data.status,resolution:r.data.resolution,createdAt:r.createdAt})),hasMore:page*20<(tab==='reports'?reports.length:list.length),drafts:drafts.slice(0,50),draftCount:drafts.length,followingIds:edges.filter(e=>e.ownerId===actor.id&&e.data.kind==='follow'&&e.data.enabled===true).map(e=>e.data.targetId),...(self&&params.get('draft')?{draft:(yield* effect(repo.all('postDraft'))).find(d=>d.id===params.get('draft')&&d.ownerId===id&&d.data.status==='draft')??null}:{})};
 }
 
 export function* communityCounts(repo:BusinessRepository,ids:string[]):Generator<unknown,{saves:Map<string,number>;comments:Map<string,number>;commentLikes:Map<string,number>;likedComments:Set<string>},unknown>{

@@ -9,6 +9,7 @@ import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { notificationPreferences, showNoticeBadge } from './notificationPreferences'
 import { DisplayAvatar } from './DisplayAvatar'
 import './messages.css'
+import {CommunityDirectMessages,CommunityDirectInbox} from './CommunityDirectMessages'
 
 function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened }: {
   conversation: LiveConversation; draft: string; onDraft: (value: string) => void
@@ -102,6 +103,7 @@ export function V2Messages() { useUiLanguage();
     if (!body) return
     if (await live.mutate('message.send', {roomId: id, body})) setDrafts(value => value[id]?.trim() === body ? {...value, [id]: ''} : value)
   }
+  if(params.get('person'))return <div className="v2-page"><CommunityDirectMessages key={params.get('person')} person={params.get('person')!}/></div>
   return <div className={`v2-page v2-messages-page${opened ? ' is-chat-open' : ''}`}>
     <PageHeading eyebrow="MESSAGES" title={view === 'notifications'?uiText('通知中心'):uiText('我的会话')} description={view === 'notifications'?uiText('校园里的新消息，都在这里。'):uiText('每一次交流，都让校园里的连接更近一点。')}/>
     <nav className="inbox-tabs" aria-label={uiText("消息分类")}>
@@ -119,7 +121,7 @@ export function V2Messages() { useUiLanguage();
       {live.data && !notices.some(item => category === '全部' || noticeCategory(item.event) === category) && <Empty icon={Bell} title={uiText("暂无此类通知")}/>}
       {notice && <Modal title={uiTemplate(["","通知"],noticeCategory(notice.event))} onClose={() => setParams({view:'notifications',category})}><time className="v2-form-note">{new Date(notice.createdAt).toLocaleString(uiLocale())}</time><p className="reference-notice-body">{notice.body}</p>{live.error && <p role="alert">{uiText(live.error)}</p>}{destination && <Link className="v2-button v2-button-primary" to={destination.path} state={{from:`/v2/messages?view=notifications&category=${encodeURIComponent(category)}`}}>{uiText(destination.label)}<ChevronRight size={16}/></Link>}</Modal>}
     </section>:<div className="inbox-workspace">
-      <aside className="inbox-list" aria-label={uiText("会话列表")}>
+      <aside className="inbox-list" aria-label={uiText("会话列表")}>{live.data?.account.roles.includes('student')&&<CommunityDirectInbox/>}
         {!live.data && !live.error && <p role="status">{uiText("正在读取本人会话…")}</p>}
         <div className="inbox-list-heading"><h2>{uiText("最近会话")}</h2><span>{conversations.length} {uiText("个会话")}</span></div>
         {conversations.map(conversation => <button type="button" className={`inbox-conversation${active?.id === conversation.id ? ' is-active' : ''}`} aria-label={uiTemplate(["打开会话：",""],conversation.title)} aria-current={active?.id === conversation.id ? 'true' : undefined} key={conversation.id} onClick={() => open(conversation.id)}>

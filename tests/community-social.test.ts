@@ -20,6 +20,36 @@ function fixture(){
   return {db,a,b,reviewer,repo,command,post,read}
 }
 
+it('个人私信持久化、幂等并只向原参与者提供，屏蔽后停止发送',()=>{
+  const {db,a,b,reviewer,command,post,repo}=fixture();post(a);post(b)
+  const request=randomUUID(),input={targetId:b.account.id,body:'你好，想聊聊校园摄影。'}
+  const sent=command(a,'direct.send',input,request)
+  expect(command(a,'direct.send',input,request)).toEqual(sent)
+  expect(repo.all('directMessage')).toHaveLength(1)
+  const chat=(token:string,id:string)=>communitySocial(db,token,new URLSearchParams({person:id,list:'chat'}))
+  expect(chat(b.token,a.account.id).messages).toMatchObject([{body:input.body,mine:false}])
+  expect(chat(a.token,b.account.id).messages).toMatchObject([{body:input.body,mine:true}])
+  expect(chat(reviewer.token,a.account.id).messages).toEqual([])
+  expect(snapshot(db,reviewer.account).entities.some(e=>e.kind==='directMessage')).toBe(false)
+  expect(communitySocial(db,b.token,new URLSearchParams('list=inbox')).conversations).toMatchObject([{id:a.account.id,body:input.body}])
+  expect(()=>command(a,'direct.send',{targetId:a.account.id,body:'自己'})).toThrow('自己')
+  expect(()=>command(a,'direct.send',{targetId:b.account.id,body:' '})).toThrow()
+  command(b,'social.block',{targetId:a.account.id,enabled:true})
+  expect(()=>command(a,'direct.send',input)).toThrow('互动')
+  expect(chat(b.token,a.account.id).messages).toHaveLength(1)
+})
+
+it('私信拒绝陌生目录账号和失效身份，发送频率受控',()=>{
+  const {db,a,b,reviewer,command,post}=fixture()
+  expect(()=>command(a,'direct.send',{targetId:b.account.id,body:'x'})).toThrow('不可访问')
+  post(b)
+  expect(()=>command(reviewer,'direct.send',{targetId:b.account.id,body:'x'})).toThrow('不能发送')
+  for(let n=0;n<20;n++)command(a,'direct.send',{targetId:b.account.id,body:`消息${n}`})
+  expect(()=>command(a,'direct.send',{targetId:b.account.id,body:'过量'})).toThrow('频繁')
+  db.prepare("UPDATE accounts SET status='muted' WHERE id=?").run(b.account.id)
+  expect(()=>command(a,'direct.send',{targetId:b.account.id,body:'x'})).toThrow('不可私信')
+})
+
 it('草稿只返回本人内容，发布原子消费草稿且重试不会重复发帖',()=>{
   const {db,a,b,command,repo}=fixture()
   const draft=command(a,'draft.save',{title:'未发布的想法',body:'私人草稿',board:'校园',images:[]})
@@ -133,6 +163,8 @@ it('异步存储执行同一关注策略，并拒绝伪造图片与外部对象'
   const asyncRepo=new Proxy(repo,{get(target,key){const value=Reflect.get(target,key);return typeof value==='function'?(...args:unknown[])=>Promise.resolve(value.apply(target,args)):value}}) as unknown as BusinessRepository
   await runAsync(communitySocialPolicy(asyncRepo,b.account,'social.follow',{targetId:a.account.id,enabled:true}))
   expect(repo.all('socialEdge')[0].data).toMatchObject({kind:'follow',enabled:true})
+  await runAsync(communitySocialPolicy(asyncRepo,b.account,'direct.send',{targetId:a.account.id,body:'异步私信'}))
+  expect(repo.all('directMessage')[0].data.body).toBe('异步私信')
   await expect(runAsync(communitySocialPolicy(asyncRepo,b.account,'social.follow',{targetId:b.account.id,enabled:true}))).rejects.toThrow('自己')
   await expect(runAsync(communitySocialPolicy(asyncRepo,a.account,'draft.save',{title:'x',body:'x',board:'校园',images:['https://unknown.invalid/image.jpg']}))).rejects.toThrow('有效')
 })
