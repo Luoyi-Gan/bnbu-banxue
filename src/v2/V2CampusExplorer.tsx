@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { liveActivities } from './liveActivities'
+import { campusActivitySchedule } from './campusActivitySchedule'
+import type { ActivityItem } from './activityFilters'
 import { fallbackCampusBuildings, resolveCampusLocation, type CampusBuilding } from './campusLocations'
 import type { createCampusScene } from './campusScene'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
@@ -11,6 +13,30 @@ import { LocalPreviewNotice } from './preview/LocalPreviewNotice'
 import './campus-explorer.css'
 
 type Scene = ReturnType<typeof createCampusScene>
+
+function BuildingActivities({ items, buildingId }: { items: ActivityItem[]; buildingId: string }) {
+  const [now, setNow] = useState(Date.now)
+  useEffect(() => {
+    const refresh = () => setNow(Date.now())
+    const timer = window.setInterval(refresh, 30000)
+    document.addEventListener('visibilitychange', refresh)
+    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', refresh) }
+  }, [])
+  const { ongoing, upcoming } = campusActivitySchedule(items, buildingId, now)
+  const time = (value: string) => new Date(value).toLocaleString(uiLocale(), { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+  return <div className="v2-building-activities">
+    <p className="v2-building-schedule-note">{uiText('按已发布的活动时间展示')}</p>
+    {([{ title: '正在进行', items: ongoing, status: 'ongoing', empty: '这里暂时没有正在进行的活动。' }, { title: '即将开始', items: upcoming, status: 'upcoming', empty: '这里暂时没有即将开始的活动。' }] as const).map(group => <section key={group.status} aria-label={uiText(group.title)}>
+      <div className="v2-explorer-section-title"><strong>{uiText(group.title)}</strong><small>{group.items.length} {uiText('项')}</small></div>
+      {group.items.length ? <div className="v2-explorer-events">{group.items.map(item => <Link key={item.id} to={'/v2/activities/' + encodeURIComponent(item.id)}>
+        <span className={`v2-building-activity-status is-${group.status}`}>{uiText(group.title)}</span><strong>{item.title}</strong>
+        <small><CalendarDays size={13}/><span>{time(item.startAt)} — {item.endAt ? time(item.endAt) : uiText('结束时间待确认')}</span></small>
+        <small><MapPin size={13}/><span>{item.location}</span></small>
+        {item.host && <small>{uiText('主办方')}：{item.host}</small>}<ArrowRight size={16}/>
+      </Link>)}</div> : <p className="v2-explorer-empty">{uiText(group.empty)}</p>}
+    </section>)}
+  </div>
+}
 
 function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'; onPick?: (building: CampusBuilding) => void; onClose?: () => void }) { useUiLanguage();
   const live = useWorkspaceBackend()
@@ -23,7 +49,6 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
   const [selected, setSelected] = useState<CampusBuilding | null>(null)
   const selectedId = selected?.id
   const scheduled = [
-    ...liveActivities(live.data).filter(event => event.local?.status === 'published' && resolveCampusLocation(event.location) === selectedId && Date.parse(event.endAt || event.startAt) >= Date.now()).map(event => ({id: event.id, title: event.title, when: new Date(event.startAt).toLocaleString(uiLocale()), place: event.location, kind: '校园活动', path: '/v2/activities/' + event.id})),
     ...(live.data?.entities ?? []).filter(room => room.kind === 'room' && room.data.status === 'open' && room.data.visibility === 'visible' && resolveCampusLocation(String(room.data.place)) === selectedId).map(room => ({id: room.id, title: String(room.data.title), when: String(room.data.time), place: String(room.data.place), kind: '正在组队', path: '/v2/partners?item=' + encodeURIComponent(room.id)})),
   ]
 
@@ -60,7 +85,7 @@ function InteractiveCampus({ mode, onPick, onClose }: { mode: 'explore' | 'pick'
       {mode === 'explore' && selected && <button type="button" className="v2-explorer-close" aria-label={uiText('关闭地点详情')} onClick={() => setSelected(null)}><X size={20}/></button>}
       <div className="v2-explorer-panel-head"><div><span className="v2-eyebrow">{mode === 'pick'?'SELECT A BUILDING':'EXPLORE BNBU'}</span><h2>{mode === 'pick'?uiText('选择校内地点'):uiText('校园探索')}</h2><p>{mode === 'pick'?uiText('点击地图上的楼栋，确认后带入地点。'):uiText('点击楼栋，查看这里计划中的活动与组队。')}</p></div>{mode === 'pick' && <button ref={closeButton} type="button" className="v2-explorer-close" aria-label={uiText("关闭地图")} onClick={onClose}><X size={20}/></button>}</div>
       <label className="v2-explorer-select">{uiText("楼栋列表")}<select value={selected?.id ?? ''} onChange={(event) => { if (status === 'ready') scene.current?.focus(event.target.value); else setSelected(buildings.find((item) => item.id === event.target.value) ?? null) }} disabled={status === 'loading'}><option value="">{uiText("选择楼栋")}</option>{buildings.filter((item) => !item.name.startsWith('未命名')).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-      {selected?<div className="v2-explorer-selection" key={selected.id}><div className="v2-explorer-building"><span><LocateFixed size={21}/></span><div><small>{uiText("当前楼栋")}</small><strong>{selected.name}</strong></div></div>{mode === 'pick' ? <p>{uiText("楼栋级定位。具体入口与集合点可在详细说明中补充。")}</p> : <><div className="v2-explorer-section-title"><strong>{uiText("这里的计划")}</strong><small>{scheduled.length} {uiText("项")}</small></div>{live.error ? <p role="alert" className="v2-explorer-empty">{uiText(live.error)}</p> : !live.data ? <p role="status">{uiText("正在读取活动与组队…")}</p> : scheduled.length ? <div className="v2-explorer-events">{scheduled.map((item) => <Link key={`${item.kind}-${item.id}`} to={item.path}><span>{item.kind}</span><strong>{item.title}</strong><small><CalendarDays size={13}/>{item.when} · {item.place}</small><ArrowRight size={16}/></Link>)}</div> : <p className="v2-explorer-empty">{uiText("当前没有计划中的活动或组队。可以看看其他楼栋。")}</p>}</>}</div>:<div className="v2-explorer-intro"><MapPin size={27}/><strong>{uiText("从一栋楼开始探索")}</strong><p>{uiText("在地图上点选楼栋，或从列表中选择。")}</p></div>}
+      {selected?<div className="v2-explorer-selection" key={selected.id}><div className="v2-explorer-building"><span><LocateFixed size={21}/></span><div><small>{uiText("当前楼栋")}</small><strong>{selected.name}</strong></div></div>{mode === 'pick' ? <p>{uiText("楼栋级定位。具体入口与集合点可在详细说明中补充。")}</p> : <>{live.error ? <p role="alert" className="v2-explorer-empty">{uiText(live.error)}</p> : !live.data ? <p role="status">{uiText("正在读取活动与组队…")}</p> : <><BuildingActivities items={liveActivities(live.data)} buildingId={selected.id}/>{scheduled.length > 0 && <><div className="v2-explorer-section-title"><strong>{uiText("正在组队")}</strong><small>{scheduled.length} {uiText("项")}</small></div><div className="v2-explorer-events">{scheduled.map((item) => <Link key={`${item.kind}-${item.id}`} to={item.path}><span>{item.kind}</span><strong>{item.title}</strong><small><CalendarDays size={13}/>{item.when} · {item.place}</small><ArrowRight size={16}/></Link>)}</div></>}</>}</>}</div>:<div className="v2-explorer-intro"><MapPin size={27}/><strong>{uiText("从一栋楼开始探索")}</strong><p>{uiText("在地图上点选楼栋，或从列表中选择。")}</p></div>}
       {mode === 'pick' && <div className="v2-explorer-actions"><button type="button" className="v2-button v2-button-secondary" onClick={onClose}>{uiText("取消")}</button><button type="button" className="v2-button v2-button-primary" disabled={!selected} onClick={() => selected && onPick?.(selected)}>{uiText("确认这栋楼")}<ArrowRight size={15}/></button></div>}
       <small className="v2-explorer-source">{uiText("BNBU 3D Model · S1.214 · 建筑体量含估算，位置以现场为准")}</small>
       {mode === 'explore' && Boolean(import.meta.hot) && <LocalPreviewNotice/>}
