@@ -42,10 +42,10 @@ function FilterChoice({label,value,options,onChange}:{label:string;value:string;
 function ActivityPanel({initialQuery,initialCategory}:{initialQuery:string;initialCategory:string}){
   useUiLanguage()
   const live=useWorkspaceBackend()
-  const [query,setQuery]=useState(initialQuery),[category,setCategory]=useState(initialCategory)
+  const [query,setQuery]=useState(initialQuery),[category,setCategory]=useState(initialCategory==='校园成员活动'?'全部':initialCategory)
   const [period,setPeriod]=useState<ActivityPeriod>('全部时间'),[sort,setSort]=useState<ActivitySort>('时间最近'),[location,setLocation]=useState('全部地点')
   const all=liveActivities(live.data)
-  const categories=['全部',...new Set(all.filter(a=>a.local?.status==='published').map(a=>a.category))]
+  const categories=['全部',...new Set(all.filter(a=>a.local?.status==='published').map(a=>a.category).filter(value=>value!=='校园成员活动'))]
   const locations=['全部地点',...new Set(all.filter(a=>a.local?.status==='published').map(a=>a.location).filter(Boolean))]
   const filtered=filterActivityItems(all,{query,category,period,sort,host:'全部主办方',status:'全部状态'},live.data?.account.id??'').filter(a=>location==='全部地点'||a.location===location)
   const hasFilters=!!query||category!=='全部'||period!=='全部时间'||location!=='全部地点'
