@@ -42,3 +42,19 @@ html[data-ui-theme=dark] .partner-filter-sheet-footer {background:#14251d}
 html[data-ui-theme=dark] .partner-filter-sheet :is(input,select) {background:#23372d;color:#e1ede4}
 @media(max-width:380px){.partner-filter-sheet input[type=datetime-local] {font-size:11px;padding-inline:4px}}
 .partner-filter-sheet-footer>.v2-button-primary {background:var(--student-glass-accent,#257965);color:#fff;border-color:transparent}
+
+/* Creation sheets keep their heading outside the scroller. */
+html[data-ui-theme] body:has(.v2-app.v2-app-student) .v2-modal:has(.v2-partner-form)>header {position:relative;top:auto;flex:none;z-index:1}
+.student-utility-content .v2-partner-form {min-width:0;gap:16px}
+.student-utility-content .v2-partner-form :is(label,.v2-form-two,.v2-partner-specific-fields) {min-width:0}
+.student-utility-content .v2-partner-form :is(input,select,textarea) {box-sizing:border-box;min-width:0;max-width:100%}
+.student-utility-content .v2-partner-form .v2-form-actions {position:sticky;bottom:-8px;z-index:3;display:flex;gap:8px;justify-content:flex-end;margin:8px 0 0;padding:12px 0 4px;border-top:1px solid var(--student-glass-divider);background:#e7efe9}
+.student-utility-content .v2-partner-form .v2-form-actions .v2-button {min-height:44px;min-width:0;padding:8px 14px;border-radius:14px;white-space:normal}
+.student-utility-content .v2-partner-form .v2-button-primary {background:var(--student-glass-accent);color:#fff;border-color:transparent}
+.partner-study-location {display:grid;gap:8px;min-width:0;padding:12px;border:1px solid var(--student-glass-divider,var(--v2-line));border-radius:16px;background:#ffffff30}
+.partner-study-location>strong {font-size:12px;font-weight:500;color:var(--student-glass-muted,var(--v2-muted))}
+.partner-study-location .v2-button {width:100%;min-height:44px;justify-content:flex-start;text-align:left;white-space:normal;overflow-wrap:anywhere;border-radius:12px;font-size:13px}
+.partner-study-location-clear {justify-self:end;min-height:32px;padding:4px 0;border:0;background:none;color:var(--student-glass-accent,var(--v2-action));font:inherit;font-size:12px;cursor:pointer}
+html[data-ui-theme=dark] .student-utility-content .v2-partner-form .v2-form-actions {background:#14251d}
+
+.partner-study-location>label {display:grid;gap:8px;font-size:12px;font-weight:500;color:var(--student-glass-muted,var(--v2-muted))}

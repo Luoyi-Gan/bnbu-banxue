@@ -6,10 +6,10 @@ import { PartnerLocationField, type PartnerPlace } from './PartnerLocationField'
 type Scope = 'campus' | 'outside'
 
 /** Campus locations use the existing 3D model; AMap is used for outside locations. */
-export function PartnerScopedLocationField({ label, name, value, onChange, onSelect, required, placeholder, scope: controlledScope }: {
+export function PartnerScopedLocationField({ label, name, value, onChange, onSelect, required, placeholder, scope: controlledScope, campusButtonLabel }: {
   label: string; name?: string; value: string; onChange: (value: string) => void;
   onSelect?: (place: PartnerPlace | null) => void; required?: boolean; placeholder?: string;
-  scope?: Scope;
+  scope?: Scope; campusButtonLabel?: string;
 }) { useUiLanguage();
   const [ownScope, setOwnScope] = useState<Scope>('campus')
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -25,7 +25,7 @@ export function PartnerScopedLocationField({ label, name, value, onChange, onSel
       <button type="button" className={scope === 'outside'?'is-active':''} onClick={() => changeScope('outside')}>{uiText("校外地图")}</button>
     </div></div>}
     {scope === 'campus'?<>
-      <button type="button" className="v2-button v2-button-secondary" onClick={() => setPickerOpen(true)}>{value || uiTemplate(["在 3D 校园模型中选择",""],label)}</button>
+      <button type="button" className="v2-button v2-button-secondary" onClick={() => setPickerOpen(true)}>{value || campusButtonLabel || uiTemplate(["在 3D 校园模型中选择",""],label)}</button>
       {name && <input type="hidden" name={name} value={value}/>}
       {pickerOpen && <CampusBuildingPicker onClose={() => setPickerOpen(false)} onPick={building => { onChange(building.name); onSelect?.(null); setPickerOpen(false) }}/ >}
       {required && !value && <small>{uiText("请先选择校内楼栋。")}</small>}

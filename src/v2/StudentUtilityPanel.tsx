@@ -13,7 +13,7 @@ export function StudentUtilityPanel({title,onClose,children}:{title:string;onClo
     const focusables=()=>Array.from(document.querySelectorAll<HTMLElement>('.v2-modal')).at(-1)?.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),[tabindex="0"]')
     const frame=requestAnimationFrame(()=>focusables()?.[0]?.focus())
     const trap=(event:KeyboardEvent)=>{
-      if(event.key!=='Tab')return
+      if(event.key!=='Tab'||document.querySelector('.v2-map-picker-layer'))return
       const nodes=Array.from(focusables()??[]).filter(el=>el.getClientRects().length)
       const first=nodes[0],last=nodes.at(-1)
       if(!document.activeElement?.closest('.v2-modal')){event.preventDefault();(event.shiftKey?last:first)?.focus()}

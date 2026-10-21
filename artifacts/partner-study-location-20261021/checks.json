@@ -1,0 +1,29 @@
+[
+  {
+    "width": 393,
+    "overflow": false,
+    "headerBottom": 142.15625,
+    "contentTop": 158.15625,
+    "footerBottom": 766.828125,
+    "sheetBottom": 783.828125,
+    "bodyLocked": true
+  },
+  {
+    "width": 320,
+    "overflow": false,
+    "headerBottom": 142.15625,
+    "contentTop": 158.15625,
+    "footerBottom": 766.828125,
+    "sheetBottom": 783.828125,
+    "bodyLocked": true
+  },
+  {
+    "width": 1440,
+    "overflow": false,
+    "headerBottom": 150.15625,
+    "contentTop": 170.15625,
+    "footerBottom": 750.828125,
+    "sheetBottom": 783.828125,
+    "bodyLocked": true
+  }
+]
