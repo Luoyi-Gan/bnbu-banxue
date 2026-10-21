@@ -18,14 +18,16 @@ describe('student participation and personal schedule', () => {
   })
   it('combines all member rooms, booked coffee and marked events; excludes unjoined and unmarked items', () => {
     const state = fixture()
-    state.participatingActivities = ['ai-agent-workshop']
+    state.participatingActivities = ['schedule-fixture']
+    // Pin activity timing independently of the rolling presentation fixtures.
+    state.localEvents = [{ id: 'schedule-fixture', title: 'Schedule fixture', description: 'test', startAt: '2026-10-10T12:00:00+08:00', location: 'T2', capacity: 2, status: 'published', registrations: 0 }]
     state.coffeeBookings = ['slot-zhang-1600', 'slot-wang-1600', 'slot-wang-1600']
     const result = studentSchedule(state, now)
     expect(result.filter(item => item.kind === 'room')).toHaveLength(2)
     expect(result.filter(item => item.kind === 'coffee')).toHaveLength(2)
     expect(result.filter(item => item.kind === 'activity')).toHaveLength(1)
     expect(result.some(item => item.id === 'room:room-car')).toBe(false)
-    expect(result.slice(0, 3).map(item => item.id)).toEqual(['activity:ai-agent-workshop', 'coffee:slot-wang-1600', 'coffee:slot-zhang-1600'])
+    expect(result.slice(0, 3).map(item => item.id)).toEqual(['activity:schedule-fixture', 'coffee:slot-wang-1600', 'coffee:slot-zhang-1600'])
   })
   it('removes cancelled coffee, ended teams and lost membership from the schedule', () => {
     const state = fixture()

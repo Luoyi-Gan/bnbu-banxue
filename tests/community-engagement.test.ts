@@ -26,7 +26,7 @@ function setup() {
 }
 
 describe('社区真实互动与作者隐私', () => {
-  it('只按主动打开标识计数，作者可见数字，75 帖时榜单关闭，76 帖时按七天互动排名', () => {
+  it('只按主动打开标识计数，作者可见数字，无数量门槛并按七天互动排名', () => {
     const {db,a,b,run,repo} = setup();
     const first = run(a,'post.create',{title:'帖子一',body:'正文',board:'校园'});
     const second = run(a,'post.create',{title:'帖子二',body:'正文',board:'学习'});
@@ -35,7 +35,7 @@ describe('社区真实互动与作者隐私', () => {
     run(b,'post.view',{id:first.id,openId:opened});
     run(b,'post.view',{id:first.id,openId:opened});
     run(b,'post.view',{id:first.id,openId:randomUUID()});
-    expect(communityView(db,a.token).hotLists.overall).toEqual([]);
+    expect(communityView(db,a.token).hotLists.overall).toEqual([first.id]);
     expect(communityView(db,a.token).posts.find(post=>post.id===first.id)?.viewCount).toBe(2);
     expect(communityView(db,b.token).posts.find(post=>post.id===first.id)).not.toHaveProperty('viewCount');
     expect(() => run(b,'post.view',{id:second.id,openId:opened})).toThrow('其他帖子');
@@ -46,7 +46,7 @@ describe('社区真实互动与作者隐私', () => {
     db.prepare('UPDATE post_views SET viewed_at=? WHERE post_id=?').run('2020-01-01T00:00:00.000Z',first.id);
     expect(communityView(db,b.token).hotLists.overall).toEqual([second.id]);
     run(a,'post.delete',{id:filler.id});
-    expect(communityView(db,b.token).hotLists.overall).toEqual([]);
+    expect(communityView(db,b.token).hotLists.overall).toEqual([second.id]);
     run(a,'post.delete',{id:first.id});
     expect(() => run(b,'post.view',{id:first.id,openId:randomUUID()})).toThrow('不可查看');
   });

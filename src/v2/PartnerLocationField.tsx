@@ -1,3 +1,4 @@
+import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 import { LocateFixed, MapPin, Minus, Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import './partnerLocation.css'
@@ -41,7 +42,7 @@ function point(position?: AmapPosition | string): [number, number] | undefined {
   return values.length === 2 && values.every(Number.isFinite) ? values as [number, number] : undefined
 }
 
-export function PartnerLocationField({ label, name, value, onChange, onSelect, required = false, map = false, placeholder = '搜索地点或手动填写集合点' }: {label: string; name?: string; value: string; onChange: (value: string) => void; onSelect?: (place: PartnerPlace | null) => void; required?: boolean; map?: boolean; placeholder?: string}) {
+export function PartnerLocationField({ label, name, value, onChange, onSelect, required = false, map = false, placeholder = '搜索地点或手动填写集合点' }: {label: string; name?: string; value: string; onChange: (value: string) => void; onSelect?: (place: PartnerPlace | null) => void; required?: boolean; map?: boolean; placeholder?: string}) { useUiLanguage();
   const [tips, setTips] = useState<PartnerPlace[]>([])
   const [status, setStatus] = useState('')
   const [confirmedText, setConfirmedText] = useState('')
@@ -101,10 +102,10 @@ export function PartnerLocationField({ label, name, value, onChange, onSelect, r
       })
     }).catch(() => setStatus('定位暂不可用，可继续手动填写。'))
   }
-  return <div className="v2-partner-location-field"><label>{label}<input name={name} value={value} onChange={event => { setConfirmedText(''); onChange(event.target.value); onSelect?.(null); setTips([]) }} required={required} maxLength={120} autoComplete="off" placeholder={placeholder}/></label>
-    {tips.length > 0 && <div className="v2-partner-place-tips" role="listbox" aria-label={`${label}候选地点`}>{tips.map((tip, index) => <button type="button" role="option" aria-selected="false" key={`${tip.name}-${tip.address}-${index}`} onClick={() => choose(tip)}><MapPin size={14}/><span><strong>{tip.name}</strong><small>{tip.address || '地点详情以高德结果为准'}</small></span></button>)}</div>}
-    <div className="v2-partner-location-tools">{map && amapConfigured && <button type="button" onClick={() => setMapOpen(open => !open)}>{mapOpen ? '收起地图' : '查看地图'}</button>}{!amapConfigured && <small>高德地图未配置，可手动填写地点。</small>}</div>
-    {mapOpen && <div className="v2-partner-map-shell"><div ref={mapNode} className="v2-partner-map" role="img" aria-label="高德地图，可拖动与缩放"/><div className="v2-partner-map-controls"><button type="button" aria-label="定位当前位置" onClick={locate}><LocateFixed size={16}/></button><button type="button" aria-label="放大地图" onClick={() => mapObject.current?.setZoom(Math.min(20, zoom + 1))}><Plus size={16}/></button><button type="button" aria-label="缩小地图" onClick={() => mapObject.current?.setZoom(Math.max(2, zoom - 1))}><Minus size={16}/></button></div><small>地图中心 {center[0].toFixed(4)}, {center[1].toFixed(4)} · 拖动地图不会修改已填写地点</small></div>}
+  return <div className="v2-partner-location-field"><label>{uiText(label)}<input name={name} value={value} onChange={event => { setConfirmedText(''); onChange(event.target.value); onSelect?.(null); setTips([]) }} required={required} maxLength={120} autoComplete="off" placeholder={placeholder}/></label>
+    {tips.length > 0 && <div className="v2-partner-place-tips" role="listbox" aria-label={uiTemplate(["","候选地点"],label)}>{tips.map((tip, index) => <button type="button" role="option" aria-selected="false" key={`${tip.name}-${tip.address}-${index}`} onClick={() => choose(tip)}><MapPin size={14}/><span><strong>{tip.name}</strong><small>{tip.address || uiText('地点详情以高德结果为准')}</small></span></button>)}</div>}
+    <div className="v2-partner-location-tools">{map && amapConfigured && <button type="button" onClick={() => setMapOpen(open => !open)}>{mapOpen?uiText('收起地图'):uiText('查看地图')}</button>}{!amapConfigured && <small>{uiText("高德地图未配置，可手动填写地点。")}</small>}</div>
+    {mapOpen && <div className="v2-partner-map-shell"><div ref={mapNode} className="v2-partner-map" role="img" aria-label={uiText("高德地图，可拖动与缩放")}/><div className="v2-partner-map-controls"><button type="button" aria-label={uiText("定位当前位置")} onClick={locate}><LocateFixed size={16}/></button><button type="button" aria-label={uiText("放大地图")} onClick={() => mapObject.current?.setZoom(Math.min(20, zoom + 1))}><Plus size={16}/></button><button type="button" aria-label={uiText("缩小地图")} onClick={() => mapObject.current?.setZoom(Math.max(2, zoom - 1))}><Minus size={16}/></button></div><small>{uiText("地图中心")}{center[0].toFixed(4)}, {center[1].toFixed(4)} {uiText("· 拖动地图不会修改已填写地点")}</small></div>}
     {status && <small role="status" className="v2-partner-location-status">{status}</small>}
   </div>
 }

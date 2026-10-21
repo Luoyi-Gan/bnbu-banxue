@@ -1,3 +1,4 @@
+import {shopPolicy} from '../shops';
 import { randomUUID } from 'node:crypto';
 import { demand, digest, ServiceError, timestamp, type Account } from '../auth';
 import type { PoolClient } from 'pg';
@@ -61,7 +62,7 @@ async function executeWithActor(db: PostgresDatabase, actorProvider: (client: Po
     else if(action==='accounts.admins.delete' || action==='accounts.close') result=await postgresAdministratorDelete(repo,actor,action,input);
     else if(action.startsWith('notification.')) result=await runAsync(notificationPolicy(repo,actor,action,input));
     else {
-      const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input)) ?? await runAsync(alumniPolicy(repo,actor,action,input));
+      const entity = action==='relation.set' ? await runAsync(relationPolicy(repo,actor,input)) : await runAsync(shopPolicy(repo,actor,action,input)) ?? await runAsync(communityPolicy(repo,actor,action,input)) ?? await runAsync(coffeePolicy(repo,actor,action,input)) ?? await runAsync(governancePolicy(repo,actor,action,input)) ?? await runAsync(activityPolicy(repo,actor,action,input)) ?? await runAsync(alumniPolicy(repo,actor,action,input));
       if(entity) result={id:entity.id};
     }
     demand(result,'不支持该业务操作。',404);

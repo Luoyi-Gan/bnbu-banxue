@@ -1,9 +1,11 @@
+import {filterCommunityCandidates,requireSocialAccess,communitySocialRead,communityCounts,communityHotForViewer} from './community-social';
+import {runSync} from './storage/effects';
 import {authenticate,demand,type Account} from './auth';
 import type {Database} from './database';
 import {Repository,type Entity} from './repository';
 import {projectCommunity} from './community-view';
 import {projectDisplayPeople} from './display-people';
-import {rankCommunity,rankHotSummaries,type CommunityCandidate,type CommunityMetrics,type CommunitySignals} from './community-ranking';
+import {rankCommunity,type CommunityCandidate,type CommunityMetrics,type CommunitySignals} from './community-ranking';
 import {readAlumni} from './alumni';
 
 type CountRow={id:string;count:number};
@@ -27,7 +29,7 @@ function signals(db:Database,actorId:string,cutoff:string):CommunitySignals {
 }
 function candidates(db:Database,actor:Account,withBody:boolean):CommunityCandidate[] {
   const body=withBody?"COALESCE(json_extract(p.data,'$.body'),'')":"''";
-  const rows=db.prepare(`SELECT p.id,p.owner_id AS ownerId,p.created_at AS createdAt,COALESCE(json_extract(p.data,'$.title'),'') AS title,${body} AS body,COALESCE(json_extract(p.data,'$.board'),'') AS board,json_extract(p.data,'$.status') AS status,CASE WHEN (SELECT json_extract(data,'$.profilePreview') FROM entities WHERE kind='preferences' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1)=0 THEN COALESCE(a.name,'已注销用户') ELSE COALESCE((SELECT json_extract(data,'$.nickname') FROM entities WHERE kind='profile' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1),a.name,'已注销用户') END AS author FROM entities p LEFT JOIN accounts a ON a.id=p.owner_id WHERE p.kind='post' AND (json_extract(p.data,'$.status')='visible' OR (p.owner_id=? AND json_extract(p.data,'$.status')='pending'))`).all(actor.id) as unknown as CommunityCandidate[];
+  const rows=db.prepare(`SELECT p.id,json_extract(p.data,'$.alumniId') AS alumniId,p.owner_id AS ownerId,p.created_at AS createdAt,COALESCE(json_extract(p.data,'$.title'),'') AS title,${body} AS body,COALESCE(json_extract(p.data,'$.board'),'') AS board,json_extract(p.data,'$.status') AS status,CASE WHEN (SELECT json_extract(data,'$.profilePreview') FROM entities WHERE kind='preferences' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1)=0 THEN COALESCE(a.name,'已注销用户') ELSE COALESCE((SELECT json_extract(data,'$.nickname') FROM entities WHERE kind='profile' AND owner_id=p.owner_id ORDER BY created_at DESC LIMIT 1),a.name,'已注销用户') END AS author FROM entities p LEFT JOIN accounts a ON a.id=p.owner_id WHERE p.kind='post' AND (json_extract(p.data,'$.status')='visible' OR (p.owner_id=? AND json_extract(p.data,'$.status')='pending'))`).all(actor.id) as unknown as CommunityCandidate[];
   return rows;
 }
 function relatedPeople(db:Database,actor:Account,entities:Entity[]) {
@@ -40,9 +42,10 @@ function projection(db:Database,actor:Account,entities:Entity[]) {
   const repo=new Repository(db),ids=entities.filter(item=>item.kind==='post').map(item=>item.id);
   const likes=new Map(ids.map(id=>[id,Number((db.prepare("SELECT count(*) AS count FROM relations WHERE kind='like' AND entity_id=?").get(id) as {count:number}).count)]));
   const viewCounts=new Map(ids.filter(id=>entities.find(item=>item.id===id)?.ownerId===actor.id).map(id=>[id,Number((db.prepare('SELECT count(*) AS count FROM post_views WHERE post_id=?').get(id) as {count:number}).count)]));
-  const relations=db.prepare("SELECT entity_id AS entityId,kind FROM relations WHERE account_id=? AND kind IN ('like','save')").all(actor.id) as {entityId:string;kind:string}[];
+  const relations=db.prepare("SELECT entity_id AS entityId,kind FROM relations WHERE account_id=? AND kind IN ('like','save','commentlike')").all(actor.id) as {entityId:string;kind:string}[];
   const alumni=readAlumni(repo);
-  const result=projectCommunity({account:actor,entities,people:relatedPeople(db,actor,entities),relations,alumni:{profiles:alumni.profiles}},likes,{allViews:viewCounts,recentViews:new Map(),recentLikes:new Map()});
+  const facts=runSync(communityCounts(repo,ids));
+  const result=projectCommunity({account:actor,entities,people:relatedPeople(db,actor,entities),relations,alumni:{profiles:alumni.profiles}},likes,{allViews:viewCounts,recentViews:new Map(),recentLikes:new Map()},facts);
   return result;
 }
 export function communityFeed(db:Database,token:string,params:URLSearchParams) {
@@ -50,12 +53,12 @@ export function communityFeed(db:Database,token:string,params:URLSearchParams) {
   const query=(params.get('q')??'').trim(),board=params.get('board')??'全部',sort=params.get('sort')==='newest'?'newest':'recommended';
   demand(query.length<=100,'搜索词过长。');
   const page=Math.max(1,Math.min(100000,Number(params.get('page'))||1)),pageSize=Math.max(1,Math.min(50,Number(params.get('limit'))||20));
-  const all=candidates(db,actor,Boolean(query)),cutoff7=new Date(Date.now()-7*86_400_000).toISOString(),cutoff30=new Date(Date.now()-30*86_400_000).toISOString();
+  const candidatesList=candidates(db,actor,Boolean(query)),all=runSync(filterCommunityCandidates(new Repository(db),actor,candidatesList,params)),cutoff7=new Date(Date.now()-7*86_400_000).toISOString(),cutoff30=new Date(Date.now()-30*86_400_000).toISOString();
   const engagement=metrics(db,cutoff7),personal=signals(db,actor.id,cutoff30);
   const ordered=rankCommunity(all,{board,query,sort},personal,engagement),selected=ordered.slice((page-1)*pageSize,page*pageSize);
-  const hot=rankHotSummaries(all,engagement);
+  const hot=runSync(communityHotForViewer(new Repository(db),actor,candidatesList,engagement));
   const hotIds=[...new Set([...hot.overall,...Object.values(hot.byBoard).flat()])];
-  const hotPosts=hotIds.flatMap(id=>{const item=all.find(post=>post.id===id);return item?[{id:item.id,title:item.title,board:item.board,author:item.author,status:item.status}]:[]});
+  const hotPosts=hotIds.flatMap(id=>{const item=candidatesList.find(post=>post.id===id);return item?[{id:item.id,title:item.title,board:item.board,author:item.author,status:item.status}]:[]});
   const repo=new Repository(db),entities=selected.map(item=>repo.get(item.id,'post'));
   const result=projection(db,actor,entities);
   return {...result,hotLists:hot,hotPosts,page,total:ordered.length,hasMore:page*pageSize<ordered.length,sort,query,board};
@@ -63,9 +66,12 @@ export function communityFeed(db:Database,token:string,params:URLSearchParams) {
 export function communityPostDetail(db:Database,token:string,id:string,page=1) {
   const actor=authenticate(db,token);requireCommunity(actor);
   const repo=new Repository(db),post=repo.get(id,'post');
+  runSync(requireSocialAccess(repo,actor,post.ownerId));
   demand(post.data.status==='visible' || post.ownerId===actor.id && post.data.status==='pending','帖子当前不可查看。',403);
   const visible=db.prepare("SELECT id FROM entities WHERE kind='comment' AND json_extract(data,'$.postId')=? AND (json_extract(data,'$.status')='visible' OR (owner_id=? AND json_extract(data,'$.status')='pending')) ORDER BY created_at,id LIMIT 51 OFFSET ?").all(id,actor.id,(Math.max(1,page)-1)*50) as {id:string}[];
   const entities=[post,...visible.slice(0,50).map(row=>repo.get(row.id,'comment'))];
   const view=projection(db,actor,entities);
-  return {post:view.posts[0],commentsHasMore:visible.length>50,commentPage:page,liked:view.likedPosts.includes(id),saved:view.savedPosts.includes(id),alumniProfiles:view.alumniProfiles};
+  return {post:view.posts[0],features:{postViews:true},commentsHasMore:visible.length>50,commentPage:page,liked:view.likedPosts.includes(id),saved:view.savedPosts.includes(id),alumniProfiles:view.alumniProfiles};
 }
+
+export function communitySocial(db:Database,token:string,params:URLSearchParams){const actor=authenticate(db,token);return runSync(communitySocialRead(new Repository(db),actor,params));}

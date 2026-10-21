@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "project": "会同里 · 学生首页",
+  "brief": "三套手机首屏共用校园照片、文楷与 MiSans、两项安排和相同的模拟内容。比较照片、日程与下一项安排的阅读优先级。所有候选均为静态视觉原型，画面中的本地模拟数据不代表学校业务事实。",
+  "round": "01",
+  "selection": { "id": "c", "number": "03", "name": "校园窗口", "confirmedOn": "2026-10-19", "scope": "深化完整首页预览，保留当前首页" },
+  "nativeViewport": "390x844",
+  "candidates": [
+    {
+      "id": "a",
+      "name": "校园画报",
+      "concept": "先看见校园，再轻松读完今天的安排。",
+      "typography": "霞鹜文楷用于品牌与问候；MiSans 用于正文、时间和导航。",
+      "palette": [
+        "#faf9f6",
+        "#243f35",
+        "#dce7df"
+      ],
+      "traits": [
+        "宽幅校园照片",
+        "画报式标题",
+        "横向摘要与紧凑安排"
+      ],
+      "source": "a.html"
+    },
+    {
+      "id": "b",
+      "name": "今日手帐",
+      "concept": "打开首页就知道今天先做什么。",
+      "typography": "霞鹜文楷用于日期与问候；MiSans 用于日程与状态。",
+      "palette": [
+        "#faf8f3",
+        "#a34f3d",
+        "#eadbd0"
+      ],
+      "traits": [
+        "纵向日程为主体",
+        "窄幅校园照片",
+        "红陶色提示阅读重点"
+      ],
+      "source": "b.html"
+    },
+    {
+      "id": "c",
+      "name": "校园窗口",
+      "concept": "把下一项安排放在校园场景之中。",
+      "typography": "霞鹜文楷用于场景标题；MiSans 用于主任务、数字与导航。",
+      "palette": [
+        "#faf9f6",
+        "#35658a",
+        "#e1ebf1"
+      ],
+      "traits": [
+        "不对称校园取景",
+        "下一项安排成为主对象",
+        "其余内容保持轻量"
+      ],
+      "source": "c.html"
+    }
+  ],
+  "lang": "zh"
+}

@@ -17,7 +17,7 @@ describe('原版 Sports 接入', () => {
   })
   it('在应用内部加载本地适配页且不给予外部窗口导航权限', () => {
     const html = renderToStaticMarkup(<NativeSportsCheckin />)
-    expect(html).toContain('src="/student/huitongli-checkin.html"')
+    expect(html).toContain('src="/student/huitongli-checkin.html?compact=1"')
     expect(html).toContain('sandbox="allow-scripts allow-same-origin"')
     expect(html).not.toContain('allow-popups')
     expect(html).not.toContain('allow-top-navigation')

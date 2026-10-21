@@ -1,0 +1,19 @@
+{
+  "scope": "Local acceptance fixtures, visual styling and existing read-only interactions.",
+  "checks": [
+    "discover: mobile has no horizontal overflow",
+    "discover: desktop has no horizontal overflow",
+    "discover: narrow has no horizontal overflow",
+    "discover: zoom has no horizontal overflow",
+    "campus: mobile has no horizontal overflow",
+    "campus: desktop has no horizontal overflow",
+    "campus: narrow has no horizontal overflow",
+    "campus: zoom has no horizontal overflow",
+    "me: mobile has no horizontal overflow",
+    "me: desktop has no horizontal overflow",
+    "me: narrow has no horizontal overflow",
+    "me: zoom has no horizontal overflow"
+  ],
+  "page_errors": [],
+  "result": "passed"
+}

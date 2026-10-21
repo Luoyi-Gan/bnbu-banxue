@@ -1,4 +1,4 @@
-export type CommunityCandidate={id:string;ownerId:string|null;title:string;body:string;board:string;author:string;createdAt:string;status:string};
+export type CommunityCandidate={alumniId?:string;id:string;ownerId:string|null;title:string;body:string;board:string;author:string;createdAt:string;status:string};
 export type CommunityMetrics={views:ReadonlyMap<string,number>;likes:ReadonlyMap<string,number>;comments:ReadonlyMap<string,number>};
 export type CommunitySignals={board:ReadonlyMap<string,number>;viewed:ReadonlySet<string>};
 
@@ -37,7 +37,6 @@ export function rankCommunity(candidates:CommunityCandidate[],options:{board?:st
 export function rankHotSummaries(candidates:CommunityCandidate[],metrics:CommunityMetrics) {
   const publicPosts=candidates.filter(item=>item.status==='visible');
   const eligiblePostCount=publicPosts.length,byBoard:Record<string,string[]>={};
-  if(eligiblePostCount<=75) return {eligiblePostCount,overall:[],byBoard};
   const ranked=publicPosts.map(item=>{
     const views=metrics.views.get(item.id)??0,likes=metrics.likes.get(item.id)??0,comments=metrics.comments.get(item.id)??0;
     return {...item,views,likes,comments,score:views+5*likes+10*comments};

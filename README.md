@@ -55,7 +55,7 @@ npm run typecheck:server
 npm run build
 ```
 
-构建结果输出到 `dist`，仅静态托管不能提供后端业务；推荐交付启动方式是 `compose.postgres.yaml`。没有执行云部署。
+构建结果输出到 `dist`，仅静态托管不能提供后端业务；推荐交付启动方式是 `compose.postgres.yaml`。2026-10-20 已将当前会同里前后端发布至 [会同里](https://www.bnbuplatform.cn/v2)，部署、演示数据及回滚记录见 [本次发布记录](deploy/hk/RELEASE_20261020.md)。
 
 ## 三维校园导览
 

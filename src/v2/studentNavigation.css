@@ -1,0 +1,27 @@
+/* One navigation breakpoint for every ordinary student route. */
+@media(min-width:761px){
+  .v2-app.v2-app-student:not(.live-app)>.v2-sidebar{position:sticky;top:0;left:auto;bottom:auto;display:flex;flex:0 0 216px;width:216px;height:100dvh;transform:none;overflow-y:auto}
+  .v2-app.v2-app-student>.v2-mobile-nav,.v2-app.v2-app-student .v2-menu-trigger,.v2-app.v2-app-student>.v2-sidebar-scrim{display:none}
+}
+@media(max-width:760px){
+  .v2-app.v2-app-student:not(.live-app)>.v2-sidebar,.v2-app.v2-app-student>.v2-sidebar-scrim,.v2-app.v2-app-student .v2-menu-trigger{display:none}
+  .v2-app.v2-app-student>.v2-mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:42;display:flex;justify-content:space-around;height:calc(64px + env(safe-area-inset-bottom));padding:6px 4px env(safe-area-inset-bottom);border-top:1px solid var(--v2-line);background:var(--v2-canvas)}
+  .v2-app.v2-app-student>.v2-mobile-nav a{display:flex;align-items:center;flex-direction:column;justify-content:center;gap:5px;min-width:50px;color:var(--v2-muted);font-size:11px}
+  .v2-app.v2-app-student>.v2-mobile-nav a:nth-child(3)>svg{width:22px;height:22px;padding:0;margin:0;border-radius:0;color:var(--v2-muted);background:none;box-shadow:none;stroke:currentColor}
+  .v2-app.v2-app-student>.v2-mobile-nav a.is-active{color:var(--v2-ink);font-weight:700}
+  .v2-app.v2-app-student>.v2-mobile-nav a.is-active:nth-child(3)>svg{color:var(--v2-ink)}
+  .v2-app.v2-app-student>.v2-workspace{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+}
+
+.student-timetable-launcher{position:fixed;left:236px;bottom:24px;z-index:71;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;border:1px solid var(--v2-line,#e3e6df);border-radius:24px;background:var(--v2-surface,#fffefa);color:var(--v2-action,#356f73);box-shadow:0 4px 16px #263c3518;font:inherit;font-size:13px;cursor:pointer}
+.student-timetable-launcher:hover,.student-timetable-launcher[aria-expanded=true]{background:var(--v2-soft,#f4f3ef)}
+@media(max-width:760px){.student-timetable-launcher{left:16px;bottom:calc(80px + env(safe-area-inset-bottom))}}
+
+.v2-title-with-back{display:flex;align-items:center;gap:10px}
+.v2-title-back{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px;height:40px;margin-left:-8px;border-radius:50%;color:inherit;letter-spacing:0}
+.v2-title-back:hover{background:var(--v2-soft)}
+.v2-title-back:focus-visible{outline:2px solid var(--v2-action);outline-offset:2px}
+
+.v2-app-student .v2-topbar .v2-top-left{display:none}
+.v2-app-student .v2-topbar{justify-content:flex-end;min-height:60px;border-bottom:0;background:var(--v2-canvas)}
+.v2-app-student .v2-top-actions{gap:8px}

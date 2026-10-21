@@ -1,3 +1,4 @@
+import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 import { Expand, LocateFixed, MapPin, RotateCcw, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -5,7 +6,7 @@ import { resolveCampusLocation, type CampusBuilding } from './campusLocations'
 import type { createCampusScene } from './campusScene'
 import './campus-map.css'
 
-export function CampusMap({ location }: { location: string }) {
+export function CampusMap({ location }: { location: string }) { useUiLanguage();
   const anchor = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const canvas = useRef<HTMLDivElement>(null)
@@ -95,17 +96,17 @@ export function CampusMap({ location }: { location: string }) {
   const closeExpanded = useRef<() => void>(() => {})
 
   return <div className="campus-map-anchor" ref={anchor}>
-    {expanded && createPortal(<button className="campus-map-backdrop" aria-label="收起三维地图" onClick={() => closeExpanded.current()}/>, document.body)}
-    <div className="campus-map-panel" ref={panel} role={expanded ? 'dialog' : 'region'} aria-modal={expanded || undefined} aria-label="互动校园地图">
-      <header className="campus-map-header"><div><span>BNBU CAMPUS</span><strong>互动地图导览 <small>3D</small></strong></div><button ref={toggle} type="button" aria-label={expanded ? '收起三维地图' : '展开三维地图'} aria-expanded={expanded} onClick={() => expanded ? closeExpanded.current() : expand()}>{expanded ? <X size={17}/> : <Expand size={17}/>}<span>{expanded ? '收起' : '展开'}</span></button></header>
+    {expanded && createPortal(<button className="campus-map-backdrop" aria-label={uiText("收起三维地图")} onClick={() => closeExpanded.current()}/>, document.body)}
+    <div className="campus-map-panel" ref={panel} role={expanded?'dialog':'region'} aria-modal={expanded || undefined} aria-label={uiText("互动校园地图")}>
+      <header className="campus-map-header"><div><span>BNBU CAMPUS</span><strong>{uiText("互动地图导览")}<small>3D</small></strong></div><button ref={toggle} type="button" aria-label={expanded?uiText('收起三维地图'):uiText('展开三维地图')} aria-expanded={expanded} onClick={() => expanded ? closeExpanded.current() : expand()}>{expanded?<X size={17}/>:<Expand size={17}/>}<span>{expanded?uiText('收起'):uiText('展开')}</span></button></header>
       <div className="campus-map-viewport">
         <div className="campus-map-canvas" ref={canvas}/>
-        {status !== 'ready' && <div className="campus-map-state" role="status">{status === 'loading' ? <><span className="campus-map-spinner"/>正在加载校园模型…</> : <><strong>三维地图暂时无法显示</strong><span>请重试，或使用支持 WebGL 的浏览器。</span><button onClick={() => { setStatus('loading'); setAttempt((value) => value + 1) }}>重新加载</button></>}</div>}
-        <div className="campus-map-tools"><button type="button" disabled={status !== 'ready' || !activityBuilding} onClick={() => activityId && scene.current?.focus(activityId)}><LocateFixed size={16}/>活动地点</button><button type="button" disabled={status !== 'ready'} onClick={() => scene.current?.overview()}><RotateCcw size={16}/>全校视角</button></div>
-        <div className="campus-map-legend"><span><i className="campus-map-orange"/>活动楼栋</span><span><i className="campus-map-blue"/>当前查看</span></div>
-        <span className="campus-map-gesture">拖动旋转 · 双指或滚轮缩放 · 点击楼栋</span>
+        {status !== 'ready' && <div className="campus-map-state" role="status">{status === 'loading'?<><span className="campus-map-spinner"/>{uiText("正在加载校园模型…")}</>:<><strong>{uiText("三维地图暂时无法显示")}</strong><span>{uiText("请重试，或使用支持 WebGL 的浏览器。")}</span><button onClick={() => { setStatus('loading'); setAttempt((value) => value + 1) }}>{uiText("重新加载")}</button></>}</div>}
+        <div className="campus-map-tools"><button type="button" disabled={status !== 'ready' || !activityBuilding} onClick={() => activityId && scene.current?.focus(activityId)}><LocateFixed size={16}/>{uiText("活动地点")}</button><button type="button" disabled={status !== 'ready'} onClick={() => scene.current?.overview()}><RotateCcw size={16}/>{uiText("全校视角")}</button></div>
+        <div className="campus-map-legend"><span><i className="campus-map-orange"/>{uiText("活动楼栋")}</span><span><i className="campus-map-blue"/>{uiText("当前查看")}</span></div>
+        <span className="campus-map-gesture">{uiText("拖动旋转 · 双指或滚轮缩放 · 点击楼栋")}</span>
       </div>
-      <footer className="campus-map-footer"><div className="campus-map-location"><MapPin size={18}/><div><strong>{location}</strong><span>{activityBuilding ? `已标记：${activityBuilding.name} · 楼栋级定位` : status === 'loading' && activityId ? '正在定位活动楼栋…' : '地点待确认，暂未标记具体位置'}</span></div></div><label className="campus-map-picker"><span>{selected ? `正在查看：${selected.name}` : '也可选择楼栋查看'}</span><select aria-label="选择校园楼栋" value={selected?.id ?? ''} disabled={status !== 'ready'} onChange={(event) => scene.current?.focus(event.target.value)}><option value="" disabled>选择校园楼栋</option>{buildings.filter((building) => !building.name.startsWith('未命名')).map((building) => <option key={building.id} value={building.id}>{building.name}</option>)}</select></label><small className="campus-map-source">BNBU 3D Model · S1.214 · 建筑体量含估算，具体集合点以活动说明为准</small></footer>
+      <footer className="campus-map-footer"><div className="campus-map-location"><MapPin size={18}/><div><strong>{location}</strong><span>{activityBuilding?uiTemplate(["已标记："," · 楼栋级定位"],activityBuilding.name):status === 'loading' && activityId?uiText('正在定位活动楼栋…'):uiText('地点待确认，暂未标记具体位置')}</span></div></div><label className="campus-map-picker"><span>{selected?uiTemplate(["正在查看：",""],selected.name):uiText('也可选择楼栋查看')}</span><select aria-label={uiText("选择校园楼栋")} value={selected?.id ?? ''} disabled={status !== 'ready'} onChange={(event) => scene.current?.focus(event.target.value)}><option value="" disabled>{uiText("选择校园楼栋")}</option>{buildings.filter((building) => !building.name.startsWith('未命名')).map((building) => <option key={building.id} value={building.id}>{building.name}</option>)}</select></label><small className="campus-map-source">{uiText("BNBU 3D Model · S1.214 · 建筑体量含估算，具体集合点以活动说明为准")}</small></footer>
     </div>
   </div>
 }

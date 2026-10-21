@@ -8,6 +8,21 @@ const databases: Database[] = []
 afterEach(() => databases.splice(0).forEach(db => db.close()))
 
 describe('学生个人背景偏好', () => {
+  it('封面保存保留简介与其他人的资料，并拒绝外部链接', () => {
+    const db=openDatabase(':memory:');databases.push(db)
+    const repo=new Repository(db)
+    const actor=repo.person(createAccount(db,{email:'cover@example.test',password:'Test-password-123',name:'学生',roles:['student']}))
+    const other=repo.person(createAccount(db,{email:'other@example.test',password:'Test-password-123',name:'同学',roles:['student']}))
+    governanceCommand(repo,actor,'profile.save',{nickname:'校园同学',avatar:'',bio:'喜欢摄影',cover:'lakeside'})
+    governanceCommand(repo,other,'profile.save',{nickname:'另一位同学',avatar:'',cover:'campus'})
+    const image='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aN2kAAAAASUVORK5CYII='
+    governanceCommand(repo,actor,'profile.save',{nickname:'校园同学',avatar:'',cover:image,ownerId:other.id})
+    expect(repo.all('profile').find(p=>p.ownerId===actor.id)?.data).toMatchObject({cover:image,bio:'喜欢摄影',nickname:'校园同学'})
+    expect(repo.all('profile').find(p=>p.ownerId===other.id)?.data.cover).toBe('campus')
+    expect(()=>governanceCommand(repo,actor,'profile.save',{nickname:'校园同学',avatar:'',cover:'https://example.test/cover.png'})).toThrow()
+    governanceCommand(repo,actor,'profile.save',{nickname:'校园同学',avatar:'',cover:'lakeside'})
+    expect(repo.all('profile').find(p=>p.ownerId===actor.id)?.data).toMatchObject({cover:'lakeside',bio:'喜欢摄影'})
+  })
   it('仅本人学生账号可切换，保留同一偏好记录中的其他设置', () => {
     const db = openDatabase(':memory:')
     databases.push(db)

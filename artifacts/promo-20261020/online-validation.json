@@ -1,0 +1,9 @@
+{
+  "viewports": 3,
+  "storyChecks": 21,
+  "moduleChecks": 36,
+  "errors": [
+    "401 https://www.bnbuplatform.cn/api/auth/me"
+  ],
+  "businessEntry": "https://www.bnbuplatform.cn/v2/login"
+}

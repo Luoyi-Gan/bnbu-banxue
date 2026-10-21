@@ -1,0 +1,1207 @@
+{
+  "sha": "a9c73c3d5dbf401e3e47f86e7b41f29ede1687df",
+  "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/a9c73c3d5dbf401e3e47f86e7b41f29ede1687df",
+  "tree": [
+    {
+      "path": ".agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4b3a91309a37c64e51d63fa5a8591936918dd6bf",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/4b3a91309a37c64e51d63fa5a8591936918dd6bf"
+    },
+    {
+      "path": ".agents/plugins",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6c97dfcfeac89cb25e4c9e8b05eba3c10096d069",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/6c97dfcfeac89cb25e4c9e8b05eba3c10096d069"
+    },
+    {
+      "path": ".agents/plugins/marketplace.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "786a26e57bc6f3427d6a167c7f2e742852f7584a",
+      "size": 410,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/786a26e57bc6f3427d6a167c7f2e742852f7584a"
+    },
+    {
+      "path": ".claude-plugin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1f41a519c4b63a5631c16cf272f6885cb280d044",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/1f41a519c4b63a5631c16cf272f6885cb280d044"
+    },
+    {
+      "path": ".claude-plugin/marketplace.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9821514b2920f4b728ec16dfcb1e2f5d6c1dcffe",
+      "size": 1820,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9821514b2920f4b728ec16dfcb1e2f5d6c1dcffe"
+    },
+    {
+      "path": ".codex-plugin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "420ad03e70b2fe67abb9fbae6d5a015bbdbdaf55",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/420ad03e70b2fe67abb9fbae6d5a015bbdbdaf55"
+    },
+    {
+      "path": ".codex-plugin/plugin.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2def6f9a263a6b6d3da1417189a9fd2bbbb6abb7",
+      "size": 1323,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/2def6f9a263a6b6d3da1417189a9fd2bbbb6abb7"
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dfdb8b771ce07609491fa2e83698969fd917a135",
+      "size": 17,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/dfdb8b771ce07609491fa2e83698969fd917a135"
+    },
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3cd74983509c21d4ef71bd57f977e4c3dc0d7713",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/3cd74983509c21d4ef71bd57f977e4c3dc0d7713"
+    },
+    {
+      "path": ".github/FUNDING.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "53f942c49a08e18756e181d69632741cee570077",
+      "size": 17,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/53f942c49a08e18756e181d69632741cee570077"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ca155c0d7d442aef9b5c75d2d54b63257732a801",
+      "size": 48,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ca155c0d7d442aef9b5c75d2d54b63257732a801"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9703d31476517da0631fd6178ae4626d2cd22ae1",
+      "size": 22959,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9703d31476517da0631fd6178ae4626d2cd22ae1"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48a2f6640b81ff8eca9ce7f6a96337692713ef5b",
+      "size": 1065,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/48a2f6640b81ff8eca9ce7f6a96337692713ef5b"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2da597c62812ab0a24d99dd481260756f1567584",
+      "size": 18369,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/2da597c62812ab0a24d99dd481260756f1567584"
+    },
+    {
+      "path": "assets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ced7c41eca12cfc2611f2ce9cf22b6f72b9927e9",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/ced7c41eca12cfc2611f2ce9cf22b6f72b9927e9"
+    },
+    {
+      "path": "assets/readme-banner.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "997611a9e4073b86576e6cead2d09478a7c3a04c",
+      "size": 56236,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/997611a9e4073b86576e6cead2d09478a7c3a04c"
+    },
+    {
+      "path": "assets/readme-tastecode.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a177e9055aeb9ebef1ab9ff7b21d891f5167909a",
+      "size": 29104,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/a177e9055aeb9ebef1ab9ff7b21d891f5167909a"
+    },
+    {
+      "path": "assets/sponsors",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "000384a87f09e216132a1db896e1874181eb1b41",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/000384a87f09e216132a1db896e1874181eb1b41"
+    },
+    {
+      "path": "assets/sponsors/animations-dev.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c101842c7cd64964d8c22ca92f5b5f0ae181d2a8",
+      "size": 16024,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c101842c7cd64964d8c22ca92f5b5f0ae181d2a8"
+    },
+    {
+      "path": "assets/sponsors/emil-animations-dev.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ce57f969a1fc9b3004589d8de884b388c278ec8",
+      "size": 39216,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9ce57f969a1fc9b3004589d8de884b388c278ec8"
+    },
+    {
+      "path": "assets/sponsors/imgly-logo.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ec885f784404d664377f61a274c499738190f73",
+      "size": 1174,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5ec885f784404d664377f61a274c499738190f73"
+    },
+    {
+      "path": "assets/sponsors/interfaces-dev-icon.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c898598a6c6ff34f76957314a5ad247ab3f7be5",
+      "size": 1924,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/3c898598a6c6ff34f76957314a5ad247ab3f7be5"
+    },
+    {
+      "path": "assets/sponsors/kimi-icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "033c0f4fb2e28a9daeca0205812d15bf3e547893",
+      "size": 11486,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/033c0f4fb2e28a9daeca0205812d15bf3e547893"
+    },
+    {
+      "path": "assets/sponsors/reactbits-icon-dark.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8aeca3812e914fd112a041c21736acacb394d2c1",
+      "size": 3939,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/8aeca3812e914fd112a041c21736acacb394d2c1"
+    },
+    {
+      "path": "assets/sponsors/reactbits-icon-light.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6ba3062d24da4fdf2e4bdc01f49cec55c9d67f0",
+      "size": 3937,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/d6ba3062d24da4fdf2e4bdc01f49cec55c9d67f0"
+    },
+    {
+      "path": "assets/sponsors/sentdm.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f93b23958966bb3eb90880b7f984773feadd02a7",
+      "size": 4382,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/f93b23958966bb3eb90880b7f984773feadd02a7"
+    },
+    {
+      "path": "assets/sponsors/sidrune-ai.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6ce494dcabaa592247337a15f13bb825e5698915",
+      "size": 21326,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/6ce494dcabaa592247337a15f13bb825e5698915"
+    },
+    {
+      "path": "assets/sponsors/vercel-logo.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34e3e5ec4ef089630d748f69b47674b3bec7edcc",
+      "size": 242,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/34e3e5ec4ef089630d748f69b47674b3bec7edcc"
+    },
+    {
+      "path": "assets/taste-skill-logo.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c5e8bd8130ed4abb4f0af104d182bd4bcf36993d",
+      "size": 17279,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c5e8bd8130ed4abb4f0af104d182bd4bcf36993d"
+    },
+    {
+      "path": "assets/taste-skill-logo.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f1eb55cf7953abdabf9c412ef6f4b2e1f1b4a483",
+      "size": 3280,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/f1eb55cf7953abdabf9c412ef6f4b2e1f1b4a483"
+    },
+    {
+      "path": "assets/vercel-oss-program-badge.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd2bd2533b920ad1b945b74f7c182fe51aee192d",
+      "size": 13296,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/bd2bd2533b920ad1b945b74f7c182fe51aee192d"
+    },
+    {
+      "path": "examples",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7604e8465ec6be886909cf920d88eb69c5cea773",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/7604e8465ec6be886909cf920d88eb69c5cea773"
+    },
+    {
+      "path": "examples/v2",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e491babb0df1abb2f8dc9e57ceaf7c85a170e7f2",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/e491babb0df1abb2f8dc9e57ceaf7c85a170e7f2"
+    },
+    {
+      "path": "examples/v2/CREDITS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a31747d6056a80fb53e19ea92005602be879119c",
+      "size": 10491,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/a31747d6056a80fb53e19ea92005602be879119c"
+    },
+    {
+      "path": "examples/v2/coffee-questions.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3146bb097de91e35fd91afa3c27212702af971ca",
+      "size": 26692,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/3146bb097de91e35fd91afa3c27212702af971ca"
+    },
+    {
+      "path": "examples/v2/coffee-roast.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4189800b0e1a63b5501c6a16176a03e068e8e2b1",
+      "size": 113142,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/4189800b0e1a63b5501c6a16176a03e068e8e2b1"
+    },
+    {
+      "path": "examples/v2/coffee-storefront.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab0d6abcf888d4feb30be3a7369f5398cb65c68f",
+      "size": 29172,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ab0d6abcf888d4feb30be3a7369f5398cb65c68f"
+    },
+    {
+      "path": "examples/v2/night-dates.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f0d60f9a63bb06d947a1b4d65d2d3439fd63afa",
+      "size": 173606,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/2f0d60f9a63bb06d947a1b4d65d2d3439fd63afa"
+    },
+    {
+      "path": "install.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "9ac14c2171df2f140fed785f0def46f36d9f4c06",
+      "size": 4012,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9ac14c2171df2f140fed785f0def46f36d9f4c06"
+    },
+    {
+      "path": "research",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7766335c5ecc1c0a27f4767d8cb46e3e9fff09c3",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/7766335c5ecc1c0a27f4767d8cb46e3e9fff09c3"
+    },
+    {
+      "path": "research/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3436417bae2f0dab79119411e56b758f95603b3c",
+      "size": 368,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/3436417bae2f0dab79119411e56b758f95603b3c"
+    },
+    {
+      "path": "research/laziness",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6a879608f1ac7f7c9c14f307f6e158976ae0c9c1",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/6a879608f1ac7f7c9c14f307f6e158976ae0c9c1"
+    },
+    {
+      "path": "research/laziness/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bfea0a5aa09b3ac8591c22eff8ec06c912ad7701",
+      "size": 1870,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/bfea0a5aa09b3ac8591c22eff8ec06c912ad7701"
+    },
+    {
+      "path": "research/laziness/findings",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "768e5243cd5bf1202cc36db15fe8cc6f93b3f311",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/768e5243cd5bf1202cc36db15fe8cc6f93b3f311"
+    },
+    {
+      "path": "research/laziness/findings/empirical-results.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5023f3edea9465553b68d7a15472177fc912104e",
+      "size": 2820,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5023f3edea9465553b68d7a15472177fc912104e"
+    },
+    {
+      "path": "research/laziness/findings/references.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe0f291fce8a157d6de8a8ea2d2788d3ba1338e2",
+      "size": 1512,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/fe0f291fce8a157d6de8a8ea2d2788d3ba1338e2"
+    },
+    {
+      "path": "research/laziness/remediation",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "afb3a9c44c86494943f66d63b3e4041c0efabefb",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/afb3a9c44c86494943f66d63b3e4041c0efabefb"
+    },
+    {
+      "path": "research/laziness/remediation/architectural-patterns.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb58186c981b657601e13e5c389e25f755f11562",
+      "size": 3142,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/eb58186c981b657601e13e5c389e25f755f11562"
+    },
+    {
+      "path": "research/laziness/remediation/parameter-tuning.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bf2a25d48d672e0037d446cb5056bf21cd68fb1",
+      "size": 2856,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5bf2a25d48d672e0037d446cb5056bf21cd68fb1"
+    },
+    {
+      "path": "research/laziness/remediation/prompt-engineering.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f3704bdd601e9cc4fa0b1021b298e9bdd05bc9f",
+      "size": 3261,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9f3704bdd601e9cc4fa0b1021b298e9bdd05bc9f"
+    },
+    {
+      "path": "research/laziness/remediation/reference-prompts.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "185ad869b2ceae7dcfee3dcd6adcba22f6394c79",
+      "size": 2363,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/185ad869b2ceae7dcfee3dcd6adcba22f6394c79"
+    },
+    {
+      "path": "research/laziness/root-causes",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8378122b55ff49c0aaf37c68acf5a68acbb7f0ef",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/8378122b55ff49c0aaf37c68acf5a68acbb7f0ef"
+    },
+    {
+      "path": "research/laziness/root-causes/cognitive-shortcuts.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad67fa113edd92ddec40f41ee7213742c52045a4",
+      "size": 2124,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ad67fa113edd92ddec40f41ee7213742c52045a4"
+    },
+    {
+      "path": "research/laziness/root-causes/output-limits.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3d346ef074d816e0c1819aa83b97ae369b952718",
+      "size": 2568,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/3d346ef074d816e0c1819aa83b97ae369b952718"
+    },
+    {
+      "path": "research/laziness/root-causes/rlhf-and-compute.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ef6783d4f958b76d8fc88e713aeb076b974e62c",
+      "size": 2165,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5ef6783d4f958b76d8fc88e713aeb076b974e62c"
+    },
+    {
+      "path": "research/laziness/root-causes/training-data-bias.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1aa2c7a7f10b91803c5dbb85a5fba39f6ded5ed6",
+      "size": 1666,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/1aa2c7a7f10b91803c5dbb85a5fba39f6ded5ed6"
+    },
+    {
+      "path": "skill.sh",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5e53322b4c83d54f9018f51b830fc0c80d7f0e53",
+      "size": 2149,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5e53322b4c83d54f9018f51b830fc0c80d7f0e53"
+    },
+    {
+      "path": "skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6f0e19134ce44063b7b6e88d7f26293218eeb8a8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/6f0e19134ce44063b7b6e88d7f26293218eeb8a8"
+    },
+    {
+      "path": "skills/brandkit",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e4af3e8f1c7464161c7e662274bce6107215596b",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/e4af3e8f1c7464161c7e662274bce6107215596b"
+    },
+    {
+      "path": "skills/brandkit/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0d533ac98e7bf7c8882d2955e2a182ed995f4560",
+      "size": 420,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/0d533ac98e7bf7c8882d2955e2a182ed995f4560"
+    },
+    {
+      "path": "skills/brandkit/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/brandkit/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/brutalist-skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "16c42ff61e8e2bbe85e85345bb04ae682fa0ce67",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/16c42ff61e8e2bbe85e85345bb04ae682fa0ce67"
+    },
+    {
+      "path": "skills/brutalist-skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "119030a65f7ef7e0eccf290e269ffaebbcdcca8e",
+      "size": 8365,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/119030a65f7ef7e0eccf290e269ffaebbcdcca8e"
+    },
+    {
+      "path": "skills/brutalist-skill/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/brutalist-skill/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/gpt-tasteskill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bec7dc0387e5d8cf58d0e814d2eaade801d13e71",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/bec7dc0387e5d8cf58d0e814d2eaade801d13e71"
+    },
+    {
+      "path": "skills/gpt-tasteskill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c9a72395c9024d4d2398238f0d8b37495228fb7d",
+      "size": 8249,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c9a72395c9024d4d2398238f0d8b37495228fb7d"
+    },
+    {
+      "path": "skills/gpt-tasteskill/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/gpt-tasteskill/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/image-to-code-skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "11902a0faed731839200aebb0735ee1c52e56fca",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/11902a0faed731839200aebb0735ee1c52e56fca"
+    },
+    {
+      "path": "skills/image-to-code-skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "efda909677c9636e35806cfe2e3c1f75bc0ddc59",
+      "size": 435,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/efda909677c9636e35806cfe2e3c1f75bc0ddc59"
+    },
+    {
+      "path": "skills/image-to-code-skill/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/image-to-code-skill/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/imagegen-frontend-mobile",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5e4f29fc17256bdb8114bfe6ecc080f6ad73d53b",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/5e4f29fc17256bdb8114bfe6ecc080f6ad73d53b"
+    },
+    {
+      "path": "skills/imagegen-frontend-mobile/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b547cded577255ca80e5802b3739ebaf5d9c4732",
+      "size": 468,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/b547cded577255ca80e5802b3739ebaf5d9c4732"
+    },
+    {
+      "path": "skills/imagegen-frontend-mobile/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/imagegen-frontend-mobile/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/imagegen-frontend-web",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c8ecb6bbd7cf0c040739e97657f32c65e40afb8b",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/c8ecb6bbd7cf0c040739e97657f32c65e40afb8b"
+    },
+    {
+      "path": "skills/imagegen-frontend-web/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "caac6180d61c438b7c4d2dc17cd17bd1df6f1743",
+      "size": 459,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/caac6180d61c438b7c4d2dc17cd17bd1df6f1743"
+    },
+    {
+      "path": "skills/imagegen-frontend-web/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/imagegen-frontend-web/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/llms.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d3b24c503804057b07e0fa643a6d46ed4607fb0b",
+      "size": 2107,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/d3b24c503804057b07e0fa643a6d46ed4607fb0b"
+    },
+    {
+      "path": "skills/minimalist-skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2e92dab6e17ddd1f4aa8895f9a5aab815fac3fbe",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/2e92dab6e17ddd1f4aa8895f9a5aab815fac3fbe"
+    },
+    {
+      "path": "skills/minimalist-skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6902a6428723cfd98746eb08c5092bbd520ade3",
+      "size": 8258,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/e6902a6428723cfd98746eb08c5092bbd520ade3"
+    },
+    {
+      "path": "skills/minimalist-skill/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/minimalist-skill/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/redesign-skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8a627d8a360864afb3cd9bd213b3acdabfc2f3a1",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/8a627d8a360864afb3cd9bd213b3acdabfc2f3a1"
+    },
+    {
+      "path": "skills/redesign-skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee5800deea2e6ec170f1c6a83cc0535eeeb517e1",
+      "size": 760,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ee5800deea2e6ec170f1c6a83cc0535eeeb517e1"
+    },
+    {
+      "path": "skills/redesign-skill/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/redesign-skill/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/soft-skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f07b956842b1fe4f47ea8b2fc999fc89040c2c79",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/f07b956842b1fe4f47ea8b2fc999fc89040c2c79"
+    },
+    {
+      "path": "skills/soft-skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "78a7a4a69665fcd3f6a6135c749d27fa64057b66",
+      "size": 10503,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/78a7a4a69665fcd3f6a6135c749d27fa64057b66"
+    },
+    {
+      "path": "skills/soft-skill/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/soft-skill/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/stitch-skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9e67b6a2c6e73dcb466546531497b2a23cad94d4",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/9e67b6a2c6e73dcb466546531497b2a23cad94d4"
+    },
+    {
+      "path": "skills/stitch-skill/DESIGN.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef78a972599e7b1791580a5bcd6cf0242abac65b",
+      "size": 12053,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ef78a972599e7b1791580a5bcd6cf0242abac65b"
+    },
+    {
+      "path": "skills/stitch-skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4f4e5a33a6acc5d6257b56a5edb7db219caa5f2e",
+      "size": 11777,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/4f4e5a33a6acc5d6257b56a5edb7db219caa5f2e"
+    },
+    {
+      "path": "skills/stitch-skill/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/stitch-skill/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/taste-skill-v1",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d0cc3f738acf6e2d70030727868695828e03cbea",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d0cc3f738acf6e2d70030727868695828e03cbea"
+    },
+    {
+      "path": "skills/taste-skill-v1/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fe03fc42f4c46409fe2d4e224f4d6bab1b794b23",
+      "size": 21098,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/fe03fc42f4c46409fe2d4e224f4d6bab1b794b23"
+    },
+    {
+      "path": "skills/taste-skill-v1/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/taste-skill-v1/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/taste-skill-v2-experimental",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "584c7115bb7f4bfaeb91eb8b3a1902577aefbd4b",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/584c7115bb7f4bfaeb91eb8b3a1902577aefbd4b"
+    },
+    {
+      "path": "skills/taste-skill-v2-experimental/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f2c70c8701a0769e4e81e15c1a7e842024e837e",
+      "size": 89426,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/1f2c70c8701a0769e4e81e15c1a7e842024e837e"
+    },
+    {
+      "path": "skills/taste-skill-v2-experimental/agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d7987cfa6b71ee2178ce86c88e1bd548269516e8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d7987cfa6b71ee2178ce86c88e1bd548269516e8"
+    },
+    {
+      "path": "skills/taste-skill-v2-experimental/agents/openai.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b1f887a9138416870f64ba2fe21602e4a59cfa7",
+      "size": 43,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/5b1f887a9138416870f64ba2fe21602e4a59cfa7"
+    },
+    {
+      "path": "skills/taste-skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5970c359dc11afae121fca2b9635d6441d265d41",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/5970c359dc11afae121fca2b9635d6441d265d41"
+    },
+    {
+      "path": "skills/taste-skill/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a98ba126ce373ba5e639560d8628834d5fa43347",
+      "size": 5345,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/a98ba126ce373ba5e639560d8628834d5fa43347"
+    },
+    {
+      "path": "skills/taste-skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "95c568372d46ee171862728aaa7d052ae3e273c1",
+      "size": 38435,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/95c568372d46ee171862728aaa7d052ae3e273c1"
+    },
+    {
+      "path": "skills/taste-skill/assets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3af0645cd933f55c7a9d0b35ae049af85538fd82",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/3af0645cd933f55c7a9d0b35ae049af85538fd82"
+    },
+    {
+      "path": "skills/taste-skill/assets/app.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "865e4ed4804556aaff51897d22bf0c1bcbee9549",
+      "size": 15918,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/865e4ed4804556aaff51897d22bf0c1bcbee9549"
+    },
+    {
+      "path": "skills/taste-skill/assets/base.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "75915d3b1ea8780090a365eabfb5c4b697cc6e86",
+      "size": 6520,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/75915d3b1ea8780090a365eabfb5c4b697cc6e86"
+    },
+    {
+      "path": "skills/taste-skill/assets/base.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "86ec0afacba394f64db238c44b8e7b980f2383b3",
+      "size": 2162,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/86ec0afacba394f64db238c44b8e7b980f2383b3"
+    },
+    {
+      "path": "skills/taste-skill/assets/charts.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fa0f459448daef137ad85900809695ad2617f512",
+      "size": 58705,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/fa0f459448daef137ad85900809695ad2617f512"
+    },
+    {
+      "path": "skills/taste-skill/assets/scenes",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8dfa183aa4ff499a532b77bbb5a7cba3407fe325",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/8dfa183aa4ff499a532b77bbb5a7cba3407fe325"
+    },
+    {
+      "path": "skills/taste-skill/assets/scenes/stage.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "190763d3c1661e7a602bec21fce952dece67bf15",
+      "size": 1141,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/190763d3c1661e7a602bec21fce952dece67bf15"
+    },
+    {
+      "path": "skills/taste-skill/assets/scenes/stage.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fd7ba541b69f4dda347e52764faf7c25c198e02b",
+      "size": 7522,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/fd7ba541b69f4dda347e52764faf7c25c198e02b"
+    },
+    {
+      "path": "skills/taste-skill/evals",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1ab7915ed3510b67c8ca84baeac3454580c442b8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/1ab7915ed3510b67c8ca84baeac3454580c442b8"
+    },
+    {
+      "path": "skills/taste-skill/evals/evals.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6d598008f22d980d135a863a7a151609822bb3f",
+      "size": 8198,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/f6d598008f22d980d135a863a7a151609822bb3f"
+    },
+    {
+      "path": "skills/taste-skill/library",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "df58c85398c64482da2c9265f320a44084feae4d",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/df58c85398c64482da2c9265f320a44084feae4d"
+    },
+    {
+      "path": "skills/taste-skill/library/app.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c06fb45f8bb6b09398f19ba35b2f71ae2363a310",
+      "size": 74229,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c06fb45f8bb6b09398f19ba35b2f71ae2363a310"
+    },
+    {
+      "path": "skills/taste-skill/library/directions.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f7f82e1a921e7009da7ce6f88410d2c8a94cf214",
+      "size": 61466,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/f7f82e1a921e7009da7ce6f88410d2c8a94cf214"
+    },
+    {
+      "path": "skills/taste-skill/library/heroes.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74227d956a049f548d99f7b420ccc6218ae3c40e",
+      "size": 108240,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/74227d956a049f548d99f7b420ccc6218ae3c40e"
+    },
+    {
+      "path": "skills/taste-skill/library/motions.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff3818f561f338b15dbe1ff45620729ef0ff8d3b",
+      "size": 9033,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ff3818f561f338b15dbe1ff45620729ef0ff8d3b"
+    },
+    {
+      "path": "skills/taste-skill/library/palettes.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9de29b16db9c9f57b977dd38648a47f866572e54",
+      "size": 34753,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9de29b16db9c9f57b977dd38648a47f866572e54"
+    },
+    {
+      "path": "skills/taste-skill/library/photos.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f403b772d3d6ae11ef07cfe44514fb019d918820",
+      "size": 160632,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/f403b772d3d6ae11ef07cfe44514fb019d918820"
+    },
+    {
+      "path": "skills/taste-skill/library/sections.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "042b8ab18ef1aa6e67a6f0f2c171fa9357528623",
+      "size": 276146,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/042b8ab18ef1aa6e67a6f0f2c171fa9357528623"
+    },
+    {
+      "path": "skills/taste-skill/library/sites.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef070e3ccdf5cb9c388bab1fd0aacb0371cba413",
+      "size": 869073,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ef070e3ccdf5cb9c388bab1fd0aacb0371cba413"
+    },
+    {
+      "path": "skills/taste-skill/library/type.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "72c1c1e493b006a5c10ec4ee18db69c99fdc4892",
+      "size": 82290,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/72c1c1e493b006a5c10ec4ee18db69c99fdc4892"
+    },
+    {
+      "path": "skills/taste-skill/references",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d185f1ba4ce67d096c6a0852a744706053ab07b8",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d185f1ba4ce67d096c6a0852a744706053ab07b8"
+    },
+    {
+      "path": "skills/taste-skill/references/app-screens.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "784439ed799484a98958764a5bf3ede2a1d25296",
+      "size": 85358,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/784439ed799484a98958764a5bf3ede2a1d25296"
+    },
+    {
+      "path": "skills/taste-skill/references/colour.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a20a810fa1f080414035a5e0fdc5002977e56ab2",
+      "size": 6853,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/a20a810fa1f080414035a5e0fdc5002977e56ab2"
+    },
+    {
+      "path": "skills/taste-skill/references/copy.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69f20af2bff6d40cc07d4dcadaa45440ced550bf",
+      "size": 9436,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/69f20af2bff6d40cc07d4dcadaa45440ced550bf"
+    },
+    {
+      "path": "skills/taste-skill/references/critique.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1989a85c83232e86aec66baf733a843947392b37",
+      "size": 11157,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/1989a85c83232e86aec66baf733a843947392b37"
+    },
+    {
+      "path": "skills/taste-skill/references/imagery.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddd88d7a31dd3a5d7f4675ead4524f34d037f665",
+      "size": 51025,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ddd88d7a31dd3a5d7f4675ead4524f34d037f665"
+    },
+    {
+      "path": "skills/taste-skill/references/layout.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dae26af173b4b60f96291f816700f390ffd8e37e",
+      "size": 18315,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/dae26af173b4b60f96291f816700f390ffd8e37e"
+    },
+    {
+      "path": "skills/taste-skill/references/motion.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c8f649d4fa45c369c53ce375a00d2f125182f181",
+      "size": 55400,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c8f649d4fa45c369c53ce375a00d2f125182f181"
+    },
+    {
+      "path": "skills/taste-skill/references/research.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c38364af48f9e95dc90a2e6b47ae75ffdc24731e",
+      "size": 24262,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c38364af48f9e95dc90a2e6b47ae75ffdc24731e"
+    },
+    {
+      "path": "skills/taste-skill/references/scenes.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2c568b5f1d18128658b28a273e90028fc22bb30",
+      "size": 9817,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c2c568b5f1d18128658b28a273e90028fc22bb30"
+    },
+    {
+      "path": "skills/taste-skill/references/tells.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9cfa4a89e466eb6df81b7a1b776421c378aad840",
+      "size": 7420,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9cfa4a89e466eb6df81b7a1b776421c378aad840"
+    },
+    {
+      "path": "skills/taste-skill/references/type.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c1552b700e9bebb2fedf79f82c875615d0f876ac",
+      "size": 8495,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/c1552b700e9bebb2fedf79f82c875615d0f876ac"
+    },
+    {
+      "path": "skills/taste-skill/scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d1a0db97021b02b81cc4778c1e9995be9b4de16a",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/d1a0db97021b02b81cc4778c1e9995be9b4de16a"
+    },
+    {
+      "path": "skills/taste-skill/scripts/assets.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4f9c5b1c1fcc5a821685c5cea35f326bcf15d75b",
+      "size": 64522,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/4f9c5b1c1fcc5a821685c5cea35f326bcf15d75b"
+    },
+    {
+      "path": "skills/taste-skill/scripts/draw.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6db3d89422057902457c97643c13f4b351d1459b",
+      "size": 54140,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/6db3d89422057902457c97643c13f4b351d1459b"
+    },
+    {
+      "path": "skills/taste-skill/scripts/inspect.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "105b0e5e0a9038244e04cfea4c79b2c66ae5833f",
+      "size": 27839,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/105b0e5e0a9038244e04cfea4c79b2c66ae5833f"
+    },
+    {
+      "path": "skills/taste-skill/scripts/lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "897442de243991a47587da1306a9c6e5fd4b1e30",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/897442de243991a47587da1306a9c6e5fd4b1e30"
+    },
+    {
+      "path": "skills/taste-skill/scripts/lib/app-draw.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e246a38f15d4f3b163a3d3aa5378c71462a4c24f",
+      "size": 14715,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/e246a38f15d4f3b163a3d3aa5378c71462a4c24f"
+    },
+    {
+      "path": "skills/taste-skill/scripts/lib/cdp.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3b8e01b9c4e603d432b83df13963a55d6aa63c5",
+      "size": 11377,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/b3b8e01b9c4e603d432b83df13963a55d6aa63c5"
+    },
+    {
+      "path": "skills/taste-skill/scripts/lib/probe.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "911094e566b35508a15b344febdf1a51a1cae0cf",
+      "size": 81280,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/911094e566b35508a15b344febdf1a51a1cae0cf"
+    },
+    {
+      "path": "skills/taste-skill/scripts/lib/rules.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "558fcccf246ae4432fa05e30a32a25d9e46d214e",
+      "size": 37284,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/558fcccf246ae4432fa05e30a32a25d9e46d214e"
+    },
+    {
+      "path": "skills/taste-skill/scripts/lint.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9277761d18222e5fc75c85ed79aa032f3d086598",
+      "size": 11747,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/9277761d18222e5fc75c85ed79aa032f3d086598"
+    },
+    {
+      "path": "skills/taste-skill/scripts/scenes.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bbde8e6bdf27859af0d54db1e1b2756de3a7d56",
+      "size": 8980,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/7bbde8e6bdf27859af0d54db1e1b2756de3a7d56"
+    },
+    {
+      "path": "tests",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6d60d58bcfc5d5c8ae2caf7cb05d1d1d82475cfc",
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/trees/6d60d58bcfc5d5c8ae2caf7cb05d1d1d82475cfc"
+    },
+    {
+      "path": "tests/skill_test.sh",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ca9f2460c5613b243a4f891a01a1fbcada435077",
+      "size": 3219,
+      "url": "https://api.github.com/repos/Leonxlnx/taste-skill/git/blobs/ca9f2460c5613b243a4f891a01a1fbcada435077"
+    }
+  ],
+  "truncated": false
+}

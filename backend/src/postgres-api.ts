@@ -1,3 +1,6 @@
+import {movementRequest} from './movement';
+import {shopRead} from './shops';
+import {runAsync as runShopRead} from './storage/effects';
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { demand, ServiceError } from './auth';
@@ -7,7 +10,7 @@ import { PostgresAuth } from './storage/postgres-auth';
 import { PostgresEmail } from './storage/postgres-email';
 import type { PostgresDatabase } from './storage/postgres';
 import { executePostgres } from './storage/postgres-commands';
-import {postgresCommunityFeed,postgresCommunityPostDetail} from './storage/postgres-community-page';
+import {postgresCommunityFeed,postgresCommunityPostDetail,postgresCommunitySocial} from './storage/postgres-community-page';
 import {postgresDiscoverHotPage} from './storage/postgres-discover-hot-page';
 import {postgresModerationPage} from './storage/postgres-community-moderation-page';
 import { searchPostgresRooms, postgresRoomDetail } from './room-search';
@@ -58,11 +61,25 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       if (request.method==='GET' && pathname==='/api/students/search') return send(response,200,await postgresStudentSearch(db,cookieToken(request) ?? '',new URL(request.url!,'http://localhost').searchParams.get('number') ?? '',request.socket.remoteAddress ?? 'unknown'));
       const hoverMatch=request.method==='GET' && /^\/api\/people\/([^/]+)\/hover$/.exec(pathname);
       if(hoverMatch) return send(response,200,await postgresPersonHover(db,cookieToken(request) ?? '',decodeURIComponent(hoverMatch[1]),new URL(request.url!,'http://localhost').searchParams.get('number') ?? undefined));
+      if(request.method==='GET' && pathname==='/api/shops')return send(response,200,await db.transaction(async client=>{
+        const actor=await auth.authenticate(cookieToken(request),client),repo=new PostgresRepository(client);
+        demand(!passwordChangeRequired(await repo.all('companionIdentity'),actor),'请先修改本人初始密码。',403);
+        return runShopRead(shopRead(repo,actor,new URL(request.url!,'http://localhost').searchParams));
+      }));
+      if((request.method==='GET'&&pathname==='/api/movement')){
+        const actor=await auth.authenticate(cookieToken(request));
+        const verified=await db.transaction(async client=>{
+          const repo=new PostgresRepository(client);demand(!passwordChangeRequired(await repo.all('companionIdentity'),actor),'请先修改本人初始密码。',403);
+          return (await repo.all('verifiedEmail')).some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
+        });
+        return send(response,200,await movementRequest(actor,verified,'resolve'));
+      }
       if (request.method === 'GET' && pathname === '/api/workspace') return send(response,200,await postgresWorkspace(db,cookieToken(request) ?? ''));
       if (request.method === 'GET' && pathname === '/api/identity/me') return send(response,200,await postgresOwnStudentIdentity(db,await auth.authenticate(cookieToken(request))));
       if (request.method === 'GET' && pathname === '/api/identity/requests') return send(response,200,await postgresListStudentIdentityRequests(db,await auth.authenticate(cookieToken(request)),new URL(request.url!,'http://localhost').searchParams));
       if (request.method === 'GET' && pathname === '/api/community') return send(response,200,await postgresCommunityFeed(db,cookieToken(request) ?? '',requestUrl.searchParams));
       if (request.method === 'GET' && pathname === '/api/discover/hot') return send(response,200,await postgresDiscoverHotPage(db,cookieToken(request) ?? ''));
+      if(request.method==='GET' && pathname==='/api/community/social') return send(response,200,await postgresCommunitySocial(db,cookieToken(request)??'',requestUrl.searchParams));
       if(request.method==='GET' && pathname==='/api/community/feed') return send(response,200,await postgresCommunityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
       if(request.method==='GET' && pathname==='/api/admin/community/moderation') return send(response,200,await postgresModerationPage(db,await auth.authenticate(cookieToken(request)),requestUrl.searchParams));
       const communityDetail=request.method==='GET' && /^\/api\/community\/posts\/([^/]+)$/.exec(pathname);
@@ -93,6 +110,16 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,token,'screenshot.import',{image:image.image,recognizedText:image.text,ocrRequestId:image.requestId},randomUUID())});
         }
         const input = await body(request);
+        if(pathname==='/api/movement/command'){
+          const actor=await auth.authenticate(cookieToken(request));
+          const verified=await db.transaction(async client=>{
+            const repo=new PostgresRepository(client);demand(!passwordChangeRequired(await repo.all('companionIdentity'),actor),'请先修改本人初始密码。',403);
+            return (await repo.all('verifiedEmail')).some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
+          });
+          demand(['launch','personal.list','personal.start','personal.pause','personal.resume','personal.finish'].includes(String(input.operation)),'无效运动操作。');
+          return send(response,200,await movementRequest(actor,verified,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
+        }
+
         if(pathname==='/api/accounts/admin-email/request') {
           demand(Object.keys(input).length===0,'邮箱验证只能使用本人当前邮箱。');
           return send(response,200,await postgresAdminEmailRequest(db,cookieToken(request) ?? '',options.localOutbox===true));

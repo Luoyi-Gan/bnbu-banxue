@@ -1,0 +1,2 @@
+# Preserve imported runtime bytes so the SHA-256 manifest survives checkouts.
+** -text

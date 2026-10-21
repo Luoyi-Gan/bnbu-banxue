@@ -1,0 +1,26 @@
+{
+  "scope": "Local acceptance data; no saved forms or decisions",
+  "routes": [
+    "/v2/teacher/coffee",
+    "/v2/teacher/schedule",
+    "/v2/teacher/messages",
+    "/v2/teacher/profile",
+    "/v2/teacher/sports",
+    "/v2/admin",
+    "/v2/admin/verifications",
+    "/v2/admin/moderation",
+    "/v2/admin/keywords",
+    "/v2/admin/mail-activities"
+  ],
+  "overlays": [
+    "Teacher slot form and bookings tabs",
+    "Teacher 取消预约 opens and closes without submitting",
+    "Teacher 提出改期 opens and closes without submitting",
+    "teacher mobile navigation opens and closes",
+    "Moderation detail opens and closes without decision",
+    "admin mobile navigation opens and closes"
+  ],
+  "page_errors": [],
+  "overflow": [],
+  "result": "passed"
+}

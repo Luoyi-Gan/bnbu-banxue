@@ -1,0 +1,165 @@
+/* Student-only extension of the selected campus-window design.
+   Portal layers receive the same tokens without styling teacher/admin screens. */
+body:has(.v2-app.v2-app-student),
+.v2-app.v2-app-student,
+body:has(.v2-app.v2-app-student) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-picker-layer) {
+  --v2-canvas:#faf9f6;--v2-surface:#fffefa;--v2-ink:#263c35;--v2-muted:#65726a;
+  --v2-blue:#426575;--v2-action:#426575;--v2-accent-soft:#e8eee9;--v2-accent-ink:#345361;
+  --v2-soft:#f0f2ec;--v2-line:#e4e7df;--v2-shadow:none;
+  --ui-canvas:#faf9f6;--ui-surface:#fffefa;--ui-ink:#263c35;--ui-muted:#65726a;
+  --ui-accent:#426575;--ui-accent-soft:#e8eee9;--ui-accent-ink:#345361;--ui-line:#e4e7df;
+  --cw-title:"BNBU WenKai","LXGW WenKai","KaiTi",serif;
+  color:var(--v2-ink);font-family:var(--reference-font);
+}
+.v2-app.v2-app-student .v2-main {background:var(--v2-canvas)}
+.v2-app.v2-app-student .v2-page {max-width:1120px;padding:28px 28px 44px;color:var(--v2-ink);min-width:0}
+.v2-app.v2-app-student :is(.v2-page-heading h1,.v2-discover-top h1,.v2-editorial-page-intro h1) {font:500 32px/1.4 var(--cw-title);letter-spacing:2px;color:var(--v2-ink)}
+.v2-app.v2-app-student .v2-page-heading {gap:18px;align-items:center;margin-bottom:26px}
+.v2-app.v2-app-student .v2-page-heading>div {min-width:0}
+.v2-app.v2-app-student :is(.v2-page-heading p,.v2-eyebrow,.v2-section-heading p,.v2-section-heading a) {color:var(--v2-muted);line-height:1.7}
+.v2-app.v2-app-student .v2-page-heading p {font-size:14px}
+.v2-app.v2-app-student .v2-eyebrow {font-size:11px;letter-spacing:.1em}
+.v2-app.v2-app-student .v2-section-heading h2 {font:500 24px/1.5 var(--cw-title);color:var(--v2-ink)}
+.v2-app.v2-app-student :is(.v2-panel,.v2-service-card,.v2-editorial-recommendation,.v2-organization-grid>article,.v2-alumni-card,.v2-alumni-intro,.v2-teacher-card,.reference-post,.v2-team-card) {background:var(--v2-surface);border:1px solid var(--v2-line);border-radius:6px;box-shadow:none;color:var(--v2-ink)}
+.v2-app.v2-app-student :is(.v2-panel,.v2-ai-layout,.v2-settings-grid,.v2-toolbar,.v2-directory-tools) {min-width:0}
+.v2-app.v2-app-student :is(.v2-button,.v2-filter-pills button,.v2-tabs button) {border-radius:6px;min-height:44px;font-size:14px;box-shadow:none}
+.v2-app.v2-app-student .v2-button-primary,
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-button-primary {background:var(--v2-action);border-color:var(--v2-action);color:#fff;box-shadow:none}
+.v2-app.v2-app-student .v2-button-primary:hover:not(:disabled),
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-button-primary:hover:not(:disabled) {background:var(--v2-accent-ink)}
+.v2-app.v2-app-student .v2-button-secondary,
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-button-secondary {background:transparent;border:1px solid #b5c8bb;color:var(--v2-ink)}
+.v2-app.v2-app-student :is(.v2-filter-pills button.is-active,.v2-tabs button.is-active,.reference-notice-filters button.is-active) {background:var(--v2-accent-soft);border-color:#b5c8bb;color:var(--v2-ink)}
+.v2-app.v2-app-student :is(.v2-filter-pills,.v2-tabs,.v2-directory-filters) {gap:8px}
+.v2-app.v2-app-student .v2-empty {background:#f1f3ed;border:1px solid var(--v2-line);border-radius:6px;color:var(--v2-muted)}
+.v2-app.v2-app-student .v2-empty strong {color:var(--v2-ink)}
+.v2-app.v2-app-student :is(.v2-form input:not([type=checkbox]):not([type=radio]),.v2-form textarea,.v2-form select,.v2-toolbar>input,.v2-toolbar>select,.v2-directory-tools input) {background:var(--v2-surface);border:1px solid var(--v2-line);border-radius:6px;color:var(--v2-ink);min-height:44px;font-size:15px}
+.v2-app.v2-app-student :is(.v2-form>label,.v2-form-two>label) {font-size:14px;font-weight:400;color:var(--v2-ink);line-height:1.7;min-width:0}
+.v2-app.v2-app-student :is(.v2-form-note,.v2-detail-lead,.v2-detail-date,.v2-panel>p,.v2-panel>small) {color:var(--v2-muted);font-size:14px;line-height:1.8}
+.v2-app.v2-app-student input:is([type=checkbox],[type=radio]) {accent-color:var(--v2-action)}
+body:has(.v2-app.v2-app-student) :is(button,a,input,textarea,select):focus-visible {outline:2px solid #426575;outline-offset:3px}
+.v2-app.v2-app-student :is(.reference-icon,.v2-org-mark,.inbox-avatar,.v2-service-icon,.v2-partner-type-icon) {background:#e8eee9;color:#3e625b;border-radius:10px}
+/* Existing campus photographs keep their URLs and object relationships. */
+.v2-app.v2-app-student :is(.reference-schedule-cover,.reference-community-hero,.v2-teacher-hero,.v2-editorial-campus-photo,.v2-campus-explore-entry) {border-radius:85px 6px 6px 6px;overflow:hidden}
+.v2-app.v2-app-student :is(.reference-schedule-cover>strong,.reference-community-hero h2,.v2-teacher-hero>strong) {font-family:var(--cw-title);font-weight:500}
+.v2-app.v2-app-student .reference-calendar {border-radius:6px 24px 6px 6px;border-color:var(--v2-line);background:var(--v2-surface);box-shadow:0 4px 0 #8faeb554}
+.v2-app.v2-app-student .reference-calendar header button {min-height:44px;min-width:44px;background:#e9eef0;color:#426575;border-radius:5px}
+.v2-app.v2-app-student .reference-week button {color:var(--v2-ink);border-radius:6px;min-height:72px}
+.v2-app.v2-app-student .reference-week button.is-active {background:#e9eef0;color:#345361}
+.v2-app.v2-app-student :is(.reference-week small,.reference-timeline time,.reference-timeline small) {color:var(--v2-muted);font-size:13px}
+.v2-app.v2-app-student .reference-timeline {background:transparent;border:0;padding:0}
+.v2-app.v2-app-student .reference-timeline>a {border-color:var(--v2-line);color:var(--v2-ink)}
+.v2-app.v2-app-student .reference-timeline strong {font-size:16px;font-weight:500}
+.v2-app.v2-app-student .reference-timeline em {background:#e8eee9;color:#3e625b;border-radius:5px}
+.v2-app.v2-app-student .v2-timetable-calendar {background:var(--v2-surface);border-radius:6px}
+.v2-app.v2-app-student .v2-timetable :is(.v2-lesson-card,.v2-timetable-day,.v2-timetable-heading) {border-radius:6px;box-shadow:none}
+.v2-app.v2-app-student :is(.v2-organization-grid>article,.v2-alumni-card,.v2-teacher-card) p {color:var(--v2-muted);line-height:1.8}
+.v2-app.v2-app-student :is(.v2-teacher-topics i,.v2-coffee-slot.is-selected,.v2-coffee-slot[aria-pressed=true]) {background:#e9eef0;border-color:#8faeb5;color:#345361}
+.v2-app.v2-app-student :is(.v2-teacher-grid,.v2-organization-grid,.v2-alumni-grid) {gap:18px}
+.v2-app.v2-app-student .v2-teacher-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+.v2-app.v2-app-student .v2-teacher-card {display:grid;grid-template-columns:minmax(0,1fr) auto;padding:0;overflow:hidden;text-align:left;justify-items:stretch;gap:0}
+.v2-app.v2-app-student .v2-teacher-card>img {grid-column:1/-1;width:100%;height:170px;object-fit:cover}
+.v2-app.v2-app-student .v2-teacher-card .v2-teacher-row-copy {padding:18px;gap:8px 12px}
+.v2-app.v2-app-student .v2-teacher-card>svg {margin:24px 18px 0 0;color:var(--v2-muted)}
+.v2-app.v2-app-student .v2-teacher-row-copy>strong {font-size:17px}
+.v2-app.v2-app-student .v2-teacher-row-copy>em {font-size:13px;color:var(--v2-muted)}
+.v2-app.v2-app-student .v2-teacher-topics i {font-size:12px}
+.v2-app.v2-app-student .v2-organization-grid :is(strong,small) {font-size:14px}
+.v2-app.v2-app-student .v2-organization-grid p {font-size:13px}
+.v2-app.v2-app-student :is(.v2-coffee-teacher-detail,.v2-coffee-slot,.v2-coffee-booking-panel,.v2-alumni-booking) {border-radius:6px;border-color:var(--v2-line);box-shadow:none}
+.v2-app.v2-app-student :is(.v2-partner-card,.v2-partner-filter-panel,.v2-partner-mobile-card,.v2-team-row) {border-radius:6px;border-color:var(--v2-line);box-shadow:none}
+.v2-app.v2-app-student .reference-post-copy :is(strong,p) {color:var(--v2-ink)}
+.v2-app.v2-app-student .reference-post-copy p {font-size:15px;line-height:1.8}
+.v2-app.v2-app-student .v2-community-compose-circle {background:#426575;box-shadow:none}
+.v2-app.v2-app-student .v2-ai-chat {background:var(--v2-surface)}
+.v2-app.v2-app-student :is(.v2-ai-message-body,.v2-ai-suggestions button) {background:#f0f2ec;border-color:var(--v2-line);border-radius:6px;color:var(--v2-ink)}
+.v2-app.v2-app-student .v2-ai-message.is-user .v2-ai-message-body {background:#e9eef0;color:#345361}
+.v2-app.v2-app-student .v2-ai-composer {border-color:var(--v2-line);border-radius:6px;background:var(--v2-surface)}
+.v2-app.v2-app-student :is(.inbox-tabs,.inbox-workspace,.inbox-conversation,.inbox-notice) {border-radius:6px;border-color:var(--v2-line)}
+.v2-app.v2-app-student .inbox-tabs {background:#f0f2ec}
+.v2-app.v2-app-student .inbox-tabs button {border-radius:5px;min-height:44px}
+.v2-app.v2-app-student .inbox-tabs button[aria-pressed=true] {background:#e8eee9;box-shadow:none;color:var(--v2-ink)}
+.v2-app.v2-app-student .inbox-message-content p {border-radius:5px 16px 5px 5px;background:#f0f2ec;color:var(--v2-ink)}
+.v2-app.v2-app-student .inbox-message.is-mine .inbox-message-content p {background:#e9eef0;color:#345361}
+.v2-app.v2-app-student .inbox-composer {background:var(--v2-surface);border-color:var(--v2-line)}
+.v2-app.v2-app-student :is(.inbox-input-wrap,.inbox-notice.is-unread) {background:#f0f2ec;border-color:var(--v2-line)}
+.v2-app.v2-app-student .v2-toggle-row {border-color:var(--v2-line)}
+.v2-app.v2-app-student .v2-toggle-row strong {font-size:15px;font-weight:500}
+.v2-app.v2-app-student .v2-toggle-row small {font-size:13px;line-height:1.7;color:var(--v2-muted)}
+.v2-app.v2-app-student .v2-timetable-heading h2 {font-family:var(--cw-title);font-weight:500}
+.v2-app.v2-app-student .v2-course-time {border-color:#8faeb5}
+.v2-app.v2-app-student .v2-course-body>span {color:var(--v2-muted)}
+.v2-app.v2-app-student :is(.movement-start,.movement-progress,.movement-metrics,.movement-list,.native-sports-checkin) {border-radius:6px;border-color:var(--v2-line);box-shadow:none}
+.v2-app.v2-app-student :is(.movement-page-header h1,.movement-heading h2,.movement-progress h2,.movement-records h2) {font-family:var(--cw-title);font-weight:500;color:var(--v2-ink)}
+.v2-app.v2-app-student .movement-start {background:#e8eee9}
+.v2-app.v2-app-student .movement-hours p strong {color:var(--v2-action)}
+.v2-app.v2-app-student .v2-floating-timetable-trigger {background:var(--v2-surface);border:1px solid var(--v2-line);color:var(--v2-action);box-shadow:0 3px 12px #263c3510}
+.v2-app.v2-app-student .v2-floating-timetable-window {background:var(--v2-canvas);border:1px solid var(--v2-line);border-radius:6px 20px 6px 6px;box-shadow:0 12px 40px #263c3520}
+.v2-app.v2-app-student .v2-floating-timetable-window>header {background:var(--v2-surface);border-color:var(--v2-line);color:var(--v2-ink)}
+/* Portals: preserve all existing dismiss, validation and mutation handlers. */
+body:has(.v2-app.v2-app-student) :is(.v2-modal-scrim,.v2-drawer-scrim,.v2-map-picker-scrim) {background:#1e30284f;backdrop-filter:blur(3px)}
+body:has(.v2-app.v2-app-student) .v2-modal {background:#faf9f6;color:#263c35;border:1px solid #e4e7df;border-radius:6px 24px 6px 6px;padding:24px;box-shadow:0 20px 70px #263c3530;max-height:min(88dvh,800px);line-height:1.8}
+body:has(.v2-app.v2-app-student) .v2-modal>header {position:sticky;top:-24px;z-index:4;background:#faf9f6;gap:16px;border-bottom:1px solid #e4e7df;padding:0 0 16px;margin-bottom:20px}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer)>header h2 {font:500 25px/1.5 var(--cw-title);color:#263c35;overflow-wrap:anywhere}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-icon-button {width:44px;height:44px;min-width:44px;flex-shrink:0;background:#e8eee9;border:0;border-radius:50%;color:#3e625b}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-button,.v2-cover-options button,.ref-cover-options button) {min-height:44px;border-radius:6px;font-size:14px}
+body:has(.v2-app.v2-app-student) .v2-drawer {background:#faf9f6;color:#263c35;border-left:1px solid #e4e7df;box-shadow:-16px 0 60px #263c3520}
+body:has(.v2-app.v2-app-student) .v2-drawer>header {background:#faf9f6;border-color:#e4e7df;padding:20px 24px}
+body:has(.v2-app.v2-app-student) .v2-drawer-body {padding:24px;line-height:1.8}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-detail-lead,.v2-detail-date,.v2-form-note,.v2-modal-copy,.v2-drawer-body>p) {color:#65726a;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-form>label,.v2-form-two>label) {color:#263c35;font-size:14px;font-weight:400;line-height:1.7;min-width:0}
+body:has(.v2-app.v2-app-student) .v2-partner-specific-fields label {color:#263c35;font-size:14px;font-weight:400;line-height:1.7;min-width:0}
+body:has(.v2-app.v2-app-student) :is(.reference-word-count,.v2-image-uploader small,.v2-image-uploader-head>span,.v2-partner-form-intro>span) {color:#65726a;font-size:12px;line-height:1.7}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-form input:not([type=checkbox]):not([type=radio]),.v2-form textarea,.v2-form select,.v2-comment-form input,.reference-inline-search) {background:#fffefa;border:1px solid #d5dcd2;color:#263c35;border-radius:6px;font:400 16px/1.5 var(--reference-font);min-height:44px;min-width:0}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(input,textarea)::placeholder {color:#65726a}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-form {gap:18px}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-form-actions {gap:10px;flex-wrap:wrap;border-color:#e4e7df;background:#faf9f6}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-upload-add,.v2-timetable-upload,.v2-recognition ol,.v2-info-box,.v2-partner-type-picker button,.v2-icon-options button,.ref-cover-options button) {background:#f0f2ec;color:#3e625b;border-color:#d5dcd2;border-radius:6px}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-partner-type-picker button.is-active,.v2-icon-options button.is-active,.ref-cover-options button[aria-pressed=true]) {background:#e9eef0;border-color:#8faeb5;color:#345361}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.reference-add-list article,.v2-comment,.v2-fact-list,.v2-detail-actions) {border-color:#e4e7df}
+body:has(.v2-app.v2-app-student) .reference-add-list article {gap:14px}
+body:has(.v2-app.v2-app-student) .reference-add-list article>span {min-width:0;overflow-wrap:anywhere}
+body:has(.v2-app.v2-app-student) .reference-add-list article>span>small {font-size:13px;color:#65726a}
+body:has(.v2-app.v2-app-student) .v2-detail-art {border-radius:6px}
+body:has(.v2-app.v2-app-student) .v2-map-picker-dialog {background:#faf9f6;border:1px solid #e4e7df;border-radius:6px;overflow:hidden}
+body:has(.v2-app.v2-app-student) :is(.v2-explorer-panel,.v2-explorer-panel-head,.v2-explorer-map-top) {color:#263c35;border-color:#e4e7df}
+body:has(.v2-app.v2-app-student) .v2-explorer-panel {background:#faf9f6}
+body:has(.v2-app.v2-app-student) .v2-explorer-panel h2 {font-family:var(--cw-title);font-weight:500}
+@media(max-width:760px) {
+  .v2-app.v2-app-student .v2-page {padding:22px 20px 35px}
+  .v2-app.v2-app-student .v2-page-heading {flex-wrap:wrap;align-items:flex-start;gap:14px}
+  .v2-app.v2-app-student .v2-page-heading h1 {font-size:28px}
+  .v2-app.v2-app-student .v2-section-heading h2 {font-size:22px}
+  .v2-app.v2-app-student :is(.reference-schedule-cover,.reference-community-hero,.v2-teacher-hero) {border-top-left-radius:60px}
+  .v2-app.v2-app-student .reference-calendar {padding:16px 10px}
+  .v2-app.v2-app-student .reference-calendar header {gap:8px;flex-wrap:wrap}
+  .v2-app.v2-app-student .v2-form-two {grid-template-columns:1fr}
+  .v2-app.v2-app-student :is(.v2-organization-grid,.v2-teacher-grid) {grid-template-columns:minmax(0,1fr)}
+  .v2-app.v2-app-student .reference-community-tools {flex-wrap:wrap;gap:10px;min-width:0}
+  .v2-app.v2-app-student .reference-community-tools>div {max-width:100%;min-width:0}
+  .v2-app.v2-app-student .reference-community-tools label {flex:1;max-width:100%;min-width:100px;border-radius:6px;min-height:44px}
+  body:has(.v2-app.v2-app-student) .v2-modal-layer {padding:12px}
+  body:has(.v2-app.v2-app-student) .v2-modal {width:100%;max-height:calc(100dvh - 24px);padding:20px 17px;border-radius:6px 22px 6px 6px}
+  body:has(.v2-app.v2-app-student) .v2-modal:has(.v2-social-compose) {width:100%;height:auto;max-height:calc(100dvh - 24px);align-self:center;padding:20px 17px;border-radius:6px 22px 6px 6px}
+  body:has(.v2-app.v2-app-student) .v2-modal:has(.v2-social-compose) .v2-form-actions {bottom:-20px;padding:15px 0;margin-bottom:0;background:#faf9f6;border-color:#e4e7df}
+  body:has(.v2-app.v2-app-student) .v2-drawer {width:100%;max-height:100dvh;border-radius:0}
+  body:has(.v2-app.v2-app-student) .v2-drawer>header {padding:16px 20px}
+  body:has(.v2-app.v2-app-student) .v2-drawer-body {padding:20px}
+  body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-form-two {grid-template-columns:1fr}
+  body:has(.v2-app.v2-app-student) .v2-modal>header {top:-20px;padding:0 0 12px;margin-bottom:16px}
+  body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer)>header h2 {font-size:23px}
+  .v2-app.v2-app-student .v2-floating-timetable-window {border-radius:6px 18px 0 0;background:#faf9f6}
+}
+@media(max-width:360px) {
+  .v2-app.v2-app-student .v2-page {padding-left:16px;padding-right:16px}
+  body:has(.v2-app.v2-app-student) .reference-add-list article {align-items:flex-start;flex-direction:column}
+  .v2-app.v2-app-student .v2-heading-action {max-width:100%}
+}
+@media(prefers-reduced-motion:reduce) {
+  body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer,.v2-modal-scrim,.v2-drawer-scrim) {animation:none;transition:none}
+  .v2-app.v2-app-student :is(.v2-filtered-list,.v2-teacher-card),
+  body:has(.v2-app.v2-app-student) .v2-partner-specific-fields {animation:none;transition:none}
+}
+
+/* Soft ambient elevation on campus course previews. */
+.v2-app.v2-app-student .ref-lesson>span{box-shadow:var(--student-course-shadow-small)}

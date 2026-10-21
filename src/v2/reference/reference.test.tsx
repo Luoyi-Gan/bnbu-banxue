@@ -5,7 +5,9 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import type { LiveEntity, Workspace } from '../../live/api'
 import * as workspaceHook from '../useWorkspaceBackend'
 import * as communityHook from '../useCommunityBackend'
-import { ReferenceHome, ReferenceCampus, ReferenceMe, ReferenceDiscover, ReferenceSports } from './pages'
+import { ReferenceCampus, ReferenceMe, ReferenceDiscover, ReferenceSports } from './pages'
+import { CampusWindowHome } from './CampusWindowHome'
+import { V2Provider } from '../store'
 import { campusDate, ownLessons, sportsSummary, weekDates } from './model'
 import type { Post } from '../../../shared/v2/model'
 
@@ -23,7 +25,7 @@ const posts:Post[]=[{id:'post-a',title:'秋日校园',body:'记录校园里平�
 beforeEach(()=>{
   vi.useFakeTimers();vi.setSystemTime(new Date('2026-10-17T10:00:00+08:00'))
   vi.spyOn(workspaceHook,'useWorkspaceBackend').mockReturnValue({data:fixture,error:'',busy:false,mutate:vi.fn().mockResolvedValue(true),refresh:vi.fn().mockResolvedValue(undefined)})
-  vi.spyOn(communityHook,'useCommunityBackend').mockReturnValue({account:{id:'student',name:'王同学'},posts,likedPosts:[],savedPosts:[],error:'',busy:false,detailPost:null,detailCommentsHasMore:false,detailCommentPage:1,mutate:vi.fn(),recordOpen:vi.fn(),loadMore:vi.fn(),loadPost:vi.fn()})
+  vi.spyOn(communityHook,'useCommunityBackend').mockReturnValue({account:{id:'student',name:'王同学'},posts,likedPosts:[],savedPosts:[],error:'',busy:false,loadingMore:false,refresh:vi.fn(),detailPost:null,detailCommentsHasMore:false,detailCommentPage:1,mutate:vi.fn(),recordOpen:vi.fn(),loadMore:vi.fn(),loadPost:vi.fn()})
 })
 afterEach(()=>{vi.restoreAllMocks();vi.useRealTimers()})
 
@@ -45,15 +47,15 @@ it('体育源不可用时隐藏旧投影，记录始终限制为授权身份',()
 })
 it('个人主页不把关注称为加入，不把参与标记称为正式报名',()=>{
   const html=renderToStaticMarkup(<MemoryRouter><ReferenceMe/></MemoryRouter>)
-  expect(html).toContain('关注组织');expect(html).toContain('标记参与');expect(html).not.toContain('报名成功')
-  expect(html).toContain('我的日历');expect(html).toContain('更多功能')
+  expect(html).toContain('关注组织');expect(html).not.toContain('近期动态');expect(html).not.toContain('报名成功')
+  expect(html).toContain('我的日历');expect(html).toContain('我的课表')
 })
-it('有内容的五页结构可渲染，运动页不提供虚构GPS或开始提交',()=>{
-  const pages={home:<ReferenceHome/>,discover:<ReferenceDiscover/>,campus:<ReferenceCampus/>,me:<ReferenceMe/>,sports:<ReferenceSports/>}
+it('有内容的五页结构可渲染，运动进度与记录通过入口访问',()=>{
+  const pages={home:<CampusWindowHome/>,discover:<ReferenceDiscover/>,campus:<ReferenceCampus/>,me:<ReferenceMe/>,sports:<ReferenceSports/>}
   for(const [name,page] of Object.entries(pages)) {
-    const html=renderToStaticMarkup(<MemoryRouter>{page}</MemoryRouter>)
+    const html=renderToStaticMarkup(<MemoryRouter><V2Provider>{page}</V2Provider></MemoryRouter>)
     expect(html).toContain('ref-page')
-    if(name==='sports'){expect(html).toContain('67%');expect(html).not.toContain('GPS');expect(html).not.toContain('开始打卡')}
+    if(name==='sports'){expect(html).toContain('正在连接 BNBU Sports');expect(html).not.toContain('本机模拟');expect(html).not.toContain('67%');expect(html).not.toContain('GPS')}
     if(process.env.REFERENCE_RENDER==='1') {
       const dir='artifacts/reference-rebuild-20261017';mkdirSync(dir,{recursive:true})
       writeFileSync(`${dir}/sample-${name}.html`,`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>布局样例 · ${name}</title><link rel="stylesheet" href="/src/styles/base.css"><link rel="stylesheet" href="/src/v2/v2.css"><link rel="stylesheet" href="/src/v2/aRedesign.css"><link rel="stylesheet" href="/src/v2/aControls.css"><link rel="stylesheet" href="/src/v2/studentTheme.css"><link rel="stylesheet" href="/src/v2/editorial.css"><link rel="stylesheet" href="/src/v2/referenceStudent.css"><link rel="stylesheet" href="/src/v2/campusReference.css"><link rel="stylesheet" href="/src/v2/reference/reference.css"><style>body{margin:0;background:#faf9f6}a{text-decoration:none}button,input,select{font:inherit}.v2-app{display:block!important}.v2-icon-button{background:transparent;border:0;padding:0;color:#252b23}.v2-icon-button svg{width:21px;height:21px}.sample-note{font:10px sans-serif;color:#8a836e;padding:5px 20px;background:#f1eade}.ref-page{padding-bottom:75px}.sample-nav{display:flex;justify-content:space-around;position:fixed;bottom:0;background:#faf9f6f2;left:0;right:0;padding:14px 0;font:12px sans-serif;color:#656e5a;border-top:1px solid #eee}</style><div class="sample-note">布局样例 · 测试数据，非真实校园记录</div><div class="v2-app v2-app-student">${html}</div><nav class="sample-nav"><span>⌂ 首页</span><span>◉ 发现</span><span>♧ 校园</span><span>♧ 打卡</span><span>♙ 我的</span></nav></html>`)

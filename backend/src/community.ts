@@ -1,4 +1,5 @@
 import { effect, runSync, type BusinessRepository } from "./storage/effects";
+import {communitySocialPolicy,requireSocialAccess,validPostImages} from './community-social';
 import { demand, type Account } from "./auth";
 import { checkCommunityKeywords, communityKeywordPolicy } from './community-keywords';
 import {
@@ -82,44 +83,52 @@ export function* communityPolicy(
   action: string,
   input: Fields,
 ): Generator<unknown, Entity | undefined, unknown> {
+  const social=yield* communitySocialPolicy(repo,actor,action,input);
+  if(social)return social;
   if (action.startsWith('keyword.')) return yield* communityKeywordPolicy(repo, actor, action, input);
   if (action === "post.create") {
     student(actor);
     canSpeak(actor);
-    const images = strings(input.images);
-    demand(
-      images.length <= 9 &&
-        images.every(
-          (url) =>
-            /^data:image\/(jpeg|png|webp);base64,/.test(url) &&
-            url.length <= 7_000_000,
-        ),
-      "最多九张有效 JPG、PNG、WebP 图片。",
-    );
+    const draft=input.draftId?yield* effect(repo.get(input.draftId,'postDraft')):null;
+    if(draft)demand(draft.ownerId===actor.id&&draft.data.status==='draft','草稿已发布或不可访问。',409);
+    if(draft)demand(!draft.data.sourcePostId,'编辑草稿须保存到原帖子。',409);
+    const images=validPostImages(input.images??[],draft?.data.images);
     const title = textField(input, "title", 80);
     const body = textField(input, "body", 1000);
     const board = textField(input, "board", 40);
     yield* checkCommunityKeywords(repo, title, body);
-    return (yield* effect(repo.create("post", actor.id, {
+    const post=yield* effect(repo.create("post", actor.id, {
       title,
       body,
       board,
       images,
       status: "visible",
-    })));
+    }));
+    if(draft)yield* effect(repo.save(draft,{status:'published',postId:post.id,images:[],body:''}));
+    return post;
   }
   if (action === "comment.create") {
     student(actor);
     canSpeak(actor);
     const post = (yield* effect(repo.get(input.postId, "post")));
     demand(post.data.status === "visible", "帖子尚未公开。");
+    yield* requireSocialAccess(repo,actor,post.ownerId);
+    const reply=input.replyToId?yield* effect(repo.get(input.replyToId,'comment')):null;
+    if(reply){
+      demand(reply.data.postId===post.id&&reply.data.status==='visible','回复对象当前不可查看。',409);
+      yield* requireSocialAccess(repo,actor,reply.ownerId);
+    }
     const body = textField(input, "body", 300);
     yield* checkCommunityKeywords(repo, body);
-    return (yield* effect(repo.create("comment", actor.id, {
+    const comment=yield* effect(repo.create("comment", actor.id, {
       postId: post.id,
       body,
       status: "visible",
-    })));
+      ...(reply?{replyToId:reply.id,parentId:reply.data.parentId||reply.id}:{}),
+    }));
+    const recipients=[...new Set([post.ownerId,reply?.ownerId].filter((id):id is string=>!!id&&id!==actor.id))];
+    if(recipients.length)yield* effect(repo.notify(recipients,post.id,reply?'community.reply':'community.comment',reply?'你的内容收到一条回复。':'你的帖子收到一条评论。'));
+    return comment;
   }
   if (action === "post.delete") {
     const post = yield* effect(repo.get(input.id, "post"));

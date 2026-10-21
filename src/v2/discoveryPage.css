@@ -1,0 +1,128 @@
+/* Shared campus feeds: the images lead; controls stay close to their content. */
+.campus-discovery{--v2-muted:#63746f;--v2-blue:#356b8b}
+.campus-discovery .ref-header{height:82px}
+.campus-discovery-sections{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border:1px solid var(--v2-line);border-radius:12px;background:var(--v2-bg,#f0f2ee)}
+.campus-discovery-sections button{position:relative;min-width:0;min-height:44px;padding:10px 6px;border:0;border-radius:8px;background:transparent;color:var(--v2-muted);font:inherit;font-size:14px;line-height:1.4;cursor:pointer}
+.campus-discovery-sections button[aria-pressed=true]{background:var(--v2-surface,#fff);color:var(--v2-ink);font-weight:650;box-shadow:0 1px 5px #203e3514}
+.campus-discovery-sections button[aria-pressed=true]:after{display:none}
+.campus-discovery-panel{padding-top:20px;min-height:60vh;animation:campus-feed-enter .18s ease-out}
+.campus-discovery-sections button,.campus-discovery-pills button{transition:color .16s,background-color .16s}
+.campus-discovery .discovery-cover img{transition:opacity .2s}
+.campus-discovery-tools{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.campus-discovery-search{display:flex;align-items:center;gap:10px;min-height:46px;padding:0 14px;flex:1;min-width:0;border:1px solid var(--v2-line);border-radius:10px;background:var(--v2-surface,#fffefa);color:var(--v2-muted)}
+.campus-discovery-search svg{flex:none}.campus-discovery-search input{min-width:0;width:100%;border:0;background:transparent;color:var(--v2-ink);font:inherit;font-size:14px;min-height:44px;outline-offset:1px}
+.campus-discovery-filter-line{position:relative;display:flex;align-items:start;gap:12px;margin-bottom:18px}
+.campus-discovery-pills{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;min-width:0;padding:2px 0 8px;margin-bottom:12px}
+.campus-discovery-filter-line>.campus-discovery-pills{flex:1;margin:0}
+.campus-discovery-pills button{flex:none;min-height:40px;padding:8px 13px;border:0;border-radius:20px;background:transparent;color:var(--v2-muted);font:inherit;font-size:13px;white-space:nowrap}
+.campus-discovery-pills button[aria-pressed=true]{background:var(--v2-soft);color:var(--v2-ink);font-weight:650}
+.campus-discovery-filters{flex:none;align-self:start}
+.campus-discovery-filters summary{display:flex;align-items:center;gap:5px;min-height:44px;font-size:13px;cursor:pointer;list-style:none;color:var(--v2-muted)}
+.campus-discovery-filters summary::-webkit-details-marker{display:none}
+.campus-discovery-filter-fields{position:absolute;z-index:4;top:50px;right:0;width:min(420px,100%);display:grid;gap:14px;border:1px solid var(--v2-line);border-radius:12px;padding:20px;background:var(--v2-surface,#fffefa);box-shadow:0 12px 28px #17372b18}
+.campus-discovery-filter-fields label{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:12px;font-size:13px}
+.campus-discovery-filter-fields select,.campus-discovery-sort{min-height:44px;max-width:100%;font:inherit;font-size:13px;color:var(--v2-ink);border:1px solid var(--v2-line);border-radius:7px;background:var(--v2-surface,#fffefa);padding:8px}
+.campus-discovery-clear{min-height:40px;border:0;background:transparent;color:var(--v2-blue);font:inherit;font-size:13px;margin:-8px 0 12px;padding:0 4px}
+.campus-discovery-alumni-actions{display:flex;gap:12px;flex:none}
+.campus-discovery-alumni-actions a{min-height:44px;display:flex;align-items:center;font-size:12px;color:var(--v2-blue);max-width:70px}
+.campus-discovery .alumni-discovery-toolbar{margin-top:0}
+.campus-discovery .discovery-columns{gap:18px}
+.campus-discovery .discovery-column{gap:24px}
+.campus-discovery .discovery-cover{border-radius:10px}
+.campus-discovery .discovery-title{margin:0;font-family:inherit;font-size:15px!important;font-weight:600;line-height:1.55;padding:9px 1px 6px}
+.campus-discovery .discovery-cover img{border-radius:0}
+.campus-discovery :is(.activity-discovery-category,.alumni-discovery-category){background:var(--v2-surface,#fffefa);color:var(--v2-ink)}
+.campus-discovery .discovery-meta{font-size:12px;min-height:40px}
+.campus-discovery .discovery-meta button{min-width:40px;min-height:40px}
+.campus-discovery :is(.activity-discovery-when,.activity-discovery-location){font-size:13px;line-height:1.55}
+.campus-discovery .discovery-save,.campus-discovery .activity-discovery-save button{width:40px;height:40px;z-index:2;background:var(--v2-surface,#fffefa);color:var(--v2-muted)}
+.community-discovery-open{display:block;width:100%;padding:0;border:0;background:transparent;color:var(--v2-ink);text-align:left;font:inherit;cursor:pointer}
+.community-discovery-cover img,.organization-discovery-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.community-discovery-cover .discovery-text-cover>span{font-size:clamp(15px,1.6vw,21px);line-height:1.65;-webkit-line-clamp:6}
+.community-discovery-cover .discovery-text-cover small{font-size:12px;color:var(--v2-blue)}
+.community-discovery-card:nth-child(even) .discovery-text-cover{background:var(--v2-soft)}
+.community-cover-failed{position:absolute;bottom:8px;left:10px;font-size:10px;color:var(--v2-muted)}
+.community-discovery-card .discovery-save.is-saved,.community-discovery-card .discovery-meta button.is-liked{color:#a6544f}
+.community-owner-views{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--v2-muted);padding:3px 2px}
+.organization-discovery-cover{cursor:default}
+.organization-text-cover{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--v2-soft);color:var(--v2-blue)}
+.organization-text-cover strong{font-size:38px;letter-spacing:.1em}.organization-text-cover small{font-size:12px}
+.organization-discovery-card .discovery-title{margin:0;font-size:16px;cursor:default}
+.organization-discovery-description{font-size:13px;line-height:1.75;color:var(--v2-muted);margin:0 2px 10px!important;overflow-wrap:anywhere}
+.organization-discovery-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.organization-discovery-footer small{color:var(--v2-muted);font-size:12px}
+.organization-discovery-footer button{min-height:44px;min-width:60px;border:1px solid var(--v2-line);border-radius:22px;padding:8px 12px;background:var(--v2-surface);color:var(--v2-blue);font:inherit;font-size:12px;cursor:pointer}
+.organization-discovery-footer button[aria-pressed=true]{background:var(--v2-soft);color:var(--v2-muted)}
+.organization-discovery-contact{display:block;line-height:1.7;color:var(--v2-muted);font-size:13px;overflow-wrap:anywhere;margin:7px 2px 0}
+.organization-discovery-details{margin-top:5px}
+.organization-discovery-details summary{min-height:44px;display:flex;align-items:center;font-size:12px;color:var(--v2-blue);cursor:pointer;list-style:none}
+.organization-discovery-details summary:after{content:'+';margin-left:auto;font-size:18px}
+.organization-discovery-details[open] summary:after{content:'−'}
+.organization-discovery-details summary::-webkit-details-marker{display:none}
+.organization-discovery .v2-directory-tools{margin-bottom:12px}.organization-discovery .v2-directory-tools>span{flex:none;font-size:12px;color:var(--v2-muted)}
+.v2-community-page .reference-community-hero{display:none}
+.v2-community-page .community-discovery-card .discovery-title{margin:0}
+.v2-community-page .v2-community-compose-action{display:inline-flex}
+.campus-discovery :is(a,button,input,summary,select):focus-visible,.organization-discovery :is(button,input):focus-visible{outline:2px solid var(--v2-blue);outline-offset:3px}
+html[lang=en] .campus-discovery-sections{gap:4px}
+html[data-ui-text=large] .campus-discovery .discovery-title{font-size:17px!important;line-height:1.6}
+html[data-ui-theme=dark] .campus-discovery{--v2-muted:#afbeb5;--v2-blue:#91b7ca}
+@keyframes campus-feed-enter{from{opacity:.7;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:600px){
+  .v2-app.v2-app-student[data-campus-route='/v2/activities']:has(.campus-discovery) .v2-floating-timetable-trigger{left:auto;right:70px}
+  .campus-discovery{padding-left:16px!important;padding-right:16px!important}
+  .campus-discovery .ref-header{height:72px}
+  .campus-discovery-sections{gap:4px}
+  .campus-discovery-sections button{font-size:13px;min-height:44px;padding:9px 4px}
+  html[lang=en] .campus-discovery-sections{gap:4px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  html[lang=en] .campus-discovery-sections button{font-size:13px;white-space:normal}
+  .campus-discovery-panel{padding-top:16px}
+  .campus-discovery .discovery-columns{gap:12px}.campus-discovery .discovery-column{gap:22px}
+  .campus-discovery .discovery-title{font-size:14px!important}
+  .campus-discovery-tools{gap:9px}
+  .campus-discovery-filter-line{gap:10px;margin-bottom:12px}
+  .campus-discovery .alumni-discovery-toolbar{gap:5px}
+  .campus-discovery .alumni-discovery-categories button{padding-inline:11px}
+  .campus-discovery .alumni-discovery-card .discovery-title{min-height:0}
+}
+@media(prefers-reduced-motion:reduce){.campus-discovery *{animation:none!important;transition:none!important}}
+
+/* Text tabs and in-page filter choices share the quiet campus palette. */
+.campus-discovery-sections{padding:0;background:none;border:0;border-bottom:1px solid var(--v2-line);border-radius:0;gap:12px}
+.campus-discovery-sections button{padding:10px 0 14px;border-radius:0;font-size:15px;background:none}
+.campus-discovery-sections button[aria-pressed=true]{background:none;box-shadow:none;color:var(--v2-ink)}
+.campus-discovery-sections button[aria-pressed=true]:after{content:'';display:block;position:absolute;bottom:0;left:calc(50% - 10px);width:20px;height:3px;border-radius:3px;background:var(--v2-action,#356f73)}
+.discovery-choice-row{display:grid;grid-template-columns:42px minmax(0,1fr);align-items:start;gap:12px;font-size:13px}.discovery-choice-row>span{padding-top:12px;color:var(--v2-muted)}
+.discovery-choice{min-width:0;border:1px solid var(--v2-line);border-radius:9px;background:var(--v2-canvas,#faf9f6)}
+.discovery-choice summary{justify-content:space-between;gap:10px;padding:0 12px;color:var(--v2-ink);font-size:13px}
+.discovery-choice summary svg{color:var(--v2-muted);transition:transform .15s}.discovery-choice[open] summary svg{transform:rotate(180deg)}
+.discovery-choice-options{max-height:220px;overflow:auto;padding:4px 6px 6px;border-top:1px solid var(--v2-line)}
+.campus-discovery-filter-fields .discovery-choice-options label{position:relative;display:flex;align-items:center;gap:8px;min-height:40px;padding:6px 8px;border-radius:6px;cursor:pointer;grid-template-columns:none}
+.discovery-choice-options label:has(input:checked){background:var(--v2-accent-soft,#edf4ee);color:var(--v2-action,#356f73)}.discovery-choice-options label:focus-within{outline:2px solid var(--v2-action);outline-offset:-2px}
+.discovery-choice-options input{position:absolute;opacity:0;width:1px;height:1px}.discovery-choice-options label>span{flex:1}.discovery-choice-options label:hover{background:var(--v2-soft)}
+.campus-discovery-filter-fields{max-height:65dvh;overflow:auto;gap:10px;padding:14px}
+
+/* Reference direction: icon tabs, soft green selection, and a single filter strip. */
+.campus-discovery-sections{display:flex;align-items:center;justify-content:space-between;gap:6px;border:0;padding:2px 0 8px;overflow:visible}
+.campus-discovery-sections button{display:flex;align-items:center;justify-content:center;gap:7px;flex:0 1 auto;min-height:42px;padding:8px 12px;border-radius:24px;color:var(--v2-muted);font-size:14px;white-space:nowrap}
+.campus-discovery-sections button svg{flex:none;stroke-width:1.8}
+.campus-discovery-sections button[aria-pressed=true]{background:#eaf4ee;color:#204e43}
+.campus-discovery-sections button[aria-pressed=true]:after{bottom:-5px;background:#2e7663;width:26px;height:3px;left:calc(50% - 13px)}
+.campus-discovery-search{border-radius:14px;box-shadow:0 2px 8px #263c3505;min-height:48px}
+.campus-discovery-filter-line{align-items:center;gap:8px;padding:6px 10px;border-radius:20px;background:#f2f4f1}
+.campus-discovery-filter-line>.campus-discovery-pills{padding:0;gap:5px;align-items:center;justify-content:space-between}
+.campus-discovery-filter-line .campus-discovery-pills button[aria-pressed=true]{background:#eaf4ee;color:#182e26}
+.campus-discovery-filters{align-self:center;padding-left:12px;margin-left:4px;border-left:1px solid var(--v2-line)}
+.campus-discovery-filters summary{min-height:36px}
+.campus-discovery .activity-discovery-when,.campus-discovery .activity-discovery-location{display:flex;align-items:center;gap:5px}
+.campus-discovery :is(.activity-discovery-when,.activity-discovery-location) svg{flex:none;color:var(--v2-muted)}
+.campus-discovery .activity-discovery-location>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:600px){.campus-discovery-sections{gap:3px}.campus-discovery-sections button{font-size:12px;padding:8px 6px;gap:5px}.campus-discovery-sections button svg{width:18px;height:18px}.campus-discovery-filter-line{padding:5px 7px;gap:4px}.campus-discovery-filter-line .campus-discovery-pills button{font-size:12px;padding-inline:9px}.campus-discovery-filters{padding-left:8px;margin-left:0}html[lang=en] .campus-discovery-sections{flex-wrap:wrap}html[lang=en] .campus-discovery-sections button{flex-basis:45%}}
+html[data-ui-theme=dark] .campus-discovery-sections button[aria-pressed=true],html[data-ui-theme=dark] .campus-discovery-filter-line .campus-discovery-pills button[aria-pressed=true]{background:#233d34;color:#c0dfd2}
+
+/* Category geometry stays identical across all four discovery panels. */
+.campus-discovery .campus-discovery-sections{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:2px 0 8px}
+.campus-discovery .campus-discovery-sections button{box-sizing:border-box;width:100%;height:44px;min-height:44px;padding:8px 6px;gap:5px;font-size:14px;line-height:1.4;font-weight:600}
+.campus-discovery .campus-discovery-sections button[aria-pressed=true]{font-weight:600}
+.campus-discovery .campus-discovery-sections button svg{width:20px;height:20px;flex:0 0 20px}
+@media(max-width:600px){.campus-discovery .campus-discovery-sections{gap:3px}.campus-discovery .campus-discovery-sections button{font-size:12px;padding:8px 3px;gap:4px}.campus-discovery .campus-discovery-sections button svg{width:18px;height:18px;flex-basis:18px}html[lang=en] .campus-discovery .campus-discovery-sections{grid-template-columns:repeat(2,minmax(0,1fr))}}

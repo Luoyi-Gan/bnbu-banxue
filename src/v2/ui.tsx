@@ -1,23 +1,52 @@
+import {useDevicePreferences} from './devicePreferences'
+import { uiText, useUiLanguage } from './uiLanguage'
 import { ArrowLeft, X, type LucideIcon } from 'lucide-react'
-import { useEffect, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 
-export function PageHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description?: string; action?: ReactNode }) {
-  return <header className="v2-page-heading"><div><span className="v2-eyebrow">{eyebrow}</span><h1>{title}</h1>{description && <p>{description}</p>}</div>{action && <div className="v2-heading-action">{action}</div>}</header>
+export function PageHeading({ eyebrow, title, description, action, back, backLabel="返回校园" }: { eyebrow: string; title: string; description?: string; action?: ReactNode; back?: string; backLabel?: string }) { useUiLanguage();
+  return <header className="v2-page-heading"><div><span className="v2-eyebrow">{uiText(eyebrow)}</span><h1 className={back?"v2-title-with-back":undefined}>{back&&<Link className="v2-title-back" to={back} aria-label={uiText(backLabel)} title={uiText(backLabel)}><ArrowLeft size={22}/></Link>}{uiText(title)}</h1>{description && <p>{uiText(description)}</p>}</div>{action && <div className="v2-heading-action">{action}</div>}</header>
 }
-export function SectionHeading({ title, detail, action }: { title: string; detail?: string; action?: ReactNode }) {
-  return <div className="v2-section-heading"><div><h2>{title}</h2>{detail && <p>{detail}</p>}</div>{action}</div>
+export function SectionHeading({ title, detail, action, hideTitle=false }: { title: string; detail?: string; action?: ReactNode;hideTitle?:boolean }) { useUiLanguage();
+  if(hideTitle&&!detail&&!action)return null
+  return <div className="v2-section-heading"><div>{!hideTitle&&<h2>{uiText(title)}</h2>}{detail && <p>{uiText(detail)}</p>}</div>{action}</div>
 }
-export function Empty({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description?: string }) {
-  return <div className="v2-empty"><Icon size={26}/><strong>{title}</strong>{description && <p>{description}</p>}</div>
+export function Empty({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description?: string }) { useUiLanguage();
+  return <div className="v2-empty"><Icon size={26}/><strong>{uiText(title)}</strong>{description && <p>{uiText(description)}</p>}</div>
 }
-export function Drawer({ title, eyebrow, children, onClose, wide = false }: { title: string; eyebrow?: string; children: ReactNode; onClose: () => void; wide?: boolean }) {
-  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [onClose])
-  return createPortal(<div className="v2-drawer-layer"><button type="button" className="v2-drawer-scrim" aria-label="关闭详情" onClick={onClose}/><aside className={`v2-drawer${wide ? ' is-wide' : ''}`} role="dialog" aria-modal="true" aria-label={title}><header><div>{eyebrow && <span className="v2-eyebrow">{eyebrow}</span>}<h2>{title}</h2></div><button type="button" className="v2-icon-button" aria-label="关闭" onClick={onClose}><X size={20}/></button></header><div className="v2-drawer-body">{children}</div></aside></div>, document.body)
+export type CardOrigin={x:number;y:number;width:number;height:number}
+export function Drawer({ title, eyebrow, children, onClose, wide = false, origin }: { title: string; eyebrow?: string; children: ReactNode; onClose: () => void; wide?: boolean; origin?:CardOrigin }) { useUiLanguage();
+  const {reducedMotion}=useDevicePreferences()
+  const panel=useRef<HTMLElement>(null),animation=useRef<Animation|null>(null),closing=useRef(false)
+  const initialTransform=useRef('')
+  useLayoutEffect(()=>{
+    const element=panel.current
+    if(!element||!origin||reducedMotion)return
+    const bounds=element.getBoundingClientRect()
+    initialTransform.current=`translate(${origin.x-bounds.x}px,${origin.y-bounds.y}px) scale(${origin.width/bounds.width},${origin.height/bounds.height})`
+    animation.current=element.animate([{transform:initialTransform.current,borderRadius:'24px',opacity:.65},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})
+    return()=>animation.current?.cancel()
+  },[origin,reducedMotion])
+  const dismiss=useCallback(()=>{
+    if(closing.current)return
+    const element=panel.current
+    if(!element||!initialTransform.current||reducedMotion){onClose();return}
+    closing.current=true
+    animation.current?.cancel()
+    animation.current=element.animate([{transform:'none',opacity:1},{transform:initialTransform.current,borderRadius:'24px',opacity:0}],{duration:220,easing:'cubic-bezier(.4,0,.8,.2)',fill:'forwards'})
+    animation.current.onfinish=onClose
+  },[onClose,reducedMotion])
+  useEffect(()=>{
+    const previous=document.activeElement
+    panel.current?.querySelector<HTMLButtonElement>('button')?.focus({preventScroll:true})
+    return()=>{if(previous instanceof HTMLElement&&previous.isConnected)previous.focus({preventScroll:true})}
+  },[])
+  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape') dismiss() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [dismiss])
+  return createPortal(<div className="v2-drawer-layer"><button type="button" className="v2-drawer-scrim" aria-label={uiText("关闭详情")} onClick={dismiss}/><aside ref={panel} className={`v2-drawer${wide ? ' is-wide' : ''}${origin?' is-course-expansion':''}`} role="dialog" aria-modal="true" aria-label={uiText(title)}><header><div>{eyebrow && <span className="v2-eyebrow">{uiText(eyebrow)}</span>}<h2>{uiText(title)}</h2></div><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={dismiss}><X size={20}/></button></header><div className="v2-drawer-body">{children}</div></aside></div>, document.body)
 }
-export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) { useUiLanguage();
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape' && !document.querySelector('.v2-map-picker-layer')) onClose() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [onClose])
-  return createPortal(<div className="v2-modal-layer"><button className="v2-modal-scrim" type="button" aria-label="关闭窗口" onClick={onClose}/><div className="v2-modal" role="dialog" aria-modal="true" aria-label={title}><header><h2>{title}</h2><button type="button" className="v2-icon-button" aria-label="关闭" onClick={onClose}><X size={19}/></button></header>{children}</div></div>, document.body)
+  return createPortal(<div className="v2-modal-layer"><button className="v2-modal-scrim" type="button" aria-label={uiText("关闭窗口")} onClick={onClose}/><div className="v2-modal" role="dialog" aria-modal="true" aria-label={uiText(title)}><header><h2>{uiText(title)}</h2><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={onClose}><X size={19}/></button></header>{children}</div></div>, document.body)
 }
-export function BackLink({ to, children }: { to: string; children: ReactNode }) { return <Link className="v2-back-link" to={to}><ArrowLeft size={17}/>{children}</Link> }
+export function BackLink({ to, children }: { to: string; children: ReactNode }) { useUiLanguage();  return <Link className="v2-back-link" to={to}><ArrowLeft size={17}/>{children}</Link> }

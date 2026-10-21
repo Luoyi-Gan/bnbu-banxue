@@ -1,0 +1,24 @@
+{
+  "scope": "Local acceptance fixtures, visual styling and existing read-only interactions.",
+  "checks": [
+    "discover: mobile has no horizontal overflow",
+    "discover: desktop has no horizontal overflow",
+    "discover: narrow has no horizontal overflow",
+    "discover: zoom has no horizontal overflow",
+    "campus: mobile has no horizontal overflow",
+    "campus: desktop has no horizontal overflow",
+    "campus: narrow has no horizontal overflow",
+    "campus: zoom has no horizontal overflow",
+    "me: mobile has no horizontal overflow",
+    "me: desktop has no horizontal overflow",
+    "me: narrow has no horizontal overflow",
+    "me: zoom has no horizontal overflow",
+    "Discover search, empty state, clear filters, sorting and actual activity detail work",
+    "Campus weekday selection and full personal timetable work",
+    "Profile cover chooser opens/cancels; saved-items route works without writing preferences",
+    "Global timetable remains reachable from all three pages",
+    "Existing campus-window home and sports route remain separate"
+  ],
+  "page_errors": [],
+  "result": "passed"
+}

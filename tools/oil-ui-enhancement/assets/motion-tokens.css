@@ -1,0 +1,17 @@
+:root {
+  --motion-feedback: 140ms;
+  --motion-popover: 200ms;
+  --motion-panel: 280ms;
+  --motion-enter: cubic-bezier(.16, 1, .3, 1);
+  --motion-exit: cubic-bezier(.4, 0, 1, 1);
+  --motion-shift: 8px;
+}
+/* Use only for these optional motion classes; do not zero business timers. */
+.ui-motion-enter { animation: ui-motion-enter var(--motion-panel) var(--motion-enter) both; }
+@keyframes ui-motion-enter {
+  from { opacity: 0; transform: translateY(var(--motion-shift)); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-motion-enter { animation: none; }
+}

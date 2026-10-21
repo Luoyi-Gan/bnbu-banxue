@@ -1,0 +1,179 @@
+{
+  "sha": "4a9ca879f24a361f4dca4174fe2da0f67b5ddee3",
+  "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/trees/4a9ca879f24a361f4dca4174fe2da0f67b5ddee3",
+  "tree": [
+    {
+      "path": "CHANGELOG.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "98f743695eca09be85d332c597a600fe82e30146",
+      "size": 7805,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/98f743695eca09be85d332c597a600fe82e30146"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "adbcec5552ebeb9745b0850b29b81478395da655",
+      "size": 1068,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/adbcec5552ebeb9745b0850b29b81478395da655"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd61aa99dd53b489fd0a4e195254c9eaaec74391",
+      "size": 7265,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/bd61aa99dd53b489fd0a4e195254c9eaaec74391"
+    },
+    {
+      "path": "skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c0c65809dcfd97622a731457e75c5e41f53dd34b",
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/trees/c0c65809dcfd97622a731457e75c5e41f53dd34b"
+    },
+    {
+      "path": "skills/design-motion-principles",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9336a907e3296588f30f9f46eceb132f47d962eb",
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/trees/9336a907e3296588f30f9f46eceb132f47d962eb"
+    },
+    {
+      "path": "skills/design-motion-principles/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e4cf1c7825756157872d241e1d349331403226d5",
+      "size": 6838,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/e4cf1c7825756157872d241e1d349331403226d5"
+    },
+    {
+      "path": "skills/design-motion-principles/references",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e3d65ead1c8c3ed8376a1d7e802cc9b4b81c8954",
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/trees/e3d65ead1c8c3ed8376a1d7e802cc9b4b81c8954"
+    },
+    {
+      "path": "skills/design-motion-principles/references/accessibility.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d70bf277383085ce903187d44a1b8976fac3fef9",
+      "size": 1596,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/d70bf277383085ce903187d44a1b8976fac3fef9"
+    },
+    {
+      "path": "skills/design-motion-principles/references/anti-checklist.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3612dbefb8110ae3dcbc8dce7b04ecaff006383c",
+      "size": 12417,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/3612dbefb8110ae3dcbc8dce7b04ecaff006383c"
+    },
+    {
+      "path": "skills/design-motion-principles/references/audit-checklist.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c08a9d2c2fb9335927e73edaa3c130d635cc3412",
+      "size": 5148,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/c08a9d2c2fb9335927e73edaa3c130d635cc3412"
+    },
+    {
+      "path": "skills/design-motion-principles/references/creation-gotchas.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc605074f7a568e89804953b95dd648e1a554533",
+      "size": 2944,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/cc605074f7a568e89804953b95dd648e1a554533"
+    },
+    {
+      "path": "skills/design-motion-principles/references/demo-shell.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0914dd7554af36152f13a9129e1d4fdc85d3f0e0",
+      "size": 13645,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/0914dd7554af36152f13a9129e1d4fdc85d3f0e0"
+    },
+    {
+      "path": "skills/design-motion-principles/references/emil-kowalski.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c913ae4a29b8b5f7c6bd991bbb7d9d61f29a2901",
+      "size": 6039,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/c913ae4a29b8b5f7c6bd991bbb7d9d61f29a2901"
+    },
+    {
+      "path": "skills/design-motion-principles/references/jakub-krehel.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ccd4e56fc7bc67a1b474a5d29fd68b450abe6985",
+      "size": 4559,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/ccd4e56fc7bc67a1b474a5d29fd68b450abe6985"
+    },
+    {
+      "path": "skills/design-motion-principles/references/jhey-tompkins.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a9d93fd6bac0daf095bfffb2b31100a2a8f76e9",
+      "size": 5778,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/3a9d93fd6bac0daf095bfffb2b31100a2a8f76e9"
+    },
+    {
+      "path": "skills/design-motion-principles/references/motion-cookbook.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "01acea69d783bf9632257f54ecf9aa0eea1cd8f7",
+      "size": 16794,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/01acea69d783bf9632257f54ecf9aa0eea1cd8f7"
+    },
+    {
+      "path": "skills/design-motion-principles/references/output-format.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f0ea8c9a8434eefa50d96c1fe8217a3b0bfff074",
+      "size": 18386,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/f0ea8c9a8434eefa50d96c1fe8217a3b0bfff074"
+    },
+    {
+      "path": "skills/design-motion-principles/references/performance.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da675deeb2cfa115938d286dd5e021421adcb889",
+      "size": 2005,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/da675deeb2cfa115938d286dd5e021421adcb889"
+    },
+    {
+      "path": "skills/design-motion-principles/references/report-template.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d10fc2c3ba3c11a08a3fad234620030b1c4cfcaa",
+      "size": 63449,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/d10fc2c3ba3c11a08a3fad234620030b1c4cfcaa"
+    },
+    {
+      "path": "skills/design-motion-principles/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4bd157c79c6d4aaac0f35314e5a6f627ea1a558b",
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/trees/4bd157c79c6d4aaac0f35314e5a6f627ea1a558b"
+    },
+    {
+      "path": "skills/design-motion-principles/workflows/audit.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e9a480324d7202ac84c4d4d4ff7b092293d8100",
+      "size": 12336,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/3e9a480324d7202ac84c4d4d4ff7b092293d8100"
+    },
+    {
+      "path": "skills/design-motion-principles/workflows/create.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1dd971f91822fe90631719be72c061851e5ab026",
+      "size": 4142,
+      "url": "https://api.github.com/repos/kylezantos/design-motion-principles/git/blobs/1dd971f91822fe90631719be72c061851e5ab026"
+    }
+  ],
+  "truncated": false
+}

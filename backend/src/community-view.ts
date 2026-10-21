@@ -28,7 +28,7 @@ export function communityView(db: Database, token: string) {
   return projectCommunity({...workspace, relations: workspace.relations as {entityId:string;kind:string}[]}, new Map(likes.map(row=>[String(row.id),Number(row.count)])),engagement);
 }
 
-export function projectCommunity(workspace: {account:{id:string;name:string};entities:Entity[];people:{id:string;name:string;nickname?:string;avatar?:string}[];relations:{entityId:string;kind:string}[];alumni:{profiles:{id:string;name:string;status:string}[]}}, likes: ReadonlyMap<string,number>, engagement: Engagement = emptyEngagement) {
+export function projectCommunity(workspace: {account:{id:string;name:string};entities:Entity[];people:{id:string;name:string;nickname?:string;avatar?:string}[];relations:{entityId:string;kind:string}[];alumni:{profiles:{id:string;name:string;status:string}[]}}, likes: ReadonlyMap<string,number>, engagement: Engagement = emptyEngagement, facts?:{saves:Map<string,number>;comments:Map<string,number>;commentLikes:Map<string,number>}) {
   const account = workspace.account;
   const content = workspace.entities.filter(
     (entity) => entity.kind === "post" || entity.kind === "comment",
@@ -46,6 +46,10 @@ export function projectCommunity(workspace: {account:{id:string;name:string};ent
   );
   const posts = visible.map((post) => ({
     id: post.id,
+    version:post.version,
+    editedAt:post.data.editedAt,
+    saves:facts?.saves.get(post.id)??0,
+    commentCount:facts?.comments.get(post.id)??0,
     ownerId: post.ownerId,
     alumniId: typeof post.data.alumniId === "string" ? post.data.alumniId : undefined,
     title: String(post.data.title),
@@ -69,6 +73,11 @@ export function projectCommunity(workspace: {account:{id:string;name:string};ent
       )
       .map((comment) => ({
         id: comment.id,
+        parentId:comment.data.parentId,
+        replyToId:comment.data.replyToId,
+        replyToAuthor:content.some(c=>c.id===comment.data.replyToId&&c.data.status==='visible')?name(content.find(c=>c.id===comment.data.replyToId)!.ownerId):undefined,
+        likes:facts?.commentLikes.get(comment.id)??0,
+        liked:workspace.relations.some(r=>r.entityId===comment.id&&r.kind==='commentlike'),
         ownerId: comment.ownerId,
         author: name(comment.ownerId),
         authorAvatar: person(comment.ownerId)?.avatar ?? "",

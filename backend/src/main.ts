@@ -1,3 +1,6 @@
+import {movementRequest} from './movement';
+import {shopRead} from './shops';
+import {runSync as runShopRead} from './storage/effects';
 import { searchStudents } from './student-search';
 import { randomUUID } from 'node:crypto';
 import { personHover } from './person-hover';
@@ -18,7 +21,7 @@ import {
 } from "./auth";
 import { openDatabase, type Database } from "./database";
 import { execute, executeMailboxImport, snapshot } from "./commands";
-import {communityFeed,communityPostDetail} from './community-page';
+import {communityFeed,communityPostDetail,communitySocial} from './community-page';
 import {discoverHotPage} from './discover-hot-page';
 import {moderationPage} from './community-moderation-page';
 import { searchRooms, roomDetail } from './room-search';
@@ -97,8 +100,14 @@ export function createApiServer(
         const id = pathname === '/api/rooms' ? null : decodeURIComponent(pathname.slice('/api/rooms/'.length));
         return send(response, 200, id === null ? searchRooms(db, actor, requestUrl.searchParams) : roomDetail(db, actor, id));
       }
+      if(request.method==='GET' && pathname==='/api/shops'){
+        const actor=authenticate(db,cookieToken(request));
+        accountSecurityGate(new Repository(db),actor);
+        return send(response,200,runShopRead(shopRead(new Repository(db),actor,requestUrl.searchParams)));
+      }
       if (request.method === "GET" && pathname === "/api/community") return send(response,200,communityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
       if (request.method === 'GET' && pathname === '/api/discover/hot') return send(response,200,discoverHotPage(db,cookieToken(request)??''));
+      if(request.method==='GET' && pathname==='/api/community/social') return send(response,200,communitySocial(db,cookieToken(request)??'',requestUrl.searchParams));
       if(request.method==='GET' && pathname==='/api/community/feed') return send(response,200,communityFeed(db,cookieToken(request)??'',requestUrl.searchParams));
       if(request.method==='GET' && pathname==='/api/admin/community/moderation') return send(response,200,moderationPage(db,authenticate(db,cookieToken(request)),requestUrl.searchParams));
       const communityDetail=request.method==='GET' && /^\/api\/community\/posts\/([^/]+)$/.exec(pathname);
@@ -113,6 +122,11 @@ export function createApiServer(
               .get()?.version ?? 0,
           ),
         });
+      if(request.method==='GET'&&pathname==='/api/movement'){
+        const actor=authenticate(db,cookieToken(request));accountSecurityGate(new Repository(db),actor);
+        const verified=new Repository(db).all('verifiedEmail').some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
+        return send(response,200,await movementRequest(actor,verified,'resolve'));
+      }
       // Same-origin mutations; media has an explicit non-simple binary content type.
       if (request.method === "POST") {
         const origin = request.headers.origin;
@@ -146,6 +160,13 @@ export function createApiServer(
           return send(response, 200, { data: execute(db, token, 'screenshot.import', {image: image.image, recognizedText: image.text, ocrRequestId: image.requestId}, randomUUID()) });
         }
         const input = await body(request);
+        if(pathname==='/api/movement/command'){
+          const actor=authenticate(db,cookieToken(request));accountSecurityGate(new Repository(db),actor);
+          const verified=new Repository(db).all('verifiedEmail').some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
+          demand(['launch','personal.list','personal.start','personal.pause','personal.resume','personal.finish'].includes(String(input.operation)),'无效运动操作。');
+          return send(response,200,await movementRequest(actor,verified,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
+        }
+
         if (pathname === "/api/auth/verification-codes") {
           return send(
             response,

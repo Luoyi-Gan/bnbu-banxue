@@ -1,0 +1,4460 @@
+{
+  "sha": "7ec0b0b0b8beb15788a9de68a40ec6be2d5e84b5",
+  "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/7ec0b0b0b8beb15788a9de68a40ec6be2d5e84b5",
+  "tree": [
+    {
+      "path": ".githooks",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "28f0955b1cb9f97d4477fce26e17d4d0801a00f8",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/28f0955b1cb9f97d4477fce26e17d4d0801a00f8"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "a2ba50941b4e0a200bb2fa8b3c4a2d658d303b6b",
+      "size": 1157,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a2ba50941b4e0a200bb2fa8b3c4a2d658d303b6b"
+    },
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0f85616414dfe25133d599aac33c277ee10beae3",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/0f85616414dfe25133d599aac33c277ee10beae3"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9755aa280cad71fbd7090be08ff6de39e3ca9760",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/9755aa280cad71fbd7090be08ff6de39e3ca9760"
+    },
+    {
+      "path": ".github/workflows/deprecate-cli-legacy.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0b2dc4c36b6c823272ef125878e784f2a9cab27f",
+      "size": 928,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0b2dc4c36b6c823272ef125878e784f2a9cab27f"
+    },
+    {
+      "path": ".github/workflows/publish-agent.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8be04a11f44fab3af1f0a9f1751b90f5d9105a4b",
+      "size": 1489,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8be04a11f44fab3af1f0a9f1751b90f5d9105a4b"
+    },
+    {
+      "path": ".github/workflows/publish-cli-legacy.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fda9c732aeeb15c95f143b1e87be513975a2c916",
+      "size": 1527,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/fda9c732aeeb15c95f143b1e87be513975a2c916"
+    },
+    {
+      "path": ".github/workflows/publish-cli.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85a2cd5ff10d0007ba5d1187a4aec3bca07f224f",
+      "size": 1394,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/85a2cd5ff10d0007ba5d1187a4aec3bca07f224f"
+    },
+    {
+      "path": ".github/workflows/publish-refine.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d8296cb881999a2664adac3cefe9f72db7dd8b3b",
+      "size": 1418,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d8296cb881999a2664adac3cefe9f72db7dd8b3b"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fafff2e8d6c86b79ee1db7cde4325e11516fabfb",
+      "size": 20,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/fafff2e8d6c86b79ee1db7cde4325e11516fabfb"
+    },
+    {
+      "path": "BingSiteAuth.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c49316634765ad74e7f6d8667aaac47096d4a423",
+      "size": 85,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c49316634765ad74e7f6d8667aaac47096d4a423"
+    },
+    {
+      "path": "CNAME",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77cfb82ad84b27b845bc674867238f2863a42fc2",
+      "size": 16,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/77cfb82ad84b27b845bc674867238f2863a42fc2"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6766f806ca46e99d7bb16c3aba9dbe8af9fafa51",
+      "size": 5149,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6766f806ca46e99d7bb16c3aba9dbe8af9fafa51"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "854a0b40579e8d5337497bdb3ef9d789192d892f",
+      "size": 6292,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/854a0b40579e8d5337497bdb3ef9d789192d892f"
+    },
+    {
+      "path": "account.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b6ca3d989c7ef92dc141339b31eacf20186a9be1",
+      "size": 294733,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b6ca3d989c7ef92dc141339b31eacf20186a9be1"
+    },
+    {
+      "path": "activate.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b11ea853b2e87260a243592aab18872ed0536dd",
+      "size": 30915,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9b11ea853b2e87260a243592aab18872ed0536dd"
+    },
+    {
+      "path": "admin.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a53f87cd546b4958209386f6ee283a5c6813f6f6",
+      "size": 120532,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a53f87cd546b4958209386f6ee283a5c6813f6f6"
+    },
+    {
+      "path": "agent-signup.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6401a5c2a830bce677fc46bfc60f7414e930daba",
+      "size": 9542,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6401a5c2a830bce677fc46bfc60f7414e930daba"
+    },
+    {
+      "path": "agent.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "022ea1a37c561ecbc7bdf56f2290b5b7f5f3511d",
+      "size": 256783,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/022ea1a37c561ecbc7bdf56f2290b5b7f5f3511d"
+    },
+    {
+      "path": "agent",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e6ae038f00848f80a0c6f2038e2ef63179cdd04e",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/e6ae038f00848f80a0c6f2038e2ef63179cdd04e"
+    },
+    {
+      "path": "agent/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df99d48e945490a79c0fff30eae7b8223df8f2ae",
+      "size": 10026,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/df99d48e945490a79c0fff30eae7b8223df8f2ae"
+    },
+    {
+      "path": "agent/action.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0ac13d3aef79a9ee9e6d80dd098f2abb6ebfd188",
+      "size": 4569,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0ac13d3aef79a9ee9e6d80dd098f2abb6ebfd188"
+    },
+    {
+      "path": "agent/action",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3cf5454f051a235da206d6ca191c22141812ef0a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/3cf5454f051a235da206d6ca191c22141812ef0a"
+    },
+    {
+      "path": "agent/action/autofix.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2f97db920cafae490446372cfc7830b07baaf70",
+      "size": 9960,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b2f97db920cafae490446372cfc7830b07baaf70"
+    },
+    {
+      "path": "agent/action/comment.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5cd8b26a297360cb365522657e673a2282582c6a",
+      "size": 689,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5cd8b26a297360cb365522657e673a2282582c6a"
+    },
+    {
+      "path": "agent/bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d389c26ab735625d0f1117662620875f94caa97f",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/d389c26ab735625d0f1117662620875f94caa97f"
+    },
+    {
+      "path": "agent/bin/transitions-agent.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e418252fdda2c02bb538e4a597397f848d6c5914",
+      "size": 30415,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e418252fdda2c02bb538e4a597397f848d6c5914"
+    },
+    {
+      "path": "agent/lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5326bd132f26bddd046aa52bd2b437c54e0009f0",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/5326bd132f26bddd046aa52bd2b437c54e0009f0"
+    },
+    {
+      "path": "agent/lib/catalog.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "395a9ce8cab532db92de7cc45dcd0e7f3beb0db1",
+      "size": 18338,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/395a9ce8cab532db92de7cc45dcd0e7f3beb0db1"
+    },
+    {
+      "path": "agent/lib/components.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2f44ffad75e10dbd5c40a9d2d057e6c51774192",
+      "size": 56180,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b2f44ffad75e10dbd5c40a9d2d057e6c51774192"
+    },
+    {
+      "path": "agent/lib/css.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "680a4d3cb2e903c31cfb01f92bc51a70a0a33d80",
+      "size": 14835,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/680a4d3cb2e903c31cfb01f92bc51a70a0a33d80"
+    },
+    {
+      "path": "agent/lib/describe.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cff0ef3a76f5a9908318b1a2e293fcd42e25e4b3",
+      "size": 13097,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cff0ef3a76f5a9908318b1a2e293fcd42e25e4b3"
+    },
+    {
+      "path": "agent/lib/env.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79faa3d014784fffb4a81792fcf5a7c8d1975b1e",
+      "size": 1432,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/79faa3d014784fffb4a81792fcf5a7c8d1975b1e"
+    },
+    {
+      "path": "agent/lib/fix.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0ea83c97e4ad294e7644cfd825804b8d517e0d0c",
+      "size": 24112,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0ea83c97e4ad294e7644cfd825804b8d517e0d0c"
+    },
+    {
+      "path": "agent/lib/recipe-specs.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0bba77d9baecabd3e75e1a3fc8d585d912224f30",
+      "size": 20137,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0bba77d9baecabd3e75e1a3fc8d585d912224f30"
+    },
+    {
+      "path": "agent/lib/report.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ee3e4de523a11d9c1c541d18aa99051be003fe1",
+      "size": 10574,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1ee3e4de523a11d9c1c541d18aa99051be003fe1"
+    },
+    {
+      "path": "agent/lib/rules.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db195ef393c8f238cd46094fd86ecca334d60089",
+      "size": 12181,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/db195ef393c8f238cd46094fd86ecca334d60089"
+    },
+    {
+      "path": "agent/lib/scan.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39304d4528e79c7aa50d3178a385388b4aa3a382",
+      "size": 3851,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/39304d4528e79c7aa50d3178a385388b4aa3a382"
+    },
+    {
+      "path": "agent/lib/walk.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "257e43ab4c8b6f9987498b0d77d02cb6f3702a9d",
+      "size": 2349,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/257e43ab4c8b6f9987498b0d77d02cb6f3702a9d"
+    },
+    {
+      "path": "agent/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91913d6769efd2ad4157b459d3a2bcf64836f79a",
+      "size": 861,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/91913d6769efd2ad4157b459d3a2bcf64836f79a"
+    },
+    {
+      "path": "agent/scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e2561706ca3aa25a928370ad7a9aede9d93bcc8b",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/e2561706ca3aa25a928370ad7a9aede9d93bcc8b"
+    },
+    {
+      "path": "agent/scripts/build-recipe-specs.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4092e076f849321139d9ebb4523121b925f35a06",
+      "size": 2341,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4092e076f849321139d9ebb4523121b925f35a06"
+    },
+    {
+      "path": "agent/skill",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5e618593cdf741fbc372758434c26d7c9e978824",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/5e618593cdf741fbc372758434c26d7c9e978824"
+    },
+    {
+      "path": "agent/skill/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b95ca6180963ef078b2937c12c6941c233aa5d1a",
+      "size": 6367,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b95ca6180963ef078b2937c12c6941c233aa5d1a"
+    },
+    {
+      "path": "agent/templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8215b34601ecc503d44a306020c3b4570095d7db",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/8215b34601ecc503d44a306020c3b4570095d7db"
+    },
+    {
+      "path": "agent/templates/transitions-agent.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "235ff550d1fda63a25028ab7321a2cf38ea574bd",
+      "size": 1961,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/235ff550d1fda63a25028ab7321a2cf38ea574bd"
+    },
+    {
+      "path": "agent/templates/transitions-fix-own-claude.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7215fbc30e248a7e5a32cd1599261d91199c853e",
+      "size": 2362,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7215fbc30e248a7e5a32cd1599261d91199c853e"
+    },
+    {
+      "path": "agent/templates/transitions-fix.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87bb0fd25941aa31b2fedd2f142e32536d6d0c33",
+      "size": 1519,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/87bb0fd25941aa31b2fedd2f142e32536d6d0c33"
+    },
+    {
+      "path": "agent/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e134c98862e46a05b6dc931d49cf13d70435cdfe",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/e134c98862e46a05b6dc931d49cf13d70435cdfe"
+    },
+    {
+      "path": "agent/test/autofix.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f74969fdeb0ddf7baf757a90087792816fa06953",
+      "size": 4173,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f74969fdeb0ddf7baf757a90087792816fa06953"
+    },
+    {
+      "path": "agent/test/components.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a888e211ce3ff7a2d38e0cb59165f5cea11833e9",
+      "size": 5182,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a888e211ce3ff7a2d38e0cb59165f5cea11833e9"
+    },
+    {
+      "path": "agent/test/components",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fe802ac16778726b25eaa7b9ccdd5f2f1a7dc6d6",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/fe802ac16778726b25eaa7b9ccdd5f2f1a7dc6d6"
+    },
+    {
+      "path": "agent/test/components/accordion",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "63535d0dd0faf7c61322c74c7d6fbd627a2395d8",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/63535d0dd0faf7c61322c74c7d6fbd627a2395d8"
+    },
+    {
+      "path": "agent/test/components/accordion/accordion.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "041b39abf2cb61f314ef608de419ac91dabb4ea8",
+      "size": 234,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/041b39abf2cb61f314ef608de419ac91dabb4ea8"
+    },
+    {
+      "path": "agent/test/components/dropdown-mount",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "36311b76cb4b91b4ced42cce0a47bccc921d6434",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/36311b76cb4b91b4ced42cce0a47bccc921d6434"
+    },
+    {
+      "path": "agent/test/components/dropdown-mount/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d20af8657320b1b3f5bced035fd02f98dcbe761f",
+      "size": 3960,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d20af8657320b1b3f5bced035fd02f98dcbe761f"
+    },
+    {
+      "path": "agent/test/components/framer-modal",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "05da7b4faec3bf1447f8816298bf0ba21382d685",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/05da7b4faec3bf1447f8816298bf0ba21382d685"
+    },
+    {
+      "path": "agent/test/components/framer-modal/Modal.jsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "456c5e35640788d450a874ef693a2c5f8a422ab4",
+      "size": 551,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/456c5e35640788d450a874ef693a2c5f8a422ab4"
+    },
+    {
+      "path": "agent/test/components/library-defaults",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "89c112d99d0880864fd4c603da605199ff1b3790",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/89c112d99d0880864fd4c603da605199ff1b3790"
+    },
+    {
+      "path": "agent/test/components/library-defaults/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52269e8607d361ac0298567cdf51b1fd88933426",
+      "size": 12646,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/52269e8607d361ac0298567cdf51b1fd88933426"
+    },
+    {
+      "path": "agent/test/components/modal-tuned",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f4cb76a67ed536930497f30a2341cda5d6b1f60d",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/f4cb76a67ed536930497f30a2341cda5d6b1f60d"
+    },
+    {
+      "path": "agent/test/components/modal-tuned/main.jsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e1fa2e93d37ae547a7d67b7f74b78e3e3a615111",
+      "size": 2624,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e1fa2e93d37ae547a7d67b7f74b78e3e3a615111"
+    },
+    {
+      "path": "agent/test/components/modal-tuned/styles.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c4930f6a5faf7192c4eec0c7e573040f9eaddd5",
+      "size": 3640,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3c4930f6a5faf7192c4eec0c7e573040f9eaddd5"
+    },
+    {
+      "path": "agent/test/components/pro-confetti",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ffac1453b909f00099850464748e4f10aec7ac8b",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/ffac1453b909f00099850464748e4f10aec7ac8b"
+    },
+    {
+      "path": "agent/test/components/pro-confetti/confetti.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "985585a4d809655da6dff9b93f16278c06f3aa6e",
+      "size": 322,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/985585a4d809655da6dff9b93f16278c06f3aa6e"
+    },
+    {
+      "path": "agent/test/components/shadcn-dialog",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b6defe53185bdc68145f9b6eb25edeb1455ee905",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/b6defe53185bdc68145f9b6eb25edeb1455ee905"
+    },
+    {
+      "path": "agent/test/components/shadcn-dialog/components",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4fb9fc26d70975a8e508513737746918c9d55a1f",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/4fb9fc26d70975a8e508513737746918c9d55a1f"
+    },
+    {
+      "path": "agent/test/components/shadcn-dialog/components/ui",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c790c6fb02b3596bc259d8c1334d65ec7015d9bb",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/c790c6fb02b3596bc259d8c1334d65ec7015d9bb"
+    },
+    {
+      "path": "agent/test/components/shadcn-dialog/components/ui/dialog.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "74d4c948f16c0763defc98508d8680e4caf5b352",
+      "size": 1071,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/74d4c948f16c0763defc98508d8680e4caf5b352"
+    },
+    {
+      "path": "agent/test/components/skeleton",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ccb62af8ea6c72d1b3cc8908b1fd249438401d13",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/ccb62af8ea6c72d1b3cc8908b1fd249438401d13"
+    },
+    {
+      "path": "agent/test/components/skeleton/skeleton.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c95abcf3e12e061696211c03275ff8295d73014a",
+      "size": 232,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c95abcf3e12e061696211c03275ff8295d73014a"
+    },
+    {
+      "path": "agent/test/components/tabs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8d89009f675d6f5e7af07b673a16b6b6f3cfed8c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/8d89009f675d6f5e7af07b673a16b6b6f3cfed8c"
+    },
+    {
+      "path": "agent/test/components/tabs/tabs.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ea4bed471c52a376621c84dce90c9121aafc2ed",
+      "size": 245,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5ea4bed471c52a376621c84dce90c9121aafc2ed"
+    },
+    {
+      "path": "agent/test/components/toast",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "23786757294afa48ae361245b34bbfb158a4e768",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/23786757294afa48ae361245b34bbfb158a4e768"
+    },
+    {
+      "path": "agent/test/components/toast/toast.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fac81cd6bbd4fec303f91923d8897ed7ba41bb50",
+      "size": 252,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/fac81cd6bbd4fec303f91923d8897ed7ba41bb50"
+    },
+    {
+      "path": "agent/test/components/toggle",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e170b86e2b954811f5aec9cf7750f239a49dad42",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/e170b86e2b954811f5aec9cf7750f239a49dad42"
+    },
+    {
+      "path": "agent/test/components/toggle/switch.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d0aaa957eb811fb88bfd714b7ee3cdbd34aaff2e",
+      "size": 335,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d0aaa957eb811fb88bfd714b7ee3cdbd34aaff2e"
+    },
+    {
+      "path": "agent/test/components/tooltip",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2a0738e4aa5eec357d3fb50ba4e109b65fa1725a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/2a0738e4aa5eec357d3fb50ba4e109b65fa1725a"
+    },
+    {
+      "path": "agent/test/components/tooltip/tooltip.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3d4f93fb77022054233182c7de22f68d6bde2649",
+      "size": 311,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3d4f93fb77022054233182c7de22f68d6bde2649"
+    },
+    {
+      "path": "agent/test/describe.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2ca5cf4e378936fce498d5509c39e5956cf693c",
+      "size": 2743,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a2ca5cf4e378936fce498d5509c39e5956cf693c"
+    },
+    {
+      "path": "agent/test/describe",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c167f4fb4af8509b419098b36dfc705b2b79b21d",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/c167f4fb4af8509b419098b36dfc705b2b79b21d"
+    },
+    {
+      "path": "agent/test/describe/before",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b2c2ccff3df1b87d7c00c5b9c369b58e94274fa4",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/b2c2ccff3df1b87d7c00c5b9c369b58e94274fa4"
+    },
+    {
+      "path": "agent/test/describe/before/test.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d20af8657320b1b3f5bced035fd02f98dcbe761f",
+      "size": 3960,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d20af8657320b1b3f5bced035fd02f98dcbe761f"
+    },
+    {
+      "path": "agent/test/describe/polished",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "597ed6622450ede3c0653a6a43a8528a0c915fa1",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/597ed6622450ede3c0653a6a43a8528a0c915fa1"
+    },
+    {
+      "path": "agent/test/describe/polished/test.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a89c92c30c302dcc488332e9e0fc347ca2f3f8d",
+      "size": 4248,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7a89c92c30c302dcc488332e9e0fc347ca2f3f8d"
+    },
+    {
+      "path": "agent/test/describe/revamped",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8117e8ac2c3624313bb5a9c4e80c2a7d17e433eb",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/8117e8ac2c3624313bb5a9c4e80c2a7d17e433eb"
+    },
+    {
+      "path": "agent/test/describe/revamped/test.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4368deae41f4cd06ff13d9475ef8f299cf9256d7",
+      "size": 6607,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4368deae41f4cd06ff13d9475ef8f299cf9256d7"
+    },
+    {
+      "path": "agent/test/fix-service.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2662a573b328c546e7a2f99fff8cb5799168a478",
+      "size": 7411,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2662a573b328c546e7a2f99fff8cb5799168a478"
+    },
+    {
+      "path": "agent/test/fixtures",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ba91352db6269b1ba5b19cc6834ace3a6e5c4720",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/ba91352db6269b1ba5b19cc6834ace3a6e5c4720"
+    },
+    {
+      "path": "agent/test/fixtures/BadModal.jsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d74b1b847ac95cf831c5a6e82e7df8d820c96a93",
+      "size": 446,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d74b1b847ac95cf831c5a6e82e7df8d820c96a93"
+    },
+    {
+      "path": "agent/test/fixtures/__fixtures__",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "63265d864f6accc84404bc3e7ef1f758256de106",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/63265d864f6accc84404bc3e7ef1f758256de106"
+    },
+    {
+      "path": "agent/test/fixtures/__fixtures__/nested-bad.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e3d748a417c8fa3a1121048443d5b21e1d27b7b",
+      "size": 35,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8e3d748a417c8fa3a1121048443d5b21e1d27b7b"
+    },
+    {
+      "path": "agent/test/fixtures/bad.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8a679eb56fae0ce547260497d4ed4a824661392",
+      "size": 290,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a8a679eb56fae0ce547260497d4ed4a824661392"
+    },
+    {
+      "path": "agent/test/fixtures/good.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5258b0f0bf30754471a68b07176472d5b38caec5",
+      "size": 357,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5258b0f0bf30754471a68b07176472d5b38caec5"
+    },
+    {
+      "path": "agent/test/fixtures/messages.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "409a25f6f34722feee5ed4f60fb1ba18c0b0c77d",
+      "size": 477,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/409a25f6f34722feee5ed4f60fb1ba18c0b0c77d"
+    },
+    {
+      "path": "agent/test/fixtures/skipped.test.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6008d1226a8dae94248a4f75bf0be2ae796bd6b",
+      "size": 131,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c6008d1226a8dae94248a4f75bf0be2ae796bd6b"
+    },
+    {
+      "path": "agent/test/fixtures/slow-tokens.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6da63d77530a07e4dfca25c18876978c155239e0",
+      "size": 470,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6da63d77530a07e4dfca25c18876978c155239e0"
+    },
+    {
+      "path": "agent/test/fixtures/styled.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1360d2d6b12368d54c12b914ce3ba63146e4965d",
+      "size": 187,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1360d2d6b12368d54c12b914ce3ba63146e4965d"
+    },
+    {
+      "path": "agent/test/fixtures/test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9b724f0c9f76b00a0a7fec0777981db01343714c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/9b724f0c9f76b00a0a7fec0777981db01343714c"
+    },
+    {
+      "path": "agent/test/fixtures/test/fixtures",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5eb6a32bc73a615437cc9f47dbd0431ec8f8b86c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/5eb6a32bc73a615437cc9f47dbd0431ec8f8b86c"
+    },
+    {
+      "path": "agent/test/fixtures/test/fixtures/deep-bad.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fad84aab2e1080723bc76bf9e60d3049372fd038",
+      "size": 35,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/fad84aab2e1080723bc76bf9e60d3049372fd038"
+    },
+    {
+      "path": "agent/test/fixtures/vendored",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e0193c6e7e97999ca99003e710e0bc167715b803",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/e0193c6e7e97999ca99003e710e0bc167715b803"
+    },
+    {
+      "path": "agent/test/fixtures/vendored/transitions-agent",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "bdd3ee5c0b4c99630226e892d3d172567ccc8d6d",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/bdd3ee5c0b4c99630226e892d3d172567ccc8d6d"
+    },
+    {
+      "path": "agent/test/fixtures/vendored/transitions-agent/bad-vendored.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e345674172e6c3dd3e52ce5ee90b7dd7115bffab",
+      "size": 39,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e345674172e6c3dd3e52ce5ee90b7dd7115bffab"
+    },
+    {
+      "path": "agent/test/fixtures/vendored/transitions-agent/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37c94c7aaa733f69bfd4cbbfd0bf73a4709424f7",
+      "size": 56,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/37c94c7aaa733f69bfd4cbbfd0bf73a4709424f7"
+    },
+    {
+      "path": "agent/test/scan.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a2a55e9a5b6931b124ab5d3150d5284fc1cb5dac",
+      "size": 4207,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a2a55e9a5b6931b124ab5d3150d5284fc1cb5dac"
+    },
+    {
+      "path": "agent/worker",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2f548d6f9194ec1041df6e65534a36c0c4deeed9",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/2f548d6f9194ec1041df6e65534a36c0c4deeed9"
+    },
+    {
+      "path": "agent/worker/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e1e608f9e6546a8d43b330a76b6d8ee28fdcbddb",
+      "size": 21,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e1e608f9e6546a8d43b330a76b6d8ee28fdcbddb"
+    },
+    {
+      "path": "agent/worker/edits.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7275b7810becd00c638cd640e352355143be7e7e",
+      "size": 4343,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7275b7810becd00c638cd640e352355143be7e7e"
+    },
+    {
+      "path": "agent/worker/events.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9eadb2fa5520ef5a464332bff28dc6ef49e37aba",
+      "size": 1100,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9eadb2fa5520ef5a464332bff28dc6ef49e37aba"
+    },
+    {
+      "path": "agent/worker/guidance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dbe771e728224592697f565f45ee446a480403c5",
+      "size": 7615,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/dbe771e728224592697f565f45ee446a480403c5"
+    },
+    {
+      "path": "agent/worker/mcp.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b002a63e392563f1dfd3f252309f8e814bc81e6",
+      "size": 8356,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7b002a63e392563f1dfd3f252309f8e814bc81e6"
+    },
+    {
+      "path": "agent/worker/pack-recipes.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "00aa777c6048a33408a45d71464a9cbebf1f1494",
+      "size": 3623,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/00aa777c6048a33408a45d71464a9cbebf1f1494"
+    },
+    {
+      "path": "agent/worker/worker.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a5c63293032d5e70f438f81803139ef542d520fe",
+      "size": 22233,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a5c63293032d5e70f438f81803139ef542d520fe"
+    },
+    {
+      "path": "agent/worker/wrangler.toml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "46dddae7aca5711b8a89801865033ec63ec6abf7",
+      "size": 1250,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/46dddae7aca5711b8a89801865033ec63ec6abf7"
+    },
+    {
+      "path": "article.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "052c574f4aeae330ad8f0ae8db4630675a8264bf",
+      "size": 45466,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/052c574f4aeae330ad8f0ae8db4630675a8264bf"
+    },
+    {
+      "path": "assets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f9eb831dfee9b9f7b3922c545ae5a7b6e1443715",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/f9eb831dfee9b9f7b3922c545ae5a7b6e1443715"
+    },
+    {
+      "path": "assets/agent-demo-dark.mp4",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6197651c9a4f2f804ea3318d6cd9c6c4e27cde0d",
+      "size": 3251571,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6197651c9a4f2f804ea3318d6cd9c6c4e27cde0d"
+    },
+    {
+      "path": "assets/agent-demo.mp4",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "836c47392a17ca3f4775e496c705c60ff04c4abf",
+      "size": 3317370,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/836c47392a17ca3f4775e496c705c60ff04c4abf"
+    },
+    {
+      "path": "assets/agent",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cac39f6c4bfd58f729d6d241d33e762df287401c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/cac39f6c4bfd58f729d6d241d33e762df287401c"
+    },
+    {
+      "path": "assets/agent/check-verified.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09c41a138a416e7e6592a8e35a19736473803cf3",
+      "size": 1105,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/09c41a138a416e7e6592a8e35a19736473803cf3"
+    },
+    {
+      "path": "assets/agent/file-search.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8e12724baeedc5b8bc18300f3033a42576c8c1c5",
+      "size": 813,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8e12724baeedc5b8bc18300f3033a42576c8c1c5"
+    },
+    {
+      "path": "assets/agent/git-pull-request.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eec9c77301316bb52d44f4039b50073d1c9cb844",
+      "size": 620,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/eec9c77301316bb52d44f4039b50073d1c9cb844"
+    },
+    {
+      "path": "assets/agent/settings.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a369034e76e290cd5275f87336167a6f7a0e405e",
+      "size": 546,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a369034e76e290cd5275f87336167a6f7a0e405e"
+    },
+    {
+      "path": "assets/agent/star-06.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8b544265885eb50e129f5b785a1ddfc8d50a7da5",
+      "size": 999,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8b544265885eb50e129f5b785a1ddfc8d50a7da5"
+    },
+    {
+      "path": "assets/avatars",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "58b8a89168dcc6a2f7b6f8a6353af16b4dc8978a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/58b8a89168dcc6a2f7b6f8a6353af16b4dc8978a"
+    },
+    {
+      "path": "assets/avatars/avatar-1.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec240f2bfe0eec1873b6d859ef8045ea49c737bd",
+      "size": 1766,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ec240f2bfe0eec1873b6d859ef8045ea49c737bd"
+    },
+    {
+      "path": "assets/avatars/avatar-2.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb54a5c46a5b873a1e8f464b9b054ba1f98f1e63",
+      "size": 2148,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/bb54a5c46a5b873a1e8f464b9b054ba1f98f1e63"
+    },
+    {
+      "path": "assets/avatars/avatar-3.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "747da05d3a0dd4fb086b9c0a65e8ec331132707f",
+      "size": 2520,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/747da05d3a0dd4fb086b9c0a65e8ec331132707f"
+    },
+    {
+      "path": "assets/avatars/avatar-4.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb23eb9b531591486def8b196d356b68cf19d367",
+      "size": 2138,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cb23eb9b531591486def8b196d356b68cf19d367"
+    },
+    {
+      "path": "assets/avatars/avatar-5.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "38a0dc5b812190c2ac053593504cd800d8c746ae",
+      "size": 2246,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/38a0dc5b812190c2ac053593504cd800d8c746ae"
+    },
+    {
+      "path": "assets/avatars/avatar-6.webp",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8edfab1e9965d5569c30b09956c2879871d70232",
+      "size": 4394,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8edfab1e9965d5569c30b09956c2879871d70232"
+    },
+    {
+      "path": "assets/bell-01.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "727763d5e37d5fd03c0eda23e7054f1b49c0d7de",
+      "size": 973,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/727763d5e37d5fd03c0eda23e7054f1b49c0d7de"
+    },
+    {
+      "path": "assets/brand-mark.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2882ff303de454cf2b28998045dd1c1edea4aa6",
+      "size": 15975,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b2882ff303de454cf2b28998045dd1c1edea4aa6"
+    },
+    {
+      "path": "assets/community",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "77f331711e59887223b9ade1d710226eafba3870",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/77f331711e59887223b9ade1d710226eafba3870"
+    },
+    {
+      "path": "assets/community/beam-dev.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "478cabb29b898698e25ff9916fbe9dedc887d1f0",
+      "size": 12159,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/478cabb29b898698e25ff9916fbe9dedc887d1f0"
+    },
+    {
+      "path": "assets/community/beam.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18bad9d2a9a0f5408d3d955c48db108ce73b5348",
+      "size": 32132,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/18bad9d2a9a0f5408d3d955c48db108ce73b5348"
+    },
+    {
+      "path": "assets/community/community.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d19273b5f8958bc28c7e835fa08f27705987df60",
+      "size": 145736,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d19273b5f8958bc28c7e835fa08f27705987df60"
+    },
+    {
+      "path": "assets/community/community.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0276c892fe881fcaf31679cfdd81f173f0d2196a",
+      "size": 97958,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0276c892fe881fcaf31679cfdd81f173f0d2196a"
+    },
+    {
+      "path": "assets/community/composer-generate.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "073e6c6c1bb1376db175279a4fcd328e67b81e38",
+      "size": 1635,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/073e6c6c1bb1376db175279a4fcd328e67b81e38"
+    },
+    {
+      "path": "assets/community/controls.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89040b9805f83b2b36e60cf74e1b98e05970789b",
+      "size": 45841,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/89040b9805f83b2b36e60cf74e1b98e05970789b"
+    },
+    {
+      "path": "assets/community/design-systems",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1602a1cac84831be85a28920bbb52431bb5973fc",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/1602a1cac84831be85a28920bbb52431bb5973fc"
+    },
+    {
+      "path": "assets/community/design-systems/modern.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc4dee07a932631e242e1d3c10c168142dc47a02",
+      "size": 6944,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cc4dee07a932631e242e1d3c10c168142dc47a02"
+    },
+    {
+      "path": "assets/community/feed.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "927f0d98ac2d5770c28cc5b2bcf6d174ff3e67e2",
+      "size": 25178,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/927f0d98ac2d5770c28cc5b2bcf6d174ff3e67e2"
+    },
+    {
+      "path": "assets/community/libraries.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad980d143c8099c83295f9fe5cc47f7ef3ebba2c",
+      "size": 18639,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ad980d143c8099c83295f9fe5cc47f7ef3ebba2c"
+    },
+    {
+      "path": "assets/community/library-pro.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "15f60b4bd45f9ca7efe1d217ba44dc31f890a062",
+      "size": 1567,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/15f60b4bd45f9ca7efe1d217ba44dc31f890a062"
+    },
+    {
+      "path": "assets/community/library.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e76ce25ac7809092f2c5e91bfe768d46cba29e8",
+      "size": 318392,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9e76ce25ac7809092f2c5e91bfe768d46cba29e8"
+    },
+    {
+      "path": "assets/community/libs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "783e91382c8a78dbe32ff7ae381835e9b9d2c872",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/783e91382c8a78dbe32ff7ae381835e9b9d2c872"
+    },
+    {
+      "path": "assets/community/libs/figma-avatars-light.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a68f39143c8a170e735dd56ec81f6d042421e4f",
+      "size": 3911,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5a68f39143c8a170e735dd56ec81f6d042421e4f"
+    },
+    {
+      "path": "assets/community/libs/figma-avatars.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "90f447b633950e45ce1a494b2aec9b3c54a43268",
+      "size": 3909,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/90f447b633950e45ce1a494b2aec9b3c54a43268"
+    },
+    {
+      "path": "assets/community/libs/figma-beam-light.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "406f03bd019a025a62309730a221c5cd7aaa5a7e",
+      "size": 7360,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/406f03bd019a025a62309730a221c5cd7aaa5a7e"
+    },
+    {
+      "path": "assets/community/libs/figma-beam.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7a67e51f7a5502720a1b2409352ee661269e9b0d",
+      "size": 9058,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7a67e51f7a5502720a1b2409352ee661269e9b0d"
+    },
+    {
+      "path": "assets/community/libs/figma-gooey-light.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "463be467d40901b4b8d634e0bdc650189a0f4802",
+      "size": 3624,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/463be467d40901b4b8d634e0bdc650189a0f4802"
+    },
+    {
+      "path": "assets/community/libs/figma-gooey.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab11f6ba1e9c1a660f44d313ed16b365aaf0379a",
+      "size": 4847,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ab11f6ba1e9c1a660f44d313ed16b365aaf0379a"
+    },
+    {
+      "path": "assets/community/libs/figma-image-light.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "645ddccba1fbb5edb361682af6bdbbb86e2699bf",
+      "size": 3496,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/645ddccba1fbb5edb361682af6bdbbb86e2699bf"
+    },
+    {
+      "path": "assets/community/libs/figma-image.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f8814546a49d3efd9b9daa5441eedaea974fcd6",
+      "size": 2622,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0f8814546a49d3efd9b9daa5441eedaea974fcd6"
+    },
+    {
+      "path": "assets/community/libs/figma-metal-light.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9faaa8f503ed172bff839bc1c31b61bac7311b0a",
+      "size": 4769,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9faaa8f503ed172bff839bc1c31b61bac7311b0a"
+    },
+    {
+      "path": "assets/community/libs/figma-metal.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06913e2d734abd383d33965a3203468563f0b832",
+      "size": 5790,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/06913e2d734abd383d33965a3203468563f0b832"
+    },
+    {
+      "path": "assets/community/libs/figma-orbs-light.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33e5d346c2a8e871124dda7edb31f3161802c586",
+      "size": 1886,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/33e5d346c2a8e871124dda7edb31f3161802c586"
+    },
+    {
+      "path": "assets/community/libs/figma-orbs.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d12f80f0c1069bdf9d41f0c92b3623ee1e48c24c",
+      "size": 3094,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d12f80f0c1069bdf9d41f0c92b3623ee1e48c24c"
+    },
+    {
+      "path": "assets/community/libs/figma-voice-light.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44ffa334abe982eec6ddc9368067e3b3f960422c",
+      "size": 4214,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/44ffa334abe982eec6ddc9368067e3b3f960422c"
+    },
+    {
+      "path": "assets/community/libs/figma-voice.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e603e25fb5e06ee89ec97f85ed1959cfb3ba4bfe",
+      "size": 4518,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e603e25fb5e06ee89ec97f85ed1959cfb3ba4bfe"
+    },
+    {
+      "path": "assets/community/profile.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bc097b19de26eef3325fc0b8e175a00a7a3ffca3",
+      "size": 8577,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/bc097b19de26eef3325fc0b8e175a00a7a3ffca3"
+    },
+    {
+      "path": "assets/community/projects.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "092ce78822028bd733b5d7a5e96dbf6aafd69d8c",
+      "size": 4608,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/092ce78822028bd733b5d7a5e96dbf6aafd69d8c"
+    },
+    {
+      "path": "assets/community/skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fbba67f3aa08bd0223f77254c7f35a0df6e51dc9",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/fbba67f3aa08bd0223f77254c7f35a0df6e51dc9"
+    },
+    {
+      "path": "assets/community/skills/make-interfaces-feel-better.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "959ce4b943cdbe2bb678004b8b1b667b56ee5fe7",
+      "size": 5080,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/959ce4b943cdbe2bb678004b8b1b667b56ee5fe7"
+    },
+    {
+      "path": "assets/community/skills/recipes.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4ae5feb4130e955332977a4ff40eae3f3739105",
+      "size": 125197,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d4ae5feb4130e955332977a4ff40eae3f3739105"
+    },
+    {
+      "path": "assets/community/skills/transitions-dev.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5be36ed787127ed199f9aa27558ac8aa66c9216",
+      "size": 14234,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e5be36ed787127ed199f9aa27558ac8aa66c9216"
+    },
+    {
+      "path": "assets/community/studio.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19b5ea76783fa3c18f1a90e3971e3a1eb7a99ade",
+      "size": 147366,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/19b5ea76783fa3c18f1a90e3971e3a1eb7a99ade"
+    },
+    {
+      "path": "assets/community/thumbs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "304bcb638ff31937292448479315bf60439278b1",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/304bcb638ff31937292448479315bf60439278b1"
+    },
+    {
+      "path": "assets/community/thumbs/3d-tilt-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b51dca709344da436cd3c6e5e97ab7abf29ceea2",
+      "size": 12500,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b51dca709344da436cd3c6e5e97ab7abf29ceea2"
+    },
+    {
+      "path": "assets/community/thumbs/3d-tilt.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3220dc3ada673da98b7d8b94759b30f08b38a11a",
+      "size": 13735,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3220dc3ada673da98b7d8b94759b30f08b38a11a"
+    },
+    {
+      "path": "assets/community/thumbs/accordion-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ace9a00eb3506fb6e9787013cb43188f2dbe8a0f",
+      "size": 8795,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ace9a00eb3506fb6e9787013cb43188f2dbe8a0f"
+    },
+    {
+      "path": "assets/community/thumbs/accordion.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f9e8f5e791f61abd19d29ce2606a106d7beed546",
+      "size": 10338,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f9e8f5e791f61abd19d29ce2606a106d7beed546"
+    },
+    {
+      "path": "assets/community/thumbs/avatar-group-hover-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12e01a11dedf52343881030d8af520418c191e36",
+      "size": 14574,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/12e01a11dedf52343881030d8af520418c191e36"
+    },
+    {
+      "path": "assets/community/thumbs/avatar-group-hover.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ec85942506a632f2510139a17b960a6b25975466",
+      "size": 15044,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ec85942506a632f2510139a17b960a6b25975466"
+    },
+    {
+      "path": "assets/community/thumbs/banner-stacking-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09a6e8144b36ac3203841f7db0d404377b004e33",
+      "size": 7252,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/09a6e8144b36ac3203841f7db0d404377b004e33"
+    },
+    {
+      "path": "assets/community/thumbs/banner-stacking.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aae0293e0a7f104e5f7f0098f582c969db6d9ddb",
+      "size": 8974,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/aae0293e0a7f104e5f7f0098f582c969db6d9ddb"
+    },
+    {
+      "path": "assets/community/thumbs/card-resize-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7878f5b499b236a72d416fa74cff429941764072",
+      "size": 8666,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7878f5b499b236a72d416fa74cff429941764072"
+    },
+    {
+      "path": "assets/community/thumbs/card-resize.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3bfc7fe5f873028891e414912e74c09ae40a3e4",
+      "size": 10559,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a3bfc7fe5f873028891e414912e74c09ae40a3e4"
+    },
+    {
+      "path": "assets/community/thumbs/card-stack-hover-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0b8c34f4a99b9b3d42b5069688c9fefd375d798e",
+      "size": 14957,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0b8c34f4a99b9b3d42b5069688c9fefd375d798e"
+    },
+    {
+      "path": "assets/community/thumbs/card-stack-hover.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "855bfea2380a936508f75fee89ddb40c83a3e617",
+      "size": 15814,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/855bfea2380a936508f75fee89ddb40c83a3e617"
+    },
+    {
+      "path": "assets/community/thumbs/checkbox-check-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4d20d4c9cef91ab94dd4fe7c1b95c88b5b92a243",
+      "size": 6931,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4d20d4c9cef91ab94dd4fe7c1b95c88b5b92a243"
+    },
+    {
+      "path": "assets/community/thumbs/checkbox-check.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ef063d340709335a073464971839c4d57ffaf95",
+      "size": 6504,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5ef063d340709335a073464971839c4d57ffaf95"
+    },
+    {
+      "path": "assets/community/thumbs/confetti-burst-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "380ebee7aef4d236233111b951334a1bed95513c",
+      "size": 22707,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/380ebee7aef4d236233111b951334a1bed95513c"
+    },
+    {
+      "path": "assets/community/thumbs/confetti-burst.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b468df78f8d20cbe171dc36be91d04f6636c1dac",
+      "size": 20289,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b468df78f8d20cbe171dc36be91d04f6636c1dac"
+    },
+    {
+      "path": "assets/community/thumbs/drag-drop-physics-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8ebbb019920310e671533152582e7a4686f8c69",
+      "size": 16523,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a8ebbb019920310e671533152582e7a4686f8c69"
+    },
+    {
+      "path": "assets/community/thumbs/drag-drop-physics.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e96b2599a710fedc0fcf18e4432c81b1750579f",
+      "size": 17004,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6e96b2599a710fedc0fcf18e4432c81b1750579f"
+    },
+    {
+      "path": "assets/community/thumbs/dropdown-menu-morph-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "60f5cdce06a048c46815ea3a054c0ac74ac63ee4",
+      "size": 5551,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/60f5cdce06a048c46815ea3a054c0ac74ac63ee4"
+    },
+    {
+      "path": "assets/community/thumbs/dropdown-menu-morph.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21e58fd907be937c4e1d005350e2ba5a7de61bec",
+      "size": 5862,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/21e58fd907be937c4e1d005350e2ba5a7de61bec"
+    },
+    {
+      "path": "assets/community/thumbs/error-state-shake-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05ceab247c33e236acd055f6d7686a15d0196ba4",
+      "size": 6714,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/05ceab247c33e236acd055f6d7686a15d0196ba4"
+    },
+    {
+      "path": "assets/community/thumbs/error-state-shake.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "945702de7f7ee304c71beea60d9060353f360817",
+      "size": 6347,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/945702de7f7ee304c71beea60d9060353f360817"
+    },
+    {
+      "path": "assets/community/thumbs/get-pro-button-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f2a5f21f07e7c34da8dea6b39cbd8f4c1e893ee6",
+      "size": 7660,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f2a5f21f07e7c34da8dea6b39cbd8f4c1e893ee6"
+    },
+    {
+      "path": "assets/community/thumbs/get-pro-button.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f354b1461e3bb473dc7d1b5d5b385a87165bdaa",
+      "size": 7641,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1f354b1461e3bb473dc7d1b5d5b385a87165bdaa"
+    },
+    {
+      "path": "assets/community/thumbs/gooey-plus-menu-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c079eb0693c808e89aa6a327158ceeec61312eff",
+      "size": 5935,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c079eb0693c808e89aa6a327158ceeec61312eff"
+    },
+    {
+      "path": "assets/community/thumbs/gooey-plus-menu.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "81af10cac2bb57a5c213c12b52c3d287b32f539c",
+      "size": 5773,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/81af10cac2bb57a5c213c12b52c3d287b32f539c"
+    },
+    {
+      "path": "assets/community/thumbs/icon-swap-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "43f9cb26a68a8d60b2eb09b38668803f2f0a25ee",
+      "size": 4840,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/43f9cb26a68a8d60b2eb09b38668803f2f0a25ee"
+    },
+    {
+      "path": "assets/community/thumbs/icon-swap.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c953c9cab547517d3468a20cb68407e3c70ac731",
+      "size": 4504,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c953c9cab547517d3468a20cb68407e3c70ac731"
+    },
+    {
+      "path": "assets/community/thumbs/image-gen-placeholder-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f3156aaf064c1ad49b4b8f806290c7ba79ba4828",
+      "size": 21611,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f3156aaf064c1ad49b4b8f806290c7ba79ba4828"
+    },
+    {
+      "path": "assets/community/thumbs/image-gen-placeholder.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "22395d0cff371c2156b119e52df174204d7a423e",
+      "size": 20512,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/22395d0cff371c2156b119e52df174204d7a423e"
+    },
+    {
+      "path": "assets/community/thumbs/image-open-tilt-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc61be33eba22d78c7e1fc4500aaf623600662e5",
+      "size": 11953,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/dc61be33eba22d78c7e1fc4500aaf623600662e5"
+    },
+    {
+      "path": "assets/community/thumbs/image-open-tilt.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "df2e967758c3e5e9a4512dbfbe0c975540b0885e",
+      "size": 12225,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/df2e967758c3e5e9a4512dbfbe0c975540b0885e"
+    },
+    {
+      "path": "assets/community/thumbs/input-clear-with-dissolve-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "02c2b3cebace8450273aff1e68a21da46e532882",
+      "size": 11477,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/02c2b3cebace8450273aff1e68a21da46e532882"
+    },
+    {
+      "path": "assets/community/thumbs/input-clear-with-dissolve.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b121f7b0370a5c8d24a6a32c55f7212fcfd63ce",
+      "size": 10849,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5b121f7b0370a5c8d24a6a32c55f7212fcfd63ce"
+    },
+    {
+      "path": "assets/community/thumbs/learn-more-hover-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5857251d2692b84113cf53dd584b536019ef143f",
+      "size": 7730,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5857251d2692b84113cf53dd584b536019ef143f"
+    },
+    {
+      "path": "assets/community/thumbs/learn-more-hover.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "073efaf8aaaff8421431e161de0674d902d21b49",
+      "size": 8500,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/073efaf8aaaff8421431e161de0674d902d21b49"
+    },
+    {
+      "path": "assets/community/thumbs/like-button-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1c068539991a4dfe8fc396c7b32e5a3d4eb9f6e",
+      "size": 6651,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d1c068539991a4dfe8fc396c7b32e5a3d4eb9f6e"
+    },
+    {
+      "path": "assets/community/thumbs/like-button.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91274ce125f0d513066cfc4d8c991c2267007aae",
+      "size": 7107,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/91274ce125f0d513066cfc4d8c991c2267007aae"
+    },
+    {
+      "path": "assets/community/thumbs/matrix-dot-loader-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2a2923a1f70d08121b99c8965afce99692b05bc",
+      "size": 6280,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e2a2923a1f70d08121b99c8965afce99692b05bc"
+    },
+    {
+      "path": "assets/community/thumbs/matrix-dot-loader.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7da8cf6e3d5f6d2cd0dc41a7f8ceccc2945bf25",
+      "size": 5585,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e7da8cf6e3d5f6d2cd0dc41a7f8ceccc2945bf25"
+    },
+    {
+      "path": "assets/community/thumbs/menu-dropdown-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3da205a34d305dee8184429a1a381bfaef56d888",
+      "size": 7815,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3da205a34d305dee8184429a1a381bfaef56d888"
+    },
+    {
+      "path": "assets/community/thumbs/menu-dropdown.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a9a9a1a058847b485241b08e542673b52570c314",
+      "size": 9889,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a9a9a1a058847b485241b08e542673b52570c314"
+    },
+    {
+      "path": "assets/community/thumbs/modal-open-close-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1f11dc6c37825daa5b1ab972199e09ca4317b27",
+      "size": 9754,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b1f11dc6c37825daa5b1ab972199e09ca4317b27"
+    },
+    {
+      "path": "assets/community/thumbs/modal-open-close.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "673b70a1fa3583f1f3ae72bea00244d289e4c07d",
+      "size": 11401,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/673b70a1fa3583f1f3ae72bea00244d289e4c07d"
+    },
+    {
+      "path": "assets/community/thumbs/notification-badge-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b72b9a09b54a0787e4d2d64e909a04f5fd354ff1",
+      "size": 5870,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b72b9a09b54a0787e4d2d64e909a04f5fd354ff1"
+    },
+    {
+      "path": "assets/community/thumbs/notification-badge.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93ce02cdba9db95711e5ac07a1bc80d5731a7f75",
+      "size": 5597,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/93ce02cdba9db95711e5ac07a1bc80d5731a7f75"
+    },
+    {
+      "path": "assets/community/thumbs/number-pop-in-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "034606c72e0a7fc0fb5da7b82cf1575414bf2ab4",
+      "size": 7711,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/034606c72e0a7fc0fb5da7b82cf1575414bf2ab4"
+    },
+    {
+      "path": "assets/community/thumbs/number-pop-in.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "275b03acdd390a33e10277be92710a12d44d30af",
+      "size": 7346,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/275b03acdd390a33e10277be92710a12d44d30af"
+    },
+    {
+      "path": "assets/community/thumbs/organic-shimmer-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "595c396726685f99fa3439e054035aea64267c07",
+      "size": 10523,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/595c396726685f99fa3439e054035aea64267c07"
+    },
+    {
+      "path": "assets/community/thumbs/organic-shimmer.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8b80c52772043f43992d0486335ffb8539f56019",
+      "size": 10505,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8b80c52772043f43992d0486335ffb8539f56019"
+    },
+    {
+      "path": "assets/community/thumbs/page-side-by-side-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9090292c72f5b10b12161433609d9273d10aa78d",
+      "size": 17247,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9090292c72f5b10b12161433609d9273d10aa78d"
+    },
+    {
+      "path": "assets/community/thumbs/page-side-by-side.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "496ec49102583eec6b1d579c69c1a9a2ea826fd9",
+      "size": 19253,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/496ec49102583eec6b1d579c69c1a9a2ea826fd9"
+    },
+    {
+      "path": "assets/community/thumbs/panel-reveal-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd362b6258adac2594f78c296a09c631a763426f",
+      "size": 7784,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cd362b6258adac2594f78c296a09c631a763426f"
+    },
+    {
+      "path": "assets/community/thumbs/panel-reveal.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "84234f04743f5a3e7dc608b8a854a3bd3543364c",
+      "size": 8158,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/84234f04743f5a3e7dc608b8a854a3bd3543364c"
+    },
+    {
+      "path": "assets/community/thumbs/pro-gradient-text-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "92496556a7e4ec978ca7c9f72d02fb2adb0cd403",
+      "size": 7835,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/92496556a7e4ec978ca7c9f72d02fb2adb0cd403"
+    },
+    {
+      "path": "assets/community/thumbs/pro-gradient-text.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "106976b09bdd9beb6b12b9c4457815ad696893c9",
+      "size": 7530,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/106976b09bdd9beb6b12b9c4457815ad696893c9"
+    },
+    {
+      "path": "assets/community/thumbs/reasoning-stream-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87bc868a066e2d1f74e0120f578eb301e3373742",
+      "size": 31814,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/87bc868a066e2d1f74e0120f578eb301e3373742"
+    },
+    {
+      "path": "assets/community/thumbs/reasoning-stream.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6cfdf5ff3c2038b9b04100dbd71635b9f7530a9",
+      "size": 33452,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d6cfdf5ff3c2038b9b04100dbd71635b9f7530a9"
+    },
+    {
+      "path": "assets/community/thumbs/shimmer-text-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8732368e76e557e8c852f2ee3aa61d61db9fee4e",
+      "size": 7934,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8732368e76e557e8c852f2ee3aa61d61db9fee4e"
+    },
+    {
+      "path": "assets/community/thumbs/shimmer-text.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5717e10a893ee6769ecb2a593d21b829741bdf50",
+      "size": 8011,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5717e10a893ee6769ecb2a593d21b829741bdf50"
+    },
+    {
+      "path": "assets/community/thumbs/skeleton-loader-and-reveal-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14fe3af092214f3181ec128d88ddef8446310533",
+      "size": 6884,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/14fe3af092214f3181ec128d88ddef8446310533"
+    },
+    {
+      "path": "assets/community/thumbs/skeleton-loader-and-reveal.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "31ab928f43f9098fd7de1fc8a1e9610cad9553c3",
+      "size": 7052,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/31ab928f43f9098fd7de1fc8a1e9610cad9553c3"
+    },
+    {
+      "path": "assets/community/thumbs/smoky-dissolve-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c7c1df06a4ed43e0976e3e3b6a2e72b798ad1ac",
+      "size": 30875,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3c7c1df06a4ed43e0976e3e3b6a2e72b798ad1ac"
+    },
+    {
+      "path": "assets/community/thumbs/smoky-dissolve.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3462077f1e30b6feba1a94657ba1f31c3736f97d",
+      "size": 32481,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3462077f1e30b6feba1a94657ba1f31c3736f97d"
+    },
+    {
+      "path": "assets/community/thumbs/spinner-check-morph-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eaf6f5430e6b5693a30c84e96981d5c6bbfc19ea",
+      "size": 12247,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/eaf6f5430e6b5693a30c84e96981d5c6bbfc19ea"
+    },
+    {
+      "path": "assets/community/thumbs/spinner-check-morph.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06753c8fe7d31e6d2926d25be8dacf72ec2f5024",
+      "size": 11949,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/06753c8fe7d31e6d2926d25be8dacf72ec2f5024"
+    },
+    {
+      "path": "assets/community/thumbs/spinning-counter-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5b61d1fcc082b4c5018ff4216dff1a6407e8851",
+      "size": 5333,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e5b61d1fcc082b4c5018ff4216dff1a6407e8851"
+    },
+    {
+      "path": "assets/community/thumbs/spinning-counter.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "99f1e0559bba9acf85ef3d48a2f62335e9004d4e",
+      "size": 4979,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/99f1e0559bba9acf85ef3d48a2f62335e9004d4e"
+    },
+    {
+      "path": "assets/community/thumbs/streaming-text-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "acb8a7c34c86fd7ce92e46476992a2a140bb577f",
+      "size": 43575,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/acb8a7c34c86fd7ce92e46476992a2a140bb577f"
+    },
+    {
+      "path": "assets/community/thumbs/streaming-text.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34f416d40e1f03fb655f3d3d67345c9f72c927fc",
+      "size": 44858,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/34f416d40e1f03fb655f3d3d67345c9f72c927fc"
+    },
+    {
+      "path": "assets/community/thumbs/success-check-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8ac76077870185dde7655390f3325fb892a05f9c",
+      "size": 4428,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8ac76077870185dde7655390f3325fb892a05f9c"
+    },
+    {
+      "path": "assets/community/thumbs/success-check.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f299b5ffd5388898b598eef885805d231ac86b0",
+      "size": 4084,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0f299b5ffd5388898b598eef885805d231ac86b0"
+    },
+    {
+      "path": "assets/community/thumbs/tabs-sliding-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f1a9c3b35d45cd9651991a963b7f51cba5afecc3",
+      "size": 8074,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f1a9c3b35d45cd9651991a963b7f51cba5afecc3"
+    },
+    {
+      "path": "assets/community/thumbs/tabs-sliding.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b444e5f1c699803aa0ff5ed740b84b75b795b1d4",
+      "size": 7738,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b444e5f1c699803aa0ff5ed740b84b75b795b1d4"
+    },
+    {
+      "path": "assets/community/thumbs/text-states-swap-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a1602c8fb10a59c215d236cb08961d920a85bd3b",
+      "size": 10778,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a1602c8fb10a59c215d236cb08961d920a85bd3b"
+    },
+    {
+      "path": "assets/community/thumbs/text-states-swap.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2c960f0cbc4f4b1097f957cd318bc8b5f2a5569",
+      "size": 10403,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e2c960f0cbc4f4b1097f957cd318bc8b5f2a5569"
+    },
+    {
+      "path": "assets/community/thumbs/texts-reveal-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05e77c70f7a918466ef660ff67e889942e218b7e",
+      "size": 4434,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/05e77c70f7a918466ef660ff67e889942e218b7e"
+    },
+    {
+      "path": "assets/community/thumbs/texts-reveal.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f299b5ffd5388898b598eef885805d231ac86b0",
+      "size": 4084,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0f299b5ffd5388898b598eef885805d231ac86b0"
+    },
+    {
+      "path": "assets/community/thumbs/thinking-states-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "891376c7250a9bf3bed0d40ab20f14974a7aa65e",
+      "size": 8359,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/891376c7250a9bf3bed0d40ab20f14974a7aa65e"
+    },
+    {
+      "path": "assets/community/thumbs/thinking-states.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "44c6c75c46995111a338ca9697ae7d88925e8f01",
+      "size": 7896,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/44c6c75c46995111a338ca9697ae7d88925e8f01"
+    },
+    {
+      "path": "assets/community/thumbs/toast-open-close-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05e77c70f7a918466ef660ff67e889942e218b7e",
+      "size": 4434,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/05e77c70f7a918466ef660ff67e889942e218b7e"
+    },
+    {
+      "path": "assets/community/thumbs/toast-open-close.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f299b5ffd5388898b598eef885805d231ac86b0",
+      "size": 4084,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0f299b5ffd5388898b598eef885805d231ac86b0"
+    },
+    {
+      "path": "assets/community/thumbs/toggle-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33571c8ff1abb435fa73142e8b18a9119422ec09",
+      "size": 5554,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/33571c8ff1abb435fa73142e8b18a9119422ec09"
+    },
+    {
+      "path": "assets/community/thumbs/toggle.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0c8acd6848ef423df4fae9b9855f44f8d978748b",
+      "size": 4953,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0c8acd6848ef423df4fae9b9855f44f8d978748b"
+    },
+    {
+      "path": "assets/community/thumbs/tooltip-open-close-dark.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62b93565664edc9c5b7bfb6b7a94007ff999c136",
+      "size": 8907,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/62b93565664edc9c5b7bfb6b7a94007ff999c136"
+    },
+    {
+      "path": "assets/community/thumbs/tooltip-open-close.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "784e7365e69d8fff15438d6cb57fe86c66bd3e29",
+      "size": 8775,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/784e7365e69d8fff15438d6cb57fe86c66bd3e29"
+    },
+    {
+      "path": "assets/community/ub-event-card.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34dfa9e4ae6a079ead6b34b70d56af2490260705",
+      "size": 24806,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/34dfa9e4ae6a079ead6b34b70d56af2490260705"
+    },
+    {
+      "path": "assets/community/ub-generate.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6fe7c8b3c919a12d891a6323afc6ee910b22368d",
+      "size": 5786,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6fe7c8b3c919a12d891a6323afc6ee910b22368d"
+    },
+    {
+      "path": "assets/customers",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "44bd27701938b481c34694e1341efc729dcd0a65",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/44bd27701938b481c34694e1341efc729dcd0a65"
+    },
+    {
+      "path": "assets/customers/asu.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4011e6875084c277e94272a7028e06bb4d8442e1",
+      "size": 13765,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4011e6875084c277e94272a7028e06bb4d8442e1"
+    },
+    {
+      "path": "assets/customers/cathay-hospital.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f3185a220260f27a3f7eeeb3dc5e8468f3fe8e75",
+      "size": 10343,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f3185a220260f27a3f7eeeb3dc5e8468f3fe8e75"
+    },
+    {
+      "path": "assets/customers/expedia-group.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b7093d10677bf649305840c152a1cd66aa2e5a8a",
+      "size": 9570,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b7093d10677bf649305840c152a1cd66aa2e5a8a"
+    },
+    {
+      "path": "assets/customers/higgsfield.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c58b7905b24dfcd4e80e7960ea71ae346e31264",
+      "size": 37010,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8c58b7905b24dfcd4e80e7960ea71ae346e31264"
+    },
+    {
+      "path": "assets/customers/mercado-libre.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b199fcd3b0077ca1665f1148c212566de37dd3a5",
+      "size": 9156,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b199fcd3b0077ca1665f1148c212566de37dd3a5"
+    },
+    {
+      "path": "assets/favicon-dark.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e22abf73e3ded86df80bc8b18e64fc11dd228d54",
+      "size": 6489,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e22abf73e3ded86df80bc8b18e64fc11dd228d54"
+    },
+    {
+      "path": "assets/favicon-darkmode.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cb6d1a2c80e61c825cf5d582072966e7f049d36b",
+      "size": 4051,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cb6d1a2c80e61c825cf5d582072966e7f049d36b"
+    },
+    {
+      "path": "assets/favicon-light-mode.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1282a741f18dc9119174945d0d14414c80b4df08",
+      "size": 3576,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1282a741f18dc9119174945d0d14414c80b4df08"
+    },
+    {
+      "path": "assets/favicon-light.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21aef07ac90338dc3651279e389905091b66b9b0",
+      "size": 10253,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/21aef07ac90338dc3651279e389905091b66b9b0"
+    },
+    {
+      "path": "assets/favicon-light@2x.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f237d1a6a5c2cda2c6f6e98ada67dbdff4c580b5",
+      "size": 17816,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f237d1a6a5c2cda2c6f6e98ada67dbdff4c580b5"
+    },
+    {
+      "path": "assets/fonts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c10bffb6d19bc7eebb5b0a9d4be56ac2a05e5640",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/c10bffb6d19bc7eebb5b0a9d4be56ac2a05e5640"
+    },
+    {
+      "path": "assets/fonts/Saans-Medium.woff",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a8aee7e1b492e8157baafddd62bb90d9d4e33451",
+      "size": 79984,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a8aee7e1b492e8157baafddd62bb90d9d4e33451"
+    },
+    {
+      "path": "assets/fonts/Saans-Medium.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "183ddf5e49572faf0f2f106083b887e76be98930",
+      "size": 57248,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/183ddf5e49572faf0f2f106083b887e76be98930"
+    },
+    {
+      "path": "assets/fonts/fonts.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08722acdfaf89b438abb0b3c1566a1c80c9be512",
+      "size": 4779,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/08722acdfaf89b438abb0b3c1566a1c80c9be512"
+    },
+    {
+      "path": "assets/fonts/inter-700.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e32b1b980704ae5f6058c0fecd1e168f6e6969f",
+      "size": 1047,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0e32b1b980704ae5f6058c0fecd1e168f6e6969f"
+    },
+    {
+      "path": "assets/fonts/inter-latin-ext.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57da6f8d46e2e42d0fd7d8b1d69d39b3b5fda6d4",
+      "size": 85272,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/57da6f8d46e2e42d0fd7d8b1d69d39b3b5fda6d4"
+    },
+    {
+      "path": "assets/fonts/inter-latin.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91dc3e8529921cabc74fb1dacf5253260b9c8cca",
+      "size": 48432,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/91dc3e8529921cabc74fb1dacf5253260b9c8cca"
+    },
+    {
+      "path": "assets/fonts/inter-variable-latin-ext.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a2f672ce50319d6c88a8ade866de27f9ae83d38",
+      "size": 140960,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2a2f672ce50319d6c88a8ade866de27f9ae83d38"
+    },
+    {
+      "path": "assets/fonts/inter-variable-latin.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c1bb7fd81ce2d8782c559b6b531e4b33e69626b9",
+      "size": 105176,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c1bb7fd81ce2d8782c559b6b531e4b33e69626b9"
+    },
+    {
+      "path": "assets/fonts/roboto-mono-latin-ext.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91f4f8c04d2bbff4340c2fca7b57d1434f7a1978",
+      "size": 22868,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/91f4f8c04d2bbff4340c2fca7b57d1434f7a1978"
+    },
+    {
+      "path": "assets/fonts/roboto-mono-latin.woff2",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a23268168ba572bb5ad6c5fb2104928564f7428",
+      "size": 32752,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4a23268168ba572bb5ad6c5fb2104928564f7428"
+    },
+    {
+      "path": "assets/icon light 2x.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "142e8339afece73102ce3c47e018c8678a1256f3",
+      "size": 56953,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/142e8339afece73102ce3c47e018c8678a1256f3"
+    },
+    {
+      "path": "assets/icon-dark-2x.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e84d195d205ead5be455c26ee5fc71ab48960bf0",
+      "size": 63284,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e84d195d205ead5be455c26ee5fc71ab48960bf0"
+    },
+    {
+      "path": "assets/icon-x.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fa9e2363b2e61e9c9b5bf2206e6abc170e5e65d",
+      "size": 536,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4fa9e2363b2e61e9c9b5bf2206e6abc170e5e65d"
+    },
+    {
+      "path": "assets/nav-products.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fba1b5df0192864f94834c73ba81df526ceaf923",
+      "size": 4385,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/fba1b5df0192864f94834c73ba81df526ceaf923"
+    },
+    {
+      "path": "assets/nav-products.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d386352782b394deeb7f537b1ee6d957745a367d",
+      "size": 7678,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d386352782b394deeb7f537b1ee6d957745a367d"
+    },
+    {
+      "path": "assets/og-agent.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ddeac15309b1c2d5f94985b2378a5827b9aac4e8",
+      "size": 58395,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ddeac15309b1c2d5f94985b2378a5827b9aac4e8"
+    },
+    {
+      "path": "assets/og-builder.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24df0a3e3d3623a9ebd90be9574fa9cdfdc87484",
+      "size": 66133,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/24df0a3e3d3623a9ebd90be9574fa9cdfdc87484"
+    },
+    {
+      "path": "assets/og-image-skill.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "49f05df6c2b333cf23c6fe86aa8c9e6f6e57c4f4",
+      "size": 90193,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/49f05df6c2b333cf23c6fe86aa8c9e6f6e57c4f4"
+    },
+    {
+      "path": "assets/og-image.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b3107c888ad806719df400407be46cd82be9c852",
+      "size": 86869,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b3107c888ad806719df400407be46cd82be9c852"
+    },
+    {
+      "path": "assets/og-main.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b25f1e281575311169bfa0ec451d7b46ccec938",
+      "size": 98584,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1b25f1e281575311169bfa0ec451d7b46ccec938"
+    },
+    {
+      "path": "assets/og-pro.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9f5bd916c9327b5c343255bca7b6d142dbcc75d6",
+      "size": 105211,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9f5bd916c9327b5c343255bca7b6d142dbcc75d6"
+    },
+    {
+      "path": "assets/og-skill.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82d33c411fb9291ca3e513dc582159f33be3d96c",
+      "size": 102337,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/82d33c411fb9291ca3e513dc582159f33be3d96c"
+    },
+    {
+      "path": "assets/pro-client.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2baa1b6cdb348bf79de097b374aacdee210b1b38",
+      "size": 95154,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2baa1b6cdb348bf79de097b374aacdee210b1b38"
+    },
+    {
+      "path": "assets/proto-images",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "52e9862c595b71af9dc8d244cf73252ce5231208",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/52e9862c595b71af9dc8d244cf73252ce5231208"
+    },
+    {
+      "path": "assets/proto-images/Screenshot 2026-05-17 at 19.52.25.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83d7abd7612f8860328e5908963b8d5c63ded931",
+      "size": 1496154,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/83d7abd7612f8860328e5908963b8d5c63ded931"
+    },
+    {
+      "path": "assets/proto-images/Screenshot 2026-05-17 at 19.52.55.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e0469e8f458b786c26a53c4a5cd585282e7d3032",
+      "size": 1092522,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e0469e8f458b786c26a53c4a5cd585282e7d3032"
+    },
+    {
+      "path": "assets/proto-images/Screenshot 2026-05-17 at 19.53.15.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b792168c494106d8698205acce114776dbffbfa5",
+      "size": 1004511,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b792168c494106d8698205acce114776dbffbfa5"
+    },
+    {
+      "path": "assets/proto-images/Screenshot 2026-05-17 at 19.58.27.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "056476509fe922654531d4819aff7e074d3ec5bc",
+      "size": 962635,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/056476509fe922654531d4819aff7e074d3ec5bc"
+    },
+    {
+      "path": "assets/proto-images/Screenshot 2026-05-17 at 19.59.07.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "341aff61a2e003d03193f5a7b33c64b22ba6a77b",
+      "size": 1601637,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/341aff61a2e003d03193f5a7b33c64b22ba6a77b"
+    },
+    {
+      "path": "assets/proto-images/Screenshot 2026-05-17 at 20.01.38.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ca9f70821f36bd79f370b8e21d59fb6ecd69068f",
+      "size": 1139424,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ca9f70821f36bd79f370b8e21d59fb6ecd69068f"
+    },
+    {
+      "path": "assets/proto-images/Untitled.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83baf616b9704696d1705d885f48660d6eccdd1f",
+      "size": 368753,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/83baf616b9704696d1705d885f48660d6eccdd1f"
+    },
+    {
+      "path": "assets/proto-images/Untitled2.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb029d20a42e8065eeb671647cfcfabe24c48061",
+      "size": 266146,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/fb029d20a42e8065eeb671647cfcfabe24c48061"
+    },
+    {
+      "path": "assets/proto-images/Untitled4.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8f1536ab749c57d6e7c5bd4a8211dd501f92d5ac",
+      "size": 483348,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8f1536ab749c57d6e7c5bd4a8211dd501f92d5ac"
+    },
+    {
+      "path": "assets/proto-images/photo-1773236759289-251d9687b6e3.avif",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7cfd19f7a4a58a2525c9581166ce12d39e3ccd0",
+      "size": 51434,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c7cfd19f7a4a58a2525c9581166ce12d39e3ccd0"
+    },
+    {
+      "path": "assets/refine-logo-cube.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14469419f0b38c52aed22343a824577564e05ade",
+      "size": 1209,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/14469419f0b38c52aed22343a824577564e05ade"
+    },
+    {
+      "path": "assets/refine-web-dark.mp4",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ade2c2c5c3d44aa6fe6d9b025404f095d55d5019",
+      "size": 6567722,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ade2c2c5c3d44aa6fe6d9b025404f095d55d5019"
+    },
+    {
+      "path": "assets/refine-web.mp4",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da99fa5e4dee4ccd1bd106ef8cc03280437fda9f",
+      "size": 3916993,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/da99fa5e4dee4ccd1bd106ef8cc03280437fda9f"
+    },
+    {
+      "path": "assets/testimonials",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0dbeeab1296e8f8433f206c1def3f0d71a49fa66",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/0dbeeab1296e8f8433f206c1def3f0d71a49fa66"
+    },
+    {
+      "path": "assets/testimonials/haaarshsingh.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "40a0a3bbe3c01bfa0a7cdc80311c39d3a5a3b880",
+      "size": 27271,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/40a0a3bbe3c01bfa0a7cdc80311c39d3a5a3b880"
+    },
+    {
+      "path": "assets/testimonials/ilyamiskov.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8220392917f833ee0a6749791aa653fd196c6fc3",
+      "size": 16132,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8220392917f833ee0a6749791aa653fd196c6fc3"
+    },
+    {
+      "path": "assets/testimonials/jakubkrehel.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f33157f647412e73f06106cb5f5fc58f3af8b9f4",
+      "size": 19052,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f33157f647412e73f06106cb5f5fc58f3af8b9f4"
+    },
+    {
+      "path": "assets/theme-moon-01.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf198baab19937aa2dbf15242b1ecf10b89bd100",
+      "size": 626,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/bf198baab19937aa2dbf15242b1ecf10b89bd100"
+    },
+    {
+      "path": "assets/theme-sun.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ada213ffc7f3be8cfbe3ee413d080e0477a35f99",
+      "size": 2313,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ada213ffc7f3be8cfbe3ee413d080e0477a35f99"
+    },
+    {
+      "path": "assets/tokens",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7655839e7904978ca4e88bdd71a878feecec51e7",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/7655839e7904978ca4e88bdd71a878feecec51e7"
+    },
+    {
+      "path": "assets/tokens/avax.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cf767f2ea809aea54439b3410cdb57c760aabb7",
+      "size": 690,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6cf767f2ea809aea54439b3410cdb57c760aabb7"
+    },
+    {
+      "path": "assets/tokens/bnb.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1647516216963d8c44f5c903826ed1fe73c0a69c",
+      "size": 582,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1647516216963d8c44f5c903826ed1fe73c0a69c"
+    },
+    {
+      "path": "assets/tokens/eth.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "81b9bfce0840aaacf4b439ef36437df117b3a7d1",
+      "size": 73100,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/81b9bfce0840aaacf4b439ef36437df117b3a7d1"
+    },
+    {
+      "path": "assets/ui-generation",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4adf83dda1686242a9c75e45159c01289b5bbc23",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/4adf83dda1686242a9c75e45159c01289b5bbc23"
+    },
+    {
+      "path": "assets/ui-generation/ui-generation.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed2a49178865007c24d77464bd865e3296b9ba39",
+      "size": 4231,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ed2a49178865007c24d77464bd865e3296b9ba39"
+    },
+    {
+      "path": "assets/ui-generation/ui-generation.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1264ca58d81653e29f734b3f0e891db7cb2b10cf",
+      "size": 36685,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1264ca58d81653e29f734b3f0e891db7cb2b10cf"
+    },
+    {
+      "path": "build",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c3ac13a7c08fb2ae1d4bfb5de2c1caa39cfc90ca",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/c3ac13a7c08fb2ae1d4bfb5de2c1caa39cfc90ca"
+    },
+    {
+      "path": "build/extract.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2647412cd2cbd1ab63e389da1bdae14ec1888192",
+      "size": 61715,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2647412cd2cbd1ab63e389da1bdae14ec1888192"
+    },
+    {
+      "path": "build/snippets",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ef1847e5bc0b045b7411e04f561750c155310b8c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/ef1847e5bc0b045b7411e04f561750c155310b8c"
+    },
+    {
+      "path": "build/snippets/p13-clear.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c4ccdf79828bd3297931579eb9d72d9083571d14",
+      "size": 5433,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c4ccdf79828bd3297931579eb9d72d9083571d14"
+    },
+    {
+      "path": "build/templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b8bac930a35bc408026ca6a8fb5a748867c39697",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/b8bac930a35bc408026ca6a8fb5a748867c39697"
+    },
+    {
+      "path": "build/templates/reference.md.tmpl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87a25a17c9016248cedd95998067757008cc8707",
+      "size": 672,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/87a25a17c9016248cedd95998067757008cc8707"
+    },
+    {
+      "path": "build/templates/skill.md.tmpl",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3bd0d9ec52f43d07153e5ac820c8939d330a6a8f",
+      "size": 16409,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3bd0d9ec52f43d07153e5ac820c8939d330a6a8f"
+    },
+    {
+      "path": "builder.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f09df6793d71272e8a47db73ab7e329368cd4da4",
+      "size": 152654,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f09df6793d71272e8a47db73ab7e329368cd4da4"
+    },
+    {
+      "path": "cli-legacy",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "85ca34559daf9507190a47efda52f8ff1bbe2525",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/85ca34559daf9507190a47efda52f8ff1bbe2525"
+    },
+    {
+      "path": "cli-legacy/bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "819b9e079e46f6a2ee0fd794cb6c56535baebc67",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/819b9e079e46f6a2ee0fd794cb6c56535baebc67"
+    },
+    {
+      "path": "cli-legacy/bin/transitions-pro.mjs",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "cb9103999edbe625a2898c67ddcd9b54aca1e2ed",
+      "size": 1094,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cb9103999edbe625a2898c67ddcd9b54aca1e2ed"
+    },
+    {
+      "path": "cli-legacy/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd5e82eea7bf9a6d918ed1ff467ca595d4c4a751",
+      "size": 512,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/dd5e82eea7bf9a6d918ed1ff467ca595d4c4a751"
+    },
+    {
+      "path": "cli",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b8916e9af90cbcbc28e67cf8b44eb0a3317136bf",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/b8916e9af90cbcbc28e67cf8b44eb0a3317136bf"
+    },
+    {
+      "path": "cli/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2bff00f266cf4fdb8198392b2158a136f38ebd3c",
+      "size": 1880,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2bff00f266cf4fdb8198392b2158a136f38ebd3c"
+    },
+    {
+      "path": "cli/bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "649051a6aa6d61168688641f863ac94cc2c98d13",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/649051a6aa6d61168688641f863ac94cc2c98d13"
+    },
+    {
+      "path": "cli/bin/transitions-dev.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "11dba85866f3ad937724de9181496e0a89b43b64",
+      "size": 16073,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/11dba85866f3ad937724de9181496e0a89b43b64"
+    },
+    {
+      "path": "cli/free-manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a516044393343d38bac7c2598d551c9eca350205",
+      "size": 2822,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a516044393343d38bac7c2598d551c9eca350205"
+    },
+    {
+      "path": "cli/free",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5894328abd0c460f6f6c47004f54b17e34a1a4ff",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/5894328abd0c460f6f6c47004f54b17e34a1a4ff"
+    },
+    {
+      "path": "cli/free/accordion.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f7553d833555e7bdc9d9feb4dbc930e6418ba54e",
+      "size": 5217,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f7553d833555e7bdc9d9feb4dbc930e6418ba54e"
+    },
+    {
+      "path": "cli/free/avatar-group-hover.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "02564672d56ca3e08ab85d53a3aea6ed0966b787",
+      "size": 7374,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/02564672d56ca3e08ab85d53a3aea6ed0966b787"
+    },
+    {
+      "path": "cli/free/banner-stacking.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a3ae55994faff10c882550e8ca2d6f37f445d4c",
+      "size": 7347,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3a3ae55994faff10c882550e8ca2d6f37f445d4c"
+    },
+    {
+      "path": "cli/free/card-resize.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "893c07f629954bca50a79b5c0a1848539d1352a0",
+      "size": 1658,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/893c07f629954bca50a79b5c0a1848539d1352a0"
+    },
+    {
+      "path": "cli/free/card-tilt.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a8fdce95bd0e2bd17b93083766c1d4b19fcf7b4",
+      "size": 7627,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5a8fdce95bd0e2bd17b93083766c1d4b19fcf7b4"
+    },
+    {
+      "path": "cli/free/checkbox-check.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ceb6e70443f74cdf33392e2933bcc0feae86b1e",
+      "size": 2667,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9ceb6e70443f74cdf33392e2933bcc0feae86b1e"
+    },
+    {
+      "path": "cli/free/error-state-shake.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cad7a65326512b2bdd22284fcd29773841f8b418",
+      "size": 8545,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cad7a65326512b2bdd22284fcd29773841f8b418"
+    },
+    {
+      "path": "cli/free/icon-swap.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "68c3ff0c999bbbbb3a9636dcd34ba54cece966d6",
+      "size": 2415,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/68c3ff0c999bbbbb3a9636dcd34ba54cece966d6"
+    },
+    {
+      "path": "cli/free/input-clear-dissolve.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42ededa9bddd89b49c0cc7ee834b7ee97ac48b5e",
+      "size": 10671,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/42ededa9bddd89b49c0cc7ee834b7ee97ac48b5e"
+    },
+    {
+      "path": "cli/free/learn-more-hover.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "156876a96dfe9db34803b10a27110bde32545cc4",
+      "size": 2794,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/156876a96dfe9db34803b10a27110bde32545cc4"
+    },
+    {
+      "path": "cli/free/like-button.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39019ccdf0d5c5714a649a6c5b9ae84eaea9e0de",
+      "size": 4334,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/39019ccdf0d5c5714a649a6c5b9ae84eaea9e0de"
+    },
+    {
+      "path": "cli/free/matrix-loader.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dffc9ed05101c11580d8ff493b58ee69d0777db",
+      "size": 4176,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8dffc9ed05101c11580d8ff493b58ee69d0777db"
+    },
+    {
+      "path": "cli/free/menu-dropdown.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2ef3f92f47a8fabdcf18289e0d23530a1177e4c",
+      "size": 3506,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e2ef3f92f47a8fabdcf18289e0d23530a1177e4c"
+    },
+    {
+      "path": "cli/free/modal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87b2a5407f39835eebb88bc4bfe207015550b3e1",
+      "size": 2814,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/87b2a5407f39835eebb88bc4bfe207015550b3e1"
+    },
+    {
+      "path": "cli/free/notification-badge.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f00b034f28981db7dd7336c4f1afcbe7ff463d7b",
+      "size": 3974,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f00b034f28981db7dd7336c4f1afcbe7ff463d7b"
+    },
+    {
+      "path": "cli/free/number-pop-in.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "196ced01d73b73cfbb566ffe5a097ac59154d8d6",
+      "size": 3747,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/196ced01d73b73cfbb566ffe5a097ac59154d8d6"
+    },
+    {
+      "path": "cli/free/page-side-by-side.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "257f4727f7fe403b314e8b8919d826c186d7c614",
+      "size": 3342,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/257f4727f7fe403b314e8b8919d826c186d7c614"
+    },
+    {
+      "path": "cli/free/panel-reveal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5c7a32a04500960f6fef262c88226d61352bdba5",
+      "size": 2742,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5c7a32a04500960f6fef262c88226d61352bdba5"
+    },
+    {
+      "path": "cli/free/plus-menu-morph.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7fc33949b49c3424d3ceb3417af4513d7089a2a1",
+      "size": 6468,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7fc33949b49c3424d3ceb3417af4513d7089a2a1"
+    },
+    {
+      "path": "cli/free/reasoning-stream.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "335e04e9ff71a2030a73da9a48941687243c1a6f",
+      "size": 4579,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/335e04e9ff71a2030a73da9a48941687243c1a6f"
+    },
+    {
+      "path": "cli/free/shimmer-text.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a8c11b3c63a7adb26a4a1c7ba92d4de9ce0c83f",
+      "size": 3140,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4a8c11b3c63a7adb26a4a1c7ba92d4de9ce0c83f"
+    },
+    {
+      "path": "cli/free/skeleton-reveal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bd2eaebad26bc1df25151a9630342ccda29e645",
+      "size": 4730,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5bd2eaebad26bc1df25151a9630342ccda29e645"
+    },
+    {
+      "path": "cli/free/spinning-counter.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ca546fef8ec032532134321ac4e623ee32005e1c",
+      "size": 3189,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ca546fef8ec032532134321ac4e623ee32005e1c"
+    },
+    {
+      "path": "cli/free/streaming-text.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2364c9d4025f5b799b22ebe3ffb07c158ea2265a",
+      "size": 3257,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2364c9d4025f5b799b22ebe3ffb07c158ea2265a"
+    },
+    {
+      "path": "cli/free/success-check.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67e180e171c62c07855941d9cae5bc75440eb0ee",
+      "size": 7122,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/67e180e171c62c07855941d9cae5bc75440eb0ee"
+    },
+    {
+      "path": "cli/free/tabs-sliding.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac2875a9307b3e837c5e67b962dc661147c4424e",
+      "size": 4578,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ac2875a9307b3e837c5e67b962dc661147c4424e"
+    },
+    {
+      "path": "cli/free/text-states-swap.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39bbafd03546b56ea1b07896c2cb485c299a2474",
+      "size": 3091,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/39bbafd03546b56ea1b07896c2cb485c299a2474"
+    },
+    {
+      "path": "cli/free/texts-reveal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "954cd3675035c554e1000043b9b1edc8093d994a",
+      "size": 3500,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/954cd3675035c554e1000043b9b1edc8093d994a"
+    },
+    {
+      "path": "cli/free/thinking-states.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f133b6fcadbb681bea5cdd53d800d5846d9fb33",
+      "size": 6320,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1f133b6fcadbb681bea5cdd53d800d5846d9fb33"
+    },
+    {
+      "path": "cli/free/toast.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9abb9cd89db003d3170d45496983ed42b6f8f19a",
+      "size": 2792,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9abb9cd89db003d3170d45496983ed42b6f8f19a"
+    },
+    {
+      "path": "cli/free/toggle.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "116f17a16d1bc1d8fe8a8317ef27389e30780152",
+      "size": 3056,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/116f17a16d1bc1d8fe8a8317ef27389e30780152"
+    },
+    {
+      "path": "cli/free/tooltip.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "065401ca0f8e9daeb897fc3af7bf7b8bc8fa0982",
+      "size": 3364,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/065401ca0f8e9daeb897fc3af7bf7b8bc8fa0982"
+    },
+    {
+      "path": "cli/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3b935b3ca9ca622fd864c0188a6a986c1832d06b",
+      "size": 783,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3b935b3ca9ca622fd864c0188a6a986c1832d06b"
+    },
+    {
+      "path": "collection.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b90a20a2d76deba9e2bb59e6fbce06833939e498",
+      "size": 138076,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b90a20a2d76deba9e2bb59e6fbce06833939e498"
+    },
+    {
+      "path": "community.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7467bd71e34c62add3765e679b07b49788948968",
+      "size": 135403,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7467bd71e34c62add3765e679b07b49788948968"
+    },
+    {
+      "path": "demo-agent.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f1f09763fe323b14896d4373140273f781bf4a9",
+      "size": 114316,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6f1f09763fe323b14896d4373140273f781bf4a9"
+    },
+    {
+      "path": "demo-example-skill.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "609ab9ce8689b392d5c49db233e17607127957ad",
+      "size": 59827,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/609ab9ce8689b392d5c49db233e17607127957ad"
+    },
+    {
+      "path": "demo2.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8bc2b6de8454de7a7de7e15646e55ecf06725570",
+      "size": 199772,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8bc2b6de8454de7a7de7e15646e55ecf06725570"
+    },
+    {
+      "path": "detail.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5d008a4c1278c7ee5adc6e4c2120f214042003e",
+      "size": 786981,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d5d008a4c1278c7ee5adc6e4c2120f214042003e"
+    },
+    {
+      "path": "example-dropdown.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e4931e5c7b0bfb09e5e34e95f1f79a7288c09aa",
+      "size": 43110,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1e4931e5c7b0bfb09e5e34e95f1f79a7288c09aa"
+    },
+    {
+      "path": "example.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23de9fc748d59f8ca0d761846e2120cc9197f11e",
+      "size": 126412,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/23de9fc748d59f8ca0d761846e2120cc9197f11e"
+    },
+    {
+      "path": "imprint.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac38df9fe00c34f95ad3c862f52c345a60ca890b",
+      "size": 15548,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ac38df9fe00c34f95ad3c862f52c345a60ca890b"
+    },
+    {
+      "path": "index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "49a4347cf518a1fc968482dac004efa864a4a431",
+      "size": 726572,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/49a4347cf518a1fc968482dac004efa864a4a431"
+    },
+    {
+      "path": "library.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a839a58818bebc34cab98a253d8c9022e6e30ce2",
+      "size": 694048,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a839a58818bebc34cab98a253d8c9022e6e30ce2"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8da3d98342e3b575de71afdc22dda7400ac83914",
+      "size": 135,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8da3d98342e3b575de71afdc22dda7400ac83914"
+    },
+    {
+      "path": "privacy.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "825533942e1f70cec248e5fffb6afcffe4b33f73",
+      "size": 32955,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/825533942e1f70cec248e5fffb6afcffe4b33f73"
+    },
+    {
+      "path": "pro.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dc66b85b9920aee5f1d8f1c137fe228c58fba94",
+      "size": 343770,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8dc66b85b9920aee5f1d8f1c137fe228c58fba94"
+    },
+    {
+      "path": "profile.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8655005418147394d3fbcfd2a9baba0526bc850c",
+      "size": 135761,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8655005418147394d3fbcfd2a9baba0526bc850c"
+    },
+    {
+      "path": "projects.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2988a53ee79cc8267c0f854bb0c8b7e3d211e9d3",
+      "size": 134563,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2988a53ee79cc8267c0f854bb0c8b7e3d211e9d3"
+    },
+    {
+      "path": "prototypes.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "961799f6c0eb5329f9226868c1b4bad7907fbf4a",
+      "size": 313462,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/961799f6c0eb5329f9226868c1b4bad7907fbf4a"
+    },
+    {
+      "path": "refine-example.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c34391dd7a5137628e36a17c5710518529afb4d",
+      "size": 40592,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2c34391dd7a5137628e36a17c5710518529afb4d"
+    },
+    {
+      "path": "refine.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "863d646d517e0ce7c50303cd5d2af1b8e1cd19ed",
+      "size": 219343,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/863d646d517e0ce7c50303cd5d2af1b8e1cd19ed"
+    },
+    {
+      "path": "refine",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1089d53969e697380e892eb6bc77aebe7c2e4b9a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/1089d53969e697380e892eb6bc77aebe7c2e4b9a"
+    },
+    {
+      "path": "refine/.agents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2565b2caddcb627c54f80f100c76211716fb181c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/2565b2caddcb627c54f80f100c76211716fb181c"
+    },
+    {
+      "path": "refine/.agents/skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "de8b2aa6851feec4ab8ba148f0d2df1d5c7bf8c3",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/de8b2aa6851feec4ab8ba148f0d2df1d5c7bf8c3"
+    },
+    {
+      "path": "refine/.agents/skills/refine-live",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3666fa421e37386e5eb6f653df9be55a58bea17b",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/3666fa421e37386e5eb6f653df9be55a58bea17b"
+    },
+    {
+      "path": "refine/.agents/skills/refine-live/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b145d426ddf169a7cbcfad14dbb0f354419779c",
+      "size": 24076,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7b145d426ddf169a7cbcfad14dbb0f354419779c"
+    },
+    {
+      "path": "refine/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5d0dc66e9a253c676762b69b3181770ea244845",
+      "size": 222,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e5d0dc66e9a253c676762b69b3181770ea244845"
+    },
+    {
+      "path": "refine/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "527712375bdbd3409221e2474f7f29ec95aa96bf",
+      "size": 10624,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/527712375bdbd3409221e2474f7f29ec95aa96bf"
+    },
+    {
+      "path": "refine/bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "37f96b4f45c78b9daebd7b5932d085c02caca6a2",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/37f96b4f45c78b9daebd7b5932d085c02caca6a2"
+    },
+    {
+      "path": "refine/bin/cli.mjs",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "ad5aedadc1263486ff9fdb7c4f34a636a1bda36f",
+      "size": 21268,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ad5aedadc1263486ff9fdb7c4f34a636a1bda36f"
+    },
+    {
+      "path": "refine/demo.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12c62a9b8217337ef7a389f6ebfa88d19143753b",
+      "size": 417755,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/12c62a9b8217337ef7a389f6ebfa88d19143753b"
+    },
+    {
+      "path": "refine/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34e5f81b5bb383da367fffd5e3c64ec335641090",
+      "size": 920,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/34e5f81b5bb383da367fffd5e3c64ec335641090"
+    },
+    {
+      "path": "refine/scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "12d6ec593c2cf2e386b735d0b8e9b9e1ab3a8906",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/12d6ec593c2cf2e386b735d0b8e9b9e1ab3a8906"
+    },
+    {
+      "path": "refine/scripts/build-website-demo.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09d2cf192830b24019e734a36e54be02555fd5e0",
+      "size": 35582,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/09d2cf192830b24019e734a36e54be02555fd5e0"
+    },
+    {
+      "path": "refine/scripts/sync-skill.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "760e0b067c48200f7da46b547a506562950030e8",
+      "size": 1430,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/760e0b067c48200f7da46b547a506562950030e8"
+    },
+    {
+      "path": "refine/server",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0319bb4006c3592b30c3459989b034f5dcf879bd",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/0319bb4006c3592b30c3459989b034f5dcf879bd"
+    },
+    {
+      "path": "refine/server/agent-resolve.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83d6fd0b9f3a134aa577cdc5b598dbd48602c8a3",
+      "size": 5399,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/83d6fd0b9f3a134aa577cdc5b598dbd48602c8a3"
+    },
+    {
+      "path": "refine/server/group-deterministic.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "51c2ec23c22eec7dc5af62a40de4f6195d3fdd3f",
+      "size": 14352,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/51c2ec23c22eec7dc5af62a40de4f6195d3fdd3f"
+    },
+    {
+      "path": "refine/server/inject.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a42298a50ef3335b33c53ba1949ab7676211ec4",
+      "size": 5256,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3a42298a50ef3335b33c53ba1949ab7676211ec4"
+    },
+    {
+      "path": "refine/server/live-refine-loop.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dcd920c4b4b86b359fba04e2621278dfee43b9f9",
+      "size": 15303,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/dcd920c4b4b86b359fba04e2621278dfee43b9f9"
+    },
+    {
+      "path": "refine/server/motion-tokens.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5996a56888caa0d1f808a21acd7da133d153f954",
+      "size": 13751,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5996a56888caa0d1f808a21acd7da133d153f954"
+    },
+    {
+      "path": "refine/server/refine-agent.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "039b10c7ae9021ec381b8b11b65b8c1583a32266",
+      "size": 2870,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/039b10c7ae9021ec381b8b11b65b8c1583a32266"
+    },
+    {
+      "path": "refine/server/relay.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06bb66b97f7ccc1b33342ec79e03fbd23e61af22",
+      "size": 68220,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/06bb66b97f7ccc1b33342ec79e03fbd23e61af22"
+    },
+    {
+      "path": "robots.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7ad6772f676a92482d62c744dabc4f9955ca1c20",
+      "size": 69,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7ad6772f676a92482d62c744dabc4f9955ca1c20"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "63da1a70136790ab1069ffc25575793a0152882b",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/63da1a70136790ab1069ffc25575793a0152882b"
+    },
+    {
+      "path": "scripts/build-community-beam.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f41754d7d03c405a96af83cd932e6a423c2f01fb",
+      "size": 9146,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f41754d7d03c405a96af83cd932e6a423c2f01fb"
+    },
+    {
+      "path": "scripts/build-community-libraries.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2ce201ab5e7de91d05192b1bdbadf00049dea9d",
+      "size": 22412,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c2ce201ab5e7de91d05192b1bdbadf00049dea9d"
+    },
+    {
+      "path": "scripts/build-community-library.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9d22fc4021539bf05d67c5eaafd86e859ee806ff",
+      "size": 21808,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9d22fc4021539bf05d67c5eaafd86e859ee806ff"
+    },
+    {
+      "path": "scripts/build-community-pro-list.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "26fb0aa2f23f8a0a88a81f1fd5ed8786a0bd6d60",
+      "size": 2103,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/26fb0aa2f23f8a0a88a81f1fd5ed8786a0bd6d60"
+    },
+    {
+      "path": "scripts/build-community-thumbs.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2c677a08d508455396042a4b69b428aa7b72a51",
+      "size": 4030,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b2c677a08d508455396042a4b69b428aa7b72a51"
+    },
+    {
+      "path": "scripts/build-transition-pages.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6cbda30c06360ec790e6360a345514ac80cdcd6",
+      "size": 14182,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f6cbda30c06360ec790e6360a345514ac80cdcd6"
+    },
+    {
+      "path": "scripts/studio-agent-eval.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6b4b393ed51de7fe2fa54be4967ef96c53f514de",
+      "size": 9254,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/6b4b393ed51de7fe2fa54be4967ef96c53f514de"
+    },
+    {
+      "path": "scripts/transitions-data.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bcc80909152db194e8953bbc2b3cb95cd97a2d40",
+      "size": 181589,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/bcc80909152db194e8953bbc2b3cb95cd97a2d40"
+    },
+    {
+      "path": "site.webmanifest",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2586b1dfae682ab5a09ee3ec4247d6c8f016c9da",
+      "size": 666,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2586b1dfae682ab5a09ee3ec4247d6c8f016c9da"
+    },
+    {
+      "path": "sitemap.xml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0eb574330f09861a33008af60d6151915e9b1d09",
+      "size": 7552,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0eb574330f09861a33008af60d6151915e9b1d09"
+    },
+    {
+      "path": "skill-refine.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e7007b77781ade31256184a5339dcd6812894b7",
+      "size": 169290,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0e7007b77781ade31256184a5339dcd6812894b7"
+    },
+    {
+      "path": "skill.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "402855fea1a7a9ad65bd310b17243db751a407e2",
+      "size": 230157,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/402855fea1a7a9ad65bd310b17243db751a407e2"
+    },
+    {
+      "path": "skills",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3a3fb2d1a5e1f626a760a029973686a6b88dcf19",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/3a3fb2d1a5e1f626a760a029973686a6b88dcf19"
+    },
+    {
+      "path": "skills/transitions-dev",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f3ed7bd315e817e02e1a101e054b0848b5c5a808",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/f3ed7bd315e817e02e1a101e054b0848b5c5a808"
+    },
+    {
+      "path": "skills/transitions-dev/01-card-resize.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "893c07f629954bca50a79b5c0a1848539d1352a0",
+      "size": 1658,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/893c07f629954bca50a79b5c0a1848539d1352a0"
+    },
+    {
+      "path": "skills/transitions-dev/02-number-pop-in.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f749a96ad29f2020f2f83962e6acecc61c09cf1",
+      "size": 4444,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/0f749a96ad29f2020f2f83962e6acecc61c09cf1"
+    },
+    {
+      "path": "skills/transitions-dev/03-notification-badge.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f00b034f28981db7dd7336c4f1afcbe7ff463d7b",
+      "size": 3974,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f00b034f28981db7dd7336c4f1afcbe7ff463d7b"
+    },
+    {
+      "path": "skills/transitions-dev/04-text-states-swap.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39bbafd03546b56ea1b07896c2cb485c299a2474",
+      "size": 3091,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/39bbafd03546b56ea1b07896c2cb485c299a2474"
+    },
+    {
+      "path": "skills/transitions-dev/05-menu-dropdown.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e2ef3f92f47a8fabdcf18289e0d23530a1177e4c",
+      "size": 3506,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e2ef3f92f47a8fabdcf18289e0d23530a1177e4c"
+    },
+    {
+      "path": "skills/transitions-dev/06-modal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87b2a5407f39835eebb88bc4bfe207015550b3e1",
+      "size": 2814,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/87b2a5407f39835eebb88bc4bfe207015550b3e1"
+    },
+    {
+      "path": "skills/transitions-dev/07-panel-reveal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5c7a32a04500960f6fef262c88226d61352bdba5",
+      "size": 2742,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5c7a32a04500960f6fef262c88226d61352bdba5"
+    },
+    {
+      "path": "skills/transitions-dev/08-page-side-by-side.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "257f4727f7fe403b314e8b8919d826c186d7c614",
+      "size": 3342,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/257f4727f7fe403b314e8b8919d826c186d7c614"
+    },
+    {
+      "path": "skills/transitions-dev/09-icon-swap.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10579532c265f9c52ccdf9caa9dc12ba52b2cf44",
+      "size": 2509,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/10579532c265f9c52ccdf9caa9dc12ba52b2cf44"
+    },
+    {
+      "path": "skills/transitions-dev/10-success-check.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67e180e171c62c07855941d9cae5bc75440eb0ee",
+      "size": 7122,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/67e180e171c62c07855941d9cae5bc75440eb0ee"
+    },
+    {
+      "path": "skills/transitions-dev/11-avatar-group-hover.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "02564672d56ca3e08ab85d53a3aea6ed0966b787",
+      "size": 7374,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/02564672d56ca3e08ab85d53a3aea6ed0966b787"
+    },
+    {
+      "path": "skills/transitions-dev/12-error-state-shake.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cad7a65326512b2bdd22284fcd29773841f8b418",
+      "size": 8545,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cad7a65326512b2bdd22284fcd29773841f8b418"
+    },
+    {
+      "path": "skills/transitions-dev/13-input-clear-dissolve.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42ededa9bddd89b49c0cc7ee834b7ee97ac48b5e",
+      "size": 10671,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/42ededa9bddd89b49c0cc7ee834b7ee97ac48b5e"
+    },
+    {
+      "path": "skills/transitions-dev/14-skeleton-reveal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bd2eaebad26bc1df25151a9630342ccda29e645",
+      "size": 4730,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5bd2eaebad26bc1df25151a9630342ccda29e645"
+    },
+    {
+      "path": "skills/transitions-dev/15-shimmer-text.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a8c11b3c63a7adb26a4a1c7ba92d4de9ce0c83f",
+      "size": 3140,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4a8c11b3c63a7adb26a4a1c7ba92d4de9ce0c83f"
+    },
+    {
+      "path": "skills/transitions-dev/16-tabs-sliding.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac2875a9307b3e837c5e67b962dc661147c4424e",
+      "size": 4578,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ac2875a9307b3e837c5e67b962dc661147c4424e"
+    },
+    {
+      "path": "skills/transitions-dev/17-tooltip.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32e42a1fd79bdc2ff89762c32d1e090d3c260df8",
+      "size": 6181,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/32e42a1fd79bdc2ff89762c32d1e090d3c260df8"
+    },
+    {
+      "path": "skills/transitions-dev/18-texts-reveal.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "954cd3675035c554e1000043b9b1edc8093d994a",
+      "size": 3500,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/954cd3675035c554e1000043b9b1edc8093d994a"
+    },
+    {
+      "path": "skills/transitions-dev/19-card-tilt.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a8fdce95bd0e2bd17b93083766c1d4b19fcf7b4",
+      "size": 7627,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5a8fdce95bd0e2bd17b93083766c1d4b19fcf7b4"
+    },
+    {
+      "path": "skills/transitions-dev/20-plus-menu-morph.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7fc33949b49c3424d3ceb3417af4513d7089a2a1",
+      "size": 6468,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7fc33949b49c3424d3ceb3417af4513d7089a2a1"
+    },
+    {
+      "path": "skills/transitions-dev/21-accordion.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f7553d833555e7bdc9d9feb4dbc930e6418ba54e",
+      "size": 5217,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/f7553d833555e7bdc9d9feb4dbc930e6418ba54e"
+    },
+    {
+      "path": "skills/transitions-dev/22-toast.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9abb9cd89db003d3170d45496983ed42b6f8f19a",
+      "size": 2792,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9abb9cd89db003d3170d45496983ed42b6f8f19a"
+    },
+    {
+      "path": "skills/transitions-dev/23-like-button.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39019ccdf0d5c5714a649a6c5b9ae84eaea9e0de",
+      "size": 4334,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/39019ccdf0d5c5714a649a6c5b9ae84eaea9e0de"
+    },
+    {
+      "path": "skills/transitions-dev/24-learn-more-hover.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "156876a96dfe9db34803b10a27110bde32545cc4",
+      "size": 2794,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/156876a96dfe9db34803b10a27110bde32545cc4"
+    },
+    {
+      "path": "skills/transitions-dev/25-checkbox-check.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ceb6e70443f74cdf33392e2933bcc0feae86b1e",
+      "size": 2667,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9ceb6e70443f74cdf33392e2933bcc0feae86b1e"
+    },
+    {
+      "path": "skills/transitions-dev/26-spinning-counter.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ca546fef8ec032532134321ac4e623ee32005e1c",
+      "size": 3189,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ca546fef8ec032532134321ac4e623ee32005e1c"
+    },
+    {
+      "path": "skills/transitions-dev/27-toggle.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "116f17a16d1bc1d8fe8a8317ef27389e30780152",
+      "size": 3056,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/116f17a16d1bc1d8fe8a8317ef27389e30780152"
+    },
+    {
+      "path": "skills/transitions-dev/28-thinking-states.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f133b6fcadbb681bea5cdd53d800d5846d9fb33",
+      "size": 6320,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1f133b6fcadbb681bea5cdd53d800d5846d9fb33"
+    },
+    {
+      "path": "skills/transitions-dev/29-reasoning-stream.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "335e04e9ff71a2030a73da9a48941687243c1a6f",
+      "size": 4579,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/335e04e9ff71a2030a73da9a48941687243c1a6f"
+    },
+    {
+      "path": "skills/transitions-dev/30-streaming-text.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2364c9d4025f5b799b22ebe3ffb07c158ea2265a",
+      "size": 3257,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2364c9d4025f5b799b22ebe3ffb07c158ea2265a"
+    },
+    {
+      "path": "skills/transitions-dev/31-matrix-loader.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8dffc9ed05101c11580d8ff493b58ee69d0777db",
+      "size": 4176,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8dffc9ed05101c11580d8ff493b58ee69d0777db"
+    },
+    {
+      "path": "skills/transitions-dev/32-banner-stacking.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c19228793c2fb6015b24b71d903077f4ebed2844",
+      "size": 7642,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c19228793c2fb6015b24b71d903077f4ebed2844"
+    },
+    {
+      "path": "skills/transitions-dev/33-text-morph.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "71bd99d69ec0151547bb63c11055f0031e519cf6",
+      "size": 4830,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/71bd99d69ec0151547bb63c11055f0031e519cf6"
+    },
+    {
+      "path": "skills/transitions-dev/34-text-swap-soft.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87fcb393a0f9cdb87782979d7cbc82d9671b3351",
+      "size": 4840,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/87fcb393a0f9cdb87782979d7cbc82d9671b3351"
+    },
+    {
+      "path": "skills/transitions-dev/35-donut-chart.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "78e6c7205128a3998062cd54e4506759b0a4f38d",
+      "size": 6505,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/78e6c7205128a3998062cd54e4506759b0a4f38d"
+    },
+    {
+      "path": "skills/transitions-dev/LICENSE.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ad9539de645f33dfdeed6aa6ed06e1e803ac6ed",
+      "size": 1191,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4ad9539de645f33dfdeed6aa6ed06e1e803ac6ed"
+    },
+    {
+      "path": "skills/transitions-dev/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a928208a79fe3905ebb9b1dbba662374fe23886f",
+      "size": 25996,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/a928208a79fe3905ebb9b1dbba662374fe23886f"
+    },
+    {
+      "path": "skills/transitions-dev/_root.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2a7137dba49fc8ea1fcb0776518f40150c8765a7",
+      "size": 9498,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2a7137dba49fc8ea1fcb0776518f40150c8765a7"
+    },
+    {
+      "path": "skills/transitions-polish",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "25c1adb387f6cd2d9d5052b9b0b20f1183ef2c25",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/25c1adb387f6cd2d9d5052b9b0b20f1183ef2c25"
+    },
+    {
+      "path": "skills/transitions-polish/LICENSE.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ad9539de645f33dfdeed6aa6ed06e1e803ac6ed",
+      "size": 1191,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4ad9539de645f33dfdeed6aa6ed06e1e803ac6ed"
+    },
+    {
+      "path": "skills/transitions-polish/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37b53a464edfab6bf4a04bf1af6186227f512101",
+      "size": 12851,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/37b53a464edfab6bf4a04bf1af6186227f512101"
+    },
+    {
+      "path": "skills/transitions-polish/_refine-rules.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd2db9d86197dd0c70067c232bc3a159990fd2f0",
+      "size": 1787,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/dd2db9d86197dd0c70067c232bc3a159990fd2f0"
+    },
+    {
+      "path": "skills/transitions-polish/_root.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5fa79f98e959b8b476c8432357a9c3a050b4d9a",
+      "size": 2261,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e5fa79f98e959b8b476c8432357a9c3a050b4d9a"
+    },
+    {
+      "path": "skills/transitions-ui-generation",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "249b58c8e403661390dd99a9192d75b25c407c1f",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/249b58c8e403661390dd99a9192d75b25c407c1f"
+    },
+    {
+      "path": "skills/transitions-ui-generation/01-skeleton.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8b2fca12955818e864184f2616c68a8df996670f",
+      "size": 3139,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8b2fca12955818e864184f2616c68a8df996670f"
+    },
+    {
+      "path": "skills/transitions-ui-generation/02-skeleton-texts.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2852073d857448ae36ec5ab1199af3509a25b9a2",
+      "size": 2484,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2852073d857448ae36ec5ab1199af3509a25b9a2"
+    },
+    {
+      "path": "skills/transitions-ui-generation/LICENSE.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ad9539de645f33dfdeed6aa6ed06e1e803ac6ed",
+      "size": 1191,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4ad9539de645f33dfdeed6aa6ed06e1e803ac6ed"
+    },
+    {
+      "path": "skills/transitions-ui-generation/SKILL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5b4c0ec2413031879a929f2f27d2591ff8fb08ca",
+      "size": 12270,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/5b4c0ec2413031879a929f2f27d2591ff8fb08ca"
+    },
+    {
+      "path": "skills/transitions-ui-generation/demo.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce2528a625709a34904383c67a2ec0acd4db75e8",
+      "size": 77024,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ce2528a625709a34904383c67a2ec0acd4db75e8"
+    },
+    {
+      "path": "skills/transitions-ui-generation/ui-generation.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ed2a49178865007c24d77464bd865e3296b9ba39",
+      "size": 4231,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ed2a49178865007c24d77464bd865e3296b9ba39"
+    },
+    {
+      "path": "skills/transitions-ui-generation/ui-generation.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7b106e796b8b9185a44456e4c2898ccb84800499",
+      "size": 34947,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7b106e796b8b9185a44456e4c2898ccb84800499"
+    },
+    {
+      "path": "studio.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c625aeb7c87f5c152c50a23533a3a3994fa45cb1",
+      "size": 165768,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c625aeb7c87f5c152c50a23533a3a3994fa45cb1"
+    },
+    {
+      "path": "success.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8c26631e82298b221d254e79c86e9e6fcd3c26df",
+      "size": 209607,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/8c26631e82298b221d254e79c86e9e6fcd3c26df"
+    },
+    {
+      "path": "terms.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1f250dcc7ec4e1feb178d7ab2940d4fbea79673",
+      "size": 38211,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b1f250dcc7ec4e1feb178d7ab2940d4fbea79673"
+    },
+    {
+      "path": "transitions",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a0ca9232028da37beda8396e4196382356e2b3df",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/a0ca9232028da37beda8396e4196382356e2b3df"
+    },
+    {
+      "path": "transitions/3d-tilt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ca0fc6232602bd31a1eb5fbf4c4121559c82373e",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/ca0fc6232602bd31a1eb5fbf4c4121559c82373e"
+    },
+    {
+      "path": "transitions/3d-tilt/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "36ce555d3003a88850fc1b75cdd739f62da4b1b7",
+      "size": 15856,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/36ce555d3003a88850fc1b75cdd739f62da4b1b7"
+    },
+    {
+      "path": "transitions/accordion",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6463b042b281447b20f1d1c3ca644f830552e42a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/6463b042b281447b20f1d1c3ca644f830552e42a"
+    },
+    {
+      "path": "transitions/accordion/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77bf17e600adf4b4cac72200092d4824b31bfe62",
+      "size": 14530,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/77bf17e600adf4b4cac72200092d4824b31bfe62"
+    },
+    {
+      "path": "transitions/avatar-group-hover",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7e8e2156965a461d1dc18a64bdc064dc9da4acc5",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/7e8e2156965a461d1dc18a64bdc064dc9da4acc5"
+    },
+    {
+      "path": "transitions/avatar-group-hover/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e25872099f6de9d3607d55901762718ccab92952",
+      "size": 14175,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e25872099f6de9d3607d55901762718ccab92952"
+    },
+    {
+      "path": "transitions/banner-stacking",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "77d2bf535a0ec5adfe9d5b1cc857e66c86ea3208",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/77d2bf535a0ec5adfe9d5b1cc857e66c86ea3208"
+    },
+    {
+      "path": "transitions/banner-stacking/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "448559c2d57985b0cab4735d881baf68664ad519",
+      "size": 11749,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/448559c2d57985b0cab4735d881baf68664ad519"
+    },
+    {
+      "path": "transitions/card-resize",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "55f53e851e256bb2cb23d02af067e17b039b6c02",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/55f53e851e256bb2cb23d02af067e17b039b6c02"
+    },
+    {
+      "path": "transitions/card-resize/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4bcd4fff330398213755770913d9db506635e447",
+      "size": 10263,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/4bcd4fff330398213755770913d9db506635e447"
+    },
+    {
+      "path": "transitions/card-stack-hover",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "05ddd1ea691a878426a9a1d90d113d015dc8a9b3",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/05ddd1ea691a878426a9a1d90d113d015dc8a9b3"
+    },
+    {
+      "path": "transitions/card-stack-hover/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb776cac87ae820b2d7a9c62803c2a98bfdda0e1",
+      "size": 8115,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/bb776cac87ae820b2d7a9c62803c2a98bfdda0e1"
+    },
+    {
+      "path": "transitions/checkbox-check",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "63e8f54142c7ce4a47b917ef71054513e1efc215",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/63e8f54142c7ce4a47b917ef71054513e1efc215"
+    },
+    {
+      "path": "transitions/checkbox-check/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae89d03a36331915e5396b1751dc7dc2db989a96",
+      "size": 12212,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ae89d03a36331915e5396b1751dc7dc2db989a96"
+    },
+    {
+      "path": "transitions/confetti-burst",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3ac275b5aea029bc494ebace41e5ba23f592ea75",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/3ac275b5aea029bc494ebace41e5ba23f592ea75"
+    },
+    {
+      "path": "transitions/confetti-burst/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9aef34f6b4d4e6b49bbe6e790a009968ff649239",
+      "size": 8101,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9aef34f6b4d4e6b49bbe6e790a009968ff649239"
+    },
+    {
+      "path": "transitions/delete-with-smoky-dissolve",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "abd5390e63091eb86a7430fa3bf1f3a901724650",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/abd5390e63091eb86a7430fa3bf1f3a901724650"
+    },
+    {
+      "path": "transitions/delete-with-smoky-dissolve/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "634de6b4043ebee53e31fe5822f2dd71fa4d47ce",
+      "size": 8259,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/634de6b4043ebee53e31fe5822f2dd71fa4d47ce"
+    },
+    {
+      "path": "transitions/drag-drop-with-physics",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4000172e5bb686d158c4b951f74abc994a4c445c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/4000172e5bb686d158c4b951f74abc994a4c445c"
+    },
+    {
+      "path": "transitions/drag-drop-with-physics/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a5b7f2cb4fad42a271e45bd6c735cdc15f5d9e1",
+      "size": 8153,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3a5b7f2cb4fad42a271e45bd6c735cdc15f5d9e1"
+    },
+    {
+      "path": "transitions/dropdown-menu-morph",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1381d6eebf307d7de51d18041f5d501779201f39",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/1381d6eebf307d7de51d18041f5d501779201f39"
+    },
+    {
+      "path": "transitions/dropdown-menu-morph/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e1f0d7e593d71ea2e0d9f4cb1e63e96f88ed606",
+      "size": 16657,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1e1f0d7e593d71ea2e0d9f4cb1e63e96f88ed606"
+    },
+    {
+      "path": "transitions/error-state-shake",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ee2647a427e0d017992cd6631c114bc2b04c1cac",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/ee2647a427e0d017992cd6631c114bc2b04c1cac"
+    },
+    {
+      "path": "transitions/error-state-shake/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87bc619fd2e97d9a1d7a2efe25e20cb0bba5712c",
+      "size": 17659,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/87bc619fd2e97d9a1d7a2efe25e20cb0bba5712c"
+    },
+    {
+      "path": "transitions/get-pro-button",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "dacc7f4c856b97466d35ad8c2d735cef16350baa",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/dacc7f4c856b97466d35ad8c2d735cef16350baa"
+    },
+    {
+      "path": "transitions/get-pro-button/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b4dda9e505869bfbeddec3f06bf178a2f9db5e51",
+      "size": 8060,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/b4dda9e505869bfbeddec3f06bf178a2f9db5e51"
+    },
+    {
+      "path": "transitions/gooey-plus-menu",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0cb2ecb88f2313f681bcde1b7570bc404e45451a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/0cb2ecb88f2313f681bcde1b7570bc404e45451a"
+    },
+    {
+      "path": "transitions/gooey-plus-menu/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03b13d06a611e06c30794ae2747f74e158317e98",
+      "size": 8075,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/03b13d06a611e06c30794ae2747f74e158317e98"
+    },
+    {
+      "path": "transitions/icon-swap",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "30a2ace46fbdafc951afbd96d9232d23ca659a5c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/30a2ace46fbdafc951afbd96d9232d23ca659a5c"
+    },
+    {
+      "path": "transitions/icon-swap/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2d6f0f0e99ae8b998e192c393a9891ef2fab5468",
+      "size": 12108,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2d6f0f0e99ae8b998e192c393a9891ef2fab5468"
+    },
+    {
+      "path": "transitions/image-generation-placeholder",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "aa0fd40471d1c738269ddca12ee04c8854c4c72c",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/aa0fd40471d1c738269ddca12ee04c8854c4c72c"
+    },
+    {
+      "path": "transitions/image-generation-placeholder/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a21f1d34a228dd2b8d11bfd78349848e3b5d436",
+      "size": 8315,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9a21f1d34a228dd2b8d11bfd78349848e3b5d436"
+    },
+    {
+      "path": "transitions/image-open-tilt",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "025379396e3a6f0c0592caf15a158ce3d7f293e5",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/025379396e3a6f0c0592caf15a158ce3d7f293e5"
+    },
+    {
+      "path": "transitions/image-open-tilt/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3e93363b63ef8029cd2bc5ad2e887a9c3cda014a",
+      "size": 8103,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3e93363b63ef8029cd2bc5ad2e887a9c3cda014a"
+    },
+    {
+      "path": "transitions/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f9335241540ff3f81632550058cbf9a65d7a2ec",
+      "size": 10266,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3f9335241540ff3f81632550058cbf9a65d7a2ec"
+    },
+    {
+      "path": "transitions/input-clear-with-dissolve",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "95b0a45a6e3f30e898fd64d9f6c1e361092d258a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/95b0a45a6e3f30e898fd64d9f6c1e361092d258a"
+    },
+    {
+      "path": "transitions/input-clear-with-dissolve/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9523fffaf86386ad15069d998d2ef3c0aedcd792",
+      "size": 23059,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9523fffaf86386ad15069d998d2ef3c0aedcd792"
+    },
+    {
+      "path": "transitions/learn-more-hover",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "53daa50cf66f441b94dc2cac889b940b6c6b7afd",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/53daa50cf66f441b94dc2cac889b940b6c6b7afd"
+    },
+    {
+      "path": "transitions/learn-more-hover/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1185a562f51b062a915e21443ff1f153ac7c8114",
+      "size": 12325,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1185a562f51b062a915e21443ff1f153ac7c8114"
+    },
+    {
+      "path": "transitions/like-button",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5874254fc6a958aa5cf603ceedc79c37c8f16444",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/5874254fc6a958aa5cf603ceedc79c37c8f16444"
+    },
+    {
+      "path": "transitions/like-button/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d34d8d8515ef4728ccfe8f10038bc7bbc9bdc3a7",
+      "size": 17003,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d34d8d8515ef4728ccfe8f10038bc7bbc9bdc3a7"
+    },
+    {
+      "path": "transitions/matrix-dot-loader",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9069801ad4697b0e98a7194adc8b4960c5c02cea",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/9069801ad4697b0e98a7194adc8b4960c5c02cea"
+    },
+    {
+      "path": "transitions/matrix-dot-loader/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c140a62b696d510fa6e6cf8a65c6b6f20fb4a30",
+      "size": 9502,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/7c140a62b696d510fa6e6cf8a65c6b6f20fb4a30"
+    },
+    {
+      "path": "transitions/menu-dropdown",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "770d39c342bbf43f9b3cc247c0e624c99deea56e",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/770d39c342bbf43f9b3cc247c0e624c99deea56e"
+    },
+    {
+      "path": "transitions/menu-dropdown/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "03b9976adf525fa373358d153672f1a065de1ad3",
+      "size": 13690,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/03b9976adf525fa373358d153672f1a065de1ad3"
+    },
+    {
+      "path": "transitions/modal-open-close",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "478fd433dab890bb4d8965f4cef58958501a977f",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/478fd433dab890bb4d8965f4cef58958501a977f"
+    },
+    {
+      "path": "transitions/modal-open-close/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1df69e2e465e6ad61cce75ed78d2b5f9de5ea0f8",
+      "size": 12427,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/1df69e2e465e6ad61cce75ed78d2b5f9de5ea0f8"
+    },
+    {
+      "path": "transitions/notification-badge",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "b27fee6678d0b339d23bfa6597a1028b2e302d36",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/b27fee6678d0b339d23bfa6597a1028b2e302d36"
+    },
+    {
+      "path": "transitions/notification-badge/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c765be2b71ee5c18e4b26f63bd6d767c481d75f5",
+      "size": 13711,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/c765be2b71ee5c18e4b26f63bd6d767c481d75f5"
+    },
+    {
+      "path": "transitions/number-pop-in",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "92182b8ef6cd04d2acbecfefc325198e93a850b0",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/92182b8ef6cd04d2acbecfefc325198e93a850b0"
+    },
+    {
+      "path": "transitions/number-pop-in/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1b9e510ab0e17e56c7fd4d6b306c8de52a467e2",
+      "size": 12854,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d1b9e510ab0e17e56c7fd4d6b306c8de52a467e2"
+    },
+    {
+      "path": "transitions/organic-shimmer",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8faea67580605260d2bfac66e66120198a4c389b",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/8faea67580605260d2bfac66e66120198a4c389b"
+    },
+    {
+      "path": "transitions/organic-shimmer/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9084b6ceadffcd6b447be0233da38c533d45fdab",
+      "size": 8187,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9084b6ceadffcd6b447be0233da38c533d45fdab"
+    },
+    {
+      "path": "transitions/page-side-by-side",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6b6d3e78b4d70bbb6c886cac47b5bc7bc622e757",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/6b6d3e78b4d70bbb6c886cac47b5bc7bc622e757"
+    },
+    {
+      "path": "transitions/page-side-by-side/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2ba561a02dc5722a57bc643fadc1ac29a7fae7b5",
+      "size": 12986,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/2ba561a02dc5722a57bc643fadc1ac29a7fae7b5"
+    },
+    {
+      "path": "transitions/panel-reveal",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6e2d8ae65059b53e6b5f940678db57d96272262f",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/6e2d8ae65059b53e6b5f940678db57d96272262f"
+    },
+    {
+      "path": "transitions/panel-reveal/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bc509aaa22956ffa53787bce30c1ddb06e0c333e",
+      "size": 12035,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/bc509aaa22956ffa53787bce30c1ddb06e0c333e"
+    },
+    {
+      "path": "transitions/pro-gradient-text",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "58bb6db664948d67ed1e36f2ff187691f80c2c3a",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/58bb6db664948d67ed1e36f2ff187691f80c2c3a"
+    },
+    {
+      "path": "transitions/pro-gradient-text/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cee0cd095db94b803a05ac6a6f0c2cb539dfc3ab",
+      "size": 8177,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cee0cd095db94b803a05ac6a6f0c2cb539dfc3ab"
+    },
+    {
+      "path": "transitions/reasoning-stream",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "90d4e2e59631ca28277d26a02325f2907b57fe35",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/90d4e2e59631ca28277d26a02325f2907b57fe35"
+    },
+    {
+      "path": "transitions/reasoning-stream/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "17e15e101f87ecc8a9f610566e23970f6ecf034b",
+      "size": 10047,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/17e15e101f87ecc8a9f610566e23970f6ecf034b"
+    },
+    {
+      "path": "transitions/shimmer-text",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "321c24297306c37020c51a3d278f97aa96755618",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/321c24297306c37020c51a3d278f97aa96755618"
+    },
+    {
+      "path": "transitions/shimmer-text/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65318f11936e519a6f251a9be72b06ba2c3612de",
+      "size": 12525,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/65318f11936e519a6f251a9be72b06ba2c3612de"
+    },
+    {
+      "path": "transitions/skeleton-loader-and-reveal",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "002f59ab4f8abbeee6c3dfbae202af7bb4fa67d0",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/002f59ab4f8abbeee6c3dfbae202af7bb4fa67d0"
+    },
+    {
+      "path": "transitions/skeleton-loader-and-reveal/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee5d0adef592b1a3f8b99397ea6814bb8ff83792",
+      "size": 15865,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/ee5d0adef592b1a3f8b99397ea6814bb8ff83792"
+    },
+    {
+      "path": "transitions/spinner-to-check-morph",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "57b41bd48754159d2d46ea612587eae63ceca2ea",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/57b41bd48754159d2d46ea612587eae63ceca2ea"
+    },
+    {
+      "path": "transitions/spinner-to-check-morph/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e584ad77417161e88ef72a3b567486affdebfb5d",
+      "size": 8169,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e584ad77417161e88ef72a3b567486affdebfb5d"
+    },
+    {
+      "path": "transitions/spinning-counter",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "87fc7bb25146caab1b08282dbaac961189e333e4",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/87fc7bb25146caab1b08282dbaac961189e333e4"
+    },
+    {
+      "path": "transitions/spinning-counter/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9bb2379b330df1ebbf5c919b68f4125c1b05c855",
+      "size": 14286,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9bb2379b330df1ebbf5c919b68f4125c1b05c855"
+    },
+    {
+      "path": "transitions/streaming-text",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d589608efd91bc1185e4c231153a437c579b505b",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/d589608efd91bc1185e4c231153a437c579b505b"
+    },
+    {
+      "path": "transitions/streaming-text/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ffb082b8fe59ce0cfc4777e8fd7816b51b53298",
+      "size": 9033,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/9ffb082b8fe59ce0cfc4777e8fd7816b51b53298"
+    },
+    {
+      "path": "transitions/success-check",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "2974597c30b8e08567b2499cfd33085d64ec3cc8",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/2974597c30b8e08567b2499cfd33085d64ec3cc8"
+    },
+    {
+      "path": "transitions/success-check/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "baf03cd35b6d562b25fac9eda3cbdc81c6b22093",
+      "size": 15987,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/baf03cd35b6d562b25fac9eda3cbdc81c6b22093"
+    },
+    {
+      "path": "transitions/tabs-sliding",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5739c88ec831f84de821bcd684b23e8280476350",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/5739c88ec831f84de821bcd684b23e8280476350"
+    },
+    {
+      "path": "transitions/tabs-sliding/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24e86cf3022eeaef08e1730f43830ae47035d167",
+      "size": 15165,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/24e86cf3022eeaef08e1730f43830ae47035d167"
+    },
+    {
+      "path": "transitions/text-states-swap",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5e33e7fda0146d4fb5b59e3af5cf6475d3ac8f9e",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/5e33e7fda0146d4fb5b59e3af5cf6475d3ac8f9e"
+    },
+    {
+      "path": "transitions/text-states-swap/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cafbb49984d6172a2460bd4aa46e784bda035a08",
+      "size": 12562,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/cafbb49984d6172a2460bd4aa46e784bda035a08"
+    },
+    {
+      "path": "transitions/texts-reveal",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "621066c05bf33f65209b8a18abfdc3d6a8c4a0a9",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/621066c05bf33f65209b8a18abfdc3d6a8c4a0a9"
+    },
+    {
+      "path": "transitions/texts-reveal/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97fb820aba0878d377490bf36fe0af59234afee5",
+      "size": 14143,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/97fb820aba0878d377490bf36fe0af59234afee5"
+    },
+    {
+      "path": "transitions/thinking-states",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e147b0a4803e3852501330735a5a4dbe3e12d80d",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/e147b0a4803e3852501330735a5a4dbe3e12d80d"
+    },
+    {
+      "path": "transitions/thinking-states/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c52a4a75e2acfec5437f93bf2ab5852c10cf32c",
+      "size": 11418,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/3c52a4a75e2acfec5437f93bf2ab5852c10cf32c"
+    },
+    {
+      "path": "transitions/toast-open-close",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0a9adeee663f92921b6571be093b50e8a48c54d8",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/0a9adeee663f92921b6571be093b50e8a48c54d8"
+    },
+    {
+      "path": "transitions/toast-open-close/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "45a64878c235e8f6ce24cc5e90aca5b8cd73f749",
+      "size": 11738,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/45a64878c235e8f6ce24cc5e90aca5b8cd73f749"
+    },
+    {
+      "path": "transitions/toggle",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6f9349613e9ef0bdeb534a423412a4b12cddcbcc",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/6f9349613e9ef0bdeb534a423412a4b12cddcbcc"
+    },
+    {
+      "path": "transitions/toggle/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eb7ab48576da50f069f17a8655871712ba3f301e",
+      "size": 12524,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/eb7ab48576da50f069f17a8655871712ba3f301e"
+    },
+    {
+      "path": "transitions/tooltip-open-close",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "11f04d3e3534f25799a00a1ce30c777cd7152b45",
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/trees/11f04d3e3534f25799a00a1ce30c777cd7152b45"
+    },
+    {
+      "path": "transitions/tooltip-open-close/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d36cdf4b91cd2a2927f37156b6b6567d38c2cb46",
+      "size": 16645,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/d36cdf4b91cd2a2927f37156b6b6567d38c2cb46"
+    },
+    {
+      "path": "website-demo.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9081068e44fdeaeeda35659b6c7ab2e0cc377e3",
+      "size": 374773,
+      "url": "https://api.github.com/repos/Jakubantalik/transitions.dev/git/blobs/e9081068e44fdeaeeda35659b6c7ab2e0cc377e3"
+    }
+  ],
+  "truncated": false
+}

@@ -1,0 +1,59 @@
+/* Device preferences apply to all Companion portals and their portaled dialogs. */
+html[data-ui-theme=dark] body:has(.v2-app),html[data-ui-theme=dark] .v2-app,html[data-ui-theme=dark] body:has(.v2-app) :is(.v2-modal-layer,.v2-drawer-layer,.v2-map-picker-layer){
+  --v2-canvas:#141c1b!important;--v2-surface:#1d2926!important;--v2-ink:#e3ece6!important;--v2-muted:#afbeb5!important;--v2-line:#36453e!important;--v2-blue:#9bc4d6!important;--v2-action:#56839a!important;--v2-accent-soft:#293d38!important;--v2-accent-ink:#c0d7e2!important;--v2-soft:#26342f!important;
+  --cw-paper:#141c1b!important;--cw-ink:#e3ece6!important;--cw-muted:#afbeb5!important;--cw-line:#36453e!important;--cw-blue:#9bc4d6!important;
+  --reference-bg:#141c1b!important;--reference-ink:#e3ece6!important;--reference-muted:#afbeb5!important;--reference-blue:#9bc4d6!important;--reference-line:#36453e!important;
+  --ui-canvas:#141c1b!important;--ui-surface:#1d2926!important;--ui-ink:#e3ece6!important;--ui-muted:#afbeb5!important;--ui-line:#36453e!important;--ui-accent:#9bc4d6!important;
+  background:var(--v2-canvas);color:var(--v2-ink)
+}
+html[data-ui-theme=dark] .v2-app :is(.ref-page,.v2-main,.v2-workspace,.v2-sidebar,.v2-topbar,.v2-mobile-nav,.ref-header,.settings-list,.settings-options,.settings-type-preview,.settings-account-details,.settings-help details,.settings-sidebar-button){background:var(--v2-canvas)!important;color:var(--v2-ink)!important;border-color:var(--v2-line)!important}
+html[data-ui-theme=dark] .v2-app :is(.settings-list,.settings-options,.settings-account-details,.settings-help details,.settings-type-preview,.v2-panel,.ref-card,.cw-next,.reference-post,.movement-records,.movement-progress,.ref-agenda-card,.ref-profile-stats,.v2-drawer,.v2-modal){background:var(--v2-surface)!important;color:var(--v2-ink)!important;border-color:var(--v2-line)!important}
+html[data-ui-theme=dark] body:has(.v2-app) :is(.v2-modal,.v2-drawer,.v2-map-picker-dialog){background:#1d2926!important;color:#e3ece6!important;border-color:#36453e!important}
+html[data-ui-theme=dark] .v2-app :is(.settings-account,.settings-icon,.settings-avatar,.movement-shortcuts button,.v2-icon-button,.v2-role-button,.ref-avatar){background:#293d38!important;color:#c0d7e2!important;border-color:#36453e!important}
+html[data-ui-theme=dark] .v2-app :is(h1,h2,h3,h4,.settings-toggle strong,.settings-entry strong,.ref-section-heading h2,.cw-next h2){color:var(--v2-ink)!important}
+html[data-ui-theme=dark] .v2-app :is(input:not([type=checkbox]):not([type=radio]),textarea,select){background:#1d2926!important;color:#e3ece6!important;border-color:#596a60!important}
+html[data-ui-theme=dark] .settings-entry:hover,html[data-ui-theme=dark] .settings-account:hover{background:#293d38!important}
+html[data-ui-theme=dark] .v2-app :is(.settings-description,.settings-entry small,.settings-toggle small,.settings-save-state,.settings-footer,.settings-policy-date){color:var(--v2-muted)!important}
+html[data-ui-theme=dark] .settings-policy-notice{background:#293d38;color:#c0d7e2;border-color:#516b60}
+html[data-ui-theme=dark] :is(.settings-toggle input:checked,.settings-options input:checked){background:#7eb0c4;accent-color:#7eb0c4}
+html[data-ui-theme=dark] .v2-app :is(a,button,input,summary):focus-visible{outline-color:#a3d0e1!important}
+html[data-ui-theme=dark] .v2-app :is(.cw-home,.cw-pages,.ref-subpage,.movement-page){--cw-paper:#141c1b!important;--cw-ink:#e3ece6!important;--cw-muted:#afbeb5!important;--cw-line:#36453e!important;--cw-blue:#9bc4d6!important}
+html[data-ui-theme=dark] .v2-app :is(.v2-mobile-nav a,.v2-side-link,.cw-header nav>a,.cw-next-top,.cw-schedule-time,.cw-summary strong,.cw-summary small,.cw-following>div>span){color:#b5cbd0!important}
+html[data-ui-theme=dark] .v2-app .v2-mobile-nav a.is-active{color:#e3ece6!important}
+html[data-ui-theme=dark] .v2-app .cw-next{border-bottom-color:#6c9caf!important}
+html[data-ui-theme=dark] .v2-app :is(.ref-search,.ref-category-tabs button,.ref-filters select,.ref-shortcut,.v2-student-search,.v2-student-search-field,.v2-student-search-results,.ref-services,.v2-chat-list,.v2-chat-main,.inbox-workspace){background-color:#1d2926!important;color:#d8e5dc!important;border-color:#36453e!important}
+html[data-ui-theme=dark] .v2-app :is(.ref-category-tabs button[aria-pressed=true],.v2-tabs button.is-active,.movement-record-sources button[aria-pressed=true],.movement-tabs button[aria-pressed=true]){background-color:#35564c!important;color:#e3ece6!important;border-color:#6e9686!important}
+html[data-ui-theme=dark] .v2-app .v2-mobile-nav a.is-active,html[data-ui-theme=dark] .v2-app .v2-mobile-nav a.is-active :is(svg,span){color:#e3ece6!important}
+html[data-ui-theme=dark] .v2-app .v2-mobile-nav a svg{stroke:currentColor!important;stroke-width:1.8!important}
+html[data-ui-theme=dark] .v2-app .v2-mobile-nav a.is-active svg{stroke-width:2.7!important}
+html[data-ui-text=large] .local-preview-notice{font-size:13px!important;line-height:1.6!important}
+html[data-ui-theme=dark] .v2-app :is(.v2-brand strong,.v2-side-link.is-active){color:#e3ece6!important}
+html[data-ui-theme=dark] .v2-app :is(.v2-side-link.is-active,.v2-floating-timetable-trigger){background-color:#293d38!important;color:#c0d7e2!important;border-color:#516b60!important}
+html[data-ui-theme=dark] .v2-app :is(.ref-event-content p,.ref-event-content small,.v2-panel p,.v2-panel small){color:#afbeb5!important}
+/* English uses the existing Latin-capable sans font and permits natural wrapping. */
+html[lang=en] .v2-app,html[lang=en] body:has(.v2-app) :is(.v2-modal,.v2-drawer){font-family:"MiSans",var(--reference-font),sans-serif;line-height:1.6}
+html[lang=en] .v2-app :is(h1,h2,h3,.cw-hello,.cw-name){font-family:"MiSans",var(--reference-font),sans-serif!important;letter-spacing:0!important;overflow-wrap:anywhere}
+html[lang=en] .v2-app :is(button,a,label,summary){overflow-wrap:anywhere;word-break:normal;white-space:normal}
+html[lang=en] .v2-app :is(.ref-discover-hero strong,.v2-editorial-campus-photo strong){font-family:"MiSans",sans-serif!important;letter-spacing:0!important;line-height:1.3!important}
+html[lang=en] .v2-app .ref-shortcuts a{font-size:13px;line-height:1.4;overflow-wrap:normal;word-break:normal;hyphens:auto;text-align:center}
+html[lang=en] .v2-app .ref-shortcuts a span{overflow-wrap:normal;word-break:normal}
+html[lang=en] .v2-app .ref-shortcuts strong{font-size:13px!important;line-height:1.4;word-break:normal;overflow-wrap:normal;hyphens:none}
+html[lang=en] .v2-app .ref-category-tabs{flex-wrap:wrap}
+html[lang=en] .v2-app .ref-category-tabs button{padding:10px;min-width:64px;flex:1;line-height:1.5;overflow-wrap:normal;word-break:normal}
+html[lang=en][data-ui-text=large] .v2-app .v2-mobile-nav a{font-size:12px!important;line-height:1.25!important;word-break:normal;overflow-wrap:normal}
+html[lang=en] .v2-app :is(.settings-entry strong,.settings-toggle strong){font-size:15px;line-height:1.5}
+html[lang=en] .v2-app :is(.settings-entry small,.settings-toggle small){font-size:13px;line-height:1.6}
+html[lang=en] .v2-mobile-nav a{font-size:11px;line-height:1.2;max-width:20%;text-align:center}
+html[lang=en] .v2-app .cw-greeting{left:22px;top:36px;right:55%;bottom:auto}
+html[lang=en] .v2-app :is(.cw-hello,.cw-name){writing-mode:horizontal-tb;font-size:clamp(19px,2.2vw,29px);line-height:1.4;white-space:normal}
+html[lang=en] .cw-home .cw-date{writing-mode:horizontal-tb;top:6px;left:22px;font-size:12px;letter-spacing:0}
+html[lang=en] .cw-home .cw-scene{left:40%}
+html[data-ui-text=large] .v2-app{font-size:17px}
+html[data-ui-text=large] .v2-app :is(p,label,input,textarea,select,.settings-entry strong,.settings-toggle strong,.v2-button,.ref-event-copy h3,.v2-side-link){font-size:17px!important;line-height:1.7!important}
+html[data-ui-text=large] .v2-app :is(small,.settings-description,.settings-save-state,.settings-entry small,.settings-toggle small,.v2-mobile-nav a){font-size:15px!important;line-height:1.6!important}
+html[data-ui-text=large] .v2-mobile-nav{height:calc(76px + env(safe-area-inset-bottom))}
+html[data-ui-text=large] .v2-main{padding-bottom:32px}
+html[data-ui-motion=reduce] .v2-app *,html[data-ui-motion=reduce] body:has(.v2-app) :is(.v2-modal-layer,.v2-drawer-layer) *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(max-width:720px){html[lang=en] .cw-home .cw-scene{left:38%}html[lang=en] .cw-home .cw-greeting{left:10px;right:64%;top:52px}html[lang=en] .cw-home .cw-date{left:10px;top:14px;max-width:34%}}
+
+@media(max-width:760px){html[lang=en] .v2-app.v2-app-student[data-campus-route='/v2/sports']:has(.movement-page) .v2-floating-timetable-trigger{left:auto;right:104px;top:12px}html[lang=en] .movement-page-header h1{max-width:calc(100% - 132px);white-space:normal;line-height:1.3}}

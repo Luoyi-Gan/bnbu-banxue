@@ -1,3 +1,4 @@
+import {shopPolicy} from './shops';
 import { notificationPolicy } from "./notification-policy";
 import { projectWorkspace } from "./snapshot-projection";
 import { runSync } from "./storage/effects";
@@ -103,6 +104,7 @@ function executeWithActor(db: Database, actorProvider: () => Account, token: str
         passwordCommand(repo, actor, token, action, input) ??
         administratorCommand(repo, actor, action, input) ??
         administratorDeletion(repo, actor, action, input) ??
+        runSync(shopPolicy(repo, actor, action, input)) ??
         communityCommand(repo, actor, action, input) ??
         coffeeCommand(repo, actor, action, input) ??
         governanceCommand(repo, actor, action, input) ??

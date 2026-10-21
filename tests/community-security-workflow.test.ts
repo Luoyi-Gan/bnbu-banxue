@@ -103,7 +103,7 @@ it('同一来源无法向超过二十个邮箱连续发码，十一轮错误口�
   expect(login(db,student.email,'Acceptance-123','owner-source').account.id).toBe(student.id);
 });
 
-it('个人排序与搜索只使用社区行为、内容和时间，热榜过 75 篇才开放',()=>{
+it('个人排序与搜索只使用社区行为、内容和时间，热榜无数量门槛',()=>{
   const now=Date.now(),createdAt=new Date(now-86_400_000).toISOString();
   const candidate=(id:string,board:string,title:string):CommunityCandidate=>({id,ownerId:'author',board,title,body:'说明',author:'作者',createdAt,status:'visible'});
   const posts=[candidate('a','学习','学习资料'),candidate('b','校园','校园资料')];
@@ -112,5 +112,5 @@ it('个人排序与搜索只使用社区行为、内容和时间，热榜过 75 
   expect(ranked.map(post=>post.id)).toEqual(['b','a']);
   expect(rankCommunity(posts,{query:'资料 校园'}, {board:new Map(),viewed:new Set()},metrics,now).map(post=>post.id)).toEqual(['b']);
   expect(rankHotSummaries(Array.from({length:75},(_,index)=>candidate(String(index),'校园','帖子')),metrics).overall).toEqual([]);
-  expect(rankHotSummaries(Array.from({length:76},(_,index)=>candidate(String(index),'校园','帖子')),{...metrics,views:new Map([['0',1]])}).overall).toEqual(['0']);
+  expect(rankHotSummaries(Array.from({length:1},(_,index)=>candidate(String(index),'校园','帖子')),{...metrics,views:new Map([['0',1]])}).overall).toEqual(['0']);
 });

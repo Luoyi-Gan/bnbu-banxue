@@ -1,7 +1,13 @@
 @font-face{font-family:MiSans;src:url('/fonts/misans/MiSans-Regular.woff2') format('woff2');font-display:swap}
 @font-face{font-family:WenKai;src:url('/fonts/lxgw-wenkai/BNBUWenKai-Medium.woff2') format('woff2');font-display:swap}
-:root{--font-family:MiSans,sans-serif;--color-primary:#168575;--color-on-primary:#fff;--color-primary-container:#e9f3ee;--color-on-primary-container:#21594b;--color-background:#faf9f6;--color-surface:#fff;--color-on-surface:#252c28;--color-on-background:#252c28;--color-on-surface-variant:#647369;--color-outline-variant:#e2e7df;--color-surface-variant:#f0f3ed;--color-secondary:#a47750}
+:root{--font-family:MiSans,sans-serif;--color-primary:#426575;--color-on-primary:#fff;--color-primary-container:#e8eee9;--color-on-primary-container:#3e625b;--color-background:#faf9f6;--color-surface:#fffefa;--color-on-surface:#263c35;--color-on-background:#263c35;--color-on-surface-variant:#65726a;--color-outline-variant:#e4e7df;--color-surface-variant:#f0f2ec;--color-secondary:#a47750}
 html,body{height:auto;min-height:100%;overflow:auto;background:var(--color-background);font-family:var(--font-family)}
+html:root[data-theme=dark]{--color-background:#141c1b;--color-surface:#1d2926;--color-on-surface:#e3ece6;--color-on-background:#e3ece6;--color-on-surface-variant:#afbeb5;--color-outline-variant:#36453e;--color-surface-variant:#293d38;--color-surface-container-lowest:#141c1b;--color-surface-container-low:#1d2926;--color-surface-container:#293d38;--color-surface-container-high:#293d38;--color-surface-container-highest:#36453e;--color-primary:#9bc4d6;--color-primary-container:#293d38;--color-on-primary-container:#c0d7e2}
+html[data-theme=dark] .demo-notice{background:#293d38;color:#c0d7e2;border-color:#36453e}
+html[lang=en] :is(h1,h2,h3,.headline-large,.headline-medium,.headline-small){font-family:MiSans,sans-serif!important;letter-spacing:0!important;overflow-wrap:anywhere}
+html[lang=en] :is(button,label,.title-medium,.body-medium){white-space:normal;line-height:1.6}
+html[data-text-size=large] :is(p,label,button,input,textarea,.body-medium,.title-medium){font-size:17px!important;line-height:1.7!important}
+html[data-motion=reduce] *{animation:none!important;transition:none!important}
 body{margin:0}.demo-notice{padding:12px 20px;background:#eaf1eb;color:#456653;font-size:12px;line-height:1.7;border-bottom:1px solid #dce6dc}
 .tab-host{height:auto;overflow:visible;padding:0 20px}.tab-host>.checkin-root{padding:20px 0 28px;min-height:660px;max-width:640px}
 .checkin-root h1,.checkin-root h2{font-family:WenKai,MiSans,sans-serif}.checkin-root .swiss-panel{border:1px solid #e2e7df;border-radius:12px;box-shadow:none;background:#fff}
@@ -19,3 +25,42 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid #244b63;outline-
 @media(max-width:360px){.tab-host{padding-inline:16px}.checkin-record-row{grid-template-columns:30px minmax(0,1fr) auto;gap:8px;padding:14px 10px}.checkin-record-row .sport-glyph{width:30px}.checkin-record-title strong{font-size:13px}.checkin-record-result{max-width:88px}.checkin-record-result>strong{font-size:15px}.checkin-root .checkin-evidence{padding:12px}.ht-file-options{gap:8px}.ht-proof-steps{font-size:9px}.checkin-summary-time{font-size:25px!important}}
 .ht-record-detail>.swiss-panel>.row>.body-medium.text-muted{width:80px!important}.ht-record-detail>.swiss-panel>.row>.grow{min-width:0}.ht-record-detail>.swiss-panel>.row{gap:0}
 .ht-detail-credit{font-size:11px;color:#6f8073;margin:14px 0 0;padding-top:12px;border-top:1px solid #dfe8db}
+/* Campus-window presentation for the isolated local sports simulator. */
+.checkin-root .swiss-panel,.checkin-root .dialog,.dialog {border-radius:6px;border-color:#e4e7df;background:#fffefa;box-shadow:none}
+.checkin-root .checkin-cta {background:#426575;border-radius:6px}
+.demo-notice {background:#e8eee9;color:#3e625b;border-color:#e4e7df}
+.dialog h2 {font-family:WenKai,MiSans,sans-serif;font-weight:500}
+.checkin-root .category-btn.active {background:#e9eef0;color:#345361}
+/* Embedded overview has one host title and one records entry. Session controls stay intact. */
+.ht-embedded .demo-notice{padding:8px 16px;font-size:12px;line-height:1.6}
+.ht-embedded .tab-host{padding:0 16px}
+.ht-embedded .tab-host>.checkin-root{padding:12px 0 6px;min-height:0}
+.ht-embedded .checkin-page-heading{display:none}
+.ht-embedded .checkin-prep .checkin-body{gap:10px;padding-bottom:0}
+.ht-embedded .checkin-prep .checkin-sport-hero{padding:2px 0;gap:5px}
+.ht-embedded .checkin-prep .checkin-sport-hero h2{font-size:25px;margin:4px 0}
+.ht-embedded .checkin-prep .checkin-note{margin-block:3px;font-size:12px;line-height:1.6}
+.ht-embedded .checkin-prep .checkin-requirements{padding:10px 12px}
+.ht-embedded .checkin-requirements>.checkin-disclosure{margin-top:8px}
+.ht-embedded .checkin-prep .checkin-disclosure summary{min-height:38px;padding-block:7px;font-size:13px}
+.ht-embedded .checkin-prep .checkin-policy-summary{padding:0}
+.ht-embedded .checkin-prep .checkin-policy-summary strong{font-size:17px}
+.ht-embedded .checkin-prep .checkin-prep-proof{margin:0;padding:0;font-size:12px}
+.ht-embedded .checkin-prep .checkin-dock{padding:10px 0 8px}
+.ht-embedded .checkin-prep .checkin-cta{min-height:50px}
+.ht-embedded .ht-record-intro{padding:0 0 14px}
+.ht-embedded .ht-record-intro>span,.ht-embedded .ht-record-intro h2{display:none}
+.ht-embedded .checkin-records{gap:0}
+.ht-embedded .checkin-record-group{margin:0 0 16px}
+.ht-embedded .checkin-record-group h2{margin-bottom:8px}
+.ht-embedded .checkin-record-filters{padding-bottom:12px}
+.ht-active-evidence{border:1px solid #e4e7df;border-radius:6px;background:#fffefa;overflow:hidden}
+.ht-active-evidence>summary{padding:12px 16px;min-height:44px;font-size:14px;line-height:1.6;color:#426575;cursor:pointer}
+.ht-embedded .ht-active-evidence .checkin-evidence{border:0;border-top:1px solid #e4e7df;border-radius:0}
+
+html[data-theme=dark] .checkin-root :is(.swiss-panel,.checkin-preflight,.checkin-evidence,.ht-active-evidence,.checkin-record-row,.ht-file-options>label){background:#1d2926!important;color:#e3ece6!important;border-color:#36453e!important}
+html[data-theme=dark] .checkin-root :is(.checkin-note,.label-medium,.label-small,.ht-record-intro p,.ht-picker-heading span){color:#afbeb5!important}
+html[data-theme=dark] .checkin-root :is(.category-btn,.checkin-record-filters button,.sport-glyph,.ht-example){background:#293d38!important;color:#c0d7e2!important;border-color:#516b60!important}
+html[data-theme=dark] .checkin-root .category-btn.active{background:#35564c!important;color:#e3ece6!important}
+html[data-theme=dark] .checkin-root :is(input,textarea,select){background:#1d2926!important;color:#e3ece6!important;border-color:#596a60!important}
+html[data-theme=dark] .checkin-root .checkin-cta{background:#56839a!important;color:#fff!important}

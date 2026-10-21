@@ -1,0 +1,24 @@
+/* Arrange existing homepage components in the reference reading order. */
+.v2-app.v2-app-student .cw-home .cw-content-grid{display:flex;flex-direction:column;gap:0}
+.cw-home .cw-services{order:0}.cw-home .cw-recommendations{order:1}.cw-home .cw-stories{order:2}.cw-home .cw-organizations{order:3}.cw-home .cw-assistant{order:4}
+.v2-app.v2-app-student .cw-home .cw-focus{margin:16px 0 0;padding:0;max-width:none}
+.v2-app.v2-app-student .cw-home .cw-next{margin-right:0}
+.v2-app.v2-app-student .cw-home .cw-summary{gap:10px;margin:16px 0 0;padding:0;border:0;grid-template-columns:repeat(3,minmax(0,1fr))}
+.v2-app.v2-app-student .cw-home .cw-summary>:is(a,div){border:0;padding:12px 14px;background:var(--v2-soft);border-radius:12px}
+.v2-app.v2-app-student .cw-home .cw-services .ref-section{margin-top:18px}
+.v2-app.v2-app-student .cw-home .cw-event-list{display:flex;flex-direction:column;gap:18px}
+.v2-app.v2-app-student .cw-home .cw-services .ref-shortcuts{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.cw-home .cw-recommendations,.cw-home .cw-stories{width:100%;min-width:0}
+@media(max-width:640px){.v2-app.v2-app-student .cw-home .cw-focus{margin-top:14px}.v2-app.v2-app-student .cw-home .cw-summary{gap:7px}.v2-app.v2-app-student .cw-home .cw-summary>:is(a,div){padding:10px}.v2-app.v2-app-student .cw-home .cw-services .ref-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Give the next arrangement a quieter edge and a clear reading rhythm. */
+.v2-app.v2-app-student .cw-home .cw-next{position:relative;padding:22px 24px 25px;border:1px solid #cddad254;border-bottom:1px solid #cddad254;box-shadow:var(--student-course-shadow)}
+.v2-app.v2-app-student .cw-home .cw-next:after{content:"";position:absolute;left:24px;right:24px;bottom:0;height:1px;background:#7aadb5}
+.v2-app.v2-app-student .cw-home .cw-next h2{font-family:var(--reference-font,'MiSans',sans-serif);font-size:25px;font-weight:650;line-height:1.4;margin:16px 0 19px}
+.v2-app.v2-app-student .cw-home .cw-next-top{font-size:12px;color:var(--v2-muted)}
+.v2-app.v2-app-student .cw-home .cw-next-meta{align-items:flex-start;gap:22px}
+.v2-app.v2-app-student .cw-home .cw-next-meta>div{gap:7px}
+.v2-app.v2-app-student .cw-home .cw-next-meta>div>span{font-size:14px;line-height:1.5}
+.v2-app.v2-app-student .cw-home .cw-next-meta small{font-size:12px;line-height:1.5}
+.v2-app.v2-app-student .cw-home .cw-next .cw-schedule-time{font-size:22px;font-weight:600;line-height:1.3;color:var(--v2-ink)}
+.v2-app.v2-app-student .cw-home .cw-next .cw-schedule-time small{margin-top:6px;font-size:11px;font-weight:400}

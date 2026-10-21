@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "path": "/api/health",
+      "status": 200
+    },
+    {
+      "path": "/v2",
+      "status": 200
+    },
+    {
+      "asset": "/assets/app-PFgUybcv.js",
+      "sha256": "ecf66935ebdec93413ba662dfe275be541a3212cdada28ad1e93a57789dbaf89",
+      "matchesLocal": true
+    },
+    {
+      "asset": "/assets/ScrollTrigger-CO_L4mgg.js",
+      "sha256": "f70dbbe5e22b41cff004ab1a4779747ced2477d5d2eb32c2cd8d3450510da998",
+      "matchesLocal": true
+    },
+    {
+      "asset": "/assets/app-BMdx3EnD.css",
+      "sha256": "74f215175333ae4b9e0c6afd9c53f712b94213e2170c3e1c86101218f74a7550",
+      "matchesLocal": true
+    },
+    {
+      "path": "/v2/login",
+      "status": 200
+    },
+    {
+      "path": "/v2/identity",
+      "status": 200
+    }
+  ]
+}

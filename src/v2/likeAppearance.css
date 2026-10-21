@@ -1,0 +1,7 @@
+/* Share the selected heart appearance across feeds, details and comments. */
+button[aria-pressed="true"]>svg.lucide-heart{
+  color:#d94b58;
+  stroke:currentColor;
+  fill:currentColor;
+}
+html[data-ui-theme="dark"] button[aria-pressed="true"]>svg.lucide-heart{color:#f17883}

@@ -16,7 +16,7 @@ export function setActivityParticipation(state: V2State, id: string, participati
   return { ...state, participatingActivities: [...marked, id] }
 }
 
-export type StudentScheduleItem = { id: string; kind: 'activity' | 'room' | 'coffee'; title: string; time: string; startAt?: string; location: string; path: string; label: string }
+export type StudentScheduleItem = { id: string; lessonId?:string; kind: 'activity' | 'room' | 'coffee' | 'course'; title: string; time: string; startAt?: string; endAt?: string; location: string; path: string; label: string }
 
 export function studentSchedule(state: V2State, now = Date.now()): StudentScheduleItem[] {
   const items: StudentScheduleItem[] = []

@@ -1,0 +1,53 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "bytes": 832,
+    "sha256": "82d84b61a7f81fb0953e0db370efbac4d98363454e62aec2d614680d2564c4e4"
+  },
+  {
+    "path": "/v2/login",
+    "status": 200,
+    "bytes": 925,
+    "sha256": "e7179df90f6e64d33533ea7cf28a8a62f4ba0791eb8832c7aea9ed35c7dd5946"
+  },
+  {
+    "path": "/v2/forgot-password",
+    "status": 200,
+    "bytes": 925,
+    "sha256": "e7179df90f6e64d33533ea7cf28a8a62f4ba0791eb8832c7aea9ed35c7dd5946"
+  },
+  {
+    "path": "/api/health",
+    "status": 200,
+    "bytes": 53,
+    "sha256": "a81c785633953b1b0bb84954eddc0ef53e3192fda0a67cb2e43f2bf76c797e3d"
+  },
+  {
+    "path": "/campus-map/viewer/index.html",
+    "status": 200,
+    "bytes": 15642,
+    "sha256": "3f775a5c66f6471f69b978e98e5b78be82c10f9132b8443e245af2a6b3673bfa"
+  },
+  {
+    "path": "/campus-map/manifest.json",
+    "status": 200,
+    "bytes": 38680,
+    "sha256": "50024bb3b90cfd1fa14883192930725834d8e3bf5cd0c3ce75d2e6fa013bd37e"
+  },
+  {
+    "path": "/assets/app-D-5VpxP_.js",
+    "status": 200,
+    "matchesLocal": true
+  },
+  {
+    "path": "/assets/ScrollTrigger-CO_L4mgg.js",
+    "status": 200,
+    "matchesLocal": true
+  },
+  {
+    "path": "/assets/app-CpABGci9.css",
+    "status": 200,
+    "matchesLocal": true
+  }
+]

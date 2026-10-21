@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "import:campus-map": "node scripts/import-campus-map.mjs",
     "dev:local": "node scripts/local.mjs",
     "typecheck:server": "tsc --noEmit -p tsconfig.server.json",
     "dev": "vite --host 127.0.0.1 --strictPort",

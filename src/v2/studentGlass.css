@@ -1,0 +1,110 @@
+/* Student-only glass surfaces. :has also scopes dialogs portaled to document.body. */
+body:has(.v2-app.v2-app-student,.v2-explore-immersive){
+  --student-glass-surface:linear-gradient(145deg,rgba(255,255,253,.7),rgba(231,241,235,.58));
+  --student-glass-raised:linear-gradient(145deg,rgba(255,255,253,.82),rgba(237,245,239,.72));
+  --student-glass-control:rgba(255,255,252,.48);
+  --student-glass-field:rgba(255,255,253,.67);
+  --student-glass-line:rgba(255,255,255,.72);
+  --student-glass-divider:rgba(76,112,90,.17);
+  --student-glass-shadow:0 12px 36px rgba(26,57,43,.13),inset 0 1px 0 rgba(255,255,255,.7);
+  --student-glass-ink:#263f35;
+  --student-glass-muted:#657a6b;
+  --student-glass-accent:#257965;
+  --student-glass-active:rgba(66,159,125,.16);
+  --student-glass-scrim:rgba(20,40,31,.2);
+  --student-course-shadow:0 12px 38px -8px rgba(46,86,67,.1),0 2px 7px rgba(46,86,67,.025);
+  --student-course-shadow-hover:0 16px 44px -8px rgba(46,86,67,.12),0 3px 9px rgba(46,86,67,.03);
+  --student-course-shadow-small:0 5px 18px -4px rgba(46,86,67,.09);
+}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive){
+  --student-glass-surface:linear-gradient(145deg,rgba(35,55,45,.77),rgba(20,37,29,.66));
+  --student-glass-raised:linear-gradient(145deg,rgba(39,58,48,.87),rgba(22,39,31,.8));
+  --student-glass-control:rgba(78,113,89,.3);
+  --student-glass-field:rgba(21,41,31,.62);
+  --student-glass-line:rgba(173,209,185,.24);
+  --student-glass-divider:rgba(173,209,185,.18);
+  --student-glass-shadow:0 12px 36px #001a1038,inset 0 1px 0 #c8e6d21a;
+  --student-glass-ink:#e1ede4;--student-glass-muted:#b0c5b8;--student-glass-accent:#8edbc0;
+  --student-course-shadow:0 14px 42px -8px rgba(4,20,13,.2),0 2px 8px rgba(4,20,13,.08);
+  --student-course-shadow-hover:0 18px 48px -8px rgba(4,20,13,.25),0 3px 10px rgba(4,20,13,.08);
+  --student-course-shadow-small:0 6px 20px -4px rgba(4,20,13,.18);
+  --student-glass-active:rgba(88,193,153,.19);--student-glass-scrim:rgba(0,14,8,.4);
+}
+/* Keep placement, dimensions and all interaction states in their owning components. */
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(
+  .v2-mobile-nav,.v2-topbar,.v2-sidebar,.v2-drawer,.v2-modal,.note-detail,
+  .v2-floating-timetable-window,.v2-person-hover,.v2-map-picker-dialog,
+  .v2-student-search-panel,.v2-search-results,.v2-quick-nav-panel,.reference-home-search,
+  .campus-discovery-filter-fields,.v2-discover-filter-popover,.v2-partner-place-tips,
+  .map-p0-dock,.map-p1-route,.v2-explorer-panel.has-selection,
+  .student-timetable-launcher,.v2-floating-timetable-trigger,.community-publish-fab,
+  .map-p0-layers,.v2-explore-back,.v2-student-search-field,
+  .campus-map-tools button,.campus-map-legend,.campus-map-gesture,
+  .note-detail .v2-social-media-arrow,.note-detail-photo figcaption,.v2-social-media-count
+){
+  background:var(--student-glass-surface)!important;
+  border-color:var(--student-glass-line)!important;
+  box-shadow:var(--student-glass-shadow)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+  color:var(--student-glass-ink);
+}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(
+  .v2-drawer,.v2-modal,.note-detail,.v2-person-hover,.v2-floating-timetable-window,
+  .v2-student-search-panel,.v2-search-results,.v2-quick-nav-panel,
+  .campus-discovery-filter-fields,.v2-discover-filter-popover,.v2-partner-place-tips
+){--student-glass-surface:var(--student-glass-raised)}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(
+  .v2-drawer-scrim,.v2-modal-scrim,.note-detail-scrim,.v2-map-picker-scrim,.v2-sidebar-scrim,.campus-map-backdrop
+){background:var(--student-glass-scrim)!important;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+/* Opaque inner headers and cards must not hide the parent glass surface. */
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(
+  .v2-floating-timetable-window>header,.v2-drawer>header,.v2-modal>header,
+  .note-detail>header,.note-detail-body,.note-detail-footer,.note-detail-actions
+){background:transparent!important;border-color:var(--student-glass-divider)!important}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.v2-modal,.v2-drawer) .v2-form-actions{background:var(--student-glass-raised)!important;border-color:var(--student-glass-divider)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(
+  .v2-floating-timetable-content .v2-panel,.v2-floating-timetable-content .v2-course-card,
+  .v2-student-search-panel a,.v2-quick-nav-card,.v2-person-hover section,
+  .community-sheet-actions button,.community-sheet-actions a
+){background:var(--student-glass-control)!important;border-color:var(--student-glass-divider)!important}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.v2-modal,.v2-drawer,.note-detail,.v2-floating-timetable-window) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select){
+  background:var(--student-glass-field)!important;color:var(--student-glass-ink)!important;border-color:var(--student-glass-divider)!important;
+}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.student-timetable-launcher,.v2-floating-timetable-trigger,.community-publish-fab){color:var(--student-glass-accent)!important;border:1px solid var(--student-glass-line)}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.student-timetable-launcher[aria-expanded=true],.v2-floating-timetable-trigger[aria-expanded=true],.v2-floating-timetable-content .v2-weekdays button.is-active){background:var(--student-glass-active)!important;color:var(--student-glass-accent)!important}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.v2-person-hover,.v2-floating-timetable-window,.v2-modal,.v2-drawer,.v2-student-search-panel){border:1px solid var(--student-glass-line);border-radius:22px}
+/* Use a calm, solid surface when backdrop filtering is unavailable. */
+.v2-campus-explorer:has([data-map-dialog-open]) :is(.v2-explorer-panel,.map-p0-dock,.map-p1-route,.map-p0-layers){visibility:hidden;pointer-events:none}
+@supports not (backdrop-filter:blur(1px)){
+  body:has(.v2-app.v2-app-student,.v2-explore-immersive){--student-glass-surface:#f5f8f2;--student-glass-raised:#fafbf7}
+  html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive){--student-glass-surface:#23372d;--student-glass-raised:#263c30}
+}
+
+/* One shared selection surface moves beneath the five student destinations. */
+@media(max-width:760px){
+ html[data-ui-theme] .v2-app.v2-app-student>.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,#fffffd85,#edf4ee70);--student-glass-shadow:0 6px 24px #24463810,inset 0 1px 0 #ffffffa6;isolation:isolate;overflow:hidden;gap:0;padding:6px}
+ .v2-app.v2-app-student>.v2-mobile-nav>.student-nav-indicator{position:absolute;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/5);border-radius:19px;background:rgba(58,153,126,.14);box-shadow:inset 0 1px 0 #ffffff55;pointer-events:none;z-index:0;transition:transform .32s cubic-bezier(.22,.8,.3,1)}
+ html[data-ui-theme] .v2-app.v2-app-student>.v2-mobile-nav>a{position:relative;z-index:1;flex:1;min-width:0;background:transparent;transition:color .18s ease}
+ html[data-ui-theme] .v2-app.v2-app-student>.v2-mobile-nav>a.is-active{background:transparent!important;color:var(--student-glass-accent)!important}
+ .v2-app.v2-app-student>.v2-mobile-nav>a>svg{transition:transform .3s cubic-bezier(.2,.85,.25,1.15)}
+ .v2-app.v2-app-student>.v2-mobile-nav>a.is-active>svg{transform:scale(1.08)}
+ html[data-ui-theme=dark] .v2-app.v2-app-student>.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,#263e30b0,#182f258f)}
+ html[data-ui-theme=dark] .v2-app.v2-app-student>.v2-mobile-nav>.student-nav-indicator{background:#53bd9f29;box-shadow:inset 0 1px 0 #c8e6d21a}
+}
+@media(prefers-reduced-motion:reduce){.v2-app.v2-app-student>.v2-mobile-nav>.student-nav-indicator,.v2-app.v2-app-student>.v2-mobile-nav>a>svg{transition:none}.v2-app.v2-app-student>.v2-mobile-nav>a.is-active>svg{transform:none}}
+
+/* Scroll changes paint only; the sticky toolbar keeps a stable footprint. */
+html[data-ui-theme] .v2-app.v2-app-student :is(.cw-header,.ref-header,.community-profile-top,.v2-topbar){position:sticky;top:0;z-index:45;background:rgba(250,251,247,calc(.12 + var(--student-toolbar-progress,0)*.55))!important;-webkit-backdrop-filter:blur(calc(4px + var(--student-toolbar-progress,0)*16px)) saturate(135%);backdrop-filter:blur(calc(4px + var(--student-toolbar-progress,0)*16px)) saturate(135%)}
+html[data-ui-theme=dark] .v2-app.v2-app-student :is(.cw-header,.ref-header,.community-profile-top,.v2-topbar){background:rgba(24,41,32,calc(.15 + var(--student-toolbar-progress,0)*.55))!important}
+.v2-app-student :is(.cw-next,.cw-following,.tt-day-course,.tt-grid-course,.ref-lesson){transition:transform 180ms cubic-bezier(.2,.8,.2,1);transform-origin:center;touch-action:manipulation}
+.v2-app-student :is(.cw-next,.cw-following,.tt-day-course,.tt-grid-course,.ref-lesson):active{transform:scale(.985)}
+.v2-drawer.is-course-expansion{animation:none;transform-origin:top left}
+@media(prefers-reduced-motion:reduce){
+ .v2-app-student :is(.cw-next,.cw-following,.tt-day-course,.tt-grid-course,.ref-lesson){transition:none}
+ .v2-app-student :is(.cw-next,.cw-following,.tt-day-course,.tt-grid-course,.ref-lesson):active{transform:none}
+ html[data-ui-theme] .v2-app.v2-app-student :is(.cw-header,.ref-header,.community-profile-top,.v2-topbar){-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+}
+
+html[data-ui-motion=reduce] .v2-app-student :is(.cw-next,.cw-following,.tt-day-course,.tt-grid-course,.ref-lesson):active{transform:none}
+html[data-ui-motion=reduce] .v2-app.v2-app-student :is(.cw-header,.ref-header,.community-profile-top,.v2-topbar){-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}

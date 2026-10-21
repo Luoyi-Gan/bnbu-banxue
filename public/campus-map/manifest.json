@@ -1,0 +1,1002 @@
+{
+  "source": "BNBU 3D Model",
+  "sourceHead": "1d82bf9c74c3e7e37a761a910f22657f46e04e27",
+  "importedAt": "2026-10-21T03:41:50.070Z",
+  "files": [
+    {
+      "file": "data/materials/environment-source.json",
+      "bytes": 565,
+      "sha256": "d3ccb5561146a68bb8f0dbe0301dcf0a8100a90b7b2e1b3a80953b8e342c2293"
+    },
+    {
+      "file": "data/materials/library.json",
+      "bytes": 3183,
+      "sha256": "e0d64604a39cde7593e214495b90fc0db40afa172701394699e8efa6413a4b4b"
+    },
+    {
+      "file": "data/materials/sources.json",
+      "bytes": 4287,
+      "sha256": "21d21f4e42bc39280e430d2423d4ac6c0c039d2bffd7129fd2a53e9149f0a41e"
+    },
+    {
+      "file": "data/processed/campus-places.json",
+      "bytes": 104338,
+      "sha256": "8ea67e6f3679501ab4db01bd5253037f1d0fcf0240309660096c693d4b7d413d"
+    },
+    {
+      "file": "data/processed/reference-map/BNBU-MAP-LICENSE.txt",
+      "bytes": 2568,
+      "sha256": "e36c0072a00727abe08294e6a3244effc7f1ce8a3f65fb4b9efaf7ab5ec68e4b"
+    },
+    {
+      "file": "data/processed/reference-map/OSM-LIBERTY-LICENSE.txt",
+      "bytes": 3223,
+      "sha256": "932694202d771c52089e87f13105e02f2b68341f584b0f3d8adc557c9d7cefa3"
+    },
+    {
+      "file": "data/processed/reference-map/POI.json",
+      "bytes": 64764,
+      "sha256": "1a0772e2754dfe79ba6b6ad8d12d3af341c008668c1ac68d38be0acf86632d7b"
+    },
+    {
+      "file": "data/processed/reference-map/basic/style.json",
+      "bytes": 32919,
+      "sha256": "e1b817c0ac886b5ba52c928eacabbd9cb54434e771cdd1b951ccb76953c2121d"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tilejson.json",
+      "bytes": 2585,
+      "sha256": "61ecb8942acf84afb299c1211960143eaadec9d176ce0630b945a54df89e6714"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/10/834/446.pbf",
+      "bytes": 95956,
+      "sha256": "5fba255f2654cb8fdc2d90f4c320005d68ac92b00d1666fbbe08243f538b751b"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/11/1669/893.pbf",
+      "bytes": 66835,
+      "sha256": "c0e92e5a26a22271bdfe6ad402712415203541034080211763e21166c2c1232a"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/12/3339/1786.pbf",
+      "bytes": 61929,
+      "sha256": "bfa14cbe85fe786208a3924da8b37b9f277feb46f8a8e5fe426e546821852d52"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/12/3339/1787.pbf",
+      "bytes": 76113,
+      "sha256": "c2f7634f897cc4d048d75b50abbfbf39d615495340ff8fa3e499cf58944138c6"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/13/6678/3573.pbf",
+      "bytes": 23231,
+      "sha256": "5f926eec8b2cfc935eb61e17a11c04790f842cd1fa21c63c3bd13fb2b52775fb"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/13/6678/3574.pbf",
+      "bytes": 15107,
+      "sha256": "3026abb622cc555172319d01455044c9f02e73a2ec9903723b9d196a7272f083"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/13/6679/3573.pbf",
+      "bytes": 49086,
+      "sha256": "c6e14f84afd8e49a5a32a2e73fd07344bab350e943cf72d0ccffadc4d788d486"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/13/6679/3574.pbf",
+      "bytes": 11873,
+      "sha256": "fdb7f0bacae34ac77236f7b5687ce6935cd24313bbe4e5bf7f2d18468a4ce3a9"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13357/7146.pbf",
+      "bytes": 15068,
+      "sha256": "0d1667673b809017c5b157a652b114612dc9e89509d310d955f25f55203fe7f7"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13357/7147.pbf",
+      "bytes": 22415,
+      "sha256": "015877f339a80be9e829519fb4da4ab29c2dada9d1f12e68d006867520a81532"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13357/7148.pbf",
+      "bytes": 5731,
+      "sha256": "4015933c3df955331c003b28c6ece6701fddbd0d87006affdf6e2989d8aa0cbe"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13358/7146.pbf",
+      "bytes": 21803,
+      "sha256": "cada004ca4bfeaa0abdc1153a05b02528f0e044d93f692db6997057ee734d20e"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13358/7147.pbf",
+      "bytes": 44497,
+      "sha256": "fb52abd0e2520eb04517ab715e39c5b4eb01b52acf497b28f0d11f3467870556"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13358/7148.pbf",
+      "bytes": 14405,
+      "sha256": "4c5ad1d9ec3ec9e9d6f0b944e0382669523723589f448d37a7f3fa97f04d3bf3"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13359/7146.pbf",
+      "bytes": 25533,
+      "sha256": "9e8d3f671e0e211a8fa55c9eb36220032a311aa36a12dbb9844581f792095d5a"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13359/7147.pbf",
+      "bytes": 51822,
+      "sha256": "160c97cb2707499e75b43247988528962fe886487e0d5bde70015ade67f68f88"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/14/13359/7148.pbf",
+      "bytes": 13384,
+      "sha256": "6392a4e944fb36c67de04a0dbcf05181ee7d5671b47b59e9ba51af0e82aceb65"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/5/26/13.pbf",
+      "bytes": 162674,
+      "sha256": "e6cabc4c41b3b8d5213df521c38a91d9d4f4beda80bef010006d32cb4edd988e"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/6/52/27.pbf",
+      "bytes": 328790,
+      "sha256": "2b7c2796baa12840921b2bbc90996839f5da5ba958ca38898feb746d18ede275"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/7/104/55.pbf",
+      "bytes": 352870,
+      "sha256": "f82a128d6ae1a62d61192e3356c308e6c179d841257c7224cd2b35f723647f46"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/8/208/111.pbf",
+      "bytes": 461676,
+      "sha256": "e1d7cb794fc05eaa398699d0668bb41c84eab163723b1e8bfbae4752e4b39a65"
+    },
+    {
+      "file": "data/processed/reference-map/basic/tiles/9/417/223.pbf",
+      "bytes": 144349,
+      "sha256": "9fca58c44ea6734ff406fca88a81d8d20c1b5e7c6b061f44b899858f8e51df96"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/0-255.pbf",
+      "bytes": 86379,
+      "sha256": "b75eae4ef558e7123912a88d6ee267b4efbe8213ef0219a5d77e573e910c8adf"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/12288-12543.pbf",
+      "bytes": 136285,
+      "sha256": "d3b5fc4e391cfabb1f723aeb4325e88ea98d02eb205b85d5f5dd5c2d69c344eb"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/19968-20223.pbf",
+      "bytes": 193411,
+      "sha256": "19f116d1f44fb23e4d593f6f6daee98ba477f9b17ad2829c0552fd6b43eb0c96"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/20224-20479.pbf",
+      "bytes": 205738,
+      "sha256": "62cb77e378bb747efcdfc7990311fbe7557d72827e7ba547e1878e16dc93f554"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/20480-20735.pbf",
+      "bytes": 206043,
+      "sha256": "4d2574d34b8cde3ed4d86896f7859e8644dfba2bae01895fd00918c15b9b9633"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/20736-20991.pbf",
+      "bytes": 201154,
+      "sha256": "82e7c4f080b9b5e321293052f551e11ddef1db7ac524bcbf995b106f1b978bf7"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/20992-21247.pbf",
+      "bytes": 198566,
+      "sha256": "f7f1801aff5f8f77eaed90c75c4cd03f760e9f3622a4bb0b5b0ce5aa563f2eec"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/21248-21503.pbf",
+      "bytes": 194989,
+      "sha256": "a0f281961f7590e9a91b73b9dd1886a454c15f75d9a923bcf7f6be0e7485d129"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/21504-21759.pbf",
+      "bytes": 195149,
+      "sha256": "5302b98467e3c9233c57fa94abcedaf29a241d5045a9865c21afc3cb9d02a434"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/21760-22015.pbf",
+      "bytes": 197081,
+      "sha256": "f2b355d5293a9b4e681df4a586553af3c1f27f60b457ad901eb0af7fd0f40b08"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/22016-22271.pbf",
+      "bytes": 196324,
+      "sha256": "1187144cff6e64aefa6f7ccff137ff5811b91c58851d43af38a7b51f622e94d8"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/22272-22527.pbf",
+      "bytes": 200128,
+      "sha256": "99e9c3fbc66ba94caed61f8908249b01b03dc0c33c0602247bfb9cac5e58b978"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/22528-22783.pbf",
+      "bytes": 202530,
+      "sha256": "737945d8fb4df13a2d4681a16569e36f26efc5d64c0ceb355e10b4c525b14f4e"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/22784-23039.pbf",
+      "bytes": 205590,
+      "sha256": "0b735c8ebac02d49a0de66195144afb5daa4145ba489a1f256063ad667827cb5"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/23040-23295.pbf",
+      "bytes": 205345,
+      "sha256": "44afa3f4388986ca4fc14970c1d849c59495974f57e5d2cb4ab86b4976c6d5f2"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/23296-23551.pbf",
+      "bytes": 204236,
+      "sha256": "fb9edcad2ebea288fe48ac8ee2daa6346318fe5ec77f9adcf0945dad57568a00"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/23552-23807.pbf",
+      "bytes": 198587,
+      "sha256": "1ea3dbc341b950e915d3ff644307c5065da1c381debe737673668bda4823a0ff"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/23808-24063.pbf",
+      "bytes": 198313,
+      "sha256": "d51cf59c89d5684dec16b47aa125ffc348cfea700815f67e710523bafe655c93"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/24064-24319.pbf",
+      "bytes": 205219,
+      "sha256": "9482822385a14be22281f2c8d04e53187947031825715d1a913f2189dfc2aedd"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/24320-24575.pbf",
+      "bytes": 201737,
+      "sha256": "389438d729b9e83cc506b93f67403c56ccf036beb4b89e9a5283d01c15026f32"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/24576-24831.pbf",
+      "bytes": 204176,
+      "sha256": "3a091aed9f32960ae5e5bdec09a528ad400fb4b435a984c41991c3d19bea39c2"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/24832-25087.pbf",
+      "bytes": 205436,
+      "sha256": "4a7c46eac7771abd9df45399f6146cba9b835e1afe4c6ca70fe8cd5f97bf08ad"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/25088-25343.pbf",
+      "bytes": 203573,
+      "sha256": "1ece43df0b829814e3988b76b83c92be439e95a34f2b90bf18e1a73029ee20e1"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/25344-25599.pbf",
+      "bytes": 204428,
+      "sha256": "0e960227326a473f2811f23e4091e6025dd44a0791e370036efb673b48c6ce17"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/256-511.pbf",
+      "bytes": 100444,
+      "sha256": "9b41e17a3291c7853a2d09ec214dc9d91b87f90253b7f4c991a9d7c0f23564db"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/25600-25855.pbf",
+      "bytes": 205937,
+      "sha256": "7898167b984cfbd11fa1b02a0dacc92e10931a89d436f55169494748d38c36cc"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/25856-26111.pbf",
+      "bytes": 205223,
+      "sha256": "4141b2a32b28f8df980dbf6022c34dc208765e5a89b26a3f73deb6ca76e5a55b"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/26112-26367.pbf",
+      "bytes": 196708,
+      "sha256": "bf4e41dfdd55aca2e2cfc2074e991e3e33e5d657ca62d4baf371b5e61b17e985"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/26368-26623.pbf",
+      "bytes": 204068,
+      "sha256": "8ae33a2a78d53e0e499f9beefd131c919801afa8fbe548a849ae25a468d45c27"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/26624-26879.pbf",
+      "bytes": 205965,
+      "sha256": "6de3a29f961ff7906feb235dfda8e9472b89544bff66a8ea9f2b6b79438d1fab"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/26880-27135.pbf",
+      "bytes": 206517,
+      "sha256": "10147363264e420bde07c04ec958d492eba85a9c4b6367450d00a8e822e5efe4"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/27136-27391.pbf",
+      "bytes": 206974,
+      "sha256": "21c1306228bdb22a64685a738a42448ff05928e301684f609f8c0a60073f5f2b"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/27392-27647.pbf",
+      "bytes": 204415,
+      "sha256": "cb76e555b33f909a2d35e3107b660b3412433e281a079f0fbaad7e31a872c88e"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/27648-27903.pbf",
+      "bytes": 204462,
+      "sha256": "8327c3e8f72edc1abb5b7119b38d8bba74bbcf50c8401ee1c628af4ae769fabe"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/27904-28159.pbf",
+      "bytes": 204759,
+      "sha256": "43d73b4108efb521b4b8ef20ebbe4cbb49160b568c395b29f6c2dd1473429ce2"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/28160-28415.pbf",
+      "bytes": 205486,
+      "sha256": "3bb0b439e656052e8345e863fbaaa0c696a45f28f430af493baaa5121108c632"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/28416-28671.pbf",
+      "bytes": 205463,
+      "sha256": "bd68ac253b69d6e8c66bcbf38de912f2479bbfef5a0edd971853f48ea41e1c13"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/28672-28927.pbf",
+      "bytes": 205044,
+      "sha256": "418d5b82ed9941cfdace5da1e6f409ee94e08efa3638e51f084404082f19e9cd"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/28928-29183.pbf",
+      "bytes": 205793,
+      "sha256": "312ff3b5fdfa818f62c6b84538f86656699ed6c5732fc8c87b73c65ea171dccd"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/29184-29439.pbf",
+      "bytes": 203771,
+      "sha256": "2b7ea6edfbdb184b3d0782e2d1e0e8ee1ea85a06761622aa034699ee20156216"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/29440-29695.pbf",
+      "bytes": 202977,
+      "sha256": "3b7ff94b18378a013ee1c97b71f36b2bd2af8a608fce854b5bb0ade62e93f6cf"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/29696-29951.pbf",
+      "bytes": 202919,
+      "sha256": "fa76ecb218d621f1470382b55ce53d36a0e59eca848f66fc61760472f7039e37"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/29952-30207.pbf",
+      "bytes": 203406,
+      "sha256": "37d3a906703e68c20847a6c86a544230a1959ed9d745c02deff62207334a13ea"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/30208-30463.pbf",
+      "bytes": 204606,
+      "sha256": "79e9fd2a3ba5a15b1fd7af4451cec95036330c8641fa18a6b0d0cea1b8135647"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/30464-30719.pbf",
+      "bytes": 197393,
+      "sha256": "ae805dadd8c8903ad4f3bd67919e56345280d1f5782872609658c4d07207af3e"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/30720-30975.pbf",
+      "bytes": 202929,
+      "sha256": "c32034c8d5fc9dddefcae9374ca47e3ee3df2ce46548b16a7dd7bf5c8b0a09fa"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/30976-31231.pbf",
+      "bytes": 206527,
+      "sha256": "aef960323f1e4fe7be4f8a5e5d7a0cb2079adfa17a977ee5bd3cda6601fdfacd"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/31232-31487.pbf",
+      "bytes": 205571,
+      "sha256": "0ffd884404226bd5f4f0b37741423ea0585f287f2aef302cf7c62972be120fdb"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/31488-31743.pbf",
+      "bytes": 207793,
+      "sha256": "bbf9985a8432a757d0edc0ba3661e2ca1fff0b791e128bfe7d98189fb394e67f"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/31744-31999.pbf",
+      "bytes": 206864,
+      "sha256": "753e810a4e180a50e2af103e961e571b4b3da713cd422b6ce959612a46a5ec87"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/32000-32255.pbf",
+      "bytes": 206151,
+      "sha256": "4dcf4a988a4d0950b428201b1a735b1b5dcb185d72286099b827f2c4fcc5320b"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/32256-32511.pbf",
+      "bytes": 206159,
+      "sha256": "c1b791c9c402d08321a757d32b51d68c7fc43be1d52b689b811a260206a89caa"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/32512-32767.pbf",
+      "bytes": 200910,
+      "sha256": "0937e460da606e7e2d701edeb401f70e095af4b8f47d35a1f9f8d57cbdbb0db4"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/32768-33023.pbf",
+      "bytes": 203632,
+      "sha256": "a0ab9a688b3e796c3f0b66e9b5344108aaebbdd6ce4012b42a79203fd9a5f21c"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/33024-33279.pbf",
+      "bytes": 204525,
+      "sha256": "dbcfa4fe0bb647924f979551bcafabe4652094706a90852a19ab274e364bdbb6"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/33280-33535.pbf",
+      "bytes": 202504,
+      "sha256": "41785cd7bc99ec8873a91334b6fa4db4cde7f2376e024896937c31c2fb8abb19"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/33536-33791.pbf",
+      "bytes": 200183,
+      "sha256": "3724def285ecba6ff5b782901d1754bf20dfec39857429db36b0d58f403fd7a7"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/33792-34047.pbf",
+      "bytes": 201226,
+      "sha256": "79af79364c8b9b128956a401f85ad011c027b3c439c55bf6dfc9627c37cc9efc"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/34048-34303.pbf",
+      "bytes": 202035,
+      "sha256": "c23220ff88057be292c2a577b8c6e053e1b77d83f939a8e91b5bffb3852310a3"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/34304-34559.pbf",
+      "bytes": 202618,
+      "sha256": "78e44b7aa2b5f6ede332dcd31946af1bbd0b26824d66a5a415485d5418fb89bc"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/34560-34815.pbf",
+      "bytes": 204868,
+      "sha256": "2cb1ee587c85f3d8be0b3fdf6836e1491eecf45c2a1bd573f93198e6ed9e7c00"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/34816-35071.pbf",
+      "bytes": 208146,
+      "sha256": "a7e482f2d6171a7a39b49e4fcd3a79466c9fea47caa512f9496bfcaca8aad62c"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/35072-35327.pbf",
+      "bytes": 207093,
+      "sha256": "ba338d861377af0be60936c14c8f1306b5318e41f2df100609df71cb0b9986fc"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/35328-35583.pbf",
+      "bytes": 204361,
+      "sha256": "fbe7477bf195c26d5e7bc29172d2edc58c59f6c2cc6b284a236f83a6aab45f4f"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/35584-35839.pbf",
+      "bytes": 203988,
+      "sha256": "0185bc919effa9355b67aa2bc14d655e8ae2a13c53e0f2e3da5b5a4727c5c6f1"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/35840-36095.pbf",
+      "bytes": 204837,
+      "sha256": "e1da1d94d8b725b767b9981018f7787e6425aaf0114df76bac28c339ea4d0ec0"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/36096-36351.pbf",
+      "bytes": 204794,
+      "sha256": "d75f99ea20116812abe1a325a69dfdaa20b8bbc6293c7799ba301fe460240a00"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/36352-36607.pbf",
+      "bytes": 204908,
+      "sha256": "f69e94401fcbbb4c64aa2009f245beed9b6be943340391fd7e1571b92934b309"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/36608-36863.pbf",
+      "bytes": 205546,
+      "sha256": "88ddf1931e6740af06466de71a5646436bc5e471654c581af9166e89637e804c"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/36864-37119.pbf",
+      "bytes": 203460,
+      "sha256": "37701fde935b189443ab8e96adace83242e4c999ee87b48c134a2f171b98bdd3"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/37120-37375.pbf",
+      "bytes": 202548,
+      "sha256": "4be374179f96216b033db80cbb6521bd2115c9e99b776c42388d92324d423dab"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/37888-38143.pbf",
+      "bytes": 205779,
+      "sha256": "0da8e4b8117a00699230b1c4ebb784f410413bbf45ae5c4e906427eef67cd18a"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/38144-38399.pbf",
+      "bytes": 198775,
+      "sha256": "a0823cbcff8106ae112bfb082855e6a213ebb746904f5d9f30d33b04569118c4"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/38400-38655.pbf",
+      "bytes": 198357,
+      "sha256": "29243bcc2aa0e70a89f2f4f778a2ee7ca242d05ad3a24bf95927cc3f15439177"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/38656-38911.pbf",
+      "bytes": 202092,
+      "sha256": "605858eb3c1631e473d9d5bff3b3f18040e4c7e4748b9a7251cb826229f0eff2"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/38912-39167.pbf",
+      "bytes": 203946,
+      "sha256": "d41a6c2da006f0a1ddb7647d31e8f18d4b1c34ad81224a626e9d13357ad12c30"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/39168-39423.pbf",
+      "bytes": 204778,
+      "sha256": "c4b6eac6ed98be1738b2170b76934a52a1160dafe463597ad061277f384ae46f"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/39424-39679.pbf",
+      "bytes": 203458,
+      "sha256": "5bc1a982dd6f1aeb6596cf4567e37fc882ac33f11c17a77c0e8a7020cd939de4"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/39936-40191.pbf",
+      "bytes": 206541,
+      "sha256": "ca0a911ffeb88425e16bf65d8e8c99fb0466f4c610070319a14c973a460a0b53"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/40192-40447.pbf",
+      "bytes": 205075,
+      "sha256": "3efa4c604da95076155ed7eedbce74d2bbf523a4494dfb7fedf7ea170d3bca81"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/40448-40703.pbf",
+      "bytes": 204951,
+      "sha256": "44d33e6904efcc5e492f9d6de2e76479670cc975f4e19c779a9533bc3d0765f6"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/40704-40959.pbf",
+      "bytes": 190066,
+      "sha256": "6f0e87a7ec88c0b352212744be2cac0d96e9132159b6820e06d4ab5a6745fafe"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/65280-65535.pbf",
+      "bytes": 42726,
+      "sha256": "d8f913887d7692a7a3827e904c0177a8d8223f307c675f1c991b90911381c876"
+    },
+    {
+      "file": "data/processed/reference-map/fonts/MiSans Semibold/8192-8447.pbf",
+      "bytes": 26742,
+      "sha256": "599c7d00c1ef82cc73006e2c8e589bf5580fe0f0e9397a1ba7f524fa08d6d8c4"
+    },
+    {
+      "file": "data/processed/reference-map/full/style.json",
+      "bytes": 36019,
+      "sha256": "57ecf000c3d1ec8dceafd4c109e4e202f2175e4d0b38214bdb2ac5609bccb5c3"
+    },
+    {
+      "file": "data/processed/reference-map/full/tilejson.json",
+      "bytes": 24411,
+      "sha256": "06a0401d720545bd94a75e835605b305a53cfc0bda2f44231f3cde8b962ed93a"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/0/0/0.pbf",
+      "bytes": 17777,
+      "sha256": "fb688d89fcd806734638349ba758b4e5ecc99a24671ac9ee65dfd76677e752a6"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/1/1/0.pbf",
+      "bytes": 140240,
+      "sha256": "5c9ae843f4f8f57ef9587865298e97b2361144c3f10bbfd99b65f59f23fef5f4"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/10/834/446.pbf",
+      "bytes": 8346,
+      "sha256": "600fdf6698ccb070d23dea3b9b34a4ee6061c26b2494df5d931fbeacf4a3a65b"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/11/1669/893.pbf",
+      "bytes": 13530,
+      "sha256": "48ea0668e1ac197a9add5b181efecb8977a7869a7d7e3bdb1cc35f1669d47140"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/12/3339/1786.pbf",
+      "bytes": 41087,
+      "sha256": "f2f0ac59f76f617bfd5d1956c853c9571239d3e755a27a25ba4d2b2872f7c0dc"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/12/3339/1787.pbf",
+      "bytes": 10439,
+      "sha256": "498d1ba1d44dcb773448663e870d0d9e3a0653e4b0c6018d0f2e4c5a0e6d942f"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/13/6678/3573.pbf",
+      "bytes": 17186,
+      "sha256": "206a52a38a89a2786b563337df9eacea876ad064a405de1ca644c0ae71065bb8"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/13/6678/3574.pbf",
+      "bytes": 6476,
+      "sha256": "d03d5236c7c4d58e27cdb9db2b17d1587cb9a082c1f8f6ccedb98000391e5529"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/13/6679/3573.pbf",
+      "bytes": 59294,
+      "sha256": "389e73e76d9bb339661570e4341a6ddfbfaaf5a090a2f7cf46794263b6f75a89"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/13/6679/3574.pbf",
+      "bytes": 15722,
+      "sha256": "2ded074d0b2adcc3bd41432528ab5c77889f9152d098f0a2ff05ff90878624b5"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13357/7146.pbf",
+      "bytes": 17884,
+      "sha256": "b63d94a2501d07729252e5db9604d4578a951de048678c737d65e4ed25ebcd9d"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13357/7147.pbf",
+      "bytes": 43280,
+      "sha256": "b0a6a08550e5d16b364cb3f0ba6f1ce86400127bbffd686daa7dc7a21537201c"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13357/7148.pbf",
+      "bytes": 20967,
+      "sha256": "ff5e0fd3988021281642d3055159b19aba5478b8540072c00b54c06b378fdeeb"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13358/7146.pbf",
+      "bytes": 36587,
+      "sha256": "3ea7aa93768fd2de1b2037e3d224debded0d9607846a9a60e96184085cf2d6c7"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13358/7147.pbf",
+      "bytes": 78765,
+      "sha256": "7c3b49553064cf095292fa11005a360cd1424e5b7a144cc8d0f13bbe59766a32"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13358/7148.pbf",
+      "bytes": 40592,
+      "sha256": "1874feaadb99d505a58eff980e055da72981c25727a8b79f4458a2b06f393a43"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13359/7146.pbf",
+      "bytes": 39329,
+      "sha256": "62e9445dd6f1a5c7dfcf28c82217d9af8a0b8bd68215e51240f5249011704293"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13359/7147.pbf",
+      "bytes": 72773,
+      "sha256": "6c061c2016cfe54f283ae954486f6dc103e250a18347e9b35c5041416e8b853e"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/14/13359/7148.pbf",
+      "bytes": 18246,
+      "sha256": "6e072fb687911053030eb06131395e8895de138b30ae9cdf302dcbf9ced2aed0"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/2/3/1.pbf",
+      "bytes": 41455,
+      "sha256": "47ab61ce8ef16cee831fb9bd5c2c20b737441347a7c784cb6b4b71c535707d7a"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/3/6/3.pbf",
+      "bytes": 28980,
+      "sha256": "915578a5baaa229900b6867d81b598884d91c42e7b8998ccc4cdd5f594623a17"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/4/13/6.pbf",
+      "bytes": 16164,
+      "sha256": "f033d4abf67267f0f15a7b15b2ceba45d25bb97ab823c1e9dde03af833332f90"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/5/26/13.pbf",
+      "bytes": 11022,
+      "sha256": "68e7819510bdda56abfe39decfb4d7db0c3bddc381702381953ecca300d6b229"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/6/52/27.pbf",
+      "bytes": 4432,
+      "sha256": "456d5dc1418f91d517a1c1270e7f497f32ffaf216b465dd901deb4bf36d16e44"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/7/104/55.pbf",
+      "bytes": 8076,
+      "sha256": "09355877404a09c8cac6b809766e1a90dd60f15751bfb4e4d4527753af3bc603"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/8/208/111.pbf",
+      "bytes": 7072,
+      "sha256": "ca87efff99752055f73ce6969e4550551df5e4795b7aa93f8b5384d31019b877"
+    },
+    {
+      "file": "data/processed/reference-map/full/tiles/9/417/223.pbf",
+      "bytes": 10341,
+      "sha256": "b7be26f3e76e730d26299e29560eadddb8fe638b740c5d601765f0e87dc50a3d"
+    },
+    {
+      "file": "data/processed/reference-map/manifest.json",
+      "bytes": 53612,
+      "sha256": "06217568c53e33852e252e010c3a068701282c05e5cbf5bfeaa79db881ad2b11"
+    },
+    {
+      "file": "data/processed/reference-map/reference-icon.png",
+      "bytes": 12055,
+      "sha256": "a756a93c8da046728f9a3a1339172aa427806b914719f049617bc60678aaae5d"
+    },
+    {
+      "file": "data/processed/reference-map/relief/0/0/0.png",
+      "bytes": 183653,
+      "sha256": "f59b7adf60b6429b3e45b7b74e44bc1c29b7f7854952d80506177d2cd20ac407"
+    },
+    {
+      "file": "data/processed/reference-map/relief/1/1/0.png",
+      "bytes": 194806,
+      "sha256": "df4a1c2b6fe7cd3e38d3afe4b45ac5261d6f4172864129a5f10cb4e1b0c04968"
+    },
+    {
+      "file": "data/processed/reference-map/relief/2/3/1.png",
+      "bytes": 236658,
+      "sha256": "f1e11b439ca6f6db31041697a515e650a448f24e14a2968905b455b92e3a8c4f"
+    },
+    {
+      "file": "data/processed/reference-map/relief/3/6/3.png",
+      "bytes": 272546,
+      "sha256": "9b91020e8301183da4f7f88d863a19e752aefe6a9b2bb1f44760138e8848d450"
+    },
+    {
+      "file": "data/processed/reference-map/relief/4/13/6.png",
+      "bytes": 195635,
+      "sha256": "ef7dbf422e893ab6eace74558d6515c113f54c73a56303b326bc27d7e4f866b6"
+    },
+    {
+      "file": "data/processed/reference-map/relief/5/26/13.png",
+      "bytes": 268822,
+      "sha256": "6e71a6cb26f171c2e5c6e7da0e423bbb763c853fee953e49d392d69a3fe3c2c2"
+    },
+    {
+      "file": "data/processed/reference-map/relief/6/52/27.png",
+      "bytes": 278502,
+      "sha256": "6c8a21f16e96b1b1804024728fd5e983baba11a1f642dbf4278ed5fddec07a64"
+    },
+    {
+      "file": "data/processed/reference-map/sprites/osm-liberty.json",
+      "bytes": 21998,
+      "sha256": "604b554c5b9f9d81fa9155d49a5a04cd64df6800bb80880e85afe844b0fd12ca"
+    },
+    {
+      "file": "data/processed/reference-map/sprites/osm-liberty.png",
+      "bytes": 40169,
+      "sha256": "9cbf37df0c9cf5e45663e1a3307da82c3c1c155189aafd48473912e3bff4876d"
+    },
+    {
+      "file": "data/processed/reference-map/sprites/osm-liberty@2x.json",
+      "bytes": 22092,
+      "sha256": "9d164746c670e98c017d79c37e3ae6285addf03b48c24b42dc188fedd4787091"
+    },
+    {
+      "file": "data/processed/reference-map/sprites/osm-liberty@2x.png",
+      "bytes": 105332,
+      "sha256": "a2227e42dc106f63932427c7997cafb4481f88228857578ea53367ae1e230661"
+    },
+    {
+      "file": "data/processed/reference-places.json",
+      "bytes": 908040,
+      "sha256": "8bf5107dba318c37c6d3d11ff6cd91cab1386aba1a1360b13dd5c7a380212fad"
+    },
+    {
+      "file": "data/processed/surroundings.json",
+      "bytes": 363572,
+      "sha256": "9bf2e00b8cef727e1fe647772d5cb464ca8a076fee904f092381ae48aa050f26"
+    },
+    {
+      "file": "data/processed/viewer-campus.json",
+      "bytes": 551513,
+      "sha256": "c53fd5c5fb219e211c9b101f815050e3f37f1ec7f184a3def144f845fb24c586"
+    },
+    {
+      "file": "viewer/assets/054f3b0c2956cbf0afe7-asphalt_02-Diffuse.webp",
+      "bytes": 110112,
+      "sha256": "054f3b0c2956cbf0afe7c8668da2860d6621851baa2ab6dced3ab76babdc4c7d"
+    },
+    {
+      "file": "viewer/assets/111341f948b7e073edf7-grass_ground-Rough.jpg",
+      "bytes": 328190,
+      "sha256": "111341f948b7e073edf7ac6add8777e1bf10df8959400df3863243e89bbc8c08"
+    },
+    {
+      "file": "viewer/assets/16b9b4ae5e0f7293e8f2-grass_ground-nor_gl.webp",
+      "bytes": 105238,
+      "sha256": "16b9b4ae5e0f7293e8f2385a332db85ae24e308b95d10173fbf3dda560e4d0e1"
+    },
+    {
+      "file": "viewer/assets/1739162669791634595b-map-ui.css",
+      "bytes": 25956,
+      "sha256": "efb845132d1c1a0b7330860a805ae25cfd3795a892f4d7ab85f3bc11c6647475"
+    },
+    {
+      "file": "viewer/assets/1aa5ce99f58a625c71d4-asphalt_02-Diffuse.jpg",
+      "bytes": 731707,
+      "sha256": "1aa5ce99f58a625c71d48cfc3e68b65ca85ccb00f39e045c0a928608a0ea25ed"
+    },
+    {
+      "file": "viewer/assets/2681b3b24566842da7e0-white_plaster_02-Diffuse.webp",
+      "bytes": 62990,
+      "sha256": "2681b3b24566842da7e03f456b475b80b390b126fa4e0eb1b21f986dc4d36a94"
+    },
+    {
+      "file": "viewer/assets/2dbbbbb1323a8e8989db-overcast_soil_puresky_1k.hdr",
+      "bytes": 1195816,
+      "sha256": "2dbbbbb1323a8e8989db2e8306bd13099b215539e5adba41b85738a250a7904e"
+    },
+    {
+      "file": "viewer/assets/2f2c942444553e9a5f8e-campus-lod2.glb",
+      "bytes": 638292,
+      "sha256": "2f2c942444553e9a5f8e44a7258261b526f5b6b2388e8cd975863cde00532ebc"
+    },
+    {
+      "file": "viewer/assets/42a1c381b53204e83a98-asphalt_02-nor_gl.jpg",
+      "bytes": 1240122,
+      "sha256": "42a1c381b53204e83a982db2864479a30bc127bbdeebb1006f8ee51bff099df3"
+    },
+    {
+      "file": "viewer/assets/4ff1fe957cd161b07f72-white_plaster_02-Rough.jpg",
+      "bytes": 295900,
+      "sha256": "4ff1fe957cd161b07f721fe6c28a9459c8c2e8ec65627a26c16e483a07c80d85"
+    },
+    {
+      "file": "viewer/assets/5374ddae24bfff937498-white_plaster_02-nor_gl.webp",
+      "bytes": 33398,
+      "sha256": "5374ddae24bfff93749828c311c70b1c0bf5c9a3c501bb15809895b62652ea57"
+    },
+    {
+      "file": "viewer/assets/64c8cb56a19682b5b0bf-white_plaster_02-Rough.webp",
+      "bytes": 23796,
+      "sha256": "64c8cb56a19682b5b0bf06dd75cd1377669fae4e8c56b2ee3c9803427af3dc26"
+    },
+    {
+      "file": "viewer/assets/7000e2ccd479bb7b66dc-grass_ground-nor_gl.jpg",
+      "bytes": 1310516,
+      "sha256": "7000e2ccd479bb7b66dcdf4faef7b47554324566886314ca620cbf03e274e826"
+    },
+    {
+      "file": "viewer/assets/70ba3edc65525eb4dc36-asphalt_02-Rough.jpg",
+      "bytes": 544032,
+      "sha256": "70ba3edc65525eb4dc366cf010ca7ae0bd34e0251ff0225c2dad627a873d0712"
+    },
+    {
+      "file": "viewer/assets/711d8f37233064806f2f-finishes.bin",
+      "bytes": 603748,
+      "sha256": "711d8f37233064806f2f21a9d982ef7e8dbe1f4745414fe94c701fa294033644"
+    },
+    {
+      "file": "viewer/assets/787e5be80e6b0722b850-grass_ground-Rough.webp",
+      "bytes": 1758,
+      "sha256": "787e5be80e6b0722b850a0f7e78b5c8ffec68ff4b7d6e85a253507e307a6f718"
+    },
+    {
+      "file": "viewer/assets/8028d873e30db1dfb6d6-style.css",
+      "bytes": 24473,
+      "sha256": "7f35fd89b0636c198c8693cefee580292d7a7fd26dbf0e0bea83ce466279e595"
+    },
+    {
+      "file": "viewer/assets/8291a7404bfb2dbe86f1-grass_ground-Diffuse.webp",
+      "bytes": 67432,
+      "sha256": "8291a7404bfb2dbe86f1692e90e81f3979a400ef79dde2affb01dabce667e766"
+    },
+    {
+      "file": "viewer/assets/953c037fa03f2017795f-asphalt_02-nor_gl.webp",
+      "bytes": 99306,
+      "sha256": "953c037fa03f2017795fa4abc21cab924b4ff933e772d27c872ec8b46d6ce60f"
+    },
+    {
+      "file": "viewer/assets/9bbed335ea3aa7dd715f-asphalt_02-Rough.webp",
+      "bytes": 99110,
+      "sha256": "9bbed335ea3aa7dd715f907e58f86996d3d6dc15fd0172c54b1bc160b0272fe8"
+    },
+    {
+      "file": "viewer/assets/9ef76a7349602f01aa20-campus-lod1.glb",
+      "bytes": 2130548,
+      "sha256": "9ef76a7349602f01aa206ce553f01ca9cf4706dd4bfa208245938405507d83d7"
+    },
+    {
+      "file": "viewer/assets/a1ebbe091bd1ae93d2ab-white_plaster_02-Diffuse.jpg",
+      "bytes": 527219,
+      "sha256": "a1ebbe091bd1ae93d2abd5de8d69f9003a8d0ee6532bcf9a87c2492c97051f23"
+    },
+    {
+      "file": "viewer/assets/a79cc5ed65af0f80261b-grass_ground-Diffuse.jpg",
+      "bytes": 876584,
+      "sha256": "a79cc5ed65af0f80261b39a383b64a8c5272c5144d724deb43dbc29f0e4cd19b"
+    },
+    {
+      "file": "viewer/assets/ce0ef3b6f5ad92533c80-overcast_soil_puresky_256.hdr",
+      "bytes": 87684,
+      "sha256": "ce0ef3b6f5ad92533c800a9c3b1e57b2429b76591da64dfb5d052945b772aaa0"
+    },
+    {
+      "file": "viewer/assets/eb572ca3630d5bfde72e-white_plaster_02-nor_gl.jpg",
+      "bytes": 652310,
+      "sha256": "eb572ca3630d5bfde72e2601b1f02412da23ca005cd19384dced8690be4cb783"
+    },
+    {
+      "file": "viewer/assets/f27109b8da2a97ca8bff-campus-lod0.glb",
+      "bytes": 4382908,
+      "sha256": "f27109b8da2a97ca8bffd60e0bfbe1b8d8de3380f1c7abae0367bf570e8104b9"
+    },
+    {
+      "file": "viewer/campus-icon.svg",
+      "bytes": 291,
+      "sha256": "3a83038ee77cc56dc2e8a0e914068dec56f7827883648c59c4ca9874f513e053"
+    },
+    {
+      "file": "viewer/campus.js",
+      "bytes": 946019,
+      "sha256": "03addf7818782d0426e72c126dc3dc1544fa3e14bdd9304534a4b8c2215ca675"
+    },
+    {
+      "file": "viewer/chunks/esm-NUV22FAU.js",
+      "bytes": 469746,
+      "sha256": "a75d53e1d2b3cd80d3159031b5614c1928e85fda62816b996ebac2d4ca5570db"
+    },
+    {
+      "file": "viewer/index.html",
+      "bytes": 15943,
+      "sha256": "ff20d1ee4f04e3a2475b2528bb720a98bcd860755953caaa71dc150d303b2e59"
+    },
+    {
+      "file": "viewer/privacy.html",
+      "bytes": 610,
+      "sha256": "85be0d0f3572e7094e53980717394e8b331943d00e332ea8c357746f9443d8a4"
+    },
+    {
+      "file": "viewer/reference-map.css",
+      "bytes": 2533,
+      "sha256": "edb6095c62c4a88a2f686611b0d814f6fdac483dd83f7dc1f27394ca37b0f852"
+    },
+    {
+      "file": "viewer/reference-map.html",
+      "bytes": 2148,
+      "sha256": "a4cc09a369338609d3e790bdeff152bee049db52ade501772e22a2eb841bd37c"
+    },
+    {
+      "file": "viewer/reference-map.js",
+      "bytes": 1114274,
+      "sha256": "1effd2eb54d3bc925517994eb7deb90b31644ddcc28274faaec2afa54bf509fd"
+    },
+    {
+      "file": "viewer/vendor/MAPLIBRE-LICENSE.txt",
+      "bytes": 5984,
+      "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2"
+    },
+    {
+      "file": "viewer/vendor/PINYIN-PRO-LICENSE.txt",
+      "bytes": 1070,
+      "sha256": "824f6069c5a59b0c1650d0fb9f8d091866c6019eb761c8e658dfc03f001eabd2"
+    },
+    {
+      "file": "viewer/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "file": "viewer/vendor/maplibre-gl-worker.mjs",
+      "bytes": 508690,
+      "sha256": "1130b55735ff48bd7cea9f63e703b866b8b2e193b448691772b387e6e8be6ec3"
+    },
+    {
+      "file": "viewer/vendor/maplibre-gl.css",
+      "bytes": 83263,
+      "sha256": "bacba6a85a867fcf602f2ff88331b8acf7edf3fbd063a519888cfbff39970193"
+    }
+  ]
+}

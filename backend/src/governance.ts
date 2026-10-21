@@ -1,3 +1,5 @@
+import {profileCoverChoices} from '../../shared/v2/profileCover';
+import {validSemesterStart} from '../../shared/v2/schedulePreferences';
 import { effect, runSync, type BusinessRepository } from "./storage/effects";
 import { demand, timestamp, type Account } from "./auth";
 import { has, operator, owner, reviewer, student } from "./community";
@@ -210,9 +212,28 @@ export function* governancePolicy(
     const data = {aiIconChoice, aiCustomIcon};
     return previous ? (yield* effect(repo.save(previous, data))) : (yield* effect(repo.create("preferences", actor.id, data)));
   }
+  if (action === 'preferences.schedule') {
+    student(actor);
+    const patch:Record<string,unknown>={};
+    if(input.academicCalendar!==undefined){patch.academicCalendar=enumField(input,'academicCalendar',['bnbu-2026-s1','custom']);}
+    if(input.homeScheduleCount!==undefined){
+      demand(typeof input.homeScheduleCount==='number'&&Number.isInteger(input.homeScheduleCount)&&input.homeScheduleCount>=1&&input.homeScheduleCount<=6,'首页安排须展示1–6项。');
+      patch.homeScheduleCount=input.homeScheduleCount;
+    }
+    if(input.semesterStartDate!==undefined){
+      demand(input.semesterStartDate===''||validSemesterStart(input.semesterStartDate),'学期第一周日期须为有效的周一。');
+      patch.semesterStartDate=input.semesterStartDate;
+      if(input.academicCalendar===undefined)patch.academicCalendar='custom';
+    }
+    demand(Object.keys(patch).length>0,'请选择要保存的日程设置。');
+    const previous=(yield* effect(repo.all('preferences'))).find(p=>p.ownerId===actor.id);
+    return previous?(yield* effect(repo.save(previous,patch))):(yield* effect(repo.create('preferences',actor.id,patch)));
+  }
   if (action === "preferences.profilebackground") {
     student(actor);
-    const profileBackground = enumField(input, "choice", ["campus", "evening", "walkway", "services"]);
+    const profileBackground = enumField(input, "choice", [...profileCoverChoices]);
+    const profile=(yield* effect(repo.all('profile'))).find(p=>p.ownerId===actor.id);
+    if(profile)yield* effect(repo.save(profile,{cover:profileBackground}));
     const previous = (yield* effect(repo.all("preferences"))).find(p => p.ownerId === actor.id);
     return previous ? (yield* effect(repo.save(previous, {profileBackground}))) : (yield* effect(repo.create("preferences", actor.id, {profileBackground})));
   }
@@ -250,6 +271,8 @@ export function* governancePolicy(
     return previous ? (yield* effect(repo.save(previous, {[key]: input.enabled}))) : (yield* effect(repo.create("preferences", actor.id, {[key]: input.enabled})));
   }
   if (action === "profile.save") {
+    const cover=input.cover===undefined?undefined:textField(input,'cover',7_000_000,true);
+    demand(cover===undefined||profileCoverChoices.some(choice=>choice===cover)||!!cover&&/^data:image\/(jpeg|png|webp);base64,/.test(cover)&&Buffer.from(cover.split(',')[1],'base64').length<=5*1024*1024,'背景须为校园预设或不超过 5MB 的 JPG、PNG、WebP。');
     const avatar = textField(input, "avatar", 7_000_000, true);
     demand(
       !avatar ||
@@ -259,7 +282,7 @@ export function* governancePolicy(
       "头像须为不超过 5MB 的 JPG、PNG、WebP。",
     );
     const profile = (yield* effect(repo.all("profile"))).find((p) => p.ownerId === actor.id),
-      data = { nickname: textField(input, "nickname", 20), avatar };
+      data = { nickname: textField(input, "nickname", 20), avatar,...(input.bio!==undefined?{bio:textField(input,"bio",100,true)}:{}),...(cover===undefined?{}:{cover}) };
     return profile
       ? (yield* effect(repo.save(profile, data)))
       : (yield* effect(repo.create("profile", actor.id, data)));

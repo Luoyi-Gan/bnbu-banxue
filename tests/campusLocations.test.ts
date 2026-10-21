@@ -9,6 +9,9 @@ describe('activity building locations', () => {
     expect(resolveCampusLocation('t3-301')).toBe('way/664082909')
     expect(resolveCampusLocation('Sports Center Court 3')).toBe('way/664082915')
     expect(resolveCampusLocation('Library Steps')).toBe('way/1215983507')
+    expect(resolveCampusLocation('二期图书馆')).toBe('way/1459105119')
+    expect(resolveCampusLocation('Library Phase 2')).toBe('way/1459105119')
+    for(const location of ['校外体育馆','线上 Library workshop','Online T4','教学楼 A101'])expect(resolveCampusLocation(location)).toBeNull()
   })
   it('does not guess generic locations or confuse building codes', () => {
     for (const name of ['Innovation Hub', 'Lake Lawn', 'Campus North Gate', 'T299', 'T20-105', 'Fitness Studio', '']) expect(resolveCampusLocation(name)).toBeNull()

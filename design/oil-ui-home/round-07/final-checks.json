@@ -1,0 +1,8 @@
+{
+  "result": "passed",
+  "checks": [
+    "Alumni cancellation field touch height",
+    "Embedded map theme loads",
+    "Gallery 56 entries and role filters"
+  ]
+}

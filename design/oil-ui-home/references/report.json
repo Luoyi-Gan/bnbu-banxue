@@ -1,0 +1,60 @@
+[
+  {
+    "file": "page.png",
+    "target": "https://structured.app",
+    "name": "page",
+    "state": null,
+    "size": "1440x900",
+    "zoom": 1,
+    "thumb": true,
+    "animationWaitMs": 0,
+    "issues": [],
+    "lint": []
+  },
+  {
+    "file": "features.png",
+    "target": "https://www.todoist.com/features",
+    "name": "features",
+    "state": null,
+    "size": "1440x900",
+    "zoom": 1,
+    "thumb": true,
+    "animationWaitMs": 0,
+    "issues": [
+      "加载错误：Access to XMLHttpRequest at 'https://tr.capterra.com/events/' from origin 'https://www.todoist.com' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No https://www.todoist.com/zh-CN/features",
+      "加载错误：Failed to load resource: net::ERR_FAILED https://tr.capterra.com/events/"
+    ],
+    "lint": []
+  },
+  {
+    "file": "sheet.png",
+    "width": 1344,
+    "height": 480,
+    "columns": 2,
+    "items": [
+      {
+        "naturalWidth": 720,
+        "naturalHeight": 450,
+        "width": 640,
+        "height": 400,
+        "labelHeight": 32,
+        "x": 24,
+        "y": 24,
+        "label": "page",
+        "labelY": 432
+      },
+      {
+        "naturalWidth": 720,
+        "naturalHeight": 450,
+        "width": 640,
+        "height": 400,
+        "labelHeight": 32,
+        "x": 680,
+        "y": 24,
+        "label": "features",
+        "labelY": 432
+      }
+    ],
+    "issues": []
+  }
+]

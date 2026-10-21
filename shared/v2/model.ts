@@ -12,8 +12,8 @@ export const timeLabel = () => new Date().toLocaleTimeString('zh-CN', { hour: '2
 export type Role = 'student' | 'admin' | 'teacher'
 export type ReviewStatus = 'pending' | 'approved' | 'rejected'
 export type RoomType = 'carpool' | 'entertainment' | 'study' | 'sport'
-export interface Comment { id: string; ownerId?: string | null; author: string; authorAvatar?: string; body: string; date: string; status: 'visible' | 'pending' | 'hidden' }
-export interface Post { alumniId?: string; ownerId?: string | null; id: string; title: string; body: string; images?: string[]; board: string; author: string; authorAvatar?: string; date: string; likes: number; viewCount?: number; status: 'visible' | 'pending' | 'hidden'; comments: Comment[] }
+export interface Comment { parentId?:string;replyToId?:string;replyToAuthor?:string;likes?:number;liked?:boolean; id: string; ownerId?: string | null; author: string; authorAvatar?: string; body: string; date: string; status: 'visible' | 'pending' | 'hidden' }
+export interface Post { version?:number;editedAt?:string;saves?:number;commentCount?:number; alumniId?: string; ownerId?: string | null; id: string; title: string; body: string; images?: string[]; board: string; author: string; authorAvatar?: string; date: string; likes: number; viewCount?: number; status: 'visible' | 'pending' | 'hidden'; comments: Comment[] }
 export interface Room { id: string; type: RoomType; title: string; body: string; time: string; place: string; buildingId?: string; capacity: number; members: string[]; owner: string; status: 'open' | 'finished'; requests: string[] }
 export interface RoomReview { id: string; roomId: string; from: string; to: string; stars: number; tags: string[]; comment: string; date: string }
 export interface Conversation { id: string; title: string; messages: { id: string; from: string; body: string; time: string }[]; unread: number }

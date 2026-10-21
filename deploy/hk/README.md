@@ -1,5 +1,7 @@
 # 香港服务器部署记录
 
+当前会同里发布记录见 [2026-10-20 会同里发布](RELEASE_20261020.md)，入口为 `https://www.bnbuplatform.cn/v2`。以下为旧 VerityAI 域名的历史记录。
+
 首次部署完成时间：2026-09-05，Asia/Shanghai。
 
 访问地址：[https://www.verityai.cn](https://www.verityai.cn/)。本次配置的域名只有 `www.verityai.cn`。

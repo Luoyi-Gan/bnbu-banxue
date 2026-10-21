@@ -1,0 +1,272 @@
+[
+  {
+    "id": "home",
+    "role": "student",
+    "url": "/v2",
+    "family": "campus"
+  },
+  {
+    "id": "discover",
+    "role": "student",
+    "url": "/v2/activities",
+    "family": "campus"
+  },
+  {
+    "id": "campus",
+    "role": "student",
+    "url": "/v2/campus",
+    "family": "campus"
+  },
+  {
+    "id": "me",
+    "role": "student",
+    "url": "/v2/me",
+    "family": "campus"
+  },
+  {
+    "id": "schedule",
+    "role": "student",
+    "url": "/v2/schedule",
+    "family": "directory"
+  },
+  {
+    "id": "activity",
+    "role": "student",
+    "url": "/v2/activities/preview-event-2",
+    "family": "detail"
+  },
+  {
+    "id": "manage-activities",
+    "role": "student",
+    "url": "/v2/activities?view=manage",
+    "family": "directory"
+  },
+  {
+    "id": "organizations",
+    "role": "student",
+    "url": "/v2/organizations",
+    "family": "directory"
+  },
+  {
+    "id": "community",
+    "role": "student",
+    "url": "/v2/community",
+    "family": "directory"
+  },
+  {
+    "id": "partners",
+    "role": "student",
+    "url": "/v2/partners",
+    "family": "directory"
+  },
+  {
+    "id": "teams",
+    "role": "student",
+    "url": "/v2/partners/teams",
+    "family": "directory"
+  },
+  {
+    "id": "coffee",
+    "role": "student",
+    "url": "/v2/coffee",
+    "family": "directory"
+  },
+  {
+    "id": "alumni",
+    "role": "student",
+    "url": "/v2/alumni",
+    "family": "directory"
+  },
+  {
+    "id": "alumni-people",
+    "role": "student",
+    "url": "/v2/alumni?view=people",
+    "family": "directory"
+  },
+  {
+    "id": "alumni-bookings",
+    "role": "student",
+    "url": "/v2/alumni?view=bookings",
+    "family": "directory"
+  },
+  {
+    "id": "messages",
+    "role": "student",
+    "url": "/v2/messages",
+    "family": "workbench"
+  },
+  {
+    "id": "notifications",
+    "role": "student",
+    "url": "/v2/messages?view=notifications",
+    "family": "workbench"
+  },
+  {
+    "id": "settings",
+    "role": "student",
+    "url": "/v2/settings",
+    "family": "workbench"
+  },
+  {
+    "id": "ai",
+    "role": "student",
+    "url": "/v2/ai",
+    "family": "workbench"
+  },
+  {
+    "id": "me-profile",
+    "role": "student",
+    "url": "/v2/me?tab=profile",
+    "family": "profile"
+  },
+  {
+    "id": "me-saved",
+    "role": "student",
+    "url": "/v2/me?tab=saved",
+    "family": "profile"
+  },
+  {
+    "id": "me-events",
+    "role": "student",
+    "url": "/v2/me?tab=events",
+    "family": "profile"
+  },
+  {
+    "id": "me-teams",
+    "role": "student",
+    "url": "/v2/me?tab=teams",
+    "family": "profile"
+  },
+  {
+    "id": "me-verification",
+    "role": "student",
+    "url": "/v2/me?tab=verification",
+    "family": "profile"
+  },
+  {
+    "id": "me-network",
+    "role": "student",
+    "url": "/v2/me?tab=network",
+    "family": "profile"
+  },
+  {
+    "id": "me-timetable",
+    "role": "student",
+    "url": "/v2/me?tab=timetable",
+    "family": "profile"
+  },
+  {
+    "id": "teaching",
+    "role": "student",
+    "url": "/v2/campus?service=teaching",
+    "family": "directory"
+  },
+  {
+    "id": "academic",
+    "role": "student",
+    "url": "/v2/campus?service=academic",
+    "family": "directory"
+  },
+  {
+    "id": "explore",
+    "role": "student",
+    "url": "/v2/campus/explore",
+    "family": "directory"
+  },
+  {
+    "id": "sports",
+    "role": "student",
+    "url": "/v2/sports",
+    "family": "directory"
+  },
+  {
+    "id": "teacher-coffee",
+    "role": "teacher",
+    "url": "/v2/teacher/coffee",
+    "family": "staff"
+  },
+  {
+    "id": "teacher-schedule",
+    "role": "teacher",
+    "url": "/v2/teacher/schedule",
+    "family": "staff"
+  },
+  {
+    "id": "teacher-messages",
+    "role": "teacher",
+    "url": "/v2/teacher/messages",
+    "family": "staff"
+  },
+  {
+    "id": "teacher-profile",
+    "role": "teacher",
+    "url": "/v2/teacher/profile",
+    "family": "staff"
+  },
+  {
+    "id": "teacher-sports",
+    "role": "teacher",
+    "url": "/v2/teacher/sports",
+    "family": "staff"
+  },
+  {
+    "id": "admin-overview",
+    "role": "admin",
+    "url": "/v2/admin",
+    "family": "staff"
+  },
+  {
+    "id": "admin-verifications",
+    "role": "admin",
+    "url": "/v2/admin/verifications",
+    "family": "staff"
+  },
+  {
+    "id": "admin-moderation",
+    "role": "admin",
+    "url": "/v2/admin/moderation",
+    "family": "staff"
+  },
+  {
+    "id": "admin-keywords",
+    "role": "admin",
+    "url": "/v2/admin/keywords",
+    "family": "staff"
+  },
+  {
+    "id": "admin-mail-activities",
+    "role": "admin",
+    "url": "/v2/admin/mail-activities",
+    "family": "staff"
+  },
+  {
+    "id": "welcome",
+    "role": "public",
+    "url": "/v2/welcome",
+    "family": "entry"
+  },
+  {
+    "id": "login",
+    "role": "public",
+    "url": "/v2/login",
+    "family": "entry"
+  },
+  {
+    "id": "register",
+    "role": "public",
+    "url": "/v2/register",
+    "family": "entry"
+  },
+  {
+    "id": "forgot-password",
+    "role": "public",
+    "url": "/v2/forgot-password",
+    "family": "entry"
+  },
+  {
+    "id": "identity",
+    "role": "student",
+    "url": "/v2/identity",
+    "family": "entry"
+  }
+]

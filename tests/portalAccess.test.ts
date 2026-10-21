@@ -3,7 +3,7 @@ import { canAccessPortal, portalHome, resolvePortalRole } from '../src/v2/portal
 import type { Role } from '../shared/v2/model'
 
 describe('portal separation', () => {
-  const paths = { student: ['/v2', '/v2/me', '/v2/sports', '/v2/activities/event'], teacher: ['/v2/teacher', '/v2/teacher/activities', '/v2/teacher/activities/event'], admin: ['/v2/admin', '/v2/admin/verifications', '/v2/admin/moderation'] }
+  const paths = { student: ['/v2/settings', '/v2', '/v2/me', '/v2/sports', '/v2/activities/event'], teacher: ['/v2/teacher/settings', '/v2/teacher', '/v2/teacher/activities', '/v2/teacher/activities/event'], admin: ['/v2/admin/settings', '/v2/admin', '/v2/admin/verifications', '/v2/admin/moderation'] }
   for (const role of ['student', 'teacher', 'admin'] as Role[]) {
     it(`${role} can enter only its own portal`, () => {
       for (const owner of Object.keys(paths) as Role[]) {

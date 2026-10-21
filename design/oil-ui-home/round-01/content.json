@@ -1,0 +1,15 @@
+{
+  "brand": "会同里",
+  "date": "10月19日 周一",
+  "greeting": "早上好，同学",
+  "disclosure": "本地模拟",
+  "summary": { "schedule": 2, "unread": 3, "sports": "—", "sportsNote": "待同步" },
+  "agenda": [
+    { "time": "10:00", "end": "11:50", "name": "设计思维", "location": "T2 · 201", "kind": "已保存课表" },
+    { "time": "16:30", "end": "17:30", "name": "校园摄影漫步", "location": "图书馆前集合", "kind": "参与标记" }
+  ],
+  "recommendation": { "name": "黄昏里的校园", "category": "摄影分享", "when": "周三 17:30", "location": "校园公共空间" },
+  "navigation": ["首页", "发现", "校园", "打卡", "我的"],
+  "assets": { "campus": "../../../src/assets/campus/home-background.jpg", "evening": "../../../src/assets/campus/evening-campus.jpg", "courtyard": "../../../src/assets/campus/campus-services.jpg" },
+  "notes": "三方案共用固定模拟内容，不读取个人账号；体育未知显示横线，不绘制完成进度；课表不表示到课，活动参与标记不表示正式报名。首屏为静态视觉候选。"
+}
