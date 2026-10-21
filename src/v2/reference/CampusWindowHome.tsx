@@ -1,4 +1,5 @@
 import {courseTone} from '../timetableWeek'
+import {homeAmbient} from '../homeAmbient'
 import {SkeletonBars} from '../MaterialSkeleton'
 import {StudentTimetable} from '../StudentTimetable'
 import type {CardOrigin} from '../ui'
@@ -80,7 +81,7 @@ export function CampusWindowHome() { useUiLanguage();
   const profile = data?.entities.find(entity => entity.kind === 'profile' && entity.ownerId === data.account.id)
   const name = String(profile?.data.nickname || data?.account.name || '同学')
   const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Shanghai', hour: '2-digit', hourCycle: 'h23' }).format(new Date()))
-  const greeting = uiText(hour < 11 ? '早上好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : '晚上好')
+  const greeting = uiText(hour < 6 ? '晚上好' : hour < 11 ? '早上好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : '晚上好')
   const agendaPreferences=schedulePreferences(data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===data.account.id)?.data)
   const [courseDetail,setCourseDetail]=useState<{id:string;origin:CardOrigin}|null>(null)
   const [now,setNow]=useState(Date.now)
@@ -93,7 +94,7 @@ export function CampusWindowHome() { useUiLanguage();
   const sportsNote = uiText(!data ? '读取中' : data.sportsStatus === 'not-enrolled' ? '尚未入班' : percent === null ? '待同步' : '本学期')
   const events = filterActivityItems(liveActivities(data), { query: '', category: '全部', period: '全部时间', host: '全部主办方', status: '未结束', sort: '时间最近' }, data?.account.id ?? '').slice(0, 2)
 
-  return <div className="ref-page cw-home">
+  return <div className="ref-page cw-home" data-ambient={homeAmbient(hour)}>
     <header className="cw-header"><h1>{uiText("会同里")}</h1><nav aria-label={uiText("首页工具")}>
       <StudentSearch/>
       <StudentUtilities/>
