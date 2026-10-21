@@ -6,6 +6,10 @@
 .discovery-columns{display:grid;gap:16px;align-items:start}
 .discovery-column{display:flex;flex-direction:column;gap:22px;min-width:0}
 .discovery-card{position:relative;min-width:0}
+.discovery-entrance-item{min-width:0}
+.discovery-entrance-item[data-entrance-state=pending]{opacity:0;transform:translateY(8px)}
+html[data-ui-motion=reduce] .discovery-entrance-item{opacity:1!important;transform:none!important}
+@media(prefers-reduced-motion:reduce){.discovery-entrance-item{opacity:1!important;transform:none!important}}
 .discovery-cover{display:block;width:100%;padding:0;border:0;border-radius:12px;overflow:hidden;background:var(--v2-soft);position:relative;text-align:left;cursor:pointer}
 .discovery-cover img{width:100%;height:100%;object-fit:cover;display:block}
 .discovery-cover.is-loading{animation:discovery-loading 1.4s ease-in-out infinite}

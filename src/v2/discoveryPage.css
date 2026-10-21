@@ -6,6 +6,7 @@
 .campus-discovery-sections button[aria-pressed=true]{background:var(--v2-surface,#fff);color:var(--v2-ink);font-weight:650;box-shadow:0 1px 5px #203e3514}
 .campus-discovery-sections button[aria-pressed=true]:after{display:none}
 .campus-discovery-panel{padding-top:20px;min-height:60vh;animation:campus-feed-enter .18s ease-out}
+.campus-discovery-panel:has(.discovery-feed[data-staggered]){animation:none}
 .campus-discovery-sections button,.campus-discovery-pills button{transition:color .16s,background-color .16s}
 .campus-discovery .discovery-cover img{transition:opacity .2s}
 .campus-discovery-tools{display:flex;align-items:center;gap:12px;margin-bottom:12px}

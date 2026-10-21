@@ -39,7 +39,7 @@ export function ActivityDiscovery({ items, basePath, live }: { items: ActivityIt
   const { state, persistenceError } = useV2()
   return <>
     {persistenceError && <p className="activity-discovery-note" role="alert">{uiText("本机保存失败，请检查浏览器存储空间。")}</p>}
-    <DiscoveryMasonry items={items} renderItem={item => <article className="discovery-card activity-discovery-card" key={item.id} data-activity-id={item.id}>
+    <DiscoveryMasonry entranceScope={`activities:${live?.data?.account.id??'visitor'}`} items={items} renderItem={item => <article className="discovery-card activity-discovery-card" key={item.id} data-activity-id={item.id}>
       <ActivityCover key={item.image ?? item.id} item={item} path={`${basePath}/${item.id}`}/>
       <div className="activity-discovery-save"><ActivityReactions live={live} item={item} compact only="savedActivities"/></div>
       <SharedMediaLink transitionKey={`activity:${item.id}`} className="discovery-title" to={`${basePath}/${item.id}`} state={{from:location.pathname+location.search}}>{item.title}</SharedMediaLink>
