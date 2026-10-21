@@ -1,7 +1,8 @@
 import {useEffect,useRef,useState} from 'react'
-import {Activity,ArrowLeft,ArrowUpRight,Camera,Check,ChevronRight,Clock3,Footprints,History,LoaderCircle,Pause,Play,QrCode,RefreshCw,Square,X} from 'lucide-react'
+import {Activity,ArrowUpRight,Camera,Check,ChevronRight,Clock3,Footprints,History,LoaderCircle,Pause,Play,QrCode,RefreshCw,Square,X} from 'lucide-react'
 import {api} from '../../live/api'
 import {Modal} from '../ui'
+import {Header} from '../reference/components'
 import {parseSportsInvite} from '../../../shared/v2/sportsInvite'
 import {uiText,useUiLanguage} from '../uiLanguage'
 import {qrDetector} from './qrDetector'
@@ -51,8 +52,8 @@ export function MovementEntry(){useUiLanguage();
  void tick
  const mutate=async(operation:string)=>{if(busy)return;const version=++personalGeneration.current;setBusy(true);setError('');try{const value=await command<Personal>(operation,operation==='personal.start'?{sport}:{id:active?.id,version:active?.version});if(!mounted.current||version!==personalGeneration.current)return;receivedAt.current=performance.now();setPersonal(value)}catch(failure){if(mounted.current){setError(failure instanceof Error?failure.message:'保存失败，请重试。');try{await loadPersonal()}catch{/* Preserve last state until retry. */}}}finally{if(mounted.current)setBusy(false)}}
  const openExternal=()=>{const popup=window.open('about:blank','_blank');if(!popup){setError('浏览器阻止了新窗口，请允许弹出窗口后重试。');return}popup.opener=null;setBusy(true);void command<{url:string}>('launch',lastLaunch.current).then(result=>{popup.location.replace(result.url)}).catch(failure=>{popup.close();setError(failure instanceof Error?failure.message:'打开失败，请重试。')}).finally(()=>setBusy(false))}
- return <section className={`ref-page motion-entry ${view==='sports'?'has-sports-frame':''}`}>
-  <header className="motion-page-heading"><div><span>BNBU SPORTS</span><h1>{uiText(view==='solo'?'个人运动':view==='join'?'扫码入班':'运动')}</h1></div><div>{view!=='entry'&&view!=='sports'&&<button type="button" className="motion-icon-button" aria-label="返回运动选择" disabled={busy} onClick={()=>{setView('entry');setError('')}}><ArrowLeft size={20}/></button>}<button type="button" className="motion-icon-button" aria-label="重新检测体育账号" disabled={loading||busy} onClick={()=>void check()}><RefreshCw size={19} className={loading?'is-spinning':''}/></button></div></header>
+ return <section className={`ref-page ref-subpage motion-entry ${view==='sports'?'has-sports-frame':''}`}>
+  <Header title={view==='solo'?'个人运动':view==='join'?'扫码入班':'运动'} back="/v2" backDisabled={busy} backLabel={view==='solo'||view==='join'?'返回运动选择':'返回首页'} onBack={view==='solo'||view==='join'?()=>{if(!busy){setView('entry');setError('')}}:undefined} actions={<button type="button" className="motion-icon-button" aria-label="重新检测体育账号" disabled={loading||busy} onClick={()=>void check()}><RefreshCw size={19} className={loading?'is-spinning':''}/></button>}/>
   {detection?.localAcceptance&&<aside className="motion-local-notice">{uiText('本地联动验收 · 体育账号目录为模拟数据，个人运动写入独立测试库。')}</aside>}
   {error&&<div className="motion-error" role="alert"><p>{uiText(error)}</p><button type="button" disabled={loading||busy} onClick={()=>void(view==='join'?join():view==='solo'?chooseSolo():check())}>{uiText('重试')}</button></div>}
   {loading?<div className="motion-connection" role="status"><LoaderCircle size={27} className="is-spinning"/><strong>{uiText('正在连接 BNBU Sports')}</strong><p>{uiText('读取你的体育账号与运动记录')}</p></div>:<>

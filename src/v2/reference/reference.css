@@ -16,6 +16,7 @@
 .v2-app.v2-app-student .ref-header h1 {font-family:Georgia,'Times New Roman','Songti SC','SimSun',serif;font-size:34px;font-weight:700;letter-spacing:0;line-height:1.2;color:#232522}
 .v2-app.v2-app-student .ref-header.ref-brand h1 {font-weight:400;font-size:35px}
 .ref-header nav>a,.ref-header>div>a {display:grid;place-items:center;width:34px;height:36px}
+.ref-header>div>.ref-header-back {display:grid;place-items:center;flex:none;width:34px;min-height:44px;padding:0;border:0;background:transparent;color:inherit}
 .ref-header .v2-student-search-trigger {border:0;background:transparent;box-shadow:none;color:#262b25;padding:0;width:34px;height:36px}
 .ref-page-body {padding:0}
 .ref-section {margin:30px 0}
