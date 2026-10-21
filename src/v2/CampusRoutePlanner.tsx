@@ -12,13 +12,13 @@ export function CampusRoutePlanner({buildings,destination,onRoute,onClose}:{buil
   const choices=buildings.filter(b=>!b.name.startsWith('未命名')&&(!graph||graph.buildings[b.id]))
   return <section className="map-p1-route" aria-label={uiText('路线规划')}><header><strong><Route size={18}/>{uiText('步行路线')}</strong><button aria-label={uiText('关闭路线规划')} onClick={()=>{onRoute(null);onClose()}}><X size={19}/></button></header>
     <form onSubmit={event=>{event.preventDefault();if(!graph)return;const planned=planCampusRoute(graph,from,to);setError(planned.error??'');setResult(planned.route??null);onRoute(planned.route??null)}}>
-      <label>{uiText('起点楼栋')}<select autoFocus aria-label={uiText('路线起点')} required value={from} onChange={e=>{setFrom(e.target.value);reset()}}><option value="">{uiText('选择起点')}</option>{choices.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</select></label>
+      <label>{uiText('起点')}<select autoFocus aria-label={uiText('路线起点')} required value={from} onChange={e=>{setFrom(e.target.value);reset()}}><option value="">{uiText('选择起点')}</option>{choices.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</select></label>
       <button className="map-p1-swap" type="button" aria-label={uiText('交换起终点')} onClick={()=>{setFrom(to);setTo(from);reset()}}><ArrowDownUp size={16}/></button>
-      <label>{uiText('终点楼栋')}<select aria-label={uiText('路线终点')} required value={to} onChange={e=>{setTo(e.target.value);reset()}}><option value="">{uiText('选择终点')}</option>{choices.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</select></label>
+      <label>{uiText('终点')}<select aria-label={uiText('路线终点')} required value={to} onChange={e=>{setTo(e.target.value);reset()}}><option value="">{uiText('选择终点')}</option>{choices.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</select></label>
       <button className="map-p1-plan" disabled={!graph||!from||!to}>{uiText(graph?'规划路线':'正在加载道路…')}</button>
     </form>
     {loadError&&<p role="alert">{uiText(loadError)}<button onClick={()=>setAttempt(n=>n+1)}>{uiText('重试')}</button></p>}{error&&<p role="alert">{uiText(error)}</p>}
-    {result&&<div className="map-p1-route-result" role="status"><strong>{uiText('已记录道路约')} {Math.round(result.metres)} m</strong>{result.steps.some(step=>step.stairs)&&<span className="map-p1-stairs">{uiText('含台阶')}</span>}<p>{uiText('起终点为楼栋附近的道路节点；距离楼栋中心约')} {Math.round(result.startGap)} m / {Math.round(result.endGap)} m。{uiText('最后一段及具体入口请现场确认。')}</p><details><summary>{uiText('查看路段明细')} · {result.steps.length}</summary><ol>{result.steps.map((step,i)=><li key={i}>{uiText(step.name)} · {Math.round(step.metres)} m{step.stairs?' · '+uiText('含台阶'):''}</li>)}</ol></details></div>}
-    <p className="map-p1-route-note">{uiText('基于离线道路记录，开放状态和无障碍条件待核实；不提供实时导航。')}</p><small>{graph?.sourceTimestamp.slice(0,10)} · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a></small>
+    {result&&<div className="map-p1-route-result" role="status"><strong>{uiText('参考路线')} · {uiText('约')} {Math.round(result.metres)} {uiText('米')}</strong>{result.steps.some(step=>step.stairs)&&<span className="map-p1-stairs">{uiText('途经台阶')}</span>}<details><summary>{uiText('沿途路线')}</summary><ol>{result.steps.map((step,i)=><li key={i}>{uiText(step.name)} · {Math.round(step.metres)} {uiText('米')}{step.stairs?' · '+uiText('台阶'):''}</li>)}</ol></details></div>}
+    <p className="map-p1-route-note">{uiText('路线仅供参考，具体入口请留意现场标识。')}</p>
   </section>
 }

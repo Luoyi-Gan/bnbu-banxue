@@ -2180,5 +2180,13 @@
   "两个楼栋对应同一处道路节点，尚无可单独规划的道路段。": "Both buildings share the same nearest road node; no separate road segment can be planned.",
   "道路资料不完整，无法生成路线。": "Road data is incomplete; a route cannot be generated.",
   "校内道路": "Campus road",
-  "台阶": "Steps"
+  "台阶": "Steps",
+  "参考路线": "Suggested route",
+  "约": "About",
+  "米": "m",
+  "途经台阶": "Steps on route",
+  "沿途路线": "Along the route",
+  "路线仅供参考，具体入口请留意现场标识。": "Route is for reference. Follow signs on site for entrances.",
+  "起点": "Start",
+  "终点": "Destination"
 }
