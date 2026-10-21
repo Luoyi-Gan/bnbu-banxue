@@ -34,7 +34,7 @@ describe('个人下一项安排',()=>{
   })
   it('只有本人的有效课表和已设置起始周才能生成课程，结束后移除',()=>{
     const data=fixture(),items=liveStudentSchedule(data,now)
-    expect(items[0]).toMatchObject({title:'数学',startAt:'2026-10-21T14:00:00+08:00',time:'第7周 · 1–16周（单周）'})
+    expect(items[0]).toMatchObject({title:'数学',lessonId:'math',startAt:'2026-10-21T14:00:00+08:00',time:'第7周 · 1–16周（单周）'})
     expect(items.some(i=>i.startAt?.startsWith('2026-10-28'))).toBe(false)
     expect(liveStudentSchedule(data,Date.parse('2026-10-21T15:01:00+08:00')).some(i=>i.startAt?.startsWith('2026-10-21'))).toBe(false)
     data.entities[0].data.semesterStartDate='';data.entities[0].data.academicCalendar='custom'

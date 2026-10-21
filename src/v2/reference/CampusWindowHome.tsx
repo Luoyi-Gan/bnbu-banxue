@@ -1,3 +1,5 @@
+import {StudentTimetable} from '../StudentTimetable'
+import type {CardOrigin} from '../ui'
 import {schedulePreferences} from '../../../shared/v2/schedulePreferences'
 import {StudentUtilities} from '../StudentUtilities'
 import { uiText, useUiLanguage , uiLocale } from '../uiLanguage'
@@ -78,6 +80,7 @@ export function CampusWindowHome() { useUiLanguage();
   const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Shanghai', hour: '2-digit', hourCycle: 'h23' }).format(new Date()))
   const greeting = uiText(hour < 11 ? '早上好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : '晚上好')
   const agendaPreferences=schedulePreferences(data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===data.account.id)?.data)
+  const [courseDetail,setCourseDetail]=useState<{id:string;origin:CardOrigin}|null>(null)
   const [now,setNow]=useState(Date.now)
   useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),30000);return()=>window.clearInterval(timer)},[])
   const schedule = liveStudentSchedule(data,now)
@@ -94,11 +97,12 @@ export function CampusWindowHome() { useUiLanguage();
       <StudentUtilities/>
     </nav></header>
 
+    {courseDetail&&<StudentTimetable initialWorkspace={data??undefined} detailOnly initialLessonId={courseDetail.id} origin={courseDetail.origin} onCloseDetails={()=>setCourseDetail(null)}/>}
     <div className="cw-intro">
       <CampusWindow greeting={uiText(greeting)} name={name}/>
       <div className="cw-focus">
         <div className="cw-agenda-controls"><label>{uiText('展示')}<select aria-label={uiText('首页安排展示条数')} value={agendaPreferences.homeScheduleCount} disabled={live.busy} onChange={event=>void live.mutate('preferences.schedule',{homeScheduleCount:Number(event.target.value)})}>{[1,2,3,4,5,6].map(count=><option key={count} value={count}>{count} {uiText('项')}</option>)}</select></label></div>
-        {next?<Link to={next.path} className="cw-next">
+        {next?<Link to={next.path} className="cw-next" onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&next.kind==='course'&&next.lessonId){event.preventDefault();setCourseDetail({id:next.lessonId,origin:event.currentTarget.getBoundingClientRect().toJSON()})}}}>
           <div className="cw-next-top"><span><i/>{uiText("下一项安排")}</span><ArrowRight size={22}/></div>
           <h2>{next.title}</h2>
           <div className="cw-next-meta"><ScheduleTime item={next}/><div><span><MapPin size={14}/>{next.location || uiText('地点待商定')}</span><small>{uiText(next.label)}</small>{next.time && <small>{next.time}</small>}</div></div>
@@ -107,7 +111,7 @@ export function CampusWindowHome() { useUiLanguage();
           <h2>{live.error?uiText('安排暂时无法读取'):data?uiText('留一点时间，去看看校园。'):uiText('正在读取你的安排…')}</h2>
           {live.error ? <button type="button" onClick={() => void live.refresh()}>{uiText("重新读取")}<ArrowRight size={16}/></button> : data ? <Link to="/v2/activities">{uiText("发现校园活动")}<ArrowRight size={16}/></Link> : <p role="status">{uiText("正在读取个人日程")}</p>}
         </section>}
-        {following.map(item=><Link key={item.id} to={item.path} className="cw-following"><ScheduleTime item={item}/><div><strong>{item.title}</strong><span>{item.location || uiText('地点待商定')} · {uiText(item.label)}</span>{item.time && <span>{item.time}</span>}</div><ChevronRight size={17}/></Link>)}
+        {following.map(item=><Link key={item.id} to={item.path} className="cw-following" onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&item.kind==='course'&&item.lessonId){event.preventDefault();setCourseDetail({id:item.lessonId,origin:event.currentTarget.getBoundingClientRect().toJSON()})}}}><ScheduleTime item={item}/><div><strong>{item.title}</strong><span>{item.location || uiText('地点待商定')} · {uiText(item.label)}</span>{item.time && <span>{item.time}</span>}</div><ChevronRight size={17}/></Link>)}
         {agendaPreferences.academicCalendar==='custom'&&!agendaPreferences.semesterStartDate&&data?.entities.some(e=>e.kind==='timetable'&&e.ownerId===data.account.id)&&<Link className="cw-agenda-pending" to="/v2/me?tab=timetable">{uiText('设置学期第一周日期，加入课程安排')}<ChevronRight size={14}/></Link>}
 
       </div>

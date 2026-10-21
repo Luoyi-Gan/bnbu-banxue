@@ -1,3 +1,4 @@
+import {useStudentScrollGlass} from './useStudentScrollGlass'
 import {StudentUtilities} from './StudentUtilities'
 import {StudentUtilityPanel} from './StudentUtilityPanel'
 import {ShopPage} from './ShopPage'
@@ -69,6 +70,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const live = useWorkspaceBackend()
   const location = useLocation()
   useSportsHomeScroll()
+  useStudentScrollGlass()
   const [mobileMenu, setMobileMenu] = useState(false)
   const [roleMenu, setRoleMenu] = useState(false)
   const [customizingSidebar, setCustomizingSidebar] = useState(false)

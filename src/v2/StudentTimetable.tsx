@@ -1,8 +1,9 @@
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { CalendarDays, Check, Clock3, ImagePlus, LoaderCircle, MapPin, Upload } from 'lucide-react'
+import type {Workspace} from '../live/api'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
-import { Drawer, Modal } from './ui'
+import { Drawer, Modal, type CardOrigin } from './ui'
 import { weekDays, type StudentTimetable as Timetable, type TimetableLesson } from '../../shared/v2/timetableModel'
 import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, type RecognitionStage } from './timetableAdapter'
 import {CampusLocationLink} from './CampusLocationLink'
@@ -10,8 +11,9 @@ import {TimetableBoard} from './TimetableBoard'
 import './timetable.css'
 
 const stages: Record<RecognitionStage, string> = { preparing: '准备图片', recognizing: '识别课程信息', organizing: '整理一周课表' }
-export function StudentTimetable({ idPrefix = 'timetable', embedded=false }: { idPrefix?: string;embedded?:boolean } = {}) { useUiLanguage();
-  const live = useWorkspaceBackend()
+export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initialLessonId=null, detailOnly=false, onCloseDetails, origin, initialWorkspace }: { idPrefix?: string;embedded?:boolean;initialLessonId?:string|null;detailOnly?:boolean;onCloseDetails?:()=>void;origin?:CardOrigin;initialWorkspace?:Workspace } = {}) { useUiLanguage();
+  const backend = useWorkspaceBackend()
+  const live = {...backend,data:backend.data??initialWorkspace??null}
   const record = live.data?.entities.find(e => e.kind === 'timetable' && e.ownerId === live.data?.account.id)
   const table = record ? {...record.data, updatedAt: record.updatedAt} as unknown as Timetable : undefined
   const recognitionPath = live.data?.capabilities?.timetableRecognition === 'configured' ? '/api/timetable/recognize' : ''
@@ -23,7 +25,8 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false }: { i
   const [message, setMessage] = useState('')
   const [sample, setSample] = useState<TimetableLesson[] | null>(null)
   const [sampleLoading, setSampleLoading] = useState(false)
-  const [selected, setSelected] = useState<string | null>(null)
+  const [selected, setSelected] = useState<string | null>(initialLessonId)
+  const [cardOrigin,setCardOrigin]=useState<CardOrigin|undefined>(origin)
   const controller = useRef<AbortController | null>(null)
   const photoVersion = useRef(0)
   const [readingPhoto, setReadingPhoto] = useState(false)
@@ -81,16 +84,17 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false }: { i
     const input = { name: String(data.get('name')), weekday: Number(data.get('weekday')), startTime: String(data.get('startTime')), endTime: String(data.get('endTime')), period: String(data.get('period')), location: String(data.get('location')), teacher: String(data.get('teacher')), weeks: String(data.get('weeks')), note: String(data.get('note')), needsReview: false }
     try {
       if (!await live.mutate('timetable.correct', {...input, lessonId: current.id})) return
-      setSelected(null); setMessage('课程信息已更新。'); setError('')
+      setSelected(null); onCloseDetails?.(); setMessage('课程信息已更新。'); setError('')
     } catch (failure) { setError(failure instanceof Error ? failure.message : '保存失败') }
   }
   return <section className="v2-timetable" aria-label={uiText("我的课表")}>
-    <div className="v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div>{!embedded&&<h2>{uiText("我的课表")}</h2>}<p>{table?uiTemplate(["已收录 "," 项课程安排"],table.lessons.length):uiText('上传一张课表照片，查看一周的课程安排。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table?uiText('重新导入'):uiText('导入课表')}</button></div>
+    {!detailOnly&&<><div className="v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div>{!embedded&&<h2>{uiText("我的课表")}</h2>}<p>{table?uiTemplate(["已收录 "," 项课程安排"],table.lessons.length):uiText('上传一张课表照片，查看一周的课程安排。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table?uiText('重新导入'):uiText('导入课表')}</button></div>
     {message && <p className="v2-timetable-message" role="status">{message}</p>}
     {live.error && <p role="alert" className="v2-info-box">{uiText(live.error)}</p>}
     {sample && <div className="v2-info-box">{uiText("示例模式 · 以下课程为虚构内容。")}<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>{uiText("退出示例")}</button></div>}
-    <TimetableBoard lessons={lessons} preferences={live.data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===live.data?.account.id)?.data} idPrefix={idPrefix} onSelect={id=>{setSelected(id);setError('')}}/>
+    <TimetableBoard lessons={lessons} preferences={live.data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===live.data?.account.id)?.data} idPrefix={idPrefix} onSelect={(id,rect)=>{setCardOrigin(rect);setSelected(id);setError('')}}/>
     <div className="v2-timetable-footnote"><span>{table && !sample?uiTemplate(["","更新于 ",""],table.fileName?`${table.fileName} · `:'',new Date(table.updatedAt).toLocaleString(uiLocale(), { timeZone: 'Asia/Shanghai' })):uiText('识别后自动按星期归类；未识别清楚的内容保留待核对。')}</span><small>{uiText("课程以学校最新安排为准。")}</small></div>
+    </>}
     {importOpen && <Modal title={uiText("导入我的课表")} onClose={closeImport}>
       {stage?<div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading?uiText('正在演示识别过程'):uiText('正在识别课表')}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{uiText(label)}</li>)}</ol><p>{uiText("识别完成后自动显示课表，原有课表在识别成功前保留。")}</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy?uiText('正在保存'):uiText('取消识别')}</button></div>:<div className="v2-timetable-import">
         <p>{uiText("请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。")}</p>
@@ -104,8 +108,8 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false }: { i
         <button className="v2-button v2-button-secondary" onClick={() => void start(true)}>{uiText("体验示例识别流程")}</button>
       </div>}
     </Modal>}
-    {current && <Drawer title={current.name} eyebrow={uiTemplate([""," · ",""],weekDays[current.weekday - 1],uiText(sample ? '示例课程' : '课程详情'))} onClose={() => { setSelected(null); setError('') }}>
-      {current.location&&<CampusLocationLink place={current.location} onClick={()=>setSelected(null)}/>}
+    {current && <Drawer origin={cardOrigin} title={current.name} eyebrow={uiTemplate([""," · ",""],weekDays[current.weekday - 1],uiText(sample ? '示例课程' : '课程详情'))} onClose={() => { setSelected(null); setError(''); onCloseDetails?.() }}>
+      {current.location&&<CampusLocationLink place={current.location} onClick={()=>{setSelected(null);onCloseDetails?.()}}/>}
       {sample?<div className="v2-fact-list"><span><Clock3 size={17}/>{current.startTime} — {current.endTime}</span><span><MapPin size={17}/>{current.location || uiText('未提供')}</span><span>{current.weeks || uiText('周次未提供')}</span><p>{uiText("示例内容不会保存到个人课表。")}</p></div>:<form className="v2-form" onSubmit={edit} key={current.id}>
         <p>{uiText("可以修正识别结果；没有明确时间或周次时，请保留为空，不推断学校安排。")}</p>
         <label>{uiText("课程名称")}<input name="name" required maxLength={100} defaultValue={current.name}/></label>

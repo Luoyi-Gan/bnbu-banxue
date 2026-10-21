@@ -30,7 +30,7 @@ export function timetableSchedule(lessons:unknown,now:number,semesterStart:strin
       const startAt=`${day}T${lesson.startTime}:00+08:00`
       const endAt=typeof lesson.endTime==='string'&&timePattern.test(lesson.endTime)&&lesson.endTime>lesson.startTime?`${day}T${lesson.endTime}:00+08:00`:undefined
       if(Date.parse(endAt??startAt)<=now)continue
-      items.push({id:`course:${id}:${day}`,kind:'course',title:lesson.name,location,path,label:teaching.makeup?'我的课程 · 补课':label,time:`第${week}周 · ${String(lesson.weeks)}`,startAt,endAt})
+      items.push({id:`course:${id}:${day}`,kind:'course',lessonId:id,title:lesson.name,location,path,label:teaching.makeup?'我的课程 · 补课':label,time:`第${week}周 · ${String(lesson.weeks)}`,startAt,endAt})
     }
   }
   return items
