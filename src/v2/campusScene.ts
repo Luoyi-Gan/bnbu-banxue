@@ -13,12 +13,24 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
   frame.setAttribute('allow', "fullscreen; geolocation 'self'")
   let disposed = false
   let ready = false
+  let dialogObserver: MutationObserver | null = null
   let buildings: CampusBuilding[] = []
   const command = (action: string, id?: string) => frame.contentWindow?.postMessage({ type: 'huitongli-map-command', action, id }, window.location.origin)
   const appearance=()=>frame.contentWindow?.postMessage({type:'huitongli-map-appearance',...deviceAppearance()},window.location.origin)
   const loaded = () => {
     appearance()
+    if (frame.contentDocument && (options.immersive || document.querySelector('.v2-app-student'))) {
+      frame.contentDocument.documentElement.dataset.companionGlass='student'
+      const glass=frame.contentDocument.createElement('link')
+      glass.rel='stylesheet';glass.href='/campus-map/viewer/student-glass.css'
+      frame.contentDocument.head.appendChild(glass)
+    }
     if (options.immersive && frame.contentDocument) {
+      dialogObserver?.disconnect()
+      const syncDialog = () => host.toggleAttribute('data-map-dialog-open', !!frame.contentDocument?.querySelector('dialog[open]'))
+      dialogObserver = new MutationObserver(syncDialog)
+      dialogObserver.observe(frame.contentDocument.body, { subtree: true, attributes: true, attributeFilter: ['open'] })
+      syncDialog()
       const style = frame.contentDocument.createElement('style')
       style.textContent = '.panel.detail,#locate-user{display:none!important}'
       frame.contentDocument.head.appendChild(style)
@@ -58,6 +70,6 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
     tool: (id: 'open-map-settings' | 'open-campus-tools' | 'open-render-studio' | 'top' | 'quick-reset') => {if(ready)frame.contentDocument?.getElementById(id)?.click()},
     dragMode: (mode: 'pan'|'rotate') => {if(ready)frame.contentDocument?.querySelector<HTMLButtonElement>(`[data-drag-mode="${mode}"]`)?.click()},
     overview: () => command('overview'),
-    dispose: () => { disposed = true; clearTimeout(timeout); unsubscribe(); frame.removeEventListener('load',loaded);window.removeEventListener('message', message); frame.remove() },
+    dispose: () => { disposed = true; clearTimeout(timeout); unsubscribe(); if(dialogObserver){dialogObserver.disconnect();host.removeAttribute('data-map-dialog-open')} frame.removeEventListener('load',loaded);window.removeEventListener('message', message); frame.remove() },
   }
 }

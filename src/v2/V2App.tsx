@@ -44,6 +44,7 @@ import './aRedesign.css'
 import './aControls.css'
 import './studentTheme.css'
 import './editorial.css'
+import './studentGlass.css'
 
 const studentNav = [
   { path: '/v2', label: '首页', icon: House, end: true },
