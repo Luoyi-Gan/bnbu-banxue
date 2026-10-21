@@ -1,4 +1,6 @@
 import {sharedMotion} from './sharedElementMotion'
+import {useSheetGesture} from './useSheetGesture'
+import './sheetGesture.css'
 import {useDevicePreferences} from './devicePreferences'
 import { uiText, useUiLanguage } from './uiLanguage'
 import { ArrowLeft, X, type LucideIcon } from 'lucide-react'
@@ -46,8 +48,11 @@ export function Drawer({ title, eyebrow, children, onClose, wide = false, origin
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape') dismiss() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [dismiss])
   return createPortal(<div className="v2-drawer-layer"><button type="button" className="v2-drawer-scrim" aria-label={uiText("关闭详情")} onClick={dismiss}/><aside ref={panel} className={`v2-drawer${wide ? ' is-wide' : ''}${origin?' is-course-expansion':''}`} role="dialog" aria-modal="true" aria-label={uiText(title)}><header><div>{eyebrow && <span className="v2-eyebrow">{uiText(eyebrow)}</span>}<h2>{uiText(title)}</h2></div><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={dismiss}><X size={20}/></button></header><div className="v2-drawer-body">{children}</div></aside></div>, document.body)
 }
-export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) { useUiLanguage();
+export function Modal({ title, children, onClose, gesture=false }: { title: string; children: ReactNode; onClose: () => void;gesture?:boolean }) { useUiLanguage();
+  const panel=useRef<HTMLDivElement>(null)
+  const {reducedMotion}=useDevicePreferences()
+  useSheetGesture(panel,gesture,reducedMotion,onClose)
   useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape' && !document.querySelector('.v2-map-picker-layer')) onClose() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [onClose])
-  return createPortal(<div className="v2-modal-layer"><button className="v2-modal-scrim" type="button" aria-label={uiText("关闭窗口")} onClick={onClose}/><div className="v2-modal" role="dialog" aria-modal="true" aria-label={uiText(title)}><header><h2>{uiText(title)}</h2><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={onClose}><X size={19}/></button></header>{children}</div></div>, document.body)
+  return createPortal(<div className="v2-modal-layer"><button className="v2-modal-scrim" type="button" aria-label={uiText("关闭窗口")} onClick={onClose}/><div ref={panel} data-sheet-gesture={gesture?true:undefined} className="v2-modal" role="dialog" aria-modal="true" aria-label={uiText(title)}><header><h2>{uiText(title)}</h2><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={onClose}><X size={19}/></button></header>{children}</div></div>, document.body)
 }
 export function BackLink({ to, children }: { to: string; children: ReactNode }) { useUiLanguage();  return <Link className="v2-back-link" to={to}><ArrowLeft size={17}/>{children}</Link> }

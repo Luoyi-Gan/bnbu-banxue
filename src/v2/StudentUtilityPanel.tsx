@@ -23,5 +23,5 @@ export function StudentUtilityPanel({title,onClose,children}:{title:string;onClo
     document.addEventListener('keydown',trap)
     return()=>{cancelAnimationFrame(frame);document.removeEventListener('keydown',trap);app?.removeAttribute('inert');document.body.style.overflow=overflow;const restore=trigger?.matches('a,button')?trigger:app?.querySelector<HTMLElement>(`.student-utilities a[aria-label="${restoreLabel}"]`);restore?.focus()}
   },[])
-  return <Modal title={title} onClose={()=>{if(document.querySelectorAll('.v2-modal').length===1)onClose()}}><div className="student-utility-content">{children}</div></Modal>
+  return <Modal title={title} gesture onClose={()=>{if(document.querySelectorAll('.v2-modal').length===1)onClose()}}><div className="student-utility-content">{children}</div></Modal>
 }

@@ -1,0 +1,53 @@
+{
+  "baseline": {
+    "height": 704,
+    "scroll": 0,
+    "top": 67.14286041259766
+  },
+  "shortPull": {
+    "exists": true,
+    "offset": "0.30267448276582115px",
+    "state": "settling",
+    "top": 67.4455337524414
+  },
+  "bodyScroll": {
+    "scroll": 503.5714416503906,
+    "top": 67.14286041259766
+  },
+  "shortPullAfterRepeats": {
+    "exists": true,
+    "scroll": 503.5714416503906
+  },
+  "longPull1": {
+    "appUnlocked": true,
+    "bodyUnlocked": true,
+    "closed": true
+  },
+  "longPull2": {
+    "closed": true
+  },
+  "longPull3": {
+    "closed": true,
+    "focusRestored": true
+  },
+  "reducedMotion": {
+    "mode": "reduce",
+    "offset": "",
+    "top": 67.14286041259766
+  },
+  "filtersDismissed": true,
+  "createSheet": {
+    "exists": true,
+    "gesture": "发起组队"
+  },
+  "escapeCleanup": {
+    "appUnlocked": true,
+    "bodyUnlocked": true,
+    "closed": true
+  },
+  "final": {
+    "bodyLocked": true,
+    "reduceMotionRestored": true,
+    "sheetLabel": "设置"
+  }
+}
