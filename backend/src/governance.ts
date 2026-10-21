@@ -1,4 +1,5 @@
 import {profileCoverChoices} from '../../shared/v2/profileCover';
+import {validSemesterStart} from '../../shared/v2/schedulePreferences';
 import { effect, runSync, type BusinessRepository } from "./storage/effects";
 import { demand, timestamp, type Account } from "./auth";
 import { has, operator, owner, reviewer, student } from "./community";
@@ -210,6 +211,23 @@ export function* governancePolicy(
     demand(aiIconChoice !== "custom" || !!aiCustomIcon, "请先上传自己的图片。");
     const data = {aiIconChoice, aiCustomIcon};
     return previous ? (yield* effect(repo.save(previous, data))) : (yield* effect(repo.create("preferences", actor.id, data)));
+  }
+  if (action === 'preferences.schedule') {
+    student(actor);
+    const patch:Record<string,unknown>={};
+    if(input.academicCalendar!==undefined){patch.academicCalendar=enumField(input,'academicCalendar',['bnbu-2026-s1','custom']);}
+    if(input.homeScheduleCount!==undefined){
+      demand(typeof input.homeScheduleCount==='number'&&Number.isInteger(input.homeScheduleCount)&&input.homeScheduleCount>=1&&input.homeScheduleCount<=6,'首页安排须展示1–6项。');
+      patch.homeScheduleCount=input.homeScheduleCount;
+    }
+    if(input.semesterStartDate!==undefined){
+      demand(input.semesterStartDate===''||validSemesterStart(input.semesterStartDate),'学期第一周日期须为有效的周一。');
+      patch.semesterStartDate=input.semesterStartDate;
+      if(input.academicCalendar===undefined)patch.academicCalendar='custom';
+    }
+    demand(Object.keys(patch).length>0,'请选择要保存的日程设置。');
+    const previous=(yield* effect(repo.all('preferences'))).find(p=>p.ownerId===actor.id);
+    return previous?(yield* effect(repo.save(previous,patch))):(yield* effect(repo.create('preferences',actor.id,patch)));
   }
   if (action === "preferences.profilebackground") {
     student(actor);
