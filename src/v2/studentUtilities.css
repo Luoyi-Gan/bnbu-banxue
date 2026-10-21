@@ -31,3 +31,21 @@ html[data-ui-theme] .v2-app-student .v2-student-search-trigger{width:40px;height
 html[data-ui-theme=dark] .v2-app-student :is(.student-utilities>a,.v2-student-search-trigger){background:linear-gradient(145deg,#42625266,#24403433);box-shadow:inset 0 1px 0 #ffffff15,0 2px 8px #0000000d}
 
 html[data-ui-theme] .v2-app-student :is(.student-utilities>a,.v2-student-search-trigger){border-top-color:var(--student-glass-edge-highlight);border-bottom-color:var(--student-glass-edge-shade)}
+/* Utility sheets scroll inside a stable painted surface, without nested backdrop sampling. */
+html[data-ui-theme] body:has(.v2-app.v2-app-student) .v2-modal-layer:has(.student-utility-content)>.v2-modal-scrim {
+  background:rgb(20 40 31 / 28%)!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+html[data-ui-theme] body:has(.v2-app.v2-app-student) .v2-modal-layer>.v2-modal:has(.student-utility-content) {
+  background:linear-gradient(145deg,#fafbf7,#e7efe9)!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  isolation:isolate;
+}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student) .v2-modal-layer>.v2-modal:has(.student-utility-content) {
+  background:linear-gradient(145deg,#23372d,#14251d)!important;
+}
+.student-utility-content {
+  scrollbar-gutter:stable;
+  overflow-anchor:none;
+  contain:layout paint;
+}

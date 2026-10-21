@@ -1,0 +1,122 @@
+[
+  {
+    "theme": "light",
+    "scroll": 0,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "scroll": 250,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "scroll": 500,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "scroll": 825,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "scroll": 500,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "light",
+    "scroll": 0,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "scroll": 0,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "scroll": 250,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "scroll": 500,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "scroll": 825,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "scroll": 500,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  },
+  {
+    "theme": "dark",
+    "scroll": 0,
+    "top": 68.15625,
+    "bottom": 783.828125,
+    "modalBlur": "none",
+    "scrimBlur": "none",
+    "bodyLocked": true,
+    "overflow": false
+  }
+]
