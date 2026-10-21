@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from 'react'
 import {Link,useSearchParams} from 'react-router-dom'
-import {ArrowLeft,Bookmark,ChevronRight,Coffee,Gift,ImagePlus,MapPin,MessageCircle,Plus,Search,Store,UtensilsCrossed,X} from 'lucide-react'
+import {ArrowLeft,Bookmark,ChevronRight,Coffee,Gift,ImagePlus,Map,MapPin,MessageCircle,Plus,Search,Store,UtensilsCrossed,X} from 'lucide-react'
 import {api,command} from '../live/api'
 import {prepareCommunityImage} from './communityImages'
 import {CommunityModal as Modal} from './CommunityModal'
@@ -51,19 +51,19 @@ export function ShopPage({admin=false}:{admin?:boolean}){
   }
   const shop=id?data?.shops.find(item=>item.id===id):undefined
   const selectPage=(value:number)=>setParams(current=>{const next=new URLSearchParams(current);if(value>1)next.set('page',String(value));else next.delete('page');return next})
-  return <div className="ref-page cw-pages shop-page"><header className="shop-heading"><div><Link to={id?base:admin?'/v2/admin':'/v2/campus'} aria-label={uiText(id?'返回店铺列表':admin?'返回运营总览':'返回校园')}><ArrowLeft size={22}/></Link><h1>{uiText(id?(shop?.data.name??'店铺详情'):admin?'店铺与点评管理':'校园探店')}</h1></div>{admin&&data?.canManage&&<button className="shop-primary" onClick={()=>setShopEditor('new')}><Plus size={17}/>{uiText("新增店铺")}</button>}</header>
+  return <div className={`ref-page cw-pages shop-page${!admin&&!id?' shop-reference-layout':''}`}><header className="shop-heading"><div><Link to={id?base:admin?'/v2/admin':'/v2/campus'} aria-label={uiText(id?'返回店铺列表':admin?'返回运营总览':'返回校园')}><ArrowLeft size={22}/></Link><h1>{uiText(id?(shop?.data.name??'店铺详情'):admin?'店铺与点评管理':'校园探店')}</h1></div>{!admin&&!id&&<Link className="shop-map-link" to="/v2/campus/explore" aria-label={uiText("打开校园地图")}><Map size={20}/></Link>}{admin&&data?.canManage&&<button className="shop-primary" onClick={()=>setShopEditor('new')}><Plus size={17}/>{uiText("新增店铺")}</button>}</header>
     {error&&<p className="shop-feedback" role="alert">{uiText(error)}<button onClick={()=>void refresh()}>{uiText("重新读取")}</button></p>}
-    {loading&&<p role="status" className="shop-status">{uiText("正在读取店铺与点评…")}</p>}
+    {loading&&!data&&<p role="status" className="shop-status">{uiText("正在读取店铺与点评…")}</p>}
     {!id&&<>
-      <div className="shop-discovery-intro"><span>CAMPUS FINDS</span><p>{uiText('下一家喜欢的小店，就在校园附近。')}</p></div>
-      <div className="shop-search"><Search size={18}/><input aria-label={uiText('搜索店铺或地址')} placeholder={uiText('找一家小店，或一杯咖啡')} value={query} onChange={event=>{setQuery(event.target.value);selectPage(1)}}/>{query&&<button type="button" aria-label={uiText('清除搜索词')} onClick={()=>{setQuery('');selectPage(1)}}><X size={16}/></button>}</div>
+      <div className="shop-discovery-intro"><p>{uiText('发现藏在校园周围的好味道。')}</p></div>
+      <div className="shop-search"><Search size={18}/><input aria-label={uiText('搜索店铺或地址')} placeholder={uiText('搜索店铺、美食或地点')} value={query} onChange={event=>{setQuery(event.target.value);selectPage(1)}}/>{query&&<button type="button" aria-label={uiText('清除搜索词')} onClick={()=>{setQuery('');selectPage(1)}}><X size={16}/></button>}</div>
       <div className="shop-filter-scroll"><nav className="shop-filters" aria-label={uiText('店铺筛选')}>
-        <div role="group" aria-label={uiText('店铺范围')}>{[['','全部'],['campus','校内'],['outside','校外']].map(([value,label])=><button type="button" aria-pressed={scope===value} key={value} onClick={()=>{setScope(value);selectPage(1)}}>{uiText(label)}</button>)}</div>
-        <div role="group" aria-label={uiText('店铺类别')}><button type="button" aria-pressed={!category} onClick={()=>{setCategory('');selectPage(1)}}>{uiText('全部类别')}</button>{data?.categories.map(item=><button type="button" aria-pressed={category===item} key={item} onClick={()=>{setCategory(item);selectPage(1)}}>{item}</button>)}</div>
+        <div role="group" aria-label={uiText('店铺范围')}>{[['','全部'],['campus','校内'],['outside','校外']].map(([value,label])=><button type="button" aria-pressed={scope===value&&!category} key={value} onClick={()=>{setScope(value);setCategory('');selectPage(1)}}>{uiText(label)}</button>)}</div>
+        <div role="group" aria-label={uiText('店铺类别')}>{data?.categories.map(item=><button type="button" aria-pressed={category===item} key={item} onClick={()=>{setCategory(item);setScope('');selectPage(1)}}>{item}</button>)}</div>
       </nav></div>
-      <div className="shop-results-heading"><h2>{uiText(query||scope||category?'找到这些小店':'校园小店漫游')}</h2><small role="status">{loading?uiText('查找中…'):data?`${data.shops.length}${data.hasMore?'+':''} ${uiText('家小店')}`:''}</small></div>
+      <div className="shop-results-heading"><h2>{uiText(query||scope||category?'找到这些小店':'值得去看看')}</h2><Link to="/v2/campus/explore" className="shop-nearby-link">{uiText('校园地图')}<ChevronRight size={14}/></Link></div>
       <div className="shop-grid" aria-busy={loading}>{data?.shops.slice().sort((a,b)=>b.data.images.length-a.data.images.length).map(item=><article className="shop-card" key={item.id}>
-        <Link className="shop-card-link" to={`${base}?id=${encodeURIComponent(item.id)}`}><ShopCover shop={item}/><div className="shop-card-copy"><h2>{item.data.name}</h2><p className="shop-card-description">{item.data.description}</p><p className="shop-card-address"><MapPin size={12}/>{item.data.address}</p><small>{item.reviewCount?`${item.reviewCount} ${uiText('条点评')}`:uiText('来写第一条点评')}<ChevronRight size={13}/></small></div></Link>
+        <Link className="shop-card-link" to={`${base}?id=${encodeURIComponent(item.id)}`}><ShopCover shop={item}/><div className="shop-card-copy"><h2>{item.data.name}</h2><p className="shop-card-kind">{item.data.category}</p><p className="shop-card-context">{uiText(item.data.scope==='campus'?'校内':'校外')} · {uiText(item.data.sourceUrl?'学校公开资料':item.data.name.includes('示例')?'示例店铺':'店铺资料')}</p></div></Link>
         {!admin&&data?.canReview&&<button type="button" className="shop-bookmark" disabled={busy} aria-label={uiTemplateShopSave(item.saved,item.data.name)} aria-pressed={Boolean(item.saved)} onClick={()=>void mutate('shop.bookmark',{id:item.id,enabled:!item.saved})}><Bookmark size={18} fill={item.saved?'currentColor':'none'}/></button>}
       </article>)}</div>
       {data&&!data.shops.length&&!loading&&<div className="shop-empty"><Store/><h2>{uiText(query||scope||category?'还没找到这家小店':'小店正在路上')}</h2><p>{uiText(query||scope||category?'换个关键词，或看看其他分类。':admin?'添加有来源的店铺资料，让同学发现下一站。':'等新的小店加入，再来逛逛。')}</p>{(query||scope||category)&&<button className="shop-primary" onClick={()=>{setQuery('');setScope('');setCategory('');selectPage(1)}}>{uiText('查看全部店铺')}</button>}</div>}

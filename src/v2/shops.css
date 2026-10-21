@@ -135,3 +135,28 @@ html[data-ui-theme=dark] .shop-cover[data-category] .shop-cover-identity {color:
 .shop-card-copy .shop-card-address svg {display:inline;vertical-align:-2px;margin:0 4px 0 0}
 @media(max-width:760px){body:has(.v2-app.v2-app-student .shop-page) :is(.student-timetable-launcher,.v2-floating-timetable-trigger:not(.is-toolbar)) {bottom:calc(92px + env(safe-area-inset-bottom,0px));top:auto}}
 html[data-ui-theme=dark] .shop-card-copy>small {color:#9bcbb8}
+
+/* Reference composition: two portrait photos, followed by three quiet text levels. */
+.shop-reference-layout {background:#f4f4f2;border-radius:24px}
+.shop-reference-layout .shop-heading {min-height:68px}
+.shop-map-link {display:grid;place-items:center;width:36px;height:44px;color:var(--v2-muted)}
+.shop-reference-layout .shop-discovery-intro {margin:0 0 16px}
+.shop-reference-layout .shop-discovery-intro>p {margin:0;font-size:14px}
+.shop-reference-layout .shop-search {border:0;box-shadow:none;border-radius:20px;margin-bottom:12px}
+.shop-reference-layout .shop-filter-scroll {margin-bottom:20px}
+.shop-reference-layout .shop-filters {gap:4px;min-width:0}
+.shop-reference-layout .shop-filters>div+div {border:0;padding:0}
+.shop-reference-layout .shop-filters button {padding-inline:14px;font-weight:400}
+.shop-reference-layout .shop-results-heading {margin-bottom:16px}
+.shop-nearby-link {display:flex;align-items:center;gap:4px;color:var(--v2-muted);font-size:12px;white-space:nowrap}
+.shop-reference-layout .shop-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 16px}
+.shop-reference-layout .shop-card {background:transparent;border:0;box-shadow:none;border-radius:0;overflow:visible}
+.shop-reference-layout .shop-card:hover {box-shadow:none;transform:none}
+.shop-reference-layout .shop-cover {aspect-ratio:4/5;border-radius:16px}
+.shop-reference-layout .shop-cover.has-photo:after,.shop-reference-layout .shop-cover>span {display:none}
+.shop-reference-layout .shop-card-copy {padding:12px 0 0}
+.shop-reference-layout .shop-card-copy h2 {font-size:16px!important;line-height:1.5;font-weight:500;margin:0 0 4px!important}
+.shop-reference-layout .shop-card-kind {font-size:13px;line-height:1.6;color:var(--v2-muted);margin:0 0 2px;display:block}
+.shop-reference-layout .shop-card-context {font-size:11px;line-height:1.6;color:var(--v2-muted);margin:0;display:block}
+@media(max-width:760px){.shop-reference-layout .shop-grid {gap:24px 12px}.shop-reference-layout .shop-cover {border-radius:14px}.shop-reference-layout .shop-card-copy h2 {font-size:15px!important}.shop-reference-layout .shop-heading {min-height:64px}}
+html[data-ui-theme=dark] .shop-reference-layout {background:#18221e}
