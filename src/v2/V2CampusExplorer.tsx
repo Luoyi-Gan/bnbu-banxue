@@ -1,3 +1,5 @@
+import {AnimatePresence,motion} from 'motion/react'
+import {useDevicePreferences} from './devicePreferences'
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
 import { ArrowLeft, ArrowRight, CalendarDays, ChevronDown, ChevronUp, Layers, List, LocateFixed, MapPin, RotateCcw, Route, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -46,6 +48,7 @@ function BuildingActivities({ items, buildingId }: { items: ActivityItem[]; buil
 
 function InteractiveCampus({ mode, initialTarget=null, place='', onPick, onClose }: { mode: 'explore' | 'pick'; initialTarget?:string|null;place?:string;onPick?: (building: CampusBuilding) => void; onClose?: () => void }) { useUiLanguage();
   const live = useWorkspaceBackend()
+  const {reducedMotion}=useDevicePreferences()
   const canvas = useRef<HTMLDivElement>(null)
   const scene = useRef<Scene | null>(null)
   const closeButton = useRef<HTMLButtonElement>(null)
@@ -125,7 +128,7 @@ function InteractiveCampus({ mode, initialTarget=null, place='', onPick, onClose
         {!dockOpen&&!['idle','located'].includes(position.state)&&<p className="map-p0-position-note" role="status">{uiText(locationMessages[position.state])}</p>}
       </section>
     </>}
-    {!routeOpen&&(mode === 'pick' || selected || status === 'error') && <aside className={`v2-explorer-panel${selected ? ' has-selection' : ''}`}>
+    <AnimatePresence initial={false}>{!routeOpen&&(mode === 'pick' || selected || status === 'error') && <motion.aside key="place-details" initial={{opacity:0,y:reducedMotion?0:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:reducedMotion?0:8,pointerEvents:'none'}} transition={{duration:reducedMotion?0:.22,ease:[.2,.8,.2,1]}} onAnimationComplete={()=>scene.current?.layout()} className={`v2-explorer-panel${selected ? ' has-selection' : ''}`}>
       {mode === 'explore' && selected && <button type="button" className="v2-explorer-close" aria-label={uiText('关闭地点详情')} onClick={() => {setSelected(null);scene.current?.dismissDetails()}}><X size={20}/></button>}
       <div className="v2-explorer-panel-head"><div><span className="v2-eyebrow">{mode === 'pick'?'SELECT A BUILDING':'EXPLORE BNBU'}</span><h2>{mode === 'pick'?uiText('选择校内地点'):uiText('校园探索')}</h2><p>{mode === 'pick'?uiText('点击地图上的楼栋，确认后带入地点。'):uiText('点击楼栋，查看这里计划中的活动与组队。')}</p></div>{mode === 'pick' && <button ref={closeButton} type="button" className="v2-explorer-close" aria-label={uiText("关闭地图")} onClick={onClose}><X size={20}/></button>}</div>
       <label className="v2-explorer-select">{uiText("楼栋列表")}<select value={selected?.id ?? ''} onChange={(event) => { if (status === 'ready') scene.current?.focus(event.target.value); else setSelected(buildings.find((item) => item.id === event.target.value) ?? null) }} disabled={status === 'loading'}><option value="">{uiText("选择楼栋")}</option>{buildings.filter((item) => !item.name.startsWith('未命名')).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
@@ -133,7 +136,7 @@ function InteractiveCampus({ mode, initialTarget=null, place='', onPick, onClose
       {mode === 'pick' && <div className="v2-explorer-actions"><button type="button" className="v2-button v2-button-secondary" onClick={onClose}>{uiText("取消")}</button><button type="button" className="v2-button v2-button-primary" disabled={!selected} onClick={() => selected && onPick?.(selected)}>{uiText("确认这栋楼")}<ArrowRight size={15}/></button></div>}
       <small className="v2-explorer-source">{uiText("BNBU 3D Model · S1.214 · 建筑体量含估算，位置以现场为准")}</small>
       {mode === 'explore' && Boolean(import.meta.hot) && <LocalPreviewNotice/>}
-    </aside>}
+    </motion.aside>}</AnimatePresence>
   </div>
 }
 

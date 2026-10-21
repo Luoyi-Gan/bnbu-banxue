@@ -1,0 +1,41 @@
+/* One palette, with material chosen for the task rather than the entire app. */
+body:has(.v2-app-student,.v2-explore-immersive){--page-paper:#fffefa;--page-tool:#f8faf6;--page-quiet:#eff3ee;--page-edge:#dce5dd;--page-map-surface:rgba(250,253,247,.92)}
+html[data-ui-theme=dark] body:has(.v2-app-student,.v2-explore-immersive){--page-paper:#1b2d24;--page-tool:#192b22;--page-quiet:#24392e;--page-edge:#395145;--page-map-surface:rgba(25,45,34,.94)}
+html[data-ui-theme] .v2-app.v2-app-student>.student-fluid-nav.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,rgba(255,255,253,.92),rgba(237,244,238,.86));backdrop-filter:blur(16px) saturate(125%);-webkit-backdrop-filter:blur(16px) saturate(125%)}
+html[data-ui-theme=dark] .v2-app.v2-app-student>.student-fluid-nav.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,rgba(35,57,44,.94),rgba(22,42,32,.9))}
+
+/* Activity and community detail are reading rooms with a photographic stage. */
+html[data-ui-theme] body:has(.v2-app.v2-app-student) .note-detail-layer>.note-detail[role=dialog]{background:var(--page-paper)!important;border-color:var(--page-edge)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 20px 70px #142f2526!important}
+.note-detail[data-reading-kind=activity] .note-detail-body{padding-top:28px}
+.note-detail[data-reading-kind=activity] .note-detail-title{font-size:25px!important;line-height:1.45}
+.note-detail-layer .note-detail-media{background:var(--page-quiet)}
+.note-detail-layer .note-detail-facts{border-color:var(--page-edge)}
+
+/* The campus is warm and layered; course tones keep their existing semantics. */
+.v2-app-student .ref-campus .shop-campus-entry{background:var(--page-paper);border:1px solid var(--page-edge);box-shadow:0 5px 18px #23413306}
+.v2-app-student .ref-campus .cw-campus-window{box-shadow:0 8px 26px #2341330b}
+
+/* Coffee Chat places time, location and availability ahead of decorative effects. */
+.v2-app-student[data-campus-route='/v2/coffee'] .v2-teacher-card{background:var(--page-paper);border-color:var(--page-edge);box-shadow:none}
+.v2-app-student[data-campus-route='/v2/coffee'] .v2-coffee-slot{background:var(--page-paper);border:1px solid var(--page-edge);box-shadow:none}
+.v2-app-student[data-campus-route='/v2/coffee'] .v2-coffee-slot.is-selected{background:var(--page-quiet);border-color:var(--student-glass-accent)}
+.v2-app-student[data-campus-route='/v2/coffee'] .v2-coffee-slot.is-booked{border-inline-start:3px solid var(--student-glass-accent)}
+.v2-app-student[data-campus-route='/v2/coffee'] .v2-coffee-slot strong{font-variant-numeric:tabular-nums;font-weight:650}
+
+/* The map remains readable beneath local, restrained tool surfaces. */
+html[data-ui-theme] body:has(.v2-app-student,.v2-explore-immersive) .v2-explore-immersive :is(.map-p0-dock,.map-p1-route,.v2-explorer-panel.has-selection){background:var(--page-map-surface)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important;border-color:var(--page-edge)!important;box-shadow:0 8px 28px #173c2521!important}
+
+/* Calendar tools use a stable paper surface; navigation keeps its translucent rail. */
+html[data-ui-theme] body:has(.v2-app-student,.v2-explore-immersive) #v2-floating-timetable.v2-floating-timetable-window{background:var(--page-tool)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:var(--page-edge)!important;box-shadow:0 12px 40px #173c2524!important}
+.v2-app-student .tt-board{background:var(--page-paper)}
+.v2-app-student .own-profile .community-profile-cover img{height:calc(100% + 12px);transform:translateY(calc(-1 * var(--student-profile-offset,0px)))}
+.v2-app-student .own-profile .profile-metric{animation:profile-metric-arrive 180ms ease-out}
+@keyframes profile-metric-arrive{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+html[data-ui-motion=reduce] .own-profile .profile-metric{animation:none}
+html[data-ui-motion=reduce] .own-profile .community-profile-cover img{height:100%;transform:none}
+@media(prefers-reduced-motion:reduce){.own-profile .profile-metric{animation:none}.v2-app-student .own-profile .community-profile-cover img{height:100%;transform:none}}
+
+/* Staff tools retain compact forms and clear state boundaries. */
+.v2-app.v2-app-staff :is(.v2-form input,.v2-form select,.v2-form textarea){border-radius:8px;box-shadow:none;min-height:40px}
+.v2-app.v2-app-staff :is(.v2-table th,.v2-table td){font-variant-numeric:tabular-nums}
+.v2-app.v2-app-staff .v2-form :is(input,select,textarea):focus-visible{outline:2px solid var(--v2-action);outline-offset:2px}

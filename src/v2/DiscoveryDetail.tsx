@@ -36,7 +36,7 @@ export function DiscoveryDetail({title,identity,media,children,actions,onClose,t
   },[])
   return createPortal(<div className="v2-drawer-layer note-detail-layer">
     <button type="button" className="note-detail-scrim" tabIndex={-1} aria-label={uiText('关闭详情')} onClick={dismiss}/>
-    <section className={`note-detail${media?'':' note-detail-text'}`} role="dialog" aria-modal="true" aria-label={title} ref={panel}>
+    <section className={`note-detail${media?'':' note-detail-text'}`} data-reading-kind={transitionKey?.split(':')[0]??'story'} role="dialog" aria-modal="true" aria-label={title} ref={panel}>
       <header className="note-detail-header">{identity}<button type="button" ref={close} className="note-detail-close" aria-label={uiText('关闭')} onClick={dismiss}><X size={22}/></button></header>
       <div className="note-detail-scroll">{media&&<div className="note-detail-media" data-shared-target={transitionKey}>{media}</div>}<article className="note-detail-body"><h2 className="note-detail-title">{title}</h2>{children}</article></div>
       {actions&&<footer className="note-detail-actions">{actions}</footer>}

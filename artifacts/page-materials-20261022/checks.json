@@ -1,0 +1,78 @@
+{
+  "activity": {
+    "background": "rgb(255, 254, 250)",
+    "blur": "none",
+    "kind": "activity"
+  },
+  "activityComplete": "complete",
+  "map": {
+    "background": "rgba(250, 253, 247, 0.92)",
+    "blur": "blur(10px)",
+    "heading": "T2 人文楼",
+    "panel": true,
+    "viewer": true
+  },
+  "mapClosed": {
+    "panels": 0,
+    "viewer": "/campus-map/viewer/index.html?surface=explore"
+  },
+  "profileBefore": {
+    "metrics": [
+      "4",
+      "3",
+      "5",
+      "6",
+      "1"
+    ],
+    "offset": "0px"
+  },
+  "profileScrolled": {
+    "offset": "12px",
+    "transform": "matrix(1, 0, 0, 1, 0, -12)"
+  },
+  "profileTransitions": [
+    {
+      "direction": "edit",
+      "result": "complete"
+    },
+    {
+      "direction": "return",
+      "result": "complete"
+    },
+    {
+      "direction": "edit",
+      "result": "complete"
+    },
+    {
+      "direction": "return",
+      "result": "complete"
+    },
+    {
+      "direction": "edit",
+      "result": "complete"
+    },
+    {
+      "direction": "return",
+      "result": "complete"
+    }
+  ],
+  "timetable": {
+    "background": "rgb(248, 250, 246)",
+    "blur": "none"
+  },
+  "coffee": {
+    "background": "rgb(255, 254, 250)",
+    "blur": "none",
+    "slots": 5
+  },
+  "mapCycles": [
+    {
+      "panels": 0,
+      "viewer": 1
+    },
+    {
+      "panels": 0,
+      "viewer": 1
+    }
+  ]
+}
