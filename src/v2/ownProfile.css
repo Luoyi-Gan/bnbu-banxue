@@ -54,3 +54,7 @@ body:has(.own-profile-editor) .v2-topbar{display:none}.own-editor-avatar-row lab
 @media(max-width:760px){.own-profile .cw-profile-body{padding:0 20px}.own-profile .community-profile-bio{margin:16px 0 12px}body:has(.own-profile,.own-profile-editor) .v2-app.v2-app-student .v2-floating-timetable-trigger{top:auto;left:16px;right:auto;bottom:calc(88px + env(safe-area-inset-bottom));width:44px;height:44px;padding:0;justify-content:center}}
 
 .own-profile .community-profile-top nav{display:flex;gap:8px}
+.own-profile .community-profile-statline>div{flex-wrap:wrap;column-gap:22px;row-gap:4px}
+.own-profile .community-profile-statline button:not(.community-primary):not(.community-outline){flex-direction:row;align-items:baseline;gap:6px;min-height:36px}
+.own-profile .community-profile-statline strong{line-height:1.4}
+.own-profile .community-profile-statline span{text-align:left;line-height:1.4}
