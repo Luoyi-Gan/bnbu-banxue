@@ -68,7 +68,7 @@ export function ReferenceMe() { useUiLanguage();
   return <OwnProfilePage/>
 }
 
-export { StudentSportsPage as ReferenceSports } from '../sports/StudentSportsPage'
+export { MovementEntry as ReferenceSports } from '../sports/MovementEntry'
 
 export function ReferenceWelcome() { useUiLanguage();
   return <main className="ref-welcome" style={{backgroundImage:`linear-gradient(180deg,#e7f1e38c,#e7f1e3b0 34%,#e7f1e35c 55%,#19342545 80%),url(${campus})`}}><div><h1>{uiText("会同里")}</h1><p>{uiText("一个更丰富的校园生活")}</p></div><span>From Campus<br/>to a Bigger You.</span><Link to="/v2">{uiText("开始探索")}<ArrowRight size={19}/></Link><small>{uiText("会同里")}</small></main>

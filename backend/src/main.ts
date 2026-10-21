@@ -1,3 +1,4 @@
+import {movementRequest} from './movement';
 import {shopRead} from './shops';
 import {runSync as runShopRead} from './storage/effects';
 import { searchStudents } from './student-search';
@@ -121,6 +122,11 @@ export function createApiServer(
               .get()?.version ?? 0,
           ),
         });
+      if(request.method==='GET'&&pathname==='/api/movement'){
+        const actor=authenticate(db,cookieToken(request));accountSecurityGate(new Repository(db),actor);
+        const verified=new Repository(db).all('verifiedEmail').some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
+        return send(response,200,await movementRequest(actor,verified,'resolve'));
+      }
       // Same-origin mutations; media has an explicit non-simple binary content type.
       if (request.method === "POST") {
         const origin = request.headers.origin;
@@ -154,6 +160,13 @@ export function createApiServer(
           return send(response, 200, { data: execute(db, token, 'screenshot.import', {image: image.image, recognizedText: image.text, ocrRequestId: image.requestId}, randomUUID()) });
         }
         const input = await body(request);
+        if(pathname==='/api/movement/command'){
+          const actor=authenticate(db,cookieToken(request));accountSecurityGate(new Repository(db),actor);
+          const verified=new Repository(db).all('verifiedEmail').some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
+          demand(['launch','personal.list','personal.start','personal.pause','personal.resume','personal.finish'].includes(String(input.operation)),'无效运动操作。');
+          return send(response,200,await movementRequest(actor,verified,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
+        }
+
         if (pathname === "/api/auth/verification-codes") {
           return send(
             response,
