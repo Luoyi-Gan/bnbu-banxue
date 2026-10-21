@@ -1,28 +1,71 @@
-.v2-app.v2-app-student .partner-discovery{--partner-paper:#eef3ee}
-.v2-app.v2-app-student .partner-discovery>.v2-page-heading{margin-bottom:18px}.partner-discovery .v2-page-heading p{display:none}
-.partner-feed-controls .v2-toolbar{margin:0 0 10px}.partner-feed-controls .v2-toolbar>div{width:100%;max-width:none}
-.partner-discovery .v2-filter-pills{display:flex;gap:8px;overflow:auto;flex-wrap:nowrap;margin:0;padding:0 0 8px}
-.partner-discovery .v2-filter-pills button{flex:none;border:0;background:none;border-radius:22px;padding:9px 16px;min-height:40px;color:var(--v2-muted)}
-.partner-discovery .v2-filter-pills button.is-active{background:#e8f0e9;color:#2c5848}
-.v2-app.v2-app-student .partner-discovery .v2-partner-filter-panel{border:0;background:none;padding:0;box-shadow:none;margin:0 0 12px}
-.partner-discovery .v2-partner-filter-toggle{justify-content:flex-end;font-size:12px;min-height:36px;padding:0}.partner-discovery .v2-partner-filter-toggle>span{margin-left:6px}
-.v2-app.v2-app-student .partner-discovery .partner-feed-panel{padding:0;border:0;background:none;box-shadow:none}
-.partner-feed-panel>.v2-section-heading{margin:0 0 12px}.partner-feed-panel>.v2-section-heading h2{font-size:15px!important}.partner-feed-panel>.v2-section-heading p{font-size:11px}
-.v2-app.v2-app-student .partner-discovery .v2-room-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 14px;align-items:start}
-.v2-app.v2-app-student .partner-discovery .v2-room-card{display:flex;flex-direction:column;min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible;animation:none}
-.partner-discovery .v2-room-card[data-room-type=carpool]{--partner-paper:#f3eee4}.partner-discovery .v2-room-card[data-room-type=entertainment]{--partner-paper:#f5eae7}.partner-discovery .v2-room-card[data-room-type=sport]{--partner-paper:#e8eff1}
-.partner-discovery .v2-room-card-top{padding:10px 12px 0;background:var(--partner-paper);border-radius:12px 12px 0 0;min-height:36px}
-.partner-discovery .v2-room-type{font-size:10px;padding:3px 6px;background:#ffffff85;color:var(--v2-ink)}
-.partner-discovery .v2-room-card-top button{display:grid;place-items:center;min-width:30px;min-height:30px;border:0;background:transparent}
-.v2-app.v2-app-student .partner-discovery .v2-room-open{padding:14px 12px 18px;min-height:145px;background:var(--partner-paper);border-radius:0 0 12px 12px;text-align:left}
-.v2-app.v2-app-student .partner-discovery .v2-room-open h3{font:600 19px/1.5 var(--reference-font,inherit);margin:0 0 10px;color:var(--v2-ink)}
-.partner-discovery .v2-room-open p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.7;margin:0;color:var(--v2-muted)}
-.partner-discovery .v2-room-facts{display:grid;gap:5px;padding:10px 2px 6px;margin:0}.partner-discovery .v2-room-facts span{display:flex;gap:5px;align-items:start;font-size:11px;line-height:1.5}.partner-discovery .v2-room-facts svg{flex:none;margin-top:1px}
-.partner-discovery .v2-room-footer{padding:6px 2px;border:0;font-size:11px;min-height:32px;color:var(--v2-muted)}.partner-discovery .v2-room-footer>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-@media(max-width:760px){.v2-app.v2-app-student .partner-discovery .v2-room-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}.v2-app.v2-app-student .partner-discovery .v2-room-open h3{font-size:17px}.partner-discovery .v2-partner-heading-actions{display:flex;gap:8px}.partner-discovery .v2-partner-heading-actions .v2-button{width:auto;min-height:36px;padding:6px 10px;font-size:12px}}
-html[data-ui-theme=dark] .partner-discovery .v2-room-card{--partner-paper:#293932}
+/* Partner discovery: one clear topic, readable logistics, and actual people. */
+.v2-app.v2-app-student .partner-discovery {padding-bottom:190px;--partner-card:#fffefa;--partner-text:#243f35;--partner-secondary:#65766d;--partner-border:#dfe6df}
+.partner-discovery .v2-page-heading p {display:none}
+.partner-feed-intro {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}
+.partner-feed-intro p {margin:0;font-size:13px;color:var(--v2-muted);line-height:1.5}
+.partner-feed-intro>a {display:flex;align-items:center;gap:4px;min-height:26px;white-space:nowrap;font-size:12px;color:var(--v2-action)}
+.partner-search-row {display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:8px;margin-bottom:12px}
+.partner-search-row .v2-toolbar {margin:0;min-width:0}
+.partner-search-row .v2-toolbar>div {width:100%;max-width:none}
+.v2-app.v2-app-student .partner-discovery .partner-search-row>.v2-partner-filter-toggle {position:relative;display:grid;place-items:center;min-height:46px;width:46px;padding:0;background:var(--v2-surface);border:1px solid var(--v2-line);border-radius:14px;color:var(--v2-action)}
+.partner-search-row .partner-filter-count {position:absolute;right:-4px;top:-5px;border:2px solid var(--v2-canvas)}
+.partner-discovery .v2-filter-pills {display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;margin:0 0 12px;padding:0 0 4px;scrollbar-width:none}
+.v2-app.v2-app-student .partner-discovery .v2-filter-pills button {position:relative;flex:none;border:0;border-radius:14px;min-height:40px;padding:8px 16px;background:transparent;box-shadow:none;color:var(--v2-muted);font-family:inherit;font-size:13px;font-weight:500;line-height:1.4;transition:background-color 180ms,color 180ms}
+.v2-app.v2-app-student .partner-discovery .v2-filter-pills button.is-active {background:transparent;color:var(--v2-accent-ink)}
+.v2-app.v2-app-student .partner-discovery .partner-feed-panel {padding:0;border:0;background:none;box-shadow:none}
+.partner-feed-panel>.v2-section-heading {margin:0 0 16px;display:flex;justify-content:space-between;align-items:center}
+.partner-feed-panel>.v2-section-heading h2 {font-size:17px!important;margin:0}
+.partner-feed-panel>.v2-section-heading p {font-size:11px;color:var(--v2-muted);margin-top:4px}
+.partner-sort-label {font-size:11px;color:var(--v2-muted);white-space:nowrap}
+.v2-app.v2-app-student .partner-discovery .v2-room-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start}
+.partner-feed-card {position:relative;min-width:0;overflow:hidden;border:1px solid var(--partner-border);border-radius:20px;background:var(--partner-card);color:var(--partner-text);box-shadow:0 4px 16px #28453605;transition:transform 180ms,box-shadow 180ms}
+.partner-feed-card:has(.partner-card-open:active) {transform:scale(.98)}
+.partner-card-open {display:block;width:100%;border:0;padding:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.partner-card-visual {position:relative;overflow:hidden;aspect-ratio:2.65;background:#ecf0e8}
+.partner-theme-art {position:absolute;inset:0;color:#7c997d;background:#e9eee2}
+.partner-theme-art.is-carpool {background:#f0eadb;color:#a3976e}
+.partner-theme-art.is-sport {background:#e0ece9;color:#779e93}
+.partner-theme-art.is-entertainment {background:#f1e7e2;color:#b39384}
+.partner-theme-art>svg {width:100%;height:100%;opacity:.75}
+.partner-art-icon {position:absolute;top:22%;left:47%;display:grid;place-items:center;width:52px;height:52px;border-radius:50%;color:inherit;background:#fff9;rotate:-8deg;box-shadow:0 4px 12px #263c3505}
+.partner-card-type {position:absolute;top:12px;left:12px;padding:4px 8px;border-radius:10px;background:#fffefadb;color:#3f6151;font-size:10px;line-height:1.5}
+.partner-card-focus {position:absolute;bottom:10px;left:12px;right:12px;font-size:11px;font-weight:500;color:#355548;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.partner-card-save {position:absolute;top:8px;right:8px;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:#fffefac9;color:#4f6f5d;cursor:pointer;transition:transform 180ms,background-color 180ms}
+.partner-card-save[aria-pressed=true] {background:#dcece1;color:#257965}
+.partner-card-save:active {transform:scale(.9)}
+.partner-card-copy {padding:16px 16px 0}
+.v2-app.v2-app-student .partner-card-copy h3 {font:500 21px/1.35 'BNBU WenKai',serif;color:var(--partner-text);margin:0 0 12px;overflow-wrap:anywhere}
+.partner-card-time,.partner-card-place {display:flex;align-items:center;gap:8px;line-height:1.5;overflow-wrap:anywhere}
+.partner-card-time {font-size:14px;font-weight:600;margin-bottom:6px;color:var(--partner-text)}
+.partner-card-place {font-size:12px;color:var(--partner-secondary)}
+.partner-card-time>svg,.partner-card-place>svg {flex:none}
+.partner-card-copy>p {display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin:10px 0 0;font-size:12px;line-height:1.6;color:var(--partner-secondary)}
+.partner-card-social {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px 0}
+.partner-card-owner {display:flex;align-items:center;gap:8px;min-width:0}
+.partner-card-owner>span:last-child {font-size:11px;color:var(--partner-secondary);white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.partner-owner-avatar,.partner-member-avatar {display:inline-grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:#e8eee7;color:#466251;font-size:11px;overflow:hidden}
+.partner-owner-avatar img,.partner-member-avatar img {width:100%;height:100%;object-fit:cover}
+.partner-member-stack {display:flex;flex:none;padding-left:6px}
+.partner-member-stack>.partner-member-avatar {margin-left:-6px;border:2px solid var(--partner-card);box-sizing:border-box;background:#edf0e8}
+.partner-card-recruitment {padding:12px 16px 0}
+.partner-card-recruitment>div {display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:var(--partner-secondary)}
+.partner-card-recruitment strong {color:var(--v2-action);font-size:11px;font-weight:500}
+.partner-card-recruitment progress {display:block;appearance:none;width:100%;height:3px;margin-top:8px;border:0;border-radius:3px;overflow:hidden;background:#e8eee8;color:#74a58b}
+.partner-card-recruitment progress::-webkit-progress-bar {background:#e8eee8}
+.partner-card-recruitment progress::-webkit-progress-value {background:#74a58b;border-radius:3px}
+.partner-card-recruitment progress::-moz-progress-bar {background:#74a58b}
+.partner-card-details {display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:8px 16px;border:0;background:none;font:inherit;font-size:12px;color:var(--v2-action);cursor:pointer}
+.partner-create-fab {position:fixed;z-index:75;right:24px;bottom:calc(96px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:6px;min-height:46px;border:0;border-radius:14px;padding:0 16px;background:var(--v2-action);color:#fff;font:600 13px/1.4 system-ui;box-shadow:0 6px 20px #285b4030;cursor:pointer;transition:transform 180ms}
+.partner-create-fab:active {transform:scale(.98)}
+@media(max-width:1100px){.v2-app.v2-app-student .partner-discovery .v2-room-grid {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.v2-app.v2-app-student .partner-discovery .v2-room-grid {grid-template-columns:minmax(0,1fr);gap:20px}.partner-feed-intro {margin-bottom:10px}.partner-card-visual {aspect-ratio:2.8}.partner-create-fab {right:16px}.partner-card-copy {padding-top:14px}}
+html[data-ui-theme=dark] .v2-app.v2-app-student .partner-discovery {--partner-card:#1d2c25;--partner-text:#dfebe3;--partner-secondary:#a6baad;--partner-border:#354b3d}
+html[data-ui-theme=dark] .partner-theme-art {filter:brightness(.7)}
+html[data-ui-theme=dark] .partner-owner-avatar,html[data-ui-theme=dark] .partner-member-avatar {background:#354b3d;color:#d9e8dc}
+@media(prefers-reduced-motion:reduce){.partner-feed-card,.partner-card-save,.partner-create-fab,.v2-app.v2-app-student .partner-discovery .v2-filter-pills button {transition:none}.partner-feed-card:has(.partner-card-open:active),.partner-card-save:active,.partner-create-fab:active {transform:none}}
+html[data-ui-motion=reduce] :is(.partner-feed-card,.partner-card-save,.partner-create-fab) {transition:none;transform:none}
 
-.v2-app.v2-app-student .partner-discovery .v2-room-card{gap:0}
-.v2-app.v2-app-student .partner-discovery .v2-filter-pills button{border:0;border-radius:22px;background:transparent;box-shadow:none}
-.v2-app.v2-app-student .partner-discovery .v2-filter-pills button.is-active{background:#e8f0e9;color:#2c5848}
-.v2-app.v2-app-student .partner-discovery .v2-room-card-top,.v2-app.v2-app-student .partner-discovery .v2-room-open{margin:0;border:0}.v2-app.v2-app-student .partner-discovery .v2-room-footer{margin-top:0}
+.partner-category-selection {position:absolute;inset:0;border-radius:14px;background:var(--v2-accent-soft);pointer-events:none}
+.partner-category-label {position:relative;z-index:1}
+
+.partner-card-status {margin-left:auto;font-size:10px;color:var(--partner-secondary)}

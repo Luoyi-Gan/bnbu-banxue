@@ -1,0 +1,42 @@
+{
+  "views": [
+    {
+      "width": 393,
+      "overflow": false,
+      "firstCardTop": 302.5,
+      "timetable": 0,
+      "fabBottom": 756,
+      "navTop": 778
+    },
+    {
+      "width": 320,
+      "overflow": false,
+      "firstCardTop": 302.5,
+      "timetable": 0,
+      "fabBottom": 756,
+      "navTop": 778
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "firstCardTop": 398.296875,
+      "timetable": 0,
+      "fabBottom": 756,
+      "navTop": 0
+    }
+  ],
+  "actualMemberCounts": true,
+  "bookmarkRefreshAndRestore": true,
+  "simulatedSaveFailurePreservesState": true,
+  "filters": true,
+  "detail": true,
+  "createEntry": true,
+  "categories": true,
+  "emptyReset": true,
+  "transitionRepeated": [
+    1,
+    1,
+    1
+  ],
+  "errors": []
+}
