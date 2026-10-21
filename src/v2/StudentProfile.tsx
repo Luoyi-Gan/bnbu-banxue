@@ -2,11 +2,11 @@ import {uiText,useUiLanguage} from './uiLanguage'
 import {api,workspaceChangedEvent} from '../live/api'
 import {useEffect,useRef,useState,type ChangeEvent,type FormEvent} from 'react'
 import {Link,useNavigate} from 'react-router-dom'
-import {ArrowLeft,Camera,Check,Upload} from 'lucide-react'
+import {ArrowLeft,Camera} from 'lucide-react'
 import {useWorkspaceBackend} from './useWorkspaceBackend'
 import {DisplayAvatar} from './DisplayAvatar'
-import {CommunityModal} from './CommunityModal'
-import {profileCovers,profileCoverSource} from './profileCovers'
+import {CoverImageEditor} from './ProfileCoverEditor'
+import {profileCoverSource} from './profileCovers'
 import './ownProfile.css'
 
 export function StudentProfile(){
@@ -66,6 +66,6 @@ function StudentProfileEditor({live}:{live:ReturnType<typeof useWorkspaceBackend
       <details className="own-editor-identity"><summary>{uiText('校园身份资料')}</summary><div className="v2-profile-facts"><div><span>{uiText('姓名')}</span><strong>{account.name}</strong></div><div><span>{uiText('学号')}</span><strong>{account.studentNumber??uiText('未验证学校邮箱')}</strong></div><div><span>{uiText('学院')}</span><strong>{account.organization}</strong></div><div><span>{uiText('身份')}</span><strong>{uiText(account.roles.includes('student')?'已授权学生':'以账号授权为准')}</strong></div></div>
       {!account.studentNumber&&account.email.endsWith('@bnbu.edu.cn')&&<div className="v2-form-note"><p>{uiText('验证本人学校邮箱（学号采用入班时填写的资料）：')}{account.email}</p><button type="button" className="v2-button v2-button-secondary" disabled={loading} onClick={()=>void verifyEmail(false)}>{uiText('获取验证码')}</button><input aria-label={uiText('邮箱验证码')} value={code} maxLength={6} onChange={event=>setCode(event.target.value)}/><button type="button" className="v2-button v2-button-secondary" disabled={loading||!code.trim()} onClick={()=>void verifyEmail(true)}>{uiText('验证邮箱')}</button></div>}{verification&&<p role="status">{uiText(verification)}</p>}<p className="own-editor-note">{uiText('昵称用于展示；姓名、学号采用入班资料，后续由学校名单核对。当前修改保存到会同里后台。')}</p></details>
     </form>
-    {coverOpen&&<CommunityModal title={uiText('选择主页背景')} onClose={()=>setCoverOpen(false)}><div className="own-cover-picker"><div className="own-cover-grid">{profileCovers.map(item=><button type="button" key={item.key} aria-pressed={cover===item.key} disabled={loading} onClick={()=>{setError('');setCover(item.key);setCoverOpen(false)}}><img src={item.image} alt=""/><span>{uiText(item.label)}</span>{cover===item.key&&<Check size={22}/>}</button>)}</div><label className="own-cover-upload"><Upload size={18}/>{uiText(loading?'处理图片中…':'上传自己的背景图')}<input type="file" accept="image/jpeg,image/png,image/webp" aria-label={uiText('选择背景图片')} disabled={loading} onChange={event=>void upload(event,'cover')}/></label><p className="own-editor-note">{uiText('选择后先预览，保存资料后生效。')}</p>{error&&<p role="alert">{uiText(error)}</p>}</div></CommunityModal>}
+    {coverOpen&&<CoverImageEditor deferred initial={cover} onClose={()=>setCoverOpen(false)} onSave={image=>{setCover(image);setCoverOpen(false)}}/>}
   </div>
 }
