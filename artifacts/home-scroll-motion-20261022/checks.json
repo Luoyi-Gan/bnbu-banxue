@@ -1,0 +1,38 @@
+[
+  {
+    "offset": "0px",
+    "photoBottom": 365.2790222167969,
+    "photoTop": 88.28125,
+    "sceneBottom": 349.2745590209961,
+    "sceneTop": 104.2745590209961,
+    "step": "top",
+    "toolbar": "0"
+  },
+  {
+    "offset": "8.392857360839844px",
+    "photoBottom": 205.81473541259768,
+    "photoTop": -71.18303680419922,
+    "sceneBottom": 181.41740798950195,
+    "sceneTop": -63.58259201049805,
+    "step": "scroll-down",
+    "toolbar": "1"
+  },
+  {
+    "offset": "16px",
+    "photoBottom": 45.564727783203125,
+    "photoTop": -231.43304443359375,
+    "sceneBottom": 13.560256958007812,
+    "sceneTop": -231.4397430419922,
+    "step": "maximum",
+    "toolbar": "1"
+  },
+  {
+    "offset": "8.392857360839844px",
+    "step": "reverse"
+  },
+  {
+    "offset": "0px",
+    "step": "return-top",
+    "toolbar": "0"
+  }
+]

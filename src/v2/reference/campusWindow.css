@@ -18,6 +18,9 @@
 .cw-home .cw-scene {position:absolute;left:180px;right:0;top:0;height:360px;overflow:hidden;border-radius:170px 0 8px 8px;background:#e0e8e6}
 .cw-home .cw-scene>img {position:absolute;width:100%;height:100%;inset:0;object-fit:cover;object-position:50% 48%;opacity:0;transition:opacity .65s ease}
 .cw-home .cw-scene>img.is-active {opacity:1}
+.cw-home .cw-scene>img {top:-16px;bottom:auto;height:calc(100% + 32px);transform:translate3d(0,var(--student-hero-offset,0px),0)}
+html[data-ui-motion=reduce] .cw-home .cw-scene>img {top:0;height:100%;transform:none}
+@media(prefers-reduced-motion:reduce){.cw-home .cw-scene>img {top:0;height:100%;transform:none}}
 .cw-home .cw-focus {position:relative;z-index:1;margin:-175px 40px 0 38%;padding:0}
 .cw-home .cw-next {display:block;padding:22px 25px;background:#fff;border-radius:6px 28px 6px 6px;border-bottom:3px solid #82afc0;box-shadow:0 6px 25px #25444b0c;animation:cw-arrive .28s ease-out}
 .cw-home .cw-next-top {display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#426575}
