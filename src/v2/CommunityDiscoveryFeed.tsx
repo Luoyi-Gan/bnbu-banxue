@@ -1,3 +1,4 @@
+import './materialSkeleton.css'
 import { Heart, Layers }  from 'lucide-react'
 import { useState } from 'react'
 import type { Post } from '../../shared/v2/model'
@@ -9,9 +10,9 @@ import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 
 function PostCover({post}:{post:Post}){
   const src=photosForPost(post)[0]
-  const [failed,setFailed]=useState(false),[ratio,setRatio]=useState(.8)
-  return <div className="discovery-cover community-discovery-cover" style={{aspectRatio:ratio}}>
-    {src&&!failed?<img src={src} alt="" loading="lazy" decoding="async" onLoad={e=>setRatio(Math.max(.7,Math.min(1.5,e.currentTarget.naturalWidth/e.currentTarget.naturalHeight)))} onError={()=>setFailed(true)}/>:<span className="discovery-text-cover"><small>{uiText(post.board)}</small><span>{post.body}</span></span>}
+  const [failed,setFailed]=useState(false),[loaded,setLoaded]=useState(false),[ratio,setRatio]=useState(.8)
+  return <div className={`discovery-cover community-discovery-cover${src&&!failed&&!loaded?' is-loading':''}`} style={{aspectRatio:ratio}}>
+    {src&&!failed?<img src={src} alt="" loading="lazy" decoding="async" onLoad={e=>{setLoaded(true);setRatio(Math.max(.7,Math.min(1.5,e.currentTarget.naturalWidth/e.currentTarget.naturalHeight)))}} onError={()=>setFailed(true)}/>:<span className="discovery-text-cover"><small>{uiText(post.board)}</small><span>{post.body}</span></span>}
     {photosForPost(post).length>1&&<span className="community-photo-count"><Layers size={14}/></span>}
     {failed&&<span className="community-cover-failed">{uiText('封面暂不可用')}</span>}
   </div>

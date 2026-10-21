@@ -1,17 +1,17 @@
 .continuity-icon{display:inline-flex;align-items:center;justify-content:center;flex:none;transform-origin:center;vertical-align:middle}
 .continuity-icon svg{transition:fill 160ms ease,color 160ms ease;overflow:visible}
-.activity-discovery-reactions button,.activity-detail-reactions button{transition:background-color 180ms,color 180ms,opacity 140ms}
+.activity-discovery-reactions button,.activity-detail-reactions button{transition:background-color var(--motion-selection,180ms),color var(--motion-selection,180ms),opacity 140ms}
 .activity-discovery-reactions button:active .continuity-icon,.activity-detail-reactions button:active .continuity-icon{scale:.92}
-.continuity-icon{transition:scale 100ms ease}
+.continuity-icon{transition:scale var(--motion-press,120ms) ease}
 .continuity-icon-enter{animation:continuity-icon-confirm 280ms cubic-bezier(.2,.7,.3,1)}
 @keyframes continuity-icon-confirm{0%{transform:scale(.8)}70%{transform:scale(1.13)}100%{transform:scale(1)}}
-.tt-date-strip button,.tt-date-strip button>strong,.tt-date-strip button>i,.v2-coffee-slot,.v2-coffee-slot-status,.reference-notice-filters button{transition:background-color 180ms,color 180ms,border-color 180ms,box-shadow 180ms}
+.tt-date-strip button,.tt-date-strip button>strong,.tt-date-strip button>i,.v2-coffee-slot,.v2-coffee-slot-status,.reference-notice-filters button{transition:background-color var(--motion-selection,180ms),color var(--motion-selection,180ms),border-color var(--motion-selection,180ms),box-shadow var(--motion-selection,180ms)}
 .tt-date-strip button:active,.campus-discovery-pills button:active{scale:.97}
-.tt-date-strip button,.campus-discovery-pills button{transition:background-color 180ms,color 180ms,scale 120ms}
+.tt-date-strip button,.campus-discovery-pills button{transition:background-color var(--motion-selection,180ms),color var(--motion-selection,180ms),scale 120ms}
 .inbox-notice{transition:background-color 200ms,color 200ms}
-.reference-notice-copy i.continuity-unread{opacity:0;scale:0;transition:opacity 180ms,scale 180ms;transform-origin:center}
+.reference-notice-copy i.continuity-unread{opacity:0;scale:0;transition:opacity var(--motion-selection,180ms),scale var(--motion-selection,180ms);transform-origin:center}
 .reference-notice-copy i.continuity-unread[data-unread=true]{opacity:1;scale:1}
-.v2-coffee-feedback.continuity-feedback{display:flex;align-items:center;gap:8px;animation:continuity-feedback-enter 180ms ease-out}
+.v2-coffee-feedback.continuity-feedback{display:flex;align-items:center;gap:8px;animation:continuity-feedback-enter var(--motion-selection,180ms) ease-out}
 .v2-coffee-feedback.continuity-feedback.is-error{color:var(--v2-danger,#b5444b);animation:none}
 @keyframes continuity-feedback-enter{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 html[data-ui-motion=reduce] :is(.continuity-icon,.continuity-icon svg,.tt-date-strip button,.tt-date-strip button>strong,.tt-date-strip button>i,.campus-discovery-pills button,.v2-coffee-slot,.v2-coffee-slot-status,.reference-notice-filters button,.inbox-notice,.continuity-unread,.continuity-feedback){animation:none!important;transition:none!important;scale:1!important}

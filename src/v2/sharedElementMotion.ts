@@ -1,7 +1,8 @@
+import {campusMotion} from './motionTokens'
 import {flushSync} from 'react-dom'
 import './sharedElementTransition.css'
 
-export const sharedMotion={enter:300,exit:220,enterEase:'cubic-bezier(.2,.8,.2,1)',exitEase:'cubic-bezier(.4,0,.8,.2)'}
+export const sharedMotion={enter:campusMotion.cardEnter,exit:campusMotion.cardExit,enterEase:campusMotion.ease,exitEase:campusMotion.exitEase}
 type Transition={finished:Promise<void>;skipTransition:()=>void}
 let active:Transition|undefined
 const origins=new Map<string,{scroll:number}>()

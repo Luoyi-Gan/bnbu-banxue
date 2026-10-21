@@ -1,3 +1,4 @@
+import {campusMotion} from './motionTokens'
 import {animate} from 'motion/react'
 import {useEffect,useRef,type RefObject} from 'react'
 import {resistedSheetOffset,shouldDismissSheet} from './sheetGesture'
@@ -24,7 +25,7 @@ export function useSheetGesture(panel:RefObject<HTMLDivElement|null>,enabled:boo
    if(reducedMotion){reset();if(dismiss)close.current();return}
    const target=dismiss?window.innerHeight-element.getBoundingClientRect().top+offset+24:0
    const complete=()=>{if(disposed)return;reset();if(dismiss)close.current()}
-   settling=animate(offset,target,dismiss?{duration:.2,ease:[.3,0,.8,.4],onUpdate:paint,onComplete:complete}:{type:'spring',stiffness:440,damping:34,mass:.8,onUpdate:paint,onComplete:complete})
+   settling=animate(offset,target,dismiss?{duration:.2,ease:[.3,0,.8,.4],onUpdate:paint,onComplete:complete}:{type:'spring',...campusMotion.sheetSpring,onUpdate:paint,onComplete:complete})
   }
   const release=()=>{
    const id=drag?.id;drag=undefined

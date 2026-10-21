@@ -1,3 +1,4 @@
+import {campusMotion} from './motionTokens'
 import {useLayoutEffect,type RefObject} from 'react'
 
 const histories=new Map<string,Set<string>>()
@@ -17,9 +18,9 @@ export function mountStaggeredEntrance(root:HTMLElement,seen:Set<string>,reduced
   fresh.forEach((entry,index)=>{
    const node=entry.target as HTMLElement
    remember(node);observer.unobserve(node)
-   node.dataset.entranceState='playing';node.dataset.entranceDelay=String(Math.min(index,5)*36);node.dataset.entranceRuns=String(Number(node.dataset.entranceRuns??0)+1)
+   node.dataset.entranceState='playing';node.dataset.entranceDelay=String(Math.min(index,5)*campusMotion.stagger);node.dataset.entranceRuns=String(Number(node.dataset.entranceRuns??0)+1)
    try{
-    const animation=node.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0px)'}],{duration:240,delay:Math.min(index,5)*36,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'})
+    const animation=node.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0px)'}],{duration:campusMotion.list,delay:Math.min(index,5)*campusMotion.stagger,easing:campusMotion.ease,fill:'both'})
     animations.set(node,animation)
     void animation.finished.catch(()=>{}).finally(()=>{if(animations.get(node)===animation){node.dataset.entranceState='shown';animations.delete(node);animation.cancel()}})
    }catch{node.dataset.entranceState='shown'}
