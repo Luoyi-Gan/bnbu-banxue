@@ -23,6 +23,28 @@ function setup(){
   return {db,repo,admin,student,other,teacher,run,read,create,tokens};
 }
 describe('校园探店共享数据与权限',()=>{
+  it('收藏按本人持久化，隐藏店铺拒绝新增收藏且允许取消，异步存储共用规则',async()=>{
+    const {repo,admin,student,other,teacher,run,read,create}=setup(),id=create();
+    run(student,'shop.bookmark',{id,enabled:true});
+    expect((read(student).shops as {saved:boolean}[])[0].saved).toBe(true);
+    expect((read(other).shops as {saved:boolean}[])[0].saved).toBe(false);
+    expect(()=>run(teacher,'shop.bookmark',{id,enabled:true})).toThrow();
+    expect(()=>run(student,'shop.bookmark',{id,enabled:'true'})).toThrow();
+    run(admin,'shop.visibility',{id,version:1,status:'hidden',reason:'核对'});
+    expect(()=>run(other,'shop.bookmark',{id,enabled:true})).toThrow('未公开');
+    await runAsync(shopPolicy(repo,student,'shop.bookmark',{id,enabled:false}));
+    expect(repo.related(student.id,id,'save')).toBe(false);
+  });
+  it('资料来源只接受HTTPS，编辑时保留来源，读取不暴露店铺维护人',()=>{
+    const {admin,student,run,read,repo}=setup();
+    const input={name:'资料店铺',category:'咖啡',scope:'campus',address:'待核对',description:'来源资料',images:[],sourceUrl:'https://ctl.bnbu.edu.cn/info/1166/5291.htm',sourceLabel:'学校公告',sourceDate:'2026-10-21'};
+    expect(()=>run(admin,'shop.save',{...input,sourceUrl:'javascript:alert(1)'})).toThrow('HTTPS');
+    const {id}=run(admin,'shop.save',input);
+    run(admin,'shop.save',{...input,sourceUrl:undefined,sourceLabel:undefined,sourceDate:undefined,id,version:1,name:'更新店铺'});
+    expect(repo.get(id).data.sourceUrl).toBe(input.sourceUrl);
+    const shop=(read(student).shops as {ownerId?:string;data:Record<string,unknown>}[])[0];
+    expect(shop.ownerId).toBeUndefined();expect(shop.data.sourceLabel).toBe('学校公告');
+  });
   it('HTTP读取执行会话与管理权限，返回新建的共享店铺',async()=>{
     const {db,admin,student,tokens,create}=setup(),id=create();
     const server=createApiServer(db);await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));

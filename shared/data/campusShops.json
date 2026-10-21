@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "checkedAt": "2026-10-21",
+  "notice": "公开学校资料确认名称与校内属性；不代表实时营业，缺少照片、楼层、步行距离与价格的店铺不补造。",
+  "shops": [
+    {
+      "name": "拾光文创馆",
+      "category": "文创",
+      "description": "把校园记忆带回日常。由学校创新中心指导、学生团队参与运营的官方纪念品实体商店。",
+      "images": [
+        "/shops/memory-0.jpg",
+        "/shops/memory-2.jpg"
+      ],
+      "sourceUrl": "https://ic.bnbu.edu.cn/souvenir/introduction.htm",
+      "sourceLabel": "BNBU 创新中心 · 拾光文创馆",
+      "scope": "campus",
+      "address": "BNBU 校内 · 具体店址待核对",
+      "sourceDate": "资料查阅：2026-10-21"
+    },
+    {
+      "name": "CHIAS Coffee 文创咖啡馆",
+      "category": "咖啡",
+      "description": "一杯咖啡，也是一场交流的开始。学校曾在这里举办教师节照片故事展。",
+      "images": [
+        "/shops/chias-2.jpg"
+      ],
+      "sourceUrl": "https://ctl.bnbu.edu.cn/info/1197/8021.htm",
+      "sourceLabel": "BNBU CTL · 教师节照片故事展",
+      "scope": "campus",
+      "address": "BNBU 校内 · 具体店址待核对",
+      "sourceDate": "资料查阅：2026-10-21"
+    },
+    {
+      "name": "For You 浮屿",
+      "category": "正餐",
+      "description": "学校师生共餐计划列出的校内用餐地点，留一点时间，坐下来聊聊。",
+      "images": [],
+      "scope": "campus",
+      "address": "BNBU 校内 · 具体店址待核对",
+      "sourceUrl": "https://ctl.bnbu.edu.cn/info/1166/5291.htm",
+      "sourceLabel": "BNBU CTL · 师生共餐计划",
+      "sourceDate": "资料查阅：2026-10-21"
+    },
+    {
+      "name": "必胜客 Pizza Hut",
+      "category": "正餐",
+      "description": "学校2026年师生共餐计划列出的校内用餐地点。",
+      "images": [],
+      "scope": "campus",
+      "address": "BNBU 校内 · 具体店址待核对",
+      "sourceUrl": "https://ctl.bnbu.edu.cn/info/1166/5291.htm",
+      "sourceLabel": "BNBU CTL · 师生共餐计划",
+      "sourceDate": "资料查阅：2026-10-21"
+    },
+    {
+      "name": "穆味王 Home Beef Noodles",
+      "category": "正餐",
+      "description": "学校2026年师生共餐计划列出的校内用餐地点。",
+      "images": [],
+      "scope": "campus",
+      "address": "BNBU 校内 · 具体店址待核对",
+      "sourceUrl": "https://ctl.bnbu.edu.cn/info/1166/5291.htm",
+      "sourceLabel": "BNBU CTL · 师生共餐计划",
+      "sourceDate": "资料查阅：2026-10-21"
+    },
+    {
+      "name": "星巴克 Starbucks",
+      "category": "咖啡",
+      "description": "学校2026年师生共餐计划列出的校内咖啡地点。",
+      "images": [],
+      "scope": "campus",
+      "address": "BNBU 校内 · 具体店址待核对",
+      "sourceUrl": "https://ctl.bnbu.edu.cn/info/1166/5291.htm",
+      "sourceLabel": "BNBU CTL · 师生共餐计划",
+      "sourceDate": "资料查阅：2026-10-21"
+    }
+  ]
+}
