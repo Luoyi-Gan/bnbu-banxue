@@ -28,7 +28,7 @@ const groups = [
   ]},
 ]
 
-export function SettingsPage() {
+export function SettingsPage({embedded=false}:{embedded?:boolean}={}) {
   const live=useWorkspaceBackend()
   const device=useDevicePreferences(), t=useSettingsLanguage()
   const [signingOut,setSigningOut]=useState(false), [logoutError,setLogoutError]=useState('')
@@ -87,10 +87,10 @@ export function SettingsPage() {
     catch{setLogoutError('退出失败，请重试。');setSigningOut(false)}
   }
   return <div className="v2-page settings-page">
-    <header className="settings-heading">
+    {(!embedded||detail)&&<header className="settings-heading">
       <Link to={detail?basePath:returnPath} aria-label={t(detail?'返回设置':'返回我的')}><ArrowLeft size={21}/></Link>
       <h1 ref={heading} tabIndex={-1}>{t(group?.title||titles[section||'']||'设置')}</h1>
-    </header>
+    </header>}
     {live.error&&<div className="settings-feedback" role="alert"><span>{live.error}</span>{!live.data&&<button type="button" onClick={()=>void live.refresh()}>{t('重试')}</button>}</div>}
     {!detail?<>
       <Link to={profilePath} className="settings-account">

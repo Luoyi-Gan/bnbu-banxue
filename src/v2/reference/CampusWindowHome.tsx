@@ -1,6 +1,7 @@
-import { uiText, uiTemplate, useUiLanguage , uiLocale } from '../uiLanguage'
+import {StudentUtilities} from '../StudentUtilities'
+import { uiText, useUiLanguage , uiLocale } from '../uiLanguage'
 import {useDevicePreferences} from '../devicePreferences'
-import { ArrowRight, Bell, ChevronRight, MapPin } from 'lucide-react'
+import { ArrowRight, ChevronRight, MapPin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { StudentSearch } from '../StudentSearch'
@@ -86,7 +87,7 @@ export function CampusWindowHome() { useUiLanguage();
   return <div className="ref-page cw-home">
     <header className="cw-header"><h1>{uiText("会同里")}</h1><nav aria-label={uiText("首页工具")}>
       <StudentSearch/>
-      <Link to="/v2/messages?view=notifications" className="cw-notification" aria-label={uiTemplate(["通知",""],uiText(unread ? `，${unread}条未读` : ''))}><Bell size={22}/>{!!unread && <i/>}</Link>
+      <StudentUtilities/>
     </nav></header>
 
     <div className="cw-intro">

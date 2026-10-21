@@ -1,6 +1,7 @@
+import {StudentUtilities} from '../StudentUtilities'
 import {CommunityDiscoveryFeed} from '../CommunityDiscoveryFeed'
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from '../uiLanguage'
-import { ArrowLeft, ArrowRight, Bell, BookOpen, CalendarDays, ChevronRight, Coffee, Compass, Heart, MapPin, MessageCircle, Settings, Sparkles, UsersRound, type LucideIcon } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, CalendarDays, ChevronRight, Coffee, Compass, Heart, MapPin, MessageCircle, Sparkles, UsersRound, type LucideIcon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { Workspace } from '../../live/api'
@@ -17,7 +18,7 @@ import coffeePhoto from '../../assets/campus/campus-services.jpg'
 
 export type Live = ReturnType<typeof useWorkspaceBackend>
 export function Header({title,brand=false,back,settings=false,search=true}:{title:string;brand?:boolean;back?:string;settings?:boolean;search?:boolean}) { useUiLanguage();
-  return <header className={`ref-header${brand?' ref-brand':''}`}><div>{back && <Link to={back} aria-label={uiText("返回")}><ArrowLeft size={21}/></Link>}<h1>{uiText(title)}</h1></div><nav aria-label={uiText("页面工具")}>{settings?<Link to="/v2/settings" aria-label={uiText("设置")}><Settings size={21}/></Link>:search&&<StudentSearch/>}<Link to="/v2/messages?view=notifications" aria-label={uiText("通知")}><Bell size={21}/></Link></nav></header>
+  return <header className={`ref-header${brand?' ref-brand':''}`}><div>{back && <Link to={back} aria-label={uiText("返回")}><ArrowLeft size={21}/></Link>}<h1>{uiText(title)}</h1></div><nav aria-label={uiText("页面工具")}>{!settings&&search&&<StudentSearch/>}<StudentUtilities/></nav></header>
 }
 export function Section({title,hint,to,children}:{title:string;hint?:string;to?:string;children:ReactNode}) { useUiLanguage();
   return <section className="ref-section"><header><h2>{uiText(title)}</h2>{hint && <span>{uiText(hint)}</span>}{to && <Link to={to}>{uiText("更多")}<ChevronRight size={14}/></Link>}</header>{children}</section>

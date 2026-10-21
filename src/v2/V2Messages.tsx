@@ -88,11 +88,9 @@ export function V2Messages() { useUiLanguage();
     void live.mutate('message.read', {roomId: active.id, ids: unreadIds})
   }, [active, opened, unreadIds, unreadKey, live])
   const reminders = notificationPreferences(live.data)
-  const unreadMessages = reminders.messages ? conversations.reduce((sum, item) => sum + item.unread, 0) : 0
 
   const notices = live.data?.notifications ?? []
   const unreadNotices = notices.filter(item => !item.readAt).length
-  const badgeNotices = notices.filter(item => showNoticeBadge(live.data, item)).length
   const open = (id: string) => {
     setParams({ conversation: id })
   }
@@ -106,10 +104,7 @@ export function V2Messages() { useUiLanguage();
   if(params.get('person'))return <div className="v2-page"><CommunityDirectMessages key={params.get('person')} person={params.get('person')!}/></div>
   return <div className={`v2-page v2-messages-page${opened ? ' is-chat-open' : ''}`}>
     <PageHeading eyebrow="MESSAGES" title={view === 'notifications'?uiText('通知中心'):uiText('我的会话')} description={view === 'notifications'?uiText('校园里的新消息，都在这里。'):uiText('每一次交流，都让校园里的连接更近一点。')}/>
-    <nav className="inbox-tabs" aria-label={uiText("消息分类")}>
-      <button type="button" aria-pressed={view === 'conversations'} onClick={() => setParams({})}><MessageCircle size={17}/>{uiText("会话")}{unreadMessages > 0 && <b>{unreadMessages}</b>}</button>
-      <button type="button" aria-pressed={view === 'notifications'} onClick={() => setParams({ view: 'notifications' })}><Bell size={17}/>{uiText("通知")}{badgeNotices > 0 && <b>{badgeNotices}</b>}</button>
-    </nav>
+
     {view === 'notifications'?<section className="inbox-notices">
       <SectionHeading title={uiText("校园通知")} detail={live.data?uiTemplate([""," 条通知"],notices.length):uiText('正在读取')} action={<button type="button" className="v2-text-button" disabled={!unreadNotices || live.busy} onClick={() => void live.mutate('notification.readmany', {ids: notices.filter(item => !item.readAt).map(item => item.id)})}>{uiText("全部标为已读")}</button>}/>
       {live.error && <p role="alert">{uiText(live.error)}</p>}

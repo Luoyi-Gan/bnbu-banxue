@@ -1,4 +1,5 @@
-import {Bell,BookOpen,FileText,ChevronRight,Coffee,Settings,ShieldCheck} from 'lucide-react'
+import {StudentUtilities} from './StudentUtilities'
+import {BookOpen,FileText,ChevronRight,Coffee,ShieldCheck} from 'lucide-react'
 import {Link,useNavigate} from 'react-router-dom'
 import {CommunityProfile} from './CommunityProfile'
 import {useCommunitySocial} from './useCommunitySocial'
@@ -24,7 +25,7 @@ export function OwnProfilePage(){
   ]
   return <div className="ref-page ref-me cw-pages own-profile">
     <section className="community-hub is-profile own-profile-summary" aria-label={uiText('我的个人主页')}>
-      <header className="community-profile-top"><span>{uiText('我的')}</span><nav aria-label={uiText('主页工具')}><Link to="/v2/messages?view=notifications" aria-label={uiText('通知')}><Bell size={21}/></Link><Link to="/v2/settings" aria-label={uiText('设置')}><Settings size={21}/></Link></nav></header>
+      <header className="community-profile-top"><span>{uiText('我的')}</span><nav aria-label={uiText('主页工具')}><StudentUtilities/></nav></header>
       {social.data?<CommunityProfile profile={social.data.profile} busy={live.busy} onFollow={()=>{}} onList={list=>navigate(`/v2/community?person=me&panel=${list}`)}/>:<p role={social.error?'alert':'status'}>{uiText(social.error||'正在读取本人资料…')}{social.error&&<button onClick={social.refresh}>{uiText('重试')}</button>}</p>}
     </section>
     <div className="ref-page-body cw-profile-body"><Feedback live={live}/>

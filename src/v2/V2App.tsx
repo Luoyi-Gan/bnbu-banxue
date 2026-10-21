@@ -1,6 +1,8 @@
+import {StudentUtilities} from './StudentUtilities'
+import {StudentUtilityPanel} from './StudentUtilityPanel'
 import {ShopPage} from './ShopPage'
 import {PublicPrivacyPage} from './PrivacyPolicy'
-import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
+import { uiText, useUiLanguage } from './uiLanguage'
 import { useDevicePreferences } from './devicePreferences'
 import './deviceAppearance.css'
 import { ReferenceDiscover, ReferenceCampus, ReferenceMe, ReferenceSports, ReferenceWelcome } from './reference/pages'
@@ -8,9 +10,9 @@ import { CampusWindowHome } from './reference/CampusWindowHome'
 import staffCampusPhoto from '../assets/campus/campus-services.jpg'
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
-import { Bell, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
+import { Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 const brandIcon = '/huitongli-app-icon.png'
 import { V2Provider } from './store'
 import { useV2 } from './useV2'
@@ -34,7 +36,7 @@ import { CampusOrganizations } from './CampusOrganizations'
 import { useOriginalSession } from './useOriginalSession'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { DisplayAvatar } from './DisplayAvatar'
-import { notificationPreferences, showNoticeBadge } from './notificationPreferences'
+import { notificationPreferences } from './notificationPreferences'
 import { liveConversations } from './liveConversations'
 import { defaultSidebarItems, parseSidebarItems } from '../../shared/v2/sidebarLayout'
 import { studentSidebarById, studentSidebarCatalog } from './studentSidebarCatalog'
@@ -92,7 +94,6 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   ]
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
-  const unreadNotices = live.data?.notifications.filter((item) => showNoticeBadge(live.data, item)).length ?? 0
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '运动' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '会同里'
   const service = new URLSearchParams(location.search).get('service')
   const sidebarMatch = (id: typeof sidebarItems[number]) => {
@@ -128,7 +129,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
       <header className="v2-topbar">
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label={uiText("打开导航")}><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>{uiText("会同里")}</span>}<div><span className="v2-breadcrumb">BNBU / {admin?uiText('管理'):teacher?uiText('教师'):uiText('校园')}</span><strong>{title}</strong></div></div>
         <div className="v2-top-actions">
-          {!admin && !teacher && <NavLink to="/v2/messages?view=notifications" className={`v2-icon-button v2-header-messages${location.pathname === '/v2/messages' && new URLSearchParams(location.search).get('view') === 'notifications' ? ' is-active' : ''}`} aria-label={unreadNotices > 0?uiTemplate(["通知，"," 条未读"],unreadNotices):live.data?uiText('通知，暂无未读'):uiText('通知状态暂不可用')} title={live.data?uiTemplate(["通知 · "," 条未读"],unreadNotices):uiText('通知状态暂不可用')}><Bell size={19} aria-hidden="true"/>{unreadNotices > 0 && <span className="v2-header-message-count" aria-hidden="true">{unreadNotices > 99?'99+':unreadNotices}</span>}</NavLink>}
+          {!admin && !teacher && <StudentUtilities/>}
           {!admin && !teacher && <StudentSearch/>}
           {!admin && !teacher?null:<div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><DisplayAvatar className="v2-role-avatar" name={displayName} avatar={displayAvatar} personId={live.data?.account.id}/><strong>{displayName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu"><span>{admin?uiText('管理员账号'):uiText('教师账号')}</span>{teacher && <Link to="/v2/teacher/profile">{uiText("个人资料")}</Link>}<Link to={teacher?'/v2/teacher/settings':'/v2/admin/settings'}>{uiText('设置')}</Link><Link to="/v2/login" onClick={() => setRoleMenu(false)}>{uiText("登录 / 注册")}</Link></div>}</div>}
         </div>
@@ -145,6 +146,10 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
 
 function V2Routes() { useUiLanguage();
   const location = useLocation()
+  const navigate=useNavigate()
+  const floating=location.pathname==='/v2/settings'||location.pathname==='/v2/messages'
+  const backdrop=useRef('/v2/me')
+  useEffect(()=>{if(!floating&&canAccessPortal('student',location.pathname)&&!['/v2/login','/v2/register','/v2/forgot-password','/v2/identity','/v2/privacy','/v2/welcome'].includes(location.pathname))backdrop.current=location.pathname+location.search},[floating,location.pathname,location.search])
   const { state, setState } = useV2()
   const session = useOriginalSession(location.pathname, location.key)
   const requestedRole = location.pathname.startsWith('/v2/admin') ? 'admin' : location.pathname.startsWith('/v2/teacher') ? 'teacher' : 'student'
@@ -165,7 +170,7 @@ function V2Routes() { useUiLanguage();
   if (!authorized) return <Navigate to="/v2/login" state={{returnTo:location.pathname + location.search, roleMismatch:true}} replace/>
   if (state.role !== requestedRole) return <p role="status">{uiText("正在切换本人已授权身份…")}</p>
   if (!canAccessPortal(state.role, location.pathname)) return <Navigate to={portalHome[state.role]} replace/>
-  return <V2Shell accountName={session.account!.name}><Routes>
+  return <V2Shell accountName={session.account!.name}><Routes location={floating?backdrop.current:location}>
     <Route path="/v2" element={<CampusWindowHome/>}/>
     {Boolean(import.meta.hot) && <Route path="/v2/design/campus-window" element={<Navigate to="/v2" replace/>}/>}
     <Route path="/v2/shops" element={<ShopPage/>}/>
@@ -202,7 +207,7 @@ function V2Routes() { useUiLanguage();
     <Route path="/v2/admin/moderation" element={<AdminModeration/>}/>
     <Route path="/v2/admin/keywords" element={<AdminCommunityKeywords/>}/>
     <Route path="*" element={<Navigate to={portalHome[state.role]} replace/>}/>
-  </Routes></V2Shell>
+  </Routes>{floating&&<StudentUtilityPanel title={location.pathname==='/v2/settings'?uiText('设置'):new URLSearchParams(location.search).get('view')==='notifications'?uiText('通知'):uiText('会话')} onClose={()=>navigate(backdrop.current)}>{location.pathname==='/v2/settings'?<V2Settings embedded/>:<V2Messages/>}</StudentUtilityPanel>}</V2Shell>
 }
 
 export function V2App() { useUiLanguage();
