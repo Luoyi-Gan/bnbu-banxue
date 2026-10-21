@@ -1,0 +1,147 @@
+import { createHash } from "node:crypto";
+import { Pool } from "pg";
+class PostgresDatabase {
+  constructor(config) {
+    this.pool = new Pool({ max: 10, connectionTimeoutMillis: 1e4, idleTimeoutMillis: 3e4, ...config });
+    this.pool.on("error", () => console.error("PostgreSQL idle connection failed"));
+  }
+  async transaction(operation) {
+    const client = await this.pool.connect();
+    let broken = false;
+    try {
+      await client.query("BEGIN");
+      const result = await operation(client);
+      await client.query("COMMIT");
+      return result;
+    } catch (error) {
+      try {
+        await client.query("ROLLBACK");
+      } catch {
+        broken = true;
+      }
+      throw error;
+    } finally {
+      client.release(broken);
+    }
+  }
+  async migrate(migrations) {
+    await this.transaction(async (client) => {
+      await client.query("SELECT pg_advisory_xact_lock(18422, 1)");
+      await client.query("CREATE TABLE IF NOT EXISTS backend_migrations (version INTEGER PRIMARY KEY, checksum TEXT NOT NULL, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())");
+      for (const migration of [...migrations].sort((a, b) => a.version - b.version)) {
+        const checksum = createHash("sha256").update(migration.sql).digest("hex");
+        const existing = await client.query("SELECT checksum FROM backend_migrations WHERE version=$1", [migration.version]);
+        if (existing.rows.length) {
+          if (existing.rows[0].checksum !== checksum) throw new Error(`Migration ${migration.version} checksum mismatch`);
+          continue;
+        }
+        await client.query(migration.sql);
+        await client.query("INSERT INTO backend_migrations(version,checksum) VALUES($1,$2)", [migration.version, checksum]);
+      }
+    });
+  }
+  close() {
+    return this.pool.end();
+  }
+}
+const companionIdentityMigrationSql = `
+UPDATE entities SET kind='companionIdentity'
+WHERE kind='sportsIdentity' AND EXISTS (
+  SELECT 1 FROM accounts a WHERE a.id=entities.owner_id AND (
+    (entities.data::jsonb->>'role'='admin' AND (a.login_kind='ADMIN' OR a.roles::jsonb ? 'superadmin'))
+    OR (entities.data::jsonb->>'role' IN ('student','teacher') AND a.roles::jsonb ? (entities.data::jsonb->>'role'))
+  )
+);
+`;
+const postgresMigrations = [{ version: 1, sql: `
+CREATE TABLE accounts (
+ id TEXT PRIMARY KEY, email TEXT, password_hash TEXT, name TEXT, organization TEXT DEFAULT '',
+ status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','muted','banned')),
+ roles TEXT NOT NULL DEFAULT '[]', created_at TEXT NOT NULL,
+ login_kind TEXT NOT NULL DEFAULT 'PERSONAL' CHECK(login_kind IN ('PERSONAL','ADMIN','HISTORY')),
+ login_name TEXT UNIQUE, UNIQUE(email,login_kind),
+ CHECK((login_kind='PERSONAL' AND login_name IS NULL AND email IS NOT NULL AND password_hash IS NOT NULL AND name IS NOT NULL)
+ OR (login_kind='ADMIN' AND login_name IS NOT NULL AND length(login_name)>0 AND email IS NOT NULL AND password_hash IS NOT NULL AND name IS NOT NULL)
+ OR (login_kind='HISTORY' AND login_name IS NULL AND email IS NULL AND password_hash IS NULL AND name IS NULL AND organization IS NULL AND status='banned' AND roles='[]'))
+);
+CREATE FUNCTION prevent_historical_login() RETURNS trigger LANGUAGE plpgsql AS $$
+ BEGIN
+ IF OLD.login_kind='HISTORY' AND NEW.login_kind<>'HISTORY' THEN
+ RAISE EXCEPTION 'Historical subjects cannot regain login' USING ERRCODE='23514';
+ END IF;
+ RETURN NEW;
+ END;
+$$;
+CREATE TRIGGER accounts_history_no_login BEFORE UPDATE ON accounts FOR EACH ROW EXECUTE FUNCTION prevent_historical_login();
+CREATE TABLE sessions(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),expires_at BIGINT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE email_challenges(email TEXT PRIMARY KEY,code_hash TEXT NOT NULL,expires_at BIGINT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,sent_at BIGINT NOT NULL);
+CREATE TABLE mail_outbox(id TEXT PRIMARY KEY,recipient TEXT NOT NULL,subject TEXT NOT NULL,body TEXT NOT NULL,created_at TEXT NOT NULL,delivered_at TEXT);
+CREATE TABLE admin_security_challenges(id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),purpose TEXT NOT NULL CHECK(purpose IN ('EMAIL_VERIFY','PASSWORD_RESET')),email TEXT NOT NULL,code_hash TEXT,expires_at BIGINT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,sent_at BIGINT NOT NULL,identity_version INTEGER NOT NULL,mail_id TEXT NOT NULL,consumed_at BIGINT);
+CREATE INDEX admin_challenge_account ON admin_security_challenges(account_id,purpose,sent_at);
+CREATE TABLE entities(id TEXT PRIMARY KEY,kind TEXT NOT NULL,owner_id TEXT REFERENCES accounts(id),data TEXT NOT NULL,version INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
+CREATE INDEX entities_kind_owner ON entities(kind,owner_id);
+CREATE TABLE relations(account_id TEXT NOT NULL REFERENCES accounts(id),entity_id TEXT NOT NULL REFERENCES entities(id),kind TEXT NOT NULL,data TEXT NOT NULL DEFAULT '{}',created_at TEXT NOT NULL,PRIMARY KEY(account_id,entity_id,kind));
+CREATE TABLE notifications(id TEXT PRIMARY KEY,recipient_id TEXT NOT NULL REFERENCES accounts(id),entity_id TEXT,event TEXT NOT NULL,body TEXT NOT NULL,created_at TEXT NOT NULL,read_at TEXT);
+CREATE INDEX notifications_recipient ON notifications(recipient_id,created_at);
+CREATE TABLE audit(id TEXT PRIMARY KEY,actor_id TEXT NOT NULL REFERENCES accounts(id),role TEXT NOT NULL,action TEXT NOT NULL,entity_id TEXT,reason TEXT NOT NULL,data TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE command_receipts(actor_id TEXT NOT NULL REFERENCES accounts(id),request_id TEXT NOT NULL,request_hash TEXT NOT NULL,result TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(actor_id,request_id));
+CREATE TABLE sports_media_blobs(sha256 TEXT PRIMARY KEY,bytes BYTEA NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE sports_template_publications(sequence BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,template_id TEXT NOT NULL UNIQUE REFERENCES entities(id));
+` }, { version: 2, sql: `
+CREATE TABLE login_attempts(identifier TEXT PRIMARY KEY, failures INTEGER NOT NULL, blocked_until BIGINT NOT NULL);
+` }, { version: 3, sql: `ALTER TABLE audit ADD COLUMN sequence BIGINT GENERATED ALWAYS AS IDENTITY;` }, { version: 4, sql: `
+CREATE TABLE student_email_challenges (
+ id TEXT PRIMARY KEY,email TEXT NOT NULL,invitation_id TEXT NOT NULL REFERENCES entities(id),
+ request_id TEXT NOT NULL,request_hash TEXT NOT NULL,code_hash TEXT,proof_secret TEXT NOT NULL,
+ sent_at BIGINT NOT NULL,expires_at BIGINT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,
+ verified_at BIGINT,verify_key TEXT,verify_hash TEXT,mail_id TEXT NOT NULL,
+ UNIQUE(email,request_id)
+);
+CREATE INDEX student_email_challenge_email ON student_email_challenges(email,sent_at);
+` }, { version: 5, sql: `
+CREATE TABLE member_join_capabilities (
+ token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),session_hash TEXT NOT NULL,
+ invitation_id TEXT NOT NULL REFERENCES entities(id),flow_id TEXT NOT NULL REFERENCES entities(id),
+ issue_key TEXT NOT NULL,profile_hash TEXT NOT NULL,expires_at BIGINT NOT NULL,
+ consume_key TEXT,result TEXT,UNIQUE(account_id,session_hash,issue_key)
+);
+` }, { version: 6, sql: `ALTER TABLE member_join_capabilities ADD COLUMN source_hash TEXT NOT NULL DEFAULT '';` }, { version: 7, sql: `
+CREATE TABLE student_login_challenges (
+ id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),email TEXT NOT NULL,
+ request_id TEXT NOT NULL,request_hash TEXT NOT NULL,code_hash TEXT,session_secret TEXT NOT NULL,
+ sent_at BIGINT NOT NULL,expires_at BIGINT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,
+ verified_at BIGINT,verify_key TEXT,verify_hash TEXT,mail_id TEXT NOT NULL,
+ UNIQUE(account_id,request_id)
+);
+CREATE INDEX student_login_challenge_account ON student_login_challenges(account_id,sent_at);
+` }, { version: 8, sql: `
+CREATE TABLE new_student_join_capabilities (
+ token_hash TEXT PRIMARY KEY,challenge_id TEXT NOT NULL UNIQUE REFERENCES student_email_challenges(id),
+ invitation_id TEXT NOT NULL REFERENCES entities(id),email TEXT NOT NULL,profile TEXT NOT NULL,
+ issue_key TEXT NOT NULL,request_hash TEXT NOT NULL,started_at BIGINT NOT NULL,expires_at BIGINT NOT NULL,
+ session_secret TEXT NOT NULL,consume_key TEXT,result TEXT,account_id TEXT REFERENCES accounts(id)
+);
+` }, { version: 9, sql: companionIdentityMigrationSql }, { version: 10, sql: `
+CREATE TABLE post_views (
+ post_id TEXT NOT NULL REFERENCES entities(id),viewer_id TEXT NOT NULL REFERENCES accounts(id),
+ open_id TEXT NOT NULL,viewed_at TEXT NOT NULL,PRIMARY KEY(viewer_id,open_id)
+);
+CREATE INDEX post_views_post_time ON post_views(post_id,viewed_at);
+` }, { version: 11, sql: `
+CREATE TABLE password_reset_challenges (
+ id TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES accounts(id),identifier TEXT NOT NULL,
+ email TEXT NOT NULL,code_hash TEXT NOT NULL,expires_at BIGINT NOT NULL,
+ attempts INTEGER NOT NULL DEFAULT 0,sent_at BIGINT NOT NULL,consumed_at BIGINT
+);
+CREATE INDEX password_reset_account ON password_reset_challenges(account_id,sent_at);
+CREATE TABLE security_rate_events(category TEXT NOT NULL,subject TEXT NOT NULL,origin TEXT NOT NULL,occurred_at BIGINT NOT NULL);
+CREATE INDEX security_rate_window ON security_rate_events(category,occurred_at,subject,origin);
+` }, { version: 12, sql: `
+CREATE UNIQUE INDEX verified_student_number_unique ON entities ((data::jsonb->>'studentNumber'))
+WHERE kind='companionIdentity' AND data::jsonb->>'role'='student' AND data::jsonb->>'status'='verified' AND data::jsonb->>'studentNumber' IS NOT NULL;
+` }];
+export {
+  PostgresDatabase as P,
+  companionIdentityMigrationSql as c,
+  postgresMigrations as p
+};
