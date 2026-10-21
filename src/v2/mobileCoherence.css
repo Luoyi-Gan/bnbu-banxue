@@ -1,0 +1,29 @@
+/* Mobile content and floating actions share one bottom clearance model. */
+@media(max-width:760px){
+ .v2-app.v2-app-student{--mobile-page-gutter:16px;--mobile-nav-reserve:96px;--mobile-action-reserve:160px;--mobile-floating-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+ .v2-app.v2-app-student[data-campus-route]>.v2-workspace{padding-bottom:calc(var(--mobile-nav-reserve) + env(safe-area-inset-bottom,0px))}
+ .v2-app.v2-app-student:has(.community-publish-fab,.partner-create-fab)>.v2-workspace{padding-bottom:calc(var(--mobile-action-reserve) + env(safe-area-inset-bottom,0px))}
+ .v2-app.v2-app-student .v2-main{min-width:0;scroll-padding-bottom:var(--mobile-nav-reserve)}
+ .v2-app.v2-app-student .v2-main>:is(.v2-page,.ref-page){padding-inline:var(--mobile-page-gutter);box-sizing:border-box;min-width:0}
+ .v2-app.v2-app-student .v2-main>.own-profile{padding-inline:0;padding-bottom:24px}
+ .v2-app.v2-app-student .own-profile .cw-profile-body{padding-inline:var(--mobile-page-gutter)}
+ .v2-app.v2-app-student .own-profile-editor{padding-inline:var(--mobile-page-gutter);padding-bottom:24px;min-width:0}
+ .v2-app.v2-app-student .v2-main :is(.partner-discovery,.shop-page){padding-bottom:24px}
+ .v2-app.v2-app-student :is(.partner-create-fab,.community-publish-fab){bottom:var(--mobile-floating-bottom);right:16px;min-height:44px;max-width:calc(100vw - 32px);border-radius:16px}
+ body:has(.v2-app.v2-app-student) .student-timetable-launcher[data-contextual=false]{display:none}
+ .v2-app.v2-app-student .v2-main .v2-directory-filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:8px;padding:2px 0 8px;min-width:0}
+ .v2-app.v2-app-student .v2-main .v2-directory-filters button{flex:none;min-height:40px;padding:8px 14px;border-radius:20px;border-color:transparent;white-space:nowrap;background:transparent;color:var(--v2-muted)}
+ .v2-app.v2-app-student .v2-main .v2-directory-filters button.is-active{background:var(--v2-accent-soft);color:var(--v2-accent-ink);box-shadow:inset 0 1px 3px #254c3812}
+ .v2-app.v2-app-student[data-campus-route='/v2/coffee'] .v2-teacher-card{border-radius:20px;overflow:hidden}
+ .v2-app.v2-app-student .v2-coffee-slot{border-radius:16px;padding:16px;min-width:0}
+ .v2-app.v2-app-student :is(.v2-coffee-booking-panel,.v2-coffee-teacher-detail){min-width:0}
+ .v2-app.v2-app-student :is(input,textarea,select){min-width:0;max-width:100%;box-sizing:border-box}
+ .student-utility-content :is(input,textarea,select){scroll-margin-block:20px}
+ .note-detail-actions .activity-detail-reactions button>.continuity-icon{display:inline-flex}
+ .note-detail-layer .note-detail-body{padding-inline:16px}
+}
+@media(max-width:430px){
+ .student-utility-content .v2-form-two:has(input[type=datetime-local]){grid-template-columns:minmax(0,1fr)}
+ .v2-app.v2-app-student .v2-coffee-booking-panel{flex-wrap:wrap;gap:12px}
+ .v2-app.v2-app-student .v2-coffee-booking-panel>button{min-height:44px}
+}
