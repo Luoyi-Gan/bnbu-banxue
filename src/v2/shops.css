@@ -136,27 +136,36 @@ html[data-ui-theme=dark] .shop-cover[data-category] .shop-cover-identity {color:
 @media(max-width:760px){body:has(.v2-app.v2-app-student .shop-page) :is(.student-timetable-launcher,.v2-floating-timetable-trigger:not(.is-toolbar)) {bottom:calc(92px + env(safe-area-inset-bottom,0px));top:auto}}
 html[data-ui-theme=dark] .shop-card-copy>small {color:#9bcbb8}
 
-/* Reference composition: two portrait photos, followed by three quiet text levels. */
-.shop-reference-layout {background:#f4f4f2;border-radius:24px}
-.shop-reference-layout .shop-heading {min-height:68px}
+/* Photo-led browsing: icon categories above a single mobile column. */
+.shop-reference-layout {background:var(--v2-canvas,#faf9f6);border-radius:0}
+.shop-reference-layout .shop-heading {min-height:60px}
 .shop-map-link {display:grid;place-items:center;width:36px;height:44px;color:var(--v2-muted)}
-.shop-reference-layout .shop-discovery-intro {margin:0 0 16px}
-.shop-reference-layout .shop-discovery-intro>p {margin:0;font-size:14px}
-.shop-reference-layout .shop-search {border:0;box-shadow:none;border-radius:20px;margin-bottom:12px}
-.shop-reference-layout .shop-filter-scroll {margin-bottom:20px}
-.shop-reference-layout .shop-filters {gap:4px;min-width:0}
+.shop-reference-layout .shop-discovery-intro,.shop-reference-layout .shop-results-heading {display:none}
+.shop-reference-layout .shop-search {margin:8px 0 16px;border:1px solid var(--v2-line);border-radius:28px;min-height:52px;box-shadow:0 3px 12px #213e2f0a}
+.shop-reference-layout .shop-filter-scroll {margin:0 -2px 20px;border-bottom:1px solid var(--v2-line);padding-bottom:0}
+.shop-reference-layout .shop-filters {gap:12px;min-width:100%}
+.shop-reference-layout .shop-filters>div {gap:12px}
 .shop-reference-layout .shop-filters>div+div {border:0;padding:0}
-.shop-reference-layout .shop-filters button {padding-inline:14px;font-weight:400}
-.shop-reference-layout .shop-results-heading {margin-bottom:16px}
-.shop-nearby-link {display:flex;align-items:center;gap:4px;color:var(--v2-muted);font-size:12px;white-space:nowrap}
-.shop-reference-layout .shop-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 8px}
+.shop-reference-layout .shop-filters button {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:48px;min-height:64px;padding:4px 6px 12px;position:relative;border-radius:0;background:transparent;color:var(--v2-muted);font-size:11px;font-weight:400}
+.shop-reference-layout .shop-filters button[aria-pressed=true] {background:transparent;color:var(--v2-ink);font-weight:600}
+.shop-reference-layout .shop-filters button[aria-pressed=true]:after {content:'';position:absolute;bottom:0;left:6px;right:6px;height:2px;background:var(--v2-action);border-radius:2px}
+.shop-reference-layout .shop-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 24px}
 .shop-reference-layout .shop-card {background:transparent;border:0;box-shadow:none;border-radius:0;overflow:visible}
 .shop-reference-layout .shop-card:hover {box-shadow:none;transform:none}
-.shop-reference-layout .shop-cover {aspect-ratio:4/5;border-radius:16px}
+.shop-reference-layout .shop-cover {aspect-ratio:1.05;border-radius:16px}
 .shop-reference-layout .shop-cover.has-photo:after,.shop-reference-layout .shop-cover>span {display:none}
+.shop-cover-photos {position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none}
+.shop-cover-photos::-webkit-scrollbar {display:none}
+.shop-cover-photos>img {flex:0 0 100%;min-width:100%;height:100%;object-fit:cover;scroll-snap-align:start}
+.shop-cover-photos:focus-visible {outline:2px solid var(--v2-action);outline-offset:-3px;border-radius:16px}
+.shop-photo-dots {position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:5px;pointer-events:none}
+.shop-photo-dots i {width:5px;height:5px;border-radius:50%;background:#ffffff80;box-shadow:0 1px 3px #0003}
+.shop-photo-dots i.is-current {background:white;scale:1.2}
+.shop-reference-layout .shop-bookmark {background:transparent;border:0;box-shadow:none;color:white;filter:drop-shadow(0 1px 2px #0008);top:8px;right:8px}
+.shop-reference-layout .shop-bookmark[aria-pressed=true] {color:#df5b67}
 .shop-reference-layout .shop-card-copy {padding:12px 0 0}
-.shop-reference-layout .shop-card-copy h2 {font-size:16px!important;line-height:1.5;font-weight:500;margin:0 0 4px!important}
-.shop-reference-layout .shop-card-kind {font-size:13px;line-height:1.6;color:var(--v2-muted);margin:0 0 2px;display:block}
-.shop-reference-layout .shop-card-context {font-size:11px;line-height:1.6;color:var(--v2-muted);margin:0;display:block}
-@media(max-width:760px){.shop-reference-layout .shop-grid {gap:24px 6px}.shop-reference-layout .shop-cover {border-radius:14px}.shop-reference-layout .shop-card-copy h2 {font-size:15px!important}.shop-reference-layout .shop-heading {min-height:64px}}
-html[data-ui-theme=dark] .shop-reference-layout {background:#18221e}
+.shop-reference-layout .shop-card-copy h2 {font-size:15px!important;line-height:1.5;font-weight:600;margin:0 0 3px!important}
+.shop-reference-layout .shop-card-kind {font-size:13px;line-height:1.6;color:var(--v2-muted);margin:0;display:block}
+.shop-reference-layout .shop-card-context {font-size:12px;line-height:1.6;color:var(--v2-muted);margin:0;display:block}
+@media(max-width:760px){.shop-reference-layout .shop-grid {grid-template-columns:minmax(0,1fr);gap:28px}.shop-reference-layout .shop-heading {min-height:56px}.shop-reference-layout .shop-cover {border-radius:14px}.shop-reference-layout .shop-filters,.shop-reference-layout .shop-filters>div {gap:10px}}
+html[data-ui-theme=dark] .shop-reference-layout .shop-filters button[aria-pressed=true] {background:transparent;color:var(--v2-ink)}

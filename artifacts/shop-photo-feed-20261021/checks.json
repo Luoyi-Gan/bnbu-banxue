@@ -1,0 +1,38 @@
+{
+  "views": [
+    {
+      "width": 393,
+      "overflow": false,
+      "brokenImages": 0,
+      "cards": 7
+    },
+    {
+      "width": 320,
+      "overflow": false,
+      "brokenImages": 0,
+      "cards": 7
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "cards": 7
+    }
+  ],
+  "sourcedShops": [
+    "星巴克 Starbucks",
+    "穆味王 Home Beef Noodles",
+    "必胜客 Pizza Hut",
+    "For You 浮屿",
+    "CHIAS Coffee 文创咖啡馆",
+    "拾光文创馆"
+  ],
+  "sharedAdminData": true,
+  "bookmarkRefreshAndRestore": true,
+  "simulatedBookmarkFailurePreservesState": true,
+  "filters": true,
+  "emptyReset": true,
+  "sourceDetail": true,
+  "photoSwipeAndKeyboard": true,
+  "errors": []
+}
