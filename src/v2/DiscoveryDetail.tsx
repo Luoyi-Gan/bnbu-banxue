@@ -1,3 +1,4 @@
+import {sharedElementTransition} from './sharedElementMotion'
 import { X } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
@@ -5,10 +6,11 @@ import { uiText, useUiLanguage } from './uiLanguage'
 import './discoveryDetail.css'
 
 /** Reading surface shared by activities, community posts and alumni stories. */
-export function DiscoveryDetail({title,identity,media,children,actions,onClose}:{title:string;identity:ReactNode;media?:ReactNode;children:ReactNode;actions?:ReactNode;onClose:()=>void}){
+export function DiscoveryDetail({title,identity,media,children,actions,onClose,transitionKey}:{transitionKey?:string;title:string;identity:ReactNode;media?:ReactNode;children:ReactNode;actions?:ReactNode;onClose:()=>void}){
   useUiLanguage()
   const panel=useRef<HTMLElement>(null),close=useRef<HTMLButtonElement>(null),closeCallback=useRef(onClose)
-  useEffect(()=>{closeCallback.current=onClose},[onClose])
+  const dismiss=()=>{if(transitionKey)sharedElementTransition(transitionKey,onClose,{reverse:true});else onClose()}
+  useEffect(()=>{closeCallback.current=dismiss})
   useEffect(()=>{
     const previous=document.activeElement,overflow=document.body.style.overflow
     const roots=[...document.querySelectorAll<HTMLElement>('.v2-app')].map(root=>({root,inert:root.inert}))
@@ -33,10 +35,10 @@ export function DiscoveryDetail({title,identity,media,children,actions,onClose}:
     }
   },[])
   return createPortal(<div className="v2-drawer-layer note-detail-layer">
-    <button type="button" className="note-detail-scrim" tabIndex={-1} aria-label={uiText('关闭详情')} onClick={onClose}/>
+    <button type="button" className="note-detail-scrim" tabIndex={-1} aria-label={uiText('关闭详情')} onClick={dismiss}/>
     <section className={`note-detail${media?'':' note-detail-text'}`} role="dialog" aria-modal="true" aria-label={title} ref={panel}>
-      <header className="note-detail-header">{identity}<button type="button" ref={close} className="note-detail-close" aria-label={uiText('关闭')} onClick={onClose}><X size={22}/></button></header>
-      <div className="note-detail-scroll">{media&&<div className="note-detail-media">{media}</div>}<article className="note-detail-body"><h2 className="note-detail-title">{title}</h2>{children}</article></div>
+      <header className="note-detail-header">{identity}<button type="button" ref={close} className="note-detail-close" aria-label={uiText('关闭')} onClick={dismiss}><X size={22}/></button></header>
+      <div className="note-detail-scroll">{media&&<div className="note-detail-media" data-shared-target={transitionKey}>{media}</div>}<article className="note-detail-body"><h2 className="note-detail-title">{title}</h2>{children}</article></div>
       {actions&&<footer className="note-detail-actions">{actions}</footer>}
     </section>
   </div>,document.body)

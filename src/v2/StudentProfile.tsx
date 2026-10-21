@@ -1,3 +1,4 @@
+import {SharedMediaLink} from './SharedMediaLink'
 import {uiText,useUiLanguage} from './uiLanguage'
 import {api,workspaceChangedEvent} from '../live/api'
 import {useEffect,useRef,useState,type ChangeEvent,type FormEvent} from 'react'
@@ -56,10 +57,10 @@ function StudentProfileEditor({live}:{live:ReturnType<typeof useWorkspaceBackend
     if(await live.mutate('profile.save',{nickname:name,avatar,bio,cover})&&active.current)navigate('/v2/me')
   }
   return <div className="own-profile-editor">
-    <header className="own-editor-heading"><Link to="/v2/me" aria-label={uiText('取消编辑，返回我的')}><ArrowLeft size={22}/></Link><h1>{uiText('编辑资料')}</h1><button type="submit" form="own-profile-form" disabled={loading||live.busy}>{uiText(live.busy?'保存中…':'保存')}</button></header>
+    <header className="own-editor-heading"><SharedMediaLink transitionKey={`profile:${account.id}`} reverse to="/v2/me" aria-label={uiText('取消编辑，返回我的')}><ArrowLeft size={22}/></SharedMediaLink><h1>{uiText('编辑资料')}</h1><button type="submit" form="own-profile-form" disabled={loading||live.busy}>{uiText(live.busy?'保存中…':'保存')}</button></header>
     {(error||live.error)&&<p className="own-editor-error" role="alert">{uiText(error||live.error)}</p>}
     <form id="own-profile-form" onSubmit={save}>
-      <button type="button" className="own-editor-cover" disabled={loading||live.busy} onClick={()=>{setError('');setCoverOpen(true)}} aria-label={uiText('更换背景图')}><img src={profileCoverSource(cover)} alt={uiText('主页背景预览')}/><span><Camera size={15}/>{uiText('更换背景')}</span></button>
+      <button type="button" data-shared-target={`profile:${account.id}`} className="own-editor-cover" disabled={loading||live.busy} onClick={()=>{setError('');setCoverOpen(true)}} aria-label={uiText('更换背景图')}><img src={profileCoverSource(cover)} alt={uiText('主页背景预览')}/><span><Camera size={15}/>{uiText('更换背景')}</span></button>
       <div className="own-editor-avatar-row"><DisplayAvatar className="own-editor-avatar" name={nickname} avatar={avatar}/><div><label>{uiText(loading?'处理图片中…':'更换头像')}<input type="file" accept="image/jpeg,image/png,image/webp" aria-label={uiText('选择头像')} disabled={loading||live.busy} onChange={event=>void upload(event,'avatar')}/></label>{avatar&&<button type="button" disabled={loading||live.busy} onClick={()=>{setError('');setAvatar('')}}>{uiText('恢复默认头像')}</button>}</div></div>
       <div className="own-editor-fields"><label><span>{uiText('昵称')}<small>{nickname.length}/20</small></span><input value={nickname} maxLength={20} required onChange={event=>setNickname(event.target.value)} placeholder={uiText('填写你的昵称')}/></label><label><span>{uiText('个人简介')}<small>{bio.length}/100</small></span><textarea value={bio} maxLength={100} rows={3} onChange={event=>setBio(event.target.value)} placeholder={uiText('介绍你的兴趣与校园生活')}/></label></div>
       <p className="own-editor-note">{uiText('头像与背景支持 JPG、PNG、WebP，最大 5 MB；保存后生效。')}</p>

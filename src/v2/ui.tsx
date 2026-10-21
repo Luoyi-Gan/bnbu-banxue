@@ -1,3 +1,4 @@
+import {sharedMotion} from './sharedElementMotion'
 import {useDevicePreferences} from './devicePreferences'
 import { uiText, useUiLanguage } from './uiLanguage'
 import { ArrowLeft, X, type LucideIcon } from 'lucide-react'
@@ -25,7 +26,7 @@ export function Drawer({ title, eyebrow, children, onClose, wide = false, origin
     if(!element||!origin||reducedMotion)return
     const bounds=element.getBoundingClientRect()
     initialTransform.current=`translate(${origin.x-bounds.x}px,${origin.y-bounds.y}px) scale(${origin.width/bounds.width},${origin.height/bounds.height})`
-    animation.current=element.animate([{transform:initialTransform.current,borderRadius:'24px',opacity:.65},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})
+    animation.current=element.animate([{transform:initialTransform.current,borderRadius:'24px',opacity:.65},{transform:'none',opacity:1}],{duration:sharedMotion.enter,easing:sharedMotion.enterEase})
     return()=>animation.current?.cancel()
   },[origin,reducedMotion])
   const dismiss=useCallback(()=>{
@@ -34,7 +35,7 @@ export function Drawer({ title, eyebrow, children, onClose, wide = false, origin
     if(!element||!initialTransform.current||reducedMotion){onClose();return}
     closing.current=true
     animation.current?.cancel()
-    animation.current=element.animate([{transform:'none',opacity:1},{transform:initialTransform.current,borderRadius:'24px',opacity:0}],{duration:220,easing:'cubic-bezier(.4,0,.8,.2)',fill:'forwards'})
+    animation.current=element.animate([{transform:'none',opacity:1},{transform:initialTransform.current,borderRadius:'24px',opacity:0}],{duration:sharedMotion.exit,easing:sharedMotion.exitEase,fill:'forwards'})
     animation.current.onfinish=onClose
   },[onClose,reducedMotion])
   useEffect(()=>{

@@ -1,0 +1,182 @@
+[
+  {
+    "kind": "activity",
+    "direction": "enter",
+    "cycle": 0,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "activity",
+    "direction": "exit",
+    "cycle": 0,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "activity",
+    "direction": "enter",
+    "cycle": 1,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "activity",
+    "direction": "exit",
+    "cycle": 1,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "activity",
+    "direction": "enter",
+    "cycle": 2,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "activity",
+    "direction": "exit",
+    "cycle": 2,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "organization",
+    "direction": "enter",
+    "cycle": 0,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "organization",
+    "direction": "exit",
+    "cycle": 0,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "organization",
+    "direction": "enter",
+    "cycle": 1,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "organization",
+    "direction": "exit",
+    "cycle": 1,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "organization",
+    "direction": "enter",
+    "cycle": 2,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "organization",
+    "direction": "exit",
+    "cycle": 2,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "coffee",
+    "direction": "enter",
+    "cycle": 0,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "coffee",
+    "direction": "exit",
+    "cycle": 0,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "coffee",
+    "direction": "enter",
+    "cycle": 1,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "coffee",
+    "direction": "exit",
+    "cycle": 1,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "coffee",
+    "direction": "enter",
+    "cycle": 2,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "coffee",
+    "direction": "exit",
+    "cycle": 2,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "profile",
+    "direction": "enter",
+    "cycle": 0,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "profile",
+    "direction": "exit",
+    "cycle": 0,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "profile",
+    "direction": "enter",
+    "cycle": 1,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "profile",
+    "direction": "exit",
+    "cycle": 1,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  },
+  {
+    "kind": "profile",
+    "direction": "enter",
+    "cycle": 2,
+    "engine": "view-transition",
+    "result": "complete"
+  },
+  {
+    "kind": "profile",
+    "direction": "exit",
+    "cycle": 2,
+    "engine": "view-transition",
+    "leftoverNames": 0,
+    "result": "complete"
+  }
+]

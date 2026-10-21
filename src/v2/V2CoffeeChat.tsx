@@ -1,3 +1,4 @@
+import {sharedElementTransition} from './sharedElementMotion'
 import { uiText, useUiLanguage, uiLocale } from './uiLanguage'
 import { Link, useSearchParams } from 'react-router-dom'
 import { DisplayAvatar } from './DisplayAvatar'
@@ -92,9 +93,9 @@ export function V2CoffeeChat() { useUiLanguage();
   if (teacher) {
     const photo = teacherPhotos[teachers.findIndex((person) => person.id === teacher.id) % teacherPhotos.length]
     return <div className="v2-coffee-schedule" key={teacher.id}>
-      <button type="button" className="v2-coffee-back" onClick={goBack}><ArrowLeft size={16}/> {uiText("返回老师列表")}</button>
+      <button type="button" className="v2-coffee-back" onClick={()=>sharedElementTransition(`coffee:${teacher.id}`,goBack,{reverse:true})}><ArrowLeft size={16}/> {uiText("返回老师列表")}</button>
       <div className="v2-coffee-teacher-detail">
-        <img src={photo} alt={uiText("校园场景")}/>
+        <img data-shared-target={`coffee:${teacher.id}`} src={photo} alt={uiText("校园场景")}/>
         <div><span className="v2-eyebrow">COFFEE CHAT · {facultyOf(teacher.department)}</span><h3 ref={headingRef} tabIndex={-1}>{teacher.name}</h3><small>{teacher.englishName} · {teacher.department}</small><p>{teacher.bio}</p><div className="v2-coffee-topics">{teacher.topics.map((topic) => <span key={topic}>{topic}</span>)}</div></div>
       </div>
       <div className="v2-coffee-schedule-heading"><div><span className="v2-eyebrow">AVAILABLE TIMES</span><h3>{uiText("选择预约时间")}</h3><p>{uiText("按老师开放的起止时间交流；预约符合条件即成立。")}</p></div><CalendarDays size={22}/></div>
@@ -121,7 +122,7 @@ export function V2CoffeeChat() { useUiLanguage();
     <div className="v2-teacher-hero" style={{ backgroundImage: `linear-gradient(90deg,rgba(6,28,68,.92),rgba(6,46,101,.18)),url(${campusServicesPhoto})` }}><span>COFFEE CHAT</span><strong>{uiText("和老师聊聊，找到新的思路。")}</strong><small>{uiText("从学院、研究兴趣和可预约时间开始探索。")}</small></div>
     <div className="v2-directory-tools"><AnimatedSearchField value={query} onChange={setQuery} placeholder={uiText("搜索老师、学院或研究方向")}/><span>{filteredTeachers.length} {uiText("位老师")}</span></div>
     <div className="v2-filter-pills v2-directory-filters">{facultyOptions.map((option) => <button type="button" key={option} className={faculty === option?'is-active':''} onClick={() => setFaculty(option)}>{option}</button>)}</div>
-    <div className="v2-teacher-grid v2-filtered-list" key={`${query}|${faculty}`}>{filteredTeachers.map((person) => <button type="button" key={person.id} className="v2-teacher-card" onClick={() => openTeacher(person.id)}><img src={teacherPhotos[teachers.findIndex((item) => item.id === person.id) % teacherPhotos.length]} alt=""/><span className="v2-teacher-row-copy"><DisplayAvatar className="v2-avatar" name={person.name} personId={person.id}/><strong>{person.name}<small>{person.englishName}</small></strong><em>{facultyOf(person.department)} · {person.department}</em><span className="v2-teacher-topics">{person.topics.slice(0, 2).map((topic) => <i key={topic}>{topic}</i>)}</span></span><ChevronRight size={19}/></button>)}</div>
+    <div className="v2-teacher-grid v2-filtered-list" key={`${query}|${faculty}`}>{filteredTeachers.map((person) => <button type="button" key={person.id} className="v2-teacher-card" onClick={event => sharedElementTransition(`coffee:${person.id}`,()=>openTeacher(person.id),{source:event.currentTarget.querySelector<HTMLElement>('[data-shared-media]')})}><img data-shared-media={`coffee:${person.id}`} src={teacherPhotos[teachers.findIndex((item) => item.id === person.id) % teacherPhotos.length]} alt=""/><span className="v2-teacher-row-copy"><DisplayAvatar className="v2-avatar" name={person.name} personId={person.id}/><strong>{person.name}<small>{person.englishName}</small></strong><em>{facultyOf(person.department)} · {person.department}</em><span className="v2-teacher-topics">{person.topics.slice(0, 2).map((topic) => <i key={topic}>{topic}</i>)}</span></span><ChevronRight size={19}/></button>)}</div>
     {live.data && !filteredTeachers.length && <Empty icon={Coffee} title={uiText("没有匹配的老师")} description={uiText("换个学院或搜索词试试。")}/>}
   </div>
 }
