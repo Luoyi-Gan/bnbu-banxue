@@ -1,0 +1,177 @@
+[
+  {
+    "route": "/v2",
+    "titles": [
+      {
+        "text": "会同里",
+        "top": 41.40625
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "cw-header",
+        "top": 24,
+        "bottom": 90
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "route": "/v2/activities",
+    "titles": [
+      {
+        "text": "发现",
+        "top": 41.40625
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "ref-header",
+        "top": 24,
+        "bottom": 90
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "route": "/v2/campus",
+    "titles": [
+      {
+        "text": "校园",
+        "top": 41.40625
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "ref-header",
+        "top": 24,
+        "bottom": 90
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "route": "/v2/sports",
+    "titles": [
+      {
+        "text": "运动",
+        "top": 57.59375
+      }
+    ],
+    "toolbar": [],
+    "overflow": false
+  },
+  {
+    "route": "/v2/me",
+    "titles": [
+      {
+        "text": "王同学",
+        "top": 268.5
+      }
+    ],
+    "toolbar": [],
+    "overflow": false
+  },
+  {
+    "route": "/v2/shops",
+    "titles": [
+      {
+        "text": "校园探店",
+        "top": 44.59375
+      }
+    ],
+    "toolbar": [],
+    "overflow": false
+  },
+  {
+    "route": "/v2/alumni",
+    "titles": [
+      {
+        "text": "校友同行",
+        "top": 127
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "v2-topbar",
+        "top": 24,
+        "bottom": 89
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "route": "/v2/organizations",
+    "titles": [
+      {
+        "text": "社团组织",
+        "top": 111
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "v2-topbar",
+        "top": 24,
+        "bottom": 89
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "route": "/v2/partners/teams",
+    "titles": [
+      {
+        "text": "我的组队",
+        "top": 111
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "v2-topbar",
+        "top": 24,
+        "bottom": 89
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "route": "/v2/ai",
+    "titles": [
+      {
+        "text": "问问奶蛙",
+        "top": 111
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "v2-topbar",
+        "top": 24,
+        "bottom": 89
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "route": "/v2/community",
+    "titles": [],
+    "toolbar": [],
+    "overflow": false
+  },
+  {
+    "route": "/v2/me?tab=timetable",
+    "titles": [
+      {
+        "text": "我的课表",
+        "top": 43.796875
+      }
+    ],
+    "toolbar": [
+      {
+        "class": "ref-header",
+        "top": 24,
+        "bottom": 90
+      }
+    ],
+    "overflow": false
+  }
+]

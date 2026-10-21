@@ -1,0 +1,266 @@
+[
+  {
+    "route": "partners",
+    "width": 393,
+    "visibleTitles": [
+      "找搭子"
+    ],
+    "titleRight": 114,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "partners",
+    "width": 320,
+    "visibleTitles": [
+      "找搭子"
+    ],
+    "titleRight": 104,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "partners",
+    "width": 1440,
+    "visibleTitles": [
+      "找搭子"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  },
+  {
+    "route": "coffee",
+    "width": 393,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 172.6875,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "coffee",
+    "width": 320,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 153,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "coffee",
+    "width": 1440,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  },
+  {
+    "route": "alumni",
+    "width": 393,
+    "visibleTitles": [
+      "校友同行"
+    ],
+    "titleRight": 136,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "alumni",
+    "width": 320,
+    "visibleTitles": [
+      "校友同行"
+    ],
+    "titleRight": 124,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "alumni",
+    "width": 1440,
+    "visibleTitles": [
+      "校友同行"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 134
+  },
+  {
+    "route": "organizations",
+    "width": 393,
+    "visibleTitles": [
+      "社团组织"
+    ],
+    "titleRight": 136,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "organizations",
+    "width": 320,
+    "visibleTitles": [
+      "社团组织"
+    ],
+    "titleRight": 124,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "organizations",
+    "width": 1440,
+    "visibleTitles": [
+      "社团组织"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  },
+  {
+    "route": "partners/teams",
+    "width": 393,
+    "visibleTitles": [
+      "我的组队"
+    ],
+    "titleRight": 136,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "partners/teams",
+    "width": 320,
+    "visibleTitles": [
+      "我的组队"
+    ],
+    "titleRight": 124,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "partners/teams",
+    "width": 1440,
+    "visibleTitles": [
+      "我的组队"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  },
+  {
+    "route": "ai",
+    "width": 393,
+    "visibleTitles": [
+      "问问奶蛙"
+    ],
+    "titleRight": 136,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "ai",
+    "width": 320,
+    "visibleTitles": [
+      "问问奶蛙"
+    ],
+    "titleRight": 124,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "ai",
+    "width": 1440,
+    "visibleTitles": [
+      "问问奶蛙"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  },
+  {
+    "route": "coffee?view=bookings",
+    "width": 393,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 172.6875,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "coffee?view=bookings",
+    "width": 320,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 153,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "coffee?view=bookings",
+    "width": 1440,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  },
+  {
+    "route": "alumni?view=bookings",
+    "width": 393,
+    "visibleTitles": [
+      "校友同行"
+    ],
+    "titleRight": 136,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "alumni?view=bookings",
+    "width": 320,
+    "visibleTitles": [
+      "校友同行"
+    ],
+    "titleRight": 124,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "alumni?view=bookings",
+    "width": 1440,
+    "visibleTitles": [
+      "校友同行"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 134
+  }
+]

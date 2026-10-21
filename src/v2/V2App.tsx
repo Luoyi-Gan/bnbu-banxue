@@ -50,6 +50,15 @@ import './editorial.css'
 import './studentGlass.css'
 import './visualOrder.css'
 
+const compactStudentHeaders:Record<string,{title:string;back:string}> = {
+  '/v2/partners':{title:'找搭子',back:'/v2/campus'},
+  '/v2/coffee':{title:'Coffee Chat',back:'/v2/campus'},
+  '/v2/alumni':{title:'校友同行',back:'/v2'},
+  '/v2/organizations':{title:'社团组织',back:'/v2/campus'},
+  '/v2/partners/teams':{title:'我的组队',back:'/v2/partners'},
+  '/v2/ai':{title:'问问奶蛙',back:'/v2'},
+}
+
 const studentNav = [
   { path: '/v2', label: '首页', icon: House, end: true },
   { path: '/v2/activities', label: '发现', icon: Compass },
@@ -99,6 +108,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const nav = admin ? adminNav : teacher ? teacherNav : studentNav
   const unread = notificationPreferences(live.data).messages ? liveConversations(live.data).reduce((sum, item) => sum + item.unread, 0) : 0
   const title = location.pathname === '/v2/campus/explore' ? '校园探索' : location.pathname === '/v2/organizations' ? '社团组织' : location.pathname === '/v2/sports' ? '运动' : [...nav, ...(!admin ? studentSidebarCatalog : [])].sort((a, b) => b.path.length - a.path.length).find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))?.label ?? '会同里'
+  const compactHeader=!admin&&!teacher?compactStudentHeaders[location.pathname]:undefined
   const service = new URLSearchParams(location.search).get('service')
   const sidebarMatch = (id: typeof sidebarItems[number]) => {
     if (id === 'home') return location.pathname === '/v2'
@@ -120,7 +130,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     return () => { document.removeEventListener('pointerdown', closeOutside); document.removeEventListener('keydown', closeEscape) }
   }, [roleMenu])
   if (location.pathname === '/v2/campus/explore') return <main>{children}</main>
-  return <div data-campus-route={location.pathname} data-campus-tab={new URLSearchParams(location.search).get('tab') ?? ''} className={`v2-app${sports ? ' v2-app-sports' : ''}${!admin && !teacher ? ' v2-app-student' : ` v2-app-staff${teacher ? ' v2-app-teacher' : ' v2-app-admin'}`}`}>
+  return <div data-compact-header={compactHeader?'true':undefined} data-campus-route={location.pathname} data-campus-tab={new URLSearchParams(location.search).get('tab') ?? ''} className={`v2-app${sports ? ' v2-app-sports' : ''}${!admin && !teacher ? ' v2-app-student' : ` v2-app-staff${teacher ? ' v2-app-teacher' : ' v2-app-admin'}`}`}>
     <aside className={`v2-sidebar${mobileMenu ? ' is-open' : ''}`} aria-label={uiText("新版主导航")}>
       <Link to={portalHome[state.role]} className="v2-brand"><img src={shellBrandIcon} alt=""/><span><strong>{uiText("会同里")}</strong><small>BNBU CAMPUS</small></span></Link>
       {(admin || teacher) && <div className="cw-staff-campus" aria-hidden="true"><img src={staffCampusPhoto} alt=""/></div>}
@@ -131,7 +141,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label={uiText("关闭导航")} onClick={() => setMobileMenu(false)}/>}
     <div className="v2-workspace">
       <header className="v2-topbar">
-        {!admin&&!teacher&&['/v2/partners','/v2/coffee'].includes(location.pathname)&&<div className="v2-compact-route-heading"><Link to={location.pathname==='/v2/coffee'&&new URLSearchParams(location.search).get('view')==='bookings'?'/v2/me':'/v2/campus'} aria-label={uiText("返回")}><ArrowLeft size={21}/></Link><h1>{location.pathname==='/v2/partners'?uiText('找搭子'):'Coffee Chat'}</h1></div>}
+        {compactHeader&&<div className="v2-compact-route-heading"><Link to={location.pathname==='/v2/coffee'&&new URLSearchParams(location.search).get('view')==='bookings'?'/v2/me':compactHeader.back} aria-label={uiText("返回")}><ArrowLeft size={21}/></Link><h1>{uiText(compactHeader.title)}</h1></div>}
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label={uiText("打开导航")}><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>{uiText("会同里")}</span>}<div><span className="v2-breadcrumb">BNBU / {admin?uiText('管理'):teacher?uiText('教师'):uiText('校园')}</span><strong>{title}</strong></div></div>
         <div className="v2-top-actions">
           {!admin && !teacher && <StudentUtilities/>}
