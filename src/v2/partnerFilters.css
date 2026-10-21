@@ -11,3 +11,22 @@
 .v2-room-sport{background:#e8f7f6;color:#16716d}
 @media(max-width:850px){.v2-partner-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.v2-partner-filter-grid{grid-template-columns:1fr}.v2-partner-type-picker{gap:4px}.v2-partner-type-picker button{padding:9px 2px}}
+
+/* Compact partner filters: common fields first, category details on demand. */
+.v2-app.v2-app-student .partner-discovery .v2-partner-filter-panel {border:1px solid var(--v2-line);border-radius:24px;padding:16px;margin:0 0 24px;background:var(--v2-surface)}
+.v2-app.v2-app-student .partner-discovery .v2-partner-filter-toggle {min-height:32px;font-size:14px}
+.partner-filter-count,.partner-filter-group summary b {display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:12px;background:var(--v2-accent-soft);color:var(--v2-action);font-size:11px}
+.v2-app.v2-app-student .v2-partner-filter-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:16px}
+.v2-partner-filter-grid>.v2-partner-location-field,.v2-partner-filter-grid>.partner-filter-group,.v2-partner-filter-grid>.v2-button {grid-column:1/-1}
+.v2-partner-filter-grid .v2-partner-location-field>label,.partner-filter-group-fields>label {display:grid;gap:8px;font-size:12px;font-weight:500;color:var(--v2-muted)}
+.v2-app.v2-app-student .v2-partner-filter-grid :is(input,select) {box-sizing:border-box;min-width:0;max-width:100%;height:44px;font-family:inherit;font-size:13px;font-weight:400;line-height:1.4;border-radius:12px;padding:0 10px}
+.v2-partner-filter-grid .v2-partner-location-tools:has(small):not(:has(button)) {display:none}
+.v2-partner-filter-grid .v2-partner-location-tools small {display:none}
+.partner-filter-group {min-width:0;border-top:1px solid var(--v2-line);padding-top:4px}
+.partner-filter-group summary {display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;list-style:none;font-size:13px;font-weight:600;color:var(--v2-ink)}
+.partner-filter-group summary::-webkit-details-marker {display:none}
+.partner-filter-group summary:after {content:'+';margin-left:auto;color:var(--v2-muted);font-size:18px;font-weight:400}
+.partner-filter-group[open] summary:after {content:'−'}
+.partner-filter-group-fields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:4px 0 12px}
+.v2-partner-filter-grid>.v2-button {justify-self:stretch;justify-content:center;margin-top:4px}
+@media(max-width:380px){.v2-app.v2-app-student .v2-partner-filter-grid input[type=datetime-local] {font-size:11px;padding-inline:4px}}

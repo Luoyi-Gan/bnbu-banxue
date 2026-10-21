@@ -31,3 +31,5 @@ html[data-ui-theme] body:has(.v2-app.v2-app-student) .v2-app.v2-app-student .v2-
 
 .v2-app.v2-app-student .v2-student-search-field input {font-family:inherit;font-weight:400;line-height:1.5;letter-spacing:normal;text-overflow:ellipsis}
 .v2-app.v2-app-student .v2-student-search-field input::placeholder {font-weight:400;color:var(--v2-muted);opacity:1}
+/* Closed search controls must not extend the document's horizontal scroll area. */
+.v2-student-search:not(.is-open) .v2-student-search-field {display:none}
