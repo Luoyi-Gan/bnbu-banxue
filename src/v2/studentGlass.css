@@ -66,7 +66,7 @@ html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.
   background:var(--student-glass-field)!important;color:var(--student-glass-ink)!important;border-color:var(--student-glass-divider)!important;
 }
 html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.student-timetable-launcher,.v2-floating-timetable-trigger,.community-publish-fab){color:var(--student-glass-accent)!important;border:1px solid var(--student-glass-line)}
-html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.student-timetable-launcher[aria-expanded=true],.v2-floating-timetable-trigger[aria-expanded=true],.v2-mobile-nav a.is-active,.v2-floating-timetable-content .v2-weekdays button.is-active){background:var(--student-glass-active)!important;color:var(--student-glass-accent)!important}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.student-timetable-launcher[aria-expanded=true],.v2-floating-timetable-trigger[aria-expanded=true],.v2-floating-timetable-content .v2-weekdays button.is-active){background:var(--student-glass-active)!important;color:var(--student-glass-accent)!important}
 html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.v2-person-hover,.v2-floating-timetable-window,.v2-modal,.v2-drawer,.v2-student-search-panel){border:1px solid var(--student-glass-line);border-radius:22px}
 /* Use a calm, solid surface when backdrop filtering is unavailable. */
 .v2-campus-explorer:has([data-map-dialog-open]) :is(.v2-explorer-panel,.map-p0-dock,.map-p1-route,.map-p0-layers){visibility:hidden;pointer-events:none}
@@ -74,3 +74,16 @@ html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.
   body:has(.v2-app.v2-app-student,.v2-explore-immersive){--student-glass-surface:#f5f8f2;--student-glass-raised:#fafbf7}
   html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive){--student-glass-surface:#23372d;--student-glass-raised:#263c30}
 }
+
+/* One shared selection surface moves beneath the five student destinations. */
+@media(max-width:760px){
+ html[data-ui-theme] .v2-app.v2-app-student>.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,#fffffd85,#edf4ee70);--student-glass-shadow:0 6px 24px #24463810,inset 0 1px 0 #ffffffa6;isolation:isolate;overflow:hidden;gap:0;padding:6px}
+ .v2-app.v2-app-student>.v2-mobile-nav>.student-nav-indicator{position:absolute;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/5);border-radius:19px;background:rgba(58,153,126,.14);box-shadow:inset 0 1px 0 #ffffff55;pointer-events:none;z-index:0;transition:transform .42s cubic-bezier(.2,.85,.25,1.15)}
+ html[data-ui-theme] .v2-app.v2-app-student>.v2-mobile-nav>a{position:relative;z-index:1;flex:1;min-width:0;background:transparent;transition:color .18s ease}
+ html[data-ui-theme] .v2-app.v2-app-student>.v2-mobile-nav>a.is-active{background:transparent!important;color:var(--student-glass-accent)!important}
+ .v2-app.v2-app-student>.v2-mobile-nav>a>svg{transition:transform .3s cubic-bezier(.2,.85,.25,1.15)}
+ .v2-app.v2-app-student>.v2-mobile-nav>a.is-active>svg{transform:scale(1.08)}
+ html[data-ui-theme=dark] .v2-app.v2-app-student>.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,#263e30b0,#182f258f)}
+ html[data-ui-theme=dark] .v2-app.v2-app-student>.v2-mobile-nav>.student-nav-indicator{background:#53bd9f29;box-shadow:inset 0 1px 0 #c8e6d21a}
+}
+@media(prefers-reduced-motion:reduce){.v2-app.v2-app-student>.v2-mobile-nav>.student-nav-indicator,.v2-app.v2-app-student>.v2-mobile-nav>a>svg{transition:none}.v2-app.v2-app-student>.v2-mobile-nav>a.is-active>svg{transform:none}}

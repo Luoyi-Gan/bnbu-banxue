@@ -84,6 +84,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const shellBrandIcon = brandIcon
   const sports = location.pathname === '/v2/teacher/sports'
   const studentSectionActive = (path: string, isActive: boolean) => location.pathname==='/v2/community'?path===(new URLSearchParams(location.search).get('person')==='me'?'/v2/me':'/v2/activities'):isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni', '/v2/shops'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const activeStudentNavIndex=studentNav.findIndex(item=>studentSectionActive(item.path,item.path==='/v2'?location.pathname===item.path:location.pathname.startsWith(item.path)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
     { path: '/v2/teacher/schedule', label: '日程', icon: CalendarDays },
@@ -135,7 +136,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
       </header>
       <main className="v2-main">{children}</main>
     </div>
-    {!admin && !teacher && <nav className="v2-mobile-nav" aria-label={uiText("手机主导航")}>{studentNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => studentSectionActive(path, isActive) ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}</nav>}
+    {!admin && !teacher && <nav className="v2-mobile-nav" aria-label={uiText("手机主导航")}>{studentNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => studentSectionActive(path, isActive) ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}{activeStudentNavIndex>=0&&<span className="student-nav-indicator" aria-hidden="true" style={{transform:`translateX(${activeStudentNavIndex*100}%)`}}/>}</nav>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label={uiText("手机教师导航")}>{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label={uiText("手机管理导航")}>{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
     {!admin && !teacher && device.preferences.timetableShortcut && <FloatingTimetable/>}
