@@ -2188,5 +2188,13 @@
   "沿途路线": "Along the route",
   "路线仅供参考，具体入口请留意现场标识。": "Route is for reference. Follow signs on site for entrances.",
   "起点": "Start",
-  "终点": "Destination"
+  "终点": "Destination",
+  "建筑信息": "Building information",
+  "层": "floors",
+  "楼层": "Floors",
+  "地图记录": "Map record",
+  "估算": "Estimated",
+  "占地面积": "Footprint area",
+  "具体入口与开放情况，请留意现场标识。": "Follow on-site signs for entrances and access.",
+  "更多资料": "More information"
 }
