@@ -1,0 +1,35 @@
+{
+  "viewports": [
+    {
+      "width": 430,
+      "overflow": false,
+      "footer": 653.125,
+      "bottom": 678.125,
+      "scrollHeight": 497,
+      "clientHeight": 497
+    },
+    {
+      "width": 320,
+      "overflow": false,
+      "footer": 658.3125,
+      "bottom": 683.3125,
+      "scrollHeight": 502,
+      "clientHeight": 502
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "footer": 668.71875,
+      "bottom": 709.71875,
+      "scrollHeight": 512,
+      "clientHeight": 512
+    }
+  ],
+  "minimalSubmit": true,
+  "optionalValuesPreserved": true,
+  "gpaErrorRevealsOptions": true,
+  "nativeInvalidRevealsOptions": true,
+  "keyboardToggle": true,
+  "failedSubmitPreservesInput": true,
+  "otherTypesFolded": true
+}

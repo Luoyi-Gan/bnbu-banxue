@@ -10,7 +10,7 @@ export function StudentUtilityPanel({title,onClose,children}:{title:string;onClo
     const overflow=document.body.style.overflow
     app?.setAttribute('inert','')
     document.body.style.overflow='hidden'
-    const focusables=()=>Array.from(document.querySelectorAll<HTMLElement>('.v2-modal')).at(-1)?.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),[tabindex="0"]')
+    const focusables=()=>Array.from(document.querySelectorAll<HTMLElement>('.v2-modal')).at(-1)?.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),summary,input:not(:disabled),textarea:not(:disabled),select:not(:disabled),[tabindex="0"]')
     const frame=requestAnimationFrame(()=>focusables()?.[0]?.focus())
     const trap=(event:KeyboardEvent)=>{
       if(event.key!=='Tab'||document.querySelector('.v2-map-picker-layer'))return
