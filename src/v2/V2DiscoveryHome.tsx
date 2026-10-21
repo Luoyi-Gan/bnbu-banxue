@@ -13,7 +13,7 @@ import campusServices from '../assets/campus/campus-services.jpg'
 
 const slides = [campusHome, campusEvening, campusServices]
 const shortcuts = [
-  { label: '活动日程', hint: '丰富此刻', path: '/v2/schedule', icon: CalendarDays, tone: 'blue' },
+  { label: '校园活动', hint: '丰富此刻', path: '/v2/activities', icon: CalendarDays, tone: 'blue' },
   { label: '师生交流', hint: '聊聊未来', path: '/v2/coffee', icon: GraduationCap, tone: 'green' },
   { label: '社团组织', hint: '遇见同好', path: '/v2/organizations', icon: UsersRound, tone: 'orange' },
   { label: '校园生活', hint: '分享日常', path: '/v2/community', icon: MessageCircle, tone: 'purple' },
@@ -49,7 +49,7 @@ export function V2Home() { useUiLanguage();
       {!activities.length && <div className="reference-empty"><CalendarDays size={27}/><strong>{live.data?uiText('新的校园活动，正在路上'):uiText('正在读取校园活动…')}</strong><p>{uiText("活动发布后，会在这里与你见面。")}</p></div>}
     </section>
     <div className="reference-feature-grid"><Link className="reference-coffee-card" to="/v2/coffee"><span><Coffee size={21}/><strong>Coffee Chat</strong><ArrowRight size={16}/></span><h3>{uiText("和老师聊聊")}<br/>{uiText("每一种可能")}</h3><p>{uiText("选一位老师，约一段交流时光。")}</p><Coffee className="reference-coffee-art" size={78} strokeWidth={1}/></Link><Link className="reference-sport-card" to="/v2/sports"><span><strong>{uiText("运动打卡")}</strong><ArrowRight size={16}/></span><div className="reference-progress-ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42"/>{percent !== null && percent > 0 && <circle cx="50" cy="50" r="42" pathLength="100" strokeDasharray={`${percent} 100`}/>}</svg><strong>{percent === null?'—':`${Math.floor(percent)}%`}</strong></div><p>{progress?sportsProgressLabel(progress):live.data?.sportsStatus === 'not-enrolled'?uiText('暂无体育课程'):uiText('进度暂不可用')}</p><small>{uiText("本学期运动进度")}</small></Link></div>
-    {next && <section className="reference-section"><SectionHeading title={uiText("接下来")} action={<Link to="/v2/schedule">{uiText("我的安排")}<ArrowRight size={14}/></Link>}/><Link className="reference-next" to={next.path} state={{from:"/v2"}}><CalendarDays size={21}/><span><strong>{next.title}</strong><small>{next.startAt?new Date(next.startAt).toLocaleString(uiLocale(), {month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}):next.time} · {next.location}</small></span><ArrowRight size={16}/></Link></section>}
+    {next && <section className="reference-section"><SectionHeading title={uiText("接下来")} /><Link className="reference-next" to={next.path} state={{from:"/v2"}}><CalendarDays size={21}/><span><strong>{next.title}</strong><small>{next.startAt?new Date(next.startAt).toLocaleString(uiLocale(), {month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}):next.time} · {next.location}</small></span><ArrowRight size={16}/></Link></section>}
     <Link className="reference-campus-more" to="/v2/campus">{uiText("校园服务与更多可能")}<ArrowRight size={16}/></Link>
   </div>
 }

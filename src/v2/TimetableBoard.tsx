@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useState,type CSSProperties} from 'react'
 import {CalendarDays,ChevronLeft,ChevronRight,LayoutGrid,List,MapPin,BookOpen,ArrowUpRight} from 'lucide-react'
-import {Link} from 'react-router-dom'
+import {TimetableCalendarSettings} from './TimetableCalendarSettings'
 import type {TimetableLesson} from '../../shared/v2/timetableModel'
 import {lessonRunsInWeek,schedulePreferences} from '../../shared/v2/schedulePreferences'
 import {schoolCalendarWeek} from '../../shared/v2/academicCalendar'
@@ -8,6 +8,7 @@ import {campusDate,mondayOf,offsetDate,timetableWeek,courseLanes,clockMinutes,co
 import {uiText} from './uiLanguage'
 
 export function TimetableBoard({lessons,preferences,onSelect,idPrefix}:{lessons:TimetableLesson[];preferences?:Record<string,unknown>;onSelect:(id:string)=>void;idPrefix:string}){
+  const [calendarSettings,setCalendarSettings]=useState(false)
   const [now,setNow]=useState(Date.now)
   useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),60000);return()=>window.clearInterval(timer)},[])
   const today=campusDate(now)
@@ -38,8 +39,9 @@ export function TimetableBoard({lessons,preferences,onSelect,idPrefix}:{lessons:
     </div>)}</div></div></div>}
     {!!incomplete.length&&<details className="tt-unplaced"><summary>{incomplete.length} {uiText('项课程信息待补充')}</summary><p>{uiText('时间或周次不完整的课程，核对后会显示在日历中。')}</p>{incomplete.map(item=><button type="button" key={item.id} onClick={()=>onSelect(item.id)}>{item.name}<ChevronRight size={15}/></button>)}</details>}
     {!!lessons.length&&<details className="tt-course-catalog"><summary>{uiText('全部课程')}<span>{lessons.length}</span></summary><div>{lessons.map(item=><button type="button" key={item.id} onClick={()=>onSelect(item.id)}><span><strong>{item.name}</strong><small>周{'一二三四五六日'[item.weekday-1]} · {item.startTime||item.period||uiText('时间待核对')} · {item.location||uiText('地点待核对')}</small></span><ChevronRight size={15}/></button>)}</div></details>}
-    {prefs.academicCalendar==='custom'&&!prefs.semesterStartDate&&<p className="tt-calendar-note">{uiText('设置学期日期后，课程将按周次显示。')}<Link to="/v2/schedule?tab=upcoming">{uiText('设置校历')}<ArrowUpRight size={13}/></Link></p>}
-    <footer className="tt-board-footer"><span><CalendarDays size={13}/>{uiText(prefs.academicCalendar==='bnbu-2026-s1'?'学校校历 · 2026/27 第一学期':'自定义学期')}</span><Link to="/v2/schedule?tab=upcoming">{uiText('校历设置')}<ArrowUpRight size={12}/></Link></footer>
+    {prefs.academicCalendar==='custom'&&!prefs.semesterStartDate&&<p className="tt-calendar-note">{uiText('设置学期日期后，课程将按周次显示。')}<button type="button" onClick={()=>setCalendarSettings(true)}>{uiText('设置校历')}<ArrowUpRight size={13}/></button></p>}
+    <footer className="tt-board-footer"><span><CalendarDays size={13}/>{uiText(prefs.academicCalendar==='bnbu-2026-s1'?'学校校历 · 2026/27 第一学期':'自定义学期')}</span><button type="button" onClick={()=>setCalendarSettings(true)}>{uiText('校历设置')}<ArrowUpRight size={12}/></button></footer>
+    {calendarSettings&&<TimetableCalendarSettings onClose={()=>setCalendarSettings(false)}/>}
   </section>
 }
 function ClockLabel(){return <span className="tt-time-label">时间</span>}

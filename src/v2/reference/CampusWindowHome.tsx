@@ -97,7 +97,7 @@ export function CampusWindowHome() { useUiLanguage();
     <div className="cw-intro">
       <CampusWindow greeting={uiText(greeting)} name={name}/>
       <div className="cw-focus">
-        <div className="cw-agenda-controls"><label>{uiText('展示')}<select aria-label={uiText('首页安排展示条数')} value={agendaPreferences.homeScheduleCount} disabled={live.busy} onChange={event=>void live.mutate('preferences.schedule',{homeScheduleCount:Number(event.target.value)})}>{[1,2,3,4,5,6].map(count=><option key={count} value={count}>{count} {uiText('项')}</option>)}</select></label><Link to="/v2/schedule?tab=upcoming">{uiText('更多安排')}<ChevronRight size={14}/></Link></div>
+        <div className="cw-agenda-controls"><label>{uiText('展示')}<select aria-label={uiText('首页安排展示条数')} value={agendaPreferences.homeScheduleCount} disabled={live.busy} onChange={event=>void live.mutate('preferences.schedule',{homeScheduleCount:Number(event.target.value)})}>{[1,2,3,4,5,6].map(count=><option key={count} value={count}>{count} {uiText('项')}</option>)}</select></label></div>
         {next?<Link to={next.path} className="cw-next">
           <div className="cw-next-top"><span><i/>{uiText("下一项安排")}</span><ArrowRight size={22}/></div>
           <h2>{next.title}</h2>
@@ -105,15 +105,15 @@ export function CampusWindowHome() { useUiLanguage();
         </Link>:<section className="cw-next cw-next-empty" aria-busy={!data && !live.error}>
           <span className="cw-next-top">{uiText("下一项安排")}</span>
           <h2>{live.error?uiText('安排暂时无法读取'):data?uiText('留一点时间，去看看校园。'):uiText('正在读取你的安排…')}</h2>
-          {live.error ? <button type="button" onClick={() => void live.refresh()}>{uiText("重新读取")}<ArrowRight size={16}/></button> : data ? <Link to="/v2/schedule">{uiText("查看我的日程")}<ArrowRight size={16}/></Link> : <p role="status">{uiText("正在读取个人日程")}</p>}
+          {live.error ? <button type="button" onClick={() => void live.refresh()}>{uiText("重新读取")}<ArrowRight size={16}/></button> : data ? <Link to="/v2/activities">{uiText("发现校园活动")}<ArrowRight size={16}/></Link> : <p role="status">{uiText("正在读取个人日程")}</p>}
         </section>}
         {following.map(item=><Link key={item.id} to={item.path} className="cw-following"><ScheduleTime item={item}/><div><strong>{item.title}</strong><span>{item.location || uiText('地点待商定')} · {uiText(item.label)}</span>{item.time && <span>{item.time}</span>}</div><ChevronRight size={17}/></Link>)}
-        {agendaPreferences.academicCalendar==='custom'&&!agendaPreferences.semesterStartDate&&data?.entities.some(e=>e.kind==='timetable'&&e.ownerId===data.account.id)&&<Link className="cw-agenda-pending" to="/v2/schedule?tab=upcoming">{uiText('设置学期第一周日期，加入课程安排')}<ChevronRight size={14}/></Link>}
-        {schedule.some(item=>!item.startAt)&&<Link className="cw-agenda-pending" to="/v2/schedule?tab=upcoming">{uiText('另有时间待确认的安排')}<ChevronRight size={14}/></Link>}
+        {agendaPreferences.academicCalendar==='custom'&&!agendaPreferences.semesterStartDate&&data?.entities.some(e=>e.kind==='timetable'&&e.ownerId===data.account.id)&&<Link className="cw-agenda-pending" to="/v2/me?tab=timetable">{uiText('设置学期第一周日期，加入课程安排')}<ChevronRight size={14}/></Link>}
+
       </div>
       <Feedback live={live}/>
       <nav className="cw-summary" aria-label={uiText("今日摘要")}>
-        <Link to="/v2/schedule"><span>{uiText("今日安排")}</span><strong>{data?today:'—'}{data && <small>{uiText("项")}</small>}</strong></Link>
+        <div><span>{uiText("今日安排")}</span><strong>{data?today:'—'}{data && <small>{uiText("项")}</small>}</strong></div>
         <Link to="/v2/messages?view=notifications"><span>{uiText("未读通知")}</span><strong>{unread ?? '—'}{data && <small>{uiText("条")}</small>}</strong></Link>
         <Link to="/v2/sports"><span>{uiText("体育进度")}</span><strong>{percent === null?'—':`${Math.round(percent)}%`}<small>{uiText(sportsNote)}</small></strong></Link>
       </nav>

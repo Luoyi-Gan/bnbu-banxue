@@ -43,9 +43,9 @@
 .cw-home .cw-following>div>span {font-size:13px;color:var(--cw-muted);overflow-wrap:anywhere}
 .cw-home .cw-following>svg {flex-shrink:0;color:var(--cw-muted)}
 .cw-home .cw-summary {display:grid;grid-template-columns:1fr 1fr 1.2fr;margin:28px 0 0;padding:20px 0;border-top:1px solid var(--cw-line);border-bottom:1px solid var(--cw-line)}
-.cw-home .cw-summary>a {padding:0 24px;border-left:1px solid var(--cw-line);min-width:0}
-.cw-home .cw-summary>a:first-child {padding-left:4px;border:0}
-.cw-home .cw-summary>a>span {font-size:13px;color:var(--cw-muted)}
+.cw-home .cw-summary>:is(a,div) {padding:0 24px;border-left:1px solid var(--cw-line);min-width:0}
+.cw-home .cw-summary>:is(a,div):first-child {padding-left:4px;border:0}
+.cw-home .cw-summary>:is(a,div)>span {font-size:13px;color:var(--cw-muted)}
 .cw-home .cw-summary strong {display:flex;align-items:baseline;flex-wrap:wrap;gap:7px;font-size:30px;font-weight:500;line-height:1.4;color:var(--cw-blue);font-variant-numeric:tabular-nums;margin-top:3px}
 .cw-home .cw-summary small {font-size:13px;font-weight:400;letter-spacing:0;color:var(--cw-muted)}
 .cw-home .cw-content-grid {display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:0 36px}
@@ -135,7 +135,7 @@
   .cw-home .cw-schedule-time {font-size:18px}
   .cw-home .cw-following {gap:14px;padding:16px 3px}
   .cw-home .cw-summary {margin-top:0;padding:19px 0 17px;border-top:0}
-  .cw-home .cw-summary>a {padding:0 15px}
+  .cw-home .cw-summary>:is(a,div) {padding:0 15px}
   .cw-home .cw-summary strong {font-size:26px;gap:6px}
   .cw-home .cw-summary small {font-size:12px}
   .cw-home .ref-section {margin-top:23px}
@@ -160,7 +160,7 @@
 }
 @media(max-width:360px) {
   .cw-home .cw-header nav>a,.cw-home .cw-header .v2-student-search-trigger {width:40px}
-  .cw-home .cw-summary>a {padding-left:10px;padding-right:8px}
+  .cw-home .cw-summary>:is(a,div) {padding-left:10px;padding-right:8px}
   .cw-home .cw-summary strong {font-size:24px}
   .cw-home .cw-next {margin-right:5px;padding:16px}
   .cw-home .cw-scene {left:96px}
