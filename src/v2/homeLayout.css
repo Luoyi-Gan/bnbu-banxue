@@ -12,7 +12,7 @@
 @media(max-width:640px){.v2-app.v2-app-student .cw-home .cw-focus{margin-top:14px}.v2-app.v2-app-student .cw-home .cw-summary{gap:7px}.v2-app.v2-app-student .cw-home .cw-summary>:is(a,div){padding:10px}.v2-app.v2-app-student .cw-home .cw-services .ref-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 /* Give the next arrangement a quieter edge and a clear reading rhythm. */
-.v2-app.v2-app-student .cw-home .cw-next{position:relative;padding:22px 24px 25px;border:1px solid #cddad254;border-bottom:1px solid #cddad254;box-shadow:0 3px 14px #25443b05}
+.v2-app.v2-app-student .cw-home .cw-next{position:relative;padding:22px 24px 25px;border:1px solid #cddad254;border-bottom:1px solid #cddad254;box-shadow:var(--student-course-shadow)}
 .v2-app.v2-app-student .cw-home .cw-next:after{content:"";position:absolute;left:24px;right:24px;bottom:0;height:1px;background:#7aadb5}
 .v2-app.v2-app-student .cw-home .cw-next h2{font-family:var(--reference-font,'MiSans',sans-serif);font-size:25px;font-weight:650;line-height:1.4;margin:16px 0 19px}
 .v2-app.v2-app-student .cw-home .cw-next-top{font-size:12px;color:var(--v2-muted)}

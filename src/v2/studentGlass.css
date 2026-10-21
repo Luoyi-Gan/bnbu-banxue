@@ -12,6 +12,9 @@ body:has(.v2-app.v2-app-student,.v2-explore-immersive){
   --student-glass-accent:#257965;
   --student-glass-active:rgba(66,159,125,.16);
   --student-glass-scrim:rgba(20,40,31,.2);
+  --student-course-shadow:0 12px 38px -8px rgba(46,86,67,.1),0 2px 7px rgba(46,86,67,.025);
+  --student-course-shadow-hover:0 16px 44px -8px rgba(46,86,67,.12),0 3px 9px rgba(46,86,67,.03);
+  --student-course-shadow-small:0 5px 18px -4px rgba(46,86,67,.09);
 }
 html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive){
   --student-glass-surface:linear-gradient(145deg,rgba(35,55,45,.77),rgba(20,37,29,.66));
@@ -22,6 +25,9 @@ html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive){
   --student-glass-divider:rgba(173,209,185,.18);
   --student-glass-shadow:0 12px 36px #001a1038,inset 0 1px 0 #c8e6d21a;
   --student-glass-ink:#e1ede4;--student-glass-muted:#b0c5b8;--student-glass-accent:#8edbc0;
+  --student-course-shadow:0 14px 42px -8px rgba(4,20,13,.2),0 2px 8px rgba(4,20,13,.08);
+  --student-course-shadow-hover:0 18px 48px -8px rgba(4,20,13,.25),0 3px 10px rgba(4,20,13,.08);
+  --student-course-shadow-small:0 6px 20px -4px rgba(4,20,13,.18);
   --student-glass-active:rgba(88,193,153,.19);--student-glass-scrim:rgba(0,14,8,.4);
 }
 /* Keep placement, dimensions and all interaction states in their owning components. */

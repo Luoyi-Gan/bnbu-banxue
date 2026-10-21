@@ -160,3 +160,6 @@ body:has(.v2-app.v2-app-student) .v2-explorer-panel h2 {font-family:var(--cw-tit
   .v2-app.v2-app-student :is(.v2-filtered-list,.v2-teacher-card),
   body:has(.v2-app.v2-app-student) .v2-partner-specific-fields {animation:none;transition:none}
 }
+
+/* Soft ambient elevation on campus course previews. */
+.v2-app.v2-app-student .ref-lesson>span{box-shadow:var(--student-course-shadow-small)}
