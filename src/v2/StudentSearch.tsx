@@ -93,7 +93,7 @@ export function StudentSearch() { useUiLanguage();
     <button ref={triggerRef} type="button" className="v2-icon-button v2-student-search-trigger" aria-label={uiText("搜索校园")} aria-expanded={open} aria-keyshortcuts="/ Meta+K Control+K" onClick={() => setOpen(true)}><Search size={19}/></button>
     <div className="v2-student-search-field" aria-hidden={!open}>
       <Search size={18} aria-hidden="true"/>
-      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder={uiText("搜索校园内容或输入完整学号")} aria-label={uiText("搜索校园内容")} tabIndex={open?0:-1}/>
+      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder={uiText("搜索校园内容或学号")} aria-label={uiText("搜索校园内容")} tabIndex={open?0:-1}/>
       {query && <button type="button" className="v2-student-search-clear" tabIndex={open?0:-1} aria-label={uiText("清除搜索词")} onClick={() => { setQuery(''); inputRef.current?.focus() }}><X size={15}/></button>}
       <button type="button" className="v2-student-search-close" tabIndex={open?0:-1} aria-label={uiText("关闭搜索")} onClick={closeToTrigger}><X size={18}/></button>
     </div>
