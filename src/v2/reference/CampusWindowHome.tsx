@@ -103,7 +103,7 @@ export function CampusWindowHome() { useUiLanguage();
       <CampusWindow greeting={uiText(greeting)} name={name}/>
       <div className="cw-focus">
         <div className="cw-agenda-controls"><label>{uiText('展示')}<select aria-label={uiText('首页安排展示条数')} value={agendaPreferences.homeScheduleCount} disabled={live.busy} onChange={event=>void live.mutate('preferences.schedule',{homeScheduleCount:Number(event.target.value)})}>{[1,2,3,4,5,6].map(count=><option key={count} value={count}>{count} {uiText('项')}</option>)}</select></label></div>
-        {next?<Link to={next.path} className={`cw-next${next.kind==='course'?` cw-course tt-tone-${courseTone(next.title)}`:''}`} onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&next.kind==='course'&&next.lessonId){event.preventDefault();setCourseDetail({id:next.lessonId,origin:event.currentTarget.getBoundingClientRect().toJSON()})}}}>
+        {next?<Link to={next.path} className="cw-next" onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&next.kind==='course'&&next.lessonId){event.preventDefault();setCourseDetail({id:next.lessonId,origin:event.currentTarget.getBoundingClientRect().toJSON()})}}}>
           <div className="cw-next-top"><span><i/>{uiText("下一项安排")}</span><ArrowRight size={22}/></div>
           <h2>{next.title}</h2>
           <div className="cw-next-meta"><ScheduleTime item={next}/><div><span><MapPin size={14}/>{next.location || uiText('地点待商定')}</span><small>{uiText(next.label)}</small>{next.time && <small>{next.time}</small>}</div></div>
