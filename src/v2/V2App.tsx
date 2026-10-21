@@ -1,4 +1,5 @@
 import {useStudentScrollGlass} from './useStudentScrollGlass'
+import {motion} from 'motion/react'
 import {StudentUtilities} from './StudentUtilities'
 import {StudentUtilityPanel} from './StudentUtilityPanel'
 import {ShopPage} from './ShopPage'
@@ -138,7 +139,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
       </header>
       <main className="v2-main">{children}</main>
     </div>
-    {!admin && !teacher && <nav className="v2-mobile-nav" aria-label={uiText("手机主导航")}>{studentNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => studentSectionActive(path, isActive) ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}{activeStudentNavIndex>=0&&<span className="student-nav-indicator" aria-hidden="true" style={{transform:`translateX(${activeStudentNavIndex*100}%)`}}/>}</nav>}
+    {!admin && !teacher && <nav className="v2-mobile-nav" aria-label={uiText("手机主导航")}>{studentNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => studentSectionActive(path, isActive) ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}{activeStudentNavIndex>=0&&<motion.span className="student-nav-indicator" aria-hidden="true" initial={false} animate={{x:`${activeStudentNavIndex*100}%`}} transition={device.reducedMotion?{duration:0}:{type:'spring',stiffness:460,damping:36,mass:.9}}/>}</nav>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label={uiText("手机教师导航")}>{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label={uiText("手机管理导航")}>{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
     {!admin && !teacher && device.preferences.timetableShortcut && <FloatingTimetable/>}

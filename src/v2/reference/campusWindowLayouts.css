@@ -220,3 +220,5 @@ body:has(.v2-app.v2-app-student[data-campus-route='/v2/community']) .v2-a-commun
 .v2-app.v2-app-student .cw-home .cw-header nav :is(.cw-notification,.v2-floating-timetable-trigger.is-toolbar)>svg{width:20px;height:20px;stroke-width:1.8}
 .cw-home .v2-timetable-toolbar-slot{display:flex;align-items:center}
 @media(max-width:360px){.v2-app.v2-app-student .cw-home .cw-header{gap:8px}.v2-app.v2-app-student .cw-home .cw-header h1{font-size:24px;letter-spacing:1px}}
+
+.v2-app.v2-app-student .ref-campus .cw-campus-window>img{-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 86%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 86%,transparent 100%)}
