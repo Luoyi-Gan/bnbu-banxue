@@ -1,4 +1,4 @@
-param([switch]$Acceptance)
+param([switch]$Acceptance, [switch]$WithoutSports)
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
 $bnbuNode = Get-Command node -ErrorAction SilentlyContinue
@@ -14,6 +14,7 @@ if ($Acceptance) {
   if ($LASTEXITCODE -ne 0) { throw '体育验收身份初始化失败。' }
   $env:BNBU_DATABASE = Join-Path $PSScriptRoot 'data/browser-acceptance.sqlite'
   $env:BNBU_LOCAL_OUTBOX = '1'
+  $env:BNBU_LOCAL_SPORTS_ACCEPTANCE = if ($WithoutSports) { '0' } else { '1' }
   if (-not $env:BNBU_SCHOOL_EMAIL_DOMAINS) { $env:BNBU_SCHOOL_EMAIL_DOMAINS = 'example.test' }
   Write-Host '使用独立验收数据库（非学校真实身份）。账号见 data/browser-acceptance-accounts.json。'
 }

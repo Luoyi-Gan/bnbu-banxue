@@ -1,6 +1,10 @@
 import { build, createServer } from "vite";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import {startLocalSportsPreview} from './local-sports-preview.mjs';
+
+const localSports = process.env.BNBU_LOCAL_SPORTS_ACCEPTANCE === '1' ? await startLocalSportsPreview() : null;
+process.once('exit',()=>localSports?.kill());
 
 await build({
   configFile: false,
@@ -28,6 +32,7 @@ const frontend = await createServer({
 await frontend.listen();
 frontend.printUrls();
 async function shutdown() {
+  localSports?.kill();
   await frontend.close();
   backend.close();
 }

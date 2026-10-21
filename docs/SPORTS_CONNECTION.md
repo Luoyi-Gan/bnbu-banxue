@@ -32,3 +32,11 @@ Sports 代码位置：`C:/Users/23328/Desktop/new_version/backend/src/companion-
 ## 独立本地演示
 
 `tools/companion-bridge/local-preview.mts` 仅在 `APP_ENV=local` 且 `COMPANION_BRIDGE_TEST_ONLY=1` 时启动，并绑定 loopback。它模拟“没有原体育账号”，使用真实 PGlite SQL保存个人运动，进程结束会清空测试库。需要通过 `BNBU_PGLITE_TEST_MODULE` 指向本地安装的PGlite模块，且配置仅本地测试用的桥密钥；此脚本不用于真实账号或正式同步。
+
+### 一次启动本地页面（2026-10-22 修复）
+
+在会同里根目录运行 `./Start-Local.ps1 -Acceptance`：先准备独立验收库，再为清单中原有的两个合成学生显式添加测试邮箱验证记录，最后启动隔离运动桥与4174/4175页面服务。初始化命令 `node scripts/acceptance.mjs sports` 可重复执行；不会给老师、管理员、真实机构账号添加验证。
+
+体育源码默认位于相邻目录 `../new_version`，可通过 `BNBU_LOCAL_SPORTS_ROOT` 指定。它须已安装backend中的tsx和PGlite依赖。启动器复用其 `tools/companion-bridge/local-preview.mts`，生成仅本次进程使用的随机签名密钥，不读取生产环境文件。只允许loopback和固定的browser-acceptance.sqlite、本地邮件箱；退出会同里服务会停止测试桥，个人运动测试库随之清空。
+
+没有体育源码时，可用 `./Start-Local.ps1 -Acceptance -WithoutSports` 预览其他页面；该模式不承诺运动连接可用。普通启动和生产启动不会自动添加测试验证记录，也不会启动此模拟体育目录。扫码页可预览，但该隔离桥不模拟原体育身份或课堂入班完成。
