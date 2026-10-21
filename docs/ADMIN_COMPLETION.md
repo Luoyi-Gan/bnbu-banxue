@@ -2741,3 +2741,8 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 - 同源地图查看器按学生端标记加载独立样式，地图设置打开时暂时隐藏外层信息与工具面板，关闭后恢复，避免相互遮挡；销毁时释放观察器。
 - 本地浏览器验证浅色课表、导入弹窗、深色课表及导航、地图设置开关与透光效果；恢复原有跟随系统主题。截图 artifacts/student-glass-timetable-light-20261021.png、student-glass-modal-light-20261021.png、student-glass-timetable-dark-20261021.png、student-glass-map-settings-20261021.png。
 - 相关 ESLint、类型检查和生产构建通过；地图迁移与页面权限共 8 项测试通过。本次仅做学生界面显示调整，属于本地浏览器验证。
+
+### 2026-10-21 校园页找搭子入口
+
+- 按用户要求，将校园页找搭子的两条队伍预览替换为与 Coffee Chat 统一的图片横幅入口，复用原横幅样式、校园林荫路图片、简短文案及箭头，整张卡片进入搭子大厅。
+- 本地浏览器检查入口与相邻 Coffee Chat、探店区域排版，点击确认进入 /v2/partners；相关 ESLint 和前端类型检查通过。截图 artifacts/campus-partners-banner-20261021.png。
