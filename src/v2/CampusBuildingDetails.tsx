@@ -1,4 +1,4 @@
-import {ArrowUpRight,ChevronDown,MapPin,Route} from 'lucide-react'
+import {ChevronDown,MapPin,Route} from 'lucide-react'
 import type {CampusBuilding} from './campusLocations'
 import {uiText} from './uiLanguage'
 import './campusBuildingDetails.css'
@@ -18,6 +18,6 @@ export function CampusBuildingDetails({building,info,onDirections}:{building:Cam
       <div><dt>{uiText('占地面积')}</dt><dd>{info?.area_m2!=null?<>{Math.round(info.area_m2).toLocaleString()}<span>m²</span></>:<span className="campus-place-unknown">{uiText('未记录')}</span>}</dd></div>
     </dl>
     <p className="campus-place-access"><MapPin size={14}/><span>{uiText('具体入口与开放情况，请留意现场标识。')}</span></p>
-    <details className="campus-place-source"><summary><span>{uiText('更多资料')}</span><ChevronDown size={15}/></summary><div><p>{uiText('地图记录时间')}<span>{info?.source_timestamp?.slice(0,10)||uiText('未记录')}</span></p><a href={'https://www.openstreetmap.org/'+building.id} target="_blank" rel="noreferrer">{uiText('查看地图来源')}<ArrowUpRight size={14}/></a></div></details>
+    <details className="campus-place-source"><summary><span>{uiText('更多资料')}</span><ChevronDown size={15}/></summary><div><p>{uiText('地图记录时间')}<span>{info?.source_timestamp?.slice(0,10)||uiText('未记录')}</span></p></div></details>
   </section>
 }
