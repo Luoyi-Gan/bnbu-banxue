@@ -49,3 +49,4 @@ html[data-ui-theme=dark] body:has(.v2-app.v2-app-student) .v2-modal-layer>.v2-mo
   overflow-anchor:none;
   contain:layout paint;
 }
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student) .v2-modal:has(.student-utility-content)>header h2 {color:#e1ede4}
