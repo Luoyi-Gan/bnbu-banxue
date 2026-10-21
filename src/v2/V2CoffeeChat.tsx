@@ -1,4 +1,5 @@
 import {sharedElementTransition} from './sharedElementMotion'
+import {ContinuityIcon} from './ContinuityIcon'
 import { uiText, useUiLanguage, uiLocale } from './uiLanguage'
 import { Link, useSearchParams } from 'react-router-dom'
 import { DisplayAvatar } from './DisplayAvatar'
@@ -75,6 +76,7 @@ export function V2CoffeeChat() { useUiLanguage();
     if (!slot) return
     const booking = bookings.find(b => b.data.slotId === slot.id)
     const cancelled = isBooked && !!booking
+    setFeedback('')
     if (await live.mutate(cancelled ? 'coffee.cancel' : 'coffee.book', cancelled ? {id: booking.id, reason: ''} : {slotId: slot.id, topic})) setFeedback(cancelled ? '预约已取消。' : '预约成功，老师已收到通知。')
   }
 
@@ -110,8 +112,8 @@ export function V2CoffeeChat() { useUiLanguage();
           <span className="v2-coffee-slot-status">{mine?<><Check size={13}/> {uiText("已预约")}</>:uiText(label)}</span>
         </button>
       })}</div>:<Empty icon={Coffee} title={uiText("暂时没有可查看的时段")} description={uiText("稍后再来看看。")}/>}
-      {!isBooked && <label className="v2-form">{uiText("想交流的问题")}<textarea maxLength={500} value={topic} onChange={event => setTopic(event.target.value)} placeholder={uiText("请填写交流主题或问题")}/></label>}<div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{slot?.location ?? teacher.location}</span><small>{slot?`${slotDate(slot.startAt)} · ${uiText(slot.timeLabel)}`:uiText('请先选择一个时段')}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} disabled={live.busy || !slot || (!isBooked && (!topic.trim() || !teacher.enabled || slot.closed || Date.parse(slot.startAt) <= Date.now() || occupied(state, slot.id) >= slot.capacity))} onClick={updateBooking}>{isBooked?uiText('取消预约'):uiText('确认预约')} <ArrowRight size={15}/></button></div>
-      {(live.error || feedback) && <p className="v2-coffee-feedback" role="status">{live.error || feedback}</p>}
+      {!isBooked && <label className="v2-form">{uiText("想交流的问题")}<textarea maxLength={500} value={topic} onChange={event => setTopic(event.target.value)} placeholder={uiText("请填写交流主题或问题")}/></label>}<div className="v2-coffee-booking-panel"><span><MapPin size={16}/>{slot?.location ?? teacher.location}</span><small>{slot?`${slotDate(slot.startAt)} · ${uiText(slot.timeLabel)}`:uiText('请先选择一个时段')}</small><button type="button" className={`v2-button ${isBooked ? 'v2-button-secondary v2-coffee-cancel' : 'v2-button-primary'}`} aria-busy={live.busy||undefined} disabled={live.busy || !slot || (!isBooked && (!topic.trim() || !teacher.enabled || slot.closed || Date.parse(slot.startAt) <= Date.now() || occupied(state, slot.id) >= slot.capacity))} onClick={updateBooking}>{live.busy?uiText('保存中…'):isBooked?uiText('取消预约'):uiText('确认预约')} <ArrowRight size={15}/></button></div>
+      {(live.error || feedback) && <p className={`v2-coffee-feedback continuity-feedback${live.error?' is-error':''}`} role={live.error?'alert':'status'}>{!live.error&&<ContinuityIcon icon={Check} active enter fill={false} size={17}/>}<span>{live.error || feedback}</span></p>}
       <p className="v2-form-note">{uiText("预约保存到会同里后台，实际到场情况不由预约状态推定。")}</p>
     </div>
   }

@@ -1,4 +1,5 @@
 import {SharedMediaLink} from './SharedMediaLink'
+import {ContinuityIcon} from './ContinuityIcon'
 import { uiTemplate, uiText, useUiLanguage , uiLocale } from './uiLanguage'
 import { Bookmark, Clock3, MapPin, Heart } from 'lucide-react'
 import { useState } from 'react'
@@ -28,8 +29,8 @@ export function ActivityReactions({ item, compact = false, only, live, showNote=
   const change = (kind: ActivityReaction) => live ? live.mutate('relation.set', {id: item.id, kind: kind === 'likedActivities' ? 'like' : 'save', enabled: !(kind === 'likedActivities' ? liked : saved)}) : setState(value => setActivityReaction(value, item.id, kind, !value[kind]?.includes(item.id)))
   if (live ? !live.data?.account.roles.includes('student') : state.role !== 'student') return null
   return <div className={compact?'activity-discovery-reactions':'activity-detail-reactions'}>
-    {only !== 'savedActivities' && <button type="button" className={liked?'is-liked':''} disabled={item.local?.status === 'draft'} aria-label={uiTemplate(["","活动：",""],uiText(liked ? '取消点赞' : '点赞'),item.title)} aria-pressed={liked} title={uiText("点赞标记仅反映本人状态")} onClick={() => change('likedActivities')}><Heart size={compact?16:18} fill={liked?'currentColor':'none'}/><span>{compact?Number(liked):liked?uiText('已点赞'):uiText('点赞')}</span></button>}
-    {only !== 'likedActivities' && <button type="button" className={saved?'is-saved':''} disabled={item.local?.status === 'draft'} aria-label={uiTemplate(["","活动：",""],uiText(saved ? '取消收藏' : '收藏'),item.title)} aria-pressed={saved} onClick={() => change('savedActivities')}><Bookmark size={compact?16:18} fill={saved?'currentColor':'none'}/>{!compact && <span>{saved?uiText('已收藏'):uiText('收藏')}</span>}</button>}
+    {only !== 'savedActivities' && <button type="button" className={liked?'is-liked':''} disabled={live?.busy||item.local?.status === 'draft'} aria-busy={live?.busy||undefined} aria-label={uiTemplate(["","活动：",""],uiText(liked ? '取消点赞' : '点赞'),item.title)} aria-pressed={liked} title={uiText("点赞标记仅反映本人状态")} onClick={() => change('likedActivities')}><ContinuityIcon icon={Heart} active={liked} size={compact?16:18}/><span>{compact?Number(liked):liked?uiText('已点赞'):uiText('点赞')}</span></button>}
+    {only !== 'likedActivities' && <button type="button" className={saved?'is-saved':''} disabled={live?.busy||item.local?.status === 'draft'} aria-busy={live?.busy||undefined} aria-label={uiTemplate(["","活动：",""],uiText(saved ? '取消收藏' : '收藏'),item.title)} aria-pressed={saved} onClick={() => change('savedActivities')}><ContinuityIcon icon={Bookmark} active={saved} size={compact?16:18}/>{!compact && <span>{saved?uiText('已收藏'):uiText('收藏')}</span>}</button>}
     {!compact && showNote && <small>{live?live.error || uiText('点赞与收藏保存到会同里后台，不影响参与标记。'):persistenceError?uiText('本机保存失败，请检查浏览器存储空间。'):uiText('点赞与收藏保存在本机，不影响参与标记。')}</small>}
   </div>
 }

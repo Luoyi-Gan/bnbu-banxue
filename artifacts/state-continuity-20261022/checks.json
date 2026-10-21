@@ -1,0 +1,55 @@
+{
+  "initial": {
+    "fill": "transparent",
+    "pressed": "false"
+  },
+  "saved": {
+    "busy": null,
+    "fill": "currentColor",
+    "phase": "activating",
+    "pressed": "true"
+  },
+  "unsaved": {
+    "fill": "transparent",
+    "phase": "deactivating",
+    "pressed": "false"
+  },
+  "restored": {
+    "fill": "transparent",
+    "pressed": "false"
+  },
+  "afterReload": {
+    "pressed": "false"
+  },
+  "date": {
+    "header": "10月23日3 项课程",
+    "selected": "2026-10-23 周五",
+    "transition": "0.18s, 0.18s, 0.12s"
+  },
+  "noticeBefore": {
+    "retainedDots": 8,
+    "unread": 8
+  },
+  "noticeAfter": {
+    "readDots": [
+      {
+        "duration": "0.18s, 0.18s",
+        "hidden": "true",
+        "opacity": "0.108475"
+      }
+    ],
+    "retainedDots": 8,
+    "unread": 7
+  },
+  "coffee": {
+    "bookingButton": "确认预约 ",
+    "selectionTransitions": [
+      "0.2s, 0.2s, 0.2s"
+    ],
+    "slots": 5
+  },
+  "coffeeSelection": {
+    "selected": "10月22日星期四14:00 – 15:00预约已取消 · 可预约",
+    "submitDisabled": true
+  }
+}

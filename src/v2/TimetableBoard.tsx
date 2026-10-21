@@ -1,3 +1,4 @@
+import './stateContinuity.css'
 import {useEffect,useMemo,useState,type CSSProperties} from 'react'
 import {CalendarDays,ChevronLeft,ChevronRight,LayoutGrid,List,MapPin,BookOpen,ArrowUpRight} from 'lucide-react'
 import {TimetableCalendarSettings} from './TimetableCalendarSettings'
