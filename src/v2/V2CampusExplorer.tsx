@@ -16,6 +16,7 @@ import { LocalPreviewNotice } from './preview/LocalPreviewNotice'
 import './campus-explorer.css'
 import './mapPresentation.css'
 import './mapP1.css'
+import './mapGlassLayout.css'
 
 type Scene = ReturnType<typeof createCampusScene>
 

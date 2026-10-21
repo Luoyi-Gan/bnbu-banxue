@@ -64,7 +64,7 @@ const plugin = { name: 'huitongli-map', setup(builder) {
       contents=contents.replace('function viewPadding(){',`function viewPadding(){
         if(new URLSearchParams(location.search).get('surface')==='explore'&&parent!==window){
           const panels=[...parent.document.querySelectorAll('.map-p0-dock,.v2-explorer-panel,.map-p1-route')].map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);
-          return innerWidth<900?{left:16,right:60,top:140,bottom:Math.max(140,...panels.map(r=>innerHeight-r.top+16))}:{left:16,right:Math.max(80,...panels.filter(r=>r.left>innerWidth/2).map(r=>r.width+40)),top:140,bottom:80};
+          return innerWidth<600?{left:16,right:60,top:140,bottom:Math.max(140,...panels.map(r=>innerHeight-r.top+16))}:{left:Math.max(16,...panels.filter(r=>r.left<innerWidth/2).map(r=>r.right+20)),right:60,top:140,bottom:24};
         }
       `)
       if(!contents.includes('renderer.toneMappingExposure=.85;'))throw Error('Map exposure adapter source no longer matches')
