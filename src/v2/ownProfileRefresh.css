@@ -14,7 +14,7 @@
 .own-profile .community-profile-card .community-profile-statline{margin:12px 0 0}.own-profile .community-profile-statline>div{gap:26px}.own-profile .community-profile-statline strong{font-size:18px}.own-profile .community-profile-statline span{font-size:11px}
 .v2-app.v2-app-student .own-profile .cw-profile-body{display:block;padding:0 24px;max-width:1000px;margin-inline:auto}
 .own-profile .ref-section{margin-top:18px}.own-profile .ref-section>header{margin-bottom:10px}.own-profile .ref-section>header h2{font-family:inherit;font-size:16px;font-weight:650}.own-profile .ref-section>header>a{font-size:11px}
-.own-profile .own-campus-shortcuts{margin:0;padding:0;gap:8px;border:0}.own-profile .own-campus-shortcuts a{background:var(--v2-soft);border-radius:14px;padding:14px 4px;gap:3px}.own-profile .own-campus-shortcuts span{font-size:10px}
+.own-profile .own-campus-shortcuts{margin:0;padding:0;gap:8px;border:0}.own-profile .own-campus-shortcuts a{background:var(--v2-soft);border-radius:14px;padding:14px 4px;gap:3px}.own-profile .own-campus-shortcuts span{font-size:10px;min-height:2.5em;display:grid;place-items:center;line-height:1.25}
 .own-profile .cw-profile-body>.ref-section:nth-of-type(2){padding:14px;background:var(--v2-soft);border-radius:18px}
 .own-profile .ref-week{margin-bottom:10px}.own-profile .ref-week button{border-radius:12px}.own-profile .ref-empty{border-radius:12px;background:var(--v2-surface);padding:12px}
 .v2-app.v2-app-student .own-profile .cw-profile-body .ref-section:last-child .ref-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:none}

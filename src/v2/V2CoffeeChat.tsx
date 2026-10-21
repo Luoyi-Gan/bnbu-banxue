@@ -1,5 +1,5 @@
 import { uiText, useUiLanguage, uiLocale } from './uiLanguage'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { DisplayAvatar } from './DisplayAvatar'
 import { coffeeSlotStatus } from './coffeeSlotStatus'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
@@ -76,6 +76,18 @@ export function V2CoffeeChat() { useUiLanguage();
     const cancelled = isBooked && !!booking
     if (await live.mutate(cancelled ? 'coffee.cancel' : 'coffee.book', cancelled ? {id: booking.id, reason: ''} : {slotId: slot.id, topic})) setFeedback(cancelled ? '预约已取消。' : '预约成功，老师已收到通知。')
   }
+
+  if(params.get('view')==='bookings')return <section className="v2-panel v2-list-panel" aria-label={uiText('我的 Coffee Chat 预约')}>
+    <div className="v2-section-heading"><h2>{uiText('我的预约')}</h2><Link to="/v2/coffee">{uiText('预约交流')}<ArrowRight size={15}/></Link></div>
+    <p className="v2-form-note">{uiText('已确认的预约，包含历史记录；预约不代表实际到场。')}</p>
+    {live.error&&<p role="alert">{uiText(live.error)}</p>}
+    {!live.data&&!live.error&&<p role="status">{uiText('正在读取预约记录…')}</p>}
+    {[...bookings].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(booking=>{
+      const bookedSlot=coffeeSlots.find(s=>s.id===booking.data.slotId),person=teachers.find(t=>t.id===booking.data.teacherId)
+      return <Link className="v2-saved-row" key={booking.id} onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){setTeacherId(String(booking.data.teacherId));setSlotId(String(booking.data.slotId));setFeedback('')}}} to={`/v2/coffee?teacher=${encodeURIComponent(String(booking.data.teacherId))}&slot=${encodeURIComponent(String(booking.data.slotId))}`}><Coffee size={20}/><span><strong>{person?.name??uiText('老师')} · Coffee Chat</strong><small>{bookedSlot?`${new Date(bookedSlot.startAt).toLocaleString(uiLocale(),{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Shanghai'})} · ${bookedSlot.location}`:uiText('时段信息暂不可用')}</small><small>{uiText(booking.data.proposedSlotId?'改期待确认':'已确认预约')}</small></span><ChevronRight size={16}/></Link>
+    })}
+    {live.data&&!bookings.length&&<Empty icon={Coffee} title={uiText('还没有已确认的交流预约')} description={uiText('预约老师后，记录会显示在这里。')}/>}
+  </section>
 
   if (teacher) {
     const photo = teacherPhotos[teachers.findIndex((person) => person.id === teacher.id) % teacherPhotos.length]

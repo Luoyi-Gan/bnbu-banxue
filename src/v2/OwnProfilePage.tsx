@@ -21,6 +21,7 @@ export function OwnProfilePage(){
   const participates=data?.relations.filter(r=>r.kind==='participate'&&entities.some(e=>e.id===r.entityId&&e.kind==='activity'&&e.data.status==='published'))??[]
   const follows=data?.relations.filter(r=>r.kind==='follow'&&entities.some(e=>e.id===r.entityId&&e.kind==='organization'&&e.data.status==='approved'&&e.data.visibility==='visible'))??[]
   const rooms=entities.filter(e=>e.kind==='room'&&(e.ownerId===id||e.data.isMember))
+  const coffeeBookings=entities.filter(e=>e.kind==='coffeeBooking'&&e.ownerId===id&&e.data.status==='confirmed')
   const saved=data?.relations.filter(r=>r.kind==='save'&&entities.some(e=>e.id===r.entityId&&(['activity','post','room'].includes(e.kind))&&(e.kind==='activity'?e.data.status==='published':e.kind==='post'?e.data.status==='visible':e.data.visibility==='visible')))??[]
   const menu=[
     {label:'我的课表',copy:'查看、导入与核对课程',path:'/v2/me?tab=timetable',icon:BookOpen},
@@ -34,7 +35,7 @@ export function OwnProfilePage(){
       {social.data?<CommunityProfile profile={social.data.profile} busy={live.busy} onFollow={()=>{}} onList={list=>navigate(`/v2/community?person=me&panel=${list}`)}/>:<div className="own-profile-loading"><p role={social.error?'alert':'status'}>{uiText(social.error||'正在读取本人资料…')}{social.error&&<button onClick={social.refresh}>{uiText('重试')}</button>}</p></div>}
     </section>
     <div className="ref-page-body cw-profile-body"><Feedback live={live}/>
-      <Section title={uiText('我的校园足迹')}><nav className="own-campus-shortcuts" aria-label={uiText('校园功能')}>{[{label:'参与活动',value:participates.length,path:'/v2/me?tab=events'},{label:'关注组织',value:follows.length,path:'/v2/organizations'},{label:'参与队伍',value:rooms.length,path:'/v2/me?tab=teams'},{label:'我的收藏',value:saved.length,path:'/v2/me?tab=saved'}].map(item=><Link key={item.label} to={item.path}><strong>{data?item.value:'—'}</strong><span>{language==='en'?({'参与活动':'Activities','关注组织':'Clubs','参与队伍':'Teams','我的收藏':'Saved'}[item.label]):uiText(item.label)}</span></Link>)}</nav></Section>
+      <Section title={uiText('我的校园足迹')}><nav className="own-campus-shortcuts" aria-label={uiText('校园功能')}>{[{label:'参与活动',value:participates.length,path:'/v2/me?tab=events'},{label:'关注组织',value:follows.length,path:'/v2/organizations'},{label:'参与队伍',value:rooms.length,path:'/v2/me?tab=teams'},{label:'我的收藏',value:saved.length,path:'/v2/me?tab=saved'},{label:'Coffee Chat',value:coffeeBookings.length,path:'/v2/coffee?view=bookings'}].map(item=><Link key={item.label} to={item.path}><strong>{data?item.value:'—'}</strong><span>{language==='en'?({'参与活动':'Activities','关注组织':'Clubs','参与队伍':'Teams','我的收藏':'Saved','Coffee Chat':'Coffee Chat'}[item.label]):uiText(item.label)}</span></Link>)}</nav></Section>
       <Section title={uiText('我的日历')}><Agenda data={data} calendar/></Section>
       <Section title={uiText('校园工具')}><div className="ref-menu">{menu.map(({label,copy,path,icon:Icon})=><Link key={path} to={path}><span className="ref-icon"><Icon size={22}/></span><div><strong>{uiText(label)}</strong><small>{uiText(copy)}</small></div><ChevronRight size={16}/></Link>)}</div></Section>
     </div>

@@ -2,7 +2,7 @@
 .own-profile .community-profile-top{justify-content:space-between}
 .own-profile-summary .community-profile-card{padding-bottom:14px}
 .own-profile .cw-profile-body{padding-top:0}
-.own-campus-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:20px 0;border-top:1px solid var(--v2-line);border-bottom:1px solid var(--v2-line);margin:0 0 24px}
+.own-campus-shortcuts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:20px 0;border-top:1px solid var(--v2-line);border-bottom:1px solid var(--v2-line);margin:0 0 24px}
 .own-campus-shortcuts a{display:grid;justify-items:center;gap:7px;text-decoration:none;color:var(--v2-muted);min-width:0;padding:4px 0}
 .own-campus-shortcuts strong{font-size:18px;font-weight:600;color:var(--v2-ink);font-variant-numeric:tabular-nums}
 .own-campus-shortcuts span{font-size:12px;text-align:center;line-height:1.5}
