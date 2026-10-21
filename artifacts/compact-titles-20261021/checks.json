@@ -1,0 +1,68 @@
+[
+  {
+    "route": "partners",
+    "width": 393,
+    "visibleTitles": [
+      "找搭子"
+    ],
+    "titleRight": 114,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "partners",
+    "width": 320,
+    "visibleTitles": [
+      "找搭子"
+    ],
+    "titleRight": 104,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "partners",
+    "width": 1440,
+    "visibleTitles": [
+      "找搭子"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  },
+  {
+    "route": "coffee",
+    "width": 393,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 172.6875,
+    "actionsLeft": 204,
+    "overflow": false,
+    "titleTop": 41.703125
+  },
+  {
+    "route": "coffee",
+    "width": 320,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 153,
+    "actionsLeft": 161,
+    "overflow": false,
+    "titleTop": 43
+  },
+  {
+    "route": "coffee",
+    "width": 1440,
+    "visibleTitles": [
+      "Coffee Chat"
+    ],
+    "titleRight": 0,
+    "actionsLeft": 1220,
+    "overflow": false,
+    "titleTop": 118
+  }
+]

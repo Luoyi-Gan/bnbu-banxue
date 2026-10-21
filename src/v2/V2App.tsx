@@ -12,7 +12,7 @@ import { CampusWindowHome } from './reference/CampusWindowHome'
 import staffCampusPhoto from '../assets/campus/campus-services.jpg'
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
-import { Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
+import { ArrowLeft, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 const brandIcon = '/huitongli-app-icon.png'
@@ -131,6 +131,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     {mobileMenu && <button type="button" className="v2-sidebar-scrim" aria-label={uiText("关闭导航")} onClick={() => setMobileMenu(false)}/>}
     <div className="v2-workspace">
       <header className="v2-topbar">
+        {!admin&&!teacher&&['/v2/partners','/v2/coffee'].includes(location.pathname)&&<div className="v2-compact-route-heading"><Link to={location.pathname==='/v2/coffee'&&new URLSearchParams(location.search).get('view')==='bookings'?'/v2/me':'/v2/campus'} aria-label={uiText("返回")}><ArrowLeft size={21}/></Link><h1>{location.pathname==='/v2/partners'?uiText('找搭子'):'Coffee Chat'}</h1></div>}
         <div className="v2-top-left"><button type="button" className="v2-icon-button v2-menu-trigger" onClick={() => setMobileMenu(true)} aria-label={uiText("打开导航")}><Menu size={21}/></button>{!admin && !teacher && <span className="v2-a-mobile-brand"><img src={shellBrandIcon} alt=""/>{uiText("会同里")}</span>}<div><span className="v2-breadcrumb">BNBU / {admin?uiText('管理'):teacher?uiText('教师'):uiText('校园')}</span><strong>{title}</strong></div></div>
         <div className="v2-top-actions">
           {!admin && !teacher && <StudentUtilities/>}

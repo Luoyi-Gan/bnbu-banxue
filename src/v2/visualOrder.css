@@ -55,3 +55,24 @@ body:has(.v2-app) :is(.v2-modal,.v2-drawer) :is(input:not([type=checkbox]):not([
 .v2-app.v2-app-staff .v2-teacher-panel>.v2-teacher-card {border-radius:var(--ui-radius-unit);padding:var(--ui-space-6);margin-top:var(--ui-space-4);box-shadow:none}
 
 @media(max-width:600px){.v2-app.v2-app-student .cw-home .cw-window {width:100%;min-width:0}.v2-app.v2-app-student .cw-home .cw-scene {right:0;max-width:calc(100% - 96px)}}
+
+.v2-compact-route-heading {display:none}
+@media(max-width:720px){
+  .v2-app.v2-app-student:is([data-campus-route='/v2/partners'],[data-campus-route='/v2/coffee']) .v2-topbar {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 16px;min-height:64px}
+  .v2-app.v2-app-student:is([data-campus-route='/v2/partners'],[data-campus-route='/v2/coffee']) .v2-top-left {display:none}
+  .v2-app.v2-app-student .v2-compact-route-heading {display:flex;align-items:center;gap:8px;min-width:0}
+  .v2-compact-route-heading>a {display:grid;place-items:center;flex:none;width:24px;min-height:44px;color:var(--v2-ink)}
+  .v2-app.v2-app-student .v2-compact-route-heading h1 {margin:0;white-space:nowrap;font:500 22px/1.3 var(--cw-title,'BNBU WenKai',serif);color:var(--v2-ink);letter-spacing:0}
+  .v2-app.v2-app-student:is([data-campus-route='/v2/partners'],[data-campus-route='/v2/coffee']) .v2-top-actions {gap:5px;flex:none}
+  .v2-app.v2-app-student :is(.partner-discovery,.reference-coffee-page) {padding-top:16px}
+  .v2-app.v2-app-student .partner-discovery>.v2-page-heading>div:first-child {display:none}
+  .v2-app.v2-app-student .partner-discovery>.v2-page-heading {margin:0 0 16px;padding:0;min-height:0}
+  .v2-app.v2-app-student .reference-coffee-page>.v2-page-heading {display:none}
+  .v2-app.v2-app-student .v2-topbar:has(.v2-student-search.is-open) .v2-compact-route-heading {visibility:hidden;pointer-events:none}
+}
+@media(max-width:360px){
+ .v2-app.v2-app-student .v2-compact-route-heading {gap:4px}
+ .v2-app.v2-app-student .v2-compact-route-heading h1 {font-size:20px}
+ .v2-app.v2-app-student .v2-topbar:has(.v2-compact-route-heading) :is(.student-utilities>a,.v2-student-search-trigger) {width:32px;height:36px;min-width:32px;min-height:36px}
+ .v2-app.v2-app-student .v2-topbar:has(.v2-compact-route-heading) .v2-student-search:not(.is-open) {width:32px}
+}
