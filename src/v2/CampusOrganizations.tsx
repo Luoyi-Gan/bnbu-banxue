@@ -1,54 +1,29 @@
-import {LoadingSwap} from './MaterialSkeleton'
-import { uiText, useUiLanguage } from './uiLanguage'
-import { UsersRound } from 'lucide-react'
-import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { AnimatedSearchField } from './AnimatedSearchField'
-import { useWorkspaceBackend } from './useWorkspaceBackend'
-import { Empty, PageHeading } from './ui'
-import { DiscoveryMasonry } from './DiscoveryMasonry'
-import { coverRatio } from './discoveryLayout'
-import './discoveryPage.css'
-import {DiscoveryDetail,DetailPhoto} from './DiscoveryDetail'
-import {sharedElementTransition} from './sharedElementMotion'
-
-export function CampusOrganizations({ embedded = false, externalQuery, externalCategory }: { embedded?: boolean; externalQuery?: string; externalCategory?: string }) { useUiLanguage();
-  const live = useWorkspaceBackend()
-  const [params] = useSearchParams()
-  const [query, setQuery] = useState(() => params.get('q') ?? '')
-  const [category, setCategory] = useState('全部')
-  const [selectedId,setSelectedId]=useState<string|null>(null)
-  const organizations = (live.data?.entities ?? []).filter(item => item.kind === 'organization' && item.data.status === 'approved' && item.data.visibility === 'visible').map(item => ({
-    id: item.id,
-    name: String(item.data.name ?? ''),
-    category: String(item.data.category ?? ''),
-    description: String(item.data.description ?? ''),
-    contact: String(item.data.contact ?? ''),
-    image: String(item.data.image ?? ''),
-  }))
-  const follows = new Set(live.data?.relations.filter(item => item.kind === 'follow').map(item => item.entityId) ?? [])
-  const selected=organizations.find(item=>item.id===selectedId)
-  const categories = ['全部', ...new Set(organizations.map(item => item.category))]
-  const normalizedQuery = (externalQuery ?? query).trim().toLocaleLowerCase()
-  const shown = organizations.filter(item => ((externalCategory ?? category) === '全部' || (externalCategory ?? category) === item.category) && `${item.name} ${uiText(item.category)} ${item.description}`.toLocaleLowerCase().includes(normalizedQuery))
-  const content = <>
-    {live.error && <p role="alert">{uiText(live.error)}</p>}
-    {externalQuery===undefined&&<div className="v2-directory-tools"><AnimatedSearchField value={query} onChange={setQuery} placeholder={uiText("搜索组织、类别或关键词")}/><span>{shown.length} {uiText("个组织")}</span></div>}
-    {externalCategory===undefined&&<nav className="campus-discovery-pills" aria-label={uiText("组织分类")}>{categories.map(item => <button type="button" key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>{uiText(item)}</button>)}</nav>}
-    <LoadingSwap loading={!live.data&&!live.error}>{!!shown.length&&<DiscoveryMasonry entranceScope={`organizations:${live.data?.account.id??'visitor'}`} key={`${normalizedQuery}|${externalCategory??category}`} items={shown} itemLabel="组织" renderItem={item=><article className="discovery-card organization-discovery-card" key={item.id} data-organization-id={item.id}>
-      <button type="button" className="organization-detail-trigger" data-shared-media={`organization:${item.id}`} aria-label={uiText('查看组织：')+item.name} onClick={event=>sharedElementTransition(`organization:${item.id}`,()=>setSelectedId(item.id),{source:event.currentTarget})}><OrganizationCover key={item.image||item.id} name={item.name} image={item.image} category={item.category} id={item.id}/></button>
-      <h3 className="discovery-title"><button className="organization-title-trigger" type="button" onClick={()=>sharedElementTransition(`organization:${item.id}`,()=>setSelectedId(item.id))}>{item.name}</button></h3>
-      <div className="organization-discovery-footer"><small>{uiText(item.category)}</small><button type="button" aria-pressed={follows.has(item.id)} disabled={live.busy} onClick={() => void live.mutate('relation.set', { id: item.id, kind: 'follow', enabled: !follows.has(item.id) })}>{follows.has(item.id)?uiText('已关注'):uiText('关注')}</button></div>
-      {(item.description||item.contact)&&<details className="organization-discovery-details"><summary>{uiText('组织介绍与联系')}</summary>{item.description&&<p className="organization-discovery-description">{item.description}</p>}{item.contact&&<small className="organization-discovery-contact">{item.contact}</small>}</details>}
-    </article>}/>}
-    {live.data && !shown.length && <Empty icon={UsersRound} title={uiText("没有匹配的组织")} description={uiText("试试其他类别或关键词。")}/>}</LoadingSwap>
-    {selected&&<DiscoveryDetail title={selected.name} transitionKey={`organization:${selected.id}`} identity={<strong>{uiText(selected.category)}</strong>} media={selected.image?<DetailPhoto src={selected.image} alt={selected.name}/>:<div className="organization-detail-placeholder"><UsersRound size={40}/><strong>{selected.name}</strong></div>} onClose={()=>setSelectedId(null)} actions={<button type="button" disabled={live.busy} aria-pressed={follows.has(selected.id)} onClick={()=>void live.mutate('relation.set',{id:selected.id,kind:'follow',enabled:!follows.has(selected.id)})}>{uiText(follows.has(selected.id)?'已关注':'关注')}</button>}><p>{selected.description||uiText('暂无组织介绍')}</p>{selected.contact&&<p>{uiText('联系方式：')}{selected.contact}</p>}{live.error&&<p role="alert">{uiText(live.error)}</p>}</DiscoveryDetail>}
-  </>
-  if (embedded) return <section className="organization-discovery" aria-label={uiText("社团组织")}>{content}</section>
-  return <div className="v2-page v2-organizations-page"><PageHeading back="/v2/campus" eyebrow="CAMPUS / ORGANIZATIONS" title={uiText("社团组织")} description={uiText("认识校园里的同行者。")}/>{content}</div>
+import {useState} from 'react'
+import {Link,useSearchParams} from 'react-router-dom'
+import {ArrowLeft,ChevronRight,Heart,Search,UsersRound,BookOpen,Palette,Activity,HandHeart,Shapes,X} from 'lucide-react'
+import {useWorkspaceBackend} from './useWorkspaceBackend'
+import {SharedMediaLink} from './SharedMediaLink'
+import {uiText,useUiLanguage} from './uiLanguage'
+import './shops.css'
+const categoryIcons:Record<string,typeof UsersRound>={'全部':UsersRound,'学术':BookOpen,'文化艺术':Palette,'体育运动':Activity,'义工服务':HandHeart,'其他类':Shapes}
+function ClubCover({id,name,image,category,detail=false}:{id:string;name:string;image:string;category:string;detail?:boolean}){
+ const [failed,setFailed]=useState(false)
+ return <div className={`shop-cover${image&&!failed?' has-photo':' is-placeholder'}`} data-category={category} data-shared-media={detail?undefined:`organization:${id}`} data-shared-target={detail?`organization:${id}`:undefined}>{image&&!failed?<img src={image} alt={`${name} 公开资料配图`} loading="lazy" onError={()=>setFailed(true)}/>:<div className="shop-cover-identity"><UsersRound size={30} strokeWidth={1.25}/><strong>{name}</strong><small>{uiText('社团照片待补充')}</small></div>}<span>{category}</span></div>
 }
-
-function OrganizationCover({id,name,image,category}:{id:string;name:string;image:string;category:string}){
-  const [failed,setFailed]=useState(false),[loaded,setLoaded]=useState(false)
-  return <div className={`discovery-cover organization-discovery-cover${image&&!failed&&!loaded?' is-loading':''}`} style={{aspectRatio:coverRatio(id)}}>{image&&!failed?<img src={image} alt="" loading="lazy" decoding="async" onLoad={()=>setLoaded(true)} onError={()=>setFailed(true)}/>:<span className="organization-text-cover"><UsersRound size={28}/><strong>{name.slice(0,2)}</strong><small>{uiText(category)}</small></span>}</div>
+export function CampusOrganizations({embedded=false,externalQuery,externalCategory}:{embedded?:boolean;externalQuery?:string;externalCategory?:string}){
+ useUiLanguage();const live=useWorkspaceBackend(),[params]=useSearchParams(),selectedId=params.get('id')??''
+ const [query,setQuery]=useState(()=>params.get('q')??''),[category,setCategory]=useState('全部'),[page,setPage]=useState(1)
+ const clubs=(live.data?.entities??[]).filter(e=>e.kind==='organization'&&e.data.status==='approved'&&e.data.visibility==='visible').map(e=>({id:e.id,name:String(e.data.name??''),englishName:String(e.data.englishName??''),category:String(e.data.category??''),description:String(e.data.description??''),contact:String(e.data.contact??''),image:String(e.data.image??''),sourceUrl:String(e.data.sourceUrl??''),sourceDate:String(e.data.sourceDate??''),directoryOnly:e.data.directoryOnly===true}))
+ const follows=new Set(live.data?.relations.filter(e=>e.kind==='follow').map(e=>e.entityId)??[]),selected=clubs.find(e=>e.id===selectedId)
+ const categories=['全部',...new Set(clubs.map(e=>e.category))],q=(externalQuery??query).trim().toLocaleLowerCase(),c=externalCategory??category
+ const shown=clubs.filter(e=>(c==='全部'||c===e.category)&&`${e.name} ${e.englishName} ${e.category} ${e.description}`.toLocaleLowerCase().includes(q))
+ const pages=Math.max(1,Math.ceil(shown.length/12)),currentPage=Math.min(page,pages)
+ const content=<>{live.error&&<p role="alert" className="shop-feedback">{live.error}</p>}{!live.data&&!live.error&&<p role="status">正在读取社团资料…</p>}
+ {selected?<><section className="shop-detail"><div className="shop-gallery"><ClubCover {...selected} detail/></div><div className="shop-detail-copy"><span className="shop-tag">{selected.category}</span><p>{selected.englishName}</p><p>{selected.description}</p>{selected.contact&&<p>{selected.contact}</p>}<p>{selected.directoryOnly?'学校公开名录收录；入会与招新请通过学校公布渠道咨询。':'平台入驻社团'}</p>{selected.sourceUrl&&<div className="shop-source"><a href={selected.sourceUrl} target="_blank" rel="noreferrer">学生事务处 · 官方社团介绍<ChevronRight size={13}/></a><small>核对日期：{selected.sourceDate}</small></div>}<button type="button" className="shop-primary" disabled={live.busy} aria-pressed={follows.has(selected.id)} onClick={()=>void live.mutate('relation.set',{id:selected.id,kind:'follow',enabled:!follows.has(selected.id)})}>{follows.has(selected.id)?'已关注':'关注社团'}</button></div></section></>:<>
+ {externalQuery===undefined&&<div className="shop-search"><Search size={18}/><input aria-label="搜索社团" placeholder="搜索社团、英文名或兴趣" value={query} onChange={event=>{setQuery(event.target.value);setPage(1)}}/>{query&&<button aria-label="清除搜索词" onClick={()=>setQuery('')}><X size={16}/></button>}</div>}
+ {externalCategory===undefined&&<div className="shop-filter-scroll"><nav className="shop-filters" aria-label="社团分类"><div>{categories.map(value=>{const Icon=categoryIcons[value]??UsersRound;return <button type="button" key={value} aria-pressed={category===value} onClick={()=>{setCategory(value);setPage(1)}}><Icon size={22} strokeWidth={1.5}/><span>{value}</span></button>})}</div></nav></div>}
+ <p className="shop-intro">{shown.length} 个社团 · 学校公开资料，具体招新以社团公告为准。</p><div className="shop-grid">{shown.slice((currentPage-1)*12,currentPage*12).map(club=><article className="shop-card" key={club.id} data-organization-id={club.id}><SharedMediaLink className="shop-card-link" transitionKey={`organization:${club.id}`} resetScroll to={`/v2/organizations?id=${encodeURIComponent(club.id)}`}><ClubCover {...club}/><div className="shop-card-copy"><h2>{club.name}</h2><p className="shop-card-kind">{club.category}</p><p className="shop-card-context">{club.englishName||'校园社团'}</p></div></SharedMediaLink><button type="button" className="shop-bookmark" disabled={live.busy} aria-label={`${follows.has(club.id)?'取消关注':'关注'}${club.name}`} aria-pressed={follows.has(club.id)} onClick={()=>void live.mutate('relation.set',{id:club.id,kind:'follow',enabled:!follows.has(club.id)})}><Heart size={22} fill={follows.has(club.id)?'currentColor':'rgb(20 35 28 / 35%)'}/></button></article>)}</div>{pages>1&&<nav className="shop-pages" aria-label="社团分页"><button disabled={currentPage===1} onClick={()=>setPage(currentPage-1)}>上一页</button><span>第 {currentPage} / {pages} 页</span><button disabled={currentPage===pages} onClick={()=>setPage(currentPage+1)}>下一页</button></nav>}{live.data&&!shown.length&&<div className="shop-empty"><UsersRound/><h2>没有匹配的社团</h2><p>试试其他类别或关键词。</p></div>}
+ </>}</>
+ if(embedded)return <section className="shop-page shop-reference-layout" aria-label="社团组织">{content}</section>
+ return <div className={`ref-page cw-pages shop-page${selectedId?'':' shop-reference-layout'}`}><header className="shop-heading"><div>{selectedId?<SharedMediaLink reverse transitionKey={`organization:${selectedId}`} to="/v2/organizations" aria-label="返回社团列表"><ArrowLeft size={22}/></SharedMediaLink>:<Link to="/v2/campus" aria-label="返回校园"><ArrowLeft size={22}/></Link>}<h1>{selected?.name??'社团组织'}</h1></div></header>{selectedId&&live.data&&!selected?<div className="shop-empty">此社团暂不可查看。<Link to="/v2/organizations">返回列表</Link></div>:content}</div>
 }

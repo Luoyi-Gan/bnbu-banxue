@@ -1,6 +1,7 @@
 import {movementRequest} from './movement';
 import {LearningAuth} from './learning-auth';
 import {LearningService} from './learning';
+import {CampusAI} from './campus-ai';
 import {postgresLearningStore} from './learning-store';
 import {shopRead} from './shops';
 import {runAsync as runShopRead} from './storage/effects';
@@ -37,7 +38,7 @@ import { recognizeActivityScreenshot, type ScreenshotRecognizer } from './activi
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'; screenshotRecognizer?:ScreenshotRecognizer} = {}) {
   demand(options.surface!=='sports','伴学不提供独立体育服务。',404);
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
-  const learningAuth=new LearningAuth(postgresLearningStore(db)),learning=new LearningService(learningAuth);
+  const learningAuth=new LearningAuth(postgresLearningStore(db)),learning=new LearningService(learningAuth),ai=new CampusAI(postgresLearningStore(db));
   const origins = new Set(options.origins ?? ['http://127.0.0.1:4174','http://localhost:4174']);
   const cookieName='bnbu_session';
   const cookieToken=(request:Parameters<typeof readCookieToken>[0])=>readCookieToken(request,cookieName);
@@ -125,6 +126,11 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown');
           if('token'in result){response.setHeader('Set-Cookie',cookie(result.token,43200));return send(response,200,{authenticated:true,account:result.account});}
           return send(response,200,result);
+        }
+        if(pathname==='/api/ai/chat'){
+          const token=cookieToken(request)??'',actor=await auth.authenticate(token);
+          const workspace=await postgresWorkspace(db,token);demand(!workspace.firstLoginOnly,'请先修改本人初始密码。',403);
+          return send(response,200,await ai.ask(actor,input,async()=>({...workspace,learning:await learning.overview(actor,token)}),()=>ai.shops()));
         }
         if(pathname==='/api/learning/command'){
           const token=cookieToken(request)??'',actor=await auth.authenticate(token);

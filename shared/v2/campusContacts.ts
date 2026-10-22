@@ -1,0 +1,5 @@
+export const campusContacts=[
+  {id:'itsc',name:'信息科技服务中心 ITSC',keywords:'邮箱 网络 wifi vpn ispace moodle 学校账号 密码 重置 邮件 技术支持',description:'学校账号、校园网络、邮箱及 iSpace 使用问题可联系 ITSC。',location:'T8-202',email:'itsc_support@bnbu.edu.cn',phone:'0756-3620315',source:'https://itsc.bnbu.edu.cn/Contact_Us.htm',action:'https://itsc.bnbu.edu.cn/info/1414/5339.htm',actionName:'iSpace 使用说明'},
+  {id:'certifications',name:'教务处 · 学业证明与成绩单',keywords:'在读证明 成绩单 全英教学证明 电子证明 transcript certificate 教务 办事',description:'成绩单与学业证明的申请对象、申请方式和领取安排，请按教务处官方指南核对。',location:'',email:'',phone:'',source:'https://ar.bnbu.edu.cn/current_students/certifications/certifications.htm',action:'https://sso.bnbu.edu.cn/#/login',actionName:'打开学校 SSO'},
+  {id:'sao',name:'学生事务处 · 奖学金证明',keywords:'奖学金证明 学生事务 sao scholarship 办事',description:'申请奖学金证明可向学生事务处邮箱咨询，申请材料以官方页面为准。',location:'',email:'sao@bnbu.edu.cn',phone:'0756-3620541',source:'https://sao.bnbu.edu.cn/campus/guidelines/certificates.htm',action:'https://sao.bnbu.edu.cn/campus/guidelines/certificates.htm',actionName:'查看办理指南'},
+]

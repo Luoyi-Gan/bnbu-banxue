@@ -87,7 +87,7 @@ export class LearningService {
         demand(existing,'安排不存在。',404);await sql.rows("DELETE FROM entities WHERE id=? AND kind='learningItem' AND owner_id=?",[existing.id,actor.id]);return done();
       }
       const value=validatePersonalItem(input);
-      if(existing?.source==='ispace')Object.assign(value,{source:'ispace',schoolEventId:existing.schoolEventId});
+      if(existing?.source==='ispace')Object.assign(value,{source:'ispace',schoolEventId:existing.schoolEventId,schoolCompleted:existing.schoolCompleted});
       if(existing)await sql.rows('UPDATE entities SET data=?,version=version+1,updated_at=? WHERE id=? AND owner_id=?',[JSON.stringify(value),timestamp(),existing.id,actor.id]);
       else {demand(items.length<200,'最多保存 200 项安排。');await learningEntity(sql,'learningItem',actor.id,value);}
       return done();

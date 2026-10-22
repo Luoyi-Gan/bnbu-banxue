@@ -3080,3 +3080,11 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 - 真实授权账号实测：自动同步complete，MIS成功；11个iSpace课程空间、5门MIS课程共10段上课时间、3项自动DDL、11个课程目录共461条文件记录。393×852浏览器从学校登录进入，验证原课表实际显示、选择课程直接展示资料；手动sync请求0、手动materials请求0、无页面异常或水平溢出。汇总证据见artifacts/school-auto-20261022/live-summary.json，实测脚本不保存凭据。真实页面截图仅留在忽略的.runtime目录，不提交真实学校资料。
 - 实测也观察到学校连接偶发中断：同步报告partial/MIS error，既有课表保留；不是“无课”。只对失败GET作一次有限重试，不自动重发密码POST。完整自动同步已实测通过，不能据此声称学校服务永久可用。
 - 本轮6个相关测试文件39项通过，覆盖自动登录同步、MIS解析、时区与校历、备份、幂等DDL/个人完成状态、失败保留、学校跳转/菜单限制及同账号不同登录会话隔离。前后端类型检查与lint通过。SQLite本地实测；PostgreSQL共用策略通过类型检查，尚未对真实实例复验。未部署。
+# 2026-10-22 DDL完成状态、社团与校园AI
+
+- 修复iSpace日历模块编号到作业编号的映射；按本人实际提交状态维护schoolCompleted，首页与提醒共用过滤。真实授权账号只读核对Programming Assignment为submitted；本地学校登录后持久化schoolCompleted=true，未改写学校作业。
+- 名录逐项核对57个社团：学术11、文化艺术13、体育运动23、义工服务5、其他5。来源https://sao.bnbu.edu.cn/students/interest_clubs/name_list.htm；迎新页另有58/59的总数口径，缺少可逐项对应名单，不据此新增。简介为公开介绍的简要整理，未核实个别独立联系方式，标注统一SAO-ICMC咨询。缺少照片显示文字封面。
+- 显式本地导入：BNBU_CLUB_IMPORT_CREDENTIALS指定本机私有运营账号文件，运行node scripts/import-campus-clubs.mjs。仅接受localhost，走共享organization.import运营策略、事务、审计及幂等回执；不随应用启动写库。当前4186预览已导入57条，原4条previewFixture模拟社团通过既有运营命令隐藏。
+- 校园社团入口复用ref-coffee配图，列表/分类/详情复用shops.css与SharedMediaLink，保持美食板块同一转场、减少动态处理；关注仍用既有relation.set并持久化。
+- /api/ai/chat在SQLite与PostgreSQL共用CampusAI；服务端字段白名单及本人权限、读取范围、DeepSeek失败/用量、去重和并行保护有测试。校园办事资料改为共享目录供页面和AI同时读取。生产服务、真实移动设备和PostgreSQL运行环境未验收。
+- 回归：6个测试文件42项通过，前后端TypeScript检查通过。手机430×932、桌面1440×1000、关注刷新及减少动态检查的本地证据保存在.runtime/campus-upgrade/，真实模型调用用量另见verification.json。

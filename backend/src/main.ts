@@ -1,6 +1,7 @@
 import {movementRequest} from './movement';
 import {LearningAuth} from './learning-auth';
 import {LearningService} from './learning';
+import {CampusAI} from './campus-ai';
 import {sqliteLearningStore} from './learning-store';
 import {shopRead} from './shops';
 import {runSync as runShopRead} from './storage/effects';
@@ -91,7 +92,7 @@ export function createApiServer(
   db: Database,
   options: { localOutbox?: boolean; screenshotRecognizer?: ScreenshotRecognizer } = {},
 ) {
-  const learningAuth=new LearningAuth(sqliteLearningStore(db)),learning=new LearningService(learningAuth);
+  const learningAuth=new LearningAuth(sqliteLearningStore(db)),learning=new LearningService(learningAuth),ai=new CampusAI(sqliteLearningStore(db));
   return createServer(async (request, response) => {
     try {
       const requestUrl = new URL(request.url ?? "/", "http://127.0.0.1");
@@ -173,6 +174,10 @@ export function createApiServer(
           const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown');
           if('token'in result){response.setHeader('Set-Cookie',`bnbu_session=${result.token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`);return send(response,200,{authenticated:true,account:result.account});}
           return send(response,200,result);
+        }
+        if(pathname==='/api/ai/chat'){
+          const token=cookieToken(request)??'',actor=authenticate(db,token);accountSecurityGate(new Repository(db),actor);
+          return send(response,200,await ai.ask(actor,input,async()=>({...snapshot(db,actor),learning:await learning.overview(actor,token)}),()=>ai.shops()));
         }
         if(pathname==='/api/learning/command'){
           const token=cookieToken(request)??'',actor=authenticate(db,token);accountSecurityGate(new Repository(db),actor);

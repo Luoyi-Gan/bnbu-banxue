@@ -62,6 +62,28 @@ export class SchoolSync {
       const data=object(await this.auth.school.call(session.token,'core_calendar_get_calendar_upcoming_view'));
       demand(Array.isArray(data.events),'iSpace日历返回无效。',502);
       session.events=list(data.events).filter(e=>Number(e.timestart)>0&&Number.isSafeInteger(Number(e.id))).map(e=>({id:Number(e.id),title:plain(e.name),startAt:new Date(Number(e.timestart)*1000).toISOString(),course:plain(object(e.course).fullname),type:String(e.modulename??e.eventtype??'calendar'),deadline:['assign','quiz'].includes(String(e.modulename))&&['due','close'].includes(String(e.eventtype))}));
+      // Query only this student's submission state. Viewing an activity is not submission.
+      const assignments=session.events.some(e=>e.deadline&&e.type==='assign')?await this.auth.school.call(session.token,'mod_assign_get_assignments').then(value=>list(object(value).courses).flatMap(course=>list(course.assignments))).catch(()=>{session.warnings!.push('作业编号暂时无法核对，原提交状态已保留。');return [];}):[];
+      const quizzes=session.events.some(e=>e.deadline&&e.type==='quiz')?await this.auth.school.call(session.token,'mod_quiz_get_quizzes_by_courses').then(value=>list(object(value).quizzes)).catch(()=>{session.warnings!.push('测验编号暂时无法核对，原提交状态已保留。');return [];}):[];
+      for(const event of session.events){
+        if(!event.deadline)continue;
+        const raw=list(data.events).find(e=>Number(e.id)===event.id),instance=Number(raw?.instance);
+        if(!Number.isSafeInteger(instance)||instance<=0)continue;
+        try{
+          if(event.type==='assign'){
+            const assignment=assignments.find(a=>Number(a.cmid)===instance||Number(a.id)===instance);
+            if(!assignment)continue;
+            const status=object(await this.auth.school.call(session.token,'mod_assign_get_submission_status',{assignid:String(assignment.id),userid:String(session.userId)}));
+            const attempt=object(status.lastattempt),submission=object(attempt.teamsubmissionenabled?attempt.teamsubmission:attempt.submission);
+            if(status.lastattempt&&typeof status.lastattempt==='object')event.schoolCompleted=submission.status==='submitted';
+          }else if(event.type==='quiz'){
+            const quiz=quizzes.find(q=>Number(q.coursemodule)===instance||Number(q.id)===instance);
+            if(!quiz)continue;
+            const status=object(await this.auth.school.call(session.token,'mod_quiz_get_user_attempts',{quizid:String(quiz.id),userid:String(session.userId),status:'all'}));
+            if(Array.isArray(status.attempts))event.schoolCompleted=list(status.attempts).some(attempt=>attempt.state==='finished');
+          }
+        }catch{session.warnings!.push(`${event.title}：提交状态暂时无法核对，已保留原状态。`);}
+      }
       await this.deadlines(actor,session);
     }catch{session.warnings!.push('iSpace日历或DDL自动同步失败，原有记录已保留。');}
     const materials={...session.materials};let cursor=0;
@@ -80,7 +102,7 @@ export class SchoolSync {
         if(!event.deadline||Date.parse(event.startAt)<Date.now())continue;
         const id='ispace-ddl-'+digest(`${actor.id}:${event.id}`);
         const row=(await sql.rows<{data:string}>('SELECT data FROM entities WHERE id=? AND owner_id=? AND kind=?',[id,actor.id,'learningItem']))[0],old=row?JSON.parse(row.data):{};
-        const data={...old,title:event.title,type:'deadline',course:event.course,location:'',startAt:event.startAt,endAt:event.startAt,weekday:1,startTime:'',endTime:'',from:'',until:'',reminderMinutes:old.reminderMinutes??30,done:old.done===true,paused:old.paused===true,source:'ispace',schoolEventId:event.id};
+        const data={...old,title:event.title,type:'deadline',course:event.course,location:'',startAt:event.startAt,endAt:event.startAt,weekday:1,startTime:'',endTime:'',from:'',until:'',reminderMinutes:old.reminderMinutes??30,done:old.done===true,schoolCompleted:event.schoolCompleted??old.schoolCompleted??false,paused:old.paused===true,source:'ispace',schoolEventId:event.id};
         if(row){if(JSON.stringify(old)!==JSON.stringify(data))await sql.rows('UPDATE entities SET data=?,version=version+1,updated_at=? WHERE id=?',[JSON.stringify(data),timestamp(),id]);}
         else await learningEntity(sql,'learningItem',actor.id,data,id);
       }

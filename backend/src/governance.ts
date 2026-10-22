@@ -18,6 +18,7 @@ import {
   type TimetableLesson,
 } from "../../shared/v2/timetableModel";
 import { parseSidebarItems } from "../../shared/v2/sidebarLayout";
+import clubDirectory from '../../data/campus-clubs.json';
 
 export function* governancePolicy(
   repo: BusinessRepository,
@@ -25,6 +26,14 @@ export function* governancePolicy(
   action: string,
   input: Fields,
 ): Generator<unknown,Entity | undefined,unknown> {
+  if(action==='organization.import'){
+    operator(actor);
+    const name=textField(input,'name',80),entry=clubDirectory.clubs.find(item=>item.name===name);
+    demand(entry,'该社团未在已核实公开名录中。',404);
+    const existing=(yield* effect(repo.all('organization'))).find(item=>item.data.name===name);
+    if(existing)return existing;
+    return yield* effect(repo.create('organization',null,{...entry}));
+  }
   if (action === "certification.apply") {
     student(actor);
     const kind = enumField(input, "kind", ["student", "club", "official"]),
@@ -101,7 +110,7 @@ export function* governancePolicy(
     demand(organization.data.status === "pending", "申请已处理。", 409);
     const reason = textField(input, "reason", 1000, approve);
     (yield* effect(repo.notify(
-      [organization.ownerId!],
+      organization.ownerId?[organization.ownerId]:[],
       organization.id,
       action,
       `入驻${approve ? "通过" : "驳回"}：${reason}`,
@@ -119,7 +128,7 @@ export function* governancePolicy(
     const visibility = enumField(input, "visibility", ["visible", "hidden"]),
       reason = textField(input, "reason", 1000);
     (yield* effect(repo.notify(
-      [organization.ownerId!],
+      organization.ownerId?[organization.ownerId]:[],
       organization.id,
       action,
       `社团资料或公开状态更新：${reason}`,

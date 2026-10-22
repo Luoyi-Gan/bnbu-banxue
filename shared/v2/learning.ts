@@ -2,10 +2,10 @@ export interface PersonalLearningItem {
   id:string;version:number;title:string;type:'deadline'|'repeat'|'exam';course:string;location:string;
   startAt:string;endAt:string;weekday:number;startTime:string;endTime:string;from:string;until:string;
   reminderMinutes:number;done:boolean;paused:boolean;
-  source?:'ispace';schoolEventId?:number;
+  source?:'ispace';schoolEventId?:number;schoolCompleted?:boolean;
 }
 export interface LearningCourse {id:number;name:string;shortname:string}
-export interface LearningEvent {id:number;title:string;startAt:string;course:string;type:string;deadline?:boolean}
+export interface LearningEvent {id:number;title:string;startAt:string;course:string;type:string;deadline?:boolean;schoolCompleted?:boolean}
 export interface LearningMaterial {id:string;courseId:number;section:string;name:string;mime:string;size:number}
 export interface LearningPage {number:number;text:string}
 export interface LearningStatus {connected:boolean;schoolAvailable:boolean;name?:string;expiresAt?:number}
@@ -15,7 +15,7 @@ export interface LearningOverview {status:LearningStatus;items:PersonalLearningI
 export function personalOccurrences(items:PersonalLearningItem[],now=Date.now(),days=60){
   const result:{id:string;title:string;startAt:string;endAt:string;location:string;label:string}[]=[];
   for(const item of items){
-    if(item.done||item.paused)continue;
+    if(item.done||item.schoolCompleted||item.paused)continue;
     if(item.type!=='repeat'){
       if(Date.parse(item.endAt||item.startAt)>now)result.push({id:item.id,title:item.title,startAt:item.startAt,endAt:item.endAt,location:item.location,label:item.type==='exam'?'个人考试安排':'DDL'});
       continue;

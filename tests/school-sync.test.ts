@@ -16,23 +16,35 @@ const html=`<select id="semesterList"><option selected>Semester 1 of 2026-2027</
 function setup(){
  const db=openDatabase(':memory:'),repo=new Repository(db);createAccount(db,{email:'sync@mail.bnbu.edu.cn',password:'Test-password-123',name:'合成学生',roles:['student']});
  const session=login(db,'sync@mail.bnbu.edu.cn','Test-password-123'),actor=session.account;
- let failed=false,misFailed=false,deadline=(Date.now()+86400000)/1000;
+ let submissionStatus='new',submissionFails=false;let failed=false,misFailed=false,deadline=(Date.now()+86400000)/1000;
  const transport=vi.fn(async(url:unknown,init?:RequestInit)=>{
   const fn=new URLSearchParams(String(init?.body)).get('wsfunction');let value:unknown={};
   if(String(url).endsWith('/token.php'))value={token:'synthetic-token'};
   if(fn==='core_webservice_get_site_info')value={userid:101,fullname:'合成学生',functions:[]};
   if(fn==='core_user_get_users_by_field')value=[{id:101,email:actor.email}];
   if(fn==='core_enrol_get_users_courses'){if(failed)throw new Error('unreachable');value=[{id:88,fullname:'合成课程',shortname:'TEST'}];}
-  if(fn==='core_calendar_get_calendar_upcoming_view')value={events:[{id:999,name:'合成作业',timestart:deadline,modulename:'assign',eventtype:'due',course:{fullname:'合成课程'}},{id:1000,name:'测验开放',timestart:deadline,modulename:'quiz',eventtype:'open'}]};
+  if(fn==='core_calendar_get_calendar_upcoming_view')value={events:[{id:999,instance:9876,name:'合成作业',timestart:deadline,modulename:'assign',eventtype:'due',course:{fullname:'合成课程'}},{id:1000,name:'测验开放',timestart:deadline,modulename:'quiz',eventtype:'open'}]};
+  if(fn==='mod_assign_get_assignments')value={courses:[{assignments:[{id:1234,cmid:9876}]}]};
+  if(fn==='mod_assign_get_submission_status'){expect(new URLSearchParams(String(init?.body)).get('assignid')).toBe('1234');if(submissionFails)throw Error('unavailable');value={lastattempt:{submission:{status:submissionStatus}}};}
   if(fn==='core_course_get_contents')value=[{name:'合成章节',modules:[{contents:[{type:'file',filename:'notes.pdf',fileurl:'https://ispace.bnbu.edu.cn/webservice/pluginfile.php/1/notes.pdf',filesize:100,mimetype:'application/pdf'}]}]}];
   return Response.json(value);
  });
  const auth=new LearningAuth(sqliteLearningStore(db),new ISpace(transport as typeof fetch));
  const mis=vi.fn(async()=>{if(misFailed)throw new Error('MIS failed');return parseMisTimetable(html);});
  const service=new LearningService(auth,{mis});
- return {db,repo,actor,auth,service,transport,mis,ordinary:session.token,fail:()=>{failed=true;misFailed=true;},reschedule:()=>{deadline+=3600;}};
+ return {db,repo,actor,auth,service,transport,mis,submission:(status:string)=>{submissionStatus=status},submissionFailure:()=>{submissionFails=true},ordinary:session.token,fail:()=>{failed=true;misFailed=true;},reschedule:()=>{deadline+=3600;}};
 }
 describe('学校登录自动同步',()=>{
+ it('学校已提交作业退出首页和提醒；草稿/重开恢复，查询失败保留已知状态',async()=>{
+  const t=setup();try{
+   t.submission('submitted');const school=await t.auth.schoolLogin('synthetic','synthetic','completion-test');
+   const items=()=>t.repo.all('learningItem');expect(items()[0].data.schoolCompleted).toBe(true);
+   expect(liveStudentSchedule(snapshot(t.db,t.actor) as unknown as Workspace).some(e=>e.title==='合成作业')).toBe(false);
+   t.submission('draft');await t.service.operation(t.actor,school.token,'sync',{});expect(items()[0].data.schoolCompleted).toBe(false);
+   t.submission('submitted');await t.service.operation(t.actor,school.token,'sync',{});t.submissionFailure();await t.service.operation(t.actor,school.token,'sync',{});expect(items()[0].data.schoolCompleted).toBe(true);
+  }finally{t.db.close();}
+ });
+
  it('MIS解析课程、星期、起止时间、教室和已确认学期；未知学期不猜教学周',()=>{
   const result=parseMisTimetable(html);expect(result.courseCount).toBe(1);expect(result.lessons).toHaveLength(2);
   expect(result.lessons[0]).toMatchObject({weekday:4,startTime:'10:00',endTime:'11:50',location:'T7-306',weeks:'1–14周'});
