@@ -2,7 +2,6 @@ import {sharedElementTransition} from './sharedElementMotion'
 import {ContinuityIcon} from './ContinuityIcon'
 import { uiText, useUiLanguage, uiLocale } from './uiLanguage'
 import { Link, useSearchParams } from 'react-router-dom'
-import { DisplayAvatar } from './DisplayAvatar'
 import { coffeeSlotStatus } from './coffeeSlotStatus'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 
@@ -16,6 +15,7 @@ import campusNightPhoto from '../assets/campus/night-walkway.jpg'
 import { AnimatedSearchField } from './AnimatedSearchField'
 
 import { Empty } from './ui'
+import './coffeeDirectory.css'
 
 
 const teacherPhotos = [campusServicesPhoto, campusHomePhoto, campusEveningPhoto, campusNightPhoto]
@@ -35,7 +35,7 @@ export function V2CoffeeChat() { useUiLanguage();
     const teachers = [...ids].filter((id): id is string => !!id).map(id => {
       const profile = profiles.find(e => e.ownerId === id)?.data
       const person = live.data?.people.find(p => p.id === id)
-      return {id, name: String(profile?.nickname ?? person?.name ?? '老师'), englishName: '', department: person?.organization ?? '', fields: [] as string[], topics: String(profile?.topics ?? '').split('、').filter(Boolean), bio: String(profile?.bio ?? ''), location: String(profile?.location ?? ''), color: '#0865D1', enabled: profile?.enabled !== false}
+      return {id, avatar: person?.avatar ?? '', name: String(profile?.nickname ?? person?.name ?? '老师'), englishName: '', department: person?.organization ?? '', fields: [] as string[], topics: String(profile?.topics ?? '').split('、').filter(Boolean), bio: String(profile?.bio ?? ''), location: String(profile?.location ?? ''), color: '#0865D1', enabled: profile?.enabled !== false}
     }).filter(t => t.enabled || bookings.some(b => b.data.teacherId === t.id))
     return {teachers, coffeeSlots, bookings}
   }, [live.data])
@@ -93,12 +93,12 @@ export function V2CoffeeChat() { useUiLanguage();
   </section>
 
   if (teacher) {
-    const photo = teacherPhotos[teachers.findIndex((person) => person.id === teacher.id) % teacherPhotos.length]
+    const photo = teacher.avatar || teacherPhotos[teachers.findIndex((person) => person.id === teacher.id) % teacherPhotos.length]
     return <div className="v2-coffee-schedule" key={teacher.id}>
       <button type="button" className="v2-coffee-back" onClick={()=>sharedElementTransition(`coffee:${teacher.id}`,goBack,{reverse:true})}><ArrowLeft size={16}/> {uiText("返回老师列表")}</button>
       <div className="v2-coffee-teacher-detail">
-        <img data-shared-target={`coffee:${teacher.id}`} src={photo} alt={uiText("校园场景")}/>
-        <div><span className="v2-eyebrow">COFFEE CHAT · {facultyOf(teacher.department)}</span><h3 ref={headingRef} tabIndex={-1}>{teacher.name}</h3><small>{teacher.englishName} · {teacher.department}</small><p>{teacher.bio}</p><div className="v2-coffee-topics">{teacher.topics.map((topic) => <span key={topic}>{topic}</span>)}</div></div>
+        <img data-shared-target={`coffee:${teacher.id}`} src={photo} alt={teacher.avatar?`${teacher.name}${uiText("头像")}`:uiText("校园场景")}/>
+        <div><span className="v2-eyebrow">COFFEE CHAT · {facultyOf(teacher.department)}</span><h3 ref={headingRef} tabIndex={-1}>{teacher.name}</h3>{(teacher.englishName || teacher.department) && <small>{[teacher.englishName,teacher.department].filter(Boolean).join(' · ')}</small>}<p>{teacher.bio}</p><div className="v2-coffee-topics">{teacher.topics.map((topic) => <span key={topic}>{topic}</span>)}</div></div>
       </div>
       <div className="v2-coffee-schedule-heading"><div><span className="v2-eyebrow">AVAILABLE TIMES</span><h3>{uiText("选择预约时间")}</h3><p>{uiText("按老师开放的起止时间交流；预约符合条件即成立。")}</p></div><CalendarDays size={22}/></div>
       {slots.length?<div className="v2-coffee-slot-list">{slots.map((item) => {
@@ -120,11 +120,12 @@ export function V2CoffeeChat() { useUiLanguage();
 
   return <div className="v2-coffee-directory">
     {live.error && <p role="alert">{uiText(live.error)}</p>}{!live.data && !live.error && <p role="status">{uiText("正在读取老师与时段…")}</p>}
-    <p className="v2-detail-lead">{uiText("选择老师与时段，让一次谈话更有准备。")}</p>
-    <div className="v2-teacher-hero" style={{ backgroundImage: `linear-gradient(90deg,rgba(6,28,68,.92),rgba(6,46,101,.18)),url(${campusServicesPhoto})` }}><span>COFFEE CHAT</span><strong>{uiText("和老师聊聊，找到新的思路。")}</strong><small>{uiText("从学院、研究兴趣和可预约时间开始探索。")}</small></div>
     <div className="v2-directory-tools"><AnimatedSearchField value={query} onChange={setQuery} placeholder={uiText("搜索老师、学院或研究方向")}/><span>{filteredTeachers.length} {uiText("位老师")}</span></div>
     <div className="v2-filter-pills v2-directory-filters">{facultyOptions.map((option) => <button type="button" key={option} className={faculty === option?'is-active':''} onClick={() => setFaculty(option)}>{option}</button>)}</div>
-    <div className="v2-teacher-grid v2-filtered-list" key={`${query}|${faculty}`}>{filteredTeachers.map((person) => <button type="button" key={person.id} className="v2-teacher-card" onClick={event => sharedElementTransition(`coffee:${person.id}`,()=>openTeacher(person.id),{source:event.currentTarget.querySelector<HTMLElement>('[data-shared-media]')})}><img data-shared-media={`coffee:${person.id}`} src={teacherPhotos[teachers.findIndex((item) => item.id === person.id) % teacherPhotos.length]} alt=""/><span className="v2-teacher-row-copy"><DisplayAvatar className="v2-avatar" name={person.name} personId={person.id}/><strong>{person.name}<small>{person.englishName}</small></strong><em>{facultyOf(person.department)} · {person.department}</em><span className="v2-teacher-topics">{person.topics.slice(0, 2).map((topic) => <i key={topic}>{topic}</i>)}</span></span><ChevronRight size={19}/></button>)}</div>
+    <div className="v2-teacher-grid coffee-discovery-grid">{filteredTeachers.map(person => <button type="button" key={person.id} className="v2-teacher-card coffee-discovery-card" aria-label={`${uiText('查看')}${person.name}${uiText('的详细信息')}`} onClick={event => sharedElementTransition(`coffee:${person.id}`,()=>openTeacher(person.id),{source:event.currentTarget.querySelector<HTMLElement>('[data-shared-media]')})}>
+      <img data-shared-media={`coffee:${person.id}`} src={person.avatar || teacherPhotos[teachers.findIndex(item => item.id === person.id) % teacherPhotos.length]} alt={person.avatar?`${person.name}${uiText('头像')}`:uiText('校园场景')} loading="lazy" draggable={false}/>
+      <span className="coffee-discovery-copy"><strong>{person.name}</strong><span className="coffee-discovery-department">{person.department || facultyOf(person.department)}</span>{person.topics.length>0&&<span className="coffee-discovery-topics">{person.topics.slice(0,2).join(' · ')}</span>}<span className="coffee-discovery-more">{uiText('查看详情')}<ChevronRight size={13}/></span></span>
+    </button>)}</div>
     {live.data && !filteredTeachers.length && <Empty icon={Coffee} title={uiText("没有匹配的老师")} description={uiText("换个学院或搜索词试试。")}/>}
   </div>
 }
