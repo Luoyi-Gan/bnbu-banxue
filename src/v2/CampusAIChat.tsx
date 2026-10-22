@@ -1,5 +1,5 @@
 import {useEffect,useLayoutEffect,useRef,useState,type FormEvent} from 'react'
-import {Link} from 'react-router-dom'
+import {Link,useLocation} from 'react-router-dom'
 import {ArrowDown,ArrowLeft,ArrowUp,ArrowUpRight,BookOpen,CalendarDays,Check,ChevronDown,Copy,ImagePlus,Info,MessageCircle,PanelLeft,Search,Sparkles,UsersRound,X} from 'lucide-react'
 import {api} from '../live/api'
 import {useWorkspaceBackend} from './useWorkspaceBackend'
@@ -14,10 +14,10 @@ import './campusAI.css'
 
 const suggestions=[{icon:CalendarDays,title:'看看我的安排',question:'我今天接下来还有哪些课程和待办？'},{icon:UsersRound,title:'发现校园活动',question:'最近有哪些可以参加的校园活动？'},{icon:BookOpen,title:'探索社团',question:'帮我了解一下学校的学术科技类社团。'},{icon:MessageCircle,title:'校园办事',question:'我想办理在读证明，应该联系哪里？'}]
 const normalizeSources=(value:unknown):AISource[]=>Array.isArray(value)?value.filter((s):s is AISource=>s&&typeof s==='object'&&typeof s.title==='string'&&typeof s.source==='string'):[]
-export function CampusAIChat(){
+export function CampusAIChat({embedded=false,initialQuestion='',onDraftChange,onExpand}:{embedded?:boolean;initialQuestion?:string;onDraftChange?:(text:string)=>void;onExpand?:(text:string)=>void}={}){
  useUiLanguage()
- const live=useWorkspaceBackend(),device=useDevicePreferences()
- const [text,setText]=useState(''),[historyOpen,setHistoryOpen]=useState(()=>window.innerWidth>=1000),[compact,setCompact]=useState(()=>window.innerWidth<1000),[historyQuery,setHistoryQuery]=useState('')
+ const live=useWorkspaceBackend(),device=useDevicePreferences(),location=useLocation()
+ const [text,setText]=useState<string>(()=>initialQuestion||(typeof location.state?.campusAIDraft==='string'?location.state.campusAIDraft.slice(0,500):'')),[historyOpen,setHistoryOpen]=useState(()=>!embedded&&window.innerWidth>=1000),[compact,setCompact]=useState(()=>embedded||window.innerWidth<1000),[historyQuery,setHistoryQuery]=useState('')
  const [attempt,setAttempt]=useState<{question:string;requestId:string;error?:string}|null>(null),[asking,setAsking]=useState(false),[recent,setRecent]=useState<AIAnswer[]>([]),[followup,setFollowup]=useState<AIAnswer|null>(null)
  const [newBelow,setNewBelow]=useState(false),[copied,setCopied]=useState(''),[copyError,setCopyError]=useState('')
  const [iconMenu,setIconMenu]=useState(false),[uploadError,setUploadError]=useState('')
@@ -30,7 +30,8 @@ export function CampusAIChat(){
  const answers=[...new Map([...recent,...saved].map(answer=>[answer.id,answer])).values()].sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id))
  const hasWorkspace=Boolean(live.data)
  const history=answers.filter(a=>a.question.toLowerCase().includes(historyQuery.trim().toLowerCase())).slice().reverse()
- useEffect(()=>{mounted.current=true;const resize=()=>setCompact(window.innerWidth<1000);window.addEventListener('resize',resize);return()=>{mounted.current=false;controller.current?.abort();if(copyTimer.current)clearTimeout(copyTimer.current);window.removeEventListener('resize',resize)}},[])
+ useEffect(()=>{mounted.current=true;const resize=()=>setCompact(embedded||window.innerWidth<1000);window.addEventListener('resize',resize);return()=>{mounted.current=false;controller.current?.abort();if(copyTimer.current)clearTimeout(copyTimer.current);window.removeEventListener('resize',resize)}},[embedded])
+ useEffect(()=>{onDraftChange?.(text)},[text,onDraftChange])
  useEffect(()=>{const viewport=window.visualViewport;const update=()=>{const root=workbench.current;if(!root)return;const height=viewport?.height??window.innerHeight,notice=document.querySelector('.local-preview-notice')?.getBoundingClientRect().height??0;root.style.setProperty('--nai-viewport-height',Math.max(180,height-notice)+'px');root.classList.toggle('is-keyboard',window.innerWidth<=720&&height<window.innerHeight*.78)};const observer=new ResizeObserver(update);const notice=document.querySelector('.local-preview-notice');if(notice)observer.observe(notice);observer.observe(document.body);update();viewport?.addEventListener('resize',update);window.addEventListener('resize',update);return()=>{observer.disconnect();viewport?.removeEventListener('resize',update);window.removeEventListener('resize',update)}},[hasWorkspace])
  useLayoutEffect(()=>{if(textarea.current){textarea.current.style.height='0px';textarea.current.style.height=Math.min(textarea.current.scrollHeight,160)+'px'}},[text])
  const contentKey=answers.map(a=>a.id).join('|')+'|'+(attempt?.requestId??'')+'|'+asking
@@ -81,8 +82,8 @@ export function CampusAIChat(){
     } catch { setUploadError('无法读取这张图片，请换一张重试。') }
     finally { URL.revokeObjectURL(objectUrl) }
   }
- return <div className="campus-ai-workbench" ref={workbench}>
-  <header className="nai-header"><div><Link className="nai-icon-button" to="/v2" aria-label={uiText('返回首页')}><ArrowLeft size={19}/></Link><button ref={historyToggle} className="nai-icon-button" aria-label={uiText(historyOpen?'收起问答记录':'展开问答记录')} aria-expanded={historyOpen} aria-controls="nai-history" onClick={()=>setHistoryOpen(!historyOpen)}><PanelLeft size={18}/></button><span className="nai-header-divider"/><button className="nai-identity" onClick={()=>setIconMenu(true)} aria-label={uiText('更换奶蛙形象')}><img src={currentIcon} alt=""/><span>{uiText('奶蛙')}<small>{uiText('校园 AI')}</small></span><ChevronDown size={12}/></button></div><span className="nai-header-mode"><span/>{uiText('校园资料问答')}</span></header>
+ return <div className={`campus-ai-workbench${embedded?' is-embedded':''}`} ref={workbench}>
+  <header className="nai-header"><div>{!embedded&&<Link className="nai-icon-button" to="/v2" aria-label={uiText('返回首页')}><ArrowLeft size={19}/></Link>}{!embedded&&<button ref={historyToggle} className="nai-icon-button" aria-label={uiText(historyOpen?'收起问答记录':'展开问答记录')} aria-expanded={historyOpen} aria-controls="nai-history" onClick={()=>setHistoryOpen(!historyOpen)}><PanelLeft size={18}/></button>}<span className="nai-header-divider"/><button className="nai-identity" onClick={()=>setIconMenu(true)} aria-label={uiText('更换奶蛙形象')}><img src={currentIcon} alt=""/><span>{uiText('奶蛙')}<small>{uiText('校园 AI')}</small></span><ChevronDown size={12}/></button></div>{embedded?<button className="nai-expand" disabled={asking} onClick={()=>onExpand?.(text)}>{uiText('展开对话')}<ArrowUpRight size={14}/></button>:<span className="nai-header-mode"><span/>{uiText('校园资料问答')}</span>}</header>
   <div className={`nai-workspace${historyOpen&&!compact?' has-history':''}`}>
    {!compact&&<aside className="nai-history" id="nai-history" aria-label={uiText('问答记录')} inert={!historyOpen}><div className="nai-history-inner"><h2>{uiText('问答记录')}</h2>{historyContent}</div></aside>}
    <section className="nai-conversation" aria-label={uiText('与奶蛙对话')}>
