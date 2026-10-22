@@ -98,20 +98,20 @@ body:has(.v2-app.v2-app-student) :is(button,a,input,textarea,select):focus-visib
 .v2-app.v2-app-student .v2-floating-timetable-window>header {background:var(--v2-surface);border-color:var(--v2-line);color:var(--v2-ink)}
 /* Portals: preserve all existing dismiss, validation and mutation handlers. */
 body:has(.v2-app.v2-app-student) :is(.v2-modal-scrim,.v2-drawer-scrim,.v2-map-picker-scrim) {background:#1e30284f;backdrop-filter:blur(3px)}
-body:has(.v2-app.v2-app-student) .v2-modal {background:#faf9f6;color:#263c35;border:1px solid #e4e7df;border-radius:6px 24px 6px 6px;padding:24px;box-shadow:0 20px 70px #263c3530;max-height:min(88dvh,800px);line-height:1.8}
+body:has(.v2-app.v2-app-student) .v2-modal {background:#faf9f6;color:var(--v2-ink);border:1px solid #e4e7df;border-radius:6px 24px 6px 6px;padding:24px;box-shadow:0 20px 70px #263c3530;max-height:min(88dvh,800px);line-height:1.8}
 body:has(.v2-app.v2-app-student) .v2-modal>header {position:sticky;top:-24px;z-index:4;background:#faf9f6;gap:16px;border-bottom:1px solid #e4e7df;padding:0 0 16px;margin-bottom:20px}
-body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer)>header h2 {font:500 25px/1.5 var(--cw-title);color:#263c35;overflow-wrap:anywhere}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer)>header h2 {font:500 25px/1.5 var(--cw-title);color:var(--v2-ink);overflow-wrap:anywhere}
 body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-icon-button {width:44px;height:44px;min-width:44px;flex-shrink:0;background:#e8eee9;border:0;border-radius:50%;color:#3e625b}
 body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-button,.v2-cover-options button,.ref-cover-options button) {min-height:44px;border-radius:6px;font-size:14px}
-body:has(.v2-app.v2-app-student) .v2-drawer {background:#faf9f6;color:#263c35;border-left:1px solid #e4e7df;box-shadow:-16px 0 60px #263c3520}
+body:has(.v2-app.v2-app-student) .v2-drawer {background:#faf9f6;color:var(--v2-ink);border-left:1px solid #e4e7df;box-shadow:-16px 0 60px #263c3520}
 body:has(.v2-app.v2-app-student) .v2-drawer>header {background:#faf9f6;border-color:#e4e7df;padding:20px 24px}
 body:has(.v2-app.v2-app-student) .v2-drawer-body {padding:24px;line-height:1.8}
-body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-detail-lead,.v2-detail-date,.v2-form-note,.v2-modal-copy,.v2-drawer-body>p) {color:#65726a;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
-body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-form>label,.v2-form-two>label) {color:#263c35;font-size:14px;font-weight:400;line-height:1.7;min-width:0}
-body:has(.v2-app.v2-app-student) .v2-partner-specific-fields label {color:#263c35;font-size:14px;font-weight:400;line-height:1.7;min-width:0}
-body:has(.v2-app.v2-app-student) :is(.reference-word-count,.v2-image-uploader small,.v2-image-uploader-head>span,.v2-partner-form-intro>span) {color:#65726a;font-size:12px;line-height:1.7}
-body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-form input:not([type=checkbox]):not([type=radio]),.v2-form textarea,.v2-form select,.v2-comment-form input,.reference-inline-search) {background:#fffefa;border:1px solid #d5dcd2;color:#263c35;border-radius:6px;font:400 16px/1.5 var(--reference-font);min-height:44px;min-width:0}
-body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(input,textarea)::placeholder {color:#65726a}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-detail-lead,.v2-detail-date,.v2-form-note,.v2-modal-copy,.v2-drawer-body>p) {color:var(--v2-muted);font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-form>label,.v2-form-two>label) {color:var(--v2-ink);font-size:14px;font-weight:400;line-height:1.7;min-width:0}
+body:has(.v2-app.v2-app-student) .v2-partner-specific-fields label {color:var(--v2-ink);font-size:14px;font-weight:400;line-height:1.7;min-width:0}
+body:has(.v2-app.v2-app-student) :is(.reference-word-count,.v2-image-uploader small,.v2-image-uploader-head>span,.v2-partner-form-intro>span) {color:var(--v2-muted);font-size:12px;line-height:1.7}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-form input:not([type=checkbox]):not([type=radio]),.v2-form textarea,.v2-form select,.v2-comment-form input,.reference-inline-search) {background:#fffefa;border:1px solid #d5dcd2;color:var(--v2-ink);border-radius:6px;font:400 16px/1.5 var(--reference-font);min-height:44px;min-width:0}
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(input,textarea)::placeholder {color:var(--v2-muted)}
 body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-form {gap:18px}
 body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) .v2-form-actions {gap:10px;flex-wrap:wrap;border-color:#e4e7df;background:#faf9f6}
 body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-upload-add,.v2-timetable-upload,.v2-recognition ol,.v2-info-box,.v2-partner-type-picker button,.v2-icon-options button,.ref-cover-options button) {background:#f0f2ec;color:#3e625b;border-color:#d5dcd2;border-radius:6px}
@@ -119,10 +119,10 @@ body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.v2-partner-type-
 body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer) :is(.reference-add-list article,.v2-comment,.v2-fact-list,.v2-detail-actions) {border-color:#e4e7df}
 body:has(.v2-app.v2-app-student) .reference-add-list article {gap:14px}
 body:has(.v2-app.v2-app-student) .reference-add-list article>span {min-width:0;overflow-wrap:anywhere}
-body:has(.v2-app.v2-app-student) .reference-add-list article>span>small {font-size:13px;color:#65726a}
+body:has(.v2-app.v2-app-student) .reference-add-list article>span>small {font-size:13px;color:var(--v2-muted)}
 body:has(.v2-app.v2-app-student) .v2-detail-art {border-radius:6px}
 body:has(.v2-app.v2-app-student) .v2-map-picker-dialog {background:#faf9f6;border:1px solid #e4e7df;border-radius:6px;overflow:hidden}
-body:has(.v2-app.v2-app-student) :is(.v2-explorer-panel,.v2-explorer-panel-head,.v2-explorer-map-top) {color:#263c35;border-color:#e4e7df}
+body:has(.v2-app.v2-app-student) :is(.v2-explorer-panel,.v2-explorer-panel-head,.v2-explorer-map-top) {color:var(--v2-ink);border-color:#e4e7df}
 body:has(.v2-app.v2-app-student) .v2-explorer-panel {background:#faf9f6}
 body:has(.v2-app.v2-app-student) .v2-explorer-panel h2 {font-family:var(--cw-title);font-weight:500}
 @media(max-width:760px) {
