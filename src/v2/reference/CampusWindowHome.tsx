@@ -1,137 +1,89 @@
-import {courseTone} from '../timetableWeek'
-import {homeAmbient} from '../homeAmbient'
-import {SkeletonBars} from '../MaterialSkeleton'
-import {StudentTimetable} from '../StudentTimetable'
-import type {CardOrigin} from '../ui'
-import {schedulePreferences} from '../../../shared/v2/schedulePreferences'
+import {useEffect,useRef,useState,type MouseEvent} from 'react'
+import {Link} from 'react-router-dom'
+import {ArrowRight,BookOpen,CalendarDays,ChevronRight,Coffee,Heart,MapPin,NotebookPen,Sun,UsersRound} from 'lucide-react'
+import {StudentSearch} from '../StudentSearch'
 import {StudentUtilities} from '../StudentUtilities'
-import { uiText, useUiLanguage , uiLocale } from '../uiLanguage'
+import {StudentTimetable} from '../StudentTimetable'
 import {useDevicePreferences} from '../devicePreferences'
-import { ArrowRight, ChevronRight, MapPin } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { StudentSearch } from '../StudentSearch'
-import { useCommunityBackend } from '../useCommunityBackend'
-import { useWorkspaceBackend } from '../useWorkspaceBackend'
-import { liveStudentSchedule } from '../liveStudentSchedule'
-import { liveActivities } from '../liveActivities'
-import { filterActivityItems } from '../activityFilters'
-import { showNoticeBadge } from '../notificationPreferences'
-import type { StudentScheduleItem } from '../studentSchedule'
-import { AssistantBanner, EmptyNote, EventCard, Feedback, Organizations, Section, Services, Stories } from './components'
-import { campusDate, sportsSummary } from './model'
-import { campusPhotographs as photographs } from '../campusPhotographs'
-import './campusWindow.css'
+import {useWorkspaceBackend} from '../useWorkspaceBackend'
+import {useCommunityBackend} from '../useCommunityBackend'
+import {liveActivities} from '../liveActivities'
+import {filterActivityItems} from '../activityFilters'
+import {photosForPost} from '../postPresentation'
+import {SharedMediaLink} from '../SharedMediaLink'
+import {schedulePreferences} from '../../../shared/v2/schedulePreferences'
+import {homepageAgenda,courseClock,deadlineClock,deadlineTitle} from '../homeAgenda'
+import {uiText,uiLocale,useUiLanguage} from '../uiLanguage'
+import type {StudentScheduleItem} from '../studentSchedule'
+import type {CardOrigin} from '../ui'
+import {Feedback} from './components'
+import evening from '../../assets/campus/evening-campus.jpg'
+import reflection from '../../assets/campus/gallery/blue-sky-reflection.webp'
+import morning from '../../assets/campus/gallery/morning-campus.webp'
+import flowers from '../../assets/campus/gallery/flowers-and-light.webp'
+import campus from '../../assets/campus/home-background.jpg'
+import './campusHome.css'
 
-function CampusWindow({ greeting, name }: { greeting: string; name: string }) { useUiLanguage();
-  const device=useDevicePreferences()
-  const stopAutoplay=!device.preferences.photoAutoplay||device.reducedMotion
-  const [slide, setSlide] = useState(0)
-  const [reduced, setReduced] = useState(false)
-  const [inView, setInView] = useState(true)
-  const windowRef = useRef<HTMLElement>(null)
-  useEffect(() => {
-    if (!windowRef.current) return
-    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting))
-    observer.observe(windowRef.current)
-    return () => observer.disconnect()
-  }, [])
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReduced(query.matches)
-    update()
-    query.addEventListener('change', update)
-    return () => query.removeEventListener('change', update)
-  }, [])
-  useEffect(() => {
-    if (reduced || stopAutoplay || !inView) return
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === 'visible') setSlide(current => (current + 1) % photographs.length)
-    }, 6500)
-    return () => window.clearInterval(timer)
-  }, [reduced, stopAutoplay, inView])
-  const dateFormat = new Intl.DateTimeFormat(uiLocale(), { timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'short' })
-  const date = new Date()
-  return <section className="cw-window" aria-label={uiText("校园窗口")} ref={windowRef}>
-    <time className="cw-date" aria-label={dateFormat.format(date)}>{dateFormat.formatToParts(date).map((part, index) => <span key={index} className={part.type === 'month' || part.type === 'day'?'cw-date-number':undefined}>{part.value}</span>)}</time>
-    <div className="cw-greeting" aria-label={`${uiText(greeting)}，${name}`}>
-      <span className="cw-hello">{uiText(greeting)}，</span>
-      <span className="cw-name" title={name}>{name}</span>
-    </div>
-    <div className="cw-scene">
-      {photographs.map((photo, index) => (index === slide || (!stopAutoplay && (index === (slide + 1) % photographs.length || index === (slide + photographs.length - 1) % photographs.length))) && <img key={photo.source} src={photo.source} alt={uiText(photo.alt)} style={{objectPosition:photo.position}} className={slide === index?'is-active':''} aria-hidden={slide !== index} decoding="async" fetchPriority={index === slide?'high':'low'}/>)}
+const scenes=[{image:evening,label:'湖畔的暮色',location:'校园湖畔'},{image:reflection,label:'晴空与湖面的相遇',location:'校园风景'},{image:morning,label:'晨光里的校园',location:'校园全景'},{image:flowers,label:'花木间，发现校园',location:'校园日常'}]
+const shortcuts=[{title:'校园地图',copy:'探索校园',path:'/v2/campus/explore',icon:MapPin,tone:'mint'},{title:'校园活动',copy:'发现精彩',path:'/v2/activities',icon:UsersRound,tone:'blue'},{title:'找搭子',copy:'同学交流',path:'/v2/partners',icon:Coffee,tone:'amber'},{title:'社团组织',copy:'发现热爱',path:'/v2/organizations',icon:UsersRound,tone:'rose'},{title:'我的课表',copy:'全部课程',path:'/v2/me?tab=timetable',icon:CalendarDays,tone:'violet'}]
+type Recommendation={id:string;title:string;image:string;category:string;path:string;transitionKey:string;detail:string;time?:string;source:'activity'|'organization'|'post'}
+function Cover({src,alt}:{src:string;alt:string}){
+ const [failed,setFailed]=useState(false)
+ return src&&!failed?<img src={src} alt={alt} loading="lazy" decoding="async" onError={()=>setFailed(true)}/>:<div className="home-cover-empty"><BookOpen size={28}/><span>{alt}</span></div>
+}
+function HomeTime({item}:{item:StudentScheduleItem}){
+ return <time className="home-row-time" dateTime={item.startAt}>{item.startAt?new Intl.DateTimeFormat(uiLocale(),{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit'}).format(new Date(item.startAt)):uiText('待确认')}<small>{item.startAt?new Intl.DateTimeFormat(uiLocale(),{timeZone:'Asia/Shanghai',month:'numeric',day:'numeric'}).format(new Date(item.startAt)):''}</small></time>
+}
+const clubGroup=(category:string)=>category==='学术'?'学术科技':['文化艺术','体育运动','艺术','运动'].includes(category)?'文艺体育':['义工服务','公益'].includes(category)?'公益志愿':'兴趣爱好'
 
-    </div>
+/** Reference composition backed by the existing permission-scoped campus workspace. */
+export function CampusWindowHome(){
+ useUiLanguage()
+ const live=useWorkspaceBackend(30000),community=useCommunityBackend(),device=useDevicePreferences()
+ const [now,setNow]=useState(Date.now),[slide,setSlide]=useState(0),[inView,setInView]=useState(true)
+ const [tab,setTab]=useState<'活动'|'社团'|'校园动态'>('活动'),[category,setCategory]=useState('全部')
+ const [courseDetail,setCourseDetail]=useState<{id:string;origin:CardOrigin}|null>(null),hero=useRef<HTMLElement>(null)
+ useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),30000);return()=>window.clearInterval(timer)},[])
+ useEffect(()=>{if(!hero.current)return;const observer=new IntersectionObserver(([entry])=>setInView(entry.isIntersecting));observer.observe(hero.current);return()=>observer.disconnect()},[])
+ useEffect(()=>{if(device.reducedMotion||!device.preferences.photoAutoplay||!inView)return;const timer=window.setInterval(()=>{if(document.visibilityState==='visible')setSlide(index=>(index+1)%scenes.length)},6500);return()=>window.clearInterval(timer)},[device.reducedMotion,device.preferences.photoAutoplay,inView])
+ const data=live.data,agenda=homepageAgenda(data,now),scene=scenes[slide]
+ const preferences=schedulePreferences(data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===data.account.id)?.data)
+ const limit=preferences.homeScheduleCount
+ const courses=agenda.visibleCourses.slice(0,limit),deadlines=agenda.deadlines.slice(0,limit)
+ const clubs=(data?.entities??[]).filter(e=>e.kind==='organization'&&e.data.status==='approved'&&e.data.visibility==='visible')
+ const filteredClubs=clubs.filter(e=>category==='全部'||clubGroup(String(e.data.category))===category)
+ const activities=filterActivityItems(liveActivities(data),{query:'',category:'全部',period:'全部时间',host:'全部主办方',status:'未结束',sort:'时间最近'},data?.account.id??'').slice(0,6)
+ const recommendations:Recommendation[]=tab==='活动'?activities.map(item=>({id:item.id,title:item.title,image:item.image||campus,category:'活动',path:`/v2/activities/${encodeURIComponent(item.id)}`,transitionKey:`activity:${item.id}`,detail:item.location||item.host||'查看活动详情',time:item.startAt,source:'activity'})):tab==='社团'?clubs.slice(0,6).map(item=>({id:item.id,title:String(item.data.name),image:String(item.data.image??''),category:String(item.data.category),path:`/v2/organizations?id=${encodeURIComponent(item.id)}`,transitionKey:`organization:${item.id}`,detail:item.data.directoryOnly?'学校公开名录':'平台入驻社团',source:'organization'})):community.posts.filter(item=>item.status==='visible').slice(0,6).map(item=>({id:item.id,title:item.title,image:photosForPost(item)[0]??'',category:item.board,path:`/v2/community?item=${encodeURIComponent(item.id)}`,transitionKey:`post:${item.id}`,detail:`${item.author} · ${item.likes} ${uiText('人点赞')}`,source:'post'}))
+ const saved=(item:Recommendation)=>item.source==='post'?community.savedPosts.includes(item.id):Boolean(data?.relations.some(r=>r.entityId===item.id&&r.kind===(item.source==='organization'?'follow':'save')))
+ const save=(item:Recommendation)=>item.source==='post'?community.mutate('relation.set',{id:item.id,kind:'save',enabled:!saved(item)}):live.mutate('relation.set',{id:item.id,kind:item.source==='organization'?'follow':'save',enabled:!saved(item)})
+ const openCourse=(event:MouseEvent<HTMLAnchorElement>,item:StudentScheduleItem)=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&item.lessonId){event.preventDefault();setCourseDetail({id:item.lessonId,origin:event.currentTarget.getBoundingClientRect().toJSON()})}}
+ const morePath=tab==='活动'?'/v2/activities':tab==='社团'?'/v2/organizations':'/v2/community'
+ return <div className="ref-page campus-home">
+  <section className="campus-home-hero" ref={hero} aria-label={uiText('校园窗口')}>
+   <div className="home-hero-scene" aria-hidden="true">{scenes.map((item,index)=><img key={item.image} src={item.image} alt="" decoding="async" fetchPriority={index===0?'high':'low'} className={index===slide?'is-active':''}/>)}</div>
+   <header className="campus-home-header"><h1>{uiText('会同里')}</h1><nav aria-label={uiText('首页工具')}><StudentSearch/><StudentUtilities profile/></nav></header>
+   <p className="home-motto">{uiText('在校园里，')}<br/><span>{uiText('发现更多可能。')}</span></p>
+   <div className="home-day"><time>{new Intl.DateTimeFormat(uiLocale(),{timeZone:'Asia/Shanghai',month:'long',day:'numeric',weekday:'short'}).format(new Date(now))}</time><span><Sun size={14} aria-hidden="true"/>{uiText('珠海 · 校园生活')}</span></div>
+   <Link className="home-day-summary" to="/v2/me?tab=timetable"><span>{data?<>{agenda.remainingCourses.length?<>{uiText('今天还有')} <b>{agenda.remainingCourses.length}</b> {uiText('节课')}</>:uiText(agenda.courses.length?'今天课程已结束':'今天暂无课程')}<br/>{uiText('还有')} <b>{agenda.deadlines.length}</b> {uiText('项待办任务')}</>:uiText('正在读取课程与任务…')}</span><ChevronRight size={20}/></Link>
+   <button className="home-scene-note" type="button" onClick={()=>setSlide(index=>(index+1)%scenes.length)} aria-label={uiText('切换校园照片')}><strong>{uiText(scene.label)}</strong><span><MapPin size={13}/>{uiText(scene.location)}<ChevronRight size={13}/></span></button>
+   <nav className="home-scene-dots" aria-label={uiText('校园照片轮播')}>{scenes.map((item,index)=><button key={item.image} aria-label={uiText('显示校园照片')+` ${index+1}`} aria-pressed={slide===index} onClick={()=>setSlide(index)}/>)}</nav>
   </section>
-}
-
-function ScheduleTime({ item }: { item: StudentScheduleItem }) { useUiLanguage();
-  if (!item.startAt) return <time className="cw-schedule-time">{uiText("待商定")}</time>
-  return <time className="cw-schedule-time" dateTime={item.startAt}>
-    {new Intl.DateTimeFormat(uiLocale(), { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit' }).format(new Date(item.startAt))}
-    <small>{new Intl.DateTimeFormat(uiLocale(), { timeZone: 'Asia/Shanghai', month: 'numeric', day: 'numeric' }).format(new Date(item.startAt))}</small>
-  </time>
-}
-
-/** Student homepage using the existing authenticated workspace and object routes. */
-export function CampusWindowHome() { useUiLanguage();
-  const live = useWorkspaceBackend(30000)
-  const community = useCommunityBackend()
-  const data = live.data
-  const profile = data?.entities.find(entity => entity.kind === 'profile' && entity.ownerId === data.account.id)
-  const name = String(profile?.data.nickname || data?.account.name || '同学')
-  const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Shanghai', hour: '2-digit', hourCycle: 'h23' }).format(new Date()))
-  const greeting = uiText(hour < 6 ? '晚上好' : hour < 11 ? '早上好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : '晚上好')
-  const agendaPreferences=schedulePreferences(data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===data.account.id)?.data)
-  const [courseDetail,setCourseDetail]=useState<{id:string;origin:CardOrigin}|null>(null)
-  const [now,setNow]=useState(Date.now)
-  useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),30000);return()=>window.clearInterval(timer)},[])
-  const schedule = liveStudentSchedule(data,now)
-  const [next,...following] = schedule.slice(0,agendaPreferences.homeScheduleCount)
-  const today = schedule.filter(item => item.startAt && campusDate(item.startAt) === campusDate()).length
-  const unread = data?.notifications.filter(notice => showNoticeBadge(data, notice)).length
-  const { percent } = sportsSummary(data)
-  const sportsNote = uiText(!data ? '读取中' : data.sportsStatus === 'not-enrolled' ? '尚未入班' : percent === null ? '待同步' : '本学期')
-  const events = filterActivityItems(liveActivities(data), { query: '', category: '全部', period: '全部时间', host: '全部主办方', status: '未结束', sort: '时间最近' }, data?.account.id ?? '').slice(0, 2)
-
-  return <div className="ref-page cw-home" data-ambient={homeAmbient(hour)}>
-    <header className="cw-header"><h1>{uiText("会同里")}</h1><nav aria-label={uiText("首页工具")}>
-      <StudentSearch/>
-      <StudentUtilities/>
-    </nav></header>
-
-    {courseDetail&&<StudentTimetable initialWorkspace={data??undefined} detailOnly initialLessonId={courseDetail.id} origin={courseDetail.origin} onCloseDetails={()=>setCourseDetail(null)}/>}
-    <div className="cw-intro">
-      <CampusWindow greeting={uiText(greeting)} name={name}/>
-      <div className="cw-focus">
-        <div className="cw-agenda-controls"><label>{uiText('展示')}<select aria-label={uiText('首页安排展示条数')} value={agendaPreferences.homeScheduleCount} disabled={live.busy} onChange={event=>void live.mutate('preferences.schedule',{homeScheduleCount:Number(event.target.value)})}>{[1,2,3,4,5,6].map(count=><option key={count} value={count}>{count} {uiText('项')}</option>)}</select></label></div>
-        {next?<Link to={next.path} className="cw-next" onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&next.kind==='course'&&next.lessonId){event.preventDefault();setCourseDetail({id:next.lessonId,origin:event.currentTarget.getBoundingClientRect().toJSON()})}}}>
-          <div className="cw-next-top"><span><i/>{uiText("下一项安排")}</span><ArrowRight size={22}/></div>
-          <h2>{next.title}</h2>
-          <div className="cw-next-meta"><ScheduleTime item={next}/><div><span><MapPin size={14}/>{next.location || uiText('地点待商定')}</span><small>{uiText(next.label)}</small>{next.time && <small>{next.time}</small>}</div></div>
-        </Link>:<section className="cw-next cw-next-empty" aria-busy={!data && !live.error}>
-          <span className="cw-next-top">{uiText("下一项安排")}</span>
-          {!data&&!live.error?<><SkeletonBars/><span className="material-loading-label" role="status">{uiText('正在读取个人日程')}</span></>:<><h2>{live.error?uiText('安排暂时无法读取'):uiText('留一点时间，去看看校园。')}</h2>{live.error ? <button type="button" onClick={() => void live.refresh()}>{uiText("重新读取")}<ArrowRight size={16}/></button> : <Link to="/v2/activities">{uiText("发现校园活动")}<ArrowRight size={16}/></Link>}</>}
-        </section>}
-        {following.map(item=><Link key={item.id} to={item.path} className={`cw-following${item.kind==='course'?` cw-course tt-tone-${courseTone(item.title)}`:''}`} onClick={event=>{if(!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&item.kind==='course'&&item.lessonId){event.preventDefault();setCourseDetail({id:item.lessonId,origin:event.currentTarget.getBoundingClientRect().toJSON()})}}}><ScheduleTime item={item}/><div><strong>{item.title}</strong><span>{item.location || uiText('地点待商定')} · {uiText(item.label)}</span>{item.time && <span>{item.time}</span>}</div><ChevronRight size={17}/></Link>)}
-        {agendaPreferences.academicCalendar==='custom'&&!agendaPreferences.semesterStartDate&&data?.entities.some(e=>e.kind==='timetable'&&e.ownerId===data.account.id)&&<Link className="cw-agenda-pending" to="/v2/me?tab=timetable">{uiText('设置学期第一周日期，加入课程安排')}<ChevronRight size={14}/></Link>}
-
-      </div>
-      <Feedback live={live}/>
-      <nav className="cw-summary" aria-label={uiText("今日摘要")}>
-        <div><span>{uiText("今日安排")}</span><strong>{data?today:'—'}{data && <small>{uiText("项")}</small>}</strong></div>
-        <Link to="/v2/messages?view=notifications"><span>{uiText("未读通知")}</span><strong>{unread ?? '—'}{data && <small>{uiText("条")}</small>}</strong></Link>
-        <Link to="/v2/sports"><span>{uiText("体育进度")}</span><strong>{percent === null?'—':`${Math.round(percent)}%`}<small>{uiText(sportsNote)}</small></strong></Link>
-      </nav>
-    </div>
-
-    <div className="cw-content-grid">
-      <div className="cw-services"><Section title={uiText("校园服务")} hint={uiText("常用功能")}><Services exclude={['/v2/me?tab=timetable','/v2/campus','/v2/me?tab=saved']}/></Section></div>
-      <div className="cw-recommendations"><Section title={uiText("校园新鲜事")} hint={uiText("为你推荐")} to="/v2/activities"><div className="cw-event-list">{events.map(item => <EventCard key={item.id} item={item} live={live} row/>)}</div>{!events.length && <EmptyNote to="/v2/activities">{data?uiText('下一场校园活动，等你来发现。'):uiText('正在读取校园活动…')}</EmptyNote>}</Section></div>
-      <div className="cw-stories"><Section title={uiText("校园里的声音")} hint={uiText("来自同学们的分享")} to="/v2/community"><Stories community={community}/></Section></div>
-      <div className="cw-organizations"><Section title={uiText("一起，让校园更有意思")} hint={uiText("你可能感兴趣的组织")} to="/v2/organizations"><Organizations live={live}/></Section></div>
-      <div className="cw-assistant"><AssistantBanner/></div>
-    </div>
-    <footer className="cw-footer"><span>{uiText("会同里")}</span><p>{uiText("今天，也在校园里发现一点新的可能。")}</p><Link to="/v2/campus/explore">{uiText("去校园走走")}<ArrowRight size={15}/></Link></footer>
+  {courseDetail&&<StudentTimetable initialWorkspace={data??undefined} detailOnly initialLessonId={courseDetail.id} origin={courseDetail.origin} onCloseDetails={()=>setCourseDetail(null)}/>}
+  <div className="home-dashboard-body"><Feedback live={live}/>
+   <section className="home-planner" aria-label={uiText('课程与待办')}>
+    <header className="home-planner-heading"><Link to="/v2/me?tab=timetable"><h2>{uiText('今日课表')}</h2><ChevronRight size={17}/></Link><Link className="home-full-timetable" to="/v2/me?tab=timetable"><CalendarDays size={15}/>{uiText('完整课表')}</Link></header>
+    <div className="home-timeline home-course-timeline">{courses.map(item=>{const clock=courseClock(item,now);return <div className={`home-timeline-row home-course-row${clock.active?' is-current':''}`} key={item.id}><span className="home-course-status">{uiText(clock.active?'进行中':clock.ended?'已结束':'待上课')}</span><HomeTime item={item}/><Link to={item.path} className="home-course-card" onClick={event=>openCourse(event,item)} style={{backgroundImage:`linear-gradient(90deg,var(--home-course-wash) 40%,var(--home-course-clear)),url(${campus})`}}><strong>{item.title}</strong><span><MapPin size={12}/>{item.location||uiText('教室待确认')}</span><small>{item.time}</small>{clock.active&&<div className="home-course-progress"><span>{uiText('还有')} {clock.remaining} {uiText('分钟')}</span><progress value={clock.progress} max={100} aria-label={uiText('课程时间进度')}/></div>}</Link></div>})}{!courses.length&&<p className="home-empty">{!data?uiText('正在读取今日课程…'):uiText('今天暂无已选课程，可选择课程或查看完整课表。')}</p>}</div>
+    <header className="home-tasks-heading"><Link to="/v2/me?tab=timetable&study=deadlines">{uiText('待办任务')}<ChevronRight size={16}/></Link></header>
+    <div className="home-timeline home-task-timeline">{deadlines.map((item,index)=>{const clock=deadlineClock(item,now);return <div className={`home-timeline-row home-task-row${clock.today?' is-due':''}`} data-home-deadline key={item.id}><span className={`home-task-icon task-tone-${index%2}`}>{index%2?<NotebookPen size={18}/>:<CalendarDays size={18}/>}</span><HomeTime item={item}/><Link to={item.path} className="home-task-card"><div><strong title={item.title}>{deadlineTitle(item.title)}</strong><small>{uiText('课程作业')} · {uiText('提交截止')}</small></div><span className="home-deadline-countdown">{uiText(clock.today?'今天截止':clock.days===1?'明天截止':'还有')}{clock.days!==null&&clock.days>1?` ${clock.days} ${uiText('天')}`:''}</span></Link></div>})}{!deadlines.length&&<p className="home-empty">{!data?uiText('正在读取待办任务…'):uiText('当前没有待提交的 DDL。')}</p>}</div>
+    {agenda.other.length>0&&<Link className="home-other-plan" to={agenda.other[0].path}>{uiText('其他安排')} · {agenda.other[0].title}<ChevronRight size={14}/></Link>}
+   </section>
+   <nav className="home-shortcuts" aria-label={uiText('校园快捷入口')}>{shortcuts.map(({title,copy,path,icon:Icon,tone})=><Link key={path} to={path} className={`home-shortcut tone-${tone}`}><Icon size={27} strokeWidth={1.6}/><strong>{uiText(title)}</strong><small>{uiText(copy)}</small><span><ChevronRight size={12}/></span></Link>)}</nav>
+   <section className="home-recommendations" aria-label={uiText('校园推荐')}><header className="home-section-heading"><h2>{uiText('校园推荐')}</h2><nav aria-label={uiText('推荐内容类型')}>{(['活动','社团','校园动态'] as const).map(item=><button key={item} aria-pressed={tab===item} onClick={()=>setTab(item)}>{uiText(item)}</button>)}</nav><Link to={morePath} aria-label={uiText('查看更多推荐')}><ChevronRight size={19}/></Link></header>
+    {tab==='校园动态'&&community.error&&<p role="alert" className="home-empty">{community.error}</p>}
+    <div className="home-recommendation-track" key={tab}>{recommendations.map(item=><article className="home-feature-card" key={item.id}><SharedMediaLink className="home-feature-link" to={item.path} transitionKey={item.transitionKey} resetScroll><div className="home-feature-photo" data-shared-media={item.transitionKey}><Cover key={item.image} src={item.image} alt={item.title}/></div><span className="home-feature-category">{uiText(item.category)}</span><div className="home-feature-copy">{item.time&&<time>{new Intl.DateTimeFormat(uiLocale(),{timeZone:'Asia/Shanghai',month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(item.time))}</time>}<h3>{item.title}</h3><p>{item.source==='activity'&&<MapPin size={12}/>}<span>{uiText(item.detail)}</span></p></div></SharedMediaLink><button className="home-feature-save" disabled={!data||live.busy||community.busy} aria-label={uiText(saved(item)?'取消收藏或关注':'收藏或关注')+' '+item.title} aria-pressed={saved(item)} onClick={()=>void save(item)}><Heart size={21} fill={saved(item)?'currentColor':'none'}/></button></article>)}</div>
+    {!recommendations.length&&<p className="home-empty">{uiText('暂时没有可展示的推荐，去校园里发现更多。')}<Link to={morePath}>{uiText('去看看')}<ArrowRight size={13}/></Link></p>}
+   </section>
+   <section className="home-club-recommendations" aria-label={uiText('推荐社团')}><header className="home-section-heading"><Link to="/v2/organizations"><h2>{uiText('推荐社团')}</h2><ChevronRight size={17}/></Link><nav aria-label={uiText('推荐社团分类')}>{['全部','学术科技','文艺体育','公益志愿','兴趣爱好'].map(item=><button key={item} aria-pressed={category===item} onClick={()=>setCategory(item)}>{uiText(item)}</button>)}</nav></header><div className="home-club-track" key={category}>{filteredClubs.slice(0,9).map(item=><Link className="home-club-card" key={item.id} to={`/v2/organizations?id=${encodeURIComponent(item.id)}`}><div><Cover key={String(item.data.image??'')} src={String(item.data.image??'')} alt={String(item.data.name)}/></div><span><strong>{String(item.data.name)}</strong><small>{String(item.data.category)}</small><small>{data?.relations.some(r=>r.kind==='follow'&&r.entityId===item.id)?uiText('已关注'):uiText('了解社团')}<ChevronRight size={10}/></small></span></Link>)}</div>{!filteredClubs.length&&<p className="home-empty">{data?uiText('这个分类暂未收录社团。'):uiText('正在读取社团…')}</p>}</section>
   </div>
+ </div>
 }

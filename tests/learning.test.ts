@@ -136,6 +136,17 @@ describe('学习工具：身份、保存与 iSpace 隔离',()=>{
    expect(await t.service.operation(t.actor,t.session.token,'reminders',{})).toEqual({added:0});
   }finally{t.db.close()}
  });
+ it('取消每日课程后停止新课前提醒，重新勾选后恢复',async()=>{
+  const t=setup(),clock=vi.spyOn(Date,'now').mockReturnValue(Date.parse('2026-10-22T09:50:00+08:00'));
+  try{
+   t.repo.create('learningPreferences',t.actor.id,{classReminderEnabled:true});
+   t.repo.create('timetable',t.actor.id,{lessons:[{id:'class-choice',name:'数学',weekday:4,startTime:'10:00',endTime:'11:50',weeks:'1–14周',location:'T7'}]});
+   const prefs=t.repo.create('preferences',t.actor.id,{academicCalendar:'bnbu-2026-s1',hiddenDailyCourses:['数学']});
+   expect(await t.service.operation(t.actor,t.session.token,'reminders',{})).toEqual({added:0});
+   t.repo.save(prefs,{hiddenDailyCourses:[]});
+   expect(await t.service.operation(t.actor,t.session.token,'reminders',{})).toEqual({added:1});
+  }finally{clock.mockRestore();t.db.close()}
+ });
  it('个人课件仅本人可读，问答须明确同意且不能伪造服务成功',async()=>{
   const t=setup();try{
    const uploaded=await t.service.operation(t.actor,t.session.token,'upload',{name:'notes.txt',base64:Buffer.from('第一页\f第二页').toString('base64')}) as {id:string};

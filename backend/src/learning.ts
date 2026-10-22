@@ -6,7 +6,7 @@ import {list,object,plain} from './ispace';
 import type {LearningOverview,LearningPage,PersonalLearningItem} from '../../shared/v2/learning';
 import {personalOccurrences} from '../../shared/v2/learning';
 import {timetableSchedule} from '../../src/v2/timetableSchedule';
-import {schedulePreferences} from '../../shared/v2/schedulePreferences';
+import {schedulePreferences,scheduleCourseKey} from '../../shared/v2/schedulePreferences';
 import {SchoolSync,courseMaterials} from './school-sync';
 import type {MisTimetable} from './mis';
 type Fields=Record<string,unknown>;
@@ -110,6 +110,7 @@ export class LearningService {
         const rows=await sql.rows<{kind:string;data:string}>("SELECT kind,data FROM entities WHERE owner_id=? AND kind IN ('timetable','preferences')",[actor.id]);
         const table=JSON.parse(rows.find(r=>r.kind==='timetable')?.data??'{}'),preferences=schedulePreferences(JSON.parse(rows.find(r=>r.kind==='preferences')?.data??'{}'));
         for(const lesson of timetableSchedule(table.lessons,now,preferences.semesterStartDate,2,preferences.academicCalendar)){
+          if(preferences.hiddenDailyCourses.includes(scheduleCourseKey(lesson.title)))continue;
           if(!lesson.startAt||Date.parse(lesson.startAt)+60000<now||Date.parse(lesson.startAt)-15*60000>now)continue;
           const id=digest(`${actor.id}:class:${lesson.id}:${lesson.startAt}`);
           if((await sql.rows('SELECT id FROM notifications WHERE id=?',[id])).length)continue;

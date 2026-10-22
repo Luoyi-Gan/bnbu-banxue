@@ -1,7 +1,7 @@
 import type { Workspace } from '../live/api'
 import type { StudentScheduleItem } from './studentSchedule'
 import {timetableSchedule} from './timetableSchedule'
-import {schedulePreferences} from '../../shared/v2/schedulePreferences'
+import {schedulePreferences,scheduleCourseKey} from '../../shared/v2/schedulePreferences'
 import {personalOccurrences,type PersonalLearningItem} from '../../shared/v2/learning'
 
 export function liveStudentSchedule(data: Workspace | null, now = Date.now()): StudentScheduleItem[] {
@@ -28,8 +28,8 @@ export function liveStudentSchedule(data: Workspace | null, now = Date.now()): S
   }
   const timetable=data.entities.find(e=>e.kind==='timetable'&&e.ownerId===actor)
   const learning=data.entities.filter(e=>e.kind==='learningItem'&&e.ownerId===actor).map(e=>({...e.data,id:e.id,version:e.version}) as unknown as PersonalLearningItem)
-  items.push(...personalOccurrences(learning,now).map(item=>({...item,kind:'course' as const,time:'',path:'/v2/me?tab=timetable&study=arrangements'})))
+  items.push(...personalOccurrences(learning,now).map(item=>({...item,learningType:learning.find(source=>source.id===item.id||item.id.startsWith(source.id+':'))?.type,kind:'course' as const,time:'',path:'/v2/me?tab=timetable&study=arrangements'})))
   const preferences=schedulePreferences(data.entities.find(e=>e.kind==='preferences'&&e.ownerId===actor)?.data)
-  items.push(...timetableSchedule(timetable?.data.lessons,now,preferences.semesterStartDate,371,preferences.academicCalendar))
+  items.push(...timetableSchedule(timetable?.data.lessons,now,preferences.semesterStartDate,371,preferences.academicCalendar).filter(item=>!preferences.hiddenDailyCourses.includes(scheduleCourseKey(item.title))))
   return items.filter(item=>!item.startAt||Number.isFinite(Date.parse(item.startAt))).sort((a,b) => (a.startAt ? Date.parse(a.startAt) : Infinity) - (b.startAt ? Date.parse(b.startAt) : Infinity)||a.id.localeCompare(b.id))
 }

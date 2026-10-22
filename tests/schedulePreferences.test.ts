@@ -18,6 +18,11 @@ describe('本人日程偏好',()=>{
       for(const input of [{homeScheduleCount:7},{homeScheduleCount:1.5},{semesterStartDate:'2026-09-08'},{semesterStartDate:'2026-02-30'},{academicCalendar:'unverified'},{}])expect(()=>governanceCommand(repo,actor,'preferences.schedule',input)).toThrow()
       governanceCommand(repo,actor,'preferences.schedule',{academicCalendar:'bnbu-2026-s1'})
       expect(repo.all('preferences')[0].data).toMatchObject({academicCalendar:'bnbu-2026-s1',homeScheduleCount:2,searchable:false})
+      governanceCommand(repo,actor,'preferences.schedule',{hiddenDailyCourses:['数学','数学'],ownerId:teacher.id})
+      expect(repo.all('preferences')[0]).toMatchObject({ownerId:actor.id,data:{hiddenDailyCourses:['数学'],homeScheduleCount:2,searchable:false}})
+      for(const hiddenDailyCourses of ['bad',[1],[''],Array(301).fill('数学')])expect(()=>governanceCommand(repo,actor,'preferences.schedule',{hiddenDailyCourses})).toThrow()
+      governanceCommand(repo,actor,'preferences.schedule',{hiddenDailyCourses:[]})
+      expect(repo.all('preferences')[0].data.hiddenDailyCourses).toEqual([])
       expect(()=>governanceCommand(repo,teacher,'preferences.schedule',{homeScheduleCount:2})).toThrow()
     }finally{db.close()}
   })

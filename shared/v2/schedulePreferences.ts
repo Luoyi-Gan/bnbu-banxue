@@ -3,9 +3,10 @@ export function validSemesterStart(value:unknown):value is string{
   const date=new Date(`${value}T12:00:00+08:00`)
   return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value&&date.getUTCDay()===1
 }
+export const scheduleCourseKey=(name:string)=>name.trim().replace(/\s+/g,' ').toLocaleLowerCase('en-US')
 export function schedulePreferences(value:Record<string,unknown>|undefined){
   const semesterStartDate=validSemesterStart(value?.semesterStartDate)?value.semesterStartDate:''
-  return {homeScheduleCount:typeof value?.homeScheduleCount==='number'&&Number.isInteger(value.homeScheduleCount)&&value.homeScheduleCount>=1&&value.homeScheduleCount<=6?value.homeScheduleCount:3,semesterStartDate,academicCalendar:value?.academicCalendar==='custom'||value?.academicCalendar===undefined&&semesterStartDate?'custom':'bnbu-2026-s1'}
+  return {hiddenDailyCourses:Array.isArray(value?.hiddenDailyCourses)?value.hiddenDailyCourses.filter((key):key is string=>typeof key==='string').map(scheduleCourseKey):[],homeScheduleCount:typeof value?.homeScheduleCount==='number'&&Number.isInteger(value.homeScheduleCount)&&value.homeScheduleCount>=1&&value.homeScheduleCount<=6?value.homeScheduleCount:3,semesterStartDate,academicCalendar:value?.academicCalendar==='custom'||value?.academicCalendar===undefined&&semesterStartDate?'custom':'bnbu-2026-s1'}
 }
 export function lessonRunsInWeek(value:unknown,week:number):boolean|null{
   if(!Number.isInteger(week)||week<1||week>53)return false

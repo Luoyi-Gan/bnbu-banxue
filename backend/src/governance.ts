@@ -235,6 +235,10 @@ export function* governancePolicy(
   if (action === 'preferences.schedule') {
     student(actor);
     const patch:Record<string,unknown>={};
+    if(input.hiddenDailyCourses!==undefined){
+      demand(Array.isArray(input.hiddenDailyCourses)&&input.hiddenDailyCourses.length<=300&&input.hiddenDailyCourses.every(key=>typeof key==='string'&&key.length>0&&key.length<=300),'请选择有效的课程。');
+      patch.hiddenDailyCourses=[...new Set(input.hiddenDailyCourses as string[])];
+    }
     if(input.academicCalendar!==undefined){patch.academicCalendar=enumField(input,'academicCalendar',['bnbu-2026-s1','custom']);}
     if(input.homeScheduleCount!==undefined){
       demand(typeof input.homeScheduleCount==='number'&&Number.isInteger(input.homeScheduleCount)&&input.homeScheduleCount>=1&&input.homeScheduleCount<=6,'首页安排须展示1–6项。');
