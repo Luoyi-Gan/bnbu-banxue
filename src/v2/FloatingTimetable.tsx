@@ -16,7 +16,7 @@ export function FloatingTimetable() { useUiLanguage();
     return () => document.removeEventListener('keydown', closeOnEscape)
   }, [open])
 
-  if(location.pathname==='/v2/partners'||location.pathname==='/v2')return null
+  if(location.pathname==='/v2/partners'||location.pathname==='/v2'||location.pathname==='/v2/ai')return null
 
   return <>
     {createPortal(<button type="button" className="student-timetable-launcher" data-contextual={location.pathname==='/v2'||location.pathname==='/v2/campus'} aria-label={open?uiText('收起课表窗口'):uiText('打开课表窗口')} aria-expanded={open} aria-controls="v2-floating-timetable" onClick={() => setOpen(value => !value)}><CalendarDays size={20}/><span>{uiText("我的课表")}</span></button>,document.body)}

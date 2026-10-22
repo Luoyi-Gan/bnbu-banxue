@@ -31,6 +31,18 @@ describe('校园 AI 查询权限与费用保护',()=>{
    expect(new Repository(t.db).all('answer')).toHaveLength(1);
   }finally{t.db.close();}
  });
+ it('追问只引用本人指定回答、限制长度，并绑定幂等请求的追问对象',async()=>{
+  const t=setup();vi.stubEnv('DEEPSEEK_API_KEY','fake-test-key');try{
+   const repo=new Repository(t.db),own=repo.create('answer',t.account.id,{question:'天文协会的介绍',body:'a'.repeat(7000)}),other=repo.create('answer',createAccount(t.db,{email:'other-ai@example.test',password:'Test-password-123',name:'其他学生',roles:['student']}),{question:'PRIVATE-OTHER',body:'PRIVATE-OTHER'});
+   const transport=vi.fn(async(_url:unknown,init?:RequestInit)=>{const content=JSON.parse(JSON.parse(String(init?.body)).messages[1].content);expect(content.previousExchange).toEqual({question:'天文协会的介绍',answer:'a'.repeat(6000)});expect(content.visiblePlatformSources[0].title).toBe('天文协会');expect(String(init?.body)).not.toContain('PRIVATE-OTHER');return Response.json({choices:[{message:{content:'继续解释。'}}]})});
+   const ai=new CampusAI(sqliteLearningStore(t.db),transport as typeof fetch),input={question:'继续解释',requestId:'followup-request',previousAnswerId:own.id};
+   expect(await ai.ask(t.account,input,async()=>({entities:[{id:'astro',kind:'organization',ownerId:null,data:{name:'天文协会',status:'approved',visibility:'visible',description:'观星'}}]}),async()=>[])).toMatchObject({previousAnswerId:own.id});
+   await ai.ask(t.account,input,async()=>({entities:[{id:'astro',kind:'organization',ownerId:null,data:{name:'天文协会',status:'approved',visibility:'visible',description:'观星'}}]}),async()=>[]);expect(transport).toHaveBeenCalledTimes(1);
+   await expect(ai.ask(t.account,{...input,previousAnswerId:other.id},async()=>({entities:[{id:'astro',kind:'organization',ownerId:null,data:{name:'天文协会',status:'approved',visibility:'visible',description:'观星'}}]}),async()=>[])).rejects.toThrow('请求标识');
+   await expect(ai.ask(t.account,{...input,requestId:'other-followup',previousAnswerId:other.id},async()=>({entities:[{id:'astro',kind:'organization',ownerId:null,data:{name:'天文协会',status:'approved',visibility:'visible',description:'观星'}}]}),async()=>[])).rejects.toThrow('不可访问');
+   await expect(ai.ask(t.account,{...input,requestId:'bad-followup',previousAnswerId:123},async()=>({entities:[{id:'astro',kind:'organization',ownerId:null,data:{name:'天文协会',status:'approved',visibility:'visible',description:'观星'}}]}),async()=>[])).rejects.toThrow('无效');expect(transport).toHaveBeenCalledTimes(1);
+  }finally{t.db.close()}
+ });
  it('完整公开名录有57个独立社团；导入遵守运营权限、去重及现有维护内容',()=>{
   const t=setup();try{
    expect(clubs.clubs).toHaveLength(57);expect(new Set(clubs.clubs.map(c=>c.name)).size).toBe(57);

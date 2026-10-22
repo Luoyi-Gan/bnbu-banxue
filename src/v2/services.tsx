@@ -4,15 +4,11 @@ import { CampusAssistantLink, CampusServiceLinks } from './CampusReferenceHome'
 import { StudentTimetable } from './StudentTimetable'
 import { StudentCoffeeChanges } from './TeacherPortal'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
-import {api} from '../live/api'
-import './campusAI.css'
 import { liveActivities } from './liveActivities'
 import { liveStudentSchedule } from './liveStudentSchedule'
-import { ArrowRight, BookOpen, Bookmark, CalendarDays, ChevronRight, Coffee, GraduationCap, ImagePlus, MapPinned, MessageCircle, Network, Send, ShieldCheck, Sparkles, UsersRound } from 'lucide-react'
-import { useRef, useState, type FormEvent } from 'react'
+import { ArrowRight, BookOpen, Bookmark, CalendarDays, ChevronRight, Coffee, GraduationCap, MapPinned, MessageCircle, Network, ShieldCheck, Sparkles, UsersRound } from 'lucide-react'
+import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
-import yellowIcon from '../assets/companion-yellow.png'
-import kittyIcon from '../assets/companion-kitty.png'
 import mapPreview from '../assets/campus/campus-guide-map.png'
 import campusPhoto from '../assets/campus/evening-campus.jpg'
 import profileCampus from '../assets/campus/home-background.jpg'
@@ -47,62 +43,7 @@ export function V2Campus() { useUiLanguage();
   return <div className="v2-page v2-editorial-campus"><PageHeading eyebrow="CAMPUS LIFE" title={uiText("校园")} description={uiText("让每一种兴趣，都找到归属。")}/><div className="v2-editorial-campus-photo" style={{backgroundImage:`linear-gradient(90deg,#162e56b3,#162e5610),url(${campusPhoto})`}}><span>{uiText("校园 · 社群 · 连接")}</span><strong>{uiText("让相遇从这里开始。")}</strong></div><div className="v2-editorial-campus-links">{entries.map(({path,title,copy,icon:Icon}) => <Link key={path} to={path}><Icon size={23}/><strong>{title}</strong><small>{uiText(copy)}</small><ArrowRight size={17}/></Link>)}</div><CampusConnections/><Link to="/v2/campus/explore" className="v2-campus-explore-entry" style={{backgroundImage:`linear-gradient(90deg,#162e56d9,#162e5620),url(${mapPreview})`}}><span>{uiText("校园地图")}</span><strong>{uiText("探索校园")}</strong><small>{uiText("查看楼栋与附近活动")}</small><span className="v2-campus-explore-cta"><MapPinned size={17}/> {uiText("打开地图")}<ArrowRight size={16}/></span></Link><section className="campus-home-section"><SectionHeading title={uiText("校园服务")} detail={uiText("常用功能")}/><CampusServiceLinks/></section><CampusAssistantLink/></div>
 }
 
-export function V2AI() { useUiLanguage();
-  const { state, setState } = useV2()
-  const live = useWorkspaceBackend()
-  const messages: {id: string; from: string; body: string; sourcePath?: string; sourceLabel?: string; sources?: {title:string;source:string;reference?:number}[]}[] = (live.data?.entities ?? []).filter(e => e.kind === 'answer' && e.ownerId === live.data?.account.id).sort((a,b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id)).flatMap(e => {
-    const sources = e.data.sources as {title: string; source: string}[]
-
-    return [{id: e.id + ':question', from: 'user', body: String(e.data.question)}, {id: e.id, from: 'assistant', body: String(e.data.body), sources}]
-  })
-  const [text, setText] = useState('')
-  const [asking,setAsking]=useState(false),[askError,setAskError]=useState('')
-  const questionLock=useRef(false),pendingQuestion=useRef<{question:string;requestId:string}|null>(null)
-  const [iconMenu, setIconMenu] = useState(false)
-  const [uploadError, setUploadError] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
-  const preferences = live.data?.entities.find(e => e.kind === 'preferences' && e.ownerId === live.data?.account.id)?.data
-  const aiIconChoice = preferences?.aiIconChoice ?? 'yellow'
-  const aiCustomIcon = String(preferences?.aiCustomIcon ?? '')
-  const currentIcon = aiIconChoice === 'kitty' ? kittyIcon : aiIconChoice === 'custom' && aiCustomIcon ? aiCustomIcon : yellowIcon
-  const send = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();const question=text.trim();if(!question||questionLock.current)return;
-    questionLock.current=true;setAsking(true);setAskError('');
-    if(pendingQuestion.current?.question!==question)pendingQuestion.current={question,requestId:crypto.randomUUID()};
-    try{await api('/api/ai/chat',pendingQuestion.current);setText(value=>value.trim()===question?'':value);pendingQuestion.current=null;window.dispatchEvent(new Event('bnbu:workspace-updated'));}
-    catch(error){setAskError(error instanceof Error?error.message:'回答失败，请重试。');}
-    finally{questionLock.current=false;setAsking(false);}
-  }
-  const choose = async (next: 'yellow' | 'kitty' | 'custom') => { if (await live.mutate('preferences.aiicon', {choice: next})) {setIconMenu(false); setUploadError('')} }
-  const upload = async (file?: File) => {
-    if (!file) return
-    if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) { setUploadError('请选择小于 5 MB 的图片。'); return }
-    const objectUrl = URL.createObjectURL(file)
-    try {
-      const image = new Image()
-      image.src = objectUrl
-      await image.decode()
-      const canvas = document.createElement('canvas')
-      canvas.width = 256
-      canvas.height = 256
-      const context = canvas.getContext('2d')
-      if (!context) throw new Error('canvas unavailable')
-      const scale = Math.max(256 / image.naturalWidth, 256 / image.naturalHeight)
-      const width = image.naturalWidth * scale
-      const height = image.naturalHeight * scale
-      context.drawImage(image, (256 - width) / 2, (256 - height) / 2, width, height)
-      const aiCustomIcon = canvas.toDataURL('image/webp', 0.82)
-      if (!await live.mutate('preferences.aiicon', {choice: 'custom', image: aiCustomIcon})) {setUploadError('图片保存失败，请重试。'); return}
-      setIconMenu(false)
-      setUploadError('')
-    } catch { setUploadError('无法读取这张图片，请换一张重试。') }
-    finally { URL.revokeObjectURL(objectUrl) }
-  }
-  const toggleSource = (path: string) => setState((value) => ({ ...value, aiPinnedSources: value.aiPinnedSources.includes(path) ? value.aiPinnedSources.filter((source) => source !== path) : [...value.aiPinnedSources, path] }))
-  return <div className="v2-page v2-ai-page"><PageHeading back="/v2" backLabel="返回首页" eyebrow="CAMPUS AI" title={uiText("问问奶蛙")} description={uiText("查询校园资料、社团、探店和本人课程安排，回答附有来源。")} action={<button type="button" className="v2-button v2-button-secondary" onClick={() => setIconMenu(true)}><img src={currentIcon} alt=""/> {uiText("更换图标")}</button>}/><div className="v2-ai-layout"><aside className="v2-panel v2-ai-context"><span className="v2-eyebrow">CONTEXT</span><h3>{uiText("资料来源")}</h3><p>{uiText("由 DeepSeek 回答（单独计费）；提问及相关校园资料、本人安排会发送给 DeepSeek。仅查询当前账号可见信息。")}</p>{[['活动资料', '/v2/activities'], ['组队与申请', '/v2/partners/teams'], ['校园服务', '/v2/campus']].map(([label, path]) => <div className="v2-ai-source" key={path}><button type="button" aria-label={uiTemplate(["","",""],uiText(state.aiPinnedSources.includes(path) ? '取消固定' : '固定'),label)} aria-pressed={state.aiPinnedSources.includes(path)} onClick={() => toggleSource(path)}><Bookmark size={16} fill={state.aiPinnedSources.includes(path)?'currentColor':'none'}/></button><Link to={path}>{uiText(label)}<ChevronRight size={15}/></Link></div>)}</aside><section className="v2-panel v2-ai-chat"><div className="v2-ai-messages">{messages.map((item) => <div className={`v2-ai-message ${item.from === 'user' ? 'is-user' : ''}`} key={item.id}>{item.from === 'assistant' && <img src={currentIcon} alt={uiText("奶蛙")}/>}<div className="v2-ai-message-body"><p>{item.id === 'ai-hello'?item.body.replace('奶娃', '奶蛙'):item.body}</p>{item.sources?.map((source,index)=>source.source.startsWith('/v2/')?<Link className="v2-ai-citation" key={index} to={source.source}>[{source.reference??index+1}] {source.title}</Link>:source.source.startsWith('https://')?<a className="v2-ai-citation" key={index} href={source.source} target="_blank" rel="noreferrer">[{source.reference??index+1}] {source.title}</a>:<small key={index}>{source.title}</small>)}{item.sourcePath && <Link className="v2-ai-citation" to={item.sourcePath}><Bookmark size={15}/> {uiText("来源：")}{uiText(item.sourceLabel)} <ArrowRight size={14}/></Link>}</div></div>)}</div>{askError && <p role="alert">{askError}</p>}{asking&&<p role="status">正在查询平台资料并生成回答…</p>}{live.error && <p role="alert">{uiText(live.error)}</p>}{!live.data && !live.error && <p role="status">{uiText("正在读取本人问答…")}</p>}<div className="v2-ai-suggestions">{['这周有什么活动？', '我接下来有什么安排？', '去哪里找学习搭子？'].map((question) => <button type="button" key={question} onClick={() => setText(question)}>{question}</button>)}</div><p className="v2-ai-data-note">DeepSeek · 提问及相关公开资料、本人安排会发送至 DeepSeek，单独计费。</p><form className="v2-ai-composer" onSubmit={send}><input value={text} onChange={(event) => setText(event.target.value)} placeholder={uiText("输入你的校园问题…")} aria-label={uiText("校园 AI 问题")} maxLength={500}/><button type="submit" className="v2-button v2-button-primary" disabled={asking || live.busy || !text.trim()}><Send size={17}/></button></form></section></div>
-    {iconMenu && <Modal title={uiText("选择奶蛙的形象")} onClose={() => setIconMenu(false)}><div className="v2-icon-options"><button type="button" className={aiIconChoice === 'yellow'?'is-active':''} onClick={() => choose('yellow')}><img src={yellowIcon} alt=""/>{uiText("奶蛙")}</button><button type="button" className={aiIconChoice === 'kitty'?'is-active':''} onClick={() => choose('kitty')}><img src={kittyIcon} alt=""/>Hello Kitty</button></div>{aiCustomIcon && <button type="button" className={`v2-custom-icon-option${aiIconChoice === 'custom' ? ' is-active' : ''}`} onClick={() => choose('custom')}><img src={aiCustomIcon} alt=""/> {uiText("我上传的图片")}</button>}<button type="button" className="v2-button v2-button-secondary v2-upload-button" onClick={() => inputRef.current?.click()}><ImagePlus size={17}/> {uiText("上传自己的图片")}</button><input ref={inputRef} type="file" accept="image/*" hidden onChange={(event) => { void upload(event.target.files?.[0]); event.target.value = '' }}/>{uploadError && <p className="v2-upload-error" role="alert">{uploadError}</p>}<p className="v2-form-note">{uiText("图片会缩小后保存到当前账号。")}</p></Modal>}
-  </div>
-}
+export {CampusAIChat as V2AI} from './CampusAIChat'
 
 export function V2Me({embedded=false}:{embedded?:boolean}={}) { useUiLanguage();
   const { state } = useV2()
