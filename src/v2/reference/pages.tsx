@@ -13,6 +13,7 @@ import {OwnProfilePage} from '../OwnProfilePage'
 import {StudentProfile} from '../StudentProfile'
 import { DiscoveryPage } from '../DiscoveryPage'
 import { StudentTimetable } from '../StudentTimetable'
+import {StudentArrangements} from '../StudentArrangements'
 import {CampusDirectory} from '../CampusDirectory'
 import { campusWeekday } from '../../../shared/v2/timetableModel'
 import { Header, Section, EmptyNote, Ring, Services, AssistantBanner, CoffeeBanner, Agenda, EventCard, Organizations, Stories, Feedback, type Live } from './components'
@@ -64,6 +65,7 @@ export function ReferenceMe() { useUiLanguage();
   const [params]=useSearchParams()
   const tab=params.get('tab')
   if(tab==='profile')return <StudentProfile/>
+  if(tab==='events')return <div className="ref-page ref-subpage cw-pages"><Header title={uiText('我的安排')} back="/v2/me"/><div className="ref-page-body"><StudentArrangements/></div></div>
   if(tab==='timetable')return <div className="ref-page ref-subpage cw-pages"><Header title={uiText("我的课表")} back="/v2/me"/><div className="ref-page-body"><StudentTimetable embedded/></div></div>
   if(tab&&tab!=='overview')return <div className="ref-page ref-subpage cw-pages"><Header title={({events:'我的活动',teams:'我的组队',saved:'我的收藏',network:'校园关系',verification:'身份认证',profile:'个人资料'} as Record<string,string>)[tab] ?? uiText('我的')} back="/v2/me"/><div className="ref-legacy-details"><V2Me embedded/></div></div>
   return <OwnProfilePage/>
