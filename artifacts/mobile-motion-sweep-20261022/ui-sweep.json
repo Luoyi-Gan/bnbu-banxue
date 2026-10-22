@@ -1,0 +1,452 @@
+{
+  "viewport": {
+    "width": 393,
+    "height": 852
+  },
+  "surfaces": [
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        },
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "complete",
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "note-detail-scroll",
+          "client": 715,
+          "content": 715,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "note-detail-body",
+          "client": 466,
+          "content": 466,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "v2-modal",
+          "client": 269,
+          "content": 269,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "post-options"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "complete",
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "v2-modal",
+          "client": 715,
+          "content": 715,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "student-utility-content",
+          "client": 610,
+          "content": 729,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners",
+      "label": "partner-filter-before-scroll"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "complete",
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "v2-modal",
+          "client": 715,
+          "content": 715,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "student-utility-content",
+          "client": 610,
+          "content": 729,
+          "overscroll": "contain",
+          "top": 119.04761505126952
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners",
+      "label": "partner-filter-after-scroll"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "complete",
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "v2-modal",
+          "client": 715,
+          "content": 715,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "student-utility-content",
+          "client": 610,
+          "content": 1506,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners",
+      "label": "partner-create-options"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "v2-modal",
+          "client": 715,
+          "content": 715,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "student-utility-content",
+          "client": 610,
+          "content": 1427,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/settings",
+      "label": "settings-before-scroll"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "v2-modal",
+          "client": 715,
+          "content": 715,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "student-utility-content",
+          "client": 610,
+          "content": 1427,
+          "overscroll": "contain",
+          "top": 816.6666259765625
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/settings",
+      "label": "settings-after-scroll"
+    },
+    {
+      "bodyOverflow": "",
+      "close": [],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [],
+      "theme": "dark",
+      "url": "/v2",
+      "label": "page-/v2"
+    },
+    {
+      "bodyOverflow": "",
+      "close": [],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [],
+      "theme": "dark",
+      "url": "/v2/sports",
+      "label": "page-/v2/sports"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "v2-modal",
+          "client": 692,
+          "content": 692,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "student-utility-content",
+          "client": 588,
+          "content": 588,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/messages",
+      "label": "page-/v2/messages"
+    },
+    {
+      "bodyOverflow": "",
+      "close": [],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [],
+      "theme": "dark",
+      "url": "/v2/alumni",
+      "label": "page-/v2/alumni"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "v2-modal",
+          "client": 715,
+          "content": 715,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "student-utility-content",
+          "client": 610,
+          "content": 1506,
+          "overscroll": "contain",
+          "top": 895.8333129882812
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners",
+      "label": "partner-create-after-scroll-final"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "1",
+          "touch": "manipulation",
+          "transition": "none"
+        }
+      ],
+      "motion": "reduce",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "direct",
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "note-detail-scroll",
+          "client": 715,
+          "content": 974,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "note-detail-body",
+          "client": 612,
+          "content": 612,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/activities/preview-event-5",
+      "label": "activity-reduced"
+    },
+    {
+      "bodyOverflow": "",
+      "close": [],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "shared": null,
+      "surfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities",
+      "label": "final-restored"
+    },
+    {
+      "bodyOverflow": "hidden",
+      "close": [
+        {
+          "scale": "none",
+          "touch": "manipulation",
+          "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+        }
+      ],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "complete",
+      "shared": null,
+      "surfaces": [
+        {
+          "className": "note-detail-scroll",
+          "client": 714,
+          "content": 974,
+          "overscroll": "contain",
+          "top": 0
+        },
+        {
+          "className": "note-detail-body",
+          "client": 612,
+          "content": 612,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/activities/preview-event-5",
+      "label": "activity-interrupted-by-escape"
+    },
+    {
+      "bodyOverflow": "",
+      "close": [],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "complete",
+      "shared": null,
+      "surfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities",
+      "label": "activity-escape-after-mount"
+    },
+    {
+      "bodyOverflow": "",
+      "close": [],
+      "motion": "normal",
+      "pageScroll": 0,
+      "residualNames": 0,
+      "result": "complete",
+      "shared": null,
+      "surfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities",
+      "label": "activity-cancel-after-surface-mount"
+    }
+  ],
+  "search": {
+    "beforePageScroll": 0,
+    "after": {
+      "closeTransition": [
+        "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.21s ease-out, color 0.21s ease-out"
+      ],
+      "pageScroll": 0,
+      "panels": [
+        {
+          "client": 314,
+          "content": 314,
+          "overscroll": "contain",
+          "top": 0
+        }
+      ]
+    }
+  },
+  "restored": {
+    "theme": "dark",
+    "motion": "normal"
+  },
+  "limits": "本地模拟数据、浏览器采样，非真实触屏帧率或完整逐帧录像"
+}

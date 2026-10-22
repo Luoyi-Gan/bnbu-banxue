@@ -30,12 +30,12 @@ html[data-ui-theme=dark] .v2-app.v2-app-student .own-profile .ref-week button[ar
 .v2-app.v2-app-student .partner-feed-card:has(.partner-card-open:active){transform:none}
 .v2-app.v2-app-student :is(.discovery-cover,.shop-cover){box-shadow:var(--student-cover-shadow)}
 
-body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back){
+body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary){
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
   transition:scale var(--student-release-time) var(--student-feedback-ease),transform var(--student-release-time) var(--student-feedback-ease),background-color var(--student-release-time) ease-out,color var(--student-release-time) ease-out;
 }
-body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back):active:not(:disabled):not([aria-disabled=true]){
+body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary):active:not(:disabled):not([aria-disabled=true]){
   scale:.97;transition-duration:var(--student-press-time);
 }
 .v2-app.v2-app-student :is(.shop-card-link,.community-discovery-open,.partner-card-open,.partner-card-details,.v2-teacher-card,.organization-detail-trigger){
@@ -57,10 +57,20 @@ body:has(.v2-app.v2-app-student) .note-detail :is(.note-detail-title,.note-detai
 /* Touch devices keep feedback under the finger, without a hover lift remaining after release. */
 @media(hover:none){
   .v2-app.v2-app-student :is(.v2-button,.v2-icon-button,.shop-card):hover{transform:none}
+  body:has(.v2-app.v2-app-student) .v2-modal>header>.v2-icon-button:hover{transform:none}
 }
-html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) :is(.discovery-card,.shop-card,.partner-feed-card,.v2-teacher-card,.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back){scale:1!important;transition:none!important}
+html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) :is(.discovery-card,.shop-card,.partner-feed-card,.v2-teacher-card,.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary){scale:1!important;transition:none!important}
 html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) .note-detail-header{transition:none}
 @media(prefers-reduced-motion:reduce){
-  body:has(.v2-app.v2-app-student) :is(.discovery-card,.shop-card,.partner-feed-card,.v2-teacher-card,.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back){scale:1!important;transition:none!important}
+  body:has(.v2-app.v2-app-student) :is(.discovery-card,.shop-card,.partner-feed-card,.v2-teacher-card,.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary){scale:1!important;transition:none!important}
   body:has(.v2-app.v2-app-student) .note-detail-header{transition:none}
 }
+
+/* Keep native momentum within the surface; reaching an edge must not scroll the page behind it. */
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer-body,.student-utility-content,.note-detail-scroll,.note-detail-body,.v2-student-search-panel){overscroll-behavior-y:contain;scroll-padding-block:12px;-webkit-overflow-scrolling:touch}
+
+/* Settings rows use a quiet color response rather than compressing a whole list. */
+body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background-color var(--student-release-time) ease-out}
+body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account):active{background:var(--student-glass-active)!important;transition-duration:var(--student-press-time)}
+html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){transition:none}
+@media(prefers-reduced-motion:reduce){body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){transition:none}}

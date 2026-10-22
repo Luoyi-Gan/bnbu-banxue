@@ -5,8 +5,9 @@ function fixture(){
  let mounted:'list'|'detail'='list'
  let observer:(()=>void)|undefined
  const style=()=>({viewTransitionName:'',setProperty:vi.fn(),removeProperty:vi.fn()})
- const node=()=>({style:style(),getClientRects:()=>[{}],getBoundingClientRect:()=>({width:100,height:100,top:20,bottom:120}),querySelector:()=>null,querySelectorAll:()=>[],closest:()=>null})
- const media=node(),target=node()
+ const node=()=>({style:style(),getClientRects:()=>[{}],getBoundingClientRect:()=>({width:100,height:100,top:20,bottom:120}),querySelector:()=>null,querySelectorAll:()=>[],closest:():unknown=>null})
+ const media=node(),target=node(),surface={dataset:{} as Record<string,string>}
+ target.closest=()=>surface
  const root={dataset:{} as Record<string,string>,style:style()}
  const transitions:Array<{finished:Promise<void>}>=[]
  const startViewTransition=vi.fn((update:()=>Promise<void>)=>{
@@ -29,7 +30,7 @@ function fixture(){
   observe(){}
   disconnect(){observer=undefined}
  })
- return{root,media,target,startViewTransition,
+ return{root,media,target,surface,startViewTransition,
   mount:(next:'list'|'detail')=>{mounted=next},
   routerCommit:(next:'list'|'detail')=>queueMicrotask(()=>{mounted=next;scroll=0;observer?.()}),
   settle:async()=>{await transitions.at(-1)!.finished;await Promise.resolve();await Promise.resolve()},
@@ -40,6 +41,18 @@ function fixture(){
 afterEach(()=>{vi.unstubAllGlobals();vi.resetModules()})
 
 describe('shared element navigation',()=>{
+ it('keeps the destination entrance suppressed after snapshot cleanup and return',async()=>{
+  const f=fixture()
+  const {sharedElementTransition}=await import('./sharedElementMotion')
+  sharedElementTransition('activity:one',()=>f.mount('detail'),{source:f.media as unknown as HTMLElement})
+  await f.settle()
+  expect(f.root.dataset.sharedTransition).toBeUndefined()
+  expect(f.target.style.viewTransitionName).toBe('')
+  expect(f.surface.dataset.sharedEntered).toBe('true')
+  sharedElementTransition('activity:one',()=>f.mount('list'),{reverse:true})
+  await f.settle()
+  expect(f.surface.dataset.sharedEntered).toBe('true')
+ })
  it('coalesces a repeated open while the same media is already expanding',async()=>{
   const f=fixture()
   const {sharedElementTransition}=await import('./sharedElementMotion')
@@ -72,6 +85,7 @@ describe('shared element navigation',()=>{
   expect(f.startViewTransition).not.toHaveBeenCalled()
   expect(f.scroll()).toBe(0)
   expect(f.root.dataset.sharedMotionEngine).toBe('reduced')
+  expect(f.surface.dataset.sharedEntered).toBeUndefined()
  })
  it('navigates without snapshots when the entry media is unavailable',async()=>{
   const f=fixture();f.mount('detail')
@@ -81,6 +95,7 @@ describe('shared element navigation',()=>{
   expect(update).toHaveBeenCalledOnce()
   expect(f.startViewTransition).not.toHaveBeenCalled()
   expect(f.root.dataset.sharedMotionResult).toBe('no-source')
+  expect(f.surface.dataset.sharedEntered).toBeUndefined()
   expect(f.scroll()).toBe(0)
  })
 })

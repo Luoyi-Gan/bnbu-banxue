@@ -1,0 +1,82 @@
+[
+  {
+    "shared": "enter"
+  },
+  {
+    "animation": "none",
+    "opacity": "1",
+    "shared": "enter",
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "0.960361",
+    "shared": null,
+    "top": 1.0192773342132568,
+    "transform": "matrix(1, 0, 0, 1, 0, 1.01928)"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  },
+  {
+    "animation": "note-detail-enter",
+    "opacity": "1",
+    "shared": null,
+    "top": 0,
+    "transform": "none"
+  }
+]

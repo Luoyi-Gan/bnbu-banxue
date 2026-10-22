@@ -52,7 +52,12 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
    let timer:ReturnType<typeof setTimeout>|undefined
    await Promise.race([image.decode().catch(()=>{}),new Promise<void>(resolve=>{timer=setTimeout(resolve,160)})]).finally(()=>clearTimeout(timer))
   }
-  if(target){targetName=target.style.viewTransitionName;target.style.viewTransitionName='campus-media';document.documentElement.style.setProperty('--shared-radius-to',getComputedStyle(target).borderRadius)}
+  if(target){
+   // Keep the destination's own entrance disabled for its entire mounted lifetime.
+   // Removing only the temporary root flag restarts CSS entrance keyframes at handoff.
+   if(!reverse){const surface=target.closest<HTMLElement>('.note-detail,.v2-coffee-schedule,.own-profile-editor,.shop-detail,.v2-explorer-panel');if(surface)surface.dataset.sharedEntered='true'}
+   targetName=target.style.viewTransitionName;target.style.viewTransitionName='campus-media';document.documentElement.style.setProperty('--shared-radius-to',getComputedStyle(target).borderRadius)
+  }
  })
  active=transition
  activeKey=key;activeReverse=reverse

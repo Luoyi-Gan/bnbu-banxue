@@ -16,6 +16,8 @@ html[data-shared-kind=shop][data-shared-transition] .v2-app-student>.v2-mobile-n
 ::view-transition-old(campus-navigation){animation:none;opacity:0}
 ::view-transition-new(campus-navigation){animation:none;opacity:1}
 html[data-shared-transition] :is(.note-detail,.v2-coffee-schedule,.own-profile-editor){animation:none}
+/* This survives root-flag cleanup, so the mounted destination never replays its entrance. */
+[data-shared-entered=true]{animation:none!important}
 @media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*),::view-transition-image-pair(*){animation-duration:0s!important}}
 html[data-ui-motion=reduce]::view-transition-group(*),html[data-ui-motion=reduce]::view-transition-old(*),html[data-ui-motion=reduce]::view-transition-new(*){animation-duration:0s!important}
 .organization-detail-trigger{display:block;width:100%;padding:0;border:0;border-radius:24px;background:transparent;color:inherit;text-align:inherit;cursor:pointer;overflow:hidden}
