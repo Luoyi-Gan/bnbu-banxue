@@ -1,6 +1,7 @@
 import {useEffect,useRef,type RefObject} from 'react'
 import {animate} from 'motion/react'
 import {campusMotion} from './motionTokens'
+import {isTopSheet} from './useSheetGesture'
 import {resistedSheetHeight,resistedSheetOffset,sheetDetent,shouldDismissSheet} from './sheetGesture'
 import './panelGesture.css'
 
@@ -28,7 +29,8 @@ export function usePanelGesture(panel:RefObject<HTMLElement|null>,enabled:boolea
   const release=()=>{const id=drag?.id;drag=undefined;if(id!==undefined&&grip.hasPointerCapture(id))grip.releasePointerCapture(id)}
   const cancel=()=>{const previous=drag;release();if(previous?.started)settle(kind==='resize'?previous.base:0)}
   const down=(event:PointerEvent)=>{
-   if(!mobile.matches||!event.isPrimary||event.button!==0||document.documentElement.dataset.sharedTransition||document.querySelector('.v2-modal-layer,.v2-map-picker-layer'))return
+   if(!mobile.matches||!event.isPrimary||event.button!==0||document.documentElement.dataset.sharedTransition)return
+   if(element.closest('.v2-drawer-layer,.v2-modal-layer')?!isTopSheet(element):document.querySelector('.v2-modal-layer,.v2-map-picker-layer'))return
    animation?.stop();dragged=false
    drag={id:event.pointerId,x:event.clientX,y:event.clientY,last:event.clientY,time:event.timeStamp,speed:0,base:kind==='resize'?element.getBoundingClientRect().height:value,started:false}
    grip.setPointerCapture(event.pointerId)
