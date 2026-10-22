@@ -8,7 +8,7 @@ export function SharedMediaLink({transitionKey,reverse=false,resetScroll=false,b
   if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.altKey||event.shiftKey||props.target==='_blank')return
   event.preventDefault()
   const source=reverse?document.querySelector<HTMLElement>(`[data-shared-target="${CSS.escape(transitionKey)}"]`):event.currentTarget.closest<HTMLElement>('article,section,.community-hub')?.querySelector<HTMLElement>(`[data-shared-media="${CSS.escape(transitionKey)}"]`)??document.querySelector<HTMLElement>(`[data-shared-media="${CSS.escape(transitionKey)}"]`)
-  sharedElementTransition(transitionKey,()=>{beforeNavigate?.();navigate(to,{state:props.state,replace:props.replace})},{source,reverse,resetScroll})
+  sharedElementTransition(transitionKey,()=>{beforeNavigate?.();navigate(to,{state:props.state,replace:props.replace,flushSync:true})},{source,reverse,resetScroll})
  }
  return <Link {...props} data-shared-trigger={reverse?undefined:transitionKey} to={to} onClick={click}/>
 }

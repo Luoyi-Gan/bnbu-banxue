@@ -1,4 +1,6 @@
 /* Keep the page context present while one matching media surface changes geometry. */
+/* Allow the mounted close button to receive input while its snapshot is moving. */
+::view-transition,::view-transition-group(*),::view-transition-image-pair(*),::view-transition-old(*),::view-transition-new(*){pointer-events:none}
 ::view-transition-group(campus-media){z-index:2;animation-duration:var(--shared-duration,420ms);animation-timing-function:cubic-bezier(.22,.8,.2,1)}
 ::view-transition-old(root){animation:shared-page-out var(--shared-duration,420ms) ease both}
 ::view-transition-new(root){animation:shared-page-in var(--shared-duration,420ms) ease both}

@@ -9,12 +9,14 @@ import { Empty } from './ui'
 export function DiscoverCommunity({ community }: { community: CommunityBackend }) {
   useUiLanguage()
   const [selected,setSelected]=useState<string|null>(null)
+  const [photoIndices,setPhotoIndices]=useState<Record<string,number>>({})
+  const rememberPhoto=(id:string,index:number)=>setPhotoIndices(previous=>previous[id]===index?previous:{...previous,[id]:index})
   const posts=community.posts.filter(post=>post.status==='visible')
   const current=community.detailPost?.id===selected?community.detailPost:null
   const openPost=(id:string)=>{setSelected(id);void community.recordOpen(id)}
   return <section aria-label={uiText('校园社区')}>
     {community.error&&<p role="alert">{uiText(community.error)}</p>}
-    {posts.length?<CommunityDiscoveryFeed posts={posts} liked={community.likedPosts} saved={community.savedPosts} viewerId={community.account.id} onOpen={openPost} onLike={id=>void community.mutate('relation.set',{id,kind:'like',enabled:!community.likedPosts.includes(id)})} onSave={id=>void community.mutate('relation.set',{id,kind:'save',enabled:!community.savedPosts.includes(id)})} hasMore={community.hasMore} onLoadMore={()=>void community.loadMore()} busy={community.busy}/>:!community.error&&<Empty icon={MessageCircle} title={uiText(community.account.id?'目前没有公开帖子':'正在读取帖子…')} description={uiText('有新内容发布后，会显示在这里。')}/>}
-    {current&&<CommunityPostDetail key={current.id} live={community} id={current.id} onClose={()=>setSelected(null)}/>}
+    {posts.length?<CommunityDiscoveryFeed photoIndices={photoIndices} posts={posts} liked={community.likedPosts} saved={community.savedPosts} viewerId={community.account.id} onOpen={openPost} onLike={id=>void community.mutate('relation.set',{id,kind:'like',enabled:!community.likedPosts.includes(id)})} onSave={id=>void community.mutate('relation.set',{id,kind:'save',enabled:!community.savedPosts.includes(id)})} hasMore={community.hasMore} onLoadMore={()=>void community.loadMore()} busy={community.busy}/>:!community.error&&<Empty icon={MessageCircle} title={uiText(community.account.id?'目前没有公开帖子':'正在读取帖子…')} description={uiText('有新内容发布后，会显示在这里。')}/>}
+    {current&&<CommunityPostDetail photoIndex={photoIndices[current.id]??0} onPhotoChange={index=>rememberPhoto(current.id,index)} key={current.id} live={community} id={current.id} onClose={()=>setSelected(null)}/>}
   </section>
 }

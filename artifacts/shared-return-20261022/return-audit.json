@@ -1,0 +1,1517 @@
+[
+  {
+    "label": "shop-second-expanded",
+    "media": [
+      {
+        "height": 330.078125,
+        "key": "shop:72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+        "photoHash": -1798474893,
+        "target": true,
+        "width": 346.5848388671875,
+        "x": 15.993304252624512,
+        "y": 96.28348541259766
+      }
+    ],
+    "named": 0,
+    "originScroll": "20.71428680419922",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1"
+  },
+  {
+    "label": "shop-second-returned",
+    "media": [
+      {
+        "height": 330.078125,
+        "key": "shop:72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+        "photoHash": -1798474893,
+        "target": false,
+        "width": 346.5848388671875,
+        "x": 15.993304252624512,
+        "y": 222.2544708251953
+      },
+      {
+        "height": 330.078125,
+        "key": "shop:b8b2a842-b0fc-46e2-9c48-d73e393f5e29",
+        "photoHash": -413357648,
+        "target": false,
+        "width": 346.5848388671875,
+        "x": 15.993304252624512,
+        "y": 657.8125
+      }
+    ],
+    "named": 0,
+    "originScroll": "20.71428680419922",
+    "phase": null,
+    "result": "complete",
+    "scroll": 20.71428680419922,
+    "url": "/v2/shops"
+  },
+  {
+    "label": "shop-second-reopened",
+    "media": [
+      {
+        "height": 330.078125,
+        "key": "shop:72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+        "photoHash": -1798474893,
+        "target": true,
+        "width": 346.5848388671875,
+        "x": 15.993304252624512,
+        "y": 96.28348541259766
+      }
+    ],
+    "named": 0,
+    "originScroll": "20.71428680419922",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1"
+  },
+  {
+    "label": "activity-origin",
+    "media": [
+      {
+        "height": 223.046875,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 133.828125,
+        "key": "activity:preview-event-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "height": 209.11830139160156,
+        "key": "activity:preview-event-6",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "activity:preview-event-7",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      }
+    ],
+    "named": 0,
+    "phase": null,
+    "result": null,
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-opening",
+    "media": [
+      {
+        "height": 223.046875,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 133.828125,
+        "key": "activity:preview-event-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "height": 209.11830139160156,
+        "key": "activity:preview-event-6",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "activity:preview-event-7",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      }
+    ],
+    "named": 1,
+    "originScroll": "0",
+    "phase": "enter",
+    "result": null,
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-return",
+    "media": [
+      {
+        "height": 223.046875,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 133.828125,
+        "key": "activity:preview-event-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "height": 209.11830139160156,
+        "key": "activity:preview-event-6",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "activity:preview-event-7",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      }
+    ],
+    "named": 0,
+    "originScroll": "0",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-other-return",
+    "media": [
+      {
+        "height": 233.69419860839844,
+        "key": "activity:preview-event-4",
+        "photoHash": -526073231,
+        "target": true,
+        "width": 362.1428527832031,
+        "x": 0.7142857313156128,
+        "y": 65.42411041259766
+      }
+    ],
+    "named": 0,
+    "originScroll": "285",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-4"
+  },
+  {
+    "label": "post-mounted",
+    "media": [
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 633.0245971679688
+      },
+      {
+        "height": 167.28794860839844,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 686.0267944335938
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 611.3504638671875
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 664.3527221679688
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 828.5491333007812
+      },
+      {
+        "height": 241.42857360839844,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": true,
+        "width": 362.1428527832031,
+        "x": 0.7142857313156128,
+        "y": 65.42411041259766
+      }
+    ],
+    "named": 1,
+    "originScroll": "105.71428680419922",
+    "phase": "enter",
+    "result": null,
+    "scroll": 0,
+    "url": "/v2/activities?section=community&item=preview-post-0"
+  },
+  {
+    "label": "post-returned",
+    "media": [
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 633.0245971679688
+      },
+      {
+        "height": 167.28794860839844,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 686.0267944335938
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 611.3504638671875
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 664.3527221679688
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 828.5491333007812
+      },
+      {
+        "height": 241.42857360839844,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": true,
+        "width": 362.1428527832031,
+        "x": 0.7142857313156128,
+        "y": 65.42411041259766
+      }
+    ],
+    "named": 0,
+    "originScroll": "105.71428680419922",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&item=preview-post-0"
+  },
+  {
+    "label": "post-close-settled",
+    "media": [
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 341.4397277832031
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 527.310302734375
+      },
+      {
+        "height": 167.28794860839844,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 580.3125
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 800.2678833007812
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 341.4397277832031
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 505.63616943359375
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 558.638427734375
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 722.8348388671875
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "post:preview-post-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 783.8370361328125
+      }
+    ],
+    "named": 0,
+    "originScroll": "105.71428680419922",
+    "phase": null,
+    "result": "complete",
+    "scroll": 105.71428680419922,
+    "url": "/v2/activities?section=community"
+  },
+  {
+    "label": "post-early-escape-final",
+    "media": [
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 341.4397277832031
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 527.310302734375
+      },
+      {
+        "height": 167.28794860839844,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 580.3125
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 800.2678833007812
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 341.4397277832031
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 505.63616943359375
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 558.638427734375
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 722.8348388671875
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "post:preview-post-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 783.8370361328125
+      }
+    ],
+    "named": 0,
+    "originScroll": "105.71428680419922",
+    "phase": null,
+    "result": "complete",
+    "scroll": 105.71428680419922,
+    "url": "/v2/activities?section=community"
+  },
+  {
+    "label": "partner-expanded",
+    "media": [
+      {
+        "height": 123.27009582519533,
+        "key": "partner:preview-room-4",
+        "photoHash": 0,
+        "target": false,
+        "width": 345.15625,
+        "x": 16.707590103149414,
+        "y": 293.4598388671875
+      },
+      {
+        "height": 123.27009582519533,
+        "key": "partner:preview-room-3",
+        "photoHash": 0,
+        "target": false,
+        "width": 345.15625,
+        "x": 16.707590103149414,
+        "y": 687.9241333007812
+      },
+      {
+        "height": 134.6875,
+        "key": "partner:preview-room-4",
+        "photoHash": 0,
+        "target": true,
+        "width": 377.1428527832031,
+        "x": 0.7142857313156128,
+        "y": 65.42411041259766
+      }
+    ],
+    "named": 0,
+    "originScroll": "10",
+    "phase": null,
+    "result": "complete",
+    "scroll": 10,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "partner-returned",
+    "media": [
+      {
+        "height": 123.27009582519533,
+        "key": "partner:preview-room-4",
+        "photoHash": 0,
+        "target": false,
+        "width": 345.15625,
+        "x": 16.707590103149414,
+        "y": 300.6026916503906
+      },
+      {
+        "height": 123.27009582519533,
+        "key": "partner:preview-room-3",
+        "photoHash": 0,
+        "target": false,
+        "width": 345.15625,
+        "x": 16.707590103149414,
+        "y": 695.0669555664062
+      }
+    ],
+    "named": 0,
+    "originScroll": "10",
+    "phase": null,
+    "result": "complete",
+    "scroll": 2.857142925262451,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "coffee-expanded",
+    "media": [
+      {
+        "height": 170,
+        "key": "coffee:839cc9e7-b30c-4787-b606-6adb00daa43a",
+        "photoHash": 946225441,
+        "target": true,
+        "width": 298.59375,
+        "x": 39.98884201049805,
+        "y": 134.8325958251953
+      }
+    ],
+    "named": 0,
+    "originScroll": "32.85714340209961",
+    "phase": null,
+    "result": "complete",
+    "scroll": 32.85714340209961,
+    "url": "/v2/coffee"
+  },
+  {
+    "label": "coffee-returned",
+    "media": [
+      {
+        "height": 100,
+        "key": "coffee:839cc9e7-b30c-4787-b606-6adb00daa43a",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 345.15625,
+        "x": 16.707590103149414,
+        "y": 307.96875
+      }
+    ],
+    "named": 0,
+    "originScroll": "32.85714340209961",
+    "phase": null,
+    "result": "complete",
+    "scroll": 40,
+    "url": "/v2/coffee"
+  },
+  {
+    "label": "profile-expanded",
+    "media": [
+      {
+        "height": 173.99554443359375,
+        "key": "profile:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": -56000823,
+        "target": true,
+        "width": 346.5848388671875,
+        "x": 15.993304252624512,
+        "y": 110.27902221679688
+      }
+    ],
+    "named": 0,
+    "originScroll": "0",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/me?tab=profile"
+  },
+  {
+    "label": "profile-returned",
+    "media": [
+      {
+        "height": 230,
+        "key": "profile:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": -56000823,
+        "target": false,
+        "width": 378.5714416503906,
+        "x": 0,
+        "y": 24.285715103149418
+      },
+      {
+        "height": 60,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": true,
+        "width": 60,
+        "x": 23.99553680419922,
+        "y": 258.29241943359375
+      }
+    ],
+    "named": 0,
+    "originScroll": "0",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/me"
+  },
+  {
+    "label": "alumni-expanded",
+    "media": [
+      {
+        "height": 75.9933090209961,
+        "key": "alumni:preview-alumni",
+        "photoHash": 0,
+        "target": true,
+        "width": 75.9933090209961,
+        "x": 40.703125,
+        "y": 290.1897277832031
+      }
+    ],
+    "named": 1,
+    "originScroll": "144.2857208251953",
+    "phase": "enter",
+    "result": null,
+    "scroll": 0,
+    "url": "/v2/alumni?person=preview-alumni"
+  },
+  {
+    "label": "alumni-returned",
+    "media": [
+      {
+        "height": 35,
+        "key": "alumni:preview-alumni",
+        "photoHash": 0,
+        "target": false,
+        "width": 35,
+        "x": 60.41294860839844,
+        "y": 325.7366027832031
+      }
+    ],
+    "named": 0,
+    "originScroll": "144.2857208251953",
+    "phase": null,
+    "result": "complete",
+    "scroll": 144.2857208251953,
+    "url": "/v2/alumni?view=people"
+  },
+  {
+    "label": "avatar-expanded",
+    "media": [
+      {
+        "height": 203.99554443359375,
+        "key": "profile:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": -56000823,
+        "target": false,
+        "width": 378.5714416503906,
+        "x": 0,
+        "y": 24.285715103149418
+      },
+      {
+        "height": 83.99553680419922,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": true,
+        "width": 83.99553680419922,
+        "x": 17.991071701049805,
+        "y": 196.2834930419922
+      },
+      {
+        "height": 114.85491180419922,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 172.28794860839844,
+        "x": 11.99776840209961,
+        "y": 567.7678833007812
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 13.995535850524902,
+        "y": 724.5089721679688
+      },
+      {
+        "height": 114.85491180419922,
+        "key": "post:preview-post-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 172.28794860839844,
+        "x": 11.99776840209961,
+        "y": 768.716552734375
+      },
+      {
+        "height": 114.85491180419922,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 172.28794860839844,
+        "x": 194.2857208251953,
+        "y": 567.7678833007812
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 196.2834930419922,
+        "y": 724.5089721679688
+      }
+    ],
+    "named": 0,
+    "originScroll": "323.5714416503906",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/community?person=82715c55-6bb0-40ab-9747-4dd1c7ceed59"
+  },
+  {
+    "label": "avatar-returned",
+    "media": [
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 633.0245971679688
+      },
+      {
+        "height": 167.28794860839844,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 686.0267944335938
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 611.3504638671875
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 664.3527221679688
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 828.5491333007812
+      }
+    ],
+    "named": 0,
+    "originScroll": "323.5714416503906",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities?section=community"
+  },
+  {
+    "label": "avatar-fixed-expanded",
+    "media": [
+      {
+        "height": 203.99554443359375,
+        "key": "profile:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": -56000823,
+        "target": false,
+        "width": 378.5714416503906,
+        "x": 0,
+        "y": 24.285715103149418
+      },
+      {
+        "height": 83.99553680419922,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": true,
+        "width": 83.99553680419922,
+        "x": 17.991071701049805,
+        "y": 196.2834930419922
+      },
+      {
+        "height": 114.85491180419922,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 172.28794860839844,
+        "x": 11.99776840209961,
+        "y": 567.7678833007812
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 13.995535850524902,
+        "y": 724.5089721679688
+      },
+      {
+        "height": 114.85491180419922,
+        "key": "post:preview-post-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 172.28794860839844,
+        "x": 11.99776840209961,
+        "y": 768.716552734375
+      },
+      {
+        "height": 114.85491180419922,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 172.28794860839844,
+        "x": 194.2857208251953,
+        "y": 567.7678833007812
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 196.2834930419922,
+        "y": 724.5089721679688
+      }
+    ],
+    "named": 0,
+    "originScroll": "323.5714416503906",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/community?person=82715c55-6bb0-40ab-9747-4dd1c7ceed59"
+  },
+  {
+    "label": "avatar-fixed-returned",
+    "media": [
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 633.0245971679688
+      },
+      {
+        "height": 167.28794860839844,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 686.0267944335938
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 611.3504638671875
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 664.3527221679688
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 828.5491333007812
+      }
+    ],
+    "named": 0,
+    "originScroll": "323.5714416503906",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities?section=community"
+  },
+  {
+    "label": "avatar-layout-stable-return",
+    "media": [
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 221.4397430419922
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 407.3102722167969
+      },
+      {
+        "height": 167.28794860839844,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 460.3125
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 680.2678833007812
+      },
+      {
+        "height": 111.51786041259766,
+        "key": "post:preview-post-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 733.2700805664062
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 221.4397430419922
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 385.63616943359375
+      },
+      {
+        "height": 111.52902221679688,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 438.6383972167969
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 197.27679443359375,
+        "y": 602.8348388671875
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "post:preview-post-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 655.8370971679688
+      }
+    ],
+    "named": 0,
+    "originScroll": "225.71429443359375",
+    "phase": null,
+    "result": "complete",
+    "scroll": 225.71429443359375,
+    "url": "/v2/activities?section=community"
+  },
+  {
+    "label": "activity-reduced-expanded",
+    "media": [
+      {
+        "height": 362.1428527832031,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": true,
+        "width": 362.1428527832031,
+        "x": 0.7142857313156128,
+        "y": 65.42411041259766
+      }
+    ],
+    "named": 0,
+    "phase": null,
+    "result": "direct",
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5"
+  },
+  {
+    "label": "activity-reduced-returned",
+    "media": [
+      {
+        "height": 223.046875,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 133.828125,
+        "key": "activity:preview-event-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "height": 209.11830139160156,
+        "key": "activity:preview-event-6",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "activity:preview-event-7",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      }
+    ],
+    "named": 0,
+    "phase": null,
+    "result": "direct",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-light-double-open",
+    "media": [
+      {
+        "height": 362.1428527832031,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": true,
+        "width": 362.1428527832031,
+        "x": 0.7142857313156128,
+        "y": 65.42411041259766
+      }
+    ],
+    "named": 0,
+    "originScroll": "0",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5"
+  },
+  {
+    "label": "activity-light-returned",
+    "media": [
+      {
+        "height": 223.046875,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 133.828125,
+        "key": "activity:preview-event-4",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 167.28794860839844,
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "height": 209.11830139160156,
+        "key": "activity:preview-event-6",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "height": 167.2991180419922,
+        "key": "activity:preview-event-7",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 167.2991180419922,
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      }
+    ],
+    "named": 0,
+    "originScroll": "0",
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "home-post-expanded",
+    "media": [
+      {
+        "height": 150,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 107.99107360839844,
+        "x": 15.993304252624512,
+        "y": -99.15178680419922
+      },
+      {
+        "height": 150,
+        "key": "activity:preview-event-6",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 107.99107360839844,
+        "x": 15.993304252624512,
+        "y": 90.82589721679688
+      },
+      {
+        "height": 112.1875,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 15.993304252624512,
+        "y": 335.8035888671875
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 512.9464111328125
+      },
+      {
+        "height": 168.29241943359375,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 15.993304252624512,
+        "y": 558.5379638671875
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 770.1004638671875
+      },
+      {
+        "height": 112.1875,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 194.2857208251953,
+        "y": 335.8035888671875
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 196.2834930419922,
+        "y": 491.26116943359375
+      },
+      {
+        "height": 112.1875,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 194.2857208251953,
+        "y": 536.8526611328125
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 196.2834930419922,
+        "y": 692.310302734375
+      },
+      {
+        "height": 241.42857360839844,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": true,
+        "width": 362.1428527832031,
+        "x": 0.7142857313156128,
+        "y": 65.42411041259766
+      }
+    ],
+    "named": 0,
+    "originScroll": "1310.71435546875",
+    "phase": null,
+    "result": "complete",
+    "scroll": 1310.71435546875,
+    "url": "/v2"
+  },
+  {
+    "label": "home-post-returned",
+    "media": [
+      {
+        "height": 150,
+        "key": "activity:preview-event-5",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 107.99107360839844,
+        "x": 15.993304252624512,
+        "y": -99.15178680419922
+      },
+      {
+        "height": 150,
+        "key": "activity:preview-event-6",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 107.99107360839844,
+        "x": 15.993304252624512,
+        "y": 90.82589721679688
+      },
+      {
+        "height": 112.1875,
+        "key": "post:preview-post-0",
+        "photoHash": -526073231,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 15.993304252624512,
+        "y": 335.8035888671875
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 512.9464111328125
+      },
+      {
+        "height": 168.29241943359375,
+        "key": "post:preview-post-1",
+        "photoHash": 946225441,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 15.993304252624512,
+        "y": 558.5379638671875
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 17.991071701049805,
+        "y": 770.1004638671875
+      },
+      {
+        "height": 112.1875,
+        "key": "post:preview-post-3",
+        "photoHash": -2071704218,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 194.2857208251953,
+        "y": 335.8035888671875
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 196.2834930419922,
+        "y": 491.26116943359375
+      },
+      {
+        "height": 112.1875,
+        "key": "post:preview-post-2",
+        "photoHash": 1526844373,
+        "target": false,
+        "width": 168.29241943359375,
+        "x": 194.2857208251953,
+        "y": 536.8526611328125
+      },
+      {
+        "height": 21.99776840209961,
+        "key": "avatar:82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+        "photoHash": 0,
+        "target": false,
+        "width": 21.99776840209961,
+        "x": 196.2834930419922,
+        "y": 692.310302734375
+      }
+    ],
+    "named": 0,
+    "originScroll": "1310.71435546875",
+    "phase": null,
+    "result": "complete",
+    "scroll": 1310.71435546875,
+    "url": "/v2"
+  }
+]
