@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import subprocess
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -35,7 +36,11 @@ def request(path, expected, payload=None):
 
 request('/student/', {200})
 request('/api/v1/health/ready', {200})
-headers = request('/student/companion.html', {200})
+for _ in range(16):
+    headers = request('/student/companion.html', {200})
+    if args.parent in headers.get('Content-Security-Policy', ''):
+        break
+    time.sleep(.5)
 assert args.parent in headers.get('Content-Security-Policy', ''), 'Missing explicit allowed parent'
 assert headers.get('X-Frame-Options', '').upper() != 'DENY', 'Embedding still blocked'
 request('/student/personal.html', {200})
@@ -46,4 +51,6 @@ bridge = json.loads(subprocess.check_output(['docker', 'inspect', 'bnbu-companio
 assert bridge['State']['Running'], 'Bridge stopped'
 ports = bridge['NetworkSettings']['Ports']
 assert all(port['HostIp'] in ('127.0.0.1', '::1') for bindings in ports.values() for port in (bindings or [])), 'Bridge publicly exposed'
+listeners = subprocess.check_output(['ss', '-H', '-ltn', 'sport = :4180'], text=True).splitlines()
+assert listeners and all(line.split()[3].startswith('127.0.0.1:') for line in listeners), 'Bridge socket must bind loopback only'
 print(json.dumps({'release': root.name, 'assets': 'verified', 'public_routes': 'verified', 'bridge': 'loopback only', 'real_user_login': 'requires authenticated owner verification'}))

@@ -26,7 +26,7 @@ if(!method)throw Error('Reviewed companion session method missing');
 const adapter=`import {AuthService} from '../modules/auth/auth.service.js';\nimport {ApplicationError} from '../common/errors/application-error.js';\nclass Extension {${method.getText(ast)}}\nif(typeof AuthService.prototype.establishStudentSession!=='function')throw new Error('Incompatible deployed Sports authentication');\nif(typeof AuthService.prototype.establishCompanionSession!=='undefined')throw new Error('Existing companion authentication requires review');\nAuthService.prototype.establishCompanionSession=Extension.prototype.establishCompanionSession;\n`;
 await save('dist/companion-bridge/session-extension.js',compile(adapter,'session-extension.ts'));
 await save('schema.sql',await readFile(join(sports,'tools/companion-bridge/schema.sql'),'utf8'));
-for(const file of ['companion.html','personal.html','js/companion-entry.js','js/personal-motion.js','js/personal-motion-api.js']){
+for(const file of ['companion.html','personal.html','js/companion-entry.js','js/companion-entry-paths.js','js/personal-motion.js','js/personal-motion-api.js']){
   await save('web/student/'+file,await readFile(join(sports,'BNBU-Sports-Web-new/frontend/student',file),'utf8'));
 }
 await save('Dockerfile',`ARG SPORTS_BASE_IMAGE=bnbu-companion-bridge-base:20261022\nFROM \${SPORTS_BASE_IMAGE}\nCOPY --chown=10001:10001 dist/companion-bridge /app/dist/companion-bridge\nCMD ["node","dist/companion-bridge/main.js"]\n`);

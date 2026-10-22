@@ -1,6 +1,6 @@
 # BNBU Sports 真实连接启用清单
 
-2026-10-22 已核对线上：学生端与 readiness 均为 HTTP 200；当前成功版本为
+以下保留准备时基线，最终启用结果见末尾。2026-10-22 准备时核对线上：学生端与 readiness 均为 HTTP 200；当时成功版本为
 `resource-guard-20261020`。线上没有连接桥，`/student/companion.html` 为404；
 原 AuthService 有 establishStudentSession，尚无 establishCompanionSession。
 现有 api.js 已导出 storeAuthSession 与 clearApiSession，可用于单次登录页。
@@ -42,6 +42,18 @@
 - 关闭桥后新表保留为受保护的恢复资料，不自动删除已写入的真实个人运动或做全库回滚；按备份及增量记录单独处理。触发器、表和授权的卸载须核对是否已有真实数据。
 - 已建立的原体育会话或邮箱验证审计按原体育规则保留，不通过批量回写伪造撤销；紧急停用连接密钥并撤销本次明确建立的会话。
 
-## 当前结论
+## 已完成启用（2026-10-23）
 
-真实连接尚未启用。候选已构建与隔离检查，生产迁移、服务激活和本人真实登录验收等待确认。
+用户明确批准“备份后启用真实连接”。两个版本均通过体育统一发布入口及独立验证后接受：连接版本`companion-real-20261022`，随后修复入口模块版本解析的`companion-entry-20261023`。当前为后者，前者为保留回滚版本。
+
+- 完整备份在服务器`/var/backups/bnbu-companion-bridge/20261022T160218Z`，仅root可读，包含数据库、schema、原Nginx、版本和容器信息。database.dump为229122814字节，SHA256为`b350d28602655d9aad33e6663855955f3677a208fa197ae17a3ba4f673a9bca9`；摘要与pg_restore目录已验证。
+- 事务内创建独立schema的5张连接表、索引、删除清理触发器与限定角色授权，没有改写原课程、运动记录或学时字段。
+- `bnbu-companion-bridge.service`为active、容器健康，只监听127.0.0.1:4180，内存256MiB、含交换320MiB、0.5CPU、64PIDs。密钥和运行配置受保护，未进入Git或浏览器。
+- 固定兑换与个人运动路由启用；无效兑换401、个人运动无Bearer401、内部签名路由公网404。学生端及readiness200，入口精确CSP已核对。
+- 修复连接启动顺序：加载运行密钥后动态加载RuntimeModule，并预加载reflect-metadata。单次入口从官方首页解析同一发布快照的API/app模块，拒绝跨源和非固定模块地址。
+- 首次因Nginx reload窗口的CSP检查触发回退；保留独立schema和恢复资料，确认5表全空后恢复执行，增加有界等待与备份复核。未自动DROP schema或全库回滚。后续清理曾因worker重启健康窗口报错，健康恢复后标准清理重试PASS。
+- 最后核对current为companion-entry-20261023，连接、原后端、媒体worker、portal均健康。本人真实账号匹配、单次登录、课程、已核算进度和记录只读核对成功。
+
+未以真实账号创建测试运动、提交课程凭证或实际入班；实体相机及完整课程写入尚未验收。会同里原生页面目前为本地4186预览，不能等同于其页面已部署。
+
+重新启动可运行根目录`./Start-RealSportsPreview.ps1`。默认受保护配置在当前用户LocalAppData下`BNBU-Companion/Sports/connection.json`；脚本检查并建立SSH加密隧道，不打印密钥。

@@ -1,3 +1,4 @@
+import {movementNative} from './movement-native';
 import {movementRequest} from './movement';
 import {LearningAuth} from './learning-auth';
 import {LearningService} from './learning';
@@ -186,8 +187,8 @@ export function createApiServer(
         if(pathname==='/api/movement/command'){
           const actor=authenticate(db,cookieToken(request));accountSecurityGate(new Repository(db),actor);
           const verified=new Repository(db).all('verifiedEmail').some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
-          demand(['launch','personal.list','personal.start','personal.pause','personal.resume','personal.finish'].includes(String(input.operation)),'无效运动操作。');
-          return send(response,200,await movementRequest(actor,verified,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
+          demand(['launch','sports.dashboard','sports.records','personal.list','personal.start','personal.pause','personal.resume','personal.finish'].includes(String(input.operation)),'无效运动操作。');
+          return send(response,200,await (String(input.operation).startsWith('sports.')?movementNative:movementRequest)(actor,verified,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
         }
 
         if (pathname === "/api/auth/verification-codes") {

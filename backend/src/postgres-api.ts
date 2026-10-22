@@ -1,3 +1,4 @@
+import {movementNative} from './movement-native';
 import {movementRequest} from './movement';
 import {LearningAuth} from './learning-auth';
 import {LearningService} from './learning';
@@ -144,8 +145,8 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
             const repo=new PostgresRepository(client);demand(!passwordChangeRequired(await repo.all('companionIdentity'),actor),'请先修改本人初始密码。',403);
             return (await repo.all('verifiedEmail')).some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
           });
-          demand(['launch','personal.list','personal.start','personal.pause','personal.resume','personal.finish'].includes(String(input.operation)),'无效运动操作。');
-          return send(response,200,await movementRequest(actor,verified,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
+          demand(['launch','sports.dashboard','sports.records','personal.list','personal.start','personal.pause','personal.resume','personal.finish'].includes(String(input.operation)),'无效运动操作。');
+          return send(response,200,await (String(input.operation).startsWith('sports.')?movementNative:movementRequest)(actor,verified,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
         }
 
         if(pathname==='/api/accounts/admin-email/request') {
