@@ -53,6 +53,7 @@ import './pageMaterials.css'
 import './surfaceRefinements.css'
 import './mobileCoherence.css'
 import './liquidGlass.css'
+import './studentInteractionPolish.css'
 
 const compactStudentHeaders:Record<string,{title:string;back:string}> = {
   '/v2/partners':{title:'找搭子',back:'/v2/campus'},
