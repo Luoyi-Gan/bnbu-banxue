@@ -1,8 +1,4 @@
-/* Search is a reading surface: underlying photos must not show through its text. */
-html[data-ui-theme] body:has(.v2-app.v2-app-student) .v2-app.v2-app-student .v2-student-search :is(.v2-student-search-field,.v2-student-search-panel) {
-  background:var(--v2-surface,#fffefa)!important;
-  -webkit-backdrop-filter:none;backdrop-filter:none;
-}
+/* Search surface paint is shared with liquidGlass.css; geometry remains local. */
 .v2-app.v2-app-student .v2-student-search-field input:focus-visible {outline:none;box-shadow:none}
 .v2-app.v2-app-student .v2-student-search-field {box-sizing:border-box}
 @media(max-width:720px) {

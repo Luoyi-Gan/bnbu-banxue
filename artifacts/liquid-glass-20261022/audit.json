@@ -1,0 +1,47 @@
+[
+  {
+    "background": "radial-gradient(at 8% 0%, rgba(194, 231, 208, 0.18), rgba(0, 0, 0, 0) 48%), radial-gradient(at 100% 100%, rgba(24, 44, 34, 0.13), rgba(0, 0, 0, 0) 52%), linear-gradient(135deg, rgba(29, 49, 39, 0.992), rgba(24, 44, 34, 0.937))",
+    "blur": "none",
+    "depth": "0.8134920756022136",
+    "scroll": 405,
+    "shadow": "rgba(194, 231, 208, 0.5) 0px 1px 1px 0px inset, rgba(194, 231, 208, 0.16) 1px 0px 1px 0px inset, rgba(0, 12, 7, 0.12) 0px -1px 2px 0px inset, rgba(0, 12, 7, 0.07) 0px 2px 5px 0px, rgba(0, 12, 7, 0.176) 0px 12px 32px 0px",
+    "width": 405,
+    "label": "dark-filter-overflow-scroll"
+  },
+  {
+    "background": "radial-gradient(at 8% 0%, rgba(194, 231, 208, 0.18), rgba(0, 0, 0, 0) 48%), radial-gradient(at 100% 100%, rgba(24, 44, 34, 0.13), rgba(0, 0, 0, 0) 52%), linear-gradient(135deg, rgba(29, 49, 39, 0.68), rgba(24, 44, 34, 0.5))",
+    "blur": "blur(22px) saturate(1.45) contrast(1.03)",
+    "depth": "0",
+    "scroll": 390,
+    "shadow": "rgba(194, 231, 208, 0.5) 0px 1px 1px 0px inset, rgba(194, 231, 208, 0.16) 1px 0px 1px 0px inset, rgba(0, 12, 7, 0.12) 0px -1px 2px 0px inset, rgba(0, 12, 7, 0.07) 0px 2px 5px 0px, rgba(0, 12, 7, 0.12) 0px 12px 32px 0px",
+    "width": 390,
+    "label": "dark-nav-top-final"
+  },
+  {
+    "background": "radial-gradient(at 8% 0%, rgba(194, 231, 208, 0.18), rgba(0, 0, 0, 0) 48%), radial-gradient(at 100% 100%, rgba(24, 44, 34, 0.13), rgba(0, 0, 0, 0) 52%), linear-gradient(135deg, rgba(29, 49, 39, 0.78), rgba(24, 44, 34, 0.62))",
+    "blur": "blur(22px) saturate(1.45) contrast(1.03)",
+    "depth": "1",
+    "scroll": 390,
+    "shadow": "rgba(194, 231, 208, 0.5) 0px 1px 1px 0px inset, rgba(194, 231, 208, 0.16) 1px 0px 1px 0px inset, rgba(0, 12, 7, 0.12) 0px -1px 2px 0px inset, rgba(0, 12, 7, 0.07) 0px 2px 5px 0px, rgba(0, 12, 7, 0.19) 0px 12px 32px 0px",
+    "width": 390,
+    "label": "dark-nav-scroll-final"
+  },
+  {
+    "background": "radial-gradient(at 8% 0%, rgba(194, 231, 208, 0.18), rgba(0, 0, 0, 0) 48%), radial-gradient(at 100% 100%, rgba(24, 44, 34, 0.13), rgba(0, 0, 0, 0) 52%), linear-gradient(135deg, rgba(29, 49, 39, 0.68), rgba(24, 44, 34, 0.5))",
+    "blur": "blur(22px) saturate(1.45) contrast(1.03)",
+    "depth": "0",
+    "scroll": 390,
+    "shadow": "rgba(194, 231, 208, 0.5) 0px 1px 1px 0px inset, rgba(194, 231, 208, 0.16) 1px 0px 1px 0px inset, rgba(0, 12, 7, 0.12) 0px -1px 2px 0px inset, rgba(0, 12, 7, 0.07) 0px 2px 5px 0px, rgba(0, 12, 7, 0.12) 0px 12px 32px 0px",
+    "width": 390,
+    "label": "reduced-nav-after-scroll"
+  },
+  {
+    "background": "radial-gradient(at 8% 0%, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0) 48%), radial-gradient(at 100% 100%, rgba(218, 237, 224, 0.13), rgba(0, 0, 0, 0) 52%), linear-gradient(135deg, rgba(250, 252, 248, 0.68), rgba(218, 237, 224, 0.52))",
+    "blur": "blur(22px) saturate(1.45) contrast(1.03)",
+    "depth": "1",
+    "scroll": 390,
+    "shadow": "rgba(255, 255, 255, 0.5) 0px 1px 1px 0px inset, rgba(255, 255, 255, 0.16) 1px 0px 1px 0px inset, rgba(22, 49, 35, 0.12) 0px -1px 2px 0px inset, rgba(22, 49, 35, 0.07) 0px 2px 5px 0px, rgba(22, 49, 35, 0.19) 0px 12px 32px 0px",
+    "width": 390,
+    "label": "light-nav-scrolled"
+  }
+]
