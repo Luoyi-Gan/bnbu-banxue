@@ -1,0 +1,47 @@
+[
+  {
+    "background": "rgb(38, 60, 70)",
+    "text": [
+      {
+        "color": "rgb(227, 236, 230)",
+        "contrast": 9.58,
+        "text": "高等数学"
+      },
+      {
+        "color": "rgb(175, 190, 181)",
+        "contrast": 5.97,
+        "text": "教 A101"
+      }
+    ]
+  },
+  {
+    "background": "rgb(41, 63, 53)",
+    "text": [
+      {
+        "color": "rgb(227, 236, 230)",
+        "contrast": 9.38,
+        "text": "数据结构"
+      },
+      {
+        "color": "rgb(175, 190, 181)",
+        "contrast": 5.85,
+        "text": "教 B302"
+      }
+    ]
+  },
+  {
+    "background": "rgb(68, 59, 48)",
+    "text": [
+      {
+        "color": "rgb(227, 236, 230)",
+        "contrast": 9.09,
+        "text": "大学英语"
+      },
+      {
+        "color": "rgb(175, 190, 181)",
+        "contrast": 5.67,
+        "text": "教 C201"
+      }
+    ]
+  }
+]

@@ -57,3 +57,25 @@ html[data-ui-motion=reduce] .v2-app *,html[data-ui-motion=reduce] body:has(.v2-a
 @media(max-width:720px){html[lang=en] .cw-home .cw-scene{left:38%}html[lang=en] .cw-home .cw-greeting{left:10px;right:64%;top:52px}html[lang=en] .cw-home .cw-date{left:10px;top:14px;max-width:34%}}
 
 @media(max-width:760px){html[lang=en] .v2-app.v2-app-student[data-campus-route='/v2/sports']:has(.movement-page) .v2-floating-timetable-trigger{left:auto;right:104px;top:12px}html[lang=en] .movement-page-header h1{max-width:calc(100% - 132px);white-space:normal;line-height:1.3}}
+
+/* Dark surfaces must change with their text, including embedded timetable cards. */
+html[data-ui-theme=dark] .v2-app.v2-app-student :is(.ref-timetable-preview,.ref-assistant,.v2-empty){background:var(--v2-surface)!important;color:var(--v2-ink)!important;border-color:var(--v2-line)!important}
+html[data-ui-theme=dark] .v2-app.v2-app-student .ref-timetable-preview .ref-lesson>span{background:#263c46!important;border-color:#88b5c7!important;color:var(--v2-ink)!important}
+html[data-ui-theme=dark] .v2-app.v2-app-student .ref-timetable-preview .lesson-1>span{background:#293f35!important;border-color:#93b99f!important}
+html[data-ui-theme=dark] .v2-app.v2-app-student .ref-timetable-preview .lesson-2>span{background:#443b30!important;border-color:#c7b296!important}
+html[data-ui-theme=dark] .v2-app.v2-app-student .ref-timetable-preview nav button[aria-pressed=true]{background:#375e6b!important;color:#f0f7f5!important}
+html[data-ui-theme=dark] .v2-app.v2-app-student :is(.ref-timetable-preview>p,.ref-lesson time,.ref-lesson>span>small,.ref-assistant p){color:var(--v2-muted)!important}
+html[data-ui-theme=dark] body:has(.v2-app-student) :is(.tt-day-course,.tt-grid-course){--course-bg:#293f35;--course-ink:#d3e7d9;border-color:#496152;box-shadow:0 2px 8px #0002}
+html[data-ui-theme=dark] body:has(.v2-app-student) .tt-tone-1{--course-bg:#263c46;--course-ink:#c5e0ed}
+html[data-ui-theme=dark] body:has(.v2-app-student) .tt-tone-2{--course-bg:#443b2c;--course-ink:#ecdbb6}
+html[data-ui-theme=dark] body:has(.v2-app-student) .tt-tone-3{--course-bg:#3d3246;--course-ink:#e3cfee}
+html[data-ui-theme=dark] body:has(.v2-app-student) .tt-tone-4{--course-bg:#48362f;--course-ink:#f0d0c2}
+html[data-ui-theme=dark] body:has(.v2-app-student) :is(.tt-board,.tt-hours,.tt-grid-head,.tt-grid-head>span){background:var(--page-tool)!important;color:var(--v2-ink);border-color:var(--v2-line)}
+html[data-ui-theme=dark] body:has(.v2-app-student) :is(.tt-week-actions,.tt-view-switch,.tt-unplaced button,.tt-course-catalog button){background:#293d38;color:var(--v2-ink)}
+html[data-ui-theme=dark] body:has(.v2-app-student) :is(.tt-week-actions button,.tt-view-switch button,.tt-date-strip button,.tt-date-strip button>strong,.tt-grid-head>button,.tt-grid-head>button strong){color:var(--v2-ink)}
+html[data-ui-theme=dark] body:has(.v2-app-student) :is(.tt-date-strip button[aria-pressed=true],.tt-view-switch button[aria-pressed=true]){background:#37574b;color:#e3f2e8}
+html[data-ui-theme=dark] body:has(.v2-app-student) .tt-date-strip button[aria-pressed=true]>strong{color:#e3f2e8}
+html[data-ui-theme=dark] body:has(.v2-app-student) :is(.tt-month>span,.tt-month small,.tt-day-courses>header small,.tt-board-footer,.tt-calendar-note,.tt-course-catalog,.tt-unplaced,.tt-hours time){color:var(--v2-muted)}
+html[data-ui-theme=dark] body:has(.v2-app-student) :is(.tt-course-info>small,.tt-day-course>time span,.tt-grid-course small){opacity:.85}
+html[data-ui-theme=dark] .v2-app.v2-app-student :is(.ref-agenda>a,.campus-discovery-filter-line){background:var(--v2-surface)!important;color:var(--v2-ink)!important;border-color:var(--v2-line)!important}
+html[data-ui-theme=dark] .v2-app.v2-app-student .ref-agenda :is(time,small){color:var(--v2-muted)!important}
