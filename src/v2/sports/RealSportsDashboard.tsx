@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useRef,useState} from 'react'
-import {ArrowUpRight,CalendarDays,Check,ChevronRight,Footprints,RefreshCw,ShieldCheck,UsersRound} from 'lucide-react'
+import {ArrowUpRight,CalendarDays,Check,ChevronRight,Footprints,RefreshCw,ShieldCheck} from 'lucide-react'
 import {api} from '../../live/api'
 import type {MovementDashboard,MovementRecord,MovementRecords} from '../../../shared/v2/movementDashboard'
 import {CommunityModal} from '../CommunityModal'
@@ -8,7 +8,7 @@ import './realSportsDashboard.css'
 
 const minute=(seconds:number|null)=>seconds===null?'—':new Intl.NumberFormat('zh-CN',{maximumFractionDigits:1}).format(seconds/60)
 const status=(r:MovementRecord)=>r.review==='VALID'?'有效记录':r.review==='INVALID'?'未通过':r.review==='SUPPLEMENT_REQUIRED'?'待补材料':r.status==='SUBMITTED'?'待审核':r.status==='DRAFT'?'草稿':'处理中'
-export function RealSportsDashboard({onJoin,onPersonal,onPlatform,busy=false}:{onJoin:()=>void;onPersonal:()=>void;onPlatform:()=>void;busy?:boolean}){
+export function RealSportsDashboard({onPlatform,busy=false}:{onPlatform:()=>void;busy?:boolean}){
  useUiLanguage()
  const [data,setData]=useState<MovementDashboard|null>(null),[error,setError]=useState(''),[loading,setLoading]=useState(false),[tab,setTab]=useState<'overview'|'courses'|'records'>('overview'),[courseId,setCourseId]=useState(''),[detail,setDetail]=useState<MovementRecord|null>(null),[filter,setFilter]=useState('all'),[more,setMore]=useState(false)
  const generation=useRef(0),lock=useRef(false)
@@ -27,7 +27,7 @@ export function RealSportsDashboard({onJoin,onPersonal,onPlatform,busy=false}:{o
    <nav className="rs-tabs" aria-label={uiText('运动内容')}><button aria-pressed={tab==='overview'} onClick={()=>setTab('overview')}>{uiText('概览')}</button><button aria-pressed={tab==='courses'} onClick={()=>setTab('courses')}>{uiText('我的课程')}</button><button aria-pressed={tab==='records'} onClick={()=>{setCourseId('all');setTab('records')}}>{uiText('运动记录')}</button></nav>
    {(courses.length>1||tab==='records')&&<label className="rs-course-select">{uiText('当前课程')}<select value={courseId==='all'&&tab==='records'?'all':course?.enrollmentId??''} onChange={e=>{setCourseId(e.target.value);setFilter('all')}}>{tab==='records'&&<option value="all">{uiText('全部课程')}</option>}{courses.map(c=><option key={c.enrollmentId} value={c.enrollmentId}>{c.name} · {c.semester||c.classCode}{c.status!=='ACTIVE'?' · 历史课程':''}</option>)}</select></label>}
    {tab==='overview'&&<><section className="rs-progress"><header><div><p>{uiText('本学期运动进度')}</p><h3>{minute(total)}<small> / {minute(target)} {uiText('分钟')}</small></h3></div><span className="rs-progress-ring" role="progressbar" aria-label={uiText('体育考核进度')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent??undefined}><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42"/><circle cx="50" cy="50" r="42" pathLength="100" strokeDasharray={`${percent??0} 100`}/></svg><b>{percent===null?'—':`${Math.floor(percent)}%`}</b></span></header><div className="rs-progress-split"><div><span>{uiText('课程相关')}</span><strong>{minute(progress?.courseSeconds??null)}<small> / {minute(progress?.courseTargetSeconds??null)} {uiText('分钟')}</small></strong></div><div><span>{uiText('其他运动')}</span><strong>{minute(progress?.generalSeconds??null)}<small> / {minute(progress?.generalTargetSeconds??null)} {uiText('分钟')}</small></strong></div></div><footer><Check size={13}/>{uiText(progress?.status==='COMPLETED'?'已完成当前课程考核要求':progress?'按体育平台已核算进度展示':'进度暂未返回，等待同步')}</footer></section>
-    <div className="rs-actions"><button onClick={onPersonal} disabled={busy}><Footprints size={23}/><strong>{uiText('个人运动')}</strong><small>{uiText('自由计时，独立保存')}</small><ChevronRight size={14}/></button><button onClick={onJoin} disabled={busy}><UsersRound size={23}/><strong>{uiText('扫码入班')}</strong><small>{uiText('连接你的体育课程')}</small><ChevronRight size={14}/></button></div>{history}</>}
+    {history}</>}
    {tab==='courses'&&<section className="rs-courses">{courses.map(c=><article key={c.enrollmentId}><span><CalendarDays size={22}/></span><div><h3>{c.name}</h3><p>{[c.classCode,c.teacher,c.semester].filter(Boolean).join(' · ')}</p><small>{uiText(c.status==='ACTIVE'?'已加入课程':'历史课程')}</small></div><button onClick={()=>{setCourseId(c.enrollmentId);setTab('overview')}}>{uiText('查看进度')}<ChevronRight size={14}/></button></article>)}{!courses.length&&<p className="rs-empty">{uiText('已有体育账号，暂无可显示的已加入课程。')}</p>}</section>}
    {tab==='records'&&history}
    {data.warnings.map(message=><p className="rs-note" key={message}>{uiText(message)}</p>)}
