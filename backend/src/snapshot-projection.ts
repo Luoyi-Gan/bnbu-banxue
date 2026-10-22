@@ -185,6 +185,7 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
     ...repo.all("profile").filter((p) => own(p.ownerId)),
     ...repo.all("preferences").filter((p) => own(p.ownerId)),
     ...repo.all("timetable").filter((t) => own(t.ownerId)),
+    ...repo.all('learningItem').filter(t=>own(t.ownerId)),
     ...repo.all("teacherProfile").filter(p => readableTeacher(p.ownerId)).map(p => ({...p, data: {...p.data, enabled: eligibleTeachers.has(p.ownerId!) && p.data.enabled !== false}})),
     ...repo.all("coffeeSlot").filter(s => readableTeacher(s.ownerId)).map((s) => ({
       ...s,

@@ -1,4 +1,7 @@
 import {movementRequest} from './movement';
+import {LearningAuth} from './learning-auth';
+import {LearningService} from './learning';
+import {sqliteLearningStore} from './learning-store';
 import {shopRead} from './shops';
 import {runSync as runShopRead} from './storage/effects';
 import { searchStudents } from './student-search';
@@ -88,10 +91,15 @@ export function createApiServer(
   db: Database,
   options: { localOutbox?: boolean; screenshotRecognizer?: ScreenshotRecognizer } = {},
 ) {
+  const learningAuth=new LearningAuth(sqliteLearningStore(db)),learning=new LearningService(learningAuth);
   return createServer(async (request, response) => {
     try {
       const requestUrl = new URL(request.url ?? "/", "http://127.0.0.1");
       const pathname = requestUrl.pathname;
+      if(request.method==='GET'&&pathname==='/api/learning'){
+        const token=cookieToken(request)??'',actor=authenticate(db,token);accountSecurityGate(new Repository(db),actor);
+        return send(response,200,await learning.overview(actor,token));
+      }
       if (request.method === 'GET' && (pathname === '/api/rooms' || /^\/api\/rooms\/[^/]+$/.test(pathname))) {
         const actor = authenticate(db, cookieToken(request));
         accountSecurityGate(new Repository(db), actor);
@@ -160,6 +168,16 @@ export function createApiServer(
           return send(response, 200, { data: execute(db, token, 'screenshot.import', {image: image.image, recognizedText: image.text, ocrRequestId: image.requestId}, randomUUID()) });
         }
         const input = await body(request);
+        if(pathname==='/api/auth/email-login/request')return send(response,200,await learningAuth.requestCode(input.email,request.socket.remoteAddress??'unknown',options.localOutbox===true));
+        if(pathname==='/api/auth/email-login'||pathname==='/api/auth/school-login'){
+          const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown',input.pendingId);
+          if('token'in result){response.setHeader('Set-Cookie',`bnbu_session=${result.token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`);return send(response,200,{authenticated:true,account:result.account});}
+          return send(response,200,result);
+        }
+        if(pathname==='/api/learning/command'){
+          const token=cookieToken(request)??'',actor=authenticate(db,token);accountSecurityGate(new Repository(db),actor);
+          return send(response,200,await learning.operation(actor,token,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Fields:{}));
+        }
         if(pathname==='/api/movement/command'){
           const actor=authenticate(db,cookieToken(request));accountSecurityGate(new Repository(db),actor);
           const verified=new Repository(db).all('verifiedEmail').some(item=>item.ownerId===actor.id&&item.data.email===actor.email);
@@ -244,6 +262,7 @@ export function createApiServer(
         if (pathname === '/api/identity/request') return send(response,200,await requestStudentIdentity(db,authenticate(db,token),input));
         if (pathname === '/api/identity/review') return send(response,200,reviewStudentIdentity(db,authenticate(db,token),input));
         if (pathname === "/api/auth/logout") {
+          learningAuth.forget(token!);
           db.prepare("DELETE FROM sessions WHERE token_hash=?").run(
             digest(token!),
           );

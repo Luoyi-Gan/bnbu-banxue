@@ -1,4 +1,7 @@
 import {movementRequest} from './movement';
+import {LearningAuth} from './learning-auth';
+import {LearningService} from './learning';
+import {postgresLearningStore} from './learning-store';
 import {shopRead} from './shops';
 import {runAsync as runShopRead} from './storage/effects';
 import { createServer } from 'node:http';
@@ -34,6 +37,7 @@ import { recognizeActivityScreenshot, type ScreenshotRecognizer } from './activi
 export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'; screenshotRecognizer?:ScreenshotRecognizer} = {}) {
   demand(options.surface!=='sports','伴学不提供独立体育服务。',404);
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
+  const learningAuth=new LearningAuth(postgresLearningStore(db)),learning=new LearningService(learningAuth);
   const origins = new Set(options.origins ?? ['http://127.0.0.1:4174','http://localhost:4174']);
   const cookieName='bnbu_session';
   const cookieToken=(request:Parameters<typeof readCookieToken>[0])=>readCookieToken(request,cookieName);
@@ -42,6 +46,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
     try {
       const requestUrl = new URL(request.url ?? '/', 'http://localhost');
       const pathname = requestUrl.pathname;
+      if(request.method==='GET'&&pathname==='/api/learning'){
+        const token=cookieToken(request)??'',actor=await auth.authenticate(token);
+        const blocked=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
+        demand(!blocked,'请先修改本人初始密码。',403);
+        return send(response,200,await learning.overview(actor,token));
+      }
       const sportsPath=pathname.startsWith('/api/v1/') || pathname.startsWith('/api/sports/');
       demand(!sportsPath,'接口不存在。',404);
       if(request.method==='GET' && (pathname==='/api/rooms' || /^\/api\/rooms\/[^/]+$/.test(pathname))) {
@@ -110,6 +120,18 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,token,'screenshot.import',{image:image.image,recognizedText:image.text,ocrRequestId:image.requestId},randomUUID())});
         }
         const input = await body(request);
+        if(pathname==='/api/auth/email-login/request')return send(response,200,await learningAuth.requestCode(input.email,request.socket.remoteAddress??'unknown',options.localOutbox===true));
+        if(pathname==='/api/auth/email-login'||pathname==='/api/auth/school-login'){
+          const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown',input.pendingId);
+          if('token'in result){response.setHeader('Set-Cookie',cookie(result.token,43200));return send(response,200,{authenticated:true,account:result.account});}
+          return send(response,200,result);
+        }
+        if(pathname==='/api/learning/command'){
+          const token=cookieToken(request)??'',actor=await auth.authenticate(token);
+          const blocked=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
+          demand(!blocked,'请先修改本人初始密码。',403);
+          return send(response,200,await learning.operation(actor,token,String(input.operation),input.input&&typeof input.input==='object'&&!Array.isArray(input.input)?input.input as Record<string,unknown>:{}));
+        }
         if(pathname==='/api/movement/command'){
           const actor=await auth.authenticate(cookieToken(request));
           const verified=await db.transaction(async client=>{
@@ -147,6 +169,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         if (pathname === '/api/auth/password-reset/request') return send(response,200,await postgresRequestPasswordReset(db,input.identifier,request.socket.remoteAddress ?? 'unknown',options.localOutbox===true));
         if (pathname === '/api/auth/password-reset/complete') return send(response,200,await postgresCompletePasswordReset(db,input));
         if (pathname === '/api/auth/logout') {
+          learningAuth.forget(cookieToken(request)??'');
           await auth.logout(cookieToken(request));
           response.setHeader('Set-Cookie',cookie('',0));
           return send(response,200,{loggedOut:true});

@@ -1,0 +1,56 @@
+{
+  "scope": "本地隔离 SQLite 与合成学生；不代表真实设备或生产验收",
+  "screenshots": [
+    {
+      "file": "login-email-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "login-school-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "repeat-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "deadlines-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "reader-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "reader-submit-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "directory-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "exams-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "grades-mobile.png",
+      "width": 393
+    },
+    {
+      "file": "materials-desktop.png",
+      "width": 1440
+    }
+  ],
+  "checks": [
+    "保留的平台密码登录完成本人账号认证",
+    "邮箱/平台密码会话无法读取 iSpace",
+    "重复安排保存后刷新读回",
+    "课件上传、分页阅读",
+    "问答表单保留用户同意控制；常规回归不发起付费调用",
+    "办事搜索按关键词筛选官方公开资料",
+    "393px 页面无横向溢出",
+    "系统减少动态下禁用进入动画"
+  ],
+  "errors": []
+}

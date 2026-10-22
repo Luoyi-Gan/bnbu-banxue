@@ -1,5 +1,6 @@
 import {useStudentScrollGlass} from './useStudentScrollGlass'
 import {FluidStudentNav} from './FluidStudentNav'
+import {LearningReminderPulse} from './LearningReminderPulse'
 import {StudentUtilities} from './StudentUtilities'
 import {StudentUtilityPanel} from './StudentUtilityPanel'
 import {studentSettingsSectionTitles} from './settingsSectionTitles'
@@ -161,6 +162,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
     {!admin && !teacher && <FluidStudentNav items={studentNav} activeIndex={activeStudentNavIndex} reducedMotion={device.reducedMotion}/>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label={uiText("手机教师导航")}>{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}</nav>}
     {admin && <nav className="v2-mobile-nav" aria-label={uiText("手机管理导航")}>{adminNav.map(({ path, label, icon: Icon, ...rest }) => <NavLink key={path} to={path} end={'end' in rest} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{label.replace('管理', '')}</span></NavLink>)}</nav>}
+    {!admin && !teacher && <LearningReminderPulse/>}
     {!admin && !teacher && device.preferences.timetableShortcut && <FloatingTimetable/>}
     {!admin && !teacher && customizingSidebar && <SidebarCustomizer initial={sidebarItems} busy={live.busy} error={uiText(live.error)} onSave={items => live.mutate('preferences.sidebarnav', {items})} onClose={() => setCustomizingSidebar(false)}/>}
   </div>

@@ -13,6 +13,7 @@ import {OwnProfilePage} from '../OwnProfilePage'
 import {StudentProfile} from '../StudentProfile'
 import { DiscoveryPage } from '../DiscoveryPage'
 import { StudentTimetable } from '../StudentTimetable'
+import {CampusDirectory} from '../CampusDirectory'
 import { campusWeekday } from '../../../shared/v2/timetableModel'
 import { Header, Section, EmptyNote, Ring, Services, AssistantBanner, CoffeeBanner, Agenda, EventCard, Organizations, Stories, Feedback, type Live } from './components'
 import { campusDate, ownLessons, sportsSummary } from './model'
@@ -52,11 +53,11 @@ function TimetablePreview({live}:{live:Live}) { useUiLanguage();
 }
 export function ReferenceCampus() { useUiLanguage();
   const [params]=useSearchParams()
-  return params.has('service')?<V2Campus/>:<CampusContent/>
+  return params.get('service')==='directory'?<div className="ref-page cw-pages"><Header title={uiText('校园办事')} back="/v2/campus" search={false}/><div className="ref-page-body"><CampusDirectory/></div></div>:params.has('service')?<V2Campus/>:<CampusContent/>
 }
 function CampusContent() { useUiLanguage();
   const live=useWorkspaceBackend()
-  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")}><Link to="/v2/partners" className="ref-coffee" style={{backgroundImage:`linear-gradient(90deg,#173c32dd,#173c3235),url(${partnersPhoto})`}}><strong>{uiText("找个搭子，一起出发")}</strong><span>{uiText("学习、运动、生活，遇见同频的伙伴")}<ArrowRight size={16}/></span></Link></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园探店")}><Link className="ref-coffee" to="/v2/shops" style={{backgroundImage:'linear-gradient(90deg,#302b21dd,#302b2135),url(/shops/memory-0.jpg)'}}><strong>{uiText("校内外的小店与美食")}</strong><span>{uiText("看看同学的真实体验，分享文字与照片。")}<ArrowRight size={16}/></span></Link></Section><AssistantBanner/></div></div>
+  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")}><Link to="/v2/partners" className="ref-coffee" style={{backgroundImage:`linear-gradient(90deg,#173c32dd,#173c3235),url(${partnersPhoto})`}}><strong>{uiText("找个搭子，一起出发")}</strong><span>{uiText("学习、运动、生活，遇见同频的伙伴")}<ArrowRight size={16}/></span></Link></Section><Section title={uiText("校园办事")}><Link className="v2-button v2-button-secondary" to="/v2/campus?service=directory">{uiText("查找办事指南与公开联系方式")}<ArrowRight size={16}/></Link></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园探店")}><Link className="ref-coffee" to="/v2/shops" style={{backgroundImage:'linear-gradient(90deg,#302b21dd,#302b2135),url(/shops/memory-0.jpg)'}}><strong>{uiText("校内外的小店与美食")}</strong><span>{uiText("看看同学的真实体验，分享文字与照片。")}<ArrowRight size={16}/></span></Link></Section><AssistantBanner/></div></div>
 }
 
 export function ReferenceMe() { useUiLanguage();
