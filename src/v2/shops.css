@@ -169,3 +169,8 @@ html[data-ui-theme=dark] .shop-card-copy>small {color:#9bcbb8}
 .shop-reference-layout .shop-card-context {font-size:12px;line-height:1.6;color:var(--v2-muted);margin:0;display:block}
 @media(max-width:760px){.shop-reference-layout .shop-grid {grid-template-columns:minmax(0,1fr);gap:28px}.shop-reference-layout .shop-heading {min-height:56px}.shop-reference-layout .shop-cover {border-radius:14px}.shop-reference-layout .shop-filters,.shop-reference-layout .shop-filters>div {gap:10px}}
 html[data-ui-theme=dark] .shop-reference-layout .shop-filters button[aria-pressed=true] {background:transparent;color:var(--v2-ink)}
+
+/* Detail reuses the exact card lens and selected photo, rather than stretching a whole gallery. */
+.shop-detail .shop-gallery{display:block;overflow:visible;max-width:680px}
+.shop-detail .shop-cover{width:100%;aspect-ratio:1.05;border-radius:16px}
+.shop-detail .shop-cover.has-photo:after,.shop-detail .shop-cover>span{display:none}

@@ -1,21 +1,30 @@
-::view-transition-group(campus-media){animation-duration:300ms;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
-html[data-shared-transition=exit]::view-transition-group(campus-media){animation-duration:220ms;animation-timing-function:cubic-bezier(.4,0,.8,.2)}
-::view-transition-old(root),::view-transition-new(root){animation:none}
-::view-transition-old(root){display:none}
-::view-transition-old(campus-media),::view-transition-new(campus-media){height:100%;width:100%;object-fit:cover;mix-blend-mode:normal}
-::view-transition-old(campus-media){animation:none;opacity:0}
-::view-transition-new(campus-media){animation:none;opacity:1}
-html[data-shared-transition=exit]::view-transition-old(campus-media){opacity:1}
-html[data-shared-transition=exit]::view-transition-new(campus-media){opacity:0}
-::view-transition-image-pair(campus-media){overflow:hidden;animation:campus-media-radius 300ms cubic-bezier(.2,.8,.2,1) both}
-html[data-shared-transition=exit]::view-transition-image-pair(campus-media){animation-duration:220ms;animation-timing-function:cubic-bezier(.4,0,.8,.2)}
-@keyframes campus-media-radius{from{border-radius:var(--shared-radius-from,24px)}to{border-radius:var(--shared-radius-to,0px)}}
+/* Keep the page context present while one matching media surface changes geometry. */
+::view-transition-group(campus-media){z-index:2;animation-duration:var(--shared-duration,420ms);animation-timing-function:cubic-bezier(.22,.8,.2,1)}
+::view-transition-old(root){animation:shared-page-out var(--shared-duration,420ms) ease both}
+::view-transition-new(root){animation:shared-page-in var(--shared-duration,420ms) ease both}
+::view-transition-old(campus-media),::view-transition-new(campus-media){height:auto;width:100%;object-fit:cover;object-position:top left;mix-blend-mode:plus-lighter}
+::view-transition-old(campus-media){animation:shared-media-out var(--shared-duration,420ms) linear both}
+::view-transition-new(campus-media){animation:shared-media-in var(--shared-duration,420ms) linear both}
+::view-transition-image-pair(campus-media){overflow:hidden;isolation:isolate;animation:campus-media-radius var(--shared-duration,420ms) cubic-bezier(.22,.8,.2,1) both}
+@keyframes shared-page-out{0%,15%{opacity:1}80%,100%{opacity:0}}
+@keyframes shared-page-in{0%,25%{opacity:0}85%,100%{opacity:1}}
+@keyframes shared-media-out{from{opacity:1}to{opacity:0}}
+@keyframes shared-media-in{from{opacity:0}to{opacity:1}}
+@keyframes campus-media-radius{from{border-radius:var(--shared-radius-from,16px)}to{border-radius:var(--shared-radius-to,16px)}}
+html[data-shared-kind=shop][data-shared-transition] .v2-app-student>.v2-mobile-nav{view-transition-name:campus-navigation}
+::view-transition-group(campus-navigation){z-index:3;animation:none}
+::view-transition-old(campus-navigation){animation:none;opacity:0}
+::view-transition-new(campus-navigation){animation:none;opacity:1}
 html[data-shared-transition] :is(.note-detail,.v2-coffee-schedule,.own-profile-editor){animation:none}
-@media(prefers-reduced-motion:reduce){::view-transition-group(*){animation-duration:0s!important}}
-html[data-ui-motion=reduce]::view-transition-group(*){animation-duration:0s!important}
-
+@media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*),::view-transition-image-pair(*){animation-duration:0s!important}}
+html[data-ui-motion=reduce]::view-transition-group(*),html[data-ui-motion=reduce]::view-transition-old(*),html[data-ui-motion=reduce]::view-transition-new(*){animation-duration:0s!important}
 .organization-detail-trigger{display:block;width:100%;padding:0;border:0;border-radius:24px;background:transparent;color:inherit;text-align:inherit;cursor:pointer;overflow:hidden}
 .organization-title-trigger{padding:0;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .organization-detail-placeholder{display:grid;place-content:center;justify-items:center;gap:20px;min-height:260px;height:100%;padding:24px;background:var(--v2-soft);color:var(--v2-ink)}
 .shared-avatar-source{display:inline-flex;flex:none;border-radius:50%;overflow:hidden}
 html[data-shared-transition] :is(.shop-detail,.v2-explorer-panel){animation:none}
+
+/* A teacher's landscape cover stays landscape when the appointment content opens. */
+.v2-app.v2-app-student .v2-coffee-teacher-detail{grid-template-columns:minmax(0,1fr);gap:0}
+.v2-app.v2-app-student .v2-coffee-teacher-detail>img{width:100%;height:170px;min-height:0;object-fit:cover;object-position:center}
+.v2-app.v2-app-student .v2-coffee-teacher-detail>div{padding:18px}

@@ -5,7 +5,7 @@ function fixture(){
  let mounted:'list'|'detail'='list'
  let observer:(()=>void)|undefined
  const style=()=>({viewTransitionName:'',setProperty:vi.fn(),removeProperty:vi.fn()})
- const node=()=>({style:style(),getClientRects:()=>[{}],getBoundingClientRect:()=>({width:100,height:100,top:20,bottom:120}),querySelector:()=>null,closest:()=>null})
+ const node=()=>({style:style(),getClientRects:()=>[{}],getBoundingClientRect:()=>({width:100,height:100,top:20,bottom:120}),querySelector:()=>null,querySelectorAll:()=>[],closest:()=>null})
  const media=node(),target=node()
  const root={dataset:{} as Record<string,string>,style:style()}
  const transitions:Array<{finished:Promise<void>}>=[]

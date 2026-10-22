@@ -2,7 +2,7 @@ import {campusMotion} from './motionTokens'
 import {flushSync} from 'react-dom'
 import './sharedElementTransition.css'
 
-export const sharedMotion={enter:campusMotion.cardEnter,exit:campusMotion.cardExit,enterEase:campusMotion.ease,exitEase:campusMotion.exitEase}
+export const sharedMotion={enter:campusMotion.sharedEnter,exit:campusMotion.sharedExit,enterEase:campusMotion.ease,exitEase:campusMotion.ease}
 type Transition={finished:Promise<void>;skipTransition:()=>void}
 let active:Transition|undefined
 const origins=new Map<string,{scroll:number;index:number}>()
@@ -23,6 +23,8 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
  const previous=from.style.viewTransitionName
  document.documentElement.style.setProperty('--shared-radius-from',getComputedStyle(from).borderRadius)
  from.style.viewTransitionName='campus-media'
+ document.documentElement.dataset.sharedKind=key.startsWith('shop:')?'shop':'media'
+ document.documentElement.style.setProperty('--shared-duration',`${reverse?sharedMotion.exit:sharedMotion.enter}ms`)
  document.documentElement.dataset.sharedTransition=reverse?'exit':'enter'
  let target:HTMLElement|null=null,targetName=''
  const transition=start(async()=>{
@@ -40,6 +42,15 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
   // Router commits can reset scroll after the first flush; restore after the destination mounts.
   if(reverse&&origins.has(key))window.scrollTo({top:origins.get(key)!.scroll,behavior:'instant'})
   if(reverse){const index=origins.get(key)?.index;if(index!=null&&index>=0)target=candidates('media',key)[index]??target}
+  const bounds=target?.getBoundingClientRect()
+  const image=(target?.tagName==='IMG'?target:Array.from(target?.querySelectorAll<HTMLImageElement>('img')??[]).find(item=>{
+   const rect=item.getBoundingClientRect()
+   return bounds&&rect.right>bounds.left&&rect.left<bounds.right&&rect.bottom>bounds.top&&rect.top<bounds.bottom
+  })) as HTMLImageElement|undefined
+  if(image&&!image.complete&&typeof image.decode==='function'){
+   let timer:ReturnType<typeof setTimeout>|undefined
+   await Promise.race([image.decode().catch(()=>{}),new Promise<void>(resolve=>{timer=setTimeout(resolve,160)})]).finally(()=>clearTimeout(timer))
+  }
   if(target){targetName=target.style.viewTransitionName;target.style.viewTransitionName='campus-media';document.documentElement.style.setProperty('--shared-radius-to',getComputedStyle(target).borderRadius)}
  })
  active=transition
@@ -48,7 +59,7 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
  void transition.finished.catch(()=>{}).finally(()=>{
   from.style.viewTransitionName=previous
   if(target)target.style.viewTransitionName=targetName
-  if(active===transition){delete document.documentElement.dataset.sharedTransition;document.documentElement.style.removeProperty('--shared-radius-from');document.documentElement.style.removeProperty('--shared-radius-to');active=undefined}
+  if(active===transition){delete document.documentElement.dataset.sharedTransition;delete document.documentElement.dataset.sharedKind;document.documentElement.style.removeProperty('--shared-duration');document.documentElement.style.removeProperty('--shared-radius-from');document.documentElement.style.removeProperty('--shared-radius-to');active=undefined}
   document.documentElement.dataset.sharedMotionResult=target?(snapshotReady?'complete':'skipped'):'missing-target'
   if(reverse){(target?.closest<HTMLElement>('a,button')??document.querySelector<HTMLElement>(`[data-shared-trigger="${CSS.escape(key)}"]`))?.focus({preventScroll:true});origins.delete(key)}
  })
