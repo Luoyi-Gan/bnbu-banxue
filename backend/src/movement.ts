@@ -14,6 +14,7 @@ export async function movementRequest(actor:Account,verified:boolean,operation:s
  const result=await response.json().catch(()=>null) as Record<string,unknown>|null;
  if(!response.ok)throw new ServiceError(response.status===401?503:response.status,'SPORTS_CONNECTION',typeof result?.message==='string'?result.message:'体育平台暂不可用，请重试。');
  demand(result&&typeof result==='object'&&!Array.isArray(result),'体育平台返回无效数据。',503);
+ if(process.env.BNBU_SPORTS_MODE==='real')demand(result.localAcceptance!==true,'当前连接返回了模拟体育数据，已停止读取。',503);
  if(operation==='resolve'){demand(result.state==='existing'||result.state==='new','未能确认体育账号，请重试。',503);const web=process.env.BNBU_SPORTS_WEB_ORIGIN;demand(web,'体育入口尚未配置。',503);result.sportsOrigin=new URL(web).origin;}
  if(operation==='launch'){
   const allowed=process.env.BNBU_SPORTS_WEB_ORIGIN;demand(allowed&&typeof result.url==='string','体育入口尚未配置。',503);

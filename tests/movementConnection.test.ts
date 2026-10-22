@@ -16,6 +16,11 @@ describe('运动平台连接与扫码',()=>{
   vi.stubEnv('BNBU_SPORTS_BRIDGE_ORIGIN','');vi.stubEnv('BNBU_SPORTS_BRIDGE_SECRET','')
   await expect(movementRequest({id:'a3b9c2de-1234-5678-90ab-cdef12345678',email:'own@mail.bnbu.edu.cn',name:'同学',organization:'学校',roles:['student'],status:'active'},true,'resolve')).rejects.toMatchObject({status:503})
  })
+ it('真实模式拒绝把模拟目录当作体育账号结果',async()=>{
+  vi.stubEnv('BNBU_SPORTS_MODE','real');vi.stubEnv('BNBU_SPORTS_BRIDGE_ORIGIN','http://127.0.0.1:4180');vi.stubEnv('BNBU_SPORTS_BRIDGE_SECRET',secret)
+  vi.stubGlobal('fetch',vi.fn(async()=>new Response(JSON.stringify({state:'new',localAcceptance:true}),{status:200})))
+  await expect(movementRequest({id:'a3b9c2de-1234-5678-90ab-cdef12345678',email:'own@mail.bnbu.edu.cn',name:'同学',organization:'学校',roles:['student'],status:'active'},true,'resolve')).rejects.toMatchObject({status:503})
+ })
  it('真实HTTP请求只带服务端本人邮箱，旧邮箱账号即使零记录也进入existing',async()=>{
   let received:Record<string,unknown>|undefined
   const server=createServer(async(req,res)=>{let body='';for await(const part of req)body+=part;received=JSON.parse(body);const time=String(req.headers['x-bridge-time']),nonce=String(req.headers['x-bridge-nonce']);expect(verifySignature(secret,time,nonce,body,String(req.headers['x-bridge-signature']))).toBe(true);res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({state:'existing',checkedAt:new Date().toISOString()}))})
