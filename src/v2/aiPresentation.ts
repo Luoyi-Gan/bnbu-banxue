@@ -1,5 +1,5 @@
 export type AISource={id?:string;title:string;source:string;reference?:number}
-export type AIAnswer={id:string;question:string;body:string;sources:AISource[];createdAt:string}
+export type AIAnswer={id:string;question:string;body:string;sources:AISource[];createdAt:string;conversationId?:string;previousAnswerId?:string;coverage?:import('../../shared/v2/aiKnowledge').AIKnowledgeCoverage}
 export type AIBlock={type:'paragraph'|'heading'|'quote'|'code'|'list'|'table';text?:string;level?:number;language?:string;ordered?:boolean;items?:string[];rows?:string[][]}
 
 /** Accept platform navigation and explicit HTTPS sources; never interpret model HTML. */

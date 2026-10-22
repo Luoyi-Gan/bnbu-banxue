@@ -30,6 +30,7 @@ export function CampusLifePage(){
  const live=useWorkspaceBackend(30000),device=useDevicePreferences(),navigate=useNavigate()
  const [now,setNow]=useState(Date.now),[expanded,setExpanded]=useState(false),[lesson,setLesson]=useState<string|null>(null)
  const [aiOpen,setAiOpen]=useState(false),[draft,setDraft]=useState(''),[question,setQuestion]=useState('')
+ const [aiConversationId]=useState(()=>crypto.randomUUID())
  useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),30000);return()=>clearInterval(timer)},[])
  const agenda=homepageAgenda(live.data,now),next=agenda.remainingCourses[0]
  const openAI=(value=draft)=>{setQuestion(value);setDraft(value);setAiOpen(true)}
@@ -53,6 +54,6 @@ export function CampusLifePage(){
    <details className="cl-photo-sources"><summary>{uiText('关于本页配图')}</summary><p>{uiText('校园实景及学校公开历史活动配图，保留原作者版权；配图不代表正在招募的搭子、可预约交流或当前活动。')}</p><a href="https://www.bnbu.edu.cn/info/1077/13899.htm" target="_blank" rel="noreferrer">{uiText('同学互动配图来源')}</a><a href="https://www.bnbu.edu.cn/info/1077/13899.htm" target="_blank" rel="noreferrer">{uiText('师生交流配图来源')}</a><a href="https://www.bnbu.edu.cn/info/1076/5861.htm" target="_blank" rel="noreferrer">{uiText('社团招新配图来源')}</a><a href="https://ic.bnbu.edu.cn/souvenir/introduction.htm" target="_blank" rel="noreferrer">{uiText('Memory 空间配图来源')}</a></details>
   </div>
   {lesson&&<StudentTimetable key={lesson} embedded detailOnly initialWorkspace={live.data??undefined} initialLessonId={lesson} onCloseDetails={()=>setLesson(null)}/>}
-  {aiOpen&&<CommunityModal title={uiText('校园 AI')} onClose={()=>setAiOpen(false)}><div className="cl-ai-sheet"><CampusAIChat embedded initialQuestion={question} onDraftChange={setDraft} onExpand={value=>navigate('/v2/ai',{state:{campusAIDraft:value}})}/></div></CommunityModal>}
+  {aiOpen&&<CommunityModal title={uiText('校园 AI')} onClose={()=>setAiOpen(false)}><div className="cl-ai-sheet"><CampusAIChat embedded initialQuestion={question} initialConversationId={aiConversationId} onDraftChange={setDraft} onExpand={(value,id)=>navigate('/v2/ai?chat='+encodeURIComponent(id),{state:{campusAIDraft:value}})}/></div></CommunityModal>}
  </div>
 }

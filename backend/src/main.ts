@@ -176,9 +176,11 @@ export function createApiServer(
           if('token'in result){response.setHeader('Set-Cookie',`bnbu_session=${result.token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=43200`);return send(response,200,{authenticated:true,account:result.account});}
           return send(response,200,result);
         }
-        if(pathname==='/api/ai/chat'){
+        if(pathname==='/api/ai/chat'||pathname==='/api/ai/knowledge'){
           const token=cookieToken(request)??'',actor=authenticate(db,token);accountSecurityGate(new Repository(db),actor);
-          return send(response,200,await ai.ask(actor,input,async()=>({...snapshot(db,actor),learning:await learning.overview(actor,token)}),()=>ai.shops()));
+          const read=async()=>({...snapshot(db,actor),learning:await learning.overview(actor,token)});
+          if(pathname==='/api/ai/knowledge'){const result=await ai.retrieve(actor,await read(),await ai.shops(),'校园平台全部资料总目录');return send(response,200,result.coverage)}
+          return send(response,200,await ai.ask(actor,input,read,()=>ai.shops()));
         }
         if(pathname==='/api/learning/command'){
           const token=cookieToken(request)??'',actor=authenticate(db,token);accountSecurityGate(new Repository(db),actor);
