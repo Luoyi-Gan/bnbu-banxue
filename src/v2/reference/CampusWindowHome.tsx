@@ -75,7 +75,7 @@ export function CampusWindowHome(){
     <div className="cw-assistant"><AssistantBanner/></div>
    </div>
    <footer className="cw-footer"><span>{uiText('会同里')}</span><p>{uiText('今天，也在校园里发现一点新的可能。')}</p><Link to="/v2/campus/explore">{uiText('去校园走走')}<ArrowRight size={15}/></Link></footer>
-   <section className="home-campus-entry" aria-label={uiText('校园快捷入口')}><Link className="home-partner-entry" to="/v2/partners"><div><h2>{uiText('找个搭子，一起出发')}</h2><p>{uiText('认识新朋友，探索更多可能')}</p></div><ArrowRight size={18}/></Link><nav className="home-shortcuts" aria-label={uiText('校园服务')}>{shortcuts.map(({title,path,icon:Icon})=><Link key={path} to={path} className="home-shortcut"><Icon size={25} strokeWidth={1.7}/><span>{uiText(title)}</span></Link>)}</nav></section>
+   <section className="home-campus-entry" aria-label={uiText('校园快捷入口')}><nav className="home-shortcuts" aria-label={uiText('校园服务')}>{shortcuts.map(({title,path,icon:Icon})=><Link key={path} to={path} className="home-shortcut"><Icon size={25} strokeWidth={1.7}/><span>{uiText(title)}</span></Link>)}</nav></section>
   </div>
  </div>
 }
