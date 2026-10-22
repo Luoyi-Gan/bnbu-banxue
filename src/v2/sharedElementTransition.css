@@ -17,3 +17,5 @@ html[data-ui-motion=reduce]::view-transition-group(*){animation-duration:0s!impo
 .organization-detail-trigger{display:block;width:100%;padding:0;border:0;border-radius:24px;background:transparent;color:inherit;text-align:inherit;cursor:pointer;overflow:hidden}
 .organization-title-trigger{padding:0;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .organization-detail-placeholder{display:grid;place-content:center;justify-items:center;gap:20px;min-height:260px;height:100%;padding:24px;background:var(--v2-soft);color:var(--v2-ink)}
+.shared-avatar-source{display:inline-flex;flex:none;border-radius:50%;overflow:hidden}
+html[data-shared-transition] :is(.shop-detail,.v2-explorer-panel){animation:none}
