@@ -1,7 +1,7 @@
 import {campusMotion} from './motionTokens'
 import {animate} from 'motion/react'
 import {useEffect,useRef,type RefObject} from 'react'
-import {resistedSheetOffset,shouldDismissSheet} from './sheetGesture'
+import {resistedSheetOffset,shouldDismissSheet,sheetReleaseVelocity} from './sheetGesture'
 
 export function isTopSheet(panel:HTMLElement|null){
  if(!panel)return false
@@ -20,10 +20,9 @@ export function mountSheetGesture(element:HTMLElement,reducedMotion:boolean,onCl
   offset=Math.max(0,value)
   layer.style.setProperty('--sheet-drag-y',`${offset}px`)
   layer.style.setProperty('--sheet-scrim-opacity',String(Math.max(0,1-offset/Math.max(240,element.clientHeight))))
-  layer.style.setProperty('--sheet-drag-blur',`${Math.min(offset/160,1)*3}px`)
  }
- const reset=()=>{delete layer.dataset.sheetState;layer.style.removeProperty('--sheet-drag-y');layer.style.removeProperty('--sheet-scrim-opacity');layer.style.removeProperty('--sheet-drag-blur');offset=0}
- const settle=(dismiss:boolean)=>{
+ const reset=()=>{delete layer.dataset.sheetState;layer.style.removeProperty('--sheet-drag-y');layer.style.removeProperty('--sheet-scrim-opacity');offset=0}
+ const settle=(dismiss:boolean,velocity=0)=>{
   settling?.stop();layer.dataset.sheetState=dismiss?'closing':'settling'
   if(reducedMotion){reset();if(dismiss)onClose();return}
   const target=dismiss?window.innerHeight-element.getBoundingClientRect().top+offset+24:0
@@ -35,7 +34,7 @@ export function mountSheetGesture(element:HTMLElement,reducedMotion:boolean,onCl
    // Existing busy/validation guards may reject closing; recover naturally in that case.
    if(!disposed)recovery=setTimeout(()=>{if(!disposed)settle(false)},80)
   }
-  settling=animate(offset,target,dismiss?{duration:.2,ease:[.3,0,.8,.4],onUpdate:paint,onComplete:complete}:{type:'spring',...campusMotion.sheetSpring,onUpdate:paint,onComplete:complete})
+  settling=animate(offset,target,{type:'spring',...campusMotion.sheetSpring,velocity,onUpdate:paint,onComplete:complete})
  }
  const release=()=>{const id=drag?.id;drag=undefined;if(id!==undefined&&header.hasPointerCapture(id))header.releasePointerCapture(id)}
  const down=(event:PointerEvent)=>{
@@ -62,7 +61,7 @@ export function mountSheetGesture(element:HTMLElement,reducedMotion:boolean,onCl
   if(!drag||drag.id!==event.pointerId)return
   const started=drag.started,distance=Math.max(0,drag.base+event.clientY-drag.y),velocity=event.timeStamp-drag.time>100?0:drag.velocity
   release()
-  if(started)settle(shouldDismissSheet(distance,velocity,element.clientHeight));else if(offset)settle(false)
+  if(started)settle(shouldDismissSheet(distance,velocity,element.clientHeight),sheetReleaseVelocity(distance,velocity));else if(offset)settle(false)
  }
  const cancel=()=>{const previous=drag;release();if(previous&&(previous.started||offset))settle(false)}
  const resize=()=>{release();settling?.stop();clearTimeout(recovery);reset()}

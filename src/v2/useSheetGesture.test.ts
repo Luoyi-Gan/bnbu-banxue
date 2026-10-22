@@ -1,5 +1,5 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
-const runs=vi.hoisted(()=>[] as Array<{from:number;to:number;options:{onUpdate:(value:number)=>void;onComplete:()=>void};stop:ReturnType<typeof vi.fn>}>)
+const runs=vi.hoisted(()=>[] as Array<{from:number;to:number;options:{velocity?:number;type?:string;onUpdate:(value:number)=>void;onComplete:()=>void};stop:ReturnType<typeof vi.fn>}>)
 vi.mock('motion/react',()=>({animate:vi.fn((from,to,options)=>{const run={from,to,options,stop:vi.fn()};runs.push(run);return run})}))
 import {mountSheetGesture,isTopSheet} from './useSheetGesture'
 
@@ -43,6 +43,14 @@ function fixture(reduced=false){
 beforeEach(()=>{runs.length=0})
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals()})
 describe('shared modal gesture controller',()=>{
+ it('hands a fresh release velocity to the spring and discards stale pointer velocity',()=>{
+  const f=fixture();f.pull(40);f.header.emit('pointerup',{clientY:140,timeStamp:220})
+  expect(runs.at(-1)!.options.type).toBe('spring')
+  expect(runs.at(-1)!.options.velocity).toBeGreaterThan(0)
+  f.cleanup()
+  const stale=fixture();stale.pull(40);stale.release()
+  expect(runs.at(-1)!.options.velocity).toBe(0);stale.cleanup()
+ })
  it('captures only the header and rolls a short drag back without closing',()=>{
   const f=fixture();f.pull();expect(f.layer.dataset.sheetState).toBe('dragging')
   expect(f.panel.listeners.size).toBe(0)

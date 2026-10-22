@@ -67,10 +67,11 @@ function InteractiveCampus({ mode, initialTarget=null, place='', onPick, onClose
   const layoutHost=useRef<HTMLDivElement>(null)
   useEffect(()=>{
     if(mode!=='explore'||status!=='ready'||!layoutHost.current)return
-    const observer=new ResizeObserver(()=>scene.current?.layout())
+    let frame=0
+    const observer=new ResizeObserver(()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;scene.current?.layout()})})
     layoutHost.current.querySelectorAll('.map-p0-dock,.v2-explorer-panel,.map-p1-route').forEach(el=>observer.observe(el))
     scene.current?.layout()
-    return()=>observer.disconnect()
+    return()=>{observer.disconnect();cancelAnimationFrame(frame)}
   },[mode,status,selected,dockOpen,routeOpen])
   const [buildingInfo,setBuildingInfo]=useState<Record<string,{phase?:string;levels?:number;height_m?:number;height_status?:string;area_m2?:number;source_timestamp?:string;construction_status?:string;name_en?:string}>>({})
   useEffect(()=>{

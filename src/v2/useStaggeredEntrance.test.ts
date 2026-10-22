@@ -16,7 +16,7 @@ describe('feed entrance lifecycle',()=>{
  it('orders visible cards spatially and never replays a seen card',()=>{
   const f=fixture();const seen=new Set<string>();const dispose=mountStaggeredEntrance(f.root,seen,false)
   f.enter([2,1,0])
-  expect(f.nodes.map(node=>node.animate.mock.calls[0])).toEqual([0,36,72].map(delay=>[[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0px)'}],{duration:240,delay,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'}]))
+  expect(f.nodes.map(node=>node.animate.mock.calls[0])).toEqual([0,32,64].map(delay=>[[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0px)'}],{duration:280,delay,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'}]))
   f.enter([0,1,2]);expect(f.nodes.map(node=>node.animate.mock.calls.length)).toEqual([1,1,1])
   dispose();expect(f.observer.disconnect).toHaveBeenCalledOnce()
   expect(f.nodes.every(node=>node.dataset.entranceState==='shown')).toBe(true)

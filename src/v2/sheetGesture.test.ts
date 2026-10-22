@@ -1,7 +1,13 @@
 import {describe,expect,it} from 'vitest'
-import {resistedSheetOffset,shouldDismissSheet,sheetDetent,resistedSheetHeight} from './sheetGesture'
+import {resistedSheetOffset,shouldDismissSheet,sheetDetent,resistedSheetHeight,sheetReleaseVelocity} from './sheetGesture'
 
 describe('sheet drag decisions',()=>{
+ it('converts release speed into resisted surface space with a bounded signed velocity',()=>{
+  expect(sheetReleaseVelocity(0,1)).toBe(1000)
+  expect(sheetReleaseVelocity(600,1)).toBe(250)
+  expect(sheetReleaseVelocity(0,-1)).toBe(-1000)
+  expect(sheetReleaseVelocity(0,100)).toBe(2400)
+ })
  it('snaps slow drags by position and fast flicks in their direction',()=>{
   const stops=[220,400,650]
   expect(sheetDetent(390,0,stops)).toBe(400)

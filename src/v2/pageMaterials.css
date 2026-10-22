@@ -23,7 +23,7 @@ html[data-ui-theme] body:has(.v2-app.v2-app-student) .note-detail-layer>.note-de
 .v2-app-student[data-campus-route='/v2/coffee'] .v2-coffee-slot strong{font-variant-numeric:tabular-nums;font-weight:650}
 
 /* The map remains readable beneath local, restrained tool surfaces. */
-html[data-ui-theme] body:has(.v2-app-student,.v2-explore-immersive) .v2-explore-immersive :is(.map-p0-dock,.map-p1-route,.v2-explorer-panel.has-selection){background:var(--page-map-surface)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important;border-color:var(--page-edge)!important;box-shadow:0 8px 28px #173c2521!important}
+html[data-ui-theme] body:has(.v2-app-student,.v2-explore-immersive) .v2-explore-immersive :is(.map-p0-dock,.map-p1-route,.v2-explorer-panel.has-selection){background:var(--page-map-surface)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important;border-color:var(--page-edge)!important;box-shadow:var(--material-shadow-contact),var(--material-shadow-float)!important}
 
 /* Calendar tools use a stable paper surface; navigation keeps its translucent rail. */
 html[data-ui-theme] body:has(.v2-app-student,.v2-explore-immersive) #v2-floating-timetable.v2-floating-timetable-window{background:var(--page-tool)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-color:var(--page-edge)!important;box-shadow:0 12px 40px #173c2524!important}

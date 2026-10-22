@@ -14,7 +14,7 @@ import {uiText} from './uiLanguage'
 
 export function TimetableBoard({lessons,preferences,onSelect,idPrefix}:{lessons:TimetableLesson[];preferences?:Record<string,unknown>;onSelect:(id:string,origin?:CardOrigin)=>void;idPrefix:string}){
   const layoutGroup=useId(),{reducedMotion}=useDevicePreferences()
-  const courseMotion={layout:reducedMotion?false as const:'position' as const,initial:false as const,transition:{layout:{duration:campusMotion.list/1000,ease:[.2,.8,.2,1] as const}}}
+  const courseMotion={layout:reducedMotion?false as const:'position' as const,initial:false as const,transition:{layout:campusMotion.layoutSpring}}
   const [calendarSettings,setCalendarSettings]=useState(false)
   const [now,setNow]=useState(Date.now)
   useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),60000);return()=>window.clearInterval(timer)},[])

@@ -3,6 +3,7 @@ import {useLayoutEffect} from 'react'
 import {Link} from 'react-router-dom'
 import type {LucideIcon} from 'lucide-react'
 import {uiText} from './uiLanguage'
+import {campusMotion} from './motionTokens'
 
 type Destination={path:string;label:string;icon:LucideIcon;end?:boolean}
 const MotionLink=motion.create(Link)
@@ -15,7 +16,7 @@ function FluidNavLink({item,index,activeIndex,position,reducedMotion}:{item:Dest
 
 /** Translation and material deformation share the same interruptible position. */
 export function FluidStudentNav({items,activeIndex,reducedMotion}:{items:Destination[];activeIndex:number;reducedMotion:boolean}){
- const position=useSpring(Math.max(0,activeIndex),{stiffness:420,damping:34,mass:.8})
+ const position=useSpring(Math.max(0,activeIndex),campusMotion.selectionSpring)
  const velocity=useVelocity(position)
  const x=useTransform(position,value=>`${value*100}%`)
  const scaleX=useTransform(velocity,value=>reducedMotion?1:1+Math.min(.14,Math.abs(value)*.012))

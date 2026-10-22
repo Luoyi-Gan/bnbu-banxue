@@ -1,16 +1,16 @@
 /* App Store web evidence: short press feedback, quieter release, light surface separation.
    Keep Huitongli's geometry, palette and layout. Values below are local design choices. */
 body:has(.v2-app.v2-app-student){
-  --student-press-time:140ms;
-  --student-release-time:210ms;
-  --student-feedback-ease:cubic-bezier(.2,.8,.2,1);
-  --student-cover-shadow:0 3px 9px #173c2510;
+  --student-press-time:var(--motion-press);
+  --student-release-time:var(--motion-release);
+  --student-feedback-ease:var(--motion-feedback-ease);
+  --student-cover-shadow:var(--material-shadow-cover);
   --student-reading-edge:0 3px 9px #173c2514;
 }
 /* Opening a reading surface must not widen the underlying feed when its scrollbar is locked. */
 html:has(.v2-app.v2-app-student){scrollbar-gutter:stable}
 html[data-ui-theme=dark] body:has(.v2-app.v2-app-student){
-  --student-cover-shadow:0 3px 9px #00000024;
+  --student-cover-shadow:var(--material-shadow-cover);
   --student-reading-edge:0 3px 9px #00000030;
 }
 html[data-ui-theme=dark] .v2-app.v2-app-student .own-profile .ref-week button[aria-pressed=true]{background:color-mix(in srgb,var(--student-glass-accent) 12%,transparent)}
@@ -36,7 +36,7 @@ body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline
   transition:scale var(--student-release-time) var(--student-feedback-ease),transform var(--student-release-time) var(--student-feedback-ease),background-color var(--student-release-time) ease-out,color var(--student-release-time) ease-out;
 }
 body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary):active:not(:disabled):not([aria-disabled=true]){
-  scale:.97;transition-duration:var(--student-press-time);
+  scale:.98;transition-duration:var(--student-press-time);
 }
 .v2-app.v2-app-student :is(.shop-card-link,.community-discovery-open,.partner-card-open,.partner-card-details,.v2-teacher-card,.organization-detail-trigger){
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;

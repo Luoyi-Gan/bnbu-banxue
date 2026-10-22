@@ -1,0 +1,20 @@
+/* Student surfaces share a light direction and two depth scales. Geometry stays local. */
+body:has(.v2-app.v2-app-student,.v2-explore-immersive){
+ --material-radius-panel:22px;
+ --material-radius-selection:19px;
+ --material-glass-blur:18px;
+ --material-glass-saturation:118%;
+ --material-edge-top:.48;
+ --material-edge-side:.24;
+ --material-edge-bottom:.12;
+ --material-shadow-contact:0 2px 5px rgba(var(--liquid-shade,22,49,35),.06);
+ --material-shadow-float:0 12px 30px rgba(var(--liquid-shade,22,49,35),.1);
+ --material-shadow-cover:0 1px 2px #173c2508,0 5px 14px #173c250b;
+ --motion-press:110ms;
+ --motion-release:200ms;
+ --motion-feedback-ease:cubic-bezier(.2,.8,.2,1);
+}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive){
+ --material-edge-top:.24;--material-edge-side:.14;--material-edge-bottom:.2;
+ --material-shadow-cover:0 1px 3px #00000020,0 5px 14px #00000024;
+}

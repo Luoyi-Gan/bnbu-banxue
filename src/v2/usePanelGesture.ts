@@ -2,7 +2,7 @@ import {useEffect,useRef,type RefObject} from 'react'
 import {animate} from 'motion/react'
 import {campusMotion} from './motionTokens'
 import {isTopSheet} from './useSheetGesture'
-import {resistedSheetHeight,resistedSheetOffset,sheetDetent,shouldDismissSheet} from './sheetGesture'
+import {resistedSheetHeight,resistedSheetOffset,sheetDetent,shouldDismissSheet,sheetReleaseVelocity} from './sheetGesture'
 import './panelGesture.css'
 
 /** Only the dedicated grip captures pointers; scrolling, map gestures and form controls stay native. */
@@ -20,11 +20,11 @@ export function usePanelGesture(panel:RefObject<HTMLElement|null>,enabled:boolea
    value=next;element.style.setProperty(kind==='resize'?'--gesture-height':'--gesture-offset',`${next}px`)
    if(kind==='dismiss')element.parentElement?.style.setProperty('--gesture-scrim',String(Math.max(.25,1-next/innerHeight)))
   }
-  const settle=(target:number)=>{
+ const settle=(target:number,velocity=0)=>{
    animation?.stop();element.dataset.panelGesture='settling'
    const finish=()=>{if(!disposed){paint(target);delete element.dataset.panelGesture}}
    if(reduced){finish();return}
-   animation=animate(value,target,{type:'spring',...campusMotion.sheetSpring,onUpdate:paint,onComplete:finish})
+   animation=animate(value,target,{type:'spring',...campusMotion.sheetSpring,velocity,onUpdate:paint,onComplete:finish})
   }
   const release=()=>{const id=drag?.id;drag=undefined;if(id!==undefined&&grip.hasPointerCapture(id))grip.releasePointerCapture(id)}
   const cancel=()=>{const previous=drag;release();if(previous?.started)settle(kind==='resize'?previous.base:0)}
@@ -44,15 +44,15 @@ export function usePanelGesture(panel:RefObject<HTMLElement|null>,enabled:boolea
    if(elapsed>0)drag.speed=drag.speed*.35+(event.clientY-drag.last)/elapsed*.65
    drag.last=event.clientY;drag.time=event.timeStamp
    if(kind==='resize'){const sizes=stops();paint(reduced?drag.base:resistedSheetHeight(drag.base-delta,sizes[0],sizes[2]))}
-   else paint(reduced?0:resistedSheetOffset(delta))
+   else paint(reduced?0:Math.max(0,drag.base+(delta<0?delta:resistedSheetOffset(delta))))
   }
   const up=(event:PointerEvent)=>{
    if(!drag||drag.id!==event.pointerId)return
    const previous=drag,speed=event.timeStamp-drag.time>100?0:drag.speed
-   release();if(!previous.started)return
-   if(kind==='resize')settle(sheetDetent(previous.base-(event.clientY-previous.y),speed,stops()))
+   release();if(!previous.started){if(kind==='dismiss'&&value)settle(0);return}
+   if(kind==='resize')settle(sheetDetent(previous.base-(event.clientY-previous.y),speed,stops()),-Math.max(-2400,Math.min(2400,speed*1000)))
    else if(shouldDismissSheet(Math.max(0,event.clientY-previous.y),speed,element.clientHeight)){element.dataset.panelGesture='closing';callback.current()}
-   else settle(0)
+   else settle(0,sheetReleaseVelocity(Math.max(0,event.clientY-previous.y),speed))
   }
   const click=(event:MouseEvent)=>{
    if(!mobile.matches)return

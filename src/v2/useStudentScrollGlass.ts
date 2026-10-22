@@ -1,4 +1,5 @@
 import {useSpring} from 'motion/react'
+import {campusMotion} from './motionTokens'
 import {useDevicePreferences} from './devicePreferences'
 import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
@@ -7,7 +8,7 @@ import {useLocation} from 'react-router-dom'
 export function useStudentScrollGlass(){
   const {pathname}=useLocation()
   const {reducedMotion}=useDevicePreferences()
-  const drift=useSpring(0,{stiffness:200,damping:30,mass:.7})
+ const drift=useSpring(0,campusMotion.scrollSpring)
   useEffect(()=>{
     const root=document.querySelector<HTMLElement>('.v2-app-student')
     if(!root)return

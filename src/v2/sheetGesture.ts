@@ -17,3 +17,7 @@ export function resistedSheetHeight(height:number,min:number,max:number){
  if(height>max)return max+(height-max)*.16
  return height
 }
+/** Pointer speeds are px/ms; springs consume px/s in the resisted surface's space. */
+export function sheetReleaseVelocity(distance:number,speed:number){
+ return Math.max(-2400,Math.min(2400,speed*1000/Math.pow(1+Math.max(0,distance)/600,2)))
+}

@@ -34,9 +34,9 @@ export function DiscoveryMasonry<T extends { id: string }>({ items, renderItem, 
     observer.observe(element)
     return () => observer.disconnect()
   }, [limit,hasMore,serverHasMore,busy,onLoadMore,items.length])
-  return <LayoutGroup id={layoutGroup}><motion.div ref={container} className="discovery-feed" layout={reducedMotion?false:'position'} initial={false} transition={{layout:{duration:campusMotion.list/1000,ease:[.2,.8,.2,1]}}} data-staggered={entranceScope?true:undefined}>
+  return <LayoutGroup id={layoutGroup}><motion.div ref={container} className="discovery-feed" layout={reducedMotion?false:'position'} initial={false} transition={{layout:campusMotion.layoutSpring}} data-staggered={entranceScope?true:undefined}>
     <div className="discovery-columns" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
-      {discoveryColumns(items.slice(0, limit), columns, (width - (columns - 1) * 16) / columns).map((column, index) => <div className="discovery-column" key={index}>{column.map(item=><motion.div key={item.id} className="discovery-layout-item" layout={reducedMotion?false:'position'} layoutId={reducedMotion?undefined:item.id} initial={false} transition={{layout:{duration:campusMotion.list/1000,ease:[.2,.8,.2,1]}}}><div className="discovery-entrance-item" data-entrance-id={entranceScope?item.id:undefined}>{renderItem(item)}</div></motion.div>)}</div>)}
+      {discoveryColumns(items.slice(0, limit), columns, (width - (columns - 1) * 16) / columns).map((column, index) => <div className="discovery-column" key={index}>{column.map(item=><motion.div key={item.id} className="discovery-layout-item" layout={reducedMotion?false:'position'} layoutId={reducedMotion?undefined:item.id} initial={false} transition={{layout:campusMotion.layoutSpring}}><div className="discovery-entrance-item" data-entrance-id={entranceScope?item.id:undefined}>{renderItem(item)}</div></motion.div>)}</div>)}
     </div>
     <div className="discovery-end" ref={sentinel}>{hasMore||serverHasMore?<button type="button" className="v2-text-button" disabled={busy} onClick={() => hasMore?setLimit(value => value + 6):onLoadMore?.()}>{uiText("加载更多")}</button>:uiTemplate(["已经看完当前",""],uiText(itemLabel))}</div>
   </motion.div></LayoutGroup>
