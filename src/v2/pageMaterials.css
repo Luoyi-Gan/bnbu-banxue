@@ -1,8 +1,8 @@
 /* One palette, with material chosen for the task rather than the entire app. */
 body:has(.v2-app-student,.v2-explore-immersive){--page-paper:#fffefa;--page-tool:#f8faf6;--page-quiet:#eff3ee;--page-edge:#dce5dd;--page-map-surface:rgba(250,253,247,.92)}
 html[data-ui-theme=dark] body:has(.v2-app-student,.v2-explore-immersive){--page-paper:#1b2d24;--page-tool:#192b22;--page-quiet:#24392e;--page-edge:#395145;--page-map-surface:rgba(25,45,34,.94)}
-html[data-ui-theme] .v2-app.v2-app-student>.student-fluid-nav.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,rgba(255,255,253,.92),rgba(237,244,238,.86));backdrop-filter:blur(16px) saturate(125%);-webkit-backdrop-filter:blur(16px) saturate(125%)}
-html[data-ui-theme=dark] .v2-app.v2-app-student>.student-fluid-nav.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,rgba(35,57,44,.94),rgba(22,42,32,.9))}
+html[data-ui-theme] .v2-app.v2-app-student>.student-fluid-nav.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,rgba(255,255,253,.58),rgba(237,244,238,.4));backdrop-filter:blur(16px) saturate(125%);-webkit-backdrop-filter:blur(16px) saturate(125%)}
+html[data-ui-theme=dark] .v2-app.v2-app-student>.student-fluid-nav.v2-mobile-nav{--student-glass-surface:linear-gradient(135deg,rgba(35,57,44,.68),rgba(22,42,32,.5))}
 
 /* Activity and community detail are reading rooms with a photographic stage. */
 html[data-ui-theme] body:has(.v2-app.v2-app-student) .note-detail-layer>.note-detail[role=dialog]{background:var(--page-paper)!important;border-color:var(--page-edge)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 20px 70px #142f2526!important}
