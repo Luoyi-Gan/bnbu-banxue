@@ -1,4 +1,5 @@
 import {useLocation} from 'react-router-dom'
+import {knownCoverRatio,rememberCover} from './discoveryCoverCache'
 import './materialSkeleton.css'
 import { Heart, Layers }  from 'lucide-react'
 import { useState } from 'react'
@@ -12,9 +13,9 @@ import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 
 function PostCover({post,photoIndex=0}:{post:Post;photoIndex?:number}){
   const photos=photosForPost(post),src=photos[Math.min(Math.max(0,photoIndex),photos.length-1)]
-  const [failed,setFailed]=useState(false),[loaded,setLoaded]=useState(false),[ratio,setRatio]=useState(.8)
+  const [failed,setFailed]=useState(false),[loaded,setLoaded]=useState(()=>knownCoverRatio(src)!==undefined),[ratio,setRatio]=useState(()=>knownCoverRatio(src)??.8)
   return <div className={`discovery-cover community-discovery-cover${src&&!failed&&!loaded?' is-loading':''}`} style={{aspectRatio:ratio}} data-shared-media={src?`post:${post.id}`:undefined}>
-    {src&&!failed?<img src={src} alt="" loading="lazy" decoding="async" onLoad={e=>{setLoaded(true);setRatio(Math.max(.7,Math.min(1.5,e.currentTarget.naturalWidth/e.currentTarget.naturalHeight)))}} onError={()=>setFailed(true)}/>:<span className="discovery-text-cover"><small>{uiText(post.board)}</small><span>{post.body}</span></span>}
+    {src&&!failed?<img src={src} alt="" loading="lazy" decoding="async" onLoad={e=>{rememberCover(src,e.currentTarget.naturalWidth/e.currentTarget.naturalHeight);setLoaded(true);setRatio(knownCoverRatio(src)??.8)}} onError={()=>setFailed(true)}/>:<span className="discovery-text-cover"><small>{uiText(post.board)}</small><span>{post.body}</span></span>}
     {photosForPost(post).length>1&&<span className="community-photo-count"><Layers size={14}/></span>}
     {failed&&<span className="community-cover-failed">{uiText('封面暂不可用')}</span>}
   </div>

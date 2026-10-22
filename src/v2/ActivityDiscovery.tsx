@@ -1,4 +1,5 @@
 import {SharedMediaLink} from './SharedMediaLink'
+import {knownCoverRatio,rememberCover} from './discoveryCoverCache'
 import {ContinuityIcon} from './ContinuityIcon'
 import { uiTemplate, uiText, useUiLanguage , uiLocale } from './uiLanguage'
 import { Bookmark, Clock3, MapPin, Heart } from 'lucide-react'
@@ -14,10 +15,10 @@ import './activityDiscovery.css'
 
 function ActivityCover({ item, path }: { item: ActivityItem; path: string }) { useUiLanguage();
   const location=useLocation()
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(()=>knownCoverRatio(item.image)!==undefined)
   const [failed, setFailed] = useState(false)
   return <SharedMediaLink transitionKey={`activity:${item.id}`} data-shared-media={`activity:${item.id}`} to={path} state={{from:location.pathname+location.search}} className={`discovery-cover activity-discovery-cover${item.image && !loaded && !failed ? ' is-loading' : ''}`} style={{ aspectRatio: coverRatio(item.id) }} aria-label={uiTemplate(["查看活动：",""],item.title)}>
-    {item.image && !failed?<img src={item.image} alt={item.isDefaultCover?uiText('校园通用照片，默认封面'):''} loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setFailed(true)}/>:<span className="discovery-text-cover"><small>{uiText(item.category)}</small><strong>{item.title}</strong><span>{failed?uiText('封面暂不可用'):item.subtitle}</span></span>}
+    {item.image && !failed?<img src={item.image} alt={item.isDefaultCover?uiText('校园通用照片，默认封面'):''} loading="lazy" decoding="async" onLoad={event => {rememberCover(item.image!,event.currentTarget.naturalWidth/event.currentTarget.naturalHeight);setLoaded(true)}} onError={() => setFailed(true)}/>:<span className="discovery-text-cover"><small>{uiText(item.category)}</small><strong>{item.title}</strong><span>{failed?uiText('封面暂不可用'):item.subtitle}</span></span>}
     <span className="activity-discovery-category">{uiText(item.category)}{item.isDefaultCover && ' · 默认封面'}</span>
   </SharedMediaLink>
 }

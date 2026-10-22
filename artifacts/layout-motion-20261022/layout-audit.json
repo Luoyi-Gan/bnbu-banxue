@@ -1,0 +1,599 @@
+[
+  {
+    "label": "activity-before-filter",
+    "cards": [
+      {
+        "id": "preview-event-5",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "id": "preview-event-4",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "id": "preview-event-3",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 917.0424194335938
+      },
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "id": "preview-event-7",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      },
+      {
+        "id": "preview-event-2",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 936.5848388671876
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-filter-moving",
+    "cards": [
+      {
+        "id": "preview-event-5",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 326.25
+      },
+      {
+        "id": "preview-event-4",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 688.2589721679688
+      },
+      {
+        "id": "preview-event-3",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 961.0491333007812
+      },
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 326.25
+      },
+      {
+        "id": "preview-event-7",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 674.3303833007812
+      },
+      {
+        "id": "preview-event-2",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 980.591552734375
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-all",
+    "cards": [
+      {
+        "id": "preview-event-5",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "id": "preview-event-4",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "id": "preview-event-3",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 917.0424194335938
+      },
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "id": "preview-event-7",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      },
+      {
+        "id": "preview-event-2",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 936.5848388671876
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-music-start",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "translate3d(143.089px, 0px, 0px)",
+        "x": 159.0821533203125,
+        "y": 326.25
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-music-mid",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "translate3d(60.2244px, 0px, 0px)",
+        "x": 76.21770477294922,
+        "y": 326.25
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-music-settled",
+    "cards": [
+      {
+        "id": "preview-event-5",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 282.2433166503906
+      },
+      {
+        "id": "preview-event-4",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 644.2522583007812
+      },
+      {
+        "id": "preview-event-3",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 917.0424194335938
+      },
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 282.2433166503906
+      },
+      {
+        "id": "preview-event-7",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 630.3236694335938
+      },
+      {
+        "id": "preview-event-2",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 936.5848388671876
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "community-study-start",
+    "cards": [
+      {
+        "id": "preview-post-0",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 686.0267944335938
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 958.984375
+      },
+      {
+        "id": "preview-post-3",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-2",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 664.3527221679688
+      },
+      {
+        "id": "preview-post-5",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 881.5513305664062
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "community-study-settled",
+    "cards": [
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "none",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "community-study-frame-0",
+    "cards": [
+      {
+        "id": "preview-post-0",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 686.0267944335938
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 958.984375
+      },
+      {
+        "id": "preview-post-3",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-2",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 664.3527221679688
+      },
+      {
+        "id": "preview-post-5",
+        "opacity": "1",
+        "transform": "",
+        "x": 195.27902221679688,
+        "y": 881.5513305664062
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "community-study-frame-1",
+    "cards": [
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "none",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "community-study-frame-2",
+    "cards": [
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "none",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "community-study-frame-3",
+    "cards": [
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "none",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "community-study-frame-4",
+    "cards": [
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "none",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "community-study-frame-5",
+    "cards": [
+      {
+        "id": "preview-post-1",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 447.1540222167969
+      },
+      {
+        "id": "preview-post-4",
+        "opacity": "1",
+        "transform": "none",
+        "x": 195.27902221679688,
+        "y": 447.1540222167969
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities?section=community&board=%E5%AD%A6%E4%B9%A0"
+  },
+  {
+    "label": "activity-final-moving",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "translate3d(179.286px, 44.0067px, 0px)",
+        "x": 195.27902221679688,
+        "y": 326.25
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-final-settled",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 326.25
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-layout-end",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "translate3d(179.286px, 0px, 0px)",
+        "x": 195.27902221679688,
+        "y": 282.24334716796875
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-reduced-filter",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "",
+        "x": 15.993304252624512,
+        "y": 326.25
+      }
+    ],
+    "motion": "reduce",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-normal-final-settled",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 326.25
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-final-repeat-start",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "translate3d(81.6834px, 0px, 0px)",
+        "x": 97.67674255371094,
+        "y": 306.2003173828125
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-final-repeat-mid",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "translate3d(26.7102px, 0px, 0px)",
+        "x": 42.7034797668457,
+        "y": 319.6938171386719
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-cover-cache-settled",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "translate3d(40.6434px, 0px, 0px)",
+        "x": 56.63673400878906,
+        "y": 316.27386474609375
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "activity-cover-final",
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "opacity": "1",
+        "transform": "none",
+        "x": 15.993304252624512,
+        "y": 326.25
+      }
+    ],
+    "motion": "normal",
+    "scroll": 0,
+    "url": "/v2/activities"
+  }
+]

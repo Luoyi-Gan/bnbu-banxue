@@ -6,7 +6,7 @@
 .discovery-columns{display:grid;gap:16px;align-items:start}
 .discovery-column{display:flex;flex-direction:column;gap:22px;min-width:0}
 .discovery-card{position:relative;min-width:0}
-.discovery-entrance-item{min-width:0}
+.discovery-layout-item,.discovery-entrance-item{min-width:0}
 .discovery-entrance-item[data-entrance-state=pending]{opacity:0;transform:translateY(8px)}
 html[data-ui-motion=reduce] .discovery-entrance-item{opacity:1!important;transform:none!important}
 @media(prefers-reduced-motion:reduce){.discovery-entrance-item{opacity:1!important;transform:none!important}}
