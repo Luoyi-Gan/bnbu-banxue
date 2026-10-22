@@ -28,3 +28,5 @@
 .v2-timetable-calendar .v2-section-heading{gap:12px}.v2-timetable-calendar .v2-section-heading>.v2-text-button{flex-shrink:0;white-space:nowrap}
 
 .tt-board-footer>button,.tt-calendar-note button{font:inherit;border:0;background:transparent;padding:0;cursor:pointer}
+
+.v2-timetable{grid-template-columns:minmax(0,1fr);min-width:0}

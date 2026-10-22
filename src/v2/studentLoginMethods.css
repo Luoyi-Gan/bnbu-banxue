@@ -1,0 +1,4 @@
+.learning-tabs{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:6px 0 12px;scrollbar-width:thin}.learning-tabs button{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border:1px solid #bccdc2;border-radius:12px;background:#ffffff70;padding:10px 13px;color:#355447;font:inherit;font-size:14px;transition:background .18s,transform .18s}.learning-tabs button[aria-pressed=true]{background:#315f4c;color:white;border-color:#315f4c}.learning-login button:active{transform:translateY(1px)}.learning-login :focus-visible{outline:3px solid #599b7d;outline-offset:3px}.learning-login>p{font-size:14px;line-height:1.8;margin-bottom:24px}.learning-login>button{margin-top:18px}.learning-login .learning-tabs>button{flex:1}
+
+@media(prefers-reduced-motion:reduce){.learning-tabs button{transition:none}}
+html[data-ui-motion=reduce] .learning-tabs button{transition:none}

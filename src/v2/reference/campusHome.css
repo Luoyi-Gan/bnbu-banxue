@@ -101,3 +101,5 @@ html[data-ui-motion=reduce] .campus-home *{scroll-behavior:auto!important;transi
 
 
 html[data-ui-theme=dark] .campus-home .home-section-heading>nav button{color:#b9cdc4;background-color:transparent}html[data-ui-theme=dark] .campus-home .home-section-heading>nav button[aria-pressed=true]{color:#e4f4ed}html[data-ui-theme=dark] .campus-home .home-club-recommendations .home-section-heading>nav button{background:#29483b;border-color:#425c50}html[data-ui-theme=dark] .campus-home .home-club-recommendations .home-section-heading>nav button[aria-pressed=true]{background:#437665}html[data-ui-theme=dark] .campus-home .home-full-timetable,html[data-ui-theme=dark] .campus-home .home-deadline-countdown{color:#c2d8ce!important}html[data-ui-theme=dark] .campus-home .is-due .home-deadline-countdown{color:#ff9ba8!important}html[data-ui-theme=dark] .campus-home-header .v2-student-search-trigger{background:#ffffff24!important;border-radius:50%!important}
+
+.home-tasks-heading>h3{margin:0;font:inherit;color:inherit}

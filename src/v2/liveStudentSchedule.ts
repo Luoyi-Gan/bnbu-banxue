@@ -27,8 +27,8 @@ export function liveStudentSchedule(data: Workspace | null, now = Date.now()): S
     items.push({id: b.id, kind: 'coffee', title: `与${name}的 Coffee Chat`, time: '', startAt: slot.startAt, endAt:slot.endAt, location: slot.location, path: person.owner === actor ? '/v2/alumni?view=manage' : '/v2/alumni?view=bookings', label: '校友 Coffee Chat'})
   }
   const timetable=data.entities.find(e=>e.kind==='timetable'&&e.ownerId===actor)
-  const learning=data.entities.filter(e=>e.kind==='learningItem'&&e.ownerId===actor).map(e=>({...e.data,id:e.id,version:e.version}) as unknown as PersonalLearningItem)
-  items.push(...personalOccurrences(learning,now).map(item=>({...item,learningType:learning.find(source=>source.id===item.id||item.id.startsWith(source.id+':'))?.type,kind:'course' as const,time:'',path:'/v2/me?tab=timetable&study=arrangements'})))
+  const learning=data.entities.filter(e=>e.kind==='learningItem'&&e.ownerId===actor&&e.data.type==='deadline').map(e=>({...e.data,id:e.id,version:e.version}) as unknown as PersonalLearningItem)
+  items.push(...personalOccurrences(learning,now).map(item=>({...item,learningType:learning.find(source=>source.id===item.id||item.id.startsWith(source.id+':'))?.type,kind:'course' as const,time:'',path:'/v2'})))
   const preferences=schedulePreferences(data.entities.find(e=>e.kind==='preferences'&&e.ownerId===actor)?.data)
   items.push(...timetableSchedule(timetable?.data.lessons,now,preferences.semesterStartDate,371,preferences.academicCalendar).filter(item=>!preferences.hiddenDailyCourses.includes(scheduleCourseKey(item.title))))
   return items.filter(item=>!item.startAt||Number.isFinite(Date.parse(item.startAt))).sort((a,b) => (a.startAt ? Date.parse(a.startAt) : Infinity) - (b.startAt ? Date.parse(b.startAt) : Infinity)||a.id.localeCompare(b.id))

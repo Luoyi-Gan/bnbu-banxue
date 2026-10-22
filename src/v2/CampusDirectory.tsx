@@ -1,7 +1,7 @@
 import {useMemo,useState} from 'react'
 import {useWorkspaceBackend} from './useWorkspaceBackend'
 import {uiText,useUiLanguage} from './uiLanguage'
-import './learning.css'
+import './campusDirectory.css'
 import {campusContacts as contacts} from '../../shared/v2/campusContacts'
 export function CampusDirectory(){useUiLanguage()
   const [query,setQuery]=useState(''),live=useWorkspaceBackend(),normalized=query.trim().toLowerCase()

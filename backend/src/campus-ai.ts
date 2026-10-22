@@ -12,9 +12,6 @@ const clean=(value:unknown,max=1000)=>typeof value==='string'?value.slice(0,max)
 export function campusContext(actor:Account,workspace:ReadModel,shops:Item[]=[],now=Date.now()){
  const sources:Source[]=[];
  const push=(id:string,title:string,source:string,text:string)=>sources.push({id,title,source,text});
- if(workspace.learning?.status.connected){
-  for(const course of workspace.learning.courses??[])push('course:'+course.id,course.name,'/v2/timetable?study=materials',JSON.stringify({name:course.name,shortname:course.shortname,materials:(workspace.learning.materials?.[String(course.id)]??[]).slice(0,30).map(file=>({name:file.name,section:file.section}))}));
- }
  for(const contact of campusContacts)push('contact:'+contact.id,contact.name,contact.source,JSON.stringify(contact));
  const clubNames=workspace.entities.filter(e=>e.kind==='organization'&&e.data.status==='approved'&&e.data.visibility==='visible').map(e=>`${clean(e.data.name)}（${clean(e.data.category)}）`);
  if(clubNames.length)push('club-directory','社团完整目录','/v2/organizations',`当前可见目录共${clubNames.length}个社团。`+clubNames.join('；'));
@@ -27,9 +24,9 @@ export function campusContext(actor:Account,workspace:ReadModel,shops:Item[]=[],
   if(item.kind==='shop'&&d.status==='visible'){fields=['name','category','address','description'];path='/v2/shops?id='+encodeURIComponent(item.id);}
   if(item.kind==='room'&&d.visibility==='visible'&&d.status==='open'){fields=['title','description','type','location','startAt','endAt'];path='/v2/partners/teams';}
   if(item.kind==='post'&&d.status==='visible'){fields=['title','body'];path='/v2/community';}
-  if(own&&item.kind==='learningItem'){
+  if(own&&item.kind==='learningItem'&&d.type==='deadline'){
    const occurrences=personalOccurrences([{...d,id:item.id,version:1} as unknown as PersonalLearningItem],now,14);
-   if(occurrences.length)push(item.id,clean(d.title),'/v2/timetable?study=arrangements',JSON.stringify({title:d.title,course:d.course,occurrences:occurrences.slice(0,14)}));
+   if(occurrences.length)push(item.id,clean(d.title),'/v2',JSON.stringify({title:d.title,course:d.course,occurrences:occurrences.slice(0,14)}));
   }
   if(own&&item.kind==='timetable'){
    const lessons=Array.isArray(d.lessons)?d.lessons.slice(0,60).map(raw=>{const l=raw as Record<string,unknown>;return Object.fromEntries(['name','course','weekday','startTime','endTime','location','weeks'].map(key=>[key,l[key]]));}):[];
@@ -41,7 +38,7 @@ export function campusContext(actor:Account,workspace:ReadModel,shops:Item[]=[],
   }
   if(fields.length){const selected=Object.fromEntries(fields.map(key=>[key,clean(d[key])]));push(item.id,clean(d.name||d.title)||'校园资料',path,JSON.stringify(selected));}
  }
- push('navigation','校园功能导航','/v2/campus','找搭子 /v2/partners；Coffee Chat /v2/coffee；校园办事 /v2/campus?service=directory；社团 /v2/organizations；探店 /v2/shops；课表与课程资料、DDL /v2/timetable。');
+ push('navigation','校园功能导航','/v2/campus','找搭子 /v2/partners；Coffee Chat /v2/coffee；校园办事 /v2/campus?service=directory；社团 /v2/organizations；探店 /v2/shops；我的课表 /v2/me?tab=timetable；首页待办 /v2。');
  return sources;
 }
 export function selectCampusSources(sources:Source[],question:string){
