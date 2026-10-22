@@ -170,3 +170,13 @@ html[data-ui-theme=dark] .campus-home .home-section-heading>nav button{color:#b9
 @media(max-width:370px){.community-home .campus-home-header{padding:20px}.v2-app.v2-app-student .community-home .campus-home-header h1{font-size:29px}.home-explore-heading{left:21px}.v2-app.v2-app-student .home-explore-heading h2{font-size:27px}.home-explore-heading p{font-size:11px}.community-home .home-dashboard-body{padding-inline:12px}.community-home .home-section-heading>nav{gap:20px}.community-home .home-section-heading>nav button{font-size:14px}.community-home .home-feature-card{height:225px}.v2-app.v2-app-student .community-home .home-feature-copy h3{font-size:14px}.community-home .home-feature-copy{left:10px;right:9px}.community-home .home-feature-copy time,.community-home .home-feature-copy p{font-size:9px}.community-home .home-course-card strong,.community-home .home-task-card strong{font-size:11px}}
 html[data-ui-theme=dark] .v2-app.v2-app-student[data-campus-route='/v2'] .v2-main>.community-home{--home-canvas:#182820;--home-ink:#e1e9df;--home-muted:#a0b1a3;--home-surface:#24392ed9}html[data-ui-theme=dark] .community-home .home-task-card{background:none}html[data-ui-theme=dark] .community-home .home-section-heading>nav button{color:#fffef2!important;background:none!important}html[data-ui-theme=dark] .community-home .home-course-card>span,html[data-ui-theme=dark] .community-home .home-course-card>small{color:var(--home-muted)}
 .community-home .home-explore-heading{bottom:30px}.community-home .home-course-card>small{display:block;margin:2px 0 0}.community-home .home-course-card>small:before{content:none}.home-more-plans{display:flex;align-items:center;justify-content:center;gap:4px;border:0;background:none;width:100%;padding:7px;color:var(--home-muted)!important;font-size:10px}
+
+/* The full photograph stays visible beneath one decoded incoming layer. */
+.community-home .home-hero-scene img{transition:none;filter:saturate(.95)}
+.community-home .home-hero-scene img.is-previous{opacity:1;z-index:0}
+.community-home .home-hero-scene img.is-active{opacity:1;z-index:1}
+.community-home .home-hero-scene img.is-entering{animation:home-photo-reveal .8s ease both}
+.community-home .home-hero-scene:after{z-index:2}
+@keyframes home-photo-reveal{from{opacity:0}to{opacity:1}}
+
+.community-home .home-hero-scene:after{background:linear-gradient(180deg,#172c2428 0%,#28362b4d 43%,#877d6b4d 57%,var(--home-canvas) 93%),linear-gradient(90deg,#132b2170,transparent 90%)}

@@ -16,15 +16,9 @@ import {uiText,uiLocale,useUiLanguage} from '../uiLanguage'
 import type {StudentScheduleItem} from '../studentSchedule'
 import type {CardOrigin} from '../ui'
 import {Feedback} from './components'
-import walkway from '../../assets/campus/gallery/bicycle-gallery.webp'
-import evening from '../../assets/campus/evening-campus.jpg'
-import reflection from '../../assets/campus/gallery/blue-sky-reflection.webp'
-import morning from '../../assets/campus/gallery/morning-campus.webp'
-import flowers from '../../assets/campus/gallery/flowers-and-light.webp'
+import {CampusHeroGallery} from '../CampusHeroGallery'
 import campus from '../../assets/campus/home-background.jpg'
 import './campusHome.css'
-
-const scenes=[{image:walkway,label:'树影里的校园',location:'校园长廊'},{image:evening,label:'湖畔的暮色',location:'校园湖畔'},{image:reflection,label:'晴空与湖面的相遇',location:'校园风景'},{image:morning,label:'晨光里的校园',location:'校园全景'},{image:flowers,label:'花木间，发现校园',location:'校园日常'}]
 
 const shortcuts=[{title:'校园地图',copy:'探索校园',path:'/v2/campus/explore',icon:MapPin,tone:'mint'},{title:'校园活动',copy:'发现精彩',path:'/v2/activities',icon:UsersRound,tone:'blue'},{title:'找搭子',copy:'同学交流',path:'/v2/partners',icon:Coffee,tone:'amber'},{title:'社团组织',copy:'发现热爱',path:'/v2/organizations',icon:UsersRound,tone:'rose'},{title:'我的课表',copy:'全部课程',path:'/v2/me?tab=timetable',icon:CalendarDays,tone:'violet'}]
 type Recommendation={id:string;title:string;image:string;category:string;path:string;transitionKey:string;detail:string;time?:string;source:'activity'|'organization'|'post'}
@@ -41,12 +35,12 @@ function HomeTime({item}:{item:StudentScheduleItem}){
 export function CampusWindowHome(){
  useUiLanguage()
  const live=useWorkspaceBackend(30000),community=useCommunityBackend(),device=useDevicePreferences()
- const [now,setNow]=useState(Date.now),[slide,setSlide]=useState(0),[inView,setInView]=useState(true)
+ const [now,setNow]=useState(Date.now),[inView,setInView]=useState(true)
  const [tab,setTab]=useState<'推荐'|'活动'|'社团'|'校园动态'>('推荐'),[allTasks,setAllTasks]=useState(false),[allPlans,setAllPlans]=useState(false)
  const [courseDetail,setCourseDetail]=useState<{id:string;origin:CardOrigin}|null>(null),hero=useRef<HTMLElement>(null)
  useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),30000);return()=>window.clearInterval(timer)},[])
  useEffect(()=>{if(!hero.current)return;const observer=new IntersectionObserver(([entry])=>setInView(entry.isIntersecting));observer.observe(hero.current);return()=>observer.disconnect()},[])
- useEffect(()=>{if(device.reducedMotion||!device.preferences.photoAutoplay||!inView)return;const timer=window.setInterval(()=>{if(document.visibilityState==='visible')setSlide(index=>(index+1)%scenes.length)},6500);return()=>window.clearInterval(timer)},[device.reducedMotion,device.preferences.photoAutoplay,inView])
+
  const data=live.data,agenda=homepageAgenda(data,now)
  const preferences=schedulePreferences(data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===data.account.id)?.data)
  const limit=preferences.homeScheduleCount
@@ -63,7 +57,7 @@ export function CampusWindowHome(){
  const morePath=tab==='活动'||tab==='推荐'?'/v2/activities':tab==='社团'?'/v2/organizations':'/v2/community'
  return <div className="ref-page campus-home community-home">
   <section className="campus-home-hero" ref={hero} aria-label={uiText('校园窗口')}>
-   <div className="home-hero-scene" aria-hidden="true">{scenes.map((item,index)=><img key={item.image} src={item.image} alt="" decoding="async" fetchPriority={index===0?'high':'low'} className={index===slide?'is-active':''}/>)}</div>
+   <CampusHeroGallery autoplay={!device.reducedMotion&&device.preferences.photoAutoplay&&inView}/>
    <header className="campus-home-header"><h1>{uiText('会同里')}</h1><nav aria-label={uiText('首页工具')}><Link className="home-ai-tool" to="/v2/ai" aria-label={uiText('校园 AI')}><Sparkles size={19}/></Link><StudentUtilities notificationsOnly/></nav></header>
    <div className="home-explore-heading"><h2>{uiText('探索校园生活')}<br/>{uiText('遇见有趣的同学')}</h2></div>
   </section>
