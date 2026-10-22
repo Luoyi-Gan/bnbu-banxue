@@ -1,0 +1,348 @@
+[
+  {
+    "label": "detail-before",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 26.707589030265808,
+          "height": 25.993303298950195,
+          "left": 149.2857208251953,
+          "right": 229.2857208251953,
+          "top": 0.7142857313156128,
+          "width": 80,
+          "x": 149.2857208251953,
+          "y": 0.7142857313156128
+        },
+        "height": 852.1428833007812,
+        "kind": "note-detail",
+        "offset": "",
+        "snap": "",
+        "state": null,
+        "top": 0
+      }
+    ],
+    "phase": null,
+    "result": "skipped",
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5"
+  },
+  {
+    "label": "detail-short-release",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 46.06242752075195,
+          "height": 25.99330139160156,
+          "left": 149.2857208251953,
+          "right": 229.2857208251953,
+          "top": 20.06912612915039,
+          "width": 80,
+          "x": 149.2857208251953,
+          "y": 20.06912612915039
+        },
+        "height": 852.1428833007812,
+        "kind": "note-detail",
+        "offset": "19.35483960281674px",
+        "snap": "",
+        "state": "settling",
+        "top": 19.354839324951172
+      }
+    ],
+    "phase": null,
+    "result": "skipped",
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5"
+  },
+  {
+    "label": "detail-short-settled",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 26.707589030265808,
+          "height": 25.993303298950195,
+          "left": 149.2857208251953,
+          "right": 229.2857208251953,
+          "top": 0.7142857313156128,
+          "width": 80,
+          "x": 149.2857208251953,
+          "y": 0.7142857313156128
+        },
+        "height": 852.1428833007812,
+        "kind": "note-detail",
+        "offset": "0px",
+        "snap": "",
+        "state": null,
+        "top": 0
+      }
+    ],
+    "phase": null,
+    "result": "skipped",
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5"
+  },
+  {
+    "label": "detail-long-return",
+    "motion": "normal",
+    "overflow": "",
+    "panels": [],
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "map-select",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 347.3995532989502,
+          "height": 25.993303298950195,
+          "left": 151.7857208251953,
+          "right": 231.7857208251953,
+          "top": 321.40625,
+          "width": 80,
+          "x": 151.7857208251953,
+          "y": 321.40625
+        },
+        "height": 383.4598388671875,
+        "kind": "v2-explorer-panel has-selection",
+        "offset": "",
+        "snap": "",
+        "state": null,
+        "top": 310.6919860839844
+      }
+    ],
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/campus/explore"
+  },
+  {
+    "label": "map-up-release",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 203.4040241241455,
+          "height": 25.993303298950195,
+          "left": 151.7857208251953,
+          "right": 231.7857208251953,
+          "top": 177.4107208251953,
+          "width": 80,
+          "x": 151.7857208251953,
+          "y": 177.4107208251953
+        },
+        "height": 527.4553833007812,
+        "kind": "v2-explorer-panel has-selection",
+        "offset": "",
+        "snap": "527.4598388671875px",
+        "state": "settling",
+        "top": 166.69642639160156
+      }
+    ],
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/campus/explore"
+  },
+  {
+    "label": "map-expanded",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 104.86607551574708,
+          "height": 25.993303298950195,
+          "left": 151.7857208251953,
+          "right": 231.7857208251953,
+          "top": 78.87277221679688,
+          "width": 80,
+          "x": 151.7857208251953,
+          "y": 78.87277221679688
+        },
+        "height": 625.9933471679688,
+        "kind": "v2-explorer-panel has-selection",
+        "offset": "",
+        "snap": "626px",
+        "state": null,
+        "top": 68.15848541259766
+      }
+    ],
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/campus/explore"
+  },
+  {
+    "label": "map-middle",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 342.7455310821533,
+          "height": 25.993303298950195,
+          "left": 151.7857208251953,
+          "right": 231.7857208251953,
+          "top": 316.7522277832031,
+          "width": 80,
+          "x": 151.7857208251953,
+          "y": 316.7522277832031
+        },
+        "height": 388.1138610839844,
+        "kind": "v2-explorer-panel has-selection",
+        "offset": "",
+        "snap": "388.12px",
+        "state": null,
+        "top": 306.0379638671875
+      }
+    ],
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/campus/explore"
+  },
+  {
+    "label": "map-click-expand",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 100.87053871154784,
+          "height": 25.993303298950195,
+          "left": 151.7857208251953,
+          "right": 231.7857208251953,
+          "top": 74.87723541259766,
+          "width": 80,
+          "x": 151.7857208251953,
+          "y": 74.87723541259766
+        },
+        "height": 625.9933471679688,
+        "kind": "v2-explorer-panel has-selection",
+        "offset": "",
+        "snap": "626px",
+        "state": null,
+        "top": 68.15848541259766
+      }
+    ],
+    "phase": null,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/campus/explore"
+  },
+  {
+    "label": "detail-reduced-before",
+    "motion": "reduce",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 26.707589030265808,
+          "height": 25.993303298950195,
+          "left": 149.2857208251953,
+          "right": 229.2857208251953,
+          "top": 0.7142857313156128,
+          "width": 80,
+          "x": 149.2857208251953,
+          "y": 0.7142857313156128
+        },
+        "height": 852.1428833007812,
+        "kind": "note-detail",
+        "offset": "",
+        "snap": "",
+        "state": null,
+        "top": 0
+      }
+    ],
+    "phase": null,
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5"
+  },
+  {
+    "label": "detail-reduced-short",
+    "motion": "reduce",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 26.707589030265808,
+          "height": 25.993303298950195,
+          "left": 149.2857208251953,
+          "right": 229.2857208251953,
+          "top": 0.7142857313156128,
+          "width": 80,
+          "x": 149.2857208251953,
+          "y": 0.7142857313156128
+        },
+        "height": 852.1428833007812,
+        "kind": "note-detail",
+        "offset": "0px",
+        "snap": "",
+        "state": null,
+        "top": 0
+      }
+    ],
+    "phase": null,
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5"
+  },
+  {
+    "label": "detail-reduced-return",
+    "motion": "reduce",
+    "overflow": "",
+    "panels": [],
+    "phase": null,
+    "result": "direct",
+    "scroll": 0,
+    "url": "/v2/activities"
+  },
+  {
+    "label": "map-reduced-initial",
+    "motion": "reduce",
+    "overflow": "hidden",
+    "panels": [],
+    "phase": null,
+    "scroll": 0,
+    "url": "/v2/campus/explore?place=%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E4%B8%AD%E5%BF%83"
+  },
+  {
+    "label": "map-reduced-snap",
+    "motion": "reduce",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "grip": {
+          "bottom": 104.86607551574708,
+          "height": 25.993303298950195,
+          "left": 151.7857208251953,
+          "right": 231.7857208251953,
+          "top": 78.87277221679688,
+          "width": 80,
+          "x": 151.7857208251953,
+          "y": 78.87277221679688
+        },
+        "height": 625.9933471679688,
+        "kind": "v2-explorer-panel has-selection",
+        "offset": "",
+        "snap": "626px",
+        "state": null,
+        "top": 68.15848541259766
+      }
+    ],
+    "phase": null,
+    "result": "direct",
+    "scroll": 0,
+    "url": "/v2/campus/explore?place=%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90%E4%B8%AD%E5%BF%83"
+  }
+]

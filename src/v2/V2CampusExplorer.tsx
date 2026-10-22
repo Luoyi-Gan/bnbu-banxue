@@ -1,4 +1,5 @@
 import {sharedElementTransition} from './sharedElementMotion'
+import {usePanelGesture} from './usePanelGesture'
 import {AnimatePresence,motion} from 'motion/react'
 import {useDevicePreferences} from './devicePreferences'
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
@@ -60,6 +61,9 @@ function InteractiveCampus({ mode, initialTarget=null, place='', onPick, onClose
   const [dockOpen,setDockOpen]=useState(false)
   const [routeOpen,setRouteOpen]=useState(false)
   const [routeDestination,setRouteDestination]=useState('')
+  const placePanel=useRef<HTMLElement>(null)
+  const dismissPlace=()=>sharedElementTransition('campus-place',()=>{setSelected(null);scene.current?.dismissDetails()},{reverse:true})
+  usePanelGesture(placePanel,mode==='explore'&&!!selected&&!routeOpen,reducedMotion,'resize',dismissPlace,selected?.id)
   const layoutHost=useRef<HTMLDivElement>(null)
   useEffect(()=>{
     if(mode!=='explore'||status!=='ready'||!layoutHost.current)return
@@ -135,8 +139,8 @@ function InteractiveCampus({ mode, initialTarget=null, place='', onPick, onClose
         {!dockOpen&&!['idle','located'].includes(position.state)&&<p className="map-p0-position-note" role="status">{uiText(locationMessages[position.state])}</p>}
       </section>
     </>}
-    <AnimatePresence initial={false}>{!routeOpen&&(mode === 'pick' || selected || status === 'error') && <motion.aside key="place-details" data-shared-target="campus-place" data-place-id={selected?.id} initial={mode==='explore'?false:{opacity:0,y:reducedMotion?0:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:reducedMotion?0:8,pointerEvents:'none'}} transition={{duration:reducedMotion?0:.22,ease:[.2,.8,.2,1]}} onAnimationComplete={()=>scene.current?.layout()} className={`v2-explorer-panel${selected ? ' has-selection' : ''}`}>
-      {mode === 'explore' && selected && <button type="button" className="v2-explorer-close" aria-label={uiText('关闭地点详情')} onClick={() => sharedElementTransition('campus-place',()=>{setSelected(null);scene.current?.dismissDetails()},{reverse:true})}><X size={20}/></button>}
+    <AnimatePresence initial={false}>{!routeOpen&&(mode === 'pick' || selected || status === 'error') && <motion.aside ref={placePanel} key="place-details" data-shared-target="campus-place" data-place-id={selected?.id} initial={mode==='explore'?false:{opacity:0,y:reducedMotion?0:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:reducedMotion?0:8,pointerEvents:'none'}} transition={{duration:reducedMotion?0:.22,ease:[.2,.8,.2,1]}} onAnimationComplete={()=>scene.current?.layout()} className={`v2-explorer-panel${selected ? ' has-selection' : ''}`}>
+      {mode === 'explore' && selected && <><button type="button" className="panel-gesture-grip" data-panel-grip aria-label={uiText('切换地点面板高度，或上下拖动')}/><button type="button" className="v2-explorer-close" aria-label={uiText('关闭地点详情')} onClick={dismissPlace}><X size={20}/></button></>}
       <div className="v2-explorer-panel-head"><div><span className="v2-eyebrow">{mode === 'pick'?'SELECT A BUILDING':'EXPLORE BNBU'}</span><h2>{mode === 'pick'?uiText('选择校内地点'):uiText('校园探索')}</h2><p>{mode === 'pick'?uiText('点击地图上的楼栋，确认后带入地点。'):uiText('点击楼栋，查看这里计划中的活动与组队。')}</p></div>{mode === 'pick' && <button ref={closeButton} type="button" className="v2-explorer-close" aria-label={uiText("关闭地图")} onClick={onClose}><X size={20}/></button>}</div>
       <label className="v2-explorer-select">{uiText("楼栋列表")}<select value={selected?.id ?? ''} onChange={(event) => { if (status === 'ready') scene.current?.focus(event.target.value); else setSelected(buildings.find((item) => item.id === event.target.value) ?? null) }} disabled={status === 'loading'}><option value="">{uiText("选择楼栋")}</option>{buildings.filter((item) => !item.name.startsWith('未命名')).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       {selected?<div className="v2-explorer-selection" key={selected.id}>{mode==='explore'?<CampusBuildingDetails building={selected} info={buildingInfo[selected.id]} onDirections={()=>openRoutes(selected.id)}/>:<div className="v2-explorer-building"><span><LocateFixed size={21}/></span><div><small>{uiText("当前楼栋")}</small><strong>{selected.name}</strong></div></div>}{mode === 'pick' ? <p>{uiText("楼栋级定位。具体入口与集合点可在详细说明中补充。")}</p> : <>{live.error ? <p role="alert" className="v2-explorer-empty">{uiText(live.error)}</p> : !live.data ? <p role="status">{uiText("正在读取活动与组队…")}</p> : <><BuildingActivities items={liveActivities(live.data)} buildingId={selected.id}/>{scheduled.length > 0 && <><div className="v2-explorer-section-title"><strong>{uiText("正在组队")}</strong><small>{scheduled.length} {uiText("项")}</small></div><div className="v2-explorer-events">{scheduled.map((item) => <Link key={`${item.kind}-${item.id}`} to={item.path}><span>{item.kind}</span><strong>{item.title}</strong><small><CalendarDays size={13}/>{item.when} · {item.place}</small><ArrowRight size={16}/></Link>)}</div></>}</>}</>}</div>:<div className="v2-explorer-intro"><MapPin size={27}/><strong>{uiText("从一栋楼开始探索")}</strong><p>{uiText("在地图上点选楼栋，或从列表中选择。")}</p></div>}

@@ -1,4 +1,6 @@
 import {sharedElementTransition} from './sharedElementMotion'
+import {usePanelGesture} from './usePanelGesture'
+import {useDevicePreferences} from './devicePreferences'
 import { X } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
@@ -8,6 +10,7 @@ import './discoveryDetail.css'
 /** Reading surface shared by activities, community posts and alumni stories. */
 export function DiscoveryDetail({title,identity,media,children,actions,onClose,transitionKey}:{transitionKey?:string;title:string;identity:ReactNode;media?:ReactNode;children:ReactNode;actions?:ReactNode;onClose:()=>void}){
   useUiLanguage()
+  const {reducedMotion}=useDevicePreferences()
   const panel=useRef<HTMLElement>(null),close=useRef<HTMLButtonElement>(null),closeCallback=useRef(onClose)
   const reading=useRef<HTMLDivElement>(null),scrollFrame=useRef(0)
   const [scrolled,setScrolled]=useState(false)
@@ -21,6 +24,7 @@ export function DiscoveryDetail({title,identity,media,children,actions,onClose,t
   }
   useEffect(()=>()=>cancelAnimationFrame(scrollFrame.current),[])
   const dismiss=()=>{if(transitionKey)sharedElementTransition(transitionKey,onClose,{reverse:true});else onClose()}
+  usePanelGesture(panel,true,reducedMotion,'dismiss',dismiss)
   useEffect(()=>{closeCallback.current=dismiss})
   useEffect(()=>{
     const previous=document.activeElement,overflow=document.body.style.overflow
@@ -48,7 +52,7 @@ export function DiscoveryDetail({title,identity,media,children,actions,onClose,t
   return createPortal(<div className="v2-drawer-layer note-detail-layer">
     <button type="button" className="note-detail-scrim" tabIndex={-1} aria-label={uiText('关闭详情')} onClick={dismiss}/>
     <section className={`note-detail${media?'':' note-detail-text'}`} data-reading-kind={transitionKey?.split(':')[0]??'story'} data-reading-scrolled={scrolled||undefined} role="dialog" aria-modal="true" aria-label={title} ref={panel}>
-      <header className="note-detail-header">{identity}<button type="button" ref={close} className="note-detail-close" aria-label={uiText('关闭')} onClick={dismiss}><X size={22}/></button></header>
+      <header className="note-detail-header"><button type="button" className="panel-gesture-grip" data-panel-grip aria-label={uiText('收起详情，或向下拖动')}/>{identity}<button type="button" ref={close} className="note-detail-close" aria-label={uiText('关闭')} onClick={dismiss}><X size={22}/></button></header>
       <div className="note-detail-scroll" ref={reading} onScrollCapture={updateReadingEdge}>{media&&<div className="note-detail-media" data-shared-target={transitionKey}>{media}</div>}<article className="note-detail-body"><h2 className="note-detail-title">{title}</h2>{children}</article></div>
       {actions&&<footer className="note-detail-actions">{actions}</footer>}
     </section>

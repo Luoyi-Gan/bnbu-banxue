@@ -1,7 +1,19 @@
 import {describe,expect,it} from 'vitest'
-import {resistedSheetOffset,shouldDismissSheet} from './sheetGesture'
+import {resistedSheetOffset,shouldDismissSheet,sheetDetent,resistedSheetHeight} from './sheetGesture'
 
 describe('sheet drag decisions',()=>{
+ it('snaps slow drags by position and fast flicks in their direction',()=>{
+  const stops=[220,400,650]
+  expect(sheetDetent(390,0,stops)).toBe(400)
+  expect(sheetDetent(390,1,stops)).toBe(220)
+  expect(sheetDetent(390,-1,stops)).toBe(650)
+  expect(sheetDetent(100,-20,stops)).toBe(400)
+ })
+ it('resists pulling beyond the smallest and largest detents',()=>{
+  expect(resistedSheetHeight(400,220,650)).toBe(400)
+  expect(resistedSheetHeight(120,220,650)).toBe(204)
+  expect(resistedSheetHeight(750,220,650)).toBe(666)
+ })
  it('clamps upward pulls and increases resistance over longer distances',()=>{
   expect(resistedSheetOffset(-30)).toBe(0)
   expect(resistedSheetOffset(0)).toBe(0)
