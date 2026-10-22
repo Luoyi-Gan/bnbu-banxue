@@ -2,13 +2,14 @@ export interface PersonalLearningItem {
   id:string;version:number;title:string;type:'deadline'|'repeat'|'exam';course:string;location:string;
   startAt:string;endAt:string;weekday:number;startTime:string;endTime:string;from:string;until:string;
   reminderMinutes:number;done:boolean;paused:boolean;
+  source?:'ispace';schoolEventId?:number;
 }
 export interface LearningCourse {id:number;name:string;shortname:string}
-export interface LearningEvent {id:number;title:string;startAt:string;course:string;type:string}
+export interface LearningEvent {id:number;title:string;startAt:string;course:string;type:string;deadline?:boolean}
 export interface LearningMaterial {id:string;courseId:number;section:string;name:string;mime:string;size:number}
 export interface LearningPage {number:number;text:string}
 export interface LearningStatus {connected:boolean;schoolAvailable:boolean;name?:string;expiresAt?:number}
-export interface LearningOverview {status:LearningStatus;items:PersonalLearningItem[];courses:LearningCourse[];events:LearningEvent[];syncedAt?:string;warnings:string[];classReminderEnabled:boolean}
+export interface LearningOverview {status:LearningStatus;items:PersonalLearningItem[];courses:LearningCourse[];events:LearningEvent[];syncedAt?:string;warnings:string[];classReminderEnabled:boolean;materials?:Record<string,LearningMaterial[]>;sync?:{state:'syncing'|'complete'|'partial';mis:'pending'|'success'|'error';misLessons?:number;misSemester?:string}}
 
 /** Shanghai calendar, independent of the browser/device timezone. */
 export function personalOccurrences(items:PersonalLearningItem[],now=Date.now(),days=60){

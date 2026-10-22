@@ -19,7 +19,7 @@ await build({
       formats: ["es"],
       fileName: () => "backend.mjs",
     },
-    rollupOptions: { external: [/^node:/, 'imapflow', 'mailparser', 'tencentcloud-sdk-nodejs-ocr', 'pdfjs-dist/legacy/build/pdf.mjs'] },
+    rollupOptions: { external: [/^node:/, 'imapflow', 'mailparser', 'tencentcloud-sdk-nodejs-ocr', 'pdfjs-dist/legacy/build/pdf.mjs', 'cheerio', 'tough-cookie', 'sm-crypto'] },
   },
 });
 const { startBackend } = await import(

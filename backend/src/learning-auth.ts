@@ -1,14 +1,15 @@
 import {randomBytes,randomInt} from 'node:crypto';
-import {account,demand,digest,encodePassword,normalizeEmail,ServiceError,timestamp,type AccountRow} from './auth';
+import {account,demand,digest,encodePassword,normalizeEmail,ServiceError,timestamp,type AccountRow,type Account} from './auth';
 import {deliverMessage} from './mail-delivery';
 import {learningEntity,type LearningSql,type LearningStore} from './learning-store';
 import {ISpace} from './ispace';
-import type {LearningCourse,LearningEvent} from '../../shared/v2/learning';
+import type {LearningCourse,LearningEvent,LearningMaterial,LearningOverview} from '../../shared/v2/learning';
 
 type SchoolIdentity=Awaited<ReturnType<ISpace['login']>>;
-type SchoolSession=SchoolIdentity&{ownerId:string;expiresAt:number;courses?:LearningCourse[];events?:LearningEvent[];syncedAt?:string};
+export type SchoolSession=SchoolIdentity&{ownerId:string;expiresAt:number;courses?:LearningCourse[];events?:LearningEvent[];syncedAt?:string;materials?:Record<string,LearningMaterial[]>;warnings?:string[];sync?:LearningOverview['sync']};
 export class LearningAuth {
   private readonly sessions=new Map<string,SchoolSession>();
+  onSchoolLogin?: (actor:Account,token:string,username:string,password:string)=>Promise<void>;
   constructor(readonly store:LearningStore,readonly school=new ISpace()){}
   private cleanup(){const now=Date.now();for(const[key,value]of this.sessions)if(value.expiresAt<=now)this.sessions.delete(key);}
   current(token:string,ownerId:string){this.cleanup();const session=this.sessions.get(digest(token));return session?.ownerId===ownerId?session:undefined;}
@@ -103,6 +104,8 @@ export class LearningAuth {
       if(!link)await learningEntity(sql,'schoolLink',row.id,{subject:String(identity.userId),source:'ispace-school-login'},`ispace-link:${identity.userId}`);
       return this.session(sql,row);
     });
-    this.sessions.set(digest(result.token),{...identity,ownerId:result.account.id,expiresAt:Date.now()+43200000});return {authenticated:true,...result};
+    this.sessions.set(digest(result.token),{...identity,ownerId:result.account.id,expiresAt:Date.now()+43200000});
+    if(this.onSchoolLogin)await this.onSchoolLogin(result.account,result.token,username.trim(),password);
+    return {authenticated:true,...result};
   }
 }

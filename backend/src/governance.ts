@@ -291,7 +291,7 @@ export function* governancePolicy(
     student(actor);
     const table = (yield* effect(repo.all("timetable"))).find((t) => t.ownerId === actor.id);
     const lessons = parseTimetableResponse({ lessons: input.lessons });
-    const data = { lessons, fileName: textField(input, "fileName", 255, true), importedAt: timestamp() };
+    const data = { lessons, fileName: textField(input, "fileName", 255, true), importedAt: timestamp(), source: "manual" };
     return table
       ? (yield* effect(repo.save(table, data)))
       : (yield* effect(repo.create("timetable", actor.id, data)));

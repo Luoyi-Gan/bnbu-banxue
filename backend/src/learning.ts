@@ -3,10 +3,12 @@ import {demand,digest,timestamp,type Account} from './auth';
 import {LearningAuth} from './learning-auth';
 import {learningEntity,type LearningSql} from './learning-store';
 import {list,object,plain} from './ispace';
-import type {LearningOverview,LearningMaterial,LearningPage,PersonalLearningItem} from '../../shared/v2/learning';
+import type {LearningOverview,LearningPage,PersonalLearningItem} from '../../shared/v2/learning';
 import {personalOccurrences} from '../../shared/v2/learning';
 import {timetableSchedule} from '../../src/v2/timetableSchedule';
 import {schedulePreferences} from '../../shared/v2/schedulePreferences';
+import {SchoolSync,courseMaterials} from './school-sync';
+import type {MisTimetable} from './mis';
 type Fields=Record<string,unknown>;
 type ItemRow={id:string;data:string;version:number};
 const text=(value:unknown,max=200)=>{demand(typeof value==='string'&&value.trim().length<=max,'文字格式或长度无效。');return value.trim();};
@@ -52,12 +54,16 @@ export async function readDocument(bytes:Buffer,name:string){
   sections.forEach((page,index)=>pages.push({number:index+1,text:page}));return {name,mime:'text/plain',pages,base64:''};
 }
 export class LearningService {
-  constructor(readonly auth:LearningAuth){}
+  readonly schoolSync:SchoolSync;
+  constructor(readonly auth:LearningAuth,options:{mis?:(username:string,password:string)=>Promise<MisTimetable>}={}){
+    this.schoolSync=new SchoolSync(auth,options.mis);
+    auth.onSchoolLogin=async(actor,token,username,password)=>{await this.schoolSync.sync(actor,token,{username,password});};
+  }
   private access(actor:Account){demand(actor.status!=='banned'&&actor.roles.includes('student'),'需要有效学生身份。',403);}
   async overview(actor:Account,token:string):Promise<LearningOverview>{
     this.access(actor);const session=this.auth.current(token,actor.id);
     const own=await this.auth.store.transaction(actor.id,async sql=>({items:await ownItems(sql,actor.id),settings:(await sql.rows<{data:string}>("SELECT data FROM entities WHERE kind='learningPreferences' AND owner_id=?",[actor.id]))[0]}));
-    return {status:{connected:!!session,schoolAvailable:true,name:session?.name,expiresAt:session?.expiresAt},items:own.items,courses:session?.courses??[],events:session?.events??[],syncedAt:session?.syncedAt,warnings:[],classReminderEnabled:own.settings?JSON.parse(own.settings.data).classReminderEnabled===true:false};
+    return {status:{connected:!!session,schoolAvailable:true,name:session?.name,expiresAt:session?.expiresAt},items:own.items,courses:session?.courses??[],events:session?.events??[],syncedAt:session?.syncedAt,warnings:session?.warnings??[],materials:session?.materials??{},sync:session?.sync,classReminderEnabled:own.settings?JSON.parse(own.settings.data).classReminderEnabled===true:false};
   }
   async operation(actor:Account,token:string,operation:string,input:Fields){
     this.access(actor);
@@ -81,6 +87,7 @@ export class LearningService {
         demand(existing,'安排不存在。',404);await sql.rows("DELETE FROM entities WHERE id=? AND kind='learningItem' AND owner_id=?",[existing.id,actor.id]);return done();
       }
       const value=validatePersonalItem(input);
+      if(existing?.source==='ispace')Object.assign(value,{source:'ispace',schoolEventId:existing.schoolEventId});
       if(existing)await sql.rows('UPDATE entities SET data=?,version=version+1,updated_at=? WHERE id=? AND owner_id=?',[JSON.stringify(value),timestamp(),existing.id,actor.id]);
       else {demand(items.length<200,'最多保存 200 项安排。');await learningEntity(sql,'learningItem',actor.id,value);}
       return done();
@@ -129,16 +136,7 @@ export class LearningService {
       return this.ask(doc.pages,input);
     }
     const session=this.auth.current(token,actor.id);demand(session,'请使用学校账号登录后连接 iSpace。',403);
-    if(operation==='sync'){
-      const courses=await this.auth.school.courses(session.token,session.userId);
-      let events:LearningOverview['events']=[];const warnings:string[]=[];
-      try{
-        const data=object(await this.auth.school.call(session.token,'core_calendar_get_calendar_upcoming_view'));
-        events=list(data.events).filter(e=>Number(e.timestart)>0).map(e=>({id:Number(e.id),title:plain(e.name),startAt:new Date(Number(e.timestart)*1000).toISOString(),course:plain(object(e.course).fullname),type:String(e.modulename??e.eventtype??'calendar')}));
-      }catch{warnings.push('iSpace 未开放日历，DDL 未能同步，请前往学校网站核对。');}
-      session.courses=courses.map(c=>({id:Number(c.id),name:plain(c.fullname),shortname:plain(c.shortname)}));session.events=events;session.syncedAt=timestamp();
-      return {courses:session.courses,events,warnings,syncedAt:session.syncedAt};
-    }
+    if(operation==='sync')return this.schoolSync.sync(actor,token);
     const courseId=Number(input.courseId);demand(Number.isSafeInteger(courseId)&&courseId>0,'课程标识无效。');
     await this.auth.school.enrolled(session.token,session.userId,courseId);
     if(operation==='grades'){
@@ -147,11 +145,7 @@ export class LearningService {
     }
     if(operation==='materials'||operation==='material.read'||operation==='material.ask'){
       const sections=list(await this.auth.school.call(session.token,'core_course_get_contents',{courseid:String(courseId)}));
-      const resources:(LearningMaterial&{url:string})[]=[];
-      for(const section of sections)for(const mod of list(section.modules))for(const file of list(mod.contents)){
-        if(file.type!=='file'||typeof file.fileurl!=='string')continue;
-        resources.push({id:digest(file.fileurl),courseId,section:plain(section.name),name:plain(file.filename),mime:String(file.mimetype??''),size:Number(file.filesize??0),url:file.fileurl});
-      }
+      const resources=courseMaterials(sections,courseId);
       if(operation==='materials')return {materials:resources.map(({url,...file})=>{void url;return file;})};
       const file=resources.find(r=>r.id===input.id);demand(file,'资料已变化，请重新读取列表。',404);
       const bytes=await this.auth.school.file(session.token,file.url),doc=await readDocument(bytes,file.name);

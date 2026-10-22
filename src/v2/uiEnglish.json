@@ -2291,5 +2291,16 @@
   "先连接学校账号，再同步课程，即可读取 iSpace 资料。": "Connect a school account, then sync courses to read iSpace materials.",
   "请先点击上方同步 iSpace，获取课程列表。": "Use Sync iSpace above to load your courses.",
   "同意将当前页文字与问题发送给 DeepSeek（API 单独计费）": "I agree to send this page text and my question to DeepSeek (API billed separately)",
-  "密码仅用于本次向 iSpace 验证；登录成功后自动关联学校邮箱。": "Your password is used only for this iSpace authentication. Successful school sign-in links your school email automatically."
+  "密码仅用于本次向 iSpace 验证；登录成功后自动关联学校邮箱。": "Your password is used only for this iSpace authentication. Successful school sign-in links your school email automatically.",
+  "登录后已自动同步": "Synced automatically after sign-in",
+  "部分同步待重试": "Some sources need another sign-in",
+  "MIS 时间表已接入我的课表": "MIS schedule is connected to My timetable",
+  "项课程时间": "class meetings",
+  "学校未返回课程": "No courses returned by the school",
+  "学校登录后自动读取当前日历范围，作业和测验截止事项自动加入个人 DDL。": "School sign-in automatically reads the available calendar range and adds assignment and quiz deadlines to your personal tasks.",
+  "已自动加入 DDL": "Added to deadlines automatically",
+  "学校在当前日历范围未返回事项；同步异常会显示在上方。": "The school returned no events in the current calendar range. Any sync issues appear above.",
+  "连接学校账号后，课程资料目录会自动显示。": "Course material lists appear automatically after school sign-in.",
+  "当前课程暂未返回文件资料；自动同步异常会显示在上方。": "No files were returned for this course. Any automatic sync issues appear above.",
+  "当前时间来自 MIS；手动修正会在下一次学校同步时按学校数据更新。": "These times come from MIS. Manual corrections are replaced by school data on the next school sync."
 }

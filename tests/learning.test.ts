@@ -27,7 +27,7 @@ function setup(schoolEmail='student@mail.bnbu.edu.cn'){
   if(String(url).includes('/pluginfile.php/'))return new Response('Study notes');
   return Response.json(value);
  });
- const auth=new LearningAuth(sqliteLearningStore(db),new ISpace(transport as typeof fetch)),service=new LearningService(auth);
+ const auth=new LearningAuth(sqliteLearningStore(db),new ISpace(transport as typeof fetch)),service=new LearningService(auth,{mis:async()=>({semester:'Semester 1 of 2026-2027',lessons:[{id:'mis-test',name:'数学',weekday:4,startTime:'10:00',endTime:'11:50',period:'',location:'T7-306',teacher:'教师',weeks:'1–14周',note:'MIS',needsReview:false}],courseCount:1})});
  const code=()=>String(db.prepare('SELECT body FROM mail_outbox ORDER BY created_at DESC LIMIT 1').get()!.body).match(/\d{6}/)![0];
  return {db,repo,actor,other,session,auth,service,transport,code};
 }
