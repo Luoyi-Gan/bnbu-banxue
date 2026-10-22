@@ -1,0 +1,6 @@
+.club-cover img{position:absolute;inset:0;display:block;width:100%;height:100%;min-height:0;object-position:50% 35%}
+.club-cover.is-poster img,.club-cover.is-detail img{object-fit:contain;object-position:center}
+.club-photo-source{display:grid;gap:5px;margin:0 0 18px;font-size:12px;color:var(--v2-muted);line-height:1.7}
+.club-photo-source a{display:flex;gap:4px;align-items:center;color:var(--v2-action)}
+.ref-org-cover{position:relative;overflow:hidden}
+.ref-org-cover img{position:absolute;inset:0;display:block;width:100%;height:100%;min-height:0;object-fit:cover;object-position:50% 35%;border-radius:inherit}

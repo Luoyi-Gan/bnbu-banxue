@@ -1,6 +1,6 @@
 {
   "sourceUrl": "https://sao.bnbu.edu.cn/students/interest_clubs/name_list.htm",
-  "checkedAt": "2026-10-22T11:18:20.776Z",
+  "checkedAt": "2026-10-22T11:39:22.667Z",
   "coverage": "学生事务处现行社团名单逐项收录；公开页面可能存在更新延迟，未列名组织不推断为在册。",
   "clubs": [
     {
@@ -15,7 +15,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/0acde41130a2322c.jpg",
+      "imageSource": {
+        "pageUrl": "https://bnbu.edu.cn/info/1077/14200.htm",
+        "pageTitle": "百团争鸣 | 别样青春，花young来袭-北师香港浸会大学",
+        "url": "https://bnbu.edu.cn/virtual_attach_file.vsb?afc=XUzf/VL7QkLR9ioKR-iM47snNLPLR-O8U4v4nN-bUNW7nzL0gihFp2hmCIa0Lkysoky8nkhkMlUZM8-DolWfoR78nlnfnlVRnmTkU8VRnlWFM4fkL8nfUmTFM4V2LlCJqjfjo4OeosrXCDMJgDTJQty0LzGsMYyPMR-aLkbw62x8c&oid=1678407622&tid=1077&nid=14200&e=.jpg",
+        "caption": "粤语社举办粤语歌手大赛",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "627265d2f9bce191913d3e591290157b7dcab5b2bb76f4630e7a11dac19c1637",
+        "bytes": 466719
+      }
     },
     {
       "name": "西语社",
@@ -29,7 +41,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/d967c119078b169f.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/4245.htm",
+        "pageTitle": "五大语言文化社团齐“安利”异国文化与美食-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=qLmCpDUzrRMzGinvzUDnmnRLm7DnzN6PU4GbnRVRUz7anRL0gihFp2hmCIa0U1yDn1h2Lky4L8r7o7nRUN7aLRNsnNl4nNlDolCaMlUDLNrFozviL8LDnNQFMlQRM4lJqjfjo4OeosrXCDMJgDTJQty0LzGsM1y8LmUigtA8pU_cc&oid=1678407622&tid=1076&nid=4245&e=.jpg",
+        "caption": "西语社在文化活动中准备的 Tapas",
+        "year": 2019,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "60c9fa30b8316c4a2abc564c62ff05d07da8b8c561fd9e9da6016bd53101da9d",
+        "bytes": 392309
+      }
     },
     {
       "name": "投资与研究协会",
@@ -43,7 +67,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "法语社",
@@ -57,7 +82,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/0c1c0aba9e01e74c.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/4245.htm",
+        "pageTitle": "五大语言文化社团齐“安利”异国文化与美食-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=qLR9p8U874LN7PMv4MkoRNZnN7bUNl6ZoRGsnm-ZnznfM8l0gihFp2hmCIa0MYyaLYyDokyDMNLaLNlPnm-DolQ2L7WRLl7sL4NDMmlanmWFLzAVL8l8LR6FMmGsM4UJqjfjo4OeosrXCDMJgDTJQty0LzGsM1y8LmUigtA8pU_cc&oid=1678407622&tid=1076&nid=4245&e=.jpg",
+        "caption": "法语社文化体验活动",
+        "year": 2019,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "f08fd7da693c6b49b2ca07db6da4e3108accf2c551dcd521a69bda4021a9822d",
+        "bytes": 395124
+      }
     },
     {
       "name": "PPT社",
@@ -71,7 +108,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "心理健康协会",
@@ -85,7 +123,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/6224a32df7f35874.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1077/13899.htm",
+        "pageTitle": "亦师亦友，这样的师生关系令人好羡慕！-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=wMRvXDU47boz-8U/z9iL8CbLRrRUl7KbUlL8MRUPnlliol70gihFp2hmCIa0okh2LYyZokhfLzLPolLbMNnVLmW7LzfRnN-sLmlDLm-8oRfFUzWRUzGiLzAFLz7PMN7Jqjfjo4OeosrXCDMJgDTJQty0LzGsMYyPL49boSbw62O8c&oid=1678407622&tid=1077&nid=13899&e=.jpg",
+        "caption": "心理健康协会举办的活动",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "8c82ad2e50cab4ae25a8fa3b0ac9362ca941774d9ceb9ef1838c51455ae0254e",
+        "bytes": 69994
+      }
     },
     {
       "name": "模拟联合国社团",
@@ -99,7 +149,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/252f020a4a8b305c.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/5861.htm",
+        "pageTitle": "【社团活动】社团联合招新  上演“百团大战”-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=nnNQS2Mz-iL7QVLzm-4Lm7YnlWfM8Wl7M7L4LzlsM7-aUzU0gihFp2hmCIa0MkybLSyDM1h2UmUaozGaL7rfnNn2UznVLRUbUzL4LNlsM8QFMRrkoRrkM4QFLllDLz-Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yioRCPgtA8pUrcc&oid=1678407622&tid=1076&nid=5861&e=.jpg",
+        "caption": "模拟联合国社团招新现场",
+        "year": 2016,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "9d41c848de4ca8003791db84f2f4edb76cddbebb6cba892c1473b12e8280bda8",
+        "bytes": 124434
+      }
     },
     {
       "name": "德意志语言文化交流社",
@@ -113,7 +175,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/b293416bf4acbdd8.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1077/13899.htm",
+        "pageTitle": "亦师亦友，这样的师生关系令人好羡慕！-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=wUznXRUz9ZozCZU/49aMllYU8nfU4lKPU47sMNnRMR-aU4v0gihFp2hmCIa0U1y4USyDokyPUNLboR9soz-ZnmLYU8lZL4-PLNCbM498UNnFnNU8L8MfL7MFLlUiLRCJqjfjo4OeosrXCDMJgDTJQty0LzGsMYyPL49boSbw62O8c&oid=1678407622&tid=1077&nid=13899&e=.jpg",
+        "caption": "德语社成员与老师一起制作土豆沙拉",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "1cdbbbd3b1504a13daefe5fb214d60d0ef6e8dc6fdac0c1fee4d8d2102b21c6e",
+        "bytes": 120070
+      }
     },
     {
       "name": "玄圃·国学与历史研讨社",
@@ -127,7 +201,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/464396bec2fb7045.jpg",
+      "imageSource": {
+        "pageUrl": "https://bnbu.edu.cn/info/1077/14200.htm",
+        "pageTitle": "百团争鸣 | 别样青春，花young来袭-北师香港浸会大学",
+        "url": "https://bnbu.edu.cn/virtual_attach_file.vsb?afc=XMR-/bL7Q7olW7oKR78nNCsnzAkL4vOPL4N4U4A2UNCYLmv0gihFp2hmCIa0Mky8MYhfoSysUzliUN-8LzlDLmNPU8QVMRr7Mz-4MmUin7WFLRffn7-ZnmnFMR7ZL4-Jqjfjo4OeosrXCDMJgDTJQty0LzGsMYyPMR-aLkbw62x8c&oid=1678407622&tid=1077&nid=14200&e=.jpg",
+        "caption": "玄圃举办首届诗词大会",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "768b045e9154c04274aeab92833562840f8732ba610e442b1b5fbde9a113bc48",
+        "bytes": 268338
+      }
     },
     {
       "name": "天文协会",
@@ -141,7 +227,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "日本文化交流社",
@@ -155,7 +242,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/90bca934bdb700b7.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/4245.htm",
+        "pageTitle": "五大语言文化社团齐“安利”异国文化与美食-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=qLRGp4M4f7LmCiLvmNaM77ZMmnRnN-6Znz94M7M2UlrVMNC0gihFp2hmCIa0MShfoSyZn1hVMNLDU4ARoz7iMzNiU8lbMln7nRMVnR9YnzVFM7-4oR6fnlnFoRG8oRCJqjfjo4OeosrXCDMJgDTJQty0LzGsM1y8LmUigtA8pU_cc&oid=1678407622&tid=1076&nid=4245&e=.jpg",
+        "caption": "日本文化交流社面具制作活动",
+        "year": 2019,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "b7edb72701e6ff9c9972b85bcb7914a8345c70b17af92e6594f482ab5b6e4520",
+        "bytes": 525446
+      }
     },
     {
       "name": "职业发展协会",
@@ -169,7 +268,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/6cec81ed2ba629c2.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1077/4077.htm",
+        "pageTitle": "活动“云”开展，社团生活不掉线-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=ML4CoaUmLbM8QkMuRMfoRGsM4QfUmCU4L4N8ozV2oz-inNl0gihFp2hmCIa0MYy8MSyYUYhRozQ7M4UYMm-PUmv8UzQ7nlCbM4WRoz-4nNQFU8VRMNMVLRQFLm9boRLJqjfjo4OeosrXCDMJgDTJQty0LzGsMYy8LRvsgtA8pUncc&oid=1678407622&tid=1077&nid=4077&e=.jpg",
+        "caption": "职业发展协会自媒体运营大赛海报",
+        "year": 2020,
+        "kind": "poster",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "c1a0604c0a7afab18f552c6451b530f0e26cb1f44f39ad760d81ec9b1438690b",
+        "bytes": 166275
+      }
     },
     {
       "name": "创行团队",
@@ -183,7 +294,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/60a4d7291f316032.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/14972.htm",
+        "pageTitle": "社企开放日 带你走进UIC学生社企-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=4Uml8sMRfkL7lYMiRvDoz7PozCZU49DioR-iLzA7UzUsLz70gihFp2hmCIa0L1hfLShkL1h2LzlbnmNDM8lbnzvPUmfVMmrfnllsolLanmAFL8l4n7lPM8QFLmvPLR9Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMRNsL1bw62s8c&oid=1678407622&tid=1076&nid=14972&e=.jpg",
+        "caption": "创行团队开展“皂起来”行动",
+        "year": 2014,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "02b25f4dff6795682875953f5734a2435fb07fea77b74d5a2b03cf20eaf5c322",
+        "bytes": 160008
+      }
     },
     {
       "name": "创野社",
@@ -197,7 +320,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/54d5992f36a14bd7.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/14972.htm",
+        "pageTitle": "社企开放日 带你走进UIC学生社企-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=4LRG84UN7bn77bMi4AVL7l4M4Canz7DPMz9YMRAfMm6VU4C0gihFp2hmCIa0UShfUSy8M1ybnRfVoRUYnz74UzG4Uzv4LNC4ozf2MRv4UNMFn7UsozA2MznFLmCaLzLJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMRNsL1bw62s8c&oid=1678407622&tid=1076&nid=14972&e=.jpg",
+        "caption": "创野社成员示范制作咖啡",
+        "year": 2014,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "1a632a35435e50e6658acdebbbd44b6b18cc571b4c2afcb443988f3bbe2afc97",
+        "bytes": 155667
+      }
     },
     {
       "name": "饮食文化社",
@@ -211,7 +346,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/00b2df46c603e2c1.jpg",
+      "imageSource": {
+        "pageUrl": "https://fhss.bnbu.edu.cn/info/1162/3439.htm",
+        "pageTitle": "【社团活动】学花样寿司 品日本文化——UIC日本寿司文化节举办-人文社科学院",
+        "url": "https://fhss.bnbu.edu.cn/virtual_attach_file.vsb?afc=aM87PsM4Nbo7lZnYRvPMl-4nR7sLlU44nN7PMR7aoRlZL4U0gihFp2hmCIa0MYybnSyYLSysMNlsLmWfMRT7oR98LN-DL7MkL7U8nR-bolrFMN-DL7CiL8rFLmlbozCJqjfjo4OeoDnwvsL0qIbtpYyPLzCYg4L8L4NJqd8nx&oid=1779726835&tid=1162&nid=3439&e=.jpg",
+        "caption": "饮食文化社主办的日本寿司文化节",
+        "year": null,
+        "kind": "activity",
+        "sourceLabel": "人文社科学院公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "c814dcb3df0117655a345ca9df808a176b54687a35839f9e93c5d7c5e6c35d3c",
+        "bytes": 154006
+      }
     },
     {
       "name": "播音主持协会",
@@ -225,7 +372,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "摄影与平面艺术社",
@@ -239,7 +387,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/d507ee98a55cabd8.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15189.htm",
+        "pageTitle": "学生社团争奇斗艳，招新现场熙来攘往-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8o7riVM4rknz7bMDRTkU4lDMzLaL4rsVU8LZU4NaoRQVnRU0gihFp2hmCIa0LYyboSyDnkysL4f2nR9DLRQfol-8nRGDMln2ol-4MR9DUmVFnlVVozMRL8QFLmVRoR-Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMz7ZoSbw62Z8c&oid=1678407622&tid=1076&nid=15189&e=.jpg",
+        "caption": "摄影与平面艺术社招新现场",
+        "year": 2013,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "4070135c0f1a93fc457a667eedc3a8f7692d20bf29b2f4b90e2b06f7c39751d4",
+        "bytes": 138370
+      }
     },
     {
       "name": "iMusic音乐社",
@@ -253,7 +413,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/d251a5416df26171.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/14314.htm",
+        "pageTitle": "来围观！UICer课余生活丰富有意义-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=mnl7NDnmLPnRMfLTRWfL49snz-Zn7-tZUl7inm9aL4TVMlL0gihFp2hmCIa0Mkh7MYyPM1hRLRT2nNrVLNMVnlMVLlVVL7CbLmW2MRlPMmQFUzTkUlUZoRfFMNWknRUJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMRLPMkbw62j8c&oid=1678407622&tid=1076&nid=14314&e=.jpg",
+        "caption": "iMusic音乐社成员在迎新晚会演出",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "cc890bd12df75e3a9e126ae932482e37d438a86319e01d2419931e624b8235b3",
+        "bytes": 441300
+      }
     },
     {
       "name": "UCCU动漫社",
@@ -267,7 +439,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/788a00eb54941272.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15189.htm",
+        "pageTitle": "学生社团争奇斗艳，招新现场熙来攘往-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8Um9iZU49soRQ2UDmQ7nmlYozTfMmWskM4L8M7UYnN7ZoR70gihFp2hmCIa0nSyPLSybn1ysnzUDUlCPU4QRnNr7M7LbUzQkU8UaM7CaLzfFo7lbM8W7LzTFLmLZL7LJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMz7ZoSbw62Z8c&oid=1678407622&tid=1076&nid=15189&e=.jpg",
+        "caption": "动漫社成员在招新现场",
+        "year": 2013,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "5a7bf7765ec76178f5c3f538325a225f7054e37cd0c7acc3e0443f6be1cb2fd4",
+        "bytes": 145420
+      }
     },
     {
       "name": "歌唱天堂",
@@ -281,7 +465,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/717db3295ef0b38d.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15189.htm",
+        "pageTitle": "学生社团争奇斗艳，招新现场熙来攘往-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8nl7ibnRNinmv4LDzrRL4L4UzliMmlsbLzG4LRGsnRlaLml0gihFp2hmCIa0MSy8oSyZLkhVoz9ZU4viU8Lbo7C8o7M7nmMRUmCsMmlsMzVFL49Dnz-sUmMFLm-iUmCJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMz7ZoSbw62Z8c&oid=1678407622&tid=1076&nid=15189&e=.jpg",
+        "caption": "歌唱天堂成员在招新现场答疑",
+        "year": 2013,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "5b48f2e45a49892ebe4c4af701f464299a752839649e36650675fe7e09632db4",
+        "bytes": 140726
+      }
     },
     {
       "name": "创意手工社",
@@ -295,7 +491,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/17ec4a74d7777218.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15189.htm",
+        "pageTitle": "学生社团争奇斗艳，招新现场熙来攘往-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8MmriRUzL8nNliLDR6RnRUan7V7LRGsiL8C8LzNaUl-4M7L0gihFp2hmCIa0oSh2oSyiUYybLz7iMNW7UmvaL8CZLz-YM4LZL7-PUlC8nm6FL7UaUllPLRWFLNVVUzUJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMz7ZoSbw62Z8c&oid=1678407622&tid=1076&nid=15189&e=.jpg",
+        "caption": "创意手工社现场手工制作",
+        "year": 2013,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "a371c55db1c7258be244fbf9250fcf2addac5e0b72ce4b71dd8add362c071373",
+        "bytes": 175780
+      }
     },
     {
       "name": "传统艺术文化体验社",
@@ -309,7 +517,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/8eec77e3f7423dd2.jpg",
+      "imageSource": {
+        "pageUrl": "https://sao.bnbu.edu.cn/info/1105/1119.htm",
+        "pageTitle": "活动回顾｜兴趣社团指导老师答谢会-学生事务处",
+        "url": "https://sao.bnbu.edu.cn/virtual_attach_file.vsb?afc=vLRL6iMRviMR-YL_zQkn77YU8Q7LRvFPMmU4Uz6RLRT2LRU0gihFp2hmCIa0U1ybUShfL1yiU4Giozr2nlUaM7MRM77iMRlDMR-ZLNnVLmAFLm-iLRv8nNQFLmCPUNLJqjfjo4OeosrXCih4CIy0qIbtpYyPLzGig47PLzNJqd9nx&oid=1974610644&tid=1105&nid=1119&e=.jpg",
+        "caption": "传统艺术文化体验社成员表演《上铃鼓》",
+        "year": 2023,
+        "kind": "activity",
+        "sourceLabel": "学生事务处公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "fceab89a700d6e8d74d22ba5d7450f9259f887c7b45d75d0352cdb49d567dbb6",
+        "bytes": 156092
+      }
     },
     {
       "name": "爱秀剧社",
@@ -323,7 +543,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/b2e516509ff14593.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15025.htm",
+        "pageTitle": "学生改编话剧《恋爱的犀牛》蜂鸟版于珠海大会堂首演-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8oRNiDnl7snNLbMD7r2nRQ7nm9YM8CsanNU4nlMfM8rVnz70gihFp2hmCIa0nkyDLYy8L1y4ozvbM4-8LlVRMzNYM8-aMm7an7lYMR7bM7rFMm74nzrVnmnFLlUZL4vJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMzGYMSbw62Z8c&oid=1678407622&tid=1076&nid=15025&e=.jpg",
+        "caption": "爱秀剧社成员演出《恋爱的犀牛》",
+        "year": 2014,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "1eff210197e24bcb67e5b115f2fa33fab0f12fae4d975ccc0eab515702674846",
+        "bytes": 120887
+      }
     },
     {
       "name": "爱乐者协会",
@@ -337,7 +569,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/9341e69e0691b40c.jpg",
+      "imageSource": {
+        "pageUrl": "https://sao.bnbu.edu.cn/info/1105/1119.htm",
+        "pageTitle": "活动回顾｜兴趣社团指导老师答谢会-学生事务处",
+        "url": "https://sao.bnbu.edu.cn/virtual_attach_file.vsb?afc=vLRN6bnR-8oz-an_mQfMzf7nm7iLm7FsMR9inz6fMm7snRl0gihFp2hmCIa0MYyinSybMkhfnmLsMR-Pn7QRMlUiU8nVUm7iL8MkMlUaolrFnR-iM8UPLNWFLmnko7-Jqjfjo4OeosrXCih4CIy0qIbtpYyPLzGig47PLzNJqd9nx&oid=1974610644&tid=1105&nid=1119&e=.jpg",
+        "caption": "爱乐者协会成员钢琴演奏",
+        "year": 2023,
+        "kind": "activity",
+        "sourceLabel": "学生事务处公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "2c2dc898da4614c6904c889262f8829701f6a71572ad98ca7635f1861ed3a2e5",
+        "bytes": 150411
+      }
     },
     {
       "name": "灯火美术社",
@@ -351,7 +595,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/2a0b95fe1888a141.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1447/14238.htm",
+        "pageTitle": "向快乐出发！假期归来的UICer收获了什么？-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=xUmLJDUzvYo77sL0mnfL4rRnzWfollasnm7iL7nVoRC8M4L0gihFp2hmCIa0M1yDoSyYMYyPM7rknlWVUNrRMzARozvYoRQfUmNaU8lsUzQFo7M2o7-YMlrFMzT2M7CJqjfjo4OeosrXCDMJgDTJQty0LzU8MYyPMR-4okbw62P8c&oid=1678407622&tid=1447&nid=14238&e=.jpg",
+        "caption": "灯火美术社在社区开展皮影戏表演",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "99ee1109a12addf1bd11e95978c6ecb68146bdf2372e32935a781faa5c32a402",
+        "bytes": 368463
+      }
     },
     {
       "name": "韩国文化交流社",
@@ -365,7 +621,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/6efcba555cdb21e8.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/4245.htm",
+        "pageTitle": "五大语言文化社团齐“安利”异国文化与美食-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=qM8UpPMl74nzviMvNLanR94MmTfL496YLRUPnmA7Um-4Lll0gihFp2hmCIa0LSyYMkyZLkyPM7C8MNCPozGsUln2L8MRolMVLmlsMz74UNWFMmv4LzLiMznFMN7iU8-Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1y8LmUigtA8pU_cc&oid=1678407622&tid=1076&nid=4245&e=.jpg",
+        "caption": "韩国文化交流社成员舞台表演",
+        "year": 2019,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "e299814e849173ce075315e7fbaf49d3564c2c0491553c620045f7332dffa898",
+        "bytes": 435659
+      }
     },
     {
       "name": "阿卡贝拉合唱社",
@@ -379,7 +647,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/83fc5aebd036e5f1.jpg",
+      "imageSource": {
+        "pageUrl": "https://bnbu.edu.cn/info/1079/13607.htm",
+        "pageTitle": "U秀 | 曹轶雯：从UIC一等荣誉学士到UCL一等荣誉硕士-北师香港浸会大学",
+        "url": "https://bnbu.edu.cn/virtual_attach_file.vsb?afc=FUm99aUzLYMlVVLARLZUN74ozfRL8-14UzUYM7U4nm-ZL470gihFp2hmCIa0MYy4MYyankybUzLPnzC4Um-YL774nmLDM8M2nR94nmQ2LzAFMlnVMmUZLNQFLlnVoRlJqjfjo4OeosrXCDMJgDTJQty0LzGsoSyPL4CaMYbw62m8c&oid=1678407622&tid=1079&nid=13607&e=.jpg",
+        "caption": "阿卡贝拉社团参加内地及香港中英文歌唱比赛",
+        "year": 2016,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "ce0bb3a02a9e1a104baf0bcaf564acc9e1eb07bd4c82247eb9578151083aa364",
+        "bytes": 122501
+      }
     },
     {
       "name": "魔术协会",
@@ -393,7 +673,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "经典映室",
@@ -407,7 +688,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "棒球社",
@@ -421,7 +703,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "啦啦队",
@@ -435,7 +718,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/e12aedf961ce0459.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/4839.htm",
+        "pageTitle": "社团招新上演百团大战，UICer齐聚各展所长-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=5MRnCknRv8L8Q2MQ8-aUmAVUmNbL4LqZnz9aLRNsL4V7nRL0gihFp2hmCIa0oSyPnShkMSybL47Pnmf7LNQRLlVVLNUsM7rfL4NYM8MRM7rFMNW2oRCZLzWFLm7ZLRCJqjfjo4OeosrXCDMJgDTJQty0LzGsM1y8oRLbgtA8pUpcc&oid=1678407622&tid=1076&nid=4839&e=.jpg",
+        "caption": "啦啦队在社团招新现场表演",
+        "year": 2018,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "a185d4e4cb9e29834db5b181364493f6fd6593ce980cedb7503b3dd0ef91d4ae",
+        "bytes": 137222
+      }
     },
     {
       "name": "弓道社",
@@ -449,7 +744,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/bbdd645cb4127210.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/6188.htm",
+        "pageTitle": "【社团活动】75个兴趣社及团体联合招新 种类丰富选择多-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=TMR7tDM4GDL4T2njm-8nNrfM8C8LRUw4L4A7ozf7LRG4Um70gihFp2hmCIa0MYybLkhknShfM49iLm9snmG8MRC4LRv4n7C8MmvbnRlbLmMFnmNbUzTVM7VFLm98UlUJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yDLz9ZgtA8pUXcc&oid=1678407622&tid=1076&nid=6188&e=.jpg",
+        "caption": "弓道社招新现场表演",
+        "year": 2015,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "914b5e7e6f1bfecfeded39ba37979ce9f3ddb87e532f18d8a7f7fd90ec0fde53",
+        "bytes": 165037
+      }
     },
     {
       "name": "剑道俱乐部",
@@ -463,7 +770,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/2e2d29c5955b4aa7.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15189.htm",
+        "pageTitle": "学生社团争奇斗艳，招新现场熙来攘往-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8UmMiknmG8LlrRnDmfVnRLZo7lPLm9siMz6VnzL8LNMknRN0gihFp2hmCIa0Mky4U1ysLYyZL77Yo7UbnzlZU8L8LzVkMmrVM774nlnVnm6FnmCPMR-4Uz6FLmvsU87Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMz7ZoSbw62Z8c&oid=1678407622&tid=1076&nid=15189&e=.jpg",
+        "caption": "剑道俱乐部成员展示剑道",
+        "year": 2013,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "88e0234ffd0a6f3fdb3f21c7836803d24f380f0dee74d7435a3d0d09b25285d9",
+        "bytes": 161738
+      }
     },
     {
       "name": "羽毛球协会",
@@ -477,7 +796,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "网球俱乐部",
@@ -491,7 +811,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "乒乓球协会",
@@ -505,7 +826,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "跆拳风之社",
@@ -519,7 +841,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/d9a4dd9775a1064d.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15189.htm",
+        "pageTitle": "学生社团争奇斗艳，招新现场熙来攘往-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8Mmvi8ozWRoRnkMDmCiMRG8MzU4U49sinRCiL8QRUzVknzC0gihFp2hmCIa0LSyaLShfoSh7o77bMlr7nzGZUmf7nlUaozlZoR6folMkM4VFMm67ozrVMlQFLlC8oRUJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMz7ZoSbw62Z8c&oid=1678407622&tid=1076&nid=15189&e=.jpg",
+        "caption": "跆拳风之社招新互动活动",
+        "year": 2013,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "81e923b66e09ac24829ef86d2718de5e4bf87f22de3521db55246b842bc862a7",
+        "bytes": 128132
+      }
     },
     {
       "name": "桌面运动协会",
@@ -533,7 +867,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "足球协会",
@@ -547,7 +882,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "极限飞盘社",
@@ -561,7 +897,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/3f4f7676667c9ba8.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/14314.htm",
+        "pageTitle": "来围观！UICer课余生活丰富有意义-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=mnzNNaMzW7MRV2UTzL4MzrkLmvYLznt7UlQfnmlPMmQVnzC0gihFp2hmCIa0U1yaLSyYn1h7o7C8LRn2olCsLzG8LzLaoznRMRrRU47boznFUzUPL8nRMNnFL8LsLzCJqjfTQ4Oeo4xiqIMmp1hXptQ0g47aM4C0LzU4LzUJqdjnx&oid=1678407622&tid=1076&nid=14314&e=.jpeg",
+        "caption": "极限飞盘社学生教练指导训练",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "51699fa1c8501125e28ecb03d6a3e7689ef9ce008047868ddf601e35f2189ae0",
+        "bytes": 247574
+      }
     },
     {
       "name": "太极社",
@@ -575,7 +923,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/78ffba006578125c.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1077/5336.htm",
+        "pageTitle": "【视频】UIC举办大学敬师礼 传承古训 弘扬尊师重道-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=qo77panzGbM7CsLvmCYMRT7nlCanmA6kUNnfnmC8M4NPUzl0gihFp2hmCIa0n1h2nSyYokybUz78U49aoRv8nzCaLRQRoz-DnzVRMlUaUzrFoRCYoR7DLlVFLzlPMRGJqjfjo4OeosrXCDMJgDTJQty0LzGsMYyiL4LDgtA8pU_cc&oid=1678407622&tid=1077&nid=5336&e=.jpg",
+        "caption": "太极社在大学敬师礼上表演",
+        "year": 2017,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "db3ab65fcec19ff3ba920a2c9b9747fe60e1862dde0a35303e35dbcfaf9db86e",
+        "bytes": 86336
+      }
     },
     {
       "name": "合气道社",
@@ -589,7 +949,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "舞灵社",
@@ -603,7 +964,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "街舞社",
@@ -617,7 +979,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/3e75d909461ed079.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/14314.htm",
+        "pageTitle": "来围观！UICer课余生活丰富有意义-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=mnRlNDoR67Uz9snTzf7MRCaLzUinR9tPLmWknzCZL4LsUzv0gihFp2hmCIa0U1hRU1ysn1h2MmlYnR7YLllPLmffLRGbUlQVMRCPLlU4nlWFo7W7M46fMRMFL4r7olLJqjfTQ4Oeo4xiqIMmp1hXptQ0g47aM4C0LzU4LzUJqdjnx&oid=1678407622&tid=1076&nid=14314&e=.jpeg",
+        "caption": "街舞社公开课动作指导",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "37270b0c291901d6082090093e80db8f87ba4b87f7ed22553bf864141d5c82f6",
+        "bytes": 220572
+      }
     },
     {
       "name": "U-SKATE滑板社",
@@ -631,7 +1005,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "野蜂户外运动社",
@@ -645,7 +1020,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/7aa3dfc6c2dad853.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/5861.htm",
+        "pageTitle": "【社团活动】社团联合招新  上演“百团大战”-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=nM4WSRMmQkUNl4Mz4GsMN-8oRN4M8CliM4lZo7QRU4QVLRG0gihFp2hmCIa0LSy8nSy8nSyPLmQfLRV7M47iM4QRL47iMzTVUNCDM8l4nNQFnlU8nmGiUmQFLNW2nN7Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yioRCPgtA8pUrcc&oid=1678407622&tid=1076&nid=5861&e=.jpg",
+        "caption": "野蜂户外运动社招新现场",
+        "year": 2016,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "c257af64e78b2360e546a4a502f33aa2649edbdbd545f248efd1851e524a05dc",
+        "bytes": 180218
+      }
     },
     {
       "name": "篮球协会",
@@ -659,7 +1046,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "联合健身协会",
@@ -673,7 +1061,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "皮划艇俱乐部",
@@ -687,7 +1076,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "橄榄球社",
@@ -701,7 +1091,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "排球社",
@@ -715,7 +1106,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "拳击社",
@@ -729,7 +1121,8 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "",
+      "imageSource": null
     },
     {
       "name": "创联慈善公益社",
@@ -743,7 +1136,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/3278cd6298265541.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/5861.htm",
+        "pageTitle": "【社团活动】社团联合招新  上演“百团大战”-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=nM4TSRnz67Um9sMzRW2MzMfU4UbL4Vl7L7L8o7W7ol7aozU0gihFp2hmCIa0okyZMSyDMYyiUl7ZM4vDLz7YU8UZL8QRM7UaoRA7L4GZozAFMmTfLm6fL4QFL8VfM4NJqjfjo4OeosrXCDMJgDTJQty0LzGsM1yioRCPgtA8pUrcc&oid=1678407622&tid=1076&nid=5861&e=.jpg",
+        "caption": "创联慈善公益社招新现场",
+        "year": 2016,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "e47c6d1827025cf18bb3ab04b8912a9334e17bfd2f7639c7abe82a6552456648",
+        "bytes": 240249
+      }
     },
     {
       "name": "绿桥环保公益协会",
@@ -757,7 +1162,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/4b21b6d40147d400.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15189.htm",
+        "pageTitle": "学生社团争奇斗艳，招新现场熙来攘往-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=8MRMi2LzGiLNW7UDlUbolU8M4vaUmfs7UN-sMzlbU8r7oll0gihFp2hmCIa0okyiMYyPoShVM8W2MNCsU49Pol-DMl7YMlCaLNVkMNVVUzrFU4vaL7UYLRnFLmNDoz-Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMz7ZoSbw62Z8c&oid=1678407622&tid=1076&nid=15189&e=.jpg",
+        "caption": "绿桥环保公益协会招新布置现场",
+        "year": 2013,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "ad6376ca812e8f9d867a73d432c46747209bfd4cf23d1201f1ede6ba0be6e538",
+        "bytes": 169618
+      }
     },
     {
       "name": "概帮慈善社",
@@ -771,7 +1188,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/bf4fd77ab3dce648.jpg",
+      "imageSource": {
+        "pageUrl": "https://bnbu.edu.cn/info/1077/14200.htm",
+        "pageTitle": "百团争鸣 | 别样青春，花young来袭-北师香港浸会大学",
+        "url": "https://bnbu.edu.cn/virtual_attach_file.vsb?afc=Xol7/Yn7rVn7Q2oKRLsMmGDnNLbLRlOZoRC4LmT2nmCiLNl0gihFp2hmCIa0nSysLYybokhVozLbUzTfU4r7oRGsM4AVnNCYMm-4MzUaUNQFM4U4LRNbLmTFMl-PLNLJqjfjo4OeosrXCDMJgDTJQty0LzGsMYyPMR-aLkbw62x8c&oid=1678407622&tid=1077&nid=14200&e=.jpg",
+        "caption": "概帮慈善社举办童话故事节",
+        "year": 2022,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "197d3660d7d69db5ca9d13fba17167c5a8bc6c50541ba366c01a642ab042421d",
+        "bytes": 373036
+      }
     },
     {
       "name": "梦想沙伐旅公益社",
@@ -785,7 +1214,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/6b156ba9ed813c0d.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/6130.htm",
+        "pageTitle": "【视频新闻】学生公益社筹建兆征纪念学校“梦想中心”-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=SnmvzZL8rRUz9ZUlzC4UzAVnRl4Ullrsnmffozl4nlUPL4U0gihFp2hmCIa0oSyDLYyiMYyiL87so7-bUzNiU4T2MzNYn7V7LzUinmT2L7rFLmffnzARnmWFLmTkUN-Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yDLzLagtA8pUIcc&oid=1678407622&tid=1076&nid=6130&e=.jpg",
+        "caption": "梦想沙伐旅公益社参与筹建的梦想中心揭幕",
+        "year": 2015,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "d0d1fe942dad8855e70088e027995b34593f6ce2dcd9df73272161d96a905404",
+        "bytes": 170939
+      }
     },
     {
       "name": "思成·筑梦大学生实践团体",
@@ -799,7 +1240,19 @@
       "status": "approved",
       "visibility": "visible",
       "contact": "统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）",
-      "image": ""
+      "image": "/clubs/9e45c765a4f0f2bb.jpg",
+      "imageSource": {
+        "pageUrl": "https://www.bnbu.edu.cn/info/1076/15517.htm",
+        "pageTitle": "UIC社团参加省团委“公益嘉年华” 荣获“十佳”奖-北师香港浸会大学",
+        "url": "https://www.bnbu.edu.cn/virtual_attach_file.vsb?afc=PLzvY4nzUZUz9Yn4mvbozUDUz7DLmG8ZL8l4LlW2U4Vfo7L0gihFp2hmCIa0okyPL1yiM1hkLzW2LNC8UlLYL4UsLlW2L8lPoRTfUm-snlrFMR9inRrRUlrFMl-iUm-Jqjfjo4OeosrXCDMJgDTJQty0LzGsM1yPMzlPMYbw62i8c&oid=1678407622&tid=1076&nid=15517&e=.jpg",
+        "caption": "思成·筑梦社团参与公益嘉年华",
+        "year": 2012,
+        "kind": "activity",
+        "sourceLabel": "学校官网公开报道",
+        "checkedAt": "2026-10-22",
+        "sha256": "d3fc418a77f611caa6391eb4d2d076509027ba4bb543407d0fa731d725ea709a",
+        "bytes": 374194
+      }
     }
   ]
 }

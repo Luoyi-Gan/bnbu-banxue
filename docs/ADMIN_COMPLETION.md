@@ -3088,3 +3088,9 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 - 校园社团入口复用ref-coffee配图，列表/分类/详情复用shops.css与SharedMediaLink，保持美食板块同一转场、减少动态处理；关注仍用既有relation.set并持久化。
 - /api/ai/chat在SQLite与PostgreSQL共用CampusAI；服务端字段白名单及本人权限、读取范围、DeepSeek失败/用量、去重和并行保护有测试。校园办事资料改为共享目录供页面和AI同时读取。生产服务、真实移动设备和PostgreSQL运行环境未验收。
 - 回归：6个测试文件42项通过，前后端TypeScript检查通过。手机430×932、桌面1440×1000、关注刷新及减少动态检查的本地证据保存在.runtime/campus-upgrade/，真实模型调用用量另见verification.json。
+
+### 2026-10-22 社团真实配图
+
+- 已为36/57个社团补充学校公开报道的真实宣传图/活动照片，21项暂缺。原图约8.05MB保存在public/clubs，逐项来源、年代与摘要记录在data/campus-club-images.json、docs/CAMPUS_CLUB_IMAGES.md；排除名录二维码和无法对应社团的通用活动照。
+- organization.images共用SQLite/PostgreSQL业务策略，运营权限、版本核对、重复不变更、保护独立维护封面；仅写image/imageSource，保留关注、介绍、联系和公开状态。列表、详情及首页共用图片；详情完整显示并附历史活动及来源。
+- 2个相关测试文件5项通过，前后端类型检查通过。36/36静态图加载200；430×932及1440×1000浏览器检查与截图在.runtime/club-images/。修复图片的网格溢出，首页图片不遮盖社团名称。未部署生产，未调用DeepSeek。

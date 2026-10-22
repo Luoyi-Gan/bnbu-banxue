@@ -26,6 +26,17 @@ export function* governancePolicy(
   action: string,
   input: Fields,
 ): Generator<unknown,Entity | undefined,unknown> {
+  if(action==='organization.images'){
+    operator(actor);
+    const existing=yield* effect(repo.get(input.id,'organization'));
+    demand(existing.version===input.version,'社团资料已变化，请刷新后重试。',409);
+    const entry=clubDirectory.clubs.find(item=>item.name===existing.data.name);
+    demand(existing.data.directoryOnly===true&&entry?.image&&entry.imageSource,'没有可核对的社团配图。');
+    // Keep an independently maintained cover unless it was imported from this catalogue.
+    if(existing.data.image&&!existing.data.imageSource)return existing;
+    if(existing.data.image===entry.image&&JSON.stringify(existing.data.imageSource)===JSON.stringify(entry.imageSource))return existing;
+    return yield* effect(repo.save(existing,{image:entry.image,imageSource:entry.imageSource}));
+  }
   if(action==='organization.import'){
     operator(actor);
     const name=textField(input,'name',80),entry=clubDirectory.clubs.find(item=>item.name===name);

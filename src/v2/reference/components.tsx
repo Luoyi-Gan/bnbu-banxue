@@ -1,4 +1,5 @@
 import {SharedMediaLink} from '../SharedMediaLink'
+import '../clubImages.css'
 import {StudentUtilities} from '../StudentUtilities'
 import {CommunityDiscoveryFeed} from '../CommunityDiscoveryFeed'
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from '../uiLanguage'
@@ -55,9 +56,13 @@ export function EventCard({item,live,row=false}:{item:ActivityItem;live:Live;row
   const ended=Date.parse(item.endAt??item.startAt)<Date.now()
   return <article className={`ref-event${row?' is-row':''}`}><SharedMediaLink transitionKey={`activity:${item.id}`} state={{from:location.pathname+location.search}} to={`/v2/activities/${encodeURIComponent(item.id)}`} data-shared-media={`activity:${item.id}`} className="ref-event-photo"><img src={item.image || campus} alt={item.isDefaultCover?uiText('校园通用封面'):uiTemplate(["","封面"],item.title)} loading="lazy"/><span>{uiText(item.category)}</span></SharedMediaLink><div className="ref-event-content"><SharedMediaLink transitionKey={`activity:${item.id}`} state={{from:location.pathname+location.search}} to={`/v2/activities/${encodeURIComponent(item.id)}`}><h3>{item.title}</h3></SharedMediaLink><p>{uiText(item.subtitle)}</p><small><CalendarDays size={13}/>{when(item.startAt)}</small><small><MapPin size={13}/>{item.location}</small><footer><span className={ended?'ended':''}>{ended?uiText('已结束'):uiText('即将开始')}</span><span>{item.host}</span></footer></div><button type="button" className={`ref-save${saved?' is-saved':''}`} disabled={!live.data || live.busy} aria-label={uiTemplate(["","：",""],uiText(saved?'取消收藏':'收藏'),item.title)} aria-pressed={saved} onClick={()=>void live.mutate('relation.set',{id:item.id,kind:'save',enabled:!saved})}><Heart size={19} fill={saved?'currentColor':'none'}/></button></article>
 }
+function OrganizationPhoto({image,name}:{image:string;name:string}){
+  const [failed,setFailed]=useState(false)
+  return image&&!failed?<img src={image} alt={`${name} 历史活动照片`} loading="lazy" decoding="async" onError={()=>setFailed(true)}/>:<UsersRound size={29}/>
+}
 export function Organizations({live}:{live:Live}) { useUiLanguage();
   const items=live.data?.entities.filter(item=>item.kind==='organization'&&item.data.status==='approved'&&item.data.visibility==='visible').slice(0,4)??[]
-  return <>{items.length?<div className="ref-organizations">{items.map((item,i)=>{const followed=live.data?.relations.some(r=>r.kind==='follow'&&r.entityId===item.id);return <article key={item.id}><Link to={`/v2/organizations?q=${encodeURIComponent(String(item.data.name??''))}`}><div className={`ref-org-cover cover-${i}`}><UsersRound size={29}/></div><h3>{String(item.data.name??'校园组织')}</h3><p>{String(item.data.category??'社团组织')}</p></Link><button type="button" disabled={live.busy} onClick={()=>void live.mutate('relation.set',{id:item.id,kind:'follow',enabled:!followed})}>{followed?uiText('已关注'):uiText('关注')}</button></article>})}</div>:<EmptyNote to="/v2/organizations">{live.data?uiText('公开组织将在这里与你相遇。'):uiText('正在读取校园组织…')}</EmptyNote>}</>
+  return <>{items.length?<div className="ref-organizations">{items.map((item,i)=>{const followed=live.data?.relations.some(r=>r.kind==='follow'&&r.entityId===item.id);return <article key={item.id}><Link to={`/v2/organizations?q=${encodeURIComponent(String(item.data.name??''))}`}><div className={`ref-org-cover cover-${i}`}><OrganizationPhoto key={String(item.data.image??item.id)} image={String(item.data.image??'')} name={String(item.data.name??'社团')}/></div><h3>{String(item.data.name??'校园组织')}</h3><p>{String(item.data.category??'社团组织')}</p></Link><button type="button" disabled={live.busy} onClick={()=>void live.mutate('relation.set',{id:item.id,kind:'follow',enabled:!followed})}>{followed?uiText('已关注'):uiText('关注')}</button></article>})}</div>:<EmptyNote to="/v2/organizations">{live.data?uiText('公开组织将在这里与你相遇。'):uiText('正在读取校园组织…')}</EmptyNote>}</>
 }
 export function Stories({community,compact=false}:{community:ReturnType<typeof useCommunityBackend>;compact?:boolean}) { useUiLanguage();
   const [selected,setSelected]=useState<string|null>(null)
