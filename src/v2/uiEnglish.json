@@ -2205,7 +2205,6 @@
   "前往学校 SSO 登录": "Open school SSO",
   "平台密码 / 管理账号登录": "Platform password / Admin sign-in",
   "使用邮箱验证码或学校账号": "Use email code or school account",
-  "密码仅用于本次向 iSpace 验证；首次连接需验证学校邮箱。": "Your password is used only for this iSpace authentication. First connection requires school email verification.",
   "使用学校账号连接 iSpace，读取本人课程、DDL、资料和课程评分。": "Connect iSpace with your school account to read your courses, deadlines, materials and course grades.",
   "使用邮箱验证码登录，浏览校园服务；内部课程数据需连接学校账号。": "Use an email code for campus services. Connect a school account for internal course data.",
   "正在验证…": "Verifying…",
@@ -2291,5 +2290,6 @@
   "来源：iSpace 测验日历": "Source: iSpace quiz calendar",
   "先连接学校账号，再同步课程，即可读取 iSpace 资料。": "Connect a school account, then sync courses to read iSpace materials.",
   "请先点击上方同步 iSpace，获取课程列表。": "Use Sync iSpace above to load your courses.",
-  "同意将当前页文字与问题发送给 DeepSeek（API 单独计费）": "I agree to send this page text and my question to DeepSeek (API billed separately)"
+  "同意将当前页文字与问题发送给 DeepSeek（API 单独计费）": "I agree to send this page text and my question to DeepSeek (API billed separately)",
+  "密码仅用于本次向 iSpace 验证；登录成功后自动关联学校邮箱。": "Your password is used only for this iSpace authentication. Successful school sign-in links your school email automatically."
 }

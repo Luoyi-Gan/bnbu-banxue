@@ -10,7 +10,7 @@ import {personalOccurrences} from '../shared/v2/learning';
 import {snapshot} from '../backend/src/commands';
 
 afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
-function setup(){
+function setup(schoolEmail='student@mail.bnbu.edu.cn'){
  const db=openDatabase(':memory:'),repo=new Repository(db);
  const id=createAccount(db,{email:'student@mail.bnbu.edu.cn',password:'Test-password-123',name:'学生',roles:['student']});
  const second=createAccount(db,{email:'second@mail.bnbu.edu.cn',password:'Test-password-123',name:'乙',roles:['student']});
@@ -19,7 +19,7 @@ function setup(){
   const values=new URLSearchParams(String(init?.body)),fn=values.get('wsfunction');
   let value:unknown=String(url).endsWith('/login/token.php')?{token:'private-moodle-token'}:{};
   if(fn==='core_webservice_get_site_info')value={userid:42,fullname:'测试学生',functions:[]};
-  if(fn==='core_user_get_users_by_field')value=[{id:42,email:'student@mail.bnbu.edu.cn'}];
+  if(fn==='core_user_get_users_by_field')value=[{id:42,email:schoolEmail}];
   if(fn==='core_enrol_get_users_courses')value=[{id:12,fullname:'数学',shortname:'MATH'}];
   if(fn==='core_calendar_get_calendar_upcoming_view')value={events:[{id:5,name:'作业',timestart:Date.now()/1000+3600,modulename:'assign',course:{fullname:'数学'}}]};
   if(fn==='core_course_get_contents')value=[{name:'第一章',modules:[{contents:[{type:'file',filename:'notes.txt',fileurl:'https://ispace.bnbu.edu.cn/webservice/pluginfile.php/1/notes.txt',mimetype:'text/plain',filesize:7}]}]}];
@@ -33,6 +33,27 @@ function setup(){
 }
 const deadline={type:'deadline',title:'报告',course:'数学',location:'',startAt:new Date(Date.now()+600000).toISOString(),reminderMinutes:30};
 describe('学习工具：身份、保存与 iSpace 隔离',()=>{
+ it('首次学校登录自动建立个人账号、验证记录与唯一绑定，并发不重复创建',async()=>{
+  const t=setup('new-school@mail.bnbu.edu.cn');try{
+   const results=await Promise.all([t.auth.schoolLogin('fake','fake','source'),t.auth.schoolLogin('fake','fake','source')]);
+   expect(results[0].account.id).toBe(results[1].account.id);expect(results[0].account.roles).toEqual(['student']);
+   expect(t.repo.all('verifiedEmail').filter(e=>e.ownerId===results[0].account.id)).toMatchObject([{data:{email:'new-school@mail.bnbu.edu.cn',source:'ispace-school-login'}}]);
+   expect(t.repo.all('schoolLink')).toHaveLength(1);expect(t.db.prepare('SELECT count(*) AS n FROM mail_outbox').get()?.n).toBe(0);
+  }finally{t.db.close()}
+ });
+ it('学校登录拒绝封禁、撤销资格及邮箱已绑定其他学校身份',async()=>{
+  const t=setup();try{
+   t.db.prepare("UPDATE accounts SET status='banned' WHERE id=?").run(t.actor.id);
+   await expect(t.auth.schoolLogin('fake','fake','source')).rejects.toThrow('封禁');
+   t.db.prepare("UPDATE accounts SET status='active' WHERE id=?").run(t.actor.id);
+   const revoked=t.repo.create('studentIdentityRequest',t.actor.id,{status:'revoked'});
+   await expect(t.auth.schoolLogin('fake','fake','source')).rejects.toThrow('撤销');
+   t.db.prepare('DELETE FROM entities WHERE id=?').run(revoked.id);
+   t.repo.create('schoolLink',t.actor.id,{subject:'another-school-subject'});
+   await expect(t.auth.schoolLogin('fake','fake','source')).rejects.toThrow('其他学校账号');
+   expect(t.auth.current(t.session.token,t.actor.id)).toBeUndefined();
+  }finally{t.db.close()}
+ });
  it('安排请求重试复用事务回执，不能用同一标识更换操作',async()=>{
   const t=setup();try{const input={...deadline,requestId:'learning-retry'};await t.service.operation(t.actor,t.session.token,'save',input);await t.service.operation(t.actor,t.session.token,'save',input);expect((await t.service.overview(t.actor,t.session.token)).items).toHaveLength(1);await expect(t.service.operation(t.actor,t.session.token,'save',{...input,title:'不同输入'})).rejects.toThrow('其他操作');}finally{t.db.close()}
  });
@@ -57,13 +78,11 @@ describe('学习工具：身份、保存与 iSpace 隔离',()=>{
    await expect(t.auth.emailLogin(t.actor.email,t.code(),'source')).rejects.toThrow('失效');
   }finally{t.db.close()}
  });
- it('首次学校登录必须验证邮箱；同一账号邮箱会话不能读取学校数据',async()=>{
+ it('学校首次登录直接关联邮箱；同一账号邮箱会话不能读取学校数据',async()=>{
   const t=setup();try{
-   const pending=await t.auth.schoolLogin('fake-user','fake-password','source');
-   expect(pending).toMatchObject({authenticated:false,email:t.actor.email});
-   expect('pendingId'in pending).toBe(true);if(!('pendingId'in pending))throw new Error('pending missing');
-   await t.auth.requestCode(t.actor.email,'source',true);
-   const school=await t.auth.emailLogin(t.actor.email,t.code(),'source',pending.pendingId);
+   const school=await t.auth.schoolLogin('fake-user','fake-password','source');
+   expect(school.authenticated).toBe(true);expect('pendingId'in school).toBe(false);
+   expect(t.db.prepare('SELECT count(*) AS n FROM mail_outbox').get()?.n).toBe(0);
    expect(school.account.id).toBe(t.actor.id);
    const sync=await t.service.operation(t.actor,school.token,'sync',{});
    expect(sync).toMatchObject({courses:[{id:12,name:'数学'}],events:[{title:'作业'}]});
@@ -77,8 +96,7 @@ describe('学习工具：身份、保存与 iSpace 隔离',()=>{
  });
  it('学校资料只接受本人课程与服务端文件标识，不跟随站外跳转',async()=>{
   const t=setup();try{
-   const pending=await t.auth.schoolLogin('fake','fake','source');if(!('pendingId'in pending))throw new Error('pending');
-   await t.auth.requestCode(t.actor.email,'source',true);const session=await t.auth.emailLogin(t.actor.email,t.code(),'source',pending.pendingId);
+   const session=await t.auth.schoolLogin('fake','fake','source');
    await expect(t.service.operation(t.actor,session.token,'materials',{courseId:999})).rejects.toThrow('未加入');
    const result=await t.service.operation(t.actor,session.token,'materials',{courseId:12}) as {materials:{id:string}[]};
    expect(JSON.stringify(result)).not.toContain('token');

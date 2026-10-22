@@ -26,7 +26,7 @@ export class ISpace {
     demand(Number.isSafeInteger(info.userid)&&Number(info.userid)>0,'学校未返回有效身份。',502);
     const users=list(await this.call(token,'core_user_get_users_by_field',{field:'id','values[0]':String(info.userid)}));
     const user=users.find(item=>Number(item.id)===Number(info.userid));
-    // This address is a delivery destination, never proof of ownership. First link requires its OTP.
+    // User-approved school identity flow: use only the authenticated own profile email.
     demand(user&&typeof user.email==='string'&&/^[^\s@]+@mail\.bnbu\.edu\.cn$/i.test(user.email),'iSpace 未提供本人学校邮箱，请使用邮箱验证码登录。',403);
     return {token,userId:Number(info.userid),email:user.email.toLowerCase(),name:plain(info.fullname).slice(0,40),functions:list(info.functions).map(item=>String(item.name))};
   }

@@ -122,7 +122,7 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
         const input = await body(request);
         if(pathname==='/api/auth/email-login/request')return send(response,200,await learningAuth.requestCode(input.email,request.socket.remoteAddress??'unknown',options.localOutbox===true));
         if(pathname==='/api/auth/email-login'||pathname==='/api/auth/school-login'){
-          const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown',input.pendingId);
+          const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown');
           if('token'in result){response.setHeader('Set-Cookie',cookie(result.token,43200));return send(response,200,{authenticated:true,account:result.account});}
           return send(response,200,result);
         }

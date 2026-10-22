@@ -7,12 +7,10 @@ import type {LearningCourse,LearningEvent} from '../../shared/v2/learning';
 
 type SchoolIdentity=Awaited<ReturnType<ISpace['login']>>;
 type SchoolSession=SchoolIdentity&{ownerId:string;expiresAt:number;courses?:LearningCourse[];events?:LearningEvent[];syncedAt?:string};
-type PendingSchool=SchoolIdentity&{expiresAt:number};
 export class LearningAuth {
   private readonly sessions=new Map<string,SchoolSession>();
-  private readonly pending=new Map<string,PendingSchool>();
   constructor(readonly store:LearningStore,readonly school=new ISpace()){}
-  private cleanup(){const now=Date.now();for(const[key,value]of this.sessions)if(value.expiresAt<=now)this.sessions.delete(key);for(const[key,value]of this.pending)if(value.expiresAt<=now)this.pending.delete(key);}
+  private cleanup(){const now=Date.now();for(const[key,value]of this.sessions)if(value.expiresAt<=now)this.sessions.delete(key);}
   current(token:string,ownerId:string){this.cleanup();const session=this.sessions.get(digest(token));return session?.ownerId===ownerId?session:undefined;}
   forget(token:string){this.sessions.delete(digest(token));}
   async limit(sql:LearningSql,subject:string,origin:string,category:string,max:number,window=60000){
@@ -50,11 +48,9 @@ export class LearningAuth {
     await sql.rows('INSERT INTO sessions(token_hash,account_id,expires_at,created_at) VALUES(?,?,?,?)',[digest(token),row.id,Date.now()+43200000,timestamp()]);
     return {token,account:account(updated)};
   }
-  async emailLogin(rawEmail:unknown,code:unknown,origin:string,pendingId?:unknown){
+  async emailLogin(rawEmail:unknown,code:unknown,origin:string){
     const email=normalizeEmail(rawEmail);demand(typeof code==='string'&&/^\d{6}$/.test(code),'请填写六位验证码。');
     this.cleanup();
-    const pending=typeof pendingId==='string'?this.pending.get(pendingId):undefined;
-    if(pendingId)demand(pending&&pending.email===email,'学校连接已过期，请重新输入学校账号密码。',401);
     const result=await this.store.transaction('email-login',async sql=>{
       // Invalid attempts commit; do not throw before storing their increment.
       await this.limit(sql,email,origin,'login',60);
@@ -70,41 +66,43 @@ export class LearningAuth {
         row=(await sql.rows<AccountRow>('SELECT * FROM accounts WHERE id=?',[id]))[0];
       }
       demand(row.status!=='banned','账号已封禁。',403);
-      const own=await sql.rows<{data:string}>("SELECT data FROM entities WHERE kind='companionIdentity' AND owner_id=?",[row.id]);
-      if(pending)demand(!own.some(item=>{const d=JSON.parse(item.data);return d.role==='student'&&d.status==='revoked';}),'学生身份已撤销。',403);
       const verified=await sql.rows<{data:string}>("SELECT data FROM entities WHERE kind='verifiedEmail' AND owner_id=?",[row.id]);
       if(!verified.some(item=>JSON.parse(item.data).email===email))await learningEntity(sql,'verifiedEmail',row.id,{email,source:'email-login-code'});
       const session=await this.session(sql,row);
-      if(pending){
-        const linkId=`ispace-link:${pending.userId}`;
-        const links=await sql.rows<{owner_id:string}>('SELECT owner_id FROM entities WHERE id=?',[linkId]);
-        demand(!links.length||links[0].owner_id===row.id,'该学校账号已有绑定，请通过原账号处理。',409);
-        if(!links.length)await learningEntity(sql,'schoolLink',row.id,{subject:String(pending.userId)},linkId);
-      }
       await sql.rows('DELETE FROM email_challenges WHERE email=?',[key]);return session;
     });
     if('error'in result)throw new ServiceError(400,'INVALID_CODE',result.error!);
-    if(pending&&typeof pendingId==='string'){
-      this.pending.delete(pendingId);this.sessions.set(digest(result.token),{...pending,ownerId:result.account.id,expiresAt:Date.now()+43200000});
-    }
     return result;
   }
   async schoolLogin(username:unknown,password:unknown,origin:string){
     demand(typeof username==='string'&&username.trim().length>0&&username.length<=254&&typeof password==='string'&&password.length>0&&password.length<=256,'请填写学校账号和密码。');
     await this.store.transaction('school-login',sql=>this.limit(sql,username,origin,'school-login',12));
-    this.cleanup();demand(this.pending.size<1000,'连接繁忙，请稍后再试。',429);
+    this.cleanup();demand(this.sessions.size<1000,'连接繁忙，请稍后再试。',429);
     const identity=await this.school.login(username.trim(),password);
     const result=await this.store.transaction('email-login',async sql=>{
       const link=(await sql.rows<{owner_id:string}>('SELECT owner_id FROM entities WHERE id=? AND kind=?',[`ispace-link:${identity.userId}`,'schoolLink']))[0];
-      if(!link)return null;
-      const row=(await sql.rows<AccountRow>("SELECT * FROM accounts WHERE id=? AND login_kind='PERSONAL'",[link.owner_id]))[0];
+      const email=normalizeEmail(identity.email);
+      demand(/^[^\s@]+@mail\.bnbu\.edu\.cn$/.test(email),'学校未返回有效的本人学校邮箱。',403);
+      let row=link?(await sql.rows<AccountRow>("SELECT * FROM accounts WHERE id=? AND login_kind='PERSONAL'",[link.owner_id]))[0]:(await sql.rows<AccountRow>("SELECT * FROM accounts WHERE email=? AND login_kind='PERSONAL'",[email]))[0];
+      if(!row&&!link){
+        const id=randomBytes(20).toString('hex');
+        await sql.rows('INSERT INTO accounts(id,email,password_hash,name,created_at) VALUES(?,?,?,?,?)',[id,email,encodePassword(randomBytes(48).toString('base64url')),identity.name||'同学',timestamp()]);
+        row=(await sql.rows<AccountRow>('SELECT * FROM accounts WHERE id=?',[id]))[0];
+      }
       demand(row,'学校账号关联已失效。',403);
+      demand(row.email===email,'学校邮箱与已有绑定不一致，请联系管理员核对。',409);
+      demand(row.status!=='banned','账号已封禁。',403);
+      const bindings=await sql.rows<{id:string}>("SELECT id FROM entities WHERE kind='schoolLink' AND owner_id=?",[row.id]);
+      demand(!bindings.some(binding=>binding.id!==`ispace-link:${identity.userId}`),'该邮箱已关联其他学校账号，请联系管理员核对。',409);
       const identities=await sql.rows<{data:string}>("SELECT data FROM entities WHERE kind='companionIdentity' AND owner_id=?",[row.id]);
       demand(!identities.some(item=>{const d=JSON.parse(item.data);return d.role==='student'&&d.status==='revoked';}),'学生身份已撤销。',403);
+      const latestRequest=(await sql.rows<{data:string}>("SELECT data FROM entities WHERE kind='studentIdentityRequest' AND owner_id=? ORDER BY created_at DESC,id DESC LIMIT 1",[row.id]))[0];
+      demand(!latestRequest||JSON.parse(latestRequest.data).status!=='revoked','学生身份已撤销。',403);
+      const verified=await sql.rows<{data:string}>("SELECT data FROM entities WHERE kind='verifiedEmail' AND owner_id=?",[row.id]);
+      if(!verified.some(item=>JSON.parse(item.data).email===email))await learningEntity(sql,'verifiedEmail',row.id,{email,source:'ispace-school-login'});
+      if(!link)await learningEntity(sql,'schoolLink',row.id,{subject:String(identity.userId),source:'ispace-school-login'},`ispace-link:${identity.userId}`);
       return this.session(sql,row);
     });
-    if(result){this.sessions.set(digest(result.token),{...identity,ownerId:result.account.id,expiresAt:Date.now()+43200000});return {authenticated:true,...result};}
-    const pendingId=randomBytes(32).toString('base64url');this.pending.set(pendingId,{...identity,expiresAt:Date.now()+600000});
-    return {authenticated:false,pendingId,email:identity.email,message:'首次连接，请验证学校邮箱以关联本人会同里账号。'};
+    this.sessions.set(digest(result.token),{...identity,ownerId:result.account.id,expiresAt:Date.now()+43200000});return {authenticated:true,...result};
   }
 }
