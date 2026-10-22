@@ -2,6 +2,8 @@ import {demand,timestamp,type Account} from './auth';
 import {learningEntity,type LearningStore} from './learning-store';
 import {personalOccurrences,type PersonalLearningItem} from '../../shared/v2/learning';
 import {campusContacts} from '../../shared/v2/campusContacts';
+import {dailyDeadlineSelected} from '../../shared/v2/dailyCourseSelection';
+import {schedulePreferences} from '../../shared/v2/schedulePreferences';
 import type {LearningOverview} from '../../shared/v2/learning';
 
 type Item={id:string;kind:string;ownerId:string|null;data:Record<string,unknown>};
@@ -11,6 +13,8 @@ const clean=(value:unknown,max=1000)=>typeof value==='string'?value.slice(0,max)
 // Explicit fields only: never send credentials, student directory, messages, or audit data.
 export function campusContext(actor:Account,workspace:ReadModel,shops:Item[]=[],now=Date.now()){
  const sources:Source[]=[];
+ const lessons=workspace.entities.find(item=>item.kind==='timetable'&&item.ownerId===actor.id)?.data.lessons;
+ const {hiddenDailyCourses}=schedulePreferences(workspace.entities.find(item=>item.kind==='preferences'&&item.ownerId===actor.id)?.data);
  const push=(id:string,title:string,source:string,text:string)=>sources.push({id,title,source,text});
  for(const contact of campusContacts)push('contact:'+contact.id,contact.name,contact.source,JSON.stringify(contact));
  const clubNames=workspace.entities.filter(e=>e.kind==='organization'&&e.data.status==='approved'&&e.data.visibility==='visible').map(e=>`${clean(e.data.name)}（${clean(e.data.category)}）`);
@@ -24,7 +28,7 @@ export function campusContext(actor:Account,workspace:ReadModel,shops:Item[]=[],
   if(item.kind==='shop'&&d.status==='visible'){fields=['name','category','address','description'];path='/v2/shops?id='+encodeURIComponent(item.id);}
   if(item.kind==='room'&&d.visibility==='visible'&&d.status==='open'){fields=['title','description','type','location','startAt','endAt'];path='/v2/partners/teams';}
   if(item.kind==='post'&&d.status==='visible'){fields=['title','body'];path='/v2/community';}
-  if(own&&item.kind==='learningItem'&&d.type==='deadline'){
+  if(own&&item.kind==='learningItem'&&d.type==='deadline'&&dailyDeadlineSelected(d,lessons,hiddenDailyCourses)){
    const occurrences=personalOccurrences([{...d,id:item.id,version:1} as unknown as PersonalLearningItem],now,14);
    if(occurrences.length)push(item.id,clean(d.title),'/v2',JSON.stringify({title:d.title,course:d.course,occurrences:occurrences.slice(0,14)}));
   }
