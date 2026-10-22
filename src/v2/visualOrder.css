@@ -57,6 +57,11 @@ body:has(.v2-app) :is(.v2-modal,.v2-drawer) :is(input:not([type=checkbox]):not([
 @media(max-width:600px){.v2-app.v2-app-student .cw-home .cw-window {width:100%;min-width:0}.v2-app.v2-app-student .cw-home .cw-scene {right:0;max-width:calc(100% - 96px)}}
 
 .v2-compact-route-heading {display:none}
+/* A mounted detail owns its navigation; loading and route changes restore the shell naturally. */
+.v2-app.v2-app-student .v2-workspace:has([data-detail-navigation])>.v2-topbar,
+.v2-app.v2-app-student .v2-main>.v2-page:has([data-detail-navigation])>.v2-page-heading,
+.v2-app.v2-app-student [data-detail-navigation]>.v2-page-heading,
+.v2-app.v2-app-student .v2-alumni-page[data-detail-navigation]>.v2-tabs{display:none}
 @media(max-width:720px){
   .v2-app.v2-app-student[data-compact-header=true] .v2-topbar {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 16px;min-height:64px}
   .v2-app.v2-app-student[data-compact-header=true] .v2-top-left {display:none}

@@ -13,7 +13,7 @@ import './ownProfile.css'
 export function StudentProfile(){
   useUiLanguage()
   const live=useWorkspaceBackend()
-  if(!live.data)return <div className="own-profile-editor"><header className="own-editor-heading"><Link to="/v2/me" aria-label={uiText('返回我的')}><ArrowLeft size={22}/></Link><h1>{uiText('编辑资料')}</h1></header><p role={live.error?'alert':'status'}>{uiText(live.error||'正在读取本人资料…')}{live.error&&<button onClick={()=>void live.refresh()}>{uiText('重试')}</button>}</p></div>
+  if(!live.data)return <div className="own-profile-editor" data-detail-navigation><header className="own-editor-heading"><Link to="/v2/me" aria-label={uiText('返回我的')}><ArrowLeft size={22}/></Link><h1>{uiText('编辑资料')}</h1></header><p role={live.error?'alert':'status'}>{uiText(live.error||'正在读取本人资料…')}{live.error&&<button onClick={()=>void live.refresh()}>{uiText('重试')}</button>}</p></div>
   return <StudentProfileEditor key={live.data.account.id} live={live}/>
 }
 function StudentProfileEditor({live}:{live:ReturnType<typeof useWorkspaceBackend>}){
@@ -56,7 +56,7 @@ function StudentProfileEditor({live}:{live:ReturnType<typeof useWorkspaceBackend
     if(bio.trim().length>100){setError('个人简介最多100字。');return}
     if(await live.mutate('profile.save',{nickname:name,avatar,bio,cover})&&active.current)navigate('/v2/me')
   }
-  return <div className="own-profile-editor">
+  return <div className="own-profile-editor" data-detail-navigation>
     <header className="own-editor-heading"><SharedMediaLink transitionKey={`profile:${account.id}`} reverse to="/v2/me" aria-label={uiText('取消编辑，返回我的')}><ArrowLeft size={22}/></SharedMediaLink><h1>{uiText('编辑资料')}</h1><button type="submit" form="own-profile-form" disabled={loading||live.busy}>{uiText(live.busy?'保存中…':'保存')}</button></header>
     {(error||live.error)&&<p className="own-editor-error" role="alert">{uiText(error||live.error)}</p>}
     <form id="own-profile-form" onSubmit={save}>

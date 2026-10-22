@@ -2,6 +2,7 @@ import {useStudentScrollGlass} from './useStudentScrollGlass'
 import {FluidStudentNav} from './FluidStudentNav'
 import {StudentUtilities} from './StudentUtilities'
 import {StudentUtilityPanel} from './StudentUtilityPanel'
+import {studentSettingsSectionTitles} from './settingsSectionTitles'
 import {ShopPage} from './ShopPage'
 import {PublicPrivacyPage} from './PrivacyPolicy'
 import { uiText, useUiLanguage } from './uiLanguage'
@@ -169,6 +170,7 @@ function V2Routes() { useUiLanguage();
   const location = useLocation()
   const navigate=useNavigate()
   const floating=location.pathname==='/v2/settings'||location.pathname==='/v2/messages'
+  const settingsTitle=location.pathname==='/v2/settings'?studentSettingsSectionTitles[new URLSearchParams(location.search).get('section')??'']:undefined
   const backdrop=useRef('/v2/me')
   useEffect(()=>{if(!floating&&canAccessPortal('student',location.pathname)&&!['/v2/login','/v2/register','/v2/forgot-password','/v2/identity','/v2/privacy','/v2/welcome'].includes(location.pathname))backdrop.current=location.pathname+location.search},[floating,location.pathname,location.search])
   const { state, setState } = useV2()
@@ -228,7 +230,7 @@ function V2Routes() { useUiLanguage();
     <Route path="/v2/admin/moderation" element={<AdminModeration/>}/>
     <Route path="/v2/admin/keywords" element={<AdminCommunityKeywords/>}/>
     <Route path="*" element={<Navigate to={portalHome[state.role]} replace/>}/>
-  </Routes>{floating&&<StudentUtilityPanel title={location.pathname==='/v2/settings'?uiText('设置'):new URLSearchParams(location.search).get('view')==='notifications'?uiText('通知'):uiText('会话')} onClose={()=>navigate(backdrop.current)}>{location.pathname==='/v2/settings'?<V2Settings embedded/>:<V2Messages/>}</StudentUtilityPanel>}</V2Shell>
+  </Routes>{floating&&<StudentUtilityPanel navigation={settingsTitle?<Link className="utility-header-back" to="/v2/settings" aria-label={uiText('返回设置')}><ArrowLeft size={21}/></Link>:undefined} title={location.pathname==='/v2/settings'?uiText(settingsTitle??'设置'):new URLSearchParams(location.search).get('view')==='notifications'?uiText('通知'):uiText('会话')} onClose={()=>navigate(backdrop.current)}>{location.pathname==='/v2/settings'?<V2Settings embedded/>:<V2Messages/>}</StudentUtilityPanel>}</V2Shell>
 }
 
 export function V2App() { useUiLanguage();

@@ -1,8 +1,9 @@
 import {useEffect, useRef, type ReactNode} from 'react'
 import {Modal} from './ui'
 
-export function StudentUtilityPanel({title,onClose,children}:{title:string;onClose:()=>void;children:ReactNode}){
+export function StudentUtilityPanel({title,onClose,children,navigation}:{title:string;onClose:()=>void;children:ReactNode;navigation?:ReactNode}){
   const initialTitle=useRef(title)
+  const previousTitle=useRef(title)
   useEffect(()=>{
     const restoreLabel=initialTitle.current
     const trigger=document.activeElement as HTMLElement|null
@@ -23,5 +24,6 @@ export function StudentUtilityPanel({title,onClose,children}:{title:string;onClo
     document.addEventListener('keydown',trap)
     return()=>{cancelAnimationFrame(frame);document.removeEventListener('keydown',trap);app?.removeAttribute('inert');document.body.style.overflow=overflow;const restore=trigger?.matches('a,button')?trigger:app?.querySelector<HTMLElement>(`.student-utilities a[aria-label="${restoreLabel}"]`);restore?.focus()}
   },[])
-  return <Modal title={title} gesture onClose={()=>{if(document.querySelectorAll('.v2-modal').length===1)onClose()}}><div className="student-utility-content">{children}</div></Modal>
+  useEffect(()=>{if(previousTitle.current!==title){document.querySelector<HTMLElement>('.v2-modal:has(.student-utility-content)>header h2')?.focus({preventScroll:true});previousTitle.current=title}},[title])
+  return <Modal title={title} navigation={navigation} gesture onClose={()=>{if(document.querySelectorAll('.v2-modal').length===1)onClose()}}><div className="student-utility-content">{children}</div></Modal>
 }

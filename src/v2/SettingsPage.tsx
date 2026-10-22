@@ -11,6 +11,7 @@ import {useSettingsLanguage} from './settingsTranslations'
 import {PrivacyPolicy} from './PrivacyPolicy'
 import {api} from '../live/api'
 import './settingsPage.css'
+import {settingsSectionTitles} from './settingsSectionTitles'
 
 const groups = [
   {key:'privacy',title:'隐私与可见性',copy:'学号搜索、资料预览',icon:ShieldCheck,rows:[
@@ -44,7 +45,7 @@ export function SettingsPage({embedded=false}:{embedded?:boolean}={}) {
   const section=params.get('section')
   const group=student?groups.find(item=>item.key===section):undefined
   const isData=section==='data'
-  const titles:Record<string,string>={language:'语言',appearance:'外观与显示',campus:'校园使用偏好',policy:'隐私政策',about:'关于会同里',account:'账号与安全',help:'使用指南',data:'演示数据'}
+  const titles=settingsSectionTitles
   const detail=!!group||!!titles[section||'']
   const profile=live.data?.entities.find(e=>e.kind==='profile'&&e.ownerId===live.data?.account.id)?.data
   const preferences=live.data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===live.data?.account.id)?.data
@@ -87,7 +88,7 @@ export function SettingsPage({embedded=false}:{embedded?:boolean}={}) {
     catch{setLogoutError('退出失败，请重试。');setSigningOut(false)}
   }
   return <div className="v2-page settings-page">
-    {(!embedded||detail)&&<header className="settings-heading">
+    {!embedded&&<header className="settings-heading">
       <Link to={detail?basePath:returnPath} aria-label={t(detail?'返回设置':'返回我的')}><ArrowLeft size={21}/></Link>
       <h1 ref={heading} tabIndex={-1}>{t(group?.title||titles[section||'']||'设置')}</h1>
     </header>}

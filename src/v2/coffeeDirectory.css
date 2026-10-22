@@ -1,5 +1,4 @@
 /* Coffee Chat uses the same photo-first discovery rhythm as campus shops. */
-.v2-app.v2-app-student[data-campus-route='/v2/coffee'] .v2-workspace:has(.v2-coffee-schedule)>.v2-topbar{display:none}
 .v2-app.v2-app-student .v2-coffee-directory{max-width:1080px;padding-bottom:32px}
 .v2-app.v2-app-student .v2-coffee-directory .v2-directory-tools{margin:0 0 14px;gap:12px}
 .v2-app.v2-app-student .v2-coffee-directory .v2-directory-tools>span{color:var(--v2-muted);font-size:12px;white-space:nowrap}

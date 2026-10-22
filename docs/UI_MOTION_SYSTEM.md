@@ -30,3 +30,9 @@
 标准 `npm run build` 两次在 esbuild 删除临时文件时遇到 Windows `Access is denied`（更换临时目录仍复现）；没有将其记为构建通过。补充 `vite build --target esnext --minify false` 模块打包通过（2334 模块），此检查不能代替默认目标的压缩构建。
 
 这是本地模拟数据和浏览器验证；没有真机帧时间或触摸延迟测量，不据此承诺特定帧率。无新增依赖。
+
+## 子页面导航归属
+
+已经提供独立返回标题的嵌入式详情在实际渲染时声明 `data-detail-navigation`，由 `visualOrder.css` 隐藏外层壳与上一级 PageHeading；退出详情后自动恢复。不能仅根据 URL 包含一个详情参数就隐藏所有导航，需确保详情本身已经渲染。
+
+浮层子页复用 Modal 的 navigation 插槽，将返回、当前页标题、关闭放入同一顶栏。设置正文在 embedded 模式不重复生成标题，标题映射在 `settingsSectionTitles.ts` 共享，往返时恢复标题焦点。返回上一层与关闭整个窗口的目的地不同，保留各自语义。检查记录见 `artifacts/navigation-hierarchy-20261022/README.md`。

@@ -94,7 +94,7 @@ export function V2CoffeeChat() { useUiLanguage();
 
   if (teacher) {
     const photo = teacher.avatar || teacherPhotos[teachers.findIndex((person) => person.id === teacher.id) % teacherPhotos.length]
-    return <div className="v2-coffee-schedule" key={teacher.id}>
+    return <div className="v2-coffee-schedule" data-detail-navigation key={teacher.id}>
       <button type="button" className="v2-coffee-back" onClick={()=>sharedElementTransition(`coffee:${teacher.id}`,goBack,{reverse:true})}><ArrowLeft size={16}/> {uiText("返回老师列表")}</button>
       <div className="v2-coffee-teacher-detail">
         <img data-shared-target={`coffee:${teacher.id}`} src={photo} alt={teacher.avatar?`${teacher.name}${uiText("头像")}`:uiText("校园场景")}/>
