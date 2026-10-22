@@ -98,10 +98,10 @@ html[data-ui-theme=dark] .v2-app.v2-app-student .v2-coffee-teacher-detail :is(p,
 html[data-ui-theme=dark] .v2-app.v2-app-student .v2-coffee-slot :is(small,.v2-coffee-slot-date,.v2-coffee-slot-status){color:var(--v2-muted)}
 html[data-ui-theme=dark] .v2-app.v2-app-student .v2-coffee-slot:disabled{opacity:1;color:var(--v2-muted);background:#1b2b24}
 html[data-ui-theme=dark] body:has(.v2-app.v2-app-student) .community-channel-chips button[aria-pressed=true]{background:#35564a;color:#d7eee1;border-color:#8ab8a1}
-html[data-ui-theme=dark] .v2-app.v2-app-student .partner-theme-art{background:#2b4235;color:#a1c3aa;filter:none}
-html[data-ui-theme=dark] .v2-app.v2-app-student .partner-theme-art.is-carpool{background:#443e2e;color:#d1c392}
-html[data-ui-theme=dark] .v2-app.v2-app-student .partner-theme-art.is-sport{background:#29433d;color:#9dc9bc}
-html[data-ui-theme=dark] .v2-app.v2-app-student .partner-theme-art.is-entertainment{background:#463630;color:#d3ada0}
+html[data-ui-theme=dark] :is(.v2-app.v2-app-student,.note-detail[data-reading-kind=partner]) .partner-theme-art{background:#2b4235;color:#a1c3aa;filter:none}
+html[data-ui-theme=dark] :is(.v2-app.v2-app-student,.note-detail[data-reading-kind=partner]) .partner-theme-art.is-carpool{background:#443e2e;color:#d1c392}
+html[data-ui-theme=dark] :is(.v2-app.v2-app-student,.note-detail[data-reading-kind=partner]) .partner-theme-art.is-sport{background:#29433d;color:#9dc9bc}
+html[data-ui-theme=dark] :is(.v2-app.v2-app-student,.note-detail[data-reading-kind=partner]) .partner-theme-art.is-entertainment{background:#463630;color:#d3ada0}
 html[data-ui-theme=dark] .v2-app.v2-app-student :is(.motion-join-panel,.motion-solo-panel){background:var(--v2-surface);color:var(--v2-ink);border-color:var(--v2-line);box-shadow:0 8px 28px #0002}
 html[data-ui-theme=dark] .v2-app.v2-app-student :is(.motion-join-panel p,.motion-join-panel small,.motion-join-panel label,.motion-or,.motion-solo-panel>p,.motion-sport-picker){color:var(--v2-muted)}
 html[data-ui-theme=dark] .v2-app.v2-app-student :is(.motion-qr-illustration,.motion-solo-symbol){background:#314e40;color:#a5d8bf;box-shadow:none}

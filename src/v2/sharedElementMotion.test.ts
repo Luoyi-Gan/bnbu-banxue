@@ -40,6 +40,17 @@ function fixture(){
 afterEach(()=>{vi.unstubAllGlobals();vi.resetModules()})
 
 describe('shared element navigation',()=>{
+ it('coalesces a repeated open while the same media is already expanding',async()=>{
+  const f=fixture()
+  const {sharedElementTransition}=await import('./sharedElementMotion')
+  const update=vi.fn(()=>f.mount('detail'))
+  sharedElementTransition('post:one',update,{source:f.media as unknown as HTMLElement})
+  sharedElementTransition('post:one',update,{source:f.media as unknown as HTMLElement})
+  await f.settle()
+  expect(update).toHaveBeenCalledOnce()
+  expect(f.startViewTransition).toHaveBeenCalledOnce()
+  expect(f.root.dataset.sharedTransition).toBeUndefined()
+ })
  it('restores origin scroll after an asynchronous router commit resets it',async()=>{
   const f=fixture()
   const {sharedElementTransition}=await import('./sharedElementMotion')

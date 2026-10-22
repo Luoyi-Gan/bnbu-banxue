@@ -28,3 +28,15 @@ html[data-shared-transition] :is(.shop-detail,.v2-explorer-panel){animation:none
 .v2-app.v2-app-student .v2-coffee-teacher-detail{grid-template-columns:minmax(0,1fr);gap:0}
 .v2-app.v2-app-student .v2-coffee-teacher-detail>img{width:100%;height:170px;min-height:0;object-fit:cover;object-position:center}
 .v2-app.v2-app-student .v2-coffee-teacher-detail>div{padding:18px}
+
+/* The reading cover uses the same crop as its feed thumbnail; full photos remain in the lightbox. */
+.note-detail[data-reading-kind=post] .note-detail-media{align-self:start}
+.note-detail[data-reading-kind=post] .v2-social-media{height:auto;position:relative}
+.note-detail[data-reading-kind=post] .community-media-lightbox{display:block;width:100%;height:100%;padding:0;border:0}
+.note-detail[data-reading-kind=post] .v2-social-media img{height:100%;max-height:none;object-fit:cover}
+.partner-shared-art{position:absolute;inset:0}
+.partner-detail-art{position:relative;aspect-ratio:2.65;overflow:hidden}
+.note-detail[data-reading-kind=partner] .note-detail-media{align-self:start}
+.alumni-detail-avatar{margin-bottom:16px}
+.alumni-detail-avatar .v2-avatar{width:76px;height:76px;font-size:28px}
+@media(max-width:600px){.partner-detail-art{aspect-ratio:2.8}}

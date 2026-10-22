@@ -5,6 +5,7 @@ import './sharedElementTransition.css'
 export const sharedMotion={enter:campusMotion.sharedEnter,exit:campusMotion.sharedExit,enterEase:campusMotion.ease,exitEase:campusMotion.ease}
 type Transition={finished:Promise<void>;skipTransition:()=>void}
 let active:Transition|undefined
+let activeKey:string|undefined,activeReverse=false
 const origins=new Map<string,{scroll:number;index:number}>()
 const candidates=(kind:'media'|'target',key:string)=>Array.from(document.querySelectorAll<HTMLElement>(`[data-shared-${kind}="${CSS.escape(key)}"]`))
 const find=(kind:'media'|'target',key:string)=>{const items=candidates(kind,key);return items.find(element=>{const rect=element.getBoundingClientRect();return rect.width>0&&rect.height>0&&rect.bottom>0&&rect.top<innerHeight})??items[0]??null}
@@ -15,7 +16,7 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
  const start=typeof document.startViewTransition==='function'?document.startViewTransition.bind(document):undefined
  document.documentElement.dataset.sharedMotionEngine=reduced?'reduced':start?'view-transition':'fallback'
  if(!start||reduced){document.documentElement.dataset.sharedMotionResult='direct';update();if(resetScroll&&!reverse)window.scrollTo({top:0,behavior:'instant'});return}
- if(active){active.skipTransition();void active.finished.catch(()=>{}).then(()=>sharedElementTransition(key,update,{source,reverse,resetScroll}));return}
+ if(active){if(activeKey===key&&activeReverse===reverse)return;active.skipTransition();void active.finished.catch(()=>{}).then(()=>sharedElementTransition(key,update,{source,reverse,resetScroll}));return}
  const from=source?.querySelector<HTMLElement>('[data-shared-media]')??source??find(reverse?'target':'media',key)
  if(!from||!from.getClientRects().length){document.documentElement.dataset.sharedMotionResult='no-source';update();if(resetScroll&&!reverse)window.scrollTo({top:0,behavior:'instant'});return}
  if(!reverse){origins.set(key,{scroll:window.scrollY,index:candidates('media',key).indexOf(from)});if(origins.size>16)origins.delete(origins.keys().next().value!)}
@@ -54,12 +55,13 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
   if(target){targetName=target.style.viewTransitionName;target.style.viewTransitionName='campus-media';document.documentElement.style.setProperty('--shared-radius-to',getComputedStyle(target).borderRadius)}
  })
  active=transition
+ activeKey=key;activeReverse=reverse
  let snapshotReady=false
  void transition.ready.then(()=>{snapshotReady=true}).catch(()=>{})
  void transition.finished.catch(()=>{}).finally(()=>{
   from.style.viewTransitionName=previous
   if(target)target.style.viewTransitionName=targetName
-  if(active===transition){delete document.documentElement.dataset.sharedTransition;delete document.documentElement.dataset.sharedKind;document.documentElement.style.removeProperty('--shared-duration');document.documentElement.style.removeProperty('--shared-radius-from');document.documentElement.style.removeProperty('--shared-radius-to');active=undefined}
+  if(active===transition){delete document.documentElement.dataset.sharedTransition;delete document.documentElement.dataset.sharedKind;document.documentElement.style.removeProperty('--shared-duration');document.documentElement.style.removeProperty('--shared-radius-from');document.documentElement.style.removeProperty('--shared-radius-to');active=undefined;activeKey=undefined}
   document.documentElement.dataset.sharedMotionResult=target?(snapshotReady?'complete':'skipped'):'missing-target'
   if(reverse){(target?.closest<HTMLElement>('a,button')??document.querySelector<HTMLElement>(`[data-shared-trigger="${CSS.escape(key)}"]`))?.focus({preventScroll:true});origins.delete(key)}
  })

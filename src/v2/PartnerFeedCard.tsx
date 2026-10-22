@@ -1,3 +1,4 @@
+import {sharedElementTransition} from './sharedElementMotion'
 import {ArrowRight,Bookmark,BookOpen,CarFront,Clapperboard,Clock3,Dumbbell,MapPin} from 'lucide-react'
 import type {PartnerRoom} from '../../shared/v2/partnerFilters'
 import {roomTypeName} from '../../shared/v2/model'
@@ -5,10 +6,9 @@ import type {Workspace} from '../live/api'
 import {DisplayAvatar} from './DisplayAvatar'
 import {displayPerson} from './displayPerson'
 import {uiLocale,uiText,useUiLanguage} from './uiLanguage'
-import type {CardOrigin} from './ui'
 import './partnerDiscovery.css'
 
-function ThemeArt({type}:{type:PartnerRoom['type']}){
+export function PartnerThemeArt({type}:{type:PartnerRoom['type']}){
   const Icon=type==='carpool'?CarFront:type==='study'?BookOpen:type==='sport'?Dumbbell:Clapperboard
   return <div className={`partner-theme-art is-${type}`} role="img" aria-label={`${uiText(roomTypeName[type])}${uiText('主题插画')}`}>
     <svg viewBox="0 0 420 160" fill="none" aria-hidden="true">
@@ -20,7 +20,7 @@ function ThemeArt({type}:{type:PartnerRoom['type']}){
   </div>
 }
 
-export function PartnerFeedCard({room,workspace,actorId,saved,busy,pending,onOpen,onSave}:{room:PartnerRoom;workspace:Workspace|null;actorId:string;saved:boolean;busy:boolean;pending:boolean;onOpen:(origin:CardOrigin)=>void;onSave:()=>void}){
+export function PartnerFeedCard({room,workspace,actorId,saved,busy,pending,onOpen,onSave}:{room:PartnerRoom;workspace:Workspace|null;actorId:string;saved:boolean;busy:boolean;pending:boolean;onOpen:()=>void;onSave:()=>void}){
   useUiLanguage()
   const owner=displayPerson(workspace,room.owner,uiText('校园同学'))
   const members=room.members.slice(0,3).map(id=>({id,...displayPerson(workspace,id,uiText('同学'))}))
@@ -31,13 +31,13 @@ export function PartnerFeedCard({room,workspace,actorId,saved,busy,pending,onOpe
     room.type==='study'&&(room.details.gpaMin!==undefined||room.details.gpaMax!==undefined)?`${uiText('期望绩点')} ${room.details.gpaMin??uiText('不限')}–${room.details.gpaMax??uiText('不限')}`:
     room.type==='sport'?[room.details.sportType,room.details.extraCost===false?uiText('无额外支出'):room.details.extraCost===true?uiText('有额外支出'):''].filter(Boolean).join(' · '):room.details.activityType||''
   return <article className="partner-feed-card" data-room-type={room.type} data-room-id={room.id}>
-    <button type="button" className="partner-card-open" onClick={event=>onOpen(event.currentTarget.closest('article')!.getBoundingClientRect().toJSON())} aria-label={`${uiText('查看')}${room.title}`}>
-      <div className="partner-card-visual"><ThemeArt type={room.type}/><span className="partner-card-type">{uiText(roomTypeName[room.type])}</span>{focus&&<span className="partner-card-focus">{focus}</span>}</div>
+    <button type="button" className="partner-card-open" onClick={event=>sharedElementTransition(`partner:${room.id}`,onOpen,{source:event.currentTarget.closest('article')?.querySelector<HTMLElement>('[data-shared-media]')})} aria-label={`${uiText('查看')}${room.title}`}>
+      <div className="partner-card-visual"><div className="partner-shared-art" data-shared-media={`partner:${room.id}`}><PartnerThemeArt type={room.type}/></div><span className="partner-card-type">{uiText(roomTypeName[room.type])}</span>{focus&&<span className="partner-card-focus">{focus}</span>}</div>
       <div className="partner-card-copy"><h3>{room.title}</h3><strong className="partner-card-time"><Clock3 size={15}/>{when}</strong><span className="partner-card-place"><MapPin size={14}/>{room.place||uiText('地点待商定')}</span>{room.body&&<p>{room.body}</p>}</div>
     </button>
     <button type="button" className="partner-card-save" disabled={busy} aria-label={uiText(saved?'取消收藏':'收藏队伍')} aria-pressed={saved} onClick={onSave}><Bookmark size={18} fill={saved?'currentColor':'none'}/></button>
     <div className="partner-card-social"><div className="partner-card-owner"><DisplayAvatar className="partner-owner-avatar" name={owner.name} avatar={owner.avatar} personId={room.owner}/><span>{room.owner===actorId?uiText('我发起的队伍'):`${owner.name} ${uiText('发起')}`}</span></div><div className="partner-member-stack" aria-label={uiText('已加入成员')}>{members.map(member=><DisplayAvatar key={member.id} className="partner-member-avatar" name={member.name} avatar={member.avatar} personId={member.id}/>)}</div></div>
     <div className="partner-card-recruitment"><div><span>{room.memberCount}/{room.capacity} {uiText('人')}</span><strong>{remaining?`${uiText('还差')} ${remaining} ${uiText('人')}`:uiText('队伍已满')}</strong></div><progress max={room.capacity} value={Math.min(room.memberCount,room.capacity)} aria-label={uiText('组队人数进度')}/></div>
-    <button type="button" className="partner-card-details" onClick={event=>onOpen(event.currentTarget.closest('article')!.getBoundingClientRect().toJSON())}><span>{uiText('看看这支队伍')}</span><span className="partner-card-status">{pending?uiText('申请待处理'):room.members.includes(actorId)?uiText('已加入'):''}</span><ArrowRight size={15}/></button>
+    <button type="button" className="partner-card-details" onClick={event=>sharedElementTransition(`partner:${room.id}`,onOpen,{source:event.currentTarget.closest('article')?.querySelector<HTMLElement>('[data-shared-media]')})}><span>{uiText('看看这支队伍')}</span><span className="partner-card-status">{pending?uiText('申请待处理'):room.members.includes(actorId)?uiText('已加入'):''}</span><ArrowRight size={15}/></button>
   </article>
 }
