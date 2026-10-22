@@ -74,3 +74,14 @@ body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){touch-ac
 body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account):active{background:var(--student-glass-active)!important;transition-duration:var(--student-press-time)}
 html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){transition:none}
 @media(prefers-reduced-motion:reduce){body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){transition:none}}
+/* Clip the sampled glass and its paint to the floating control's rounded shape.
+   Overflow alone does not provide a reliable backdrop boundary during compositing. */
+body:has(.v2-app.v2-app-student) :is(.student-fluid-nav.v2-mobile-nav,.student-timetable-launcher){
+ clip-path:inset(0 round 24px);
+ overflow:hidden;
+ isolation:isolate;
+}
+body:has(.v2-app.v2-app-student) :is(.student-timetable-launcher,.student-fluid-nav>a):focus-visible{
+ outline:2px solid currentColor;
+ outline-offset:-4px;
+}
