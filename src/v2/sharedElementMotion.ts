@@ -29,7 +29,7 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
  const previous=from.style.viewTransitionName
  document.documentElement.style.setProperty('--shared-radius-from',getComputedStyle(from).borderRadius)
  from.style.viewTransitionName='campus-media'
- document.documentElement.dataset.sharedKind=key.startsWith('shop:')?'shop':'media'
+ document.documentElement.dataset.sharedKind=key.startsWith('organization:')?'organization':key.startsWith('shop:')?'shop':'media'
  document.documentElement.style.setProperty('--shared-duration',`${reverse?sharedMotion.exit:sharedMotion.enter}ms`)
  document.documentElement.dataset.sharedTransition=reverse?'exit':'enter'
  let target:HTMLElement|null=null,targetName=''

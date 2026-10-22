@@ -6,7 +6,7 @@ import {pathToFileURL} from 'node:url';
 
 /** Run the existing isolated Sports fixture; never connect this launcher to production. */
 export async function startLocalSportsPreview() {
-  if (process.env.BNBU_LOCAL_OUTBOX !== '1' || resolve(process.env.BNBU_DATABASE ?? '') !== resolve('data/browser-acceptance.sqlite') || !['127.0.0.1','localhost','::1'].includes(process.env.BNBU_API_HOST ?? '127.0.0.1') || !['127.0.0.1','localhost','::1'].includes(process.env.BNBU_WEB_HOST ?? '127.0.0.1')) throw new Error('本地运动预览仅支持loopback上的独立验收数据库及本地邮件箱。');
+  if (process.env.BNBU_LOCAL_OUTBOX !== '1' || !['data/browser-acceptance.sqlite','.runtime/learning-preview.sqlite'].some(path=>resolve(process.env.BNBU_DATABASE ?? '')===resolve(path)) || !['127.0.0.1','localhost','::1'].includes(process.env.BNBU_API_HOST ?? '127.0.0.1') || !['127.0.0.1','localhost','::1'].includes(process.env.BNBU_WEB_HOST ?? '127.0.0.1')) throw new Error('本地运动预览仅支持loopback上的独立验收数据库及本地邮件箱。');
   const root = resolve(process.env.BNBU_LOCAL_SPORTS_ROOT ?? '../new_version');
   const entry = resolve(root, 'tools/companion-bridge/local-preview.mts');
   const loader = resolve(root, 'backend/node_modules/tsx/dist/loader.mjs');

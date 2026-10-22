@@ -44,3 +44,6 @@ html[data-shared-transition] :is(.shop-detail,.v2-explorer-panel){animation:none
 .alumni-detail-avatar{margin-bottom:16px}
 .alumni-detail-avatar .v2-avatar{width:76px;height:76px;font-size:28px}
 @media(max-width:600px){.partner-detail-art{aspect-ratio:2.8}}
+
+/* Preserve photo proportions while the club cover changes its crop and bounds. */
+html[data-shared-kind=organization]::view-transition-old(campus-media),html[data-shared-kind=organization]::view-transition-new(campus-media){height:100%;object-fit:cover;object-position:center}

@@ -4,3 +4,6 @@
 .club-photo-source a{display:flex;gap:4px;align-items:center;color:var(--v2-action)}
 .ref-org-cover{position:relative;overflow:hidden}
 .ref-org-cover img{position:absolute;inset:0;display:block;width:100%;height:100%;min-height:0;object-fit:cover;object-position:50% 35%;border-radius:inherit}
+
+.shop-detail .club-cover.is-detail.has-photo{aspect-ratio:auto;height:auto;display:block}
+.shop-detail .club-cover.is-detail.has-photo img{position:static;width:100%;height:auto;object-fit:contain;display:block;transform:none;animation:none}

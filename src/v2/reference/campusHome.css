@@ -180,3 +180,13 @@ html[data-ui-theme=dark] .v2-app.v2-app-student[data-campus-route='/v2'] .v2-mai
 @keyframes home-photo-reveal{from{opacity:0}to{opacity:1}}
 
 .community-home .home-hero-scene:after{background:linear-gradient(180deg,#172c2428 0%,#28362b4d 43%,#877d6b4d 57%,var(--home-canvas) 93%),linear-gradient(90deg,#132b2170,transparent 90%)}
+
+/* One social invitation followed by four quiet campus entries. */
+.home-campus-entry{margin:24px 3px 18px}.home-partner-entry{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 0 12px;color:var(--v2-ink)}
+.v2-app.v2-app-student .home-partner-entry h2{font-family:inherit;font-weight:650;font-size:20px;line-height:1.45;margin:0 0 3px}.home-partner-entry p{margin:0;color:var(--v2-muted);font-size:13px}.home-partner-entry>svg{flex:none;color:var(--v2-muted);transform:rotate(-45deg)}
+.home-campus-entry .home-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0}.home-campus-entry .home-shortcut{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:76px;padding:12px 6px;border:0;border-radius:12px;background:#f0f1ef;color:#303632;text-align:center}
+.home-campus-entry .home-shortcut>svg{width:25px;height:25px;margin:0;color:#646964}.home-campus-entry .home-shortcut>span{position:static;display:block;width:auto;height:auto;background:none;border-radius:0;color:inherit;font-size:13px;line-height:1.4}
+.home-campus-entry a:focus-visible{outline:2px solid var(--v2-action);outline-offset:3px}.home-campus-entry .home-shortcut:hover{background:#e7ebe7}
+html[data-ui-theme=dark] .home-campus-entry .home-shortcut{background:#27352e;color:#e1e8e3}html[data-ui-theme=dark] .home-campus-entry .home-shortcut>svg{color:#adbcb1}
+@media(min-width:760px){.home-campus-entry{margin:28px 0 22px}.home-campus-entry .home-shortcuts{gap:10px}.home-campus-entry .home-shortcut{min-height:84px}.home-partner-entry p{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.home-campus-entry .home-shortcut{transition:none}}

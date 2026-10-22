@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState,type MouseEvent} from 'react'
 import {Link} from 'react-router-dom'
-import {ArrowRight,BookOpen,CalendarDays,CheckCircle2,ChevronRight,Coffee,Heart,MapPin,Sparkles,UsersRound} from 'lucide-react'
+import {ArrowRight,BookOpen,CalendarDays,CheckCircle2,ChevronRight,Flag,Heart,MapPin,Sparkles} from 'lucide-react'
 import {StudentUtilities} from '../StudentUtilities'
 import {StudentTimetable} from '../StudentTimetable'
 import {useDevicePreferences} from '../devicePreferences'
@@ -20,7 +20,7 @@ import {CampusHeroGallery} from '../CampusHeroGallery'
 import campus from '../../assets/campus/home-background.jpg'
 import './campusHome.css'
 
-const shortcuts=[{title:'校园地图',copy:'探索校园',path:'/v2/campus/explore',icon:MapPin,tone:'mint'},{title:'校园活动',copy:'发现精彩',path:'/v2/activities',icon:UsersRound,tone:'blue'},{title:'找搭子',copy:'同学交流',path:'/v2/partners',icon:Coffee,tone:'amber'},{title:'社团组织',copy:'发现热爱',path:'/v2/organizations',icon:UsersRound,tone:'rose'},{title:'我的课表',copy:'全部课程',path:'/v2/me?tab=timetable',icon:CalendarDays,tone:'violet'}]
+const shortcuts=[{title:'地图',path:'/v2/campus/explore',icon:MapPin},{title:'活动',path:'/v2/activities',icon:CalendarDays},{title:'社团',path:'/v2/organizations',icon:Flag},{title:'课表',path:'/v2/me?tab=timetable',icon:BookOpen}]
 type Recommendation={id:string;title:string;image:string;category:string;path:string;transitionKey:string;detail:string;time?:string;source:'activity'|'organization'|'post'}
 function Cover({src,alt}:{src:string;alt:string}){
  const [failed,setFailed]=useState(false)
@@ -77,7 +77,7 @@ export function CampusWindowHome(){
    </section>
 
 
-   <nav className="home-shortcuts" aria-label={uiText('校园快捷入口')}>{shortcuts.map(({title,copy,path,icon:Icon,tone})=><Link key={path} to={path} className={`home-shortcut tone-${tone}`}><Icon size={27} strokeWidth={1.6}/><strong>{uiText(title)}</strong><small>{uiText(copy)}</small><span><ChevronRight size={12}/></span></Link>)}</nav>
+   <section className="home-campus-entry" aria-label={uiText('校园快捷入口')}><Link className="home-partner-entry" to="/v2/partners"><div><h2>{uiText('找个搭子，一起出发')}</h2><p>{uiText('认识新朋友，探索更多可能')}</p></div><ArrowRight size={18}/></Link><nav className="home-shortcuts" aria-label={uiText('校园服务')}>{shortcuts.map(({title,path,icon:Icon})=><Link key={path} to={path} className="home-shortcut"><Icon size={25} strokeWidth={1.7}/><span>{uiText(title)}</span></Link>)}</nav></section>
   </div>
  </div>
 }
