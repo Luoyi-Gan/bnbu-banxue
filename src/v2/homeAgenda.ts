@@ -8,8 +8,10 @@ export function homepageAgenda(data:Workspace|null,now=Date.now()){
  const today=campusDate(new Date(now)),midnight=Date.parse(today+'T00:00:00+08:00')
  const schedule=liveStudentSchedule(data,now)
  const courses=liveStudentSchedule(data,midnight).filter(item=>item.lessonId&&item.startAt&&campusDate(item.startAt)===today)
+ const tomorrow=midnight+86400000
+ const arrangements=schedule.filter(item=>{if(!item.startAt)return false;const start=Date.parse(item.startAt),end=Date.parse(item.endAt??item.startAt);return start<tomorrow&&end>=midnight&&end>now})
  const pendingCourses=courses.filter(item=>Date.parse(item.endAt??item.startAt!)>now)
- return {courses,remainingCourses:pendingCourses,visibleCourses:pendingCourses.length?pendingCourses:courses,deadlines:schedule.filter(isDeadline),other:schedule.filter(item=>!item.lessonId&&!isDeadline(item))}
+ return {arrangements,courses,remainingCourses:pendingCourses,visibleCourses:pendingCourses.length?pendingCourses:courses,deadlines:schedule.filter(isDeadline),other:schedule.filter(item=>!item.lessonId&&!isDeadline(item))}
 }
 export function courseClock(item:StudentScheduleItem,now:number){
  const start=Date.parse(item.startAt??''),end=Date.parse(item.endAt??'')
