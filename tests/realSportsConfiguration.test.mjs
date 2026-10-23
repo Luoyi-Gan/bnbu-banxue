@@ -1,4 +1,4 @@
-import {test} from 'node:test';
+import {test} from 'vitest';
 import assert from 'node:assert/strict';
 import {configureRealSportsConnection} from '../scripts/real-sports-connection.mjs';
 const config=()=>({BNBU_SPORTS_BRIDGE_ORIGIN:'http://127.0.0.1:4190',BNBU_SPORTS_BRIDGE_SECRET:'s'.repeat(40),BNBU_SPORTS_WEB_ORIGIN:'https://www.student.bnbusports.cn'});

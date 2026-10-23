@@ -1,0 +1,86 @@
+[
+  {
+    "width": 430,
+    "overflow": false,
+    "aiButtons": 0,
+    "photoDisclosure": 0,
+    "images": [
+      {
+        "src": "http://127.0.0.1:4186/campus-life/partners-2026-640.webp",
+        "width": 192,
+        "rendered": 185.5
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/clubs-2026-640.webp",
+        "width": 192,
+        "rendered": 185.5
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/coffee-2026-640.webp",
+        "width": 192,
+        "rendered": 185.5
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/shops-2026-640.webp",
+        "width": 192,
+        "rendered": 185.5
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "overflow": false,
+    "aiButtons": 0,
+    "photoDisclosure": 0,
+    "images": [
+      {
+        "src": "http://127.0.0.1:4186/campus-life/partners-2026-640.webp",
+        "width": 137,
+        "rendered": 130.5
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/clubs-2026-640.webp",
+        "width": 137,
+        "rendered": 130.5
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/coffee-2026-640.webp",
+        "width": 137,
+        "rendered": 130.5
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/shops-2026-640.webp",
+        "width": 137,
+        "rendered": 130.5
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "overflow": false,
+    "aiButtons": 0,
+    "photoDisclosure": 0,
+    "images": [
+      {
+        "src": "http://127.0.0.1:4186/campus-life/partners-2026-640.webp",
+        "width": 500,
+        "rendered": 552.09375
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/clubs-2026-640.webp",
+        "width": 500,
+        "rendered": 501.90625
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/coffee-2026-640.webp",
+        "width": 500,
+        "rendered": 552.09375
+      },
+      {
+        "src": "http://127.0.0.1:4186/campus-life/shops-2026-640.webp",
+        "width": 500,
+        "rendered": 501.90625
+      }
+    ]
+  }
+]
