@@ -1,6 +1,6 @@
 import {SharedMediaLink} from './SharedMediaLink'
 import {LoadingSwap} from './MaterialSkeleton'
-import {useEffect,useState} from 'react'
+import {useEffect,useRef,useState} from 'react'
 import {ArrowLeft,Bell,ChevronRight,FileText,LockKeyhole,MoreHorizontal,Plus,Search,X} from 'lucide-react'
 import {Link,useLocation,useSearchParams} from 'react-router-dom'
 import {useCommunityBackend} from './useCommunityBackend'
@@ -22,6 +22,7 @@ export function CommunityHub({embedded=false}:{embedded?:boolean}){
   const returnPath=(location.state as {profileReturnTo?:string}|null)?.profileReturnTo
   const profileReturnTo=returnPath&&/^\/v2\/(activities|community)(\?|$)/.test(returnPath)?returnPath:undefined
   const [photoIndices,setPhotoIndices]=useState<Record<string,number>>({})
+  const backgroundScroll=useRef<number|null>(null)
   const rememberPhoto=(id:string,index:number)=>setPhotoIndices(current=>current[id]===index?current:{...current,[id]:index})
   const [params,setParams]=useSearchParams(),[query,setQuery]=useState(params.get('q')??''),[search,setSearch]=useState(Boolean(params.get('q'))),[searchQuery,setSearchQuery]=useState(query)
   const [view,setView]=useState(params.get('feed')??''),[board,setBoard]=useState(params.get('board')??'全部'),[sort,setSort]=useState<'recommended'|'newest'>('recommended')
@@ -39,7 +40,17 @@ export function CommunityHub({embedded=false}:{embedded?:boolean}){
     // Object loading follows navigation, independently of feed refreshes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[selected,edit])
-  const update=(key:string,value?:string)=>setParams(current=>{const next=new URLSearchParams(current);if(value===undefined)next.delete(key);else next.set(key,value);return next})
+  const update=(key:string,value?:string)=>{
+    if(key==='item'){
+      if(value) backgroundScroll.current=window.scrollY
+      else if(backgroundScroll.current!==null){
+        const top=backgroundScroll.current
+        backgroundScroll.current=null
+        requestAnimationFrame(()=>window.scrollTo({top,behavior:'instant'}))
+      }
+    }
+    setParams(current=>{const next=new URLSearchParams(current);if(value===undefined)next.delete(key);else next.set(key,value);return next},{preventScrollReset:true})
+  }
   const closeComposer=()=>setParams(current=>{const next=new URLSearchParams(current);['compose','edit','draft'].forEach(key=>next.delete(key));return next},{replace:true})
   const done=(id?:string)=>{setParams(current=>{const next=new URLSearchParams(current);['compose','edit','draft'].forEach(key=>next.delete(key));if(id)next.set('item',id);return next},{replace:true});social.refresh()}
   const current=live.detailPost?.id===selected?live.detailPost:null

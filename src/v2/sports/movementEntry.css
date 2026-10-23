@@ -12,3 +12,4 @@ html[data-ui-theme=dark] .v2-app.v2-app-student :is(.motion-option-icon,.motion-
 html[data-ui-theme=dark] .v2-app.v2-app-student .motion-option-icon.is-solo{background:#49412f;color:#e1ce92}
 html[data-ui-theme=dark] .v2-app.v2-app-student .motion-local-notice{background:#363529;color:#d4cbaa}
 html[data-ui-theme=dark] .v2-app.v2-app-student .motion-icon-button{background:#293d38;color:#b8d7ca;border-color:#486155}
+.motion-error>a{color:#347b62;white-space:nowrap;text-decoration:underline;text-underline-offset:3px}

@@ -2,7 +2,7 @@ import './stateContinuity.css'
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
 import { ArrowLeft, ArrowUp, Bell, CalendarDays, ChevronRight, Coffee, MessageCircle, UsersRound } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { liveConversations, type LiveConversation } from './liveConversations'
 import { Empty, Modal, PageHeading, SectionHeading } from './ui'
 import { noticeCategories, noticeCategory, noticeDestination } from './notificationPresentation'
@@ -64,6 +64,7 @@ function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened
 }
 
 export function V2Messages() { useUiLanguage();
+  const navigate = useNavigate()
   const live = useWorkspaceBackend(10000)
   const conversations = useMemo(() => liveConversations(live.data), [live.data])
   const [params, setParams] = useSearchParams()
@@ -111,7 +112,7 @@ export function V2Messages() { useUiLanguage();
       {live.error && <p role="alert">{uiText(live.error)}</p>}
       {!live.data && !live.error && <p role="status">{uiText("正在读取本人通知…")}</p>}
       <div className="reference-notice-filters" aria-label={uiText("通知筛选")}>{noticeCategories.map(name => <button key={name} aria-pressed={category === name} className={category === name ? 'is-active' : ''} onClick={() => setCategory(name)}>{name} <small>{notices.filter(item => name === '全部' || noticeCategory(item.event) === name).length}</small></button>)}</div>
-      {notices.filter(item => category === '全部' || noticeCategory(item.event) === category).map(item => {const kind = noticeCategory(item.event); const Icon = kind === '活动' ? CalendarDays : kind === '交流' ? Coffee : kind === '社区' ? MessageCircle : Bell; return <button type="button" className={`inbox-notice reference-notice${showNoticeBadge(live.data, item) ? ' is-unread' : ''}`} key={item.id} onClick={() => {setParams({view:'notifications',category,notice:item.id}); if (!item.readAt) void live.mutate('notification.read', {id:item.id})}}>
+      {notices.filter(item => category === '全部' || noticeCategory(item.event) === category).map(item => {const kind = noticeCategory(item.event); const Icon = kind === '活动' ? CalendarDays : kind === '交流' ? Coffee : kind === '社区' ? MessageCircle : Bell; const target=noticeDestination(item,live.data); return <button type="button" className={`inbox-notice reference-notice${showNoticeBadge(live.data, item) ? ' is-unread' : ''}`} key={item.id} aria-label={`${item.body}${target?`，${uiText(target.label)}`:''}`} onClick={() => {if (!item.readAt) void live.mutate('notification.read', {id:item.id}); if(target)navigate(target.path,{state:{from:`/v2/messages?view=notifications&category=${encodeURIComponent(category)}`}}); else setParams({view:'notifications',category,notice:item.id})}}>
         <span className={`reference-icon tone-${kind === '交流' ? 'orange' : kind === '社区' ? 'purple' : 'blue'}`}><Icon size={21}/></span><span className="reference-notice-copy"><strong>{kind}{uiText("通知")}<i className="continuity-unread" data-unread={showNoticeBadge(live.data, item)} aria-hidden={!showNoticeBadge(live.data, item)} aria-label={showNoticeBadge(live.data, item)?uiText("未读"):undefined}/></strong><p>{item.body}</p><time>{new Date(item.createdAt).toLocaleString(uiLocale())}</time></span><ChevronRight size={17}/>
       </button>})}
       {live.data && !notices.some(item => category === '全部' || noticeCategory(item.event) === category) && <Empty icon={Bell} title={uiText("暂无此类通知")}/>}
@@ -125,7 +126,7 @@ export function V2Messages() { useUiLanguage();
           <span className="inbox-conversation-copy"><strong>{conversation.title}</strong><small>{conversation.messages.at(-1)?.body ?? uiText('开始一段新对话')}</small></span>
           <span className="inbox-conversation-meta"><time>{conversation.messages.at(-1)?.time}</time>{reminders.messages && conversation.unread > 0 && <b aria-label={uiTemplate([""," 条未读"],conversation.unread)}>{conversation.unread}</b>}</span>
         </button>)}
-        {live.data && !conversations.length && <Empty icon={MessageCircle} title={uiText("还没有会话")} description={uiText("加入队伍后，可以在这里继续交流。")}/>}
+        {live.data && !conversations.length && <><Empty icon={MessageCircle} title={uiText("还没有会话")} description={uiText("加入队伍后，可以在这里继续交流。")}/><Link className="v2-button v2-button-secondary" to="/v2/partners">{uiText('看看校园搭子')}<ChevronRight size={16}/></Link></>}
         <p className="inbox-list-note">{uiText("与一起参与的同学，保持联系。")}</p>
       </aside>
       <section className="inbox-chat" aria-label={uiText("聊天区域")}>

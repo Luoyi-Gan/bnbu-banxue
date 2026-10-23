@@ -22,7 +22,7 @@ export function noticeDestination(notice: Notice, data: Workspace | null): { pat
     const room = data.entities.find(item => item.id === entity.data.roomId && item.kind === 'room' && item.data.isMember)
     if (room) return {path:`/v2/partners/teams?item=${encodeURIComponent(room.id)}`,label:'查看队伍申请'}
   }
-  if (/^(post|community\.(?:post|like|save|comment|reply|commentlike))\./.test(notice.event) && !/(hidden|delete|removed|rejected)/.test(notice.event)) return {path:`/v2/community?item=${encodeURIComponent(id)}`,label:'查看帖子'}
+  if (/^(?:post\.|community\.(?:post|like|save|comment|reply|commentlike)(?:\.|$))/.test(notice.event) && !/(hidden|delete|removed|rejected)/.test(notice.event)) return {path:`/v2/community?item=${encodeURIComponent(id)}`,label:'查看帖子'}
   if (entity?.kind === 'comment' && typeof entity.data.postId === 'string') return {path:`/v2/community?item=${encodeURIComponent(entity.data.postId)}`,label:'查看评论所在帖子'}
   return null
 }

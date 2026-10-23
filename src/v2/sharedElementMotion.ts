@@ -68,7 +68,12 @@ export function sharedElementTransition(key:string,update:()=>void,{source,rever
   if(reverse){
    const origin=origins.get(key),items=candidates('media',key)
    target=origin?(items.includes(origin.element)?origin.element:items[origin.index]??find('media',key)):find('media',key)
-   if(origin&&target){window.scrollTo({top:origin.scroll,behavior:'instant'});window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-origin.top,behavior:'instant'})}
+   if(origin&&target){
+    window.scrollTo({top:origin.scroll,behavior:'instant'})
+    // A post closes over the same feed. Matching its card geometry by scrolling
+    // moves the reader away from the exact list position they left.
+    if(!key.startsWith('post:'))window.scrollTo({top:window.scrollY+target.getBoundingClientRect().top-origin.top,behavior:'instant'})
+   }
   }
   if(target){
    // Keep the destination's own entrance disabled for its entire mounted lifetime.

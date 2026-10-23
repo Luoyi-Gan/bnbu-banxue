@@ -1,4 +1,5 @@
 import {useEffect,useRef,useState} from 'react'
+import {Link} from 'react-router-dom'
 import {Activity,Camera,ChevronRight,Clock3,Footprints,History,LoaderCircle,Pause,Play,QrCode,RefreshCw,Square,X} from 'lucide-react'
 import {api} from '../../live/api'
 import {Modal} from '../ui'
@@ -51,7 +52,7 @@ export function MovementEntry(){useUiLanguage();
  return <section className={`ref-page ref-subpage motion-entry ${view==='sports'?'has-sports-frame':''}`}>
   <Header title={view==='solo'?'个人运动':view==='join'?'扫码入班':'运动'} backDisabled={busy} backLabel={view==='solo'||view==='join'?'返回运动选择':'返回首页'} onBack={view==='solo'||view==='join'?()=>{if(!busy){setView('entry');setError('')}}:undefined} actions={<button type="button" className="motion-icon-button" aria-label="重新检测体育账号" disabled={loading||busy} onClick={()=>void check()}><RefreshCw size={19} className={loading?'is-spinning':''}/></button>}/>
   {detection?.localAcceptance&&<aside className="motion-local-notice">{uiText('本地联动验收 · 体育账号目录为模拟数据，个人运动写入独立测试库。')}</aside>}
-  {error&&<div className="motion-error" role="alert"><p>{uiText(error)}</p><button type="button" disabled={loading||busy} onClick={()=>void(view==='join'?join():view==='solo'?chooseSolo():check())}>{uiText('重试')}</button></div>}
+  {error&&<div className="motion-error" role="alert"><p>{uiText(error)}</p>{error.includes('体育平台连接尚未配置')?<Link to="/v2/campus">{uiText('返回校园')}</Link>:<button type="button" disabled={loading||busy} onClick={()=>void(view==='join'?join():view==='solo'?chooseSolo():check())}>{uiText('重试')}</button>}</div>}
   {!loading&&detection?.state==='existing'&&(view==='solo'||view==='join')&&<button className="motion-join-later" onClick={()=>{setView('sports');setError('')}}>{uiText('返回运动概览')}</button>}
   {loading?<div className="motion-connection" role="status"><LoaderCircle size={27} className="is-spinning"/><strong>{uiText('正在连接 BNBU Sports')}</strong><p>{uiText('读取你的体育账号与运动记录')}</p></div>:<>
    {view==='entry'&&detection?.state==='new'&&<><div className="motion-welcome"><span><Footprints size={34}/></span><h2>{uiText('选一种方式，开始运动')}</h2><p>{uiText('加入体育班级，或留一点时间给自己。')}</p></div><div className="motion-options"><button type="button" disabled={busy} onClick={()=>{setView('join');setError('')}}><span className="motion-option-icon"><QrCode size={27}/></span><span><strong>{uiText('扫码入班')}</strong><small>{uiText('扫描老师的二维码，加入体育课程')}</small></span><ChevronRight size={21}/></button><button type="button" disabled={busy} onClick={()=>void chooseSolo()}><span className="motion-option-icon is-solo"><Footprints size={27}/></span><span><strong>{uiText('自己运动，不入班')}</strong><small>{uiText('记录个人运动，自由安排每一次出发')}</small></span><ChevronRight size={21}/></button></div><p className="motion-entry-note">{uiText('之后也可以随时扫码加入班级。')}</p></>}

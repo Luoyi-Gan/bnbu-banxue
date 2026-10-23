@@ -91,24 +91,24 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
     } catch (failure) { setError(failure instanceof Error ? failure.message : '保存失败') }
   }
   return <section className="v2-timetable" aria-label={uiText("我的课表")}>
-    {!detailOnly&&<><div className="v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div>{!embedded&&<h2>{uiText("我的课表")}</h2>}<p>{table?uiTemplate(["已收录 "," 项课程安排"],table.lessons.length):uiText('上传一张课表照片，查看一周的课程安排。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{table?uiText('重新导入'):uiText('导入课表')}</button></div>
+    {!detailOnly&&<><div className="v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div>{!embedded&&<h2>{uiText("我的课表")}</h2>}<p>{table?uiTemplate(["已收录 "," 项课程安排"],table.lessons.length):recognitionPath?uiText('上传一张课表照片，查看一周的课程安排。'):uiText('图片识别服务尚未接入，可先体验示例课表。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{recognitionPath?table?uiText('重新导入'):uiText('导入课表'):uiText('体验示例课表')}</button></div>
     {message && <p className="v2-timetable-message" role="status">{message}</p>}
     {live.error && <p role="alert" className="v2-info-box">{uiText(live.error)}</p>}
     {sample && <div className="v2-info-box">{uiText("示例模式 · 以下课程为虚构内容。")}<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>{uiText("退出示例")}</button></div>}
     <TimetableBoard lessons={lessons} preferences={live.data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===live.data?.account.id)?.data} idPrefix={idPrefix} onSelect={(id,rect)=>{setCardOrigin(rect);setSelected(id);setError('')}}/>
-    <div className="v2-timetable-footnote"><span>{table && !sample?uiTemplate(["","更新于 ",""],table.fileName?`${table.fileName} · `:'',new Date(table.updatedAt).toLocaleString(uiLocale(), { timeZone: 'Asia/Shanghai' })):uiText('识别后自动按星期归类；未识别清楚的内容保留待核对。')}</span><small>{uiText("课程以学校最新安排为准。")}</small></div>
+    <div className="v2-timetable-footnote"><span>{table && !sample?uiTemplate(["","更新于 ",""],table.fileName?`${table.fileName} · `:'',new Date(table.updatedAt).toLocaleString(uiLocale(), { timeZone: 'Asia/Shanghai' })):recognitionPath?uiText('识别后自动按星期归类；未识别清楚的内容保留待核对。'):uiText('示例课程仅供体验，不会保存。')}</span><small>{uiText("课程以学校最新安排为准。")}</small></div>
     </>}
-    {importOpen && <Modal title={uiText("导入我的课表")} onClose={closeImport}>
+    {importOpen && <Modal title={uiText(recognitionPath?'导入我的课表':'体验示例课表')} onClose={closeImport}>
       {stage?<div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading?uiText('正在演示识别过程'):uiText('正在识别课表')}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{uiText(label)}</li>)}</ol><p>{uiText("识别完成后自动显示课表，原有课表在识别成功前保留。")}</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy?uiText('正在保存'):uiText('取消识别')}</button></div>:<div className="v2-timetable-import">
-        <p>{uiText("请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。")}</p>
-        <label className="v2-timetable-upload"><input type="file" accept="image/jpeg,image/png,image/webp" aria-label={uiText("选择课表照片")} onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = '' }}/>{preview ? <img src={preview} alt={uiText("待识别的课表照片")}/> : <><ImagePlus size={32}/><strong>{uiText("选择课表照片")}</strong><span>{uiText("上传照片或课表截图")}</span></>}</label>
+        {recognitionPath&&<><p>{uiText("请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。")}</p>
+        <label className="v2-timetable-upload"><input type="file" accept="image/jpeg,image/png,image/webp" aria-label={uiText("选择课表照片")} onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = '' }}/>{preview ? <img src={preview} alt={uiText("待识别的课表照片")}/> : <><ImagePlus size={32}/><strong>{uiText("选择课表照片")}</strong><span>{uiText("上传照片或课表截图")}</span></>}</label></>}
         {readingPhoto && <p role="status">{uiText("正在读取图片…")}</p>}
         {file && <p className="v2-timetable-filename">{file.name} · {(file.size / 1024 / 1024).toFixed(1)} MB</p>}
-        {table && <p>{uiText("识别成功后将替换当前课表；失败或取消保留原有记录。")}</p>}
-        {!recognitionPath && <div className="v2-info-box">{uiText("图片识别服务尚未接入，当前照片不会上传。可先体验加载过程和示例课表。")}</div>}
+        {table && recognitionPath && <p>{uiText("识别成功后将替换当前课表；失败或取消保留原有记录。")}</p>}
+        {!recognitionPath && <div className="v2-info-box">{uiText("图片识别服务尚未接入。示例课表仅供体验，不会上传照片或覆盖已有课程。")}</div>}
         {(error || live.error) && <p role="alert">{error || live.error}</p>}
-        <button className="v2-button v2-button-primary" disabled={!file || readingPhoto} onClick={() => void start(false)}><Upload size={16}/>{uiText("开始识别")}</button>
-        <button className="v2-button v2-button-secondary" onClick={() => void start(true)}>{uiText("体验示例识别流程")}</button>
+        {recognitionPath&&<button className="v2-button v2-button-primary" disabled={!file || readingPhoto} onClick={() => void start(false)}><Upload size={16}/>{uiText("开始识别")}</button>}
+        <button className={`v2-button ${recognitionPath?'v2-button-secondary':'v2-button-primary'}`} onClick={() => void start(true)}>{uiText("体验示例识别流程")}</button>
       </div>}
     </Modal>}
     {current && <Drawer origin={cardOrigin} title={current.name} eyebrow={uiTemplate([""," · ",""],weekDays[current.weekday - 1],uiText(sample ? '示例课程' : '课程详情'))} onClose={() => { setSelected(null); setError(''); onCloseDetails?.() }}>

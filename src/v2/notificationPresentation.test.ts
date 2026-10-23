@@ -24,6 +24,12 @@ describe('student notice and schedule destinations', () => {
     expect(noticeDestination(notice('coffee.book','booking'),data)?.path).toBe('/v2/coffee?teacher=t%2F1&slot=s%3F1')
     expect(noticeDestination(notice('comment.create','comment'),data)?.path).toBe('/v2/community?item=p%2F1')
   })
+  it('opens like and comment notices at their associated post', () => {
+    const data = workspace([])
+    for (const event of ['community.like','community.comment','community.reply','community.commentlike']) {
+      expect(noticeDestination(notice(event,'post/1'),data)?.path).toBe('/v2/community?item=post%2F1')
+    }
+  })
   it('keeps calendar membership and confirmed booking rules while linking to specific objects', () => {
     const data = workspace([
       entity('room','room',{isMember:true,status:'open',visibility:'visible',title:'队伍',time:'周六',place:'校园'}),

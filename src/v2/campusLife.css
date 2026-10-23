@@ -82,5 +82,4 @@
 }
 @media(max-width:360px){.cl-hero>a{height:142px}.v2-app-student .campus-life .cl-hero h2{font-size:20px}.cl-hero p{font-size:10px}.cl-hero time{font-size:9px}.cl-entry-photo>span{font-size:7px}.cl-course-row{gap:8px}.cl-course-row strong{font-size:12px}.cl-hero>a>span{font-size:9px}.cl-ai-heading small{font-size:9px}}
 html[data-ui-motion=reduce] .campus-life *,html[data-ui-motion=reduce] .cl-ai-sheet *{transition:none!important;animation:none!important}
-html[data-ui-theme=dark] .campus-life :is(.cl-ai,
 @media(prefers-reduced-motion:reduce){.campus-life *,.cl-ai-sheet *{transition:none!important;animation:none!important}}
