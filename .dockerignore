@@ -2,7 +2,8 @@
 node_modules
 dist
 .runtime
-data
+data/*
+!data/campus-clubs.json
 artifacts
 integrations
 *.log

@@ -4,6 +4,8 @@ COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 COPY backend ./backend
 COPY shared ./shared
+COPY data/campus-clubs.json ./data/campus-clubs.json
+COPY src/v2/timetableSchedule.ts ./src/v2/timetableSchedule.ts
 RUN node backend/build.mjs
 
 FROM node:24-bookworm-slim

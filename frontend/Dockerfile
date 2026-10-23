@@ -5,7 +5,7 @@ RUN npm ci --ignore-scripts
 COPY src ./src
 COPY shared ./shared
 COPY public ./public
-COPY index.html vite.config.ts tsconfig.app.json ./
+COPY index.html promo.html vite.config.ts tsconfig.app.json ./
 ARG VITE_SPORTS_STUDENT_URL
 ARG VITE_SPORTS_TEACHER_URL
 ARG VITE_AMAP_KEY
