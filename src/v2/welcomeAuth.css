@@ -52,3 +52,8 @@
 @media(max-width:360px){.v2-auth-page.v2-auth-welcome .v2-auth-card{padding:20px 15px}.v2-auth-page.v2-auth-welcome .v2-auth-intro{height:140px}.v2-auth-page.v2-auth-welcome .v2-auth-code-row>button{min-width:88px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){.v2-auth-page.v2-auth-welcome *{transition:none!important}}
 html[data-ui-motion=reduce] .v2-auth-page.v2-auth-welcome *{transition:none!important}
+/* The supplied photograph includes its own title and photographer credit. */
+.v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story{padding:0;background:#0a3946;justify-content:initial}
+.v2-auth-page.v2-auth-welcome .v2-auth-story-image{display:block;width:100%;height:100%;object-fit:cover;object-position:center 35%}
+@media(max-width:850px){.v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story{height:240px;padding:0}.v2-auth-page.v2-auth-welcome .v2-auth-story-image{object-position:center 23%}}
+@media(max-width:360px){.v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story{height:216px}}

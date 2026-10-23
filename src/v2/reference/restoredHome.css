@@ -17,17 +17,17 @@ html[data-ui-theme=dark] .restored-home .home-campus-entry .home-shortcut{box-sh
 @media(max-width:640px){.v2-app.v2-app-student[data-campus-route='/v2'] .v2-main>.restored-home{padding:0 17px 110px}.restored-home .cw-header{height:69px;min-height:69px}.restored-home .cw-header .student-utilities{gap:6px}.restored-home .campus-home-header>nav{gap:6px}.restored-home .cw-window{height:279px}.restored-home .cw-scene{left:-17px;right:-17px;top:-69px;height:calc(100% + 69px)}.restored-home .cw-date{left:1px;top:25px;font-size:12px}.restored-home .cw-greeting{left:35px;top:22px}.restored-home .cw-hello{font-size:28px}.restored-home .cw-name{font-size:18px;max-height:112px}.restored-home .cw-summary{gap:7px}.restored-home .cw-summary>:is(a,div)>span{font-size:11px}.restored-home .cw-content-grid,.restored-home .cw-event-list{display:flex;flex-direction:column;gap:0}.restored-home .cw-event-list{gap:18px}.restored-home .ref-section{margin-top:22px}.restored-home .cw-assistant .ref-assistant{margin-top:22px}.restored-home .cw-footer{margin-top:24px}}
 @media(max-width:360px){.restored-home .campus-home-header :is(.student-utilities>a,.v2-student-search-trigger){width:31px!important;min-width:31px;height:34px!important}.restored-home .campus-home-header>nav,.restored-home .cw-header .student-utilities{gap:3px}.restored-home .cw-window{height:258px}.v2-app.v2-app-student .restored-home .cw-header h1{font-size:24px}.restored-home .cw-summary>a{padding:12px 8px!important}}
 html[data-ui-theme=dark] .restored-home{--cw-ink:var(--v2-ink);--cw-muted:var(--v2-muted);--cw-line:var(--v2-line);--cw-blue:#9bc1cf}html[data-ui-theme=dark] .restored-home .cw-header h1{color:var(--v2-ink)}
-/* Keep the confirmed vertical greeting legible against changing campus photos. */
+/* Keep the greeting legible against changing campus photos. */
 .restored-home :is(.cw-date,.cw-greeting){color:#1e3837;text-shadow:0 1px 8px rgba(250,249,246,.92)}
 @media(max-width:640px){.restored-home .cw-name{max-height:190px}}
-/* The date and greeting share one readable line on the hero photo. */
-.restored-home .cw-hero-copy{position:absolute;z-index:2;top:28px;left:22px;right:22px;display:flex;align-items:baseline;gap:18px;min-width:0;color:#1e3837;text-shadow:0 1px 8px rgba(250,249,246,.92)}
+/* Date and greeting form two distinct lines on the hero photo. */
+.restored-home .cw-hero-copy{position:absolute;z-index:2;top:24px;left:24px;right:24px;display:grid;justify-items:start;align-content:start;gap:4px;min-width:0;color:#1e3837;text-shadow:0 1px 8px rgba(250,249,246,.92)}
 .restored-home .cw-hero-copy .cw-date,.restored-home .cw-hero-copy .cw-greeting{position:static;writing-mode:horizontal-tb;max-width:none;max-height:none;bottom:auto;top:auto;left:auto;right:auto;color:inherit;text-shadow:inherit}
-.restored-home .cw-hero-copy .cw-date{flex:none;white-space:nowrap;letter-spacing:.02em;font-size:13px}
+.restored-home .cw-hero-copy .cw-date{white-space:nowrap;letter-spacing:.02em;font-size:16px}
 .restored-home .cw-hero-copy .cw-date-number{text-combine-upright:none}
 .restored-home .cw-hero-copy .cw-greeting{display:flex;align-items:baseline;gap:2px;min-width:0}
 .restored-home .cw-hero-copy :is(.cw-hello,.cw-name){writing-mode:horizontal-tb;margin:0;max-height:none;letter-spacing:0;white-space:nowrap}
-.restored-home .cw-hero-copy .cw-hello{font-size:clamp(23px,3vw,35px)}
-.restored-home .cw-hero-copy .cw-name{font-size:clamp(17px,2vw,24px);min-width:0;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:640px){.restored-home .cw-hero-copy{top:22px;left:12px;right:12px;gap:10px}.restored-home .cw-hero-copy .cw-date{font-size:11px}.restored-home .cw-hero-copy .cw-hello{font-size:clamp(20px,5vw,27px)}.restored-home .cw-hero-copy .cw-name{font-size:clamp(14px,3.5vw,19px)}}
-@media(max-width:380px){.restored-home .cw-hero-copy{gap:6px}.restored-home .cw-hero-copy .cw-date{font-size:10px}.restored-home .cw-hero-copy .cw-hello{font-size:20px}.restored-home .cw-hero-copy .cw-name{font-size:14px}}
+.restored-home .cw-hero-copy .cw-hello{font-size:clamp(32px,3.7vw,44px)}
+.restored-home .cw-hero-copy .cw-name{font-size:clamp(22px,2.5vw,29px);min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){.restored-home .cw-hero-copy{top:22px;left:20px;right:20px;gap:3px}.restored-home .cw-hero-copy .cw-date{font-size:15px}.restored-home .cw-hero-copy .cw-hello{font-size:clamp(30px,7vw,38px)}.restored-home .cw-hero-copy .cw-name{font-size:clamp(21px,5vw,27px)}}
+@media(max-width:380px){.restored-home .cw-hero-copy{left:16px;right:16px}.restored-home .cw-hero-copy .cw-date{font-size:13px}.restored-home .cw-hero-copy .cw-hello{font-size:29px}.restored-home .cw-hero-copy .cw-name{font-size:20px}}

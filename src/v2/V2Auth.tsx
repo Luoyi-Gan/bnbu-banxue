@@ -12,13 +12,14 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-const brandIcon = "/huitongli-app-icon.png";
+import loginCoverStory from '../assets/campus/login-cover-story.png';
 import { authApi, AuthServiceError } from "./authApi";
 import {StudentLoginMethods} from './StudentLoginMethods';
 import { roleLoginPath } from "./authReturnPath";
 import "./auth.css";
 import "./editorialAuth.css";
 import "./welcomeAuth.css";
+const brandIcon = "/huitongli-app-icon.png";
 
 type AuthMode = "login" | "register";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -142,19 +143,21 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
           {uiText("返回校园")}</Link>
       </header>
       <main className="v2-auth-layout">
-        <section className="v2-auth-intro" aria-label={uiText("会同里校园生活")}>
-          <span className="v2-auth-eyebrow">BNBU / CAMPUS</span>
-          <div>
-            <span className="v2-auth-index">01 — 03</span>
-            <h1>
-              {uiText("让校园生活")}<br />
-              {uiText("从这里开始。")}</h1>
-            <p>{uiText("活动、搭子、社区与个人安排，放在清晰的一处。")}</p>
-          </div>
-          <div className="v2-auth-intro-footer">
-            <span>{uiText("为每一次参与，留好位置。")}</span>
-            <span>{uiText("会同里 · 校园生活助手")}</span>
-          </div>
+        <section className={`v2-auth-intro${mode==='login'?' v2-auth-story':''}`} aria-label={uiText(mode==='login'?'封面故事':'会同里校园生活')}>
+          {mode==='login'?<img className="v2-auth-story-image" src={loginCoverStory} alt={uiText('暮色落下，故事在灯光里继续。摄影 / hty。夜色中的校园建筑亮起灯光。')}/>:<>
+            <span className="v2-auth-eyebrow">BNBU / CAMPUS</span>
+            <div>
+              <span className="v2-auth-index">01 — 03</span>
+              <h1>
+                {uiText("让校园生活")}<br />
+                {uiText("从这里开始。")}</h1>
+              <p>{uiText("活动、搭子、社区与个人安排，放在清晰的一处。")}</p>
+            </div>
+            <div className="v2-auth-intro-footer">
+              <span>{uiText("为每一次参与，留好位置。")}</span>
+              <span>{uiText("会同里 · 校园生活助手")}</span>
+            </div>
+          </>}
         </section>
         <section className="v2-auth-card" aria-labelledby="auth-title">
           <div className="v2-auth-card-head">
