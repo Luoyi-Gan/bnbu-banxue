@@ -70,6 +70,7 @@ export class LearningAuth {
       const verified=await sql.rows<{data:string}>("SELECT data FROM entities WHERE kind='verifiedEmail' AND owner_id=?",[row.id]);
       if(!verified.some(item=>JSON.parse(item.data).email===email))await learningEntity(sql,'verifiedEmail',row.id,{email,source:'email-login-code'});
       const session=await this.session(sql,row);
+      await sql.rows("UPDATE mail_outbox SET body='[验证码已消费]' WHERE recipient=? AND subject=?",[email,'会同里登录验证码']);
       await sql.rows('DELETE FROM email_challenges WHERE email=?',[key]);return session;
     });
     if('error'in result)throw new ServiceError(400,'INVALID_CODE',result.error!);

@@ -1,9 +1,11 @@
 import {build,createServer} from 'vite';
 import {configureRealSportsConnection} from '../../scripts/real-sports-connection.mjs';
+import {configureEmailDelivery} from '../../scripts/configure-email.mjs';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 process.env.BNBU_DATABASE=resolve('.runtime/learning-preview.sqlite');
 process.env.BNBU_API_PORT='4187';process.env.BNBU_LOCAL_OUTBOX='1';
+await configureEmailDelivery();
 process.env.BNBU_COMPANION_ORIGIN='http://127.0.0.1:4187';
 await configureRealSportsConnection();
 await build({configFile:false,publicDir:false,logLevel:'warn',build:{ssr:true,target:'node22',outDir:'.runtime/learning-preview',minify:false,lib:{entry:resolve('backend/src/main.ts'),formats:['es'],fileName:()=> 'backend.mjs'},rollupOptions:{external:[/^node:/,'imapflow','mailparser','tencentcloud-sdk-nodejs-ocr','pdfjs-dist/legacy/build/pdf.mjs']}}});

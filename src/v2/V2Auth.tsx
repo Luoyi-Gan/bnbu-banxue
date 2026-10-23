@@ -18,6 +18,7 @@ import {StudentLoginMethods} from './StudentLoginMethods';
 import { roleLoginPath } from "./authReturnPath";
 import "./auth.css";
 import "./editorialAuth.css";
+import "./welcomeAuth.css";
 
 type AuthMode = "login" | "register";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -128,7 +129,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
   };
 
   return (
-    <div className="v2-auth-page">
+    <div className={`v2-auth-page${mode==='login'?' v2-auth-welcome':''}`}>
       <header className="v2-auth-header">
         <Link className="v2-auth-brand" to="/v2">
           <img src={brandIcon} alt="" />
@@ -306,7 +307,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
             </button>
           </form>}
           {mode==='login'&&legacy&&<button type="button" className="v2-auth-text-action" onClick={()=>{setLegacy(false);setPassword('');setError('')}}>{uiText('使用邮箱验证码或学校账号')}</button>}
-          {mode === 'login' && <p className="v2-auth-switch"><Link to="/v2/forgot-password">{uiText("忘记密码？")}</Link></p>}
+          {mode === 'login' && legacy && <p className="v2-auth-switch"><Link to="/v2/forgot-password">{uiText("忘记密码？")}</Link></p>}
           <p className="v2-auth-switch">
             {mode === "login"?uiText("还没有账号？"):uiText("已有账号？")}{" "}
             <Link to={mode === "login"?"/v2/register":"/v2/login"}>
@@ -314,10 +315,10 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
               <ArrowRight size={14} />
             </Link>
           </p>
-          <div className="v2-auth-demo">
+          {mode!=='login'&&<div className="v2-auth-demo">
             <span>
               {uiText("请使用本人邮箱注册或找回密码。校园身份需完成相应认证。")}</span>
-          </div>
+          </div>}
         </section>
       </main>
       <footer className="v2-auth-footer"><Link to="/v2/privacy">{uiText("隐私政策")}</Link>

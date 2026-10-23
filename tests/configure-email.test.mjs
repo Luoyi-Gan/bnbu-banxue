@@ -1,0 +1,11 @@
+import {afterEach,expect,it} from 'vitest';
+import {mkdtemp,writeFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {configureEmailDelivery,aoksendEndpoint} from '../scripts/configure-email.mjs';
+const paths=[];
+afterEach(async()=>{for(const path of paths.splice(0))await rm(path,{recursive:true,force:true})});
+const config={BNBU_EMAIL_PROVIDER:'aoksend',BNBU_EMAIL_DELIVERY_URL:aoksendEndpoint,BNBU_AOKSEND_APP_KEY:'test-key',BNBU_AOKSEND_TEMPLATE_ID:'test-template',BNBU_AOKSEND_CODE_VARIABLE:'code',BNBU_AOKSEND_LOGIN_TEMPLATE_ID:'test-login-template'};
+it('未配置时不伪装为真实发信',async()=>{const env={BNBU_LOCAL_OUTBOX:'1'};expect(await configureEmailDelivery(env)).toBe(false);expect(env.BNBU_LOCAL_OUTBOX).toBe('1')});
+it('从指定私有文件载入配置并关闭本地收件箱',async()=>{const path=await mkdtemp(join(tmpdir(),'bnbu-email-'));paths.push(path);const file=join(path,'connection.json');await writeFile(file,JSON.stringify(config));const env={BNBU_EMAIL_CONNECTION_FILE:file,BNBU_LOCAL_OUTBOX:'1'};expect(await configureEmailDelivery(env)).toBe(true);expect(env.BNBU_LOCAL_OUTBOX).toBe('0');expect(env.BNBU_AOKSEND_LOGIN_TEMPLATE_ID).toBe('test-login-template')});
+it('无效地址或不完整配置失败关闭，错误不暴露密钥',async()=>{await expect(configureEmailDelivery({...config,BNBU_EMAIL_DELIVERY_URL:'https://other.example/send'})).rejects.toThrow('地址无效');await expect(configureEmailDelivery({...config,BNBU_AOKSEND_APP_KEY:''})).rejects.toThrow('不完整')});
