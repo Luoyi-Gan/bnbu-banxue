@@ -2302,5 +2302,9 @@
   "学校在当前日历范围未返回事项；同步异常会显示在上方。": "The school returned no events in the current calendar range. Any sync issues appear above.",
   "连接学校账号后，课程资料目录会自动显示。": "Course material lists appear automatically after school sign-in.",
   "当前课程暂未返回文件资料；自动同步异常会显示在上方。": "No files were returned for this course. Any automatic sync issues appear above.",
-  "当前时间来自 MIS；手动修正会在下一次学校同步时按学校数据更新。": "These times come from MIS. Manual corrections are replaced by school data on the next school sync."
+  "当前时间来自 MIS；手动修正会在下一次学校同步时按学校数据更新。": "These times come from MIS. Manual corrections are replaced by school data on the next school sync.",
+  "知识库": "Knowledge base",
+  "原始封面": "Campus covers",
+  "选择原始封面，或上传自己的图片。": "Choose a campus cover or upload your own image.",
+  "重置封面": "Reset cover"
 }

@@ -104,7 +104,7 @@ function InteractiveCampus({ mode, initialTarget=null, place='', onPick, onClose
           if(existing?.dataset.placeId===building.id)return
           const source=existing??layoutHost.current?.querySelector<HTMLElement>('.map-p0-dock')
           sharedElementTransition('campus-place',()=>setSelected(building),{source})
-        }, () => { setBuildings(fallbackCampusBuildings); setStatus('error') }, { immersive: mode === 'explore', onLocation: setPosition })
+        }, () => { setBuildings(fallbackCampusBuildings); setStatus('error') }, { immersive: mode === 'explore', picker: mode === 'pick', onLocation: setPosition })
       } catch { setBuildings(fallbackCampusBuildings); setStatus('error') }
     }).catch(() => { if (!cancelled) { setBuildings(fallbackCampusBuildings); setStatus('error') } })
     return () => { cancelled = true; scene.current?.dispose(); scene.current = null }

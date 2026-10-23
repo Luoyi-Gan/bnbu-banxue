@@ -20,7 +20,7 @@ export function DiscoveryPage(){
   const language=useUiLanguage()
   const [params,setParams]=useSearchParams()
   const section=sections.find(([key])=>key===params.get('section'))?.[0]??'activities'
-  return <div className="ref-page cw-pages campus-discovery"><Header title={uiText('发现')} search={false}/>
+  return <div className="ref-page cw-pages campus-discovery"><Header title={uiText('发现')} search={false} hideConversations/>
     <nav className="campus-discovery-sections" aria-label={uiText('发现分类')}>{sections.map(([key,label,enLabel])=>{const Icon=sectionIcons[key];return <button key={key} type="button" aria-pressed={section===key} onClick={()=>setParams(key==='activities'?{}:{section:key})}><Icon size={20} aria-hidden="true"/><span>{language==='en'?enLabel:label}</span></button>})}</nav>
     <div className="campus-discovery-panel" key={section}>
       {section==='activities'&&<ActivityPanel initialQuery={params.get('q')??''} initialCategory={params.get('category')??'全部'}/>}

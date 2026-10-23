@@ -50,8 +50,8 @@ export function CampusWindowHome(){
  return <div className="ref-page cw-home campus-home restored-home">
   <header className="cw-header campus-home-header"><h1>{uiText('会同里')}</h1><nav aria-label={uiText('首页工具')}><StudentSearch/><StudentUtilities/></nav></header>
   <section className="cw-window" ref={hero} aria-label={uiText('校园窗口')}>
-   <time className="cw-date" dateTime={new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now))} aria-label={dateFormat.format(new Date(now))}>{dateFormat.formatToParts(new Date(now)).map((part,index)=><span key={index} className={part.type==='month'||part.type==='day'?'cw-date-number':undefined}>{part.value}</span>)}</time>
-   <div className="cw-greeting" aria-label={`${uiText(greeting)}，${name}`}><span className="cw-hello">{uiText(greeting)}，</span><span className="cw-name" title={name}>{name}</span></div>
+   <div className="cw-hero-copy"><time className="cw-date" dateTime={new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now))} aria-label={dateFormat.format(new Date(now))}>{dateFormat.formatToParts(new Date(now)).map((part,index)=><span key={index} className={part.type==='month'||part.type==='day'?'cw-date-number':undefined}>{part.value}</span>)}</time>
+   <div className="cw-greeting" aria-label={`${uiText(greeting)}，${name}`}><span className="cw-hello">{uiText(greeting)}，</span><span className="cw-name" title={name}>{name}</span></div></div>
    <div className="cw-scene"><CampusHeroGallery autoplay={!device.reducedMotion&&device.preferences.photoAutoplay&&inView}/></div>
   </section>
   {courseDetail&&<StudentTimetable initialWorkspace={data??undefined} detailOnly initialLessonId={courseDetail.id} origin={courseDetail.origin} onCloseDetails={()=>setCourseDetail(null)}/>}

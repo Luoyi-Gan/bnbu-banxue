@@ -26,3 +26,16 @@ html[data-ui-theme=dark] .campus-ai-workbench,html[data-ui-theme=dark] .nai-mobi
 html[data-ui-text=large] .campus-ai-workbench .nai-prose{font-size:18px}html[data-ui-text=large] .campus-ai-workbench .nai-composer-limit{display:none}
 html[data-ui-motion=reduce] .campus-ai-workbench *,html[data-ui-motion=reduce] .nai-mobile-history *{animation:none!important;transition:none!important;scroll-behavior:auto!important}@media(prefers-reduced-motion:reduce){.campus-ai-workbench *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 .campus-ai-workbench.is-embedded{height:100%;padding:0}.is-embedded .nai-header{height:52px}.is-embedded .nai-reading{padding-top:15px}.is-embedded .nai-welcome{padding-bottom:10px}.is-embedded .nai-welcome h1{font-size:22px!important}.is-embedded .nai-compose-zone{padding-bottom:10px}.is-embedded .nai-header .nai-identity small{display:none}
+/* Clear input hierarchy and finger-sized controls in the AI sheet. */
+.campus-ai-workbench .nai-compose-zone{padding-top:10px}
+.campus-ai-workbench .nai-composer{border-color:var(--nai-line);border-radius:22px;background:var(--nai-surface);padding:12px 13px 10px;box-shadow:0 4px 18px #1c302310}
+.campus-ai-workbench .nai-composer:focus-within{border-color:var(--nai-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--nai-accent) 18%,transparent),0 8px 22px #1c302314}
+.campus-ai-workbench .nai-composer>textarea{min-height:45px;padding:3px 4px 9px;font-size:16px;line-height:1.5}
+.campus-ai-workbench .nai-composer-tools{gap:8px;margin-top:3px}
+.campus-ai-workbench .nai-knowledge-tool,.campus-ai-workbench .nai-provider>summary{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;height:40px;padding:0 11px;border:1px solid var(--nai-line);border-radius:20px;background:var(--nai-soft);color:var(--nai-ink);font-size:12px;white-space:nowrap}
+.campus-ai-workbench .nai-knowledge-tool{width:auto}
+.campus-ai-workbench .nai-provider>summary{cursor:pointer}
+.campus-ai-workbench .nai-send{width:44px;height:44px;margin-left:auto;border-radius:15px}
+.campus-ai-workbench .nai-knowledge-tool:focus-visible,.campus-ai-workbench .nai-provider>summary:focus-visible,.campus-ai-workbench .nai-send:focus-visible{outline:2px solid var(--nai-accent);outline-offset:2px}
+.campus-ai-workbench .nai-disclosure{font-size:11px;line-height:1.5}
+@media(max-width:380px){.campus-ai-workbench .nai-composer-tools{gap:5px}.campus-ai-workbench .nai-knowledge-tool,.campus-ai-workbench .nai-provider>summary{padding:0 8px;font-size:11px}}

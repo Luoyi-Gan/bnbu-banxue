@@ -5,7 +5,7 @@ import type {Point} from './campusRouting'
 
 export type CampusLocationState = 'idle' | 'locating' | 'refining' | 'located' | 'denied' | 'unavailable' | 'timeout' | 'outside' | 'unsupported' | 'insecure' | 'imprecise'
 export type CampusLocationStatus = { state: CampusLocationState; accuracy?: number }
-export function createCampusScene(host: HTMLDivElement, activityId: string | null, onReady: (buildings: CampusBuilding[]) => void, onSelect: (building: CampusBuilding) => void, onError: () => void, options: { immersive?: boolean; onLocation?: (value: CampusLocationStatus) => void } = {}) {
+export function createCampusScene(host: HTMLDivElement, activityId: string | null, onReady: (buildings: CampusBuilding[]) => void, onSelect: (building: CampusBuilding) => void, onError: () => void, options: { immersive?: boolean; picker?: boolean; onLocation?: (value: CampusLocationStatus) => void } = {}) {
   const frame = document.createElement('iframe')
   frame.title = uiText('BNBU 三维校园地图')
   frame.src = '/campus-map/viewer/index.html'+(options.immersive?'?surface=explore':'')
@@ -24,6 +24,11 @@ export function createCampusScene(host: HTMLDivElement, activityId: string | nul
       const glass=frame.contentDocument.createElement('link')
       glass.rel='stylesheet';glass.href='/campus-map/viewer/student-glass.css'
       frame.contentDocument.head.appendChild(glass)
+    }
+    if (options.picker && frame.contentDocument) {
+      const style = frame.contentDocument.createElement('style')
+      style.textContent = '.panel.detail{display:none!important}'
+      frame.contentDocument.head.appendChild(style)
     }
     if (options.immersive && frame.contentDocument) {
       dialogObserver?.disconnect()

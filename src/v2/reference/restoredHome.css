@@ -20,3 +20,14 @@ html[data-ui-theme=dark] .restored-home{--cw-ink:var(--v2-ink);--cw-muted:var(--
 /* Keep the confirmed vertical greeting legible against changing campus photos. */
 .restored-home :is(.cw-date,.cw-greeting){color:#1e3837;text-shadow:0 1px 8px rgba(250,249,246,.92)}
 @media(max-width:640px){.restored-home .cw-name{max-height:190px}}
+/* The date and greeting share one readable line on the hero photo. */
+.restored-home .cw-hero-copy{position:absolute;z-index:2;top:28px;left:22px;right:22px;display:flex;align-items:baseline;gap:18px;min-width:0;color:#1e3837;text-shadow:0 1px 8px rgba(250,249,246,.92)}
+.restored-home .cw-hero-copy .cw-date,.restored-home .cw-hero-copy .cw-greeting{position:static;writing-mode:horizontal-tb;max-width:none;max-height:none;bottom:auto;top:auto;left:auto;right:auto;color:inherit;text-shadow:inherit}
+.restored-home .cw-hero-copy .cw-date{flex:none;white-space:nowrap;letter-spacing:.02em;font-size:13px}
+.restored-home .cw-hero-copy .cw-date-number{text-combine-upright:none}
+.restored-home .cw-hero-copy .cw-greeting{display:flex;align-items:baseline;gap:2px;min-width:0}
+.restored-home .cw-hero-copy :is(.cw-hello,.cw-name){writing-mode:horizontal-tb;margin:0;max-height:none;letter-spacing:0;white-space:nowrap}
+.restored-home .cw-hero-copy .cw-hello{font-size:clamp(23px,3vw,35px)}
+.restored-home .cw-hero-copy .cw-name{font-size:clamp(17px,2vw,24px);min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){.restored-home .cw-hero-copy{top:22px;left:12px;right:12px;gap:10px}.restored-home .cw-hero-copy .cw-date{font-size:11px}.restored-home .cw-hero-copy .cw-hello{font-size:clamp(20px,5vw,27px)}.restored-home .cw-hero-copy .cw-name{font-size:clamp(14px,3.5vw,19px)}}
+@media(max-width:380px){.restored-home .cw-hero-copy{gap:6px}.restored-home .cw-hero-copy .cw-date{font-size:10px}.restored-home .cw-hero-copy .cw-hello{font-size:20px}.restored-home .cw-hero-copy .cw-name{font-size:14px}}

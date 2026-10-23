@@ -71,4 +71,20 @@ html[data-ui-theme=dark] .student-utility-content .v2-partner-form .v2-form-acti
 .partner-create-options>summary:focus-visible {outline:2px solid var(--student-glass-accent);outline-offset:3px}
 .partner-create-options-body {display:grid;gap:16px;padding:12px 0 4px;min-width:0}
 body:has(.v2-app.v2-app-student) .v2-partner-form .v2-partner-type-picker button {min-height:52px;padding:8px 2px;border-radius:12px;gap:4px}
+/* Keep the create sheet readable without changing the type-specific fields. */
+.student-utility-content .v2-partner-form{gap:18px}
+.student-utility-content .v2-partner-form .v2-partner-type-picker{gap:8px}
+.student-utility-content .v2-partner-form .v2-partner-type-picker button{min-height:72px;padding:10px 4px;gap:7px;background:var(--student-glass-control);color:var(--student-glass-ink);border-color:var(--student-glass-divider)}
+.student-utility-content .v2-partner-form .v2-partner-type-picker button strong{font-size:14px;line-height:1.3;font-weight:600}
+.student-utility-content .v2-partner-form label,.student-utility-content .v2-partner-form .v2-location-choice>strong{font-size:14px;font-weight:600;line-height:1.5;color:var(--student-glass-ink)}
+.student-utility-content .v2-partner-form :is(input,select,textarea){min-height:44px;padding:10px 12px;border-radius:12px;font-size:16px;line-height:1.45;background:var(--student-glass-control);color:var(--student-glass-ink)}
+.student-utility-content .v2-partner-form textarea{min-height:84px}
+.student-utility-content .v2-partner-form :is(input,select,textarea):focus-visible{outline:2px solid var(--student-glass-accent);outline-offset:2px}
+.student-utility-content .v2-partner-form .partner-create-hint{font-size:14px;line-height:1.6}
+.student-utility-content .v2-partner-form .v2-partner-scoped-location{display:grid;gap:8px;min-width:0}
+.student-utility-content .v2-partner-form .v2-partner-scoped-location>.v2-button{width:100%;justify-content:flex-start;text-align:left;white-space:normal;overflow-wrap:anywhere;min-height:48px;padding:10px 12px;font-size:14px}
+.student-utility-content .v2-partner-form .v2-partner-scoped-location>small{display:block;font-size:12px;line-height:1.5;color:var(--student-glass-muted)}
+.student-utility-content .v2-partner-form :is(.v2-partner-location-tools,.v2-partner-location-status,.v2-form-note){font-size:12px;line-height:1.5}
+.student-utility-content .v2-partner-form .v2-form-actions .v2-button{font-size:14px;font-weight:600}
+@media(max-width:640px){.student-utility-content .v2-partner-form.type-carpool .v2-form-two:has(.v2-partner-location-field){grid-template-columns:minmax(0,1fr)}.student-utility-content .v2-partner-form .v2-partner-type-picker button{min-height:64px}.student-utility-content .v2-partner-form .v2-partner-type-picker button strong{font-size:12px}.student-utility-content .v2-partner-form :is(input,select,textarea){font-size:16px}}
 @media(prefers-reduced-motion:reduce){.partner-create-options>summary>svg {transition:none}}

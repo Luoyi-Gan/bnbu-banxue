@@ -19,8 +19,8 @@ import campus from '../../assets/campus/home-background.jpg'
 import coffeePhoto from '../../assets/campus/campus-services.jpg'
 
 export type Live = ReturnType<typeof useWorkspaceBackend>
-export function Header({title,brand=false,back,onBack,backDisabled=false,backLabel='返回',actions,settings=false,search=true}:{title:string;brand?:boolean;back?:string;onBack?:()=>void;backDisabled?:boolean;backLabel?:string;actions?:ReactNode;settings?:boolean;search?:boolean}) { useUiLanguage();
-  return <header className={`ref-header${brand?' ref-brand':''}`}><div>{onBack?<button type="button" className="ref-header-back" disabled={backDisabled} onClick={onBack} aria-label={uiText(backLabel)}><ArrowLeft size={21}/></button>:back&&<Link to={back} aria-label={uiText(backLabel)}><ArrowLeft size={21}/></Link>}<h1>{uiText(title)}</h1></div><nav aria-label={uiText("页面工具")}>{actions??<>{!settings&&search&&<StudentSearch/>}<StudentUtilities/></>}</nav></header>
+export function Header({title,brand=false,back,onBack,backDisabled=false,backLabel='返回',actions,settings=false,search=true,hideConversations=false}:{title:string;brand?:boolean;back?:string;onBack?:()=>void;backDisabled?:boolean;backLabel?:string;actions?:ReactNode;settings?:boolean;search?:boolean;hideConversations?:boolean}) { useUiLanguage();
+  return <header className={`ref-header${brand?' ref-brand':''}`}><div>{onBack?<button type="button" className="ref-header-back" disabled={backDisabled} onClick={onBack} aria-label={uiText(backLabel)}><ArrowLeft size={21}/></button>:back&&<Link to={back} aria-label={uiText(backLabel)}><ArrowLeft size={21}/></Link>}<h1>{uiText(title)}</h1></div><nav aria-label={uiText("页面工具")}>{actions??<>{!settings&&search&&<StudentSearch/>}<StudentUtilities hideConversations={hideConversations}/></>}</nav></header>
 }
 export function Section({title,hint,to,children}:{title:string;hint?:string;to?:string;children:ReactNode}) { useUiLanguage();
   return <section className="ref-section"><header><h2>{uiText(title)}</h2>{hint && <span>{uiText(hint)}</span>}{to && <Link to={to}>{uiText("更多")}<ChevronRight size={14}/></Link>}</header>{children}</section>
