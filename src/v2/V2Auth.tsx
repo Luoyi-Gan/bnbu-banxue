@@ -144,7 +144,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
       </header>
       <main className="v2-auth-layout">
         <section className={`v2-auth-intro${mode==='login'?' v2-auth-story':''}`} aria-label={uiText(mode==='login'?'封面故事':'会同里校园生活')}>
-          {mode==='login'?<img className="v2-auth-story-image" src={loginCoverStory} alt={uiText('暮色落下，故事在灯光里继续。摄影 / hty。夜色中的校园建筑亮起灯光。')}/>:<>
+          {mode==='login'?<><img className="v2-auth-story-image" src={loginCoverStory} alt={uiText('暮色落下，故事在灯光里继续。摄影 / hty。夜色中的校园建筑亮起灯光。')}/><div className="v2-auth-story-copy" aria-hidden="true"><strong>{uiText('暮色落下，')}<br/>{uiText('故事在灯光里继续。')}</strong><small>{uiText('摄影 / hty')}</small></div></>:<>
             <span className="v2-auth-eyebrow">BNBU / CAMPUS</span>
             <div>
               <span className="v2-auth-index">01 — 03</span>

@@ -55,5 +55,13 @@ html[data-ui-motion=reduce] .v2-auth-page.v2-auth-welcome *{transition:none!impo
 /* The supplied photograph includes its own title and photographer credit. */
 .v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story{padding:0;background:#0a3946;justify-content:initial}
 .v2-auth-page.v2-auth-welcome .v2-auth-story-image{display:block;width:100%;height:100%;object-fit:cover;object-position:center 35%}
-@media(max-width:850px){.v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story{height:240px;padding:0}.v2-auth-page.v2-auth-welcome .v2-auth-story-image{object-position:center 23%}}
-@media(max-width:360px){.v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story{height:216px}}
+.v2-auth-page.v2-auth-welcome .v2-auth-story-copy{display:none}
+@media(max-width:850px){
+ .v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story{height:clamp(240px,38dvh,330px);padding:0}
+ .v2-auth-page.v2-auth-welcome .v2-auth-story-image{object-position:center 58%}
+ .v2-auth-page.v2-auth-welcome .v2-auth-intro.v2-auth-story:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#082e39 0%,#082e39e8 15%,#082e39aa 28%,transparent 55%);pointer-events:none}
+ .v2-auth-page.v2-auth-welcome .v2-auth-story-copy{position:absolute;z-index:1;top:20px;left:24px;right:18px;display:grid;gap:6px;color:#fff;text-shadow:0 1px 8px #052b36a8}
+ .v2-auth-page.v2-auth-welcome .v2-auth-story-copy strong{font:400 clamp(21px,4vw,27px)/1.35 Georgia,"Songti SC",serif;letter-spacing:.07em}
+ .v2-auth-page.v2-auth-welcome .v2-auth-story-copy small{font-size:11px;letter-spacing:.2em}
+}
+@media(max-width:360px){.v2-auth-page.v2-auth-welcome .v2-auth-story-copy{top:18px;left:20px}.v2-auth-page.v2-auth-welcome .v2-auth-story-copy strong{font-size:21px}}
