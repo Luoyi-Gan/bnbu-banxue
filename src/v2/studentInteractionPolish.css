@@ -85,3 +85,9 @@ body:has(.v2-app.v2-app-student) :is(.student-timetable-launcher,.student-fluid-
  outline:2px solid currentColor;
  outline-offset:-4px;
 }
+
+/* A tap responds before the active tab's spring reaches its new position. */
+.v2-app.v2-app-student .student-fluid-nav>a:active>svg{scale:.94;transition:transform .3s cubic-bezier(.2,.85,.25,1.15),scale var(--student-press-time) ease-out}
+.v2-app.v2-app-student .student-fluid-nav>a:not(:active)>svg{scale:1;transition:transform .3s cubic-bezier(.2,.85,.25,1.15),scale var(--student-release-time) var(--student-feedback-ease)}
+html[data-ui-motion=reduce] .v2-app.v2-app-student .student-fluid-nav>a>svg{scale:1!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){.v2-app.v2-app-student .student-fluid-nav>a>svg{scale:1!important;transition:none!important}}

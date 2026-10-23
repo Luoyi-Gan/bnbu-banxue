@@ -1,4 +1,5 @@
 import {useStudentScrollGlass} from './useStudentScrollGlass'
+import {useStudentRouteMotion} from './useStudentRouteMotion'
 import {FluidStudentNav} from './FluidStudentNav'
 import {StudentUtilities} from './StudentUtilities'
 import {StudentUtilityPanel} from './StudentUtilityPanel'
@@ -96,6 +97,8 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   useEffect(()=>{const open=()=>setCustomizingSidebar(true);window.addEventListener('huitongli:open-sidebar-settings',open);return()=>window.removeEventListener('huitongli:open-sidebar-settings',open)},[])
   const admin = state.role === 'admin'
   const teacher = state.role === 'teacher'
+  const routeMotionPath=location.pathname==='/v2/settings'||(location.pathname==='/v2/messages'&&new URLSearchParams(location.search).get('view')==='notifications')?null:location.pathname
+  const mainRef=useStudentRouteMotion(routeMotionPath,!admin&&!teacher,device.reducedMotion)
   const studentProfile = !admin && !teacher ? live.data?.entities.find(e => e.kind === 'profile' && e.ownerId === live.data?.account.id)?.data : undefined
   const displayName = typeof studentProfile?.nickname === 'string' ? studentProfile.nickname : accountName
   const displayAvatar = typeof studentProfile?.avatar === 'string' ? studentProfile.avatar : ''
@@ -156,7 +159,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
           {!admin && !teacher?null:<div ref={roleMenuRef} className="v2-role-wrap"><button type="button" className="v2-role-button" aria-expanded={roleMenu} onClick={() => setRoleMenu((value) => !value)}><DisplayAvatar className="v2-role-avatar" name={displayName} avatar={displayAvatar} personId={live.data?.account.id}/><strong>{displayName}</strong><ChevronDown size={15}/></button>{roleMenu && <div className="v2-role-menu"><span>{admin?uiText('管理员账号'):uiText('教师账号')}</span>{teacher && <Link to="/v2/teacher/profile">{uiText("个人资料")}</Link>}<Link to={teacher?'/v2/teacher/settings':'/v2/admin/settings'}>{uiText('设置')}</Link><Link to="/v2/login" onClick={() => setRoleMenu(false)}>{uiText("登录 / 注册")}</Link></div>}</div>}
         </div>
       </header>
-      <main className="v2-main">{children}</main>
+      <main className="v2-main" ref={mainRef}>{children}</main>
     </div>
     {!admin && !teacher && <FluidStudentNav items={studentNav} activeIndex={activeStudentNavIndex} reducedMotion={device.reducedMotion}/>}
     {teacher && !sports && <nav className="v2-mobile-nav" aria-label={uiText("手机教师导航")}>{teacherNav.map(({ path, label, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? 'is-active' : ''}><Icon size={20}/><span>{uiText(label)}</span></NavLink>)}</nav>}
