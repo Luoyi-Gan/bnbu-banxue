@@ -117,17 +117,18 @@ export function V2Messages() { useUiLanguage();
       </button>})}
       {live.data && !notices.some(item => category === '全部' || noticeCategory(item.event) === category) && <Empty icon={Bell} title={uiText("暂无此类通知")}/>}
       {notice && <Modal title={uiTemplate(["","通知"],noticeCategory(notice.event))} onClose={() => setParams({view:'notifications',category})}><time className="v2-form-note">{new Date(notice.createdAt).toLocaleString(uiLocale())}</time><p className="reference-notice-body">{notice.body}</p>{live.error && <p role="alert">{uiText(live.error)}</p>}{destination && <Link className="v2-button v2-button-primary" to={destination.path} state={{from:`/v2/messages?view=notifications&category=${encodeURIComponent(category)}`}}>{uiText(destination.label)}<ChevronRight size={16}/></Link>}</Modal>}
-    </section>:<div className="inbox-workspace">
+    </section>:<div className={`inbox-workspace${conversations.length ? '' : ' is-empty'}`}>
       <aside className="inbox-list" aria-label={uiText("会话列表")}>{live.data?.account.roles.includes('student')&&<CommunityDirectInbox/>}
         {!live.data && !live.error && <p role="status">{uiText("正在读取本人会话…")}</p>}
+        {live.error && !conversations.length && <p className="inbox-save-error" role="alert">{uiText(live.error)}</p>}
         <div className="inbox-list-heading"><h2>{uiText("最近会话")}</h2><span>{conversations.length} {uiText("个会话")}</span></div>
         {conversations.map(conversation => <button type="button" className={`inbox-conversation${active?.id === conversation.id ? ' is-active' : ''}`} aria-label={uiTemplate(["打开会话：",""],conversation.title)} aria-current={active?.id === conversation.id ? 'true' : undefined} key={conversation.id} onClick={() => open(conversation.id)}>
           <span className="inbox-avatar"><UsersRound size={22}/></span>
           <span className="inbox-conversation-copy"><strong>{conversation.title}</strong><small>{conversation.messages.at(-1)?.body ?? uiText('开始一段新对话')}</small></span>
           <span className="inbox-conversation-meta"><time>{conversation.messages.at(-1)?.time}</time>{reminders.messages && conversation.unread > 0 && <b aria-label={uiTemplate([""," 条未读"],conversation.unread)}>{conversation.unread}</b>}</span>
         </button>)}
-        {live.data && !conversations.length && <><Empty icon={MessageCircle} title={uiText("还没有会话")} description={uiText("加入队伍后，可以在这里继续交流。")}/><Link className="v2-button v2-button-secondary" to="/v2/partners">{uiText('看看校园搭子')}<ChevronRight size={16}/></Link></>}
-        <p className="inbox-list-note">{uiText("与一起参与的同学，保持联系。")}</p>
+        {live.data && !conversations.length && <div className="inbox-list-empty"><span className="inbox-list-empty-icon" aria-hidden="true"><MessageCircle size={23}/></span><strong>{uiText("还没有会话")}</strong><p>{uiText("加入队伍后，可以在这里继续交流。")}</p><Link className="v2-button v2-button-secondary" to="/v2/partners">{uiText('看看校园搭子')}<ChevronRight size={16}/></Link></div>}
+        {conversations.length > 0 && <p className="inbox-list-note">{uiText("与一起参与的同学，保持联系。")}</p>}
       </aside>
       <section className="inbox-chat" aria-label={uiText("聊天区域")}>
         {active ? <ConversationPane conversation={active} draft={drafts[active.id] ?? ''} onDraft={value => setDrafts(previous => ({ ...previous, [active.id]: value }))} onSend={send} onBack={() => setParams({})} opened={opened}/> : <Empty icon={MessageCircle} title={uiText("选择一个会话")} description={uiText("在这里延续校园里的交流。")}/>}

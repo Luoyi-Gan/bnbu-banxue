@@ -4,6 +4,9 @@
 .inbox-tabs button[aria-pressed=true] { background:var(--v2-surface); color:var(--v2-action); box-shadow:0 2px 5px rgb(0 0 0 / 4%); }
 .inbox-tabs b,.inbox-conversation-meta b { display:grid; place-items:center; min-width:19px; height:19px; padding:0 5px; border-radius:12px; background:var(--v2-action); color:white; font-size:10px; font-weight:600; }
 .inbox-workspace { display:grid; grid-template-columns:minmax(275px,.85fr) minmax(0,1.8fr); height:clamp(360px,calc(100dvh - 390px),680px); overflow:hidden; border:1px solid var(--inbox-divider); border-radius:24px; background:var(--v2-surface); }
+.inbox-workspace.is-empty { grid-template-columns:minmax(0,1fr); max-width:680px; height:auto; min-height:360px; }
+.inbox-workspace.is-empty .inbox-chat { display:none; }
+.inbox-workspace.is-empty .inbox-list { border-right:0; }
 .inbox-list { min-width:0; overflow:auto; padding:12px; border-right:1px solid var(--inbox-divider); scrollbar-width:thin; }
 .inbox-list-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:13px 12px 23px; }
 .inbox-list-heading h2 { margin:0; font-size:14px; font-weight:600; }
@@ -19,6 +22,10 @@
 .inbox-conversation-meta { display:flex; flex:none; align-self:stretch; align-items:flex-end; justify-content:center; flex-direction:column; gap:10px; }
 .inbox-conversation-meta time { color:var(--v2-muted); font-size:10px; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .inbox-list-note { margin:24px 12px 12px; color:var(--v2-muted); font-size:11px; line-height:1.8; }
+.inbox-list-empty { display:flex; align-items:center; flex-direction:column; padding:34px 20px 38px; border-top:1px solid var(--inbox-divider); text-align:center; }
+.inbox-list-empty-icon { display:grid; place-items:center; width:52px; height:52px; margin-bottom:14px; border-radius:18px; background:var(--v2-accent-soft); color:var(--v2-action); }
+.inbox-list-empty strong { color:var(--v2-ink); font-size:15px; }
+.inbox-list-empty p { margin:8px 0 22px; color:var(--v2-muted); font-size:12px; line-height:1.7; }
 .inbox-chat { display:flex; flex-direction:column; min-width:0; min-height:0; background:var(--v2-surface); }
 .inbox-chat-heading { display:flex; flex:none; align-items:center; gap:12px; padding:20px 26px; border-bottom:1px solid var(--inbox-divider); }
 .inbox-chat-heading>div { min-width:0; }
@@ -72,6 +79,7 @@
   .v2-app-student .v2-messages-page>.v2-page-heading { margin-bottom:24px; }
   .inbox-tabs { margin-bottom:22px; }
   .inbox-workspace { display:block; height:auto; min-height:0; border:0; border-radius:22px; }
+  .inbox-workspace.is-empty { min-height:0; }
   .inbox-list { padding:10px 8px 16px; border:0; overflow:visible; }
   .inbox-list-heading { padding:16px 14px 20px; }
   .inbox-conversation { min-height:96px; padding:18px 12px; margin-bottom:0; }
@@ -81,6 +89,7 @@
   .inbox-conversation-copy strong { font-size:15px; }
   .inbox-conversation-copy small { font-size:12px; }
   .inbox-list-note { margin-top:20px; text-align:center; font-size:11px; }
+  .inbox-list-empty { padding:32px 14px 38px; }
   .inbox-chat { display:none; }
   .v2-messages-page.is-chat-open .inbox-chat { display:flex; position:fixed; top:58px; left:0; right:0; bottom:calc(60px + env(safe-area-inset-bottom)); z-index:44; animation:inbox-appear .2s ease-out; }
   .v2-messages-page.is-chat-open>.v2-page-heading,.v2-messages-page.is-chat-open>.inbox-tabs,.v2-messages-page.is-chat-open .inbox-list { display:none; }
