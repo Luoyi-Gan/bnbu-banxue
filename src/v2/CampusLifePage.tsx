@@ -17,12 +17,11 @@ import campus from '../assets/campus/gallery/blue-sky-reflection.webp'
 import './campusLife.css'
 import {campusLifePrompt} from './campusLifeModel'
 
-const questions={courses:'帮我整理今天接下来的课程安排。',partners:'我想找一起学习的同学，有哪些公开的搭子信息？',clubs:'有哪些适合了解和加入的校园社团？',coffee:'我想认识做创业项目的老师，有哪些可预约的 Coffee Chat？',shops:'推荐适合小组讨论的校园咖啡店，请注明已有资料和待核实的信息。',directory:'学校的在读证明怎么办理，应该联系哪个部门？'}
 const entries=[
- {key:'partners',title:'找搭子',description:'一起学习，一起出发',path:'/v2/partners',image:'/clubs/6224a32df7f35874.jpg',alt:'心理健康协会历史活动中的同学互动',caption:'校园互动 · 历史活动配图'},
- {key:'clubs',title:'社团组织',description:'发现兴趣相投的人',path:'/v2/organizations',image:'/clubs/7aa3dfc6c2dad853.jpg',alt:'野蜂户外运动社历史招新现场',caption:'真实社团 · 历史招新现场'},
- {key:'coffee',title:'Coffee Chat',description:'和老师聊一聊，交换新的想法',path:'/v2/coffee',image:'/clubs/b293416bf4acbdd8.jpg',alt:'德意志语言文化交流社成员与老师一起制作水果沙拉',caption:'师生交流 · 历史活动配图'},
- {key:'shops',title:'校园探店',description:'收藏身边的好去处',path:'/v2/shops',image:'/shops/memory-0.jpg',alt:'学校 Memory 纪念品中心的真实室内空间',caption:'Memory · 校园空间'},
+ {key:'partners',title:'找搭子',description:'一起学习，一起出发',path:'/v2/partners',alt:'学校2026年报道中结伴户外出行的同学',caption:'结伴出发 · 校园生活'},
+ {key:'clubs',title:'社团组织',description:'发现兴趣相投的人',path:'/v2/organizations',alt:'2026年校园开放日的古琴演奏现场',caption:'开放日 · 古琴演奏'},
+ {key:'coffee',title:'Coffee Chat',description:'和老师聊一聊，交换新的想法',path:'/v2/coffee',alt:'学校2026年报道中的师生面对面交流',caption:'师生之间 · 面对面交流'},
+ {key:'shops',title:'校园探店',description:'收藏身边的好去处',path:'/v2/shops',alt:'2026年教师节活动中的CHIAS文创咖啡馆室内空间',caption:'CHIAS · 文创咖啡馆'},
 ] as const
 
 export function CampusLifePage(){
@@ -49,9 +48,8 @@ export function CampusLifePage(){
     </section>
     <section className="cl-ai" aria-labelledby="cl-ai-title"><button className="cl-ai-heading" onClick={()=>openAI()}><span className="cl-ai-mark"><Sparkles size={19}/></span><span><h2 id="cl-ai-title">{uiText('问问校园 AI')}</h2><small>{uiText('课程、办事、活动，都可以问我')}</small></span><ArrowUpRight size={17}/></button><form onSubmit={launchAI}><input aria-label={uiText('想问校园 AI 的问题')} value={draft} onChange={e=>setDraft(e.target.value)} placeholder={uiText(campusLifePrompt(now))} maxLength={500}/><button aria-label={uiText('打开校园 AI 对话')} type="submit"><ArrowRight size={17}/></button></form></section>
    </div>
-   <section className="cl-explore" aria-labelledby="cl-explore-title"><header><div><p>CAMPUS LIFE</p><h2 id="cl-explore-title">{uiText('探索校园')}</h2></div><Link to="/v2/discover">{uiText('发现更多')}<ArrowRight size={15}/></Link></header><div className="cl-explore-grid">{entries.map(entry=><article key={entry.key} className={`cl-entry cl-entry-${entry.key}`}><Link to={entry.path} className="cl-entry-link"><div className="cl-entry-photo"><img src={entry.image} alt={uiText(entry.alt)} loading="lazy" decoding="async"/><span>{uiText(entry.caption)}</span><ArrowUpRight size={17}/></div><div className="cl-entry-copy"><h3>{uiText(entry.title)}</h3><p>{uiText(entry.description)}</p></div></Link><button className="cl-context-question" onClick={()=>openAI(questions[entry.key])} aria-label={`${uiText('问 AI：')}${uiText(entry.title)}`}><Sparkles size={12}/><span>{uiText('问 AI')}</span></button></article>)}</div></section>
+   <section className="cl-explore" aria-labelledby="cl-explore-title"><header><div><p>CAMPUS LIFE</p><h2 id="cl-explore-title">{uiText('探索校园')}</h2></div><Link to="/v2/discover">{uiText('发现更多')}<ArrowRight size={15}/></Link></header><div className="cl-explore-grid">{entries.map(entry=><article key={entry.key} className={`cl-entry cl-entry-${entry.key}`}><Link to={entry.path} className="cl-entry-link"><div className="cl-entry-photo"><img src={`/campus-life/${entry.key}-2026-640.webp`} srcSet={`/campus-life/${entry.key}-2026-640.webp 640w, /campus-life/${entry.key}-2026-1280.webp 1280w`} sizes="(max-width:760px) calc((100vw - 46px) / 2), (max-width:1200px) 42vw, 500px" alt={uiText(entry.alt)} loading="lazy" decoding="async"/><span>{uiText(entry.caption)}</span><ArrowUpRight size={17}/></div><div className="cl-entry-copy"><h3>{uiText(entry.title)}</h3><p>{uiText(entry.description)}</p></div></Link></article>)}</div></section>
    <Link to="/v2/campus?service=directory" className="cl-directory"><span><Building2 size={22}/></span><div><h2>{uiText('校园办事')}</h2><p>{uiText('办事指南 · 常用服务 · 校园联系')}</p></div><ChevronRight size={18}/></Link>
-   <details className="cl-photo-sources"><summary>{uiText('关于本页配图')}</summary><p>{uiText('校园实景及学校公开历史活动配图，保留原作者版权；配图不代表正在招募的搭子、可预约交流或当前活动。')}</p><a href="https://www.bnbu.edu.cn/info/1077/13899.htm" target="_blank" rel="noreferrer">{uiText('同学互动配图来源')}</a><a href="https://www.bnbu.edu.cn/info/1077/13899.htm" target="_blank" rel="noreferrer">{uiText('师生交流配图来源')}</a><a href="https://www.bnbu.edu.cn/info/1076/5861.htm" target="_blank" rel="noreferrer">{uiText('社团招新配图来源')}</a><a href="https://ic.bnbu.edu.cn/souvenir/introduction.htm" target="_blank" rel="noreferrer">{uiText('Memory 空间配图来源')}</a></details>
   </div>
   {lesson&&<StudentTimetable key={lesson} embedded detailOnly initialWorkspace={live.data??undefined} initialLessonId={lesson} onCloseDetails={()=>setLesson(null)}/>}
   {aiOpen&&<CommunityModal title={uiText('校园 AI')} onClose={()=>setAiOpen(false)}><div className="cl-ai-sheet"><CampusAIChat embedded initialQuestion={question} initialConversationId={aiConversationId} onDraftChange={setDraft} onExpand={(value,id)=>navigate('/v2/ai?chat='+encodeURIComponent(id),{state:{campusAIDraft:value}})}/></div></CommunityModal>}

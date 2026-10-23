@@ -52,14 +52,14 @@
 .cl-entry-clubs .cl-entry-photo{aspect-ratio:1.13;object-position:60% center}
 .cl-entry-photo>span{position:absolute;bottom:0;left:0;right:0;padding:24px 12px 10px;background:linear-gradient(transparent,#102e26a6);font:400 9px/1.5 MiSans,sans-serif;color:#fff}
 .cl-entry-photo>svg{position:absolute;right:10px;top:10px;width:29px;height:29px;padding:6px;border-radius:50%;color:#fff;background:#14342f55}
-.cl-entry-copy{padding:12px 52px 0 1px}
+.cl-entry-copy{padding:12px 0 0 1px}
 .campus-life .cl-entry h3{margin:0;font:600 16px/1.5 MiSans,sans-serif}
 .cl-entry-copy p{margin:4px 0 0;font:400 11px/1.6 MiSans,sans-serif;color:var(--v2-muted,#75817a)}
-.cl-context-question{position:absolute;right:0;bottom:0;display:flex;align-items:center;gap:4px;padding:4px 0 4px 6px;min-height:32px;border:0;background:none;color:var(--v2-action,#367563);font:400 10px/1.4 MiSans,sans-serif}
+
 .cl-directory{display:flex;align-items:center;gap:13px;padding:18px;border-radius:18px;border:1px solid var(--v2-line,#e6e9e2);background:var(--v2-surface,#fff);color:inherit}
 .cl-directory>span{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--v2-soft,#eef0e9);color:var(--v2-action,#367563)}
 .cl-directory>div{flex:1;min-width:0}.campus-life .cl-directory h2{margin:0;font:600 15px/1.5 MiSans,sans-serif}.cl-directory p{margin:3px 0 0;font:400 11px/1.6 MiSans,sans-serif;color:var(--v2-muted,#75817a)}
-.cl-photo-sources{margin-top:18px;color:var(--v2-muted,#75817a);font:400 10px/1.7 MiSans,sans-serif}.cl-photo-sources summary{cursor:pointer;width:fit-content;padding:6px 0}.cl-photo-sources p{max-width:600px}.cl-photo-sources a{display:inline-block;margin:0 12px 8px 0;text-decoration:underline}
+
 /* Keep the existing chat logic in a sheet, with the same sources and disclosure. */
 .v2-modal-layer:has(.cl-ai-sheet){align-items:flex-end;padding:18px}
 .v2-modal-layer:has(.cl-ai-sheet)>.v2-modal{width:min(800px,100%);max-width:800px;max-height:calc(100dvh - 36px);overflow:hidden;border-radius:24px!important;background:var(--v2-canvas,#faf9f6)!important}
@@ -67,7 +67,7 @@
 .cl-ai-sheet .campus-ai-workbench.is-embedded{--nai-bg:var(--v2-canvas,#fafaf7);--nai-ink:var(--v2-ink,#263a36);--nai-muted:var(--v2-muted,#7b8580);--nai-line:var(--v2-line,#e6e9e3);--nai-soft:var(--v2-soft,#f0f2ec);--nai-surface:var(--v2-surface,#fff);--nai-accent:var(--v2-action,#367563);--nai-wash:#e7eee6;color:var(--nai-ink);background:var(--nai-bg);height:min(70dvh,calc(var(--nai-viewport-height,100dvh) - 100px));min-height:0;display:flex;flex-direction:column;overflow:hidden;font-family:MiSans,sans-serif}
 .cl-ai-sheet .nai-header{min-height:48px;padding:6px 18px}.cl-ai-sheet .nai-header-divider{display:none}.cl-ai-sheet .nai-expand{display:flex;align-items:center;gap:5px;background:none;border:0;padding:8px 0;font-size:11px;color:var(--nai-accent)}
 .cl-ai-sheet .nai-welcome{padding:8px 0 20px}.cl-ai-sheet .nai-welcome-mark{display:none}.cl-ai-sheet .nai-welcome h1{font-size:25px}.cl-ai-sheet .nai-welcome>p{margin-bottom:16px}.cl-ai-sheet .nai-welcome-note{display:none}.cl-ai-sheet .nai-reading{padding-top:18px}.cl-ai-sheet .nai-starters{gap:6px}.cl-ai-sheet .nai-starters button{padding:10px}
-@media(hover:hover){.cl-hero>a:hover img,.cl-entry-link:hover img{transform:scale(1.025)}.cl-context-question:hover{text-decoration:underline}.cl-course-row:hover strong{color:var(--v2-action,#367563)}}
+@media(hover:hover){.cl-hero>a:hover img,.cl-entry-link:hover img{transform:scale(1.025)}.cl-course-row:hover strong{color:var(--v2-action,#367563)}}
 @media(max-width:760px){
  .v2-app.v2-app-student .v2-main>.campus-life{padding:0 17px 110px}
  .campus-life .ref-header{min-height:67px}.campus-life .ref-header h1{font-size:27px}.campus-life .ref-header nav{gap:4px}
@@ -75,12 +75,12 @@
  .cl-daily{grid-template-columns:1fr;gap:10px}.cl-courses{padding:12px 14px;border-radius:18px}.cl-courses>header>a{font-size:10px}.cl-course-row{padding:11px 0}.cl-course-row strong{font-size:13px}.cl-course-row>time{flex-basis:51px;font-size:14px}.cl-courses h2{font-size:14px}
  .cl-ai{padding:12px 13px;border-radius:18px}.cl-ai-heading{padding-bottom:8px}.cl-ai-heading small{font-size:10px}.v2-app-student .cl-ai form input{font-size:16px}
  .cl-explore{margin:27px 0 23px}.cl-explore>header{margin-bottom:12px}.campus-life .cl-explore h2{font-size:24px}.cl-explore-grid{gap:20px 12px;grid-template-columns:1fr 1fr}
- .cl-entry-photo{border-radius:15px;aspect-ratio:1.15}.cl-entry-partners .cl-entry-photo,.cl-entry-clubs .cl-entry-photo{aspect-ratio:.92}.cl-entry-photo>span{font-size:8px;padding:23px 9px 8px}.cl-entry-copy{padding:10px 0 26px}.campus-life .cl-entry h3{font-size:15px}.cl-entry-copy p{font-size:10px}.cl-context-question{left:0;right:auto;bottom:-3px;font-size:10px;padding-left:0}
+ .cl-entry-photo{border-radius:15px;aspect-ratio:1.15}.cl-entry-partners .cl-entry-photo,.cl-entry-clubs .cl-entry-photo{aspect-ratio:.92}.cl-entry-photo>span{font-size:8px;padding:23px 9px 8px}.cl-entry-copy{padding:10px 0 0}.campus-life .cl-entry h3{font-size:15px}.cl-entry-copy p{font-size:10px}
  .cl-directory{padding:15px 13px}.cl-directory p{font-size:10px}.cl-hero time{font-size:10px}
  .v2-modal-layer:has(.cl-ai-sheet){padding:0}.v2-modal-layer:has(.cl-ai-sheet)>.v2-modal{width:100%;max-height:100dvh;margin:0;border-radius:24px 24px 0 0!important}.cl-ai-sheet .nai-compose-zone{padding-bottom:max(12px,env(safe-area-inset-bottom))}.cl-ai-sheet .nai-header{padding-inline:16px}
  .cl-ai-sheet .nai-welcome h1{font-size:25px}.cl-ai-sheet .nai-reading{padding:14px 18px}.cl-ai-sheet .nai-welcome>p{font-size:12px}.cl-ai-sheet .nai-starters strong{font-size:11px}
 }
 @media(max-width:360px){.cl-hero>a{height:142px}.v2-app-student .campus-life .cl-hero h2{font-size:20px}.cl-hero p{font-size:10px}.cl-hero time{font-size:9px}.cl-entry-photo>span{font-size:7px}.cl-course-row{gap:8px}.cl-course-row strong{font-size:12px}.cl-hero>a>span{font-size:9px}.cl-ai-heading small{font-size:9px}}
 html[data-ui-motion=reduce] .campus-life *,html[data-ui-motion=reduce] .cl-ai-sheet *{transition:none!important;animation:none!important}
-html[data-ui-theme=dark] .campus-life :is(.cl-ai,.cl-context-question,.cl-directory){--v2-action:#a4d2bc}
+html[data-ui-theme=dark] .campus-life :is(.cl-ai,
 @media(prefers-reduced-motion:reduce){.campus-life *,.cl-ai-sheet *{transition:none!important;animation:none!important}}
