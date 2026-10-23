@@ -13,7 +13,7 @@ import { CampusWindowHome } from './reference/CampusWindowHome'
 import staffCampusPhoto from '../assets/campus/campus-services.jpg'
 import { AdminMailActivities } from './AdminMailActivities'
 import { AdminCommunityKeywords } from './AdminCommunityKeywords'
-import { ArrowLeft, Compass, Footprints, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
+import { ArrowLeft, Compass, UsersRound, Mail, CalendarDays, Coffee, ChevronDown, GraduationCap, House, LayoutDashboard, Menu, MessageCircle, Newspaper, Settings2, ShieldAlert, ShieldCheck, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 const brandIcon = '/huitongli-app-icon.png'
@@ -70,7 +70,7 @@ const studentNav = [
   { path: '/v2', label: '首页', icon: House, end: true },
   { path: '/v2/activities', label: '发现', icon: Compass },
   { path: '/v2/campus', label: '校园', icon: UsersRound },
-  { path: '/v2/sports', label: '运动', icon: Footprints },
+  { path: '/v2/messages', label: '会话', icon: MessageCircle },
   { path: '/v2/me', label: '我的', icon: UserRound },
 ]
 const adminNav = [
@@ -103,7 +103,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
   const sidebarItems = parseSidebarItems(ownPreferences?.sidebarItems) ?? defaultSidebarItems
   const shellBrandIcon = brandIcon
   const sports = location.pathname === '/v2/teacher/sports'
-  const studentSectionActive = (path: string, isActive: boolean) => location.pathname==='/v2/community'?path===(new URLSearchParams(location.search).get('person')==='me'?'/v2/me':'/v2/activities'):isActive || (path === '/v2/campus' && ['/v2/community', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni', '/v2/shops'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
+  const studentSectionActive = (path: string, isActive: boolean) => location.pathname==='/v2/community'?path===(new URLSearchParams(location.search).get('person')==='me'?'/v2/me':'/v2/activities'):path==='/v2/messages'?isActive&&new URLSearchParams(location.search).get('view')!=='notifications':isActive || (path === '/v2/campus' && ['/v2/sports', '/v2/partners', '/v2/organizations', '/v2/coffee', '/v2/alumni', '/v2/shops'].some(prefix => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)))
   const activeStudentNavIndex=studentNav.findIndex(item=>studentSectionActive(item.path,item.path==='/v2'?location.pathname===item.path:location.pathname.startsWith(item.path)))
   const teacherNav = [
     { path: '/v2/teacher/coffee', label: 'Coffee Chat', icon: Coffee },
@@ -169,7 +169,7 @@ function V2Shell({ children, accountName }: { children: ReactNode; accountName: 
 function V2Routes() { useUiLanguage();
   const location = useLocation()
   const navigate=useNavigate()
-  const floating=location.pathname==='/v2/settings'||location.pathname==='/v2/messages'
+  const floating=location.pathname==='/v2/settings'||(location.pathname==='/v2/messages'&&new URLSearchParams(location.search).get('view')==='notifications')
   const settingsTitle=location.pathname==='/v2/settings'?studentSettingsSectionTitles[new URLSearchParams(location.search).get('section')??'']:undefined
   const backdrop=useRef('/v2/me')
   useEffect(()=>{if(!floating&&canAccessPortal('student',location.pathname)&&!['/v2/login','/v2/register','/v2/forgot-password','/v2/identity','/v2/privacy','/v2/welcome'].includes(location.pathname))backdrop.current=location.pathname+location.search},[floating,location.pathname,location.search])

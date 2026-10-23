@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, Coffee, GraduationCap, House, MapPinned, MessageCircle, Network, Newspaper, Sparkles, UserRound, UsersRound, type LucideIcon } from 'lucide-react'
+import { BookOpen, CalendarDays, Coffee, Footprints, GraduationCap, House, MapPinned, MessageCircle, Network, Newspaper, Sparkles, UserRound, UsersRound, type LucideIcon } from 'lucide-react'
 import type { SidebarItemId } from '../../shared/v2/sidebarLayout'
 
 export type SidebarEntry = { id: SidebarItemId; label: string; path: string; icon: LucideIcon; kind: 'core' | 'campus' }
@@ -16,7 +16,7 @@ export const studentSidebarCatalog: SidebarEntry[] = [
   {id: 'ai', label: '校园 AI', path: '/v2/ai', icon: Sparkles, kind: 'campus'},
   {id: 'organizations', label: '社团组织', path: '/v2/organizations', icon: GraduationCap, kind: 'campus'},
   {id: 'coffee', label: 'Coffee Chat', path: '/v2/coffee', icon: Coffee, kind: 'campus'},
-  {id: 'sports', label: '体育打卡', path: '/v2/sports', icon: CalendarDays, kind: 'campus'},
+  {id: 'sports', label: '运动', path: '/v2/sports', icon: Footprints, kind: 'campus'},
   {id: 'teaching', label: '教学支持', path: '/v2/campus?service=teaching', icon: BookOpen, kind: 'campus'},
   {id: 'academic', label: '学术讨论', path: '/v2/campus?service=academic', icon: MessageCircle, kind: 'campus'},
 ]

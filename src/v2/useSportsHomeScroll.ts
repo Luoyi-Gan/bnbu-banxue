@@ -2,7 +2,8 @@ import { useLayoutEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
 let sportsEntryPosition: number | null = null
-export function rememberSportsEntryPosition() { sportsEntryPosition = window.scrollY }
+let sportsEntrySource = '/v2'
+export function rememberSportsEntryPosition(source = '/v2') { sportsEntryPosition = window.scrollY; sportsEntrySource = source }
 
 export function useSportsHomeScroll() {
   const { pathname, search } = useLocation()
@@ -14,16 +15,18 @@ export function useSportsHomeScroll() {
     return () => { window.history.scrollRestoration = previous }
   }, [])
   useLayoutEffect(() => {
-    const returning = pathname === '/v2' && previousPath.current === '/v2/sports'
+    const returning = previousPath.current === '/v2/sports' && (pathname === '/v2' || pathname === '/v2/campus' && sportsEntrySource === '/v2/campus' && sportsEntryPosition !== null)
     const target = returning ? sportsEntryPosition ?? homePosition.current : 0
     if (returning) sportsEntryPosition = null
     else if (pathname !== '/v2/sports') sportsEntryPosition = null
     window.scrollTo({ top: target, behavior: 'instant' })
     previousPath.current = pathname
-    if (pathname !== '/v2') return
+    if (pathname !== '/v2' && pathname !== '/v2/campus') return
     const remember = () => { homePosition.current = window.scrollY }
-    remember()
-    window.addEventListener('scroll', remember, { passive: true })
+    if (pathname === '/v2') {
+      remember()
+      window.addEventListener('scroll', remember, { passive: true })
+    }
     // On return, the loading card can temporarily shorten the document. Restore
     // once data/images give it enough height, without fighting a user's scroll.
     const observer = new ResizeObserver(() => {

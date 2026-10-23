@@ -20,7 +20,7 @@ export function SportsProgressCard({ sports, href = '/v2/sports' }: { sports?: S
     : percent === 100 ? '总时长已完成，最终达标状态以体育平台为准。'
     : data?.status === 'not-started' ? '从第一次运动开始，慢慢积累。' : '每一次有效运动，都在靠近目标。'
   return <section className="v2-sports-progress-card" aria-label={uiText("体育打卡进度看板")}>
-    <Link to={href} onClick={rememberSportsEntryPosition} className="v2-sports-progress-link" aria-label={uiText("体育打卡进度，进入体育打卡主界面")} aria-describedby={descriptionId}>
+    <Link to={href} onClick={()=>rememberSportsEntryPosition()} className="v2-sports-progress-link" aria-label={uiText("体育打卡进度，进入体育打卡主界面")} aria-describedby={descriptionId}>
       <div className="v2-sports-progress-heading"><span className="v2-sports-progress-icon"><Activity size={21}/></span><div><h2>{uiText("体育打卡进度")}</h2><span>{data.semester || uiText('本学期')}{data.source === 'local'?uiText(' · 本地体育库'):''}</span></div><ArrowUpRight size={19} className="v2-sports-progress-arrow"/></div>
       <div className="v2-sports-progress-content" id={descriptionId}>
         <div className="v2-sports-progress-ring" role={percent === null?undefined:'progressbar'} aria-label={uiText("本学期体育打卡完成率")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent ?? undefined}>

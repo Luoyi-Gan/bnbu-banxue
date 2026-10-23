@@ -1,6 +1,6 @@
 import {useEffect,useState,type FormEvent} from 'react'
 import {Link,useNavigate} from 'react-router-dom'
-import {ArrowRight,ArrowUpRight,Building2,CalendarDays,ChevronDown,ChevronRight,MapPin,Sparkles} from 'lucide-react'
+import {ArrowRight,ArrowUpRight,Building2,CalendarDays,ChevronDown,ChevronRight,Footprints,MapPin,Sparkles} from 'lucide-react'
 import {AnimatePresence,motion} from 'motion/react'
 import {useWorkspaceBackend} from './useWorkspaceBackend'
 import {useDevicePreferences} from './devicePreferences'
@@ -16,6 +16,7 @@ import {uiText,uiLocale,useUiLanguage} from './uiLanguage'
 import campus from '../assets/campus/gallery/blue-sky-reflection.webp'
 import './campusLife.css'
 import {campusLifePrompt} from './campusLifeModel'
+import {rememberSportsEntryPosition} from './useSportsHomeScroll'
 
 const entries=[
  {key:'partners',title:'找搭子',description:'一起学习，一起出发',path:'/v2/partners',alt:'学校2026年报道中结伴户外出行的同学',caption:'结伴出发 · 校园生活'},
@@ -49,6 +50,7 @@ export function CampusLifePage(){
     <section className="cl-ai" aria-labelledby="cl-ai-title"><button className="cl-ai-heading" onClick={()=>openAI()}><span className="cl-ai-mark"><Sparkles size={19}/></span><span><h2 id="cl-ai-title">{uiText('问问校园 AI')}</h2><small>{uiText('课程、办事、活动，都可以问我')}</small></span><ArrowUpRight size={17}/></button><form onSubmit={launchAI}><input aria-label={uiText('想问校园 AI 的问题')} value={draft} onChange={e=>setDraft(e.target.value)} placeholder={uiText(campusLifePrompt(now))} maxLength={500}/><button aria-label={uiText('打开校园 AI 对话')} type="submit"><ArrowRight size={17}/></button></form></section>
    </div>
    <section className="cl-explore" aria-labelledby="cl-explore-title"><header><div><p>CAMPUS LIFE</p><h2 id="cl-explore-title">{uiText('探索校园')}</h2></div><Link to="/v2/activities">{uiText('发现更多')}<ArrowRight size={15}/></Link></header><div className="cl-explore-grid">{entries.map(entry=><article key={entry.key} className={`cl-entry cl-entry-${entry.key}`}><Link to={entry.path} className="cl-entry-link"><div className="cl-entry-photo"><img src={`/campus-life/${entry.key}-2026-640.webp`} srcSet={`/campus-life/${entry.key}-2026-640.webp 640w, /campus-life/${entry.key}-2026-1280.webp 1280w`} sizes="(max-width:760px) calc((100vw - 46px) / 2), (max-width:1200px) 42vw, 500px" alt={uiText(entry.alt)} loading="lazy" decoding="async"/><span>{uiText(entry.caption)}</span><ArrowUpRight size={17}/></div><div className="cl-entry-copy"><h3>{uiText(entry.title)}</h3><p>{uiText(entry.description)}</p></div></Link></article>)}</div></section>
+   <Link to="/v2/sports" className="cl-sports-entry" onClick={()=>rememberSportsEntryPosition('/v2/campus')}><span><Footprints size={24}/></span><div><small>BNBU SPORTS</small><h2>{uiText('运动')}</h2><p>{uiText('查看体育课程、运动进度与记录')}</p></div><ArrowUpRight size={19}/></Link>
    <Link to="/v2/campus?service=directory" className="cl-directory"><span><Building2 size={22}/></span><div><h2>{uiText('校园办事')}</h2><p>{uiText('办事指南 · 常用服务 · 校园联系')}</p></div><ChevronRight size={18}/></Link>
   </div>
   {lesson&&<StudentTimetable key={lesson} embedded detailOnly initialWorkspace={live.data??undefined} initialLessonId={lesson} onCloseDetails={()=>setLesson(null)}/>}

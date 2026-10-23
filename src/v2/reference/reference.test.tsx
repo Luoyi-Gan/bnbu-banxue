@@ -9,6 +9,8 @@ import { ReferenceCampus, ReferenceMe, ReferenceDiscover, ReferenceSports } from
 import { CampusWindowHome } from './CampusWindowHome'
 import { V2Provider } from '../store'
 import { campusDate, ownLessons, sportsSummary, weekDates } from './model'
+import {uiText} from '../uiLanguage'
+import {currentUiLanguage} from '../devicePreferences'
 import type { Post } from '../../../shared/v2/model'
 
 const stamp='2026-10-17T09:00:00+08:00'
@@ -48,8 +50,8 @@ it('体育源不可用时隐藏旧投影，记录始终限制为授权身份',()
 })
 it('个人主页不把关注称为加入，不把参与标记称为正式报名',()=>{
   const html=renderToStaticMarkup(<MemoryRouter><ReferenceMe/></MemoryRouter>)
-  expect(html).toContain('关注组织');expect(html).not.toContain('近期动态');expect(html).not.toContain('报名成功')
-  expect(html).toContain('我的日历');expect(html).toContain('我的课表')
+  expect(html).toContain(currentUiLanguage()==='en'?'Clubs':'关注组织');expect(html).not.toContain(uiText('近期动态'));expect(html).not.toContain(uiText('报名成功'))
+  expect(html).toContain(uiText('我的日历'));expect(html).toContain(uiText('我的课表'))
 })
 it('校园首页先摘要课程与AI，再探索入口，顶部移除设置且不复制整周课表',()=>{
  const html=renderToStaticMarkup(<MemoryRouter><ReferenceCampus/></MemoryRouter>)
@@ -60,6 +62,9 @@ it('校园首页先摘要课程与AI，再探索入口，顶部移除设置且�
  expect(html).not.toContain('选择课程星期')
  expect(html).toContain('想问校园 AI 的问题')
  expect(html).toContain('Coffee Chat')
+ expect(html).toContain('href="/v2/sports"')
+ expect(html.indexOf('cl-explore')).toBeLessThan(html.indexOf('cl-sports-entry'))
+ expect(html.indexOf('cl-sports-entry')).toBeLessThan(html.indexOf('cl-directory'))
  expect(html).not.toContain('href="/v2/learning')
 })
 it('有内容的五页结构可渲染，运动进度与记录通过入口访问',()=>{
@@ -70,7 +75,7 @@ it('有内容的五页结构可渲染，运动进度与记录通过入口访问'
     if(name==='sports'){expect(html).toContain('正在连接 BNBU Sports');expect(html).not.toContain('本机模拟');expect(html).not.toContain('67%');expect(html).not.toContain('GPS')}
     if(process.env.REFERENCE_RENDER==='1') {
       const dir='artifacts/reference-rebuild-20261017';mkdirSync(dir,{recursive:true})
-      writeFileSync(`${dir}/sample-${name}.html`,`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>布局样例 · ${name}</title><link rel="stylesheet" href="/src/styles/base.css"><link rel="stylesheet" href="/src/v2/v2.css"><link rel="stylesheet" href="/src/v2/aRedesign.css"><link rel="stylesheet" href="/src/v2/aControls.css"><link rel="stylesheet" href="/src/v2/studentTheme.css"><link rel="stylesheet" href="/src/v2/editorial.css"><link rel="stylesheet" href="/src/v2/referenceStudent.css"><link rel="stylesheet" href="/src/v2/campusReference.css"><link rel="stylesheet" href="/src/v2/reference/reference.css"><style>body{margin:0;background:#faf9f6}a{text-decoration:none}button,input,select{font:inherit}.v2-app{display:block!important}.v2-icon-button{background:transparent;border:0;padding:0;color:#252b23}.v2-icon-button svg{width:21px;height:21px}.sample-note{font:10px sans-serif;color:#8a836e;padding:5px 20px;background:#f1eade}.ref-page{padding-bottom:75px}.sample-nav{display:flex;justify-content:space-around;position:fixed;bottom:0;background:#faf9f6f2;left:0;right:0;padding:14px 0;font:12px sans-serif;color:#656e5a;border-top:1px solid #eee}</style><div class="sample-note">布局样例 · 测试数据，非真实校园记录</div><div class="v2-app v2-app-student">${html}</div><nav class="sample-nav"><span>⌂ 首页</span><span>◉ 发现</span><span>♧ 校园</span><span>♧ 打卡</span><span>♙ 我的</span></nav></html>`)
+      writeFileSync(`${dir}/sample-${name}.html`,`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>布局样例 · ${name}</title><link rel="stylesheet" href="/src/styles/base.css"><link rel="stylesheet" href="/src/v2/v2.css"><link rel="stylesheet" href="/src/v2/aRedesign.css"><link rel="stylesheet" href="/src/v2/aControls.css"><link rel="stylesheet" href="/src/v2/studentTheme.css"><link rel="stylesheet" href="/src/v2/editorial.css"><link rel="stylesheet" href="/src/v2/referenceStudent.css"><link rel="stylesheet" href="/src/v2/campusReference.css"><link rel="stylesheet" href="/src/v2/reference/reference.css"><style>body{margin:0;background:#faf9f6}a{text-decoration:none}button,input,select{font:inherit}.v2-app{display:block!important}.v2-icon-button{background:transparent;border:0;padding:0;color:#252b23}.v2-icon-button svg{width:21px;height:21px}.sample-note{font:10px sans-serif;color:#8a836e;padding:5px 20px;background:#f1eade}.ref-page{padding-bottom:75px}.sample-nav{display:flex;justify-content:space-around;position:fixed;bottom:0;background:#faf9f6f2;left:0;right:0;padding:14px 0;font:12px sans-serif;color:#656e5a;border-top:1px solid #eee}</style><div class="sample-note">布局样例 · 测试数据，非真实校园记录</div><div class="v2-app v2-app-student">${html}</div><nav class="sample-nav"><span>⌂ 首页</span><span>◉ 发现</span><span>♧ 校园</span><span>◉ 会话</span><span>♙ 我的</span></nav></html>`)
     }
   }
 })
