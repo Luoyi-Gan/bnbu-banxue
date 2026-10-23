@@ -1,0 +1,54 @@
+/* A quiet lens on floating controls; reading surfaces retain their solid material. */
+body:has(.v2-app.v2-app-student){
+  --liquid-base:250,252,248;--liquid-tint:231,240,233;
+  --liquid-light:255,255,255;--liquid-shade:22,49,35;
+}
+html[data-ui-theme=dark]:root body:has(.v2-app.v2-app-student[data-campus-route]){
+  --liquid-base:29,49,39;--liquid-tint:24,44,34;
+  --liquid-light:194,231,208;--liquid-shade:0,12,7;
+}
+html[data-ui-theme]:root body:has(.v2-app.v2-app-student[data-campus-route]) :is(.v2-mobile-nav,.v2-student-search-field,.v2-student-search-panel,.campus-discovery-filter-fields,.v2-modal){
+  --liquid-alpha:.58;--liquid-alpha-end:.4;
+  --liquid-depth:var(--student-liquid-progress,0);
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(var(--liquid-light),.12),transparent 48%),
+    radial-gradient(ellipse at 100% 100%,rgba(var(--liquid-tint),.06),transparent 52%),
+    linear-gradient(135deg,rgba(var(--liquid-base),calc(var(--liquid-alpha) + var(--liquid-depth)*.06)),rgba(var(--liquid-tint),calc(var(--liquid-alpha-end) + var(--liquid-depth)*.06)))!important;
+  border-top-color:rgba(var(--liquid-light),var(--material-edge-top))!important;
+  border-left-color:rgba(var(--liquid-light),var(--material-edge-side))!important;
+  border-right-color:rgba(var(--liquid-shade),var(--material-edge-bottom))!important;
+  border-bottom-color:rgba(var(--liquid-shade),var(--material-edge-bottom))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(var(--liquid-light),var(--material-edge-top)),
+    inset 1px 0 0 rgba(var(--liquid-light),.1),
+    inset 0 -1px 0 rgba(var(--liquid-shade),.08),
+    var(--material-shadow-contact),var(--material-shadow-float)!important;
+  backdrop-filter:blur(var(--material-glass-blur)) saturate(var(--material-glass-saturation));
+  -webkit-backdrop-filter:blur(var(--material-glass-blur)) saturate(var(--material-glass-saturation));
+}
+html[data-ui-theme]:root body:has(.v2-app.v2-app-student[data-campus-route]) :is(.v2-modal,.v2-student-search-panel,.campus-discovery-filter-fields){--liquid-alpha:.86;--liquid-alpha-end:.76}
+html[data-ui-theme=dark]:root body:has(.v2-app.v2-app-student[data-campus-route]) :is(.v2-modal,.v2-student-search-panel,.campus-discovery-filter-fields){--liquid-alpha:.91;--liquid-alpha-end:.84}
+html[data-ui-theme=dark]:root body:has(.v2-app.v2-app-student[data-campus-route]) .v2-mobile-nav{--liquid-alpha:.68;--liquid-alpha-end:.5}
+html[data-ui-theme=dark]:root body:has(.v2-app.v2-app-student[data-campus-route]) .v2-student-search-field{--liquid-alpha:.86;--liquid-alpha-end:.76}
+html[data-ui-theme]:root body:has(.v2-app.v2-app-student[data-campus-route]) .v2-student-search-panel{--liquid-alpha:.94;--liquid-alpha-end:.88}
+/* Let the search lens sample the page, rather than another backdrop-filtered header. */
+.v2-app.v2-app-student :is(.cw-header,.ref-header,.v2-topbar):has(.v2-student-search.is-open),
+.v2-app.v2-app-student :is(.cw-header,.ref-header,.v2-topbar):has(.v2-student-search.is-open):before{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+/* Utility content keeps its stable paint layer; blur is sampled once on the fixed scrim. */
+html[data-ui-theme]:root body:has(.v2-app.v2-app-student[data-campus-route]) .v2-modal-layer:has(.student-utility-content)>.v2-modal-scrim{
+  backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;
+}
+html[data-ui-theme][data-ui-motion=reduce]:root body:has(.v2-app.v2-app-student[data-campus-route]) :is(.v2-mobile-nav,.v2-student-search-field,.v2-student-search-panel,.campus-discovery-filter-fields,.v2-modal){--liquid-depth:0}
+@media(prefers-reduced-motion:reduce){
+  html[data-ui-theme]:root body:has(.v2-app.v2-app-student[data-campus-route]) :is(.v2-mobile-nav,.v2-student-search-field,.v2-student-search-panel,.campus-discovery-filter-fields,.v2-modal){--liquid-depth:0}
+}
+@supports not (backdrop-filter:blur(1px)){
+  html[data-ui-theme]:root body:has(.v2-app.v2-app-student[data-campus-route]) :is(.v2-mobile-nav,.v2-student-search-field,.v2-student-search-panel,.campus-discovery-filter-fields,.v2-modal){background:rgb(var(--liquid-base))!important}
+}
+
+/* A modal already samples its scrim: avoid a second blur pass across the same viewport. */
+html[data-ui-theme]:root body:has(.v2-app.v2-app-student[data-campus-route]) .v2-modal-layer:has(.student-utility-content)>.v2-modal{
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}

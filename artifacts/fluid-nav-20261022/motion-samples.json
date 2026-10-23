@@ -1,0 +1,178 @@
+{
+  "singleSwitch": [
+    {
+      "material": "border-radius: 19px; transform: none;",
+      "position": "transform: translateX(300%);"
+    },
+    {
+      "material": "border-radius: 20.236px; transform: scaleX(1.03708) scaleY(0.98764);",
+      "position": "transform: translateX(302.284%);"
+    },
+    {
+      "material": "border-radius: 22.477px; transform: scaleX(1.10431) scaleY(0.96523);",
+      "position": "transform: translateX(365.129%);"
+    },
+    {
+      "material": "border-radius: 19.9955px; transform: scaleX(1.02987) scaleY(0.990045);",
+      "position": "transform: translateX(388.271%);"
+    },
+    {
+      "material": "border-radius: 20.2594px; transform: scaleX(1.03778) scaleY(0.987406);",
+      "position": "transform: translateX(391.999%);"
+    },
+    {
+      "material": "border-radius: 19.5351px; transform: scaleX(1.01605) scaleY(0.994649);",
+      "position": "transform: translateX(394.118%);"
+    },
+    {
+      "material": "border-radius: 19.5292px; transform: scaleX(1.01587) scaleY(0.994708);",
+      "position": "transform: translateX(395.044%);"
+    },
+    {
+      "material": "border-radius: 19.3858px; transform: scaleX(1.01157) scaleY(0.996142);",
+      "position": "transform: translateX(396.526%);"
+    },
+    {
+      "material": "border-radius: 19.3445px; transform: scaleX(1.01034) scaleY(0.996555);",
+      "position": "transform: translateX(397.112%);"
+    },
+    {
+      "material": "border-radius: 19.2456px; transform: scaleX(1.00737) scaleY(0.997544);",
+      "position": "transform: translateX(398.035%);"
+    },
+    {
+      "material": "border-radius: 19.2077px; transform: scaleX(1.00623) scaleY(0.997923);",
+      "position": "transform: translateX(398.393%);"
+    },
+    {
+      "material": "border-radius: 19.17px; transform: scaleX(1.0051) scaleY(0.9983);",
+      "position": "transform: translateX(398.695%);"
+    }
+  ],
+  "rapidRetarget": [
+    {
+      "active": "1",
+      "material": "border-radius: 19.0005px; transform: scaleX(1.00001) scaleY(0.999995);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(-0.0622606%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 21.8209px; transform: scaleX(1.08463) scaleY(0.971791);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(17.9249%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 21.9565px; transform: scaleX(1.08869) scaleY(0.970435);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(29.3155%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 22.5767px; transform: scaleX(1.1073) scaleY(0.964233);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(35.4852%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 22.0308px; transform: scaleX(1.09092) scaleY(0.969692);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(47.2655%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 21.9563px; transform: scaleX(1.08869) scaleY(0.970437);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(57.8181%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 21.5535px; transform: scaleX(1.0766) scaleY(0.974465);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(62.542%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 21.2302px; transform: scaleX(1.06691) scaleY(0.977698);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(70.8406%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 21.1417px; transform: scaleX(1.06425) scaleY(0.978583);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(74.428%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 20.8209px; transform: scaleX(1.05463) scaleY(0.981791);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(77.66%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 20.5894px; transform: scaleX(1.04768) scaleY(0.984106);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(83.1391%);"
+    },
+    {
+      "active": "1",
+      "material": "border-radius: 20.31px; transform: scaleX(1.0393) scaleY(0.9869);",
+      "path": "/v2/activities",
+      "position": "transform: translateX(85.4317%);"
+    }
+  ],
+  "interrupted": [
+    {
+      "active": "2",
+      "material": "border-radius: 24px; transform: scaleX(1.14) scaleY(0.955);",
+      "position": "transform: translateX(87.7254%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 24px; transform: scaleX(1.14) scaleY(0.955);",
+      "position": "transform: translateX(75.7884%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 23.6031px; transform: scaleX(1.13809) scaleY(0.955);",
+      "position": "transform: translateX(123.007%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 23.0752px; transform: scaleX(1.12225) scaleY(0.959248);",
+      "position": "transform: translateX(137.421%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 22.7773px; transform: scaleX(1.11332) scaleY(0.962227);",
+      "position": "transform: translateX(144.031%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 22.0736px; transform: scaleX(1.09221) scaleY(0.969264);",
+      "position": "transform: translateX(149.333%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 22.0511px; transform: scaleX(1.09153) scaleY(0.969489);",
+      "position": "transform: translateX(160.34%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 21.7368px; transform: scaleX(1.0821) scaleY(0.972632);",
+      "position": "transform: translateX(165.129%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 21.475px; transform: scaleX(1.07425) scaleY(0.97525);",
+      "position": "transform: translateX(169.461%);"
+    },
+    {
+      "active": "2",
+      "material": "border-radius: 21.2256px; transform: scaleX(1.06677) scaleY(0.977744);",
+      "position": "transform: translateX(173.355%);"
+    }
+  ]
+}

@@ -1,0 +1,811 @@
+[
+  {
+    "label": "team-before",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 599.0234375,
+        "input": [
+          {
+            "label": "例如：COMP1021 或计算机科学导论",
+            "value": "手势验收草稿"
+          },
+          {
+            "label": "例如：找队友一起完成期末项目",
+            "value": ""
+          },
+          {
+            "label": "已填编号时，可补充课程名称",
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": "4"
+          },
+          {
+            "label": "例如：每周三晚",
+            "value": ""
+          },
+          {
+            "label": "自定义地点，如图书馆二楼或线上会议",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "例如：计算机相关优先",
+            "value": ""
+          },
+          {
+            "label": "例如：前端、设计、研究",
+            "value": ""
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "发起组队",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "team-short-release",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 160.6341209411621,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 104.04930114746094,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 104.04930114746094
+        },
+        "height": 599.0234375,
+        "input": [
+          {
+            "label": "例如：COMP1021 或计算机科学导论",
+            "value": "手势验收草稿"
+          },
+          {
+            "label": "例如：找队友一起完成期末项目",
+            "value": ""
+          },
+          {
+            "label": "已填编号时，可补充课程名称",
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": "4"
+          },
+          {
+            "label": "例如：每周三晚",
+            "value": ""
+          },
+          {
+            "label": "自定义地点，如图书馆二楼或线上会议",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "例如：计算机相关优先",
+            "value": ""
+          },
+          {
+            "label": "例如：前端、设计、研究",
+            "value": ""
+          }
+        ],
+        "layerState": "settling",
+        "offset": "19.274370387509165px",
+        "scroll": 0,
+        "title": "发起组队",
+        "top": 87.45703887939453,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "team-short-settled",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 599.0234375,
+        "input": [
+          {
+            "label": "例如：COMP1021 或计算机科学导论",
+            "value": "手势验收草稿"
+          },
+          {
+            "label": "例如：找队友一起完成期末项目",
+            "value": ""
+          },
+          {
+            "label": "已填编号时，可补充课程名称",
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": "4"
+          },
+          {
+            "label": "例如：每周三晚",
+            "value": ""
+          },
+          {
+            "label": "自定义地点，如图书馆二楼或线上会议",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "例如：计算机相关优先",
+            "value": ""
+          },
+          {
+            "label": "例如：前端、设计、研究",
+            "value": ""
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "发起组队",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "team-body-scroll",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 715.9970092773438,
+        "input": [
+          {
+            "label": "例如：COMP1021 或计算机科学导论",
+            "value": "手势验收草稿"
+          },
+          {
+            "label": "例如：找队友一起完成期末项目",
+            "value": ""
+          },
+          {
+            "label": "已填编号时，可补充课程名称",
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": "4"
+          },
+          {
+            "label": "例如：每周三晚",
+            "value": ""
+          },
+          {
+            "label": "自定义地点，如图书馆二楼或线上会议",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "可留空",
+            "value": ""
+          },
+          {
+            "label": "例如：计算机相关优先",
+            "value": ""
+          },
+          {
+            "label": "例如：前端、设计、研究",
+            "value": ""
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "发起组队",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "team-closed",
+    "motion": "normal",
+    "overflow": "",
+    "panels": [],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "filter-before",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 659.8400268554688,
+        "input": [
+          {
+            "label": "地点名称或地址",
+            "value": "图书馆"
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": "按出发地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "按目的地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "筛选条件",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "filter-short-release",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 160.53855514526367,
+          "height": 56.58481216430664,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 103.95374298095705,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 103.95374298095705
+        },
+        "height": 659.8400268554688,
+        "input": [
+          {
+            "label": "地点名称或地址",
+            "value": "图书馆"
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": "按出发地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "按目的地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          }
+        ],
+        "layerState": "settling",
+        "offset": "19.178818148768695px",
+        "scroll": 0,
+        "title": "筛选条件",
+        "top": 87.36148071289062,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "filter-settled",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 659.8400268554688,
+        "input": [
+          {
+            "label": "地点名称或地址",
+            "value": "图书馆"
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": "按出发地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "按目的地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "筛选条件",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "nested-before",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 715.9970092773438,
+        "input": [
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "设置",
+        "top": 68.18266296386719,
+        "touch": "none"
+      },
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 89.17410659790039,
+          "height": 56.58481979370117,
+          "left": 29.585193634033203,
+          "right": 334.10527420043945,
+          "top": 32.58928680419922,
+          "width": 304.52008056640625,
+          "x": 29.585193634033203,
+          "y": 32.58928680419922
+        },
+        "height": 828.3760986328125,
+        "input": [],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "侧栏设置",
+        "top": 11.997767448425291,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/settings?section=campus"
+  },
+  {
+    "label": "nested-short",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 715.9970092773438,
+        "input": [
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "设置",
+        "top": 68.18266296386719,
+        "touch": "none"
+      },
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 107.9775276184082,
+          "height": 56.58481979370117,
+          "left": 29.585193634033203,
+          "right": 334.10527420043945,
+          "top": 51.39270782470703,
+          "width": 304.52008056640625,
+          "x": 29.585193634033203,
+          "y": 51.39270782470703
+        },
+        "height": 828.3760986328125,
+        "input": [],
+        "layerState": "settling",
+        "offset": "18.803420449593883px",
+        "scroll": 0,
+        "title": "侧栏设置",
+        "top": 30.801189422607425,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/settings?section=campus"
+  },
+  {
+    "label": "nested-escape",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 715.9970092773438,
+        "input": [
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "设置",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/settings?section=campus"
+  },
+  {
+    "label": "nested-drag-closed",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 715.9970092773438,
+        "input": [
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "设置",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/settings?section=campus"
+  },
+  {
+    "label": "drawer-long-closed",
+    "motion": "normal",
+    "overflow": "",
+    "panels": [],
+    "scroll": 136.3095245361328,
+    "url": "/v2/me?tab=timetable"
+  },
+  {
+    "label": "settings-reduced-short",
+    "motion": "reduce",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 715.9970092773438,
+        "input": [
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          },
+          {
+            "label": null,
+            "value": "on"
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "设置",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/settings?section=campus"
+  },
+  {
+    "label": "settings-reduced-closed",
+    "motion": "reduce",
+    "overflow": "",
+    "panels": [],
+    "scroll": 0,
+    "url": "/v2/me"
+  },
+  {
+    "label": "filter-final-open",
+    "motion": "normal",
+    "overflow": "hidden",
+    "panels": [
+      {
+        "gesture": "true",
+        "header": {
+          "bottom": 141.35974502563477,
+          "height": 56.58481979370117,
+          "left": 28.590028762817383,
+          "right": 349.9813861846924,
+          "top": 84.7749252319336,
+          "width": 321.391357421875,
+          "x": 28.590028762817383,
+          "y": 84.7749252319336
+        },
+        "height": 659.8400268554688,
+        "input": [
+          {
+            "label": "地点名称或地址",
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": null,
+            "value": ""
+          },
+          {
+            "label": "按出发地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "按目的地点或地址筛选",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          },
+          {
+            "label": "不限",
+            "value": ""
+          }
+        ],
+        "layerState": null,
+        "offset": "",
+        "scroll": 0,
+        "title": "筛选条件",
+        "top": 68.18266296386719,
+        "touch": "none"
+      }
+    ],
+    "scroll": 0,
+    "url": "/v2/partners"
+  },
+  {
+    "label": "filter-final-closed",
+    "motion": "normal",
+    "overflow": "",
+    "panels": [],
+    "scroll": 0,
+    "url": "/v2/partners"
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "loading": {
+    "background": "rgb(239, 238, 231)",
+    "busy": "true",
+    "count": 4,
+    "radius": "12px",
+    "shimmer": "material-skeleton-flow"
+  },
+  "loaded": {
+    "busy": "false",
+    "content": 2,
+    "placeholder": 0
+  },
+  "replaced": {
+    "content": 2,
+    "placeholder": 0
+  },
+  "reduced": {
+    "animation": "none",
+    "motion": "reduce"
+  },
+  "activityPage": {
+    "busy": "false",
+    "cards": 6,
+    "coverRadii": [
+      "10px",
+      "10px"
+    ],
+    "skeletons": 0
+  },
+  "home": {
+    "background": "rgb(255, 255, 255)",
+    "next": "下一项安排高等数学08:0010/22教 A101我的课程第7周 · 1–16周",
+    "radius": "5px 25px 5px 5px"
+  },
+  "organizations": {
+    "cards": 4,
+    "loading": "false"
+  },
+  "community": {
+    "cards": 6,
+    "loading": "false"
+  },
+  "finalPreference": "normal"
+}

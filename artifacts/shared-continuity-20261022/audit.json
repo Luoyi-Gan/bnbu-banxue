@@ -1,0 +1,237 @@
+{
+  "viewport": {
+    "width": 393,
+    "height": 852
+  },
+  "note": "final-shop-enter/return 在恢复原浏览器尺寸后复查",
+  "surfaces": [
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities/preview-event-5",
+      "label": "activity-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities",
+      "label": "activity-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/coffee",
+      "label": "coffee-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/coffee",
+      "label": "coffee-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/me?tab=profile",
+      "label": "profile-cover-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/me",
+      "label": "profile-cover-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/community?person=c1093a45-9abc-4780-baa1-ef9920d6181f",
+      "label": "avatar-enter-verified"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=community",
+      "label": "avatar-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=organizations",
+      "label": "organization-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=organizations",
+      "label": "organization-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/campus/explore",
+      "label": "map-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/campus/explore",
+      "label": "map-return"
+    },
+    {
+      "active": null,
+      "engine": "reduced",
+      "named": 0,
+      "result": "direct",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "reduced-shop-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "shop-double-click"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/shops",
+      "label": "final-shop-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "final-shop-enter"
+    }
+  ],
+  "photos": [
+    {
+      "active": null,
+      "aspect": "1.05 / 1",
+      "engine": "view-transition",
+      "photo": 0,
+      "photoHash": "b64c7cce",
+      "radius": "14px",
+      "rect": {
+        "bottom": 572.9259643554688,
+        "height": 330.0688171386719,
+        "left": 15.997023582458496,
+        "right": 362.5744161605835,
+        "top": 242.85714721679688,
+        "width": 346.577392578125,
+        "x": 15.997023582458496,
+        "y": 242.85714721679688
+      },
+      "result": "complete",
+      "url": "/v2/shops",
+      "label": "final-list"
+    },
+    {
+      "active": null,
+      "aspect": "1.05 / 1",
+      "engine": "view-transition",
+      "photo": 1,
+      "photoHash": "6da742a2",
+      "radius": "16px",
+      "rect": {
+        "bottom": 426.3392791748047,
+        "height": 330.0688171386719,
+        "left": 15.997023582458496,
+        "right": 362.5744161605835,
+        "top": 96.2704620361328,
+        "width": 346.577392578125,
+        "x": 15.997023582458496,
+        "y": 96.2704620361328
+      },
+      "result": "complete",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "detail-photo-two"
+    },
+    {
+      "active": null,
+      "aspect": "1.05 / 1",
+      "engine": "view-transition",
+      "photo": 1,
+      "photoHash": "6da742a2",
+      "radius": "14px",
+      "rect": {
+        "bottom": 552.6878662109375,
+        "height": 330.0688171386719,
+        "left": 15.997023582458496,
+        "right": 362.5744161605835,
+        "top": 222.6190490722656,
+        "width": 346.577392578125,
+        "x": 15.997023582458496,
+        "y": 222.6190490722656
+      },
+      "result": "complete",
+      "url": "/v2/shops",
+      "label": "list-photo-two-return"
+    },
+    {
+      "active": null,
+      "aspect": "1.05 / 1",
+      "engine": "view-transition",
+      "photo": 1,
+      "photoHash": "6da742a2",
+      "radius": "16px",
+      "rect": {
+        "bottom": 426.3392791748047,
+        "height": 330.0688171386719,
+        "left": 15.997023582458496,
+        "right": 362.5744161605835,
+        "top": 96.2704620361328,
+        "width": 346.577392578125,
+        "x": 15.997023582458496,
+        "y": 96.2704620361328
+      },
+      "result": "complete",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "detail-photo-two-reopen"
+    }
+  ],
+  "frames": [
+    {
+      "active": "enter",
+      "transform": "none"
+    },
+    {
+      "active": "enter",
+      "transform": "matrix(1, 0, 0, 1, 16.0714, 222.619)"
+    },
+    {
+      "active": "enter",
+      "transform": "matrix(1, 0, 0, 1, 16.0714, 97.6159)"
+    }
+  ]
+}

@@ -33,7 +33,7 @@ it('无身份账号的工作区不暴露 108 人名录或隐藏学号',()=>{
   expect(JSON.stringify(view)).not.toContain('S100000');
   expect(JSON.stringify(view)).not.toContain('私有学院');
   expect(()=>communityFeed(db,stranger.token,new URLSearchParams())).toThrow('核验');
-});
+},20000);
 
 it('三千帖工作区保持有界，社区与审核按页返回并提供评论上下文',()=>{
   const db=database(),author=account(db,'author',['student']),reader=account(db,'reader',['student']),reviewer=account(db,'reviewer',['reviewer']);

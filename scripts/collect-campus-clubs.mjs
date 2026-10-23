@@ -1,0 +1,22 @@
+import {load} from 'cheerio';
+import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
+const descriptions=JSON.parse(readFileSync(new URL('../data/campus-club-summaries.json',import.meta.url),'utf8'));
+const imageCatalog=JSON.parse(readFileSync(new URL('../data/campus-club-images.json',import.meta.url),'utf8'));
+const sourceUrl='https://sao.bnbu.edu.cn/students/interest_clubs/name_list.htm';
+const response=await fetch(sourceUrl);if(!response.ok)throw Error('学校社团名单无法读取');
+const $=load(await response.text()),clubs=[];
+const summaries={'学术':'通过学习、分享与交流，探索共同感兴趣的学术与语言文化。','其他类':'围绕共同兴趣开展校园交流与实践。','文化艺术':'通过创作、排练与分享，结识有共同艺术兴趣的同学。','体育运动':'参与运动交流与训练，结识喜欢这项运动的伙伴。','义工服务':'通过志愿服务与公益实践，参与社区与校园服务。'};
+$('table').first().find('tr').slice(1).each((_,row)=>{
+ const cells=$(row).find('td'),nameCell=cells.eq(1).clone();nameCell.find('br').replaceWith('\n');
+ const raw=nameCell.text().trim(),category=cells.eq(2).text().match(/[\u4e00-\u9fff]+/)?.[0];
+ const lines=raw.split('\n').map(s=>s.replace(/\s+/g,' ').trim()).filter(Boolean);
+ const parts=lines.length===1?lines[0].split(/(?<=[\u4e00-\u9fff])\s*(?=[A-Za-z])/):lines;
+ const name=parts[0],englishName=parts.slice(1).join(' ');
+ if(!name||!category||!summaries[category])throw Error('名单结构变化，请人工核对');
+ if(!descriptions[name])throw Error('缺少核对后的社团简介：'+name);
+ const photo=imageCatalog.images.find(item=>item.name===name);
+ clubs.push({name,englishName,category,description:descriptions[name],sourceUrl,sourceLabel:'BNBU 学生事务处 · 社团名单',sourceDate:new Date().toISOString().slice(0,10),directoryOnly:true,status:'approved',visibility:'visible',contact:'统一咨询：SAO-ICMC；sao-icmc@bnbu.edu.cn（非该社团独立邮箱）',image:photo?.image??'',imageSource:photo?.imageSource??null});
+});
+if(clubs.length<50||new Set(clubs.map(c=>c.name)).size!==clubs.length)throw Error('名单不完整或重复');
+mkdirSync('data',{recursive:true});writeFileSync('data/campus-clubs.json',JSON.stringify({sourceUrl,checkedAt:new Date().toISOString(),coverage:'学生事务处现行社团名单逐项收录；公开页面可能存在更新延迟，未列名组织不推断为在册。',clubs},null,2)+'\n');
+console.log(JSON.stringify({count:clubs.length,categories:Object.fromEntries(Object.keys(summaries).map(k=>[k,clubs.filter(c=>c.category===k).length]))}));

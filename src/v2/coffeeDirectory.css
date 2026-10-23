@@ -1,0 +1,21 @@
+/* Coffee Chat uses the same photo-first discovery rhythm as campus shops. */
+.v2-app.v2-app-student .v2-coffee-directory{max-width:1080px;padding-bottom:32px}
+.v2-app.v2-app-student .v2-coffee-directory .v2-directory-tools{margin:0 0 14px;gap:12px}
+.v2-app.v2-app-student .v2-coffee-directory .v2-directory-tools>span{color:var(--v2-muted);font-size:12px;white-space:nowrap}
+.v2-app.v2-app-student .v2-coffee-directory .v2-directory-tools>.v2-animated-search{width:100%;max-width:none;min-width:0}
+.v2-app.v2-app-student .v2-coffee-directory .v2-directory-filters{margin-bottom:20px;gap:8px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+.v2-app.v2-app-student .v2-coffee-directory .v2-directory-filters>button{flex:none;white-space:nowrap}
+.v2-app.v2-app-student .v2-coffee-directory .coffee-discovery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 16px;align-items:start}
+.v2-app.v2-app-student .v2-coffee-directory .coffee-discovery-card{display:flex;flex-direction:column;gap:0;width:100%;min-width:0;min-height:0;height:auto;max-height:none;padding:0;overflow:visible;background:transparent;border:0;border-radius:0;box-shadow:none;color:var(--v2-ink);font:inherit;text-align:left;cursor:pointer}
+.v2-app.v2-app-student .v2-coffee-directory .coffee-discovery-card>img{display:block;flex:none;width:100%;height:auto;min-width:0;min-height:0;aspect-ratio:1.05;object-fit:cover;object-position:center;border-radius:18px;box-shadow:var(--material-shadow-cover)}
+.v2-app.v2-app-student .coffee-discovery-copy{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:11px 0 0;min-width:0;width:100%}
+.v2-app.v2-app-student .coffee-discovery-copy>strong{font-size:16px;line-height:1.5;font-weight:600;overflow-wrap:anywhere}
+.v2-app.v2-app-student :is(.coffee-discovery-department,.coffee-discovery-topics){font-size:12px;line-height:1.6;color:var(--v2-muted);overflow-wrap:anywhere}
+.v2-app.v2-app-student .coffee-discovery-more{display:flex;align-items:center;gap:2px;margin-top:2px;color:var(--student-glass-accent);font-size:11px;line-height:1.6}
+.v2-app.v2-app-student .v2-coffee-directory .coffee-discovery-card:focus-visible{outline:2px solid var(--student-glass-accent);outline-offset:5px;border-radius:18px}
+@media(max-width:760px){
+ .v2-app.v2-app-student .v2-coffee-directory .coffee-discovery-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}
+ .v2-app.v2-app-student .v2-coffee-directory .v2-directory-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
+ .v2-app.v2-app-student .v2-coffee-directory .v2-directory-tools>span{justify-self:end;width:auto;margin:0;text-align:right;font-size:11px}
+ .v2-app.v2-app-student .v2-coffee-directory .v2-directory-filters{margin-bottom:18px}
+}

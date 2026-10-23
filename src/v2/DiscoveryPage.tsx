@@ -1,3 +1,4 @@
+import {LoadingSwap} from './MaterialSkeleton'
 import { CalendarDays, House, MessageCircle, UsersRound, Check, ChevronDown, Search, SlidersHorizontal } from 'lucide-react'
 import { useId, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -60,7 +61,7 @@ function ActivityPanel({initialQuery,initialCategory}:{initialQuery:string;initi
     </div>
     {hasFilters&&<button className="campus-discovery-clear" type="button" onClick={()=>{setQuery('');setCategory('全部');setPeriod('全部时间');setLocation('全部地点')}}>{uiText('清除筛选')}</button>}
     <Feedback live={live}/>
-    {filtered.length?<ActivityDiscovery key={`${query}|${category}|${period}|${location}|${sort}`} items={filtered} basePath="/v2/activities" live={live}/>:<EmptyNote>{!live.data?uiText('正在读取活动…'):hasFilters?uiText('没有符合条件的活动，试试其他筛选。'):uiText('暂时没有公开活动。新的校园消息会在这里出现。')}</EmptyNote>}
+    <LoadingSwap loading={!live.data&&!live.error}>{filtered.length?<ActivityDiscovery items={filtered} basePath="/v2/activities" live={live}/>:<EmptyNote>{!live.data?uiText('正在读取活动…'):hasFilters?uiText('没有符合条件的活动，试试其他筛选。'):uiText('暂时没有公开活动。新的校园消息会在这里出现。')}</EmptyNote>}</LoadingSwap>
   </>
 }
 

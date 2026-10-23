@@ -43,3 +43,14 @@ it('拒绝供应商业务失败及网络失败，不将 HTTP 200 当作发信成
   vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network failure')))
   await expect(deliverMessage(message, endpoint)).rejects.toThrow('未确认发送')
 })
+
+it('登录可使用独立模板，找回密码继续使用原模板', async () => {
+  provider()
+  vi.stubEnv('BNBU_AOKSEND_LOGIN_TEMPLATE_ID', 'login-template')
+  const send = vi.fn().mockImplementation(async()=>Response.json({ code: 200 }))
+  vi.stubGlobal('fetch', send)
+  await deliverMessage({...message,subject:'会同里登录验证码'},endpoint)
+  await deliverMessage(message,endpoint)
+  expect(new URLSearchParams(send.mock.calls[0][1].body).get('template_id')).toBe('login-template')
+  expect(new URLSearchParams(send.mock.calls[1][1].body).get('template_id')).toBe('test-template')
+})

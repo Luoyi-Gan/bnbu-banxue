@@ -1,0 +1,52 @@
+[
+  {
+    "id": 81,
+    "index": 0,
+    "name": "首页",
+    "centerError": 0,
+    "layers": 1,
+    "material": "border-radius: 19px; transform: none;",
+    "selected": "首页",
+    "selection": "1"
+  },
+  {
+    "id": 82,
+    "index": 1,
+    "name": "发现",
+    "centerError": 0.005580902099609375,
+    "layers": 1,
+    "material": "border-radius: 19px; transform: none;",
+    "selected": "发现",
+    "selection": "1"
+  },
+  {
+    "id": 83,
+    "index": 2,
+    "name": "校园",
+    "centerError": 0.01116943359375,
+    "layers": 1,
+    "material": "border-radius: 19px; transform: none;",
+    "selected": "校园",
+    "selection": "1"
+  },
+  {
+    "id": 84,
+    "index": 3,
+    "name": "运动",
+    "centerError": 0.016719818115234375,
+    "layers": 1,
+    "material": "border-radius: 19px; transform: none;",
+    "selected": "运动",
+    "selection": "1"
+  },
+  {
+    "id": 85,
+    "index": 4,
+    "name": "我的",
+    "centerError": 0.027919769287109375,
+    "layers": 1,
+    "material": "border-radius: 19px; transform: none;",
+    "selected": "我的",
+    "selection": "1"
+  }
+]

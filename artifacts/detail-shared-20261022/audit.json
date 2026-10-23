@@ -1,0 +1,341 @@
+{
+  "viewport": {
+    "width": 393,
+    "height": 852
+  },
+  "surfaces": [
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 251.5811004638672,
+          "key": "post:preview-post-0",
+          "width": 377.3809509277344
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "post-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=community",
+      "label": "post-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 140.0855712890625,
+          "key": "partner:preview-room-4",
+          "width": 392.2619018554687
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/partners",
+      "label": "partner-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/partners",
+      "label": "partner-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 75.99516296386719,
+          "key": "alumni:preview-alumni",
+          "width": 75.99516296386719
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/alumni?person=preview-alumni",
+      "label": "alumni-person-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/alumni?view=people",
+      "label": "alumni-person-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 377.3809509277344,
+          "key": "post:preview-alumni-post",
+          "width": 377.3809509277344
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/alumni",
+      "label": "alumni-story-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 377.3809509277344,
+          "key": "activity:preview-event-5",
+          "width": 377.3809509277344
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities/preview-event-5",
+      "label": "activity-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities",
+      "label": "activity-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 169.99627685546875,
+          "key": "coffee:839cc9e7-b30c-4787-b606-6adb00daa43a",
+          "width": 298.5863037109375
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/coffee",
+      "label": "coffee-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/coffee",
+      "label": "coffee-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 377.3809509277344,
+          "key": "post:preview-alumni-post",
+          "width": 377.3809509277344
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/alumni",
+      "label": "alumni-story-enter-final"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/alumni",
+      "label": "alumni-story-return-final"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 251.5811004638672,
+          "key": "post:preview-post-0",
+          "width": 377.3809509277344
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "post-double-open"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=community",
+      "label": "post-return-after-double"
+    },
+    {
+      "active": null,
+      "engine": "reduced",
+      "media": [
+        {
+          "height": 140.0855712890625,
+          "key": "partner:preview-room-4",
+          "width": 392.2619018554687
+        }
+      ],
+      "named": 0,
+      "result": "direct",
+      "url": "/v2/partners",
+      "label": "partner-reduced-enter"
+    },
+    {
+      "active": null,
+      "engine": "reduced",
+      "media": [],
+      "named": 0,
+      "result": "direct",
+      "url": "/v2/partners",
+      "label": "partner-reduced-return"
+    },
+    {
+      "active": null,
+      "engine": "reduced",
+      "media": [
+        {
+          "height": 251.5811004638672,
+          "key": "post:preview-post-0",
+          "width": 377.3809509277344
+        }
+      ],
+      "named": 0,
+      "result": "direct",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "post-reduced-enter"
+    },
+    {
+      "active": null,
+      "engine": "reduced",
+      "media": [],
+      "named": 0,
+      "result": "direct",
+      "url": "/v2/activities?section=community",
+      "label": "post-reduced-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 140.0855712890625,
+          "key": "partner:preview-room-4",
+          "width": 392.2619018554687
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/partners",
+      "label": "partner-final-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/partners",
+      "label": "partner-final-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 140.0855712890625,
+          "key": "partner:preview-room-4",
+          "width": 392.2619018554687
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/partners",
+      "label": "partner-repeat-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/partners",
+      "label": "partner-repeat-return"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [
+        {
+          "height": 251.5811004638672,
+          "key": "post:preview-post-0",
+          "width": 377.3809509277344
+        }
+      ],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "post-final-enter"
+    },
+    {
+      "active": null,
+      "engine": "view-transition",
+      "media": [],
+      "named": 0,
+      "result": "complete",
+      "url": "/v2/activities?section=community",
+      "label": "post-final-return"
+    }
+  ],
+  "partnerColors": [
+    {
+      "background": "rgb(68, 62, 46)",
+      "color": "rgb(209, 195, 146)",
+      "filter": "none",
+      "where": "list"
+    },
+    {
+      "background": "rgb(68, 62, 46)",
+      "color": "rgb(209, 195, 146)",
+      "filter": "none",
+      "where": "detail"
+    }
+  ],
+  "postReturnFrames": [
+    {
+      "active": "exit",
+      "transform": "matrix(1, 0, 0, 1, 0.595245, 65.4762)"
+    },
+    {
+      "active": "exit",
+      "transform": "matrix(1, 0, 0, 1, 16.0526, 446.56)"
+    },
+    {
+      "active": null,
+      "transform": "none"
+    }
+  ],
+  "multiPhotoVerification": "两张合成图片的渲染回归通过；浏览器当前帖子夹具为单图",
+  "scope": "本地模拟数据，非真机性能验收"
+}

@@ -1,5 +1,5 @@
 .student-utilities{display:inline-flex;align-items:center;gap:7px}
-html[data-ui-theme] .student-utilities>a{position:relative;display:grid!important;place-items:center;width:40px;height:40px;padding:0!important;border-radius:50%;color:var(--student-glass-ink,#263f35);background:linear-gradient(145deg,#ffffff66,#ffffff1c);border:1px solid var(--student-glass-line,#ffffffb8);backdrop-filter:blur(16px) saturate(135%);-webkit-backdrop-filter:blur(16px) saturate(135%);box-shadow:inset 0 1px 0 #ffffff80,0 2px 8px #29483c05}
+html[data-ui-theme] .student-utilities>a{position:relative;display:grid!important;place-items:center;width:40px;height:40px;padding:0!important;border-radius:50%;color:var(--student-glass-ink,#263f35);background:radial-gradient(ellipse at 25% 0%,#ffffff80,transparent 60%),linear-gradient(145deg,#ffffff55,#ffffff18);border:1px solid var(--student-glass-line,#ffffffb8);backdrop-filter:blur(16px) saturate(135%);-webkit-backdrop-filter:blur(16px) saturate(135%);box-shadow:inset 0 1px 0 #ffffff80,0 2px 8px #29483c05}
 html[data-ui-theme] .student-utilities>a:is(:hover,.is-active){color:var(--student-glass-accent,#257965);background:var(--student-glass-active,#42a07d29)}
 .student-utilities b{position:absolute;top:-4px;right:-3px;min-width:14px;padding:0 3px;border-radius:10px;background:#d9545f;color:white;font:600 9px/14px system-ui}
 .v2-modal-layer:has(.student-utility-content){--utility-top-gap:max(8dvh,env(safe-area-inset-top));--utility-bottom-gap:max(8dvh,env(safe-area-inset-bottom));box-sizing:border-box;display:flex!important;align-items:flex-start;justify-content:flex-end;padding:var(--utility-top-gap) 20px var(--utility-bottom-gap)!important;background:transparent!important}
@@ -10,6 +10,10 @@ html[data-ui-theme] .student-utilities>a:is(:hover,.is-active){color:var(--stude
 .student-utility-content .v2-page-heading,.student-utility-content .inbox-tabs{display:none}
 .student-utility-content .settings-heading{position:static;background:transparent;padding:12px 0;margin:0}
 .student-utility-content .settings-heading h1{font-size:18px}
+.v2-modal:has(.student-utility-content)>header:has(.utility-header-back){gap:10px}
+.v2-modal:has(.student-utility-content)>header:has(.utility-header-back)>h2{flex:1;min-width:0}
+.utility-header-back{display:grid;place-items:center;flex:none;min-width:32px;min-height:44px;color:var(--student-glass-ink)}
+.utility-header-back:focus-visible{outline:2px solid var(--student-glass-accent);outline-offset:2px;border-radius:10px}
 .student-utility-content .inbox-workspace{height: min(650px,65dvh);min-height:340px;grid-template-columns:minmax(150px,.7fr) minmax(0,1.3fr)}
 .student-utility-content .v2-messages-page.is-chat-open .inbox-chat{position:relative;inset:auto;height:65dvh;z-index:auto}
 .student-utility-content .community-direct{height:65dvh;min-height:320px}
@@ -29,3 +33,24 @@ html[data-ui-theme] .student-utilities>a:is(:hover,.is-active){color:var(--stude
 
 html[data-ui-theme] .v2-app-student .v2-student-search-trigger{width:40px;height:40px;min-width:40px;min-height:40px;padding:0;border-radius:50%;border:1px solid var(--student-glass-line);background:linear-gradient(145deg,#ffffff66,#ffffff1c);color:var(--student-glass-ink);box-shadow:inset 0 1px 0 #ffffff80,0 2px 8px #29483c05;-webkit-backdrop-filter:blur(16px) saturate(135%);backdrop-filter:blur(16px) saturate(135%)}
 html[data-ui-theme=dark] .v2-app-student :is(.student-utilities>a,.v2-student-search-trigger){background:linear-gradient(145deg,#42625266,#24403433);box-shadow:inset 0 1px 0 #ffffff15,0 2px 8px #0000000d}
+
+html[data-ui-theme] .v2-app-student :is(.student-utilities>a,.v2-student-search-trigger){border-top-color:var(--student-glass-edge-highlight);border-bottom-color:var(--student-glass-edge-shade)}
+/* Utility sheets scroll inside a stable painted surface, without nested backdrop sampling. */
+html[data-ui-theme] body:has(.v2-app.v2-app-student) .v2-modal-layer:has(.student-utility-content)>.v2-modal-scrim {
+  background:rgb(20 40 31 / 28%)!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+html[data-ui-theme] body:has(.v2-app.v2-app-student) .v2-modal-layer>.v2-modal:has(.student-utility-content) {
+  background:linear-gradient(145deg,#fafbf7,#e7efe9)!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  isolation:isolate;
+}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student) .v2-modal-layer>.v2-modal:has(.student-utility-content) {
+  background:linear-gradient(145deg,#23372d,#14251d)!important;
+}
+.student-utility-content {
+  scrollbar-gutter:stable;
+  overflow-anchor:none;
+  contain:layout paint;
+}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student) .v2-modal:has(.student-utility-content)>header h2 {color:#e1ede4}

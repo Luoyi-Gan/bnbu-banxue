@@ -1,0 +1,22 @@
+{
+  "scope": "用户授权学校账号在本地隔离数据库的实测；不含密码、令牌、邮箱或学校原始资料",
+  "checkedAt": "2026-10-22T10:57:13.954Z",
+  "autoSync": {
+    "state": "complete",
+    "mis": "success",
+    "misLessons": 10,
+    "misSemester": "Semester 1 of 2026-2027"
+  },
+  "courseSpaces": 11,
+  "misCourseCount": 5,
+  "automaticDeadlines": 3,
+  "materialCourses": 11,
+  "files": 461,
+  "warnings": [],
+  "manualSyncRequests": 0,
+  "manualMaterialRequests": 0,
+  "timetableRendered": true,
+  "materialsRendered": true,
+  "horizontalOverflow": false,
+  "pageErrors": []
+}

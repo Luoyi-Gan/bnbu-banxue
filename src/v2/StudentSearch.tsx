@@ -1,3 +1,4 @@
+import './studentSearch.css'
 import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 import { api } from '../live/api'
 import { ArrowRight, CalendarDays, MessageCircle, Search, UsersRound, X } from 'lucide-react'
@@ -67,7 +68,11 @@ export function StudentSearch() { useUiLanguage();
     return () => { document.removeEventListener('pointerdown', onPointer); document.removeEventListener('keydown', onKey) }
   }, [open, close, closeToTrigger])
 
-  useEffect(() => { if (open) inputRef.current?.focus() }, [open])
+  useEffect(() => {
+    if (!open) return
+    const frame = requestAnimationFrame(() => inputRef.current?.focus())
+    return () => cancelAnimationFrame(frame)
+  }, [open])
 
   useLayoutEffect(() => {
     const panel = panelRef.current
@@ -88,9 +93,9 @@ export function StudentSearch() { useUiLanguage();
     <button ref={triggerRef} type="button" className="v2-icon-button v2-student-search-trigger" aria-label={uiText("搜索校园")} aria-expanded={open} aria-keyshortcuts="/ Meta+K Control+K" onClick={() => setOpen(true)}><Search size={19}/></button>
     <div className="v2-student-search-field" aria-hidden={!open}>
       <Search size={18} aria-hidden="true"/>
-      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder={uiText("搜索校园内容或输入完整学号")} aria-label={uiText("搜索校园内容")} tabIndex={open?0:-1}/>
-      {query && <button type="button" className="v2-student-search-clear" aria-label={uiText("清除搜索词")} onClick={() => { setQuery(''); inputRef.current?.focus() }}><X size={15}/></button>}
-      <button type="button" className="v2-student-search-close" aria-label={uiText("关闭搜索")} onClick={closeToTrigger}><X size={18}/></button>
+      <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && results[0]) choose(results[0].path) }} placeholder={uiText("搜索校园内容")} aria-label={uiText("搜索校园内容")} tabIndex={open?0:-1}/>
+      {query && <button type="button" className="v2-student-search-clear" tabIndex={open?0:-1} aria-label={uiText("清除搜索词")} onClick={() => { setQuery(''); inputRef.current?.focus() }}><X size={15}/></button>}
+      <button type="button" className="v2-student-search-close" tabIndex={open?0:-1} aria-label={uiText("关闭搜索")} onClick={closeToTrigger}><X size={18}/></button>
     </div>
     <div ref={panelRef} className="v2-student-search-panel" aria-hidden={!open} inert={!open}>
       <div className="v2-student-search-panel-inner">

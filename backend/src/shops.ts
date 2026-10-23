@@ -12,11 +12,21 @@ const visible=(entity:Entity)=>entity.data.status==='visible';
 export function* shopPolicy(repo:BusinessRepository,actor:Account,action:string,input:Fields):Generator<unknown,Entity|undefined,unknown>{
   if(!action.startsWith('shop.'))return;
   access(actor);
+  if(action==='shop.bookmark'){
+    demand(actor.roles.includes('student'),'需要学生身份。',403);
+    demand(typeof input.enabled==='boolean','请明确收藏状态。');
+    const shop=yield* effect(repo.get(input.id,'shop'));
+    if(input.enabled)demand(visible(shop),'店铺当前未公开。',409);
+    yield* effect(repo.relation(actor.id,shop.id,'save',input.enabled));
+    return shop;
+  }
   if(action==='shop.save'){
     demand(managesShops(actor),'仅管理员可维护店铺。',403);
     const current=input.id?yield* effect(repo.get(input.id,'shop')):undefined;
     if(current)version(current,input);
-    const patch={name:textField(input,'name',80),category:textField(input,'category',30),scope:enumField(input,'scope',['campus','outside']),address:textField(input,'address',240),description:textField(input,'description',1000,true),images:validPostImages(input.images??[],current?.data.images),status:current?.data.status??'visible'};
+    const sourceUrl=input.sourceUrl===undefined?String(current?.data.sourceUrl??''):textField(input,'sourceUrl',500,true);
+    if(sourceUrl){let valid=false;try{const url=new URL(sourceUrl);valid=url.protocol==='https:'&&!url.username&&!url.password}catch{ /* rejected below */ }demand(valid,'资料来源须为有效 HTTPS 链接。')}
+    const patch={sourceUrl,sourceLabel:input.sourceLabel===undefined?String(current?.data.sourceLabel??''):textField(input,'sourceLabel',80,true),sourceDate:input.sourceDate===undefined?String(current?.data.sourceDate??''):textField(input,'sourceDate',40,true),name:textField(input,'name',80),category:textField(input,'category',30),scope:enumField(input,'scope',['campus','outside']),address:textField(input,'address',240),description:textField(input,'description',1000,true),images:validPostImages(input.images??[],current?.data.images),status:current?.data.status??'visible'};
     return current?yield* effect(repo.save(current,patch)):yield* effect(repo.create('shop',actor.id,patch));
   }
   if(action==='shop.visibility'){
@@ -90,5 +100,7 @@ export function* shopRead(repo:BusinessRepository,actor:Account,params:URLSearch
     const profile=preview?profiles.find(p=>p.ownerId===review.ownerId):undefined;
     return {...review,ownerId:undefined,mine:review.ownerId===actor.id,author:typeof profile?.data.nickname==='string'?profile.data.nickname:'校园同学',data:{shopId:review.data.shopId,body:review.data.body,dish:review.data.dish,images:strings(review.data.images),status:review.data.status,...(admin||review.ownerId===actor.id?{reason:review.data.reason}: {})}};
   });
-  return {canManage:managesShops(actor),canReview:actor.roles.includes('student'),shops:selected.map(shop=>({...shop,ownerId:undefined,reviewCount:allReviews.filter(r=>r.data.shopId===shop.id&&visible(r)).length})),categories:[...new Set(allowed.map(shop=>String(shop.data.category)))],reviews:projected,hasMore:id?reviews.length>start+20:filtered.length>start+20,page,reports:admin?(yield* effect(repo.all('shopReport'))).filter(r=>r.data.status==='pending').slice(0,100):[]};
+  const savedIds=new Set<string>();
+  for(const shop of selected)if(yield* effect(repo.related(actor.id,shop.id,'save')))savedIds.add(shop.id);
+  return {canManage:managesShops(actor),canReview:actor.roles.includes('student'),shops:selected.map(shop=>({...shop,ownerId:undefined,saved:savedIds.has(shop.id),reviewCount:allReviews.filter(r=>r.data.shopId===shop.id&&visible(r)).length})),categories:[...new Set(allowed.map(shop=>String(shop.data.category)))],reviews:projected,hasMore:id?reviews.length>start+20:filtered.length>start+20,page,reports:admin?(yield* effect(repo.all('shopReport'))).filter(r=>r.data.status==='pending').slice(0,100):[]};
 }

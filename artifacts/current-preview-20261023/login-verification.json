@@ -1,0 +1,18 @@
+{
+  "viewports": [
+    393,
+    320,
+    1440
+  ],
+  "overflow": false,
+  "invalidEmailRejected": true,
+  "failureRetainsEmail": true,
+  "retry": true,
+  "codeFocus": true,
+  "perEmailCooldown": true,
+  "digitsOnly": true,
+  "schoolAndLegacy": true,
+  "reducedMotion": true,
+  "mockedMailRequests": 2,
+  "realMailRequests": 0
+}

@@ -23,11 +23,12 @@ const fixture:Workspace={account:{id:'student',name:'王同学',email:'layout@ex
 ],relations:[{entityId:'event-a',kind:'participate',createdAt:stamp},{entityId:'org-1',kind:'follow',createdAt:stamp},{entityId:'event-b',kind:'save',createdAt:stamp}],notifications:[],people:[],audit:[],alumni:{profiles:[],follows:[],slots:[],bookings:[],notices:[],history:[]},sportsStatus:'available',sports:{source:'local',role:'student',progress:{source:'local',semester:'2026秋季学期',course:'体育课程',status:'in-progress',completedHours:16,targetHours:24,remainingHours:8,percent:66.6}},sportsDashboard:{serverNow:Date.parse(stamp),identity:entity('identity','identity',{role:'student'}),records:[entity('run-1','record',{sportName:'户外跑步',status:'VALID'}),entity('run-2','record',{sportName:'体育场馆',status:'TEACHER_PENDING'})]}}
 const posts:Post[]=[{id:'post-a',title:'秋日校园',body:'记录校园里平常而美好的瞬间。',images:['/src/assets/campus/home-background.jpg'],board:'校园',author:'摄影社',date:stamp,likes:0,status:'visible',comments:[]},{id:'post-b',title:'傍晚的校园',body:'分享你喜欢的校园风景。',images:['/src/assets/campus/evening-campus.jpg'],board:'生活',author:'同学',date:stamp,likes:0,status:'visible',comments:[]},{id:'post-c',title:'校园生活回顾',body:'认识同学，也认识更大的世界。',images:['/src/assets/campus/campus-services.jpg'],board:'校园',author:'计算机协会',date:stamp,likes:0,status:'visible',comments:[]}]
 beforeEach(()=>{
+  vi.stubGlobal('document',{visibilityState:'visible'})
   vi.useFakeTimers();vi.setSystemTime(new Date('2026-10-17T10:00:00+08:00'))
   vi.spyOn(workspaceHook,'useWorkspaceBackend').mockReturnValue({data:fixture,error:'',busy:false,mutate:vi.fn().mockResolvedValue(true),refresh:vi.fn().mockResolvedValue(undefined)})
   vi.spyOn(communityHook,'useCommunityBackend').mockReturnValue({account:{id:'student',name:'王同学'},posts,likedPosts:[],savedPosts:[],error:'',busy:false,loadingMore:false,refresh:vi.fn(),detailPost:null,detailCommentsHasMore:false,detailCommentPage:1,mutate:vi.fn(),recordOpen:vi.fn(),loadMore:vi.fn(),loadPost:vi.fn()})
 })
-afterEach(()=>{vi.restoreAllMocks();vi.useRealTimers()})
+afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals();vi.useRealTimers()})
 
 it('上海日期和周日历在跨日及跨月边界保持一致',()=>{
   expect(campusDate('2026-10-31T17:00:00Z')).toBe('2026-11-01')
@@ -49,6 +50,17 @@ it('个人主页不把关注称为加入，不把参与标记称为正式报名'
   const html=renderToStaticMarkup(<MemoryRouter><ReferenceMe/></MemoryRouter>)
   expect(html).toContain('关注组织');expect(html).not.toContain('近期动态');expect(html).not.toContain('报名成功')
   expect(html).toContain('我的日历');expect(html).toContain('我的课表')
+})
+it('校园首页先摘要课程与AI，再探索入口，顶部移除设置且不复制整周课表',()=>{
+ const html=renderToStaticMarkup(<MemoryRouter><ReferenceCampus/></MemoryRouter>)
+ expect(html.indexOf('cl-courses')).toBeLessThan(html.indexOf('cl-ai'))
+ expect(html.indexOf('cl-ai')).toBeLessThan(html.indexOf('cl-explore'))
+ expect(html.indexOf('cl-explore')).toBeLessThan(html.indexOf('cl-directory'))
+ expect(html).not.toContain('aria-label="设置"')
+ expect(html).not.toContain('选择课程星期')
+ expect(html).toContain('想问校园 AI 的问题')
+ expect(html).toContain('Coffee Chat')
+ expect(html).not.toContain('href="/v2/learning')
 })
 it('有内容的五页结构可渲染，运动进度与记录通过入口访问',()=>{
   const pages={home:<CampusWindowHome/>,discover:<ReferenceDiscover/>,campus:<ReferenceCampus/>,me:<ReferenceMe/>,sports:<ReferenceSports/>}

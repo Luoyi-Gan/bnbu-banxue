@@ -1,0 +1,30 @@
+{
+  "origin": "http://127.0.0.1:4174",
+  "created": [
+    {
+      "name": "拾光文创馆",
+      "id": "72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1"
+    },
+    {
+      "name": "CHIAS Coffee 文创咖啡馆",
+      "id": "b8b2a842-b0fc-46e2-9c48-d73e393f5e29"
+    },
+    {
+      "name": "For You 浮屿",
+      "id": "5f29f318-5fc0-4867-a0bf-fa3bc18310c1"
+    },
+    {
+      "name": "必胜客 Pizza Hut",
+      "id": "f7bdca70-3724-4f95-9a89-a248800a9377"
+    },
+    {
+      "name": "穆味王 Home Beef Noodles",
+      "id": "d7c3d317-b3b5-4cb1-b3e3-ccc8413275dd"
+    },
+    {
+      "name": "星巴克 Starbucks",
+      "id": "b7008f3e-b74e-4b51-abce-69e41591ae30"
+    }
+  ],
+  "skipped": []
+}

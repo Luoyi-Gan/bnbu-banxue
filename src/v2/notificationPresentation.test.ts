@@ -30,11 +30,12 @@ describe('student notice and schedule destinations', () => {
       entity('slot','coffeeSlot',{startAt:'2026-10-18T08:00:00Z',endAt:'2026-10-18T09:00:00Z',location:'交流室'}),
       entity('booking','coffeeBooking',{status:'confirmed',teacherId:'teacher',slotId:'slot'}),
       entity('cancelled','coffeeBooking',{status:'cancelled',teacherId:'teacher',slotId:'slot'}),
-      entity('unmarked','activity',{status:'published',title:'未标记活动',startAt:'2026-10-18T08:00:00Z'}),
+      {...entity('unmarked','activity',{status:'published',title:'未标记活动',startAt:'2026-10-18T08:00:00Z'}),ownerId:'organizer'},
+      entity('mine','activity',{status:'published',title:'本人主办活动',startAt:'2026-10-18T08:00:00Z'}),
     ])
     const items = liveStudentSchedule(data,Date.parse('2026-10-17T08:00:00Z'))
-    expect(items.map(item => item.id)).toEqual(['booking','room'])
-    expect(items.map(item => item.path)).toEqual(['/v2/coffee?teacher=teacher&slot=slot','/v2/partners/teams?item=room'])
+    expect(items.map(item => item.id)).toEqual(['booking','mine','room'])
+    expect(items.map(item => item.path)).toEqual(['/v2/coffee?teacher=teacher&slot=slot','/v2/activities/mine','/v2/partners/teams?item=room'])
     expect(data.entities.find(item => item.id === 'booking')?.data.status).toBe('confirmed')
   })
 })

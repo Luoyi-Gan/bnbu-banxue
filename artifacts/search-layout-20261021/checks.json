@@ -1,0 +1,44 @@
+[
+  {
+    "width": 393,
+    "left": 32,
+    "right": 361,
+    "panelLeft": 32,
+    "panelRight": 361,
+    "panelTop": 92,
+    "fieldBottom": 84,
+    "background": "rgb(255, 254, 250)",
+    "overflow": false,
+    "focused": true,
+    "closeAndFocus": true,
+    "queryCleared": true
+  },
+  {
+    "width": 320,
+    "left": 32,
+    "right": 288,
+    "panelLeft": 32,
+    "panelRight": 288,
+    "panelTop": 92,
+    "fieldBottom": 84,
+    "background": "rgb(255, 254, 250)",
+    "overflow": false,
+    "focused": true,
+    "closeAndFocus": true,
+    "queryCleared": true
+  },
+  {
+    "width": 1440,
+    "left": 840,
+    "right": 1220,
+    "panelLeft": 830,
+    "panelRight": 1220,
+    "panelTop": 91,
+    "fieldBottom": 83,
+    "background": "rgb(255, 254, 250)",
+    "overflow": false,
+    "focused": true,
+    "closeAndFocus": true,
+    "queryCleared": true
+  }
+]

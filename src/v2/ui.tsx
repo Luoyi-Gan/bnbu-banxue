@@ -1,3 +1,7 @@
+import {sharedMotion} from './sharedElementMotion'
+import {useSheetGesture,isTopSheet} from './useSheetGesture'
+import {usePanelGesture} from './usePanelGesture'
+import './sheetGesture.css'
 import {useDevicePreferences} from './devicePreferences'
 import { uiText, useUiLanguage } from './uiLanguage'
 import { ArrowLeft, X, type LucideIcon } from 'lucide-react'
@@ -25,7 +29,7 @@ export function Drawer({ title, eyebrow, children, onClose, wide = false, origin
     if(!element||!origin||reducedMotion)return
     const bounds=element.getBoundingClientRect()
     initialTransform.current=`translate(${origin.x-bounds.x}px,${origin.y-bounds.y}px) scale(${origin.width/bounds.width},${origin.height/bounds.height})`
-    animation.current=element.animate([{transform:initialTransform.current,borderRadius:'24px',opacity:.65},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'})
+    animation.current=element.animate([{transform:initialTransform.current,borderRadius:'24px',opacity:.65},{transform:'none',opacity:1}],{duration:sharedMotion.enter,easing:sharedMotion.enterEase})
     return()=>animation.current?.cancel()
   },[origin,reducedMotion])
   const dismiss=useCallback(()=>{
@@ -34,19 +38,23 @@ export function Drawer({ title, eyebrow, children, onClose, wide = false, origin
     if(!element||!initialTransform.current||reducedMotion){onClose();return}
     closing.current=true
     animation.current?.cancel()
-    animation.current=element.animate([{transform:'none',opacity:1},{transform:initialTransform.current,borderRadius:'24px',opacity:0}],{duration:220,easing:'cubic-bezier(.4,0,.8,.2)',fill:'forwards'})
+    animation.current=element.animate([{transform:'none',translate:getComputedStyle(element).translate,opacity:1},{transform:initialTransform.current,translate:'0px',borderRadius:'24px',opacity:0}],{duration:sharedMotion.exit,easing:sharedMotion.exitEase,fill:'forwards'})
     animation.current.onfinish=onClose
   },[onClose,reducedMotion])
+  usePanelGesture(panel,true,reducedMotion,'dismiss',dismiss)
   useEffect(()=>{
     const previous=document.activeElement
     panel.current?.querySelector<HTMLButtonElement>('button')?.focus({preventScroll:true})
     return()=>{if(previous instanceof HTMLElement&&previous.isConnected)previous.focus({preventScroll:true})}
   },[])
-  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape') dismiss() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [dismiss])
-  return createPortal(<div className="v2-drawer-layer"><button type="button" className="v2-drawer-scrim" aria-label={uiText("关闭详情")} onClick={dismiss}/><aside ref={panel} className={`v2-drawer${wide ? ' is-wide' : ''}${origin?' is-course-expansion':''}`} role="dialog" aria-modal="true" aria-label={uiText(title)}><header><div>{eyebrow && <span className="v2-eyebrow">{uiText(eyebrow)}</span>}<h2>{uiText(title)}</h2></div><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={dismiss}><X size={20}/></button></header><div className="v2-drawer-body">{children}</div></aside></div>, document.body)
+  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape'&&isTopSheet(panel.current)) dismiss() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [dismiss])
+  return createPortal(<div className="v2-drawer-layer"><button type="button" className="v2-drawer-scrim" aria-label={uiText("关闭详情")} onClick={dismiss}/><aside ref={panel} className={`v2-drawer${wide ? ' is-wide' : ''}${origin?' is-course-expansion':''}`} role="dialog" aria-modal="true" aria-label={uiText(title)}><header><button type="button" className="panel-gesture-grip" data-panel-grip aria-label={uiText("收起详情，或向下拖动")}/><div>{eyebrow && <span className="v2-eyebrow">{uiText(eyebrow)}</span>}<h2>{uiText(title)}</h2></div><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={dismiss}><X size={20}/></button></header><div className="v2-drawer-body">{children}</div></aside></div>, document.body)
 }
-export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) { useUiLanguage();
-  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape' && !document.querySelector('.v2-map-picker-layer')) onClose() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [onClose])
-  return createPortal(<div className="v2-modal-layer"><button className="v2-modal-scrim" type="button" aria-label={uiText("关闭窗口")} onClick={onClose}/><div className="v2-modal" role="dialog" aria-modal="true" aria-label={uiText(title)}><header><h2>{uiText(title)}</h2><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={onClose}><X size={19}/></button></header>{children}</div></div>, document.body)
+export function Modal({ title, children, onClose, gesture=true,navigation,className }: { title: string; children: ReactNode; onClose: () => void;gesture?:boolean;navigation?:ReactNode;className?:string }) { useUiLanguage();
+  const panel=useRef<HTMLDivElement>(null)
+  const {reducedMotion}=useDevicePreferences()
+  useSheetGesture(panel,gesture,reducedMotion,onClose)
+  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === 'Escape'&&isTopSheet(panel.current)) onClose() }; document.addEventListener('keydown', close); return () => document.removeEventListener('keydown', close) }, [onClose])
+  return createPortal(<div className={'v2-modal-layer'+(className?' '+className:'')}><button className="v2-modal-scrim" type="button" aria-label={uiText("关闭窗口")} onClick={onClose}/><div ref={panel} data-sheet-gesture={gesture?true:undefined} className="v2-modal" role="dialog" aria-modal="true" aria-label={uiText(title)}><header>{navigation}<h2 tabIndex={-1}>{uiText(title)}</h2><button type="button" className="v2-icon-button" aria-label={uiText("关闭")} onClick={onClose}><X size={19}/></button></header>{children}</div></div>, document.body)
 }
 export function BackLink({ to, children }: { to: string; children: ReactNode }) { useUiLanguage();  return <Link className="v2-back-link" to={to}><ArrowLeft size={17}/>{children}</Link> }

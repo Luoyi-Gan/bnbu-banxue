@@ -1,0 +1,44 @@
+/* Physical cues have different strengths on paper, glass and photographic surfaces. */
+body:has(.v2-app.v2-app-student,.v2-explore-immersive){--surface-card-neutral:#fffffd;--surface-canvas-warm:#faf9f6;--surface-glass-cool:#edf5f2;--surface-edge-left:#ffffffb8;--surface-edge-right:#38594624;--surface-near-shadow:0 1px 3px #18342612;--surface-far-shadow:0 14px 34px -12px #264c3824;--student-course-shadow:var(--surface-near-shadow),var(--surface-far-shadow)}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive){--surface-card-neutral:#1c3026;--surface-canvas-warm:#14271e;--surface-glass-cool:#233d32;--surface-edge-left:#d2f0dc30;--surface-edge-right:#01140b45;--surface-near-shadow:0 1px 3px #00000022;--surface-far-shadow:0 14px 34px -12px #00160e44}
+
+/* Top-left light is kept separate from the outer rim and the inner highlight. */
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.v2-mobile-nav,.v2-modal,.v2-floating-timetable-window,.v2-floating-timetable-trigger,.map-p0-dock,.map-p1-route,.v2-explorer-panel.has-selection){border-left-color:var(--surface-edge-left)!important;border-right-color:var(--surface-edge-right)!important}
+html[data-ui-theme] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.v2-floating-timetable-trigger,.student-timetable-launcher,.v2-student-search-field){box-shadow:inset 0 1px 0 #ffffffa6,inset 1px 0 0 #ffffff45,0 1px 3px #18342612,0 9px 24px -8px #264c3824!important}
+html[data-ui-theme] .v2-app-student :is(.student-utilities>a,.v2-student-search-trigger){border-left-color:var(--surface-edge-left);border-right-color:var(--surface-edge-right);box-shadow:inset 0 1px 0 #ffffff75,0 1px 2px #1834260b,0 6px 18px -8px #264c381c}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student,.v2-explore-immersive) :is(.v2-floating-timetable-trigger,.student-timetable-launcher,.v2-student-search-field){box-shadow:inset 0 1px 0 #d2f0dc26,inset 1px 0 0 #d2f0dc15,var(--surface-near-shadow),var(--surface-far-shadow)!important}
+html[data-ui-theme=dark] .v2-app-student :is(.student-utilities>a,.v2-student-search-trigger){box-shadow:inset 0 1px 0 #d2f0dc26,var(--surface-near-shadow),var(--surface-far-shadow)}
+
+/* A masked extra sampling layer softens only the toolbar edge. */
+.v2-app-student :is(.cw-header,.ref-header){isolation:isolate}
+.v2-app-student :is(.cw-header,.ref-header):before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;backdrop-filter:none;-webkit-backdrop-filter:none;mask-image:linear-gradient(#000,transparent 92%);-webkit-mask-image:linear-gradient(#000,transparent 92%)}
+.v2-app-student>.student-fluid-nav:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:rgba(var(--liquid-light),.06);backdrop-filter:none;-webkit-backdrop-filter:none;mask-image:linear-gradient(90deg,#000,transparent 20%,transparent 80%,#000);-webkit-mask-image:linear-gradient(90deg,#000,transparent 20%,transparent 80%,#000)}
+
+.v2-app-student .ref-campus .shop-campus-entry,.v2-app-student[data-campus-route='/v2/coffee'] :is(.v2-teacher-card,.v2-coffee-slot){background:var(--surface-card-neutral)}
+html[data-ui-theme] body:has(.v2-app.v2-app-student) .note-detail-layer>.note-detail[role=dialog]{background-image:url('../assets/paper-grain.svg')!important;background-size:128px 128px}
+.v2-app-student .ref-campus{background-image:radial-gradient(ellipse at 18% 4%,#b5c9b608,transparent 65%)}
+.v2-app-student :is(.campus-discovery-pills button[aria-pressed=true],.tt-date-strip button[aria-pressed=true],.reference-notice-filters button.is-active){box-shadow:inset 0 1px 3px #254c3812}
+.v2-app-student :is(.ref-timetable-preview nav button[aria-pressed=true],.ref-week button[aria-pressed=true] strong){box-shadow:inset 0 1px 3px #152f3824}
+
+/* Only bundled campus photography receives a small common display correction. */
+.v2-app-student :is(.cw-scene>img,.cw-campus-window>img){filter:saturate(.97) contrast(1.01)}
+.v2-app-student :is(.activity-discovery-cover img[src*='/assets/'],.community-discovery-cover img[src*='/assets/'],.community-profile-cover img:not([src^='data:'])){filter:saturate(.97) contrast(1.01)}
+body:has(.v2-app-student) .note-detail-photo img[src*='/assets/']{filter:saturate(.97) contrast(1.01)}
+.v2-app.v2-app-student .cw-home .cw-scene,.v2-app.v2-app-student .ref-campus .cw-campus-window>img{mask-image:linear-gradient(to bottom,#000 0%,#000 80%,transparent 100%)!important;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 80%,transparent 100%)!important}
+.v2-app-student .cw-next-top>svg{translate:.5px 0}
+.v2-app-student .student-utilities>a>svg{translate:0 -.25px}
+.v2-app-student :is(.cw-schedule-time,.tt-date-strip strong){font-variant-numeric:tabular-nums;font-feature-settings:'tnum'}
+
+.cw-home{--home-ambient:#e5d4a30a}
+.v2-app.v2-app-student .ref-page.cw-home{background-image:radial-gradient(ellipse at 10% 0%,var(--home-ambient),transparent 68%)!important}
+.cw-home[data-ambient=morning]{--home-ambient:#ead49d12}
+.cw-home[data-ambient=day]{--home-ambient:#b8d4c10a}
+.cw-home[data-ambient=evening]{--home-ambient:#e7b99212}
+.cw-home[data-ambient=night]{--home-ambient:#a5c1c90e}
+html[data-ui-theme=dark] .v2-app.v2-app-student .ref-page.cw-home{background-image:radial-gradient(ellipse at 10% 0%,#93b7a008,transparent 68%)!important}
+
+@supports(corner-shape:squircle){.v2-app-student>.student-fluid-nav,.v2-modal:has(.student-utility-content),.v2-explore-immersive .map-p0-dock,.v2-explore-immersive .v2-explorer-panel.has-selection{corner-shape:squircle}}
+html[data-ui-motion=reduce] .v2-app-student :is(.cw-header,.ref-header):before{backdrop-filter:none;-webkit-backdrop-filter:none}
+@media(prefers-reduced-motion:reduce){.v2-app-student :is(.cw-header,.ref-header):before{backdrop-filter:none;-webkit-backdrop-filter:none}}
+
+html[data-ui-theme] .v2-app.v2-app-student{--student-course-shadow:var(--surface-near-shadow),var(--surface-far-shadow)}

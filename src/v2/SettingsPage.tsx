@@ -11,6 +11,8 @@ import {useSettingsLanguage} from './settingsTranslations'
 import {PrivacyPolicy} from './PrivacyPolicy'
 import {api} from '../live/api'
 import './settingsPage.css'
+import {HomeCoursePicker} from './HomeCoursePicker'
+import {settingsSectionTitles} from './settingsSectionTitles'
 
 const groups = [
   {key:'privacy',title:'隐私与可见性',copy:'学号搜索、资料预览',icon:ShieldCheck,rows:[
@@ -44,7 +46,7 @@ export function SettingsPage({embedded=false}:{embedded?:boolean}={}) {
   const section=params.get('section')
   const group=student?groups.find(item=>item.key===section):undefined
   const isData=section==='data'
-  const titles:Record<string,string>={language:'语言',appearance:'外观与显示',campus:'校园使用偏好',policy:'隐私政策',about:'关于会同里',account:'账号与安全',help:'使用指南',data:'演示数据'}
+  const titles=settingsSectionTitles
   const detail=!!group||!!titles[section||'']
   const profile=live.data?.entities.find(e=>e.kind==='profile'&&e.ownerId===live.data?.account.id)?.data
   const preferences=live.data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===live.data?.account.id)?.data
@@ -87,7 +89,7 @@ export function SettingsPage({embedded=false}:{embedded?:boolean}={}) {
     catch{setLogoutError('退出失败，请重试。');setSigningOut(false)}
   }
   return <div className="v2-page settings-page">
-    {(!embedded||detail)&&<header className="settings-heading">
+    {!embedded&&<header className="settings-heading">
       <Link to={detail?basePath:returnPath} aria-label={t(detail?'返回设置':'返回我的')}><ArrowLeft size={21}/></Link>
       <h1 ref={heading} tabIndex={-1}>{t(group?.title||titles[section||'']||'设置')}</h1>
     </header>}
@@ -101,7 +103,7 @@ export function SettingsPage({embedded=false}:{embedded?:boolean}={}) {
         {groups.map(({key,title,copy,icon:Icon})=><Link to={`?section=${key}`} key={key} className="settings-entry"><span className={`settings-icon settings-icon-${key}`}><Icon size={20}/></span><span className="settings-entry-copy"><strong>{t(title)}</strong><small>{t(copy)}</small></span><ChevronRight size={17}/></Link>)}
       </div></section>}
       <section className="settings-group" aria-labelledby="settings-general"><h2 id="settings-general">{t('通用')}</h2><div className="settings-list">
-        {entry('language','语言','中文 / English',Languages)}{entry('appearance','外观与显示','主题、文字大小',Palette)}{student&&entry('campus','校园使用偏好','轮播、动效与课表快捷入口',SlidersHorizontal)}
+        {entry('language','语言','中文 / English',Languages)}{entry('appearance','外观与显示','主题、文字大小',Palette)}{student&&entry('campus','校园使用偏好','每日课程、轮播与课表入口',SlidersHorizontal)}
       </div></section>
       <section className="settings-group" aria-labelledby="settings-app"><h2 id="settings-app">{t('应用与数据')}</h2><div className="settings-list">
         {entry('account','账号与安全','账号信息、密码与登录',LockKeyhole)}
@@ -122,7 +124,7 @@ export function SettingsPage({embedded=false}:{embedded?:boolean}={}) {
     </>:<>
       {section==='language'&&<>{options('language','语言',[['system','跟随系统'],['zh','简体中文'],['en','English']])}<p className="settings-description">{t('语言与显示偏好保存在当前浏览器，刷新后继续使用。')}</p></>}
       {section==='appearance'&&<>{options('theme','主题',[['system','跟随系统'],['light','浅色'],['dark','深色']])}{options('textSize','文字大小',[['standard','标准'],['large','大号']])}<div className="settings-type-preview"><strong>{device.language==='en'?'Campus, connected':'校园生活，随时相伴'}</strong><p>{device.language==='en'?'Explore campus activities and keep track of your day.':'发现校园活动，安排属于你的一天。'}</p></div></>}
-      {section==='campus'&&<><div className="settings-list">{localToggle('reduceMotion','减少动态效果','减弱界面过渡并暂停首页照片自动轮播；系统减少动态设置始终优先。')}{localToggle('photoAutoplay','首页照片自动轮播','关闭后仅加载当前照片，手动切换仍然可用。')}{localToggle('timetableShortcut','课表快捷入口','显示右下角课表窗口按钮。')}</div><button type="button" className="settings-sidebar-button" onClick={()=>window.dispatchEvent(new Event('huitongli:open-sidebar-settings'))}><SlidersHorizontal size={19}/><span>{t('自定义侧栏')}<small>{t('调整校园功能入口的顺序和显隐')}</small></span><ChevronRight size={18}/></button></>}
+      {section==='campus'&&<><HomeCoursePicker/><div className="settings-list">{localToggle('reduceMotion','减少动态效果','减弱界面过渡并暂停首页照片自动轮播；系统减少动态设置始终优先。')}{localToggle('photoAutoplay','首页照片自动轮播','关闭后保留当前照片，停止自动切换。')}{localToggle('timetableShortcut','课表快捷入口','显示右下角课表窗口按钮。')}</div><button type="button" className="settings-sidebar-button" onClick={()=>window.dispatchEvent(new Event('huitongli:open-sidebar-settings'))}><SlidersHorizontal size={19}/><span>{t('自定义侧栏')}<small>{t('调整校园功能入口的顺序和显隐')}</small></span><ChevronRight size={18}/></button></>}
       {section==='policy'&&<PrivacyPolicy/>}
       {section==='about'&&<div className="settings-about"><img src="/huitongli-app-icon.png" alt=""/><h2>{t('会同里')}</h2><p>{t('网页端 · 校园窗口')}</p><p>{t('当前版本')} {version}</p><p>{t('会同里提供校园活动、组队、社区、交流预约、课表及体育信息入口。')}</p><Link to="?section=policy">{t('隐私政策')} <ChevronRight size={16}/></Link></div>}
       {section==='help'&&<div className="settings-help">{[['通知关闭后还会收到消息吗？','关闭提醒只隐藏红点；消息和通知仍会保留，未读状态不变。'],['体育模拟会计入学时吗？','不会。浏览器中的模拟运动和凭证不会提交体育平台或计入真实学时。'],['如何调整校园入口？','在校园使用偏好中打开侧栏设置；手机底部主导航保持固定。']].map(([q,a])=><details key={q}><summary>{t(q)}</summary><p>{t(a)}</p></details>)}</div>}

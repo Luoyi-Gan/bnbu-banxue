@@ -18,6 +18,7 @@ import {
   type TimetableLesson,
 } from "../../shared/v2/timetableModel";
 import { parseSidebarItems } from "../../shared/v2/sidebarLayout";
+import clubDirectory from '../../data/campus-clubs.json';
 
 export function* governancePolicy(
   repo: BusinessRepository,
@@ -25,6 +26,25 @@ export function* governancePolicy(
   action: string,
   input: Fields,
 ): Generator<unknown,Entity | undefined,unknown> {
+  if(action==='organization.images'){
+    operator(actor);
+    const existing=yield* effect(repo.get(input.id,'organization'));
+    demand(existing.version===input.version,'社团资料已变化，请刷新后重试。',409);
+    const entry=clubDirectory.clubs.find(item=>item.name===existing.data.name);
+    demand(existing.data.directoryOnly===true&&entry?.image&&entry.imageSource,'没有可核对的社团配图。');
+    // Keep an independently maintained cover unless it was imported from this catalogue.
+    if(existing.data.image&&!existing.data.imageSource)return existing;
+    if(existing.data.image===entry.image&&JSON.stringify(existing.data.imageSource)===JSON.stringify(entry.imageSource))return existing;
+    return yield* effect(repo.save(existing,{image:entry.image,imageSource:entry.imageSource}));
+  }
+  if(action==='organization.import'){
+    operator(actor);
+    const name=textField(input,'name',80),entry=clubDirectory.clubs.find(item=>item.name===name);
+    demand(entry,'该社团未在已核实公开名录中。',404);
+    const existing=(yield* effect(repo.all('organization'))).find(item=>item.data.name===name);
+    if(existing)return existing;
+    return yield* effect(repo.create('organization',null,{...entry}));
+  }
   if (action === "certification.apply") {
     student(actor);
     const kind = enumField(input, "kind", ["student", "club", "official"]),
@@ -101,7 +121,7 @@ export function* governancePolicy(
     demand(organization.data.status === "pending", "申请已处理。", 409);
     const reason = textField(input, "reason", 1000, approve);
     (yield* effect(repo.notify(
-      [organization.ownerId!],
+      organization.ownerId?[organization.ownerId]:[],
       organization.id,
       action,
       `入驻${approve ? "通过" : "驳回"}：${reason}`,
@@ -119,7 +139,7 @@ export function* governancePolicy(
     const visibility = enumField(input, "visibility", ["visible", "hidden"]),
       reason = textField(input, "reason", 1000);
     (yield* effect(repo.notify(
-      [organization.ownerId!],
+      organization.ownerId?[organization.ownerId]:[],
       organization.id,
       action,
       `社团资料或公开状态更新：${reason}`,
@@ -215,6 +235,10 @@ export function* governancePolicy(
   if (action === 'preferences.schedule') {
     student(actor);
     const patch:Record<string,unknown>={};
+    if(input.hiddenDailyCourses!==undefined){
+      demand(Array.isArray(input.hiddenDailyCourses)&&input.hiddenDailyCourses.length<=300&&input.hiddenDailyCourses.every(key=>typeof key==='string'&&key.length>0&&key.length<=300),'请选择有效的课程。');
+      patch.hiddenDailyCourses=[...new Set(input.hiddenDailyCourses as string[])];
+    }
     if(input.academicCalendar!==undefined){patch.academicCalendar=enumField(input,'academicCalendar',['bnbu-2026-s1','custom']);}
     if(input.homeScheduleCount!==undefined){
       demand(typeof input.homeScheduleCount==='number'&&Number.isInteger(input.homeScheduleCount)&&input.homeScheduleCount>=1&&input.homeScheduleCount<=6,'首页安排须展示1–6项。');
@@ -291,7 +315,7 @@ export function* governancePolicy(
     student(actor);
     const table = (yield* effect(repo.all("timetable"))).find((t) => t.ownerId === actor.id);
     const lessons = parseTimetableResponse({ lessons: input.lessons });
-    const data = { lessons, fileName: textField(input, "fileName", 255, true), importedAt: timestamp() };
+    const data = { lessons, fileName: textField(input, "fileName", 255, true), importedAt: timestamp(), source: "manual" };
     return table
       ? (yield* effect(repo.save(table, data)))
       : (yield* effect(repo.create("timetable", actor.id, data)));

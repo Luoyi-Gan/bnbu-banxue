@@ -9,9 +9,12 @@ import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, typ
 import {CampusLocationLink} from './CampusLocationLink'
 import {TimetableBoard} from './TimetableBoard'
 import './timetable.css'
+import {useSearchParams} from 'react-router-dom'
 
 const stages: Record<RecognitionStage, string> = { preparing: '准备图片', recognizing: '识别课程信息', organizing: '整理一周课表' }
 export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initialLessonId=null, detailOnly=false, onCloseDetails, origin, initialWorkspace }: { idPrefix?: string;embedded?:boolean;initialLessonId?:string|null;detailOnly?:boolean;onCloseDetails?:()=>void;origin?:CardOrigin;initialWorkspace?:Workspace } = {}) { useUiLanguage();
+  const [studyParams,setStudyParams]=useSearchParams()
+  useEffect(()=>{if(studyParams.has('study'))setStudyParams(p=>{p.delete('study');return p},{replace:true})},[studyParams,setStudyParams])
   const backend = useWorkspaceBackend()
   const live = {...backend,data:backend.data??initialWorkspace??null}
   const record = live.data?.entities.find(e => e.kind === 'timetable' && e.ownerId === live.data?.account.id)
@@ -111,7 +114,7 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
     {current && <Drawer origin={cardOrigin} title={current.name} eyebrow={uiTemplate([""," · ",""],weekDays[current.weekday - 1],uiText(sample ? '示例课程' : '课程详情'))} onClose={() => { setSelected(null); setError(''); onCloseDetails?.() }}>
       {current.location&&<CampusLocationLink place={current.location} onClick={()=>{setSelected(null);onCloseDetails?.()}}/>}
       {sample?<div className="v2-fact-list"><span><Clock3 size={17}/>{current.startTime} — {current.endTime}</span><span><MapPin size={17}/>{current.location || uiText('未提供')}</span><span>{current.weeks || uiText('周次未提供')}</span><p>{uiText("示例内容不会保存到个人课表。")}</p></div>:<form className="v2-form" onSubmit={edit} key={current.id}>
-        <p>{uiText("可以修正识别结果；没有明确时间或周次时，请保留为空，不推断学校安排。")}</p>
+        <p>{uiText(record?.data.source==='mis'?'当前时间来自 MIS；手动修正会在下一次学校同步时按学校数据更新。':'可以修正识别结果；没有明确时间或周次时，请保留为空，不推断学校安排。')}</p>
         <label>{uiText("课程名称")}<input name="name" required maxLength={100} defaultValue={current.name}/></label>
         <label>{uiText("上课星期")}<select name="weekday" defaultValue={current.weekday}>{weekDays.map((name, index) => <option value={index + 1} key={name}>{name}</option>)}</select></label>
         <div className="v2-form-two"><label>{uiText("开始时间")}<input type="time" name="startTime" defaultValue={current.startTime}/></label><label>{uiText("结束时间")}<input type="time" name="endTime" defaultValue={current.endTime}/></label></div>

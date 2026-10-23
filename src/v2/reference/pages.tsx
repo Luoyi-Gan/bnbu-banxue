@@ -13,14 +13,14 @@ import {OwnProfilePage} from '../OwnProfilePage'
 import {StudentProfile} from '../StudentProfile'
 import { DiscoveryPage } from '../DiscoveryPage'
 import { StudentTimetable } from '../StudentTimetable'
-import { campusWeekday } from '../../../shared/v2/timetableModel'
-import { Header, Section, EmptyNote, Ring, Services, AssistantBanner, CoffeeBanner, Agenda, EventCard, Organizations, Stories, Feedback, type Live } from './components'
-import { campusDate, ownLessons, sportsSummary } from './model'
-import {campusMapHref} from '../campusMapLinks'
+import {StudentArrangements} from '../StudentArrangements'
+import {CampusDirectory} from '../CampusDirectory'
+import {CampusLifePage} from '../CampusLifePage'
+import { Header, Section, EmptyNote, Ring, Services, AssistantBanner, Agenda, EventCard, Organizations, Stories, Feedback } from './components'
+import { campusDate, sportsSummary } from './model'
 import campus from '../../assets/campus/home-background.jpg'
 import sunset from '../../assets/campus/evening-campus.jpg'
 import courtyard from '../../assets/campus/campus-services.jpg'
-import partnersPhoto from '../../assets/campus/gallery/tree-lined-path.webp'
 
 const photos=[campus,sunset,courtyard]
 function PhotoHero() { useUiLanguage();
@@ -45,24 +45,15 @@ export function ReferenceDiscover() { useUiLanguage();
   return <DiscoveryPage/>
 }
 
-function TimetablePreview({live}:{live:Live}) { useUiLanguage();
-  const [day,setDay]=useState(campusWeekday())
-  const lessons=ownLessons(live.data,day)
-  return <section className="ref-timetable-preview"><header><strong>{uiText("我的课程")}</strong><Link to="/v2/me?tab=timetable">{uiText("完整课表")}<ChevronRight size={14}/></Link></header><nav aria-label={uiText("选择课程星期")}>{['一','二','三','四','五','六','日'].map((label,i)=><button type="button" key={label} aria-pressed={day===i+1} onClick={()=>setDay(i+1)}>{uiText(label)}</button>)}</nav><div>{lessons.slice(0,3).map((lesson,i)=><Link to={campusMapHref(lesson.location,'/v2/campus')} key={lesson.id} className={`ref-lesson lesson-${i}`} title={uiText('在地图中查看')}><time>{lesson.startTime || lesson.period}<small>{lesson.endTime}</small></time><span><strong>{lesson.name}</strong><small>{lesson.location || uiText('教室待确认')}</small></span></Link>)}{!lessons.length&&<EmptyNote to="/v2/me?tab=timetable" label={uiText("查看或导入课表")}>{live.data?uiText('这一天暂未记录课程。'):uiText('正在读取课表…')}</EmptyNote>}</div><p>{uiText("按已保存课表展示，请核对课程周次。")}</p></section>
-}
 export function ReferenceCampus() { useUiLanguage();
   const [params]=useSearchParams()
-  return params.has('service')?<V2Campus/>:<CampusContent/>
+  return params.get('service')==='directory'?<div className="ref-page cw-pages"><Header title={uiText('校园办事')} back="/v2/campus" search={false}/><div className="ref-page-body"><CampusDirectory/></div></div>:params.has('service')?<V2Campus/>:<CampusLifePage/>
 }
-function CampusContent() { useUiLanguage();
-  const live=useWorkspaceBackend()
-  return <div className="ref-page ref-campus cw-pages"><Header title={uiText("校园")}/><Feedback live={live}/><div className="cw-campus-lead"><div className="cw-campus-window" aria-label={uiText("校园公共空间")}><span>{uiText("校园日常")}</span><img src={courtyard} alt={uiText("校园公共空间与建筑")}/></div><TimetablePreview live={live}/></div><div className="ref-page-body"><Section title={uiText("找搭子")}><Link to="/v2/partners" className="ref-coffee" style={{backgroundImage:`linear-gradient(90deg,#173c32dd,#173c3235),url(${partnersPhoto})`}}><strong>{uiText("找个搭子，一起出发")}</strong><span>{uiText("学习、运动、生活，遇见同频的伙伴")}<ArrowRight size={16}/></span></Link></Section><Section title="Coffee Chat"><CoffeeBanner/></Section><Section title={uiText("校园探店")}><Link className="shop-campus-entry" to="/v2/shops"><div><strong>{uiText("校内外的小店与美食")}</strong><p>{uiText("看看同学的真实体验，分享文字与照片。")}</p></div><ChevronRight size={22}/></Link></Section><AssistantBanner/></div></div>
-}
-
 export function ReferenceMe() { useUiLanguage();
   const [params]=useSearchParams()
   const tab=params.get('tab')
   if(tab==='profile')return <StudentProfile/>
+  if(tab==='events')return <div className="ref-page ref-subpage cw-pages"><Header title={uiText('我的安排')} back="/v2/me"/><div className="ref-page-body"><StudentArrangements/></div></div>
   if(tab==='timetable')return <div className="ref-page ref-subpage cw-pages"><Header title={uiText("我的课表")} back="/v2/me"/><div className="ref-page-body"><StudentTimetable embedded/></div></div>
   if(tab&&tab!=='overview')return <div className="ref-page ref-subpage cw-pages"><Header title={({events:'我的活动',teams:'我的组队',saved:'我的收藏',network:'校园关系',verification:'身份认证',profile:'个人资料'} as Record<string,string>)[tab] ?? uiText('我的')} back="/v2/me"/><div className="ref-legacy-details"><V2Me embedded/></div></div>
   return <OwnProfilePage/>

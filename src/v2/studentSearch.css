@@ -1,0 +1,31 @@
+/* Search surface paint is shared with liquidGlass.css; geometry remains local. */
+.v2-app.v2-app-student .v2-student-search-field input:focus-visible {outline:none;box-shadow:none}
+.v2-app.v2-app-student .v2-student-search-field {box-sizing:border-box}
+@media(max-width:720px) {
+  html[data-ui-theme] .v2-app.v2-app-student .v2-student-search.is-open {
+    position:absolute;left:16px;right:16px;top:12px;width:auto;height:48px;z-index:56;
+  }
+  html[data-ui-theme] .v2-app.v2-app-student .v2-student-search.is-open .v2-student-search-field {
+    height:48px;gap:8px;padding:0 4px 0 12px;border-radius:16px;
+  }
+  .v2-app.v2-app-student .v2-student-search-field input {font-size:16px;width:0}
+  .v2-app.v2-app-student .v2-student-search-field :is(.v2-student-search-clear,.v2-student-search-close) {
+    width:40px;height:40px;min-width:40px;border-radius:12px;
+  }
+  html[data-ui-theme] .v2-app.v2-app-student .v2-student-search.is-open .v2-student-search-panel {
+    left:0;right:0;width:100%;max-height:min(60dvh,470px);overflow-y:auto;overscroll-behavior:contain;
+    border-radius:24px;box-sizing:border-box;
+  }
+  .v2-app.v2-app-student :is(.cw-header,.ref-header,.v2-topbar):has(.v2-student-search.is-open)>h1,
+  .v2-app.v2-app-student :is(.cw-header,.ref-header,.v2-topbar):has(.v2-student-search.is-open) .student-utilities {visibility:hidden;pointer-events:none}
+  .v2-app.v2-app-student .v2-student-search-heading {font-size:12px;padding:8px}
+  .v2-app.v2-app-student .v2-student-search-result {min-height:64px;gap:12px;padding:8px}
+  .v2-app.v2-app-student .v2-student-search-result-copy strong {font-size:14px}
+  .v2-app.v2-app-student .v2-student-search-result-copy small {font-size:12px}
+  .v2-app.v2-app-student .v2-student-search-footer button {min-height:44px;font-size:13px}
+}
+
+.v2-app.v2-app-student .v2-student-search-field input {font-family:inherit;font-weight:400;line-height:1.5;letter-spacing:normal;text-overflow:ellipsis}
+.v2-app.v2-app-student .v2-student-search-field input::placeholder {font-weight:400;color:var(--v2-muted);opacity:1}
+/* Closed search controls must not extend the document's horizontal scroll area. */
+.v2-student-search:not(.is-open) .v2-student-search-field {display:none}

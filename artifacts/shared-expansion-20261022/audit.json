@@ -1,0 +1,110 @@
+[
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+    "label": "shop-enter"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/shops",
+    "label": "shop-return"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/community?person=c1093a45-9abc-4780-baa1-ef9920d6181f",
+    "label": "avatar-enter"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities?section=community",
+    "label": "avatar-return"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/campus/explore",
+    "label": "map-place-enter"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/campus/explore",
+    "label": "map-place-return"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities/preview-event-5",
+    "label": "activity-regression"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/community?person=82715c55-6bb0-40ab-9747-4dd1c7ceed59",
+    "label": "self-profile-enter"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/activities?section=community",
+    "label": "self-profile-return"
+  },
+  {
+    "active": null,
+    "engine": "reduced",
+    "named": 0,
+    "result": "direct",
+    "scroll": 0,
+    "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+    "label": "reduced-shop-enter"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 213.09523010253903,
+    "url": "/v2/shops",
+    "label": "shop-return-layout-fixed"
+  },
+  {
+    "active": null,
+    "engine": "view-transition",
+    "named": 0,
+    "result": "complete",
+    "scroll": 0,
+    "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+    "label": "shop-double-click"
+  }
+]

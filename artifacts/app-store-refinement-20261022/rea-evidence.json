@@ -1,0 +1,106 @@
+{
+  "evidence_id": "ev_5d1b9d10d36d5706d7a81e31ed7fd01fc16998b50db702f5e733e5acf1902c9e",
+  "provider": {
+    "id": "rea-playwright-browser-scenario",
+    "name": "REA Playwright browser scenario capture provider",
+    "version": "1"
+  },
+  "source": "https://apps.apple.com/us/iphone/today",
+  "environment": {
+    "viewport": {
+      "width": 393,
+      "height": 852,
+      "device_scale_factor": 1
+    },
+    "locale": "en-US",
+    "timezone": "UTC",
+    "color_scheme": "light",
+    "reduced_motion": "reduce",
+    "service_workers": "block"
+  },
+  "actions": [
+    {
+      "step_id": "settle",
+      "action": "wait_for_timeout",
+      "duration_ms": 1000
+    },
+    {
+      "step_id": "story",
+      "action": "click",
+      "locator": {
+        "kind": "css",
+        "selector": "a[href=\"https://apps.apple.com/us/iphone/story/id1533855222\"]"
+      },
+      "button": "left",
+      "click_count": 1
+    },
+    {
+      "step_id": "story_settle",
+      "action": "wait_for_timeout",
+      "duration_ms": 600
+    }
+  ],
+  "steps": [
+    {
+      "id": "scenario_start",
+      "status": "completed",
+      "url": "https://apps.apple.com/us/iphone/today",
+      "dom_sha256": "01ecdb37795a24607b440f932a1c18d7e95236d36f42d5fdff0b2aa61f338177",
+      "screenshot_sha256": "8aa8fe8948d4efd09ed6d21e943e2f16692b5aaaa1c7b59ac245ad2fc0a8daac"
+    },
+    {
+      "id": "settle",
+      "status": "completed",
+      "url": "https://apps.apple.com/us/iphone/today",
+      "dom_sha256": "01ecdb37795a24607b440f932a1c18d7e95236d36f42d5fdff0b2aa61f338177",
+      "screenshot_sha256": "8aa8fe8948d4efd09ed6d21e943e2f16692b5aaaa1c7b59ac245ad2fc0a8daac"
+    },
+    {
+      "id": "story",
+      "status": "completed",
+      "url": "https://apps.apple.com/us/iphone/today",
+      "dom_sha256": "01ecdb37795a24607b440f932a1c18d7e95236d36f42d5fdff0b2aa61f338177",
+      "screenshot_sha256": "a3a597c68dbc2689cb92c4ffd4c4414a4fca0a9089fb334886c7da54d5b10bcf"
+    },
+    {
+      "id": "story_settle",
+      "status": "completed",
+      "url": "https://apps.apple.com/us/iphone/today",
+      "dom_sha256": "a1d95aa02235601929a26f452f15d1336de21f1ea4909a321d5c9914bc374e4d",
+      "screenshot_sha256": "9086b6425425b67512dd17643cab44e9fe773be247780810909d586a39037a82"
+    }
+  ],
+  "css": {
+    "url": "https://apps.apple.com/assets/index~DPWTyaYqK4.css",
+    "sha256": "c22b32431156c59c483754a831319c59ca6ad8c0ee25fb493540859586bce7b0",
+    "bytes": 387554,
+    "excerpts": [
+      ".get-button{border-radius:1000px;display:inline-block;font:var(--get-button-font,var(--body-bold-tall));padding:7px 16px;transition:background-color .14s ease-out;word-break:keep-all}",
+      ".get-button:hover{text-decoration:none;transition:background-color .21s ease-out}",
+      ".get-button:active{transition:background-color .14s ease-out}",
+      ".get-button.gray{--alpha-multiplier:1;background-color:rgba(var(--keyColor-rgb),calc(var(--alpha-multiplier)*.06));color:var(--keyColor)}",
+      ".get-button.gray:hover{background-color:rgba(var(--keyColor-rgb),calc(var(--alpha-multiplier)*.1));transition:background-color .21s ease-out}",
+      ".get-button.gray:active{background-color:rgba(var(--keyColor-rgb),calc(var(--alpha-multiplier)*.07));transition:background-color .14s ease-out}",
+      ".get-button.gray{--alpha-multiplier:1.33}",
+      ".get-button.gray{background:#fff}",
+      ".get-button.blue{background-color:var(--keyColor);color:var(--systemPrimary-onDark)}"
+    ]
+  },
+  "limits": {
+    "status": {
+      "status": "incomplete",
+      "equality_eligible": false,
+      "missing_sections": [
+        "events"
+      ],
+      "truncated_sections": []
+    },
+    "limitations": [
+      "Web content only; no iOS native App Store binary or gesture capture.",
+      "Today loaded; story click produced An Error Occurred; no usable story transition evidence.",
+      "Network body retention incomplete; selected CSS captured.",
+      "Response.body() API bytes are not verified wire bytes."
+    ]
+  },
+  "browser_cleanup": "terminated-owned-process"
+}

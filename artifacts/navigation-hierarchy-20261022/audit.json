@@ -1,0 +1,583 @@
+[
+  {
+    "label": "alumni-before",
+    "backs": [
+      {
+        "href": "/v2",
+        "label": "返回"
+      },
+      {
+        "href": "/v2/alumni?view=people",
+        "label": "返回校友列表"
+      },
+      {
+        "href": null,
+        "label": "关闭搜索"
+      }
+    ],
+    "headers": [
+      "校友同行"
+    ],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/alumni?person=preview-alumni"
+  },
+  {
+    "label": "/v2/shops",
+    "backs": [
+      {
+        "href": "/v2/campus",
+        "label": "返回校园"
+      }
+    ],
+    "headers": [
+      "校园探店"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/shops"
+  },
+  {
+    "label": "/v2/community?person=me",
+    "backs": [
+      {
+        "href": "/v2/me",
+        "label": "返回我的"
+      }
+    ],
+    "headers": [
+      "我的社区主页",
+      "王同学"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/community?person=me"
+  },
+  {
+    "label": "/v2/me?tab=profile",
+    "backs": [
+      {
+        "href": "/v2/me",
+        "label": "取消编辑，返回我的"
+      }
+    ],
+    "headers": [
+      "编辑资料保存",
+      "编辑资料"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/me?tab=profile"
+  },
+  {
+    "label": "/v2/partners/teams",
+    "backs": [
+      {
+        "href": "/v2/partners",
+        "label": "返回"
+      }
+    ],
+    "headers": [
+      "我的组队"
+    ],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/partners/teams"
+  },
+  {
+    "label": "/v2/organizations",
+    "backs": [
+      {
+        "href": "/v2/campus",
+        "label": "返回"
+      },
+      {
+        "href": null,
+        "label": "关闭搜索"
+      }
+    ],
+    "headers": [
+      "社团组织"
+    ],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/organizations"
+  },
+  {
+    "label": "/v2/sports",
+    "backs": [],
+    "headers": [
+      "运动"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/sports"
+  },
+  {
+    "label": "/v2/ai",
+    "backs": [
+      {
+        "href": "/v2",
+        "label": "返回"
+      }
+    ],
+    "headers": [
+      "问问奶蛙"
+    ],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/ai"
+  },
+  {
+    "label": "/v2/settings",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [
+      "设置"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/settings"
+  },
+  {
+    "label": "/v2/settings?section=appearance",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      },
+      {
+        "href": "/v2/settings",
+        "label": "返回设置"
+      }
+    ],
+    "headers": [
+      "设置",
+      "外观与显示"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/settings?section=appearance"
+  },
+  {
+    "label": "/v2/messages",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [
+      "会话"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/messages"
+  },
+  {
+    "label": "/v2/messages?view=notifications",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [
+      "通知"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/messages?view=notifications"
+  },
+  {
+    "label": "/v2/activities",
+    "backs": [],
+    "headers": [
+      "发现"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/activities"
+  },
+  {
+    "label": "/v2/campus",
+    "backs": [],
+    "headers": [
+      "校园"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/campus"
+  },
+  {
+    "label": "/v2/me",
+    "backs": [],
+    "headers": [
+      "我的47",
+      "王同学"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/me"
+  },
+  {
+    "label": "alumni-after",
+    "backs": [
+      {
+        "href": "/v2/alumni?view=people",
+        "label": "返回校友列表"
+      },
+      {
+        "href": null,
+        "label": "关闭搜索"
+      }
+    ],
+    "headers": [],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/alumni?person=preview-alumni"
+  },
+  {
+    "label": "alumni-list-restored",
+    "backs": [
+      {
+        "href": "/v2/alumni?view=people",
+        "label": "返回校友列表"
+      },
+      {
+        "href": null,
+        "label": "关闭搜索"
+      }
+    ],
+    "headers": [],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/alumni?person=preview-alumni"
+  },
+  {
+    "label": "settings-root-restored",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [
+      "设置"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/settings"
+  },
+  {
+    "label": "alumni-list-restored-final",
+    "backs": [
+      {
+        "href": "/v2",
+        "label": "返回"
+      }
+    ],
+    "headers": [
+      "校友同行"
+    ],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/alumni?view=people"
+  },
+  {
+    "label": "activity-detail",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭详情"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/activities/preview-event-5"
+  },
+  {
+    "label": "post-detail",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭详情"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/activities?section=community&item=preview-post-0"
+  },
+  {
+    "label": "organization-detail",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭详情"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/organizations"
+  },
+  {
+    "label": "partner-detail",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭详情"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/partners"
+  },
+  {
+    "label": "shop-detail",
+    "backs": [
+      {
+        "href": "/v2/shops",
+        "label": "返回店铺列表"
+      }
+    ],
+    "headers": [
+      "拾光文创馆"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1"
+  },
+  {
+    "label": "conversation-detail",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      },
+      {
+        "href": null,
+        "label": "返回会话列表"
+      }
+    ],
+    "headers": [
+      "会话"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/messages?conversation=preview-room-4"
+  },
+  {
+    "label": "direct-message-detail",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      },
+      {
+        "href": "/v2/community?person=c1093a45-9abc-4780-baa1-ef9920d6181f",
+        "label": "返回个人主页"
+      }
+    ],
+    "headers": [
+      "会话"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/messages?person=c1093a45-9abc-4780-baa1-ef9920d6181f"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "语言",
+    "url": "http://127.0.0.1:4174/v2/settings?section=language"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "外观与显示",
+    "url": "http://127.0.0.1:4174/v2/settings?section=appearance"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "校园使用偏好",
+    "url": "http://127.0.0.1:4174/v2/settings?section=campus"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "隐私与可见性",
+    "url": "http://127.0.0.1:4174/v2/settings?section=privacy"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "消息与提醒",
+    "url": "http://127.0.0.1:4174/v2/settings?section=notifications"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "资料展示内容",
+    "url": "http://127.0.0.1:4174/v2/settings?section=preview"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "隐私政策",
+    "url": "http://127.0.0.1:4174/v2/settings?section=policy"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "关于会同里",
+    "url": "http://127.0.0.1:4174/v2/settings?section=about"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "账号与安全",
+    "url": "http://127.0.0.1:4174/v2/settings?section=account"
+  },
+  {
+    "backCount": 1,
+    "bodyHeadingCount": 0,
+    "label": "settings-section",
+    "overflow": false,
+    "title": "使用指南",
+    "url": "http://127.0.0.1:4174/v2/settings?section=help"
+  },
+  {
+    "label": "desktop-coffee-detail",
+    "backs": [
+      {
+        "href": null,
+        "label": "返回老师列表"
+      }
+    ],
+    "headers": [],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/coffee"
+  },
+  {
+    "label": "desktop-alumni-detail",
+    "backs": [
+      {
+        "href": "/v2/alumni?view=people",
+        "label": "返回校友列表"
+      },
+      {
+        "href": null,
+        "label": "关闭搜索"
+      }
+    ],
+    "headers": [],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/alumni?person=preview-alumni"
+  },
+  {
+    "label": "desktop-profile-editor",
+    "backs": [
+      {
+        "href": "/v2/me",
+        "label": "取消编辑，返回我的"
+      }
+    ],
+    "headers": [
+      "编辑资料保存",
+      "编辑资料"
+    ],
+    "outer": "none",
+    "url": "http://127.0.0.1:4174/v2/me?tab=profile"
+  },
+  {
+    "active": "外观与显示",
+    "label": "settings-forward-focus",
+    "tag": "H2"
+  },
+  {
+    "active": "设置",
+    "label": "settings-back-focus",
+    "tag": "H2"
+  },
+  {
+    "label": "create-team-modal",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [
+      "发起组队"
+    ],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/partners"
+  },
+  {
+    "label": "partner-filter-modal",
+    "backs": [
+      {
+        "href": null,
+        "label": "关闭窗口"
+      },
+      {
+        "href": null,
+        "label": "关闭"
+      }
+    ],
+    "headers": [
+      "筛选条件"
+    ],
+    "outer": "flex",
+    "url": "http://127.0.0.1:4174/v2/partners"
+  }
+]

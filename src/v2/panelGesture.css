@@ -1,0 +1,16 @@
+.panel-gesture-grip{display:none}
+@media(max-width:600px){
+ .panel-gesture-grip{display:block;width:80px;height:26px;min-height:26px;margin:0 auto;padding:0;border:0;border-radius:12px;background:transparent;color:var(--v2-muted);touch-action:none;user-select:none;cursor:grab;flex:none}
+ .panel-gesture-grip:before{content:'';display:block;margin:auto;width:30px;height:4px;border-radius:999px;background:currentColor;opacity:.45}
+ .panel-gesture-grip:focus-visible{outline:2px solid var(--v2-action,var(--v2-blue));outline-offset:1px}
+ [data-panel-gesture=dragging]>.panel-gesture-grip{cursor:grabbing}
+ .note-detail,.v2-drawer{translate:0 var(--gesture-offset,0px)}
+ .note-detail-header{position:relative}
+ .note-detail-header>.panel-gesture-grip{position:absolute;top:0;left:calc(50% - 40px)}
+ .v2-drawer>header{position:relative}
+ .v2-drawer>header>.panel-gesture-grip{position:absolute;top:0;left:calc(50% - 40px)}
+ .note-detail-layer:has([data-panel-gesture])>.note-detail-scrim{opacity:var(--gesture-scrim,1)}
+ .v2-explore-immersive .is-immersive>.v2-explorer-panel.has-selection{height:var(--gesture-height,auto);box-sizing:border-box;overscroll-behavior:contain}
+ .v2-explore-immersive .is-immersive>.v2-explorer-panel.has-selection[style*="--gesture-height"]{max-height:calc(100dvh - 155px)}
+ .v2-explorer-panel>.panel-gesture-grip{position:sticky;top:-14px;z-index:2;margin-top:-10px;margin-bottom:4px}
+}

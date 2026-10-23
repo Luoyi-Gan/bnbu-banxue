@@ -1,0 +1,67 @@
+[
+  {
+    "case": "activity-return",
+    "overflow": false,
+    "scroll": 0,
+    "url": "http://127.0.0.1:4174/v2/activities"
+  },
+  {
+    "blur": "none",
+    "case": "team",
+    "header": {
+      "h": 56.58481979370117,
+      "w": 321.391357421875,
+      "x": 28.590028762817383,
+      "y": 84.7749252319336
+    },
+    "scrim": "blur(6px)"
+  },
+  {
+    "case": "short-drag-rebound",
+    "offset": "26.751592356687897px",
+    "state": "settling"
+  },
+  {
+    "background": "radial-gradient(at 8% 0%, rgba(194, 231, 208, 0.12), rgba(0, 0, 0, 0) 48%), radial-gradient(at 100% 100%, rgba(24, 44, 34, 0.06), rgba(0, 0, 0, 0) 52%), linear-gradient(135deg, rgba(29, 49, 39, 0.91), rgba(24, 44, 34, 0.84))",
+    "case": "dark-filter",
+    "ink": "rgb(227, 236, 230)",
+    "overflow": false,
+    "theme": "dark"
+  },
+  {
+    "animation": "none",
+    "case": "reduced-detail",
+    "motion": "reduce",
+    "readable": "周末志愿服务"
+  },
+  {
+    "case": "map-expanded",
+    "gesture": null,
+    "height": 625.9951782226562,
+    "overflow": false,
+    "pageScroll": 0
+  },
+  {
+    "cards": [
+      {
+        "id": "preview-event-6",
+        "transform": "none",
+        "x": 15.997023582458496,
+        "y": 326.2183837890625
+      }
+    ],
+    "case": "filtered-layout",
+    "overflow": false
+  },
+  {
+    "bodyScroll": 0,
+    "case": "short-drag-final",
+    "offset": "",
+    "state": null
+  },
+  {
+    "case": "desktop",
+    "navDisplay": "none",
+    "overflow": false
+  }
+]

@@ -1,0 +1,557 @@
+{
+  "formColors": {
+    "active": "rgb(56, 93, 78)",
+    "label": "rgb(227, 236, 230)",
+    "modalWidth": 405,
+    "placeholder": "rgb(168, 188, 176)",
+    "scrollWidth": 405
+  },
+  "bubbleColors": {
+    "background": "rgb(50, 100, 83)",
+    "color": "rgb(240, 248, 242)"
+  },
+  "states": [
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities",
+      "label": "activities"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities?section=community",
+      "label": "community"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities?section=organizations",
+      "label": "organizations"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(233, 238, 240)",
+          "cls": "",
+          "color": "rgb(52, 83, 97)",
+          "tag": "I",
+          "text": "学业规划"
+        },
+        {
+          "bg": "rgb(233, 238, 240)",
+          "cls": "",
+          "color": "rgb(52, 83, 97)",
+          "tag": "I",
+          "text": "技术项目"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/coffee",
+      "label": "coffee"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(233, 238, 230)",
+          "cls": "shop-cover has-photo",
+          "color": "rgb(99, 132, 119)",
+          "tag": "DIV",
+          "text": "校内 · 文创"
+        },
+        {
+          "bg": "rgb(233, 238, 230)",
+          "cls": "shop-cover has-photo",
+          "color": "rgb(99, 132, 119)",
+          "tag": "DIV",
+          "text": "校内 · 咖啡"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/shops",
+      "label": "shops"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(250, 249, 246)",
+          "cls": "community-avatar-open",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "王"
+        },
+        {
+          "bg": "rgb(220, 233, 228)",
+          "cls": "community-profile-avatar v2-display-avatar",
+          "color": "rgb(53, 111, 115)",
+          "tag": "SPAN",
+          "text": "王"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/messages",
+      "label": "messages"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(250, 249, 246)",
+          "cls": "community-avatar-open",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "王"
+        },
+        {
+          "bg": "rgb(220, 233, 228)",
+          "cls": "community-profile-avatar v2-display-avatar",
+          "color": "rgb(53, 111, 115)",
+          "tag": "SPAN",
+          "text": "王"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/messages?view=notifications",
+      "label": "notifications"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(220, 233, 228)",
+          "cls": "own-editor-avatar v2-display-avatar",
+          "color": "rgb(53, 111, 115)",
+          "tag": "SPAN",
+          "text": "王"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/me?tab=profile",
+      "label": "profile"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(250, 249, 246)",
+          "cls": "community-avatar-open",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "王"
+        },
+        {
+          "bg": "rgb(220, 233, 228)",
+          "cls": "community-profile-avatar v2-display-avatar",
+          "color": "rgb(53, 111, 115)",
+          "tag": "SPAN",
+          "text": "王"
+        },
+        {
+          "bg": "rgb(255, 254, 250)",
+          "cls": "settings-avatar v2-display-avatar",
+          "color": "rgb(66, 101, 117)",
+          "tag": "SPAN",
+          "text": "王"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/settings",
+      "label": "settings"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/sports",
+      "label": "sports"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(236, 240, 232)",
+          "cls": "partner-card-visual",
+          "color": "rgb(223, 235, 227)",
+          "tag": "DIV",
+          "text": "拼车学校南门 → 目的地待商定"
+        },
+        {
+          "bg": "rgb(236, 240, 232)",
+          "cls": "partner-card-visual",
+          "color": "rgb(223, 235, 227)",
+          "tag": "DIV",
+          "text": "学习"
+        },
+        {
+          "bg": "rgb(240, 242, 236)",
+          "cls": "",
+          "color": "rgb(62, 98, 91)",
+          "tag": "BUTTON",
+          "text": "拼车"
+        },
+        {
+          "bg": "rgb(240, 242, 236)",
+          "cls": "",
+          "color": "rgb(62, 98, 91)",
+          "tag": "BUTTON",
+          "text": "娱乐"
+        },
+        {
+          "bg": "rgb(240, 242, 236)",
+          "cls": "",
+          "color": "rgb(62, 98, 91)",
+          "tag": "BUTTON",
+          "text": "运动"
+        },
+        {
+          "bg": "rgba(255, 255, 255, 0.19)",
+          "cls": "partner-study-location",
+          "color": "rgb(227, 236, 230)",
+          "tag": "DIV",
+          "text": "讨论地点（可选）从校内 3D 地图选择"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners",
+      "label": "partner-create"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(236, 240, 232)",
+          "cls": "partner-card-visual",
+          "color": "rgb(223, 235, 227)",
+          "tag": "DIV",
+          "text": "拼车学校南门 → 目的地待商定"
+        },
+        {
+          "bg": "rgb(236, 240, 232)",
+          "cls": "partner-card-visual",
+          "color": "rgb(223, 235, 227)",
+          "tag": "DIV",
+          "text": "学习"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners",
+      "label": "partner-filter"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(233, 238, 240)",
+          "cls": "v2-coffee-teacher-detail",
+          "color": "rgb(227, 236, 230)",
+          "tag": "DIV",
+          "text": "COFFEE CHAT · 其他陈老师 · 模拟教师资料，欢迎预约交流学习与项目中的问题。学业规划技术项目校园"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/coffee",
+      "label": "coffee-detail"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "shop-detail"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "shop-review"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities?section=community&compose=1",
+      "label": "community-composer"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/partners",
+      "label": "partner-create-fixed"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/shops?id=72f0cc1d-4cb5-4ce7-b6d0-951294bf22a1",
+      "label": "shop-review-final"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/me?tab=timetable",
+      "label": "timetable-import"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities/preview-event-5",
+      "label": "activity-detail"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/settings?section=account",
+      "label": "logout-confirm"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgba(248, 252, 246, 0.667)",
+          "cls": "motion-secondary",
+          "color": "rgb(62, 119, 93)",
+          "tag": "BUTTON",
+          "text": "查看班级并加入"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/sports",
+      "label": "sports-join"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/messages?conversation=preview-room-4",
+      "label": "message-thread"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/me?tab=profile",
+      "label": "profile-cover"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities",
+      "label": "activity-filter"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities?section=alumni",
+      "label": "alumni"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/alumni?view=people",
+      "label": "alumni-people"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(244, 245, 241)",
+          "cls": "v2-alumni-booking-question",
+          "color": "rgb(227, 236, 230)",
+          "tag": "DIV",
+          "text": "交流问题如何准备第一份实习？"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/alumni?view=bookings",
+      "label": "alumni-bookings"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "",
+          "color": "rgb(94, 112, 119)",
+          "tag": "BUTTON",
+          "text": "已完成 (0)"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "拼车周末市区拼车本周末 15:00 · 学校南门 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "学习高数学习搭子本周末 15:00 · 图书馆 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "运动羽毛球搭子本周末 15:00 · 体育馆 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "娱乐周末摄影小队本周末 15:00 · 校园广场 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "学习英语口语练习本周末 15:00 · 教学楼 · 2/8 人"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners/teams",
+      "label": "teams"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/settings?section=privacy",
+      "label": "settings-privacy"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/settings?section=notifications",
+      "label": "settings-notifications"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/settings?section=campus",
+      "label": "settings-campus"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "",
+          "color": "rgb(94, 112, 119)",
+          "tag": "BUTTON",
+          "text": "已完成 (0)"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "拼车周末市区拼车本周末 15:00 · 学校南门 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "学习高数学习搭子本周末 15:00 · 图书馆 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "运动羽毛球搭子本周末 15:00 · 体育馆 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "娱乐周末摄影小队本周末 15:00 · 校园广场 · 2/8 人"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-team-row",
+          "color": "rgb(227, 236, 230)",
+          "tag": "BUTTON",
+          "text": "学习英语口语练习本周末 15:00 · 教学楼 · 2/8 人"
+        },
+        {
+          "bg": "rgb(243, 246, 253)",
+          "cls": "v2-fact-list",
+          "color": "rgb(227, 236, 230)",
+          "tag": "DIV",
+          "text": "本周末 15:00学校南门2/8 人"
+        },
+        {
+          "bg": "rgb(237, 243, 255)",
+          "cls": "v2-member-chip",
+          "color": "rgb(42, 75, 145)",
+          "tag": "SPAN",
+          "text": "王 · 王同学"
+        },
+        {
+          "bg": "rgb(237, 243, 255)",
+          "cls": "v2-member-chip",
+          "color": "rgb(42, 75, 145)",
+          "tag": "SPAN",
+          "text": "李 · 李同学"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/partners/teams?item=preview-room-4",
+      "label": "team-detail"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/partners/teams?item=preview-room-4",
+      "label": "team-detail-fixed"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/coffee",
+      "label": "coffee-detail-fixed"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/sports",
+      "label": "sports-join-fixed"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/activities?section=organizations",
+      "label": "organization-detail"
+    },
+    {
+      "lightSurfaces": [],
+      "theme": "dark",
+      "url": "/v2/campus",
+      "label": "global-search"
+    },
+    {
+      "lightSurfaces": [
+        {
+          "bg": "rgb(234, 240, 245)",
+          "cls": "v2-explore-immersive",
+          "color": "rgb(17, 26, 50)",
+          "tag": "DIV",
+          "text": "正在加载 3D 校园模型…探索 BNBU 校园搜索或点选建筑，查看地点详情定位路线规划建筑列表返回"
+        },
+        {
+          "bg": "rgb(255, 255, 255)",
+          "cls": "v2-campus-explorer is-immersive",
+          "color": "rgb(17, 26, 50)",
+          "tag": "DIV",
+          "text": "正在加载 3D 校园模型…探索 BNBU 校园搜索或点选建筑，查看地点详情定位路线规划建筑列表"
+        },
+        {
+          "bg": "rgb(234, 240, 245)",
+          "cls": "v2-explorer-map",
+          "color": "rgb(17, 26, 50)",
+          "tag": "DIV",
+          "text": "正在加载 3D 校园模型…"
+        },
+        {
+          "bg": "rgb(234, 240, 245)",
+          "cls": "v2-explorer-status",
+          "color": "rgb(83, 103, 129)",
+          "tag": "DIV",
+          "text": "正在加载 3D 校园模型…"
+        }
+      ],
+      "theme": "dark",
+      "url": "/v2/campus/explore",
+      "label": "map-host"
+    }
+  ]
+}

@@ -1,0 +1,819 @@
+{
+  "viewport": "393 × 852 CSS px",
+  "scale": 3,
+  "pixels": "1179 × 2556 px",
+  "engine": "Chrome，iPhone触摸与视口模拟",
+  "entries": [
+    {
+      "num": "001",
+      "role": "public",
+      "name": "产品介绍",
+      "route": "/intro",
+      "file": "public/001-产品介绍.png",
+      "full": "public/001-产品介绍-完整长图.png",
+      "height": 4644,
+      "text": "跳到正文\n会\n会同里\n进入会同里\n在北师港浸大，连接每一种可能\n在这里，\n与校园\n不期而遇。\n\n一场想去的活动，一群同频的朋友，\n一条还没走过的小路。\n你的校园生活，从会同里展开。\n\n开启校园生活\n先逛一逛\n浏览器即开即用\n为校园日常而设计\n会同里 · 校园生活的另一扇窗\n会同里\n首页\n发现\n校园\n日程\n相聚，在会同里。\n让每一天，都有新发现。\n熟悉的校园，\n新的打开方式。\n校园生活，由你展开\n发"
+    },
+    {
+      "num": "002",
+      "role": "public",
+      "name": "宣传页",
+      "route": "/promo.html",
+      "file": "public/002-宣传页.png",
+      "full": "public/002-宣传页-完整长图.png",
+      "height": 13936,
+      "text": "跳过动画，开始使用\n会同里\n打开会同里\n会同里\n为 BNBU 校园生活而来\n\nYOUR CAMPUS, WITH YOU.\n\n把校园生活，\n带在身边。\n\n发现校园里的新鲜事，约一次交流，找到同行的人。打开会同里，让今天的安排和下一次相遇，自然相连。\n\n打开网页版\n先看看会同里\n添加到主屏幕\n＋\n\nWeb 版现已可用 · 手机与电脑均可访问\n\n会同里 · 校园日常\n功能演示\n从今天的安排开始\n会同里"
+    },
+    {
+      "num": "003",
+      "role": "public",
+      "name": "欢迎页",
+      "route": "/v2/welcome",
+      "file": "public/003-欢迎页.png",
+      "full": null,
+      "height": 852,
+      "text": "会同里\n\n一个更丰富的校园生活\n\nFrom Campus\nto a Bigger You.\n开始探索\n会同里"
+    },
+    {
+      "num": "004",
+      "role": "public",
+      "name": "登录",
+      "route": "/v2/login",
+      "file": "public/004-登录.png",
+      "full": "public/004-登录-完整长图.png",
+      "height": 910,
+      "text": "会同里\nBNBU CAMPUS\n返回校园\n让校园生活\n从这里开始。\n\n活动、搭子、社区与个人安排，放在清晰的一处。\n\n登录会同里\n\n输入账号和密码，继续你的校园生活。\n\n邮箱或管理账号\n密码\n登录\n\n忘记密码？\n\n还没有账号？\n立即注册\n\n请使用本人邮箱注册或找回密码。校园身份需完成相应认证。\n隐私政策\nBNBU CAMPUS · 会同里\n清晰连接校园生活"
+    },
+    {
+      "num": "005",
+      "role": "public",
+      "name": "注册",
+      "route": "/v2/register",
+      "file": "public/005-注册.png",
+      "full": "public/005-注册-完整长图.png",
+      "height": 907,
+      "text": "会同里\nBNBU CAMPUS\n返回校园\n让校园生活\n从这里开始。\n\n活动、搭子、社区与个人安排，放在清晰的一处。\n\n注册会同里\n\n填写邮箱与验证码，再设置登录密码。\n\n1\n填写验证码\n2\n设置密码\n邮箱地址\n邮箱验证码\n发送验证码\n下一步\n\n已有账号？\n去登录\n\n请使用本人邮箱注册或找回密码。校园身份需完成相应认证。\n隐私政策\nBNBU CAMPUS · 会同里\n清晰连接校园生活"
+    },
+    {
+      "num": "006",
+      "role": "public",
+      "name": "找回密码",
+      "route": "/v2/forgot-password",
+      "file": "public/006-找回密码.png",
+      "full": null,
+      "height": 852,
+      "text": "会同里\nBNBU CAMPUS\n返回登录\n找回密码\n\n通过当前已验证的邮箱设置新密码。成功后，旧登录会话自动失效。\n\n找回密码\n\n填写个人邮箱或独立管理登录账号。\n\n邮箱或管理登录账号\n发送找回验证码\n\n返回登录"
+    },
+    {
+      "num": "007",
+      "role": "public",
+      "name": "隐私政策",
+      "route": "/v2/privacy",
+      "file": "public/007-隐私政策.png",
+      "full": "public/007-隐私政策-完整长图.png",
+      "height": 1625,
+      "text": "返回\n隐私政策\nEnglish\n\n最近更新：2026年10月19日\n\n运营主体\n珠海澄序智能科技有限公司\n联系邮箱\nsiltotchen@gmail.com\n数据存放区域\n待确认\n保存期限\n待确认\n\n本地预览说明：正式发布前需确认数据存放区域、服务商与保存期限。本页依据当前功能说明数据使用方式。\n\n1. 我们处理哪些信息\n\n账号与资料：邮箱、学校身份资料、昵称、头像及本人选择展示的资料；校园操作："
+    },
+    {
+      "num": "008",
+      "role": "student",
+      "name": "首页",
+      "route": "/v2",
+      "file": "student/008-首页.png",
+      "full": "student/008-首页-完整长图.png",
+      "height": 3239,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n10月21日周三\n晚上好，\n王同学\n展示\n1 项\n2 项\n3 项\n4 项\n5 项\n6 项\n下一项安排\n高等数学\n08:00\n10/22\n教 A101\n我的课程\n第7周"
+    },
+    {
+      "num": "009",
+      "role": "student",
+      "name": "发现活动",
+      "route": "/v2/activities",
+      "file": "student/009-发现活动.png",
+      "full": "student/009-发现活动-完整长图.png",
+      "height": 1524,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n发现\n4\n6\n校园社区\n活动\n社团组织\n校友交流\n全部\n学校活动\n筛选\n校园成员活动\n英语口语工作坊\n\n10/21周三 19:00\n\n校园广场\n\n摄\n摄影社\n1\n校园成员活动\n校园音乐分享会\n\n10/23周五 19:00\n\n东区操场\n\n跑\n跑步社\n0\n学校活动\n羽毛球交流赛\n\n10/20周二 19:00\n\n体育馆\n\n羽\n羽毛球社\n0\n已标记"
+    },
+    {
+      "num": "010",
+      "role": "student",
+      "name": "发现社区",
+      "route": "/v2/activities?section=community",
+      "file": "student/010-发现社区.png",
+      "full": "student/010-发现社区-完整长图.png",
+      "height": 1466,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n发现\n4\n6\n校园社区\n活动\n社团组织\n校友交流\n关注\n发现\n王\n推荐\n校园\n学习\n生活\n活动\n互助\n校友升学\n校友就业\n综合\n热点榜\n1\n秋日校园，收藏这一束阳光\n2\n分享我的自习路线\n3\n傍晚的球场很热闹\n4\n技术分享会精彩回顾\n5\n我的第一场志愿活动\n6\n周末一起练英语\n7\n第一份实习，从整理校园项目开始\n秋日校园，收藏这一束阳光\n王"
+    },
+    {
+      "num": "011",
+      "role": "student",
+      "name": "校园",
+      "route": "/v2/campus",
+      "file": "student/011-校园.png",
+      "full": "student/011-校园-完整长图.png",
+      "height": 1400,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n校园\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n校园日常\n我的课程\n完整课表\n一\n二\n三\n四\n五\n六\n日\n08:00\n09:50\n高等数学\n教 A101\n11:00\n11:50\n数据结构\n教 B302\n14:00\n1"
+    },
+    {
+      "num": "012",
+      "role": "student",
+      "name": "运动",
+      "route": "/v2/sports",
+      "file": "student/012-运动.png",
+      "full": "student/012-运动-完整长图.png",
+      "height": 886,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\nBNBU SPORTS\n运动\n\n请先验证本人邮箱，再连接体育平台。\n\n重试\n首页\n发现\n校园\n运动\n我的\n我的课表"
+    },
+    {
+      "num": "013",
+      "role": "student",
+      "name": "我的",
+      "route": "/v2/me",
+      "file": "student/013-我的.png",
+      "full": "student/013-我的-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "014",
+      "role": "student",
+      "name": "校园探店",
+      "route": "/v2/shops",
+      "file": "student/014-校园探店.png",
+      "full": "student/014-校园探店-完整长图.png",
+      "height": 886,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n校园探店\n\n校内外的小店与美食，听听同学们怎么说。\n\n全部\n校内\n校外\n全部类别\n美食\n校内 · 美食\n本地验收示例店（非真实店铺）\n\n校内测试地点，仅用于功能验收\n\n1 条点评\n首页\n发现\n校园\n运动\n我的\n我的课表"
+    },
+    {
+      "num": "015",
+      "role": "student",
+      "name": "校友同行",
+      "route": "/v2/alumni",
+      "file": "student/015-校友同行.png",
+      "full": "student/015-校友同行-完整长图.png",
+      "height": 1043,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n校友同行\n\n向走过这段路的人请教，让校园里的连接延续。\n\n校友认证\n经验发现\n寻找校友\n我的交流\n全部\n升学\n就业\n已关注\n已收藏\n搜索校友经验\n\n1 篇分享 · 内容来自当"
+    },
+    {
+      "num": "016",
+      "role": "student",
+      "name": "校友预约",
+      "route": "/v2/alumni?view=bookings",
+      "file": "student/016-校友预约.png",
+      "full": "student/016-校友预约-完整长图.png",
+      "height": 1124,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n校友同行\n\n向走过这段路的人请教，让校园里的连接延续。\n\n校友认证\n经验发现\n寻找校友\n我的交流\n交流通知\n\n模拟交流通知：校友交流预约已确认，请提前准备想讨论的问题。\n\n1"
+    },
+    {
+      "num": "017",
+      "role": "student",
+      "name": "Coffee Chat",
+      "route": "/v2/coffee",
+      "file": "student/017-Coffee Chat.png",
+      "full": "student/017-Coffee Chat-完整长图.png",
+      "height": 951,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\nCoffee Chat\n\n和老师聊聊，每一种可能。\n\n搜索老师、学院或研究方向\n1 位老师\n全部\nFST\nFBM\nFHSS\nSCC\n创新创业\n其他\n陈\n陈老师\n其他 ·\n学业"
+    },
+    {
+      "num": "018",
+      "role": "student",
+      "name": "我的教师交流预约",
+      "route": "/v2/coffee?view=bookings",
+      "file": "student/018-我的教师交流预约.png",
+      "full": "student/018-我的教师交流预约-完整长图.png",
+      "height": 951,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\nCoffee Chat\n\n和老师聊聊，每一种可能。\n\n我的预约\n预约交流\n\n已确认的预约，包含历史记录；预约不代表实际到场。\n\n陈老师 · Coffee Chat\n2026年"
+    },
+    {
+      "num": "019",
+      "role": "student",
+      "name": "校园社区",
+      "route": "/v2/community",
+      "file": "student/019-校园社区.png",
+      "full": "student/019-校园社区-完整长图.png",
+      "height": 1393,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n关注\n发现\n王\n推荐\n校园\n学习\n生活\n活动\n互助\n校友升学\n校友就业\n综合\n热点榜\n1\n秋日校园，收藏这一束阳光\n2\n分享我的自习路线\n3\n傍晚的球场很热闹\n4\n技术分享会精彩回顾\n5\n我的第一场志愿活动\n6\n周末一起练英语\n7\n第一份实习，从整理校园项目开始\n秋日校园，收藏这一束阳光\n王\n王同学\n1\n分享我的自习路线\n李\n李同学\n1\n周"
+    },
+    {
+      "num": "020",
+      "role": "student",
+      "name": "我的笔记",
+      "route": "/v2/community?person=me",
+      "file": "student/020-我的笔记.png",
+      "full": "student/020-我的笔记-完整长图.png",
+      "height": 1316,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的社区主页\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n笔记\n收藏\n赞过\n草稿箱\n互动消息\n秋日校园，收藏这一束阳光\n王\n王同学\n1\n傍晚的球场很热闹\n王\n王同学\n2\n我的第一场志愿活动\n王\n王同学\n0\n已经看完当前帖"
+    },
+    {
+      "num": "021",
+      "role": "student",
+      "name": "发布笔记",
+      "route": "/v2/community?compose=1",
+      "file": "student/021-发布笔记.png",
+      "full": "student/021-发布笔记-完整长图.png",
+      "height": 1393,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n关注\n发现\n王\n推荐\n校园\n学习\n生活\n活动\n互助\n校友升学\n校友就业\n综合\n热点榜\n1\n秋日校园，收藏这一束阳光\n2\n分享我的自习路线\n3\n傍晚的球场很热闹\n4\n技术分享会精彩回顾\n5\n我的第一场志愿活动\n6\n周末一起练英语\n7\n第一份实习，从整理校园项目开始\n秋日校园，收藏这一束阳光\n王\n王同学\n1\n分享我的自习路线\n李\n李同学\n1\n周"
+    },
+    {
+      "num": "022",
+      "role": "student",
+      "name": "找搭子",
+      "route": "/v2/partners",
+      "file": "student/022-找搭子.png",
+      "full": "student/022-找搭子-完整长图.png",
+      "height": 1545,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n找搭子\n管理组队\n发起组队\n搜索队伍、地点或关键词\n全部\n拼车\n娱乐\n学习\n运动\n筛选条件\n展开\n搭子大厅\n\n5 个正在招募的队伍\n\n拼车\n周末市区拼车\n\n模拟队伍：欢迎一起"
+    },
+    {
+      "num": "023",
+      "role": "student",
+      "name": "我的队伍",
+      "route": "/v2/partners/teams",
+      "file": "student/023-我的队伍.png",
+      "full": "student/023-我的队伍-完整长图.png",
+      "height": 1157,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n我的组队\n\n管理队伍、处理申请，并在完成后评价同行的伙伴。\n\n发起新队伍\n进行中 (5)\n已完成 (0)\n正在进行的队伍\n拼车\n周末市区拼车\n本周末 15:00 · 学校南门"
+    },
+    {
+      "num": "024",
+      "role": "student",
+      "name": "会话",
+      "route": "/v2/messages",
+      "file": "student/024-会话.png",
+      "full": "student/024-会话-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "025",
+      "role": "student",
+      "name": "通知",
+      "route": "/v2/messages?view=notifications",
+      "file": "student/025-通知.png",
+      "full": "student/025-通知-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "026",
+      "role": "student",
+      "name": "社团组织",
+      "route": "/v2/organizations",
+      "file": "student/026-社团组织.png",
+      "full": "student/026-社团组织-完整长图.png",
+      "height": 1331,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n社团组织\n\n认识校园里的同行者。\n\n搜索组织、类别或关键词\n4 个组织\n全部\n学术\n艺术\n运动\n公益\n计算机协会\n学术\n已关注\n组织介绍与联系\n志愿者协会\n公益\n关注\n组织介"
+    },
+    {
+      "num": "027",
+      "role": "student",
+      "name": "校园地图",
+      "route": "/v2/campus/explore",
+      "file": "student/027-校园地图.png",
+      "full": null,
+      "height": 852,
+      "text": "探索 BNBU 校园\n搜索或点选建筑，查看地点详情\n定位\n路线规划\n建筑列表"
+    },
+    {
+      "num": "028",
+      "role": "student",
+      "name": "校园AI",
+      "route": "/v2/ai",
+      "file": "student/028-校园AI.png",
+      "full": "student/028-校园AI-完整长图.png",
+      "height": 1075,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n问问奶蛙\n\n查询已发布的校园知识，回答附有资料来源。\n\n更换图标\n活动资料\n组队与申请\n校园服务\n\n这周有什么活动可以参加？\n\n可以看看秋日摄影展、技术分享会和夜跑计划。你已"
+    },
+    {
+      "num": "029",
+      "role": "student",
+      "name": "个人资料",
+      "route": "/v2/me?tab=profile",
+      "file": "student/029-个人资料.png",
+      "full": "student/029-个人资料-完整长图.png",
+      "height": 1014,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n编辑资料\n保存\n更换背景\n王\n更换头像\n昵称\n3/20\n个人简介\n20/100\n\n头像与背景支持 JPG、PNG、WebP，最大 5 MB；保存后生效。\n\n校园身份资料\n首页\n发现\n校园\n运动\n我的\n我的课表"
+    },
+    {
+      "num": "030",
+      "role": "student",
+      "name": "我的课表",
+      "route": "/v2/me?tab=timetable",
+      "file": "student/030-我的课表.png",
+      "full": "student/030-我的课表-完整长图.png",
+      "height": 1165,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的课表\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n已收录 21 项课程安排\n\n重新导入\n2026 / 10 月\n第 7 周\n10.19 — 10.25\n今天\n本周 18 项课程\n周课表\n日列表\n一\n19\n二\n20"
+    },
+    {
+      "num": "031",
+      "role": "student",
+      "name": "我的活动",
+      "route": "/v2/me?tab=events",
+      "file": "student/031-我的活动.png",
+      "full": "student/031-我的活动-完整长图.png",
+      "height": 8670,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的活动\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n本人主办活动与确认安排\n\n秋日校园摄影展\n我主办 ·展示中\n校园夜跑计划\n我主办 ·展示中\n英语口语工作坊\n我主办 ·展示中\n校园音乐分享会\n我主办 ·展示中\n高"
+    },
+    {
+      "num": "032",
+      "role": "student",
+      "name": "我的组队",
+      "route": "/v2/me?tab=teams",
+      "file": "student/032-我的组队.png",
+      "full": "student/032-我的组队-完整长图.png",
+      "height": 886,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的组队\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n管理全部\n周末市区拼车\n我发起 · 本周末 15:00\n高数学习搭子\n我发起 · 本周末 15:00\n羽毛球搭子\n已加入 · 本周末 15:00\n周末摄影小队\n我发"
+    },
+    {
+      "num": "033",
+      "role": "student",
+      "name": "我的收藏",
+      "route": "/v2/me?tab=saved",
+      "file": "student/033-我的收藏.png",
+      "full": "student/033-我的收藏-完整长图.png",
+      "height": 886,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的收藏\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n秋日校园，收藏这一束阳光\n社区帖子\n分享我的自习路线\n社区帖子\n傍晚的球场很热闹\n社区帖子\n秋日校园摄影展\n校园活动\n计算机前沿技术分享会\n校园活动\n校园夜跑计划\n"
+    },
+    {
+      "num": "034",
+      "role": "student",
+      "name": "校园关系",
+      "route": "/v2/me?tab=network",
+      "file": "student/034-校园关系.png",
+      "full": "student/034-校园关系-完整长图.png",
+      "height": 1427,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n校园关系\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\nMY CONNECTIONS\n我的校园关系网\n\n从校园里的连接，发现共同的经历。\n\n查找连接\n节点类型\n全部类型\n活动\n队伍\n组织\n交流\n关系\n全部关系\n标记参与\n"
+    },
+    {
+      "num": "035",
+      "role": "student",
+      "name": "身份认证",
+      "route": "/v2/me?tab=verification",
+      "file": "student/035-身份认证.png",
+      "full": "student/035-身份认证-完整长图.png",
+      "height": 886,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n身份认证\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n按本人全部认证记录核对\n\n已有有效学生社团成员认证，可按活动规则发起活动。\n\n学生社团成员 · 已通过\n\n摄影社 · 本地模拟认证\n\n审核备注：仅用于本地展示\n提"
+    },
+    {
+      "num": "036",
+      "role": "student",
+      "name": "设置",
+      "route": "/v2/settings",
+      "file": "student/036-设置.png",
+      "full": "student/036-设置-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "037",
+      "role": "student",
+      "name": "活动详情",
+      "route": "/v2/activities/preview-event-0",
+      "file": "student/037-活动详情.png",
+      "full": "student/037-活动详情-完整长图.png",
+      "height": 951,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n首页\n发现\n校园\n运动\n我的\n我的课表\n摄\n摄影社\n主办方 · 校园成员活动\n秋日校园摄影展\n\n校园成员发起的活动\n\n时间\n10月17日周六 19:00–21:00\n地点\n校"
+    },
+    {
+      "num": "038",
+      "role": "student",
+      "name": "搭子详情",
+      "route": "/v2/partners?item=preview-room-4",
+      "file": "student/038-搭子详情.png",
+      "full": "student/038-搭子详情-完整长图.png",
+      "height": 1545,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n找搭子\n管理组队\n发起组队\n搜索队伍、地点或关键词\n全部\n拼车\n娱乐\n学习\n运动\n筛选条件\n展开\n搭子大厅\n\n5 个正在招募的队伍\n\n拼车\n周末市区拼车\n\n模拟队伍：欢迎一起"
+    },
+    {
+      "num": "039",
+      "role": "student",
+      "name": "发现社团",
+      "route": "/v2/activities?section=organizations",
+      "file": "student/039-发现社团.png",
+      "full": "student/039-发现社团-完整长图.png",
+      "height": 1222,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n发现\n4\n6\n校园社区\n活动\n社团组织\n校友交流\n搜索组织、类别或关键词\n4 个组织\n全部\n学术\n艺术\n运动\n公益\n计算机协会\n学术\n已关注\n组织介绍与联系\n志愿者协会\n公益\n关注\n组织介绍与联系\n摄影社\n艺术\n已关注\n组织介绍与联系\n羽毛球社\n运动\n已关注\n组织介绍与联系\n已经看完当前组织\n首页\n发现\n校园\n运动\n我的\n我的课表"
+    },
+    {
+      "num": "040",
+      "role": "student",
+      "name": "发现校友",
+      "route": "/v2/activities?section=alumni",
+      "file": "student/040-发现校友.png",
+      "full": "student/040-发现校友-完整长图.png",
+      "height": 886,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n发现\n4\n6\n校园社区\n活动\n社团组织\n校友交流\n寻找校友\n我的交流\n全部\n升学\n就业\n已关注\n已收藏\n第一份实习，从整理校园项目开始\n李\n李同学\n0\n已经看完当前帖子\n首页\n发现\n校园\n运动\n我的\n我的课表"
+    },
+    {
+      "num": "041",
+      "role": "student",
+      "name": "全局搜索",
+      "route": "/v2",
+      "file": "student/041-全局搜索.png",
+      "full": "student/041-全局搜索-完整长图.png",
+      "height": 3239,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n10月21日周三\n晚上好，\n王同学\n展示\n1 项\n2 项\n3 项\n4 项\n5 项\n6 项\n下一项安排\n高等数学\n08:00\n10/22\n教 A101\n我的课程\n第7周"
+    },
+    {
+      "num": "042",
+      "role": "student",
+      "name": "课表导入弹窗",
+      "route": "/v2/me?tab=timetable",
+      "file": "student/042-课表导入弹窗.png",
+      "full": "student/042-课表导入弹窗-完整长图.png",
+      "height": 1165,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的课表\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n已收录 21 项课程安排\n\n重新导入\n2026 / 10 月\n第 7 周\n10.19 — 10.25\n今天\n本周 18 项课程\n周课表\n日列表\n一\n19\n二\n20"
+    },
+    {
+      "num": "043",
+      "role": "student",
+      "name": "发起组队表单",
+      "route": "/v2/partners",
+      "file": "student/043-发起组队表单.png",
+      "full": "student/043-发起组队表单-完整长图.png",
+      "height": 1545,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n找搭子\n管理组队\n发起组队\n搜索队伍、地点或关键词\n全部\n拼车\n娱乐\n学习\n运动\n筛选条件\n展开\n搭子大厅\n\n5 个正在招募的队伍\n\n拼车\n周末市区拼车\n\n模拟队伍：欢迎一起"
+    },
+    {
+      "num": "044",
+      "role": "student",
+      "name": "组织介绍",
+      "route": "/v2/organizations",
+      "file": "student/044-组织介绍.png",
+      "full": "student/044-组织介绍-完整长图.png",
+      "height": 1431,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n社团组织\n\n认识校园里的同行者。\n\n搜索组织、类别或关键词\n4 个组织\n全部\n学术\n艺术\n运动\n公益\n计算机协会\n学术\n已关注\n组织介绍与联系\n\n模拟组织：一起学习、交流，记"
+    },
+    {
+      "num": "045",
+      "role": "student",
+      "name": "地图路线规划",
+      "route": "/v2/campus/explore",
+      "file": "student/045-地图路线规划.png",
+      "full": null,
+      "height": 852,
+      "text": "步行路线\n起点\n选择起点\nV29 容闳楼\n学习资源中心（一期）\nT2 人文楼\nT3 格物楼\nT1 厚德楼\n演艺厅\n行政楼\n大学会堂\n体育馆\nT4 教学楼\nT5 教学楼\nT6 教学楼\nT7 教学楼\nT8 博简楼\nV28 莎翁楼\nV27 雨果楼\n榆栈\nV26 歌德楼\nV25 东坡楼\nV23 雪芹楼\nV24 阳明楼\n会贤邨待核低层轮廓\nV20 笃行楼\nV19 真知楼\nV21 博文楼\nV22 雅志楼\nV1"
+    },
+    {
+      "num": "046",
+      "role": "student",
+      "name": "地图建筑列表",
+      "route": "/v2/campus/explore",
+      "file": "student/046-地图建筑列表.png",
+      "full": null,
+      "height": 852,
+      "text": "探索 BNBU 校园\n搜索或点选建筑，查看地点详情\n定位\n路线规划\n建筑列表\n选择校内楼栋\n选择楼栋\nV29 容闳楼\n学习资源中心（一期）\nT2 人文楼\nT3 格物楼\nT1 厚德楼\n演艺厅\n行政楼\n大学会堂\n体育馆\nT4 教学楼\nT5 教学楼\nT6 教学楼\nT7 教学楼\nT8 博简楼\nV28 莎翁楼\nV27 雨果楼\n榆栈\nV26 歌德楼\nV25 东坡楼\nV23 雪芹楼\nV24 阳明楼\n会贤邨待核低"
+    },
+    {
+      "num": "047",
+      "role": "teacher",
+      "name": "教师交流",
+      "route": "/v2/teacher/coffee",
+      "file": "teacher/047-教师交流.png",
+      "full": "teacher/047-教师交流-完整长图.png",
+      "height": 1044,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n教师\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程\n设置\n校园生活，随时相伴\nBNBU / 教师\n验\nCoffee Chat\n\n先看看哪些同学预约了与你交流。\n\n预约学生\n开放时段\n 包含取消记录\n已预约\n验收学生甲\n\n10月18日 14:00 – 10月18日 15:00 · 教学楼 B30"
+    },
+    {
+      "num": "048",
+      "role": "teacher",
+      "name": "教师日程",
+      "route": "/v2/teacher/schedule",
+      "file": "teacher/048-教师日程.png",
+      "full": null,
+      "height": 876,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n教师\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程\n设置\n校园生活，随时相伴\nBNBU / 教师\n验\n日程信息\n\n已成立的 Coffee Chat 安排；改期确认前保留原时间。\n\n验收学生甲 · Coffee Chat\n10月18日 14:00 – 10月18日 15:00 · 教学楼 B30"
+    },
+    {
+      "num": "049",
+      "role": "teacher",
+      "name": "教师消息",
+      "route": "/v2/teacher/messages",
+      "file": "teacher/049-教师消息.png",
+      "full": null,
+      "height": 876,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n教师\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程\n设置\n校园生活，随时相伴\nBNBU / 教师\n验\n消息与通知\n\n预约、取消与改期的业务通知。\n\n暂无消息\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程"
+    },
+    {
+      "num": "050",
+      "role": "teacher",
+      "name": "教师资料",
+      "route": "/v2/teacher/profile",
+      "file": "teacher/050-教师资料.png",
+      "full": "teacher/050-教师资料-完整长图.png",
+      "height": 1116,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n教师\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程\n设置\n校园生活，随时相伴\nBNBU / 教师\n验\n个人资料\n\n维护学生预约前可以查看的介绍。\n\n教师标识\n学院\n教师资格\n展示名称\n个人介绍\n交流主题（用顿号分隔）\n默认交流地点\n保存资料\n\n体育资格不能通过编辑资料取得。已开放时段的地点以时"
+    },
+    {
+      "num": "051",
+      "role": "teacher",
+      "name": "教师体育课程",
+      "route": "/v2/teacher/sports",
+      "file": "teacher/051-教师体育课程.png",
+      "full": null,
+      "height": 876,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n教师\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程\n设置\n校园生活，随时相伴\nBNBU / 教师\n验\n体育数据暂不可用\n接通后展示获授权数据；未读取的数值显示为 —。\n体育平台\n运动数据总览\n\n我的教学课程 · 按学期统计\n\n暂无学期\n刷新\n体育数据源暂未接通，当前无法确认课程情况。\n所选学期"
+    },
+    {
+      "num": "052",
+      "role": "teacher",
+      "name": "教师设置",
+      "route": "/v2/teacher/settings",
+      "file": "teacher/052-教师设置.png",
+      "full": "teacher/052-教师设置-完整长图.png",
+      "height": 1062,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n教师\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程\n设置\n校园生活，随时相伴\nBNBU / 教师\n验\n设置\n陈\n陈老师\n个人资料与校园身份\n通用\n语言\n中文 / English\n外观与显示\n主题、文字大小\n应用与数据\n账号与安全\n账号信息、密码与登录\n字体与许可\n使用说明\n隐私政策\n了解数据如"
+    },
+    {
+      "num": "053",
+      "role": "teacher",
+      "name": "开放时段管理",
+      "route": "/v2/teacher/coffee",
+      "file": "teacher/053-开放时段管理.png",
+      "full": "teacher/053-开放时段管理-完整长图.png",
+      "height": 1957,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n教师\nCoffee Chat\n日程\n消息与通知\n个人资料\n体育课程\n设置\n校园生活，随时相伴\nBNBU / 教师\n验\nCoffee Chat\n\n先看看哪些同学预约了与你交流。\n\n预约学生\n开放时段\n新增开放时段\n开始时间\n结束时间\n地点\n预约容量\n开放时段\n我的时段\n10月18日 14:00 – 10月18日"
+    },
+    {
+      "num": "054",
+      "role": "admin",
+      "name": "运营总览",
+      "route": "/v2/admin",
+      "file": "admin/054-运营总览.png",
+      "full": null,
+      "height": 876,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n运营工作台\n\n按当前账号权限显示共享后端中的待办。\n\n邮件转活动\n0\n内容待审\n0\n认证待审\n0\n内容审核待办\n\n保留历史待审内容，并处理已公开内容\n\n查看全部\n内容队列已处理完\n认证审核"
+    },
+    {
+      "num": "055",
+      "role": "admin",
+      "name": "邮件转活动",
+      "route": "/v2/admin/mail-activities",
+      "file": "admin/055-邮件转活动.png",
+      "full": "admin/055-邮件转活动-完整长图.png",
+      "height": 1214,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n学校活动发布\n\n自动接收学校邮件，识别海报或通知截图，集中核对待处理活动。\n\n收件邮箱：未配置；部署时需连接学校收件邮箱。邮件信息完整时自动发布，缺项时进入待核实。\n识别活动海报或通知截图"
+    },
+    {
+      "num": "056",
+      "role": "admin",
+      "name": "认证审核",
+      "route": "/v2/admin/verifications",
+      "file": "admin/056-认证审核.png",
+      "full": "admin/056-认证审核-完整长图.png",
+      "height": 1110,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n认证审核\n\n核验学生、社团成员、官方机构及校友身份。\n\n学生身份核验\n\n0 条符合条件的申请\n\n待核验\n已核验\n已驳回\n已撤销\n全部\n\n当前没有符合条件的申请。\n\n上一页\n第1 页\n下一页"
+    },
+    {
+      "num": "057",
+      "role": "admin",
+      "name": "社区内容审核",
+      "route": "/v2/admin/moderation",
+      "file": "admin/057-社区内容审核.png",
+      "full": "admin/057-社区内容审核-完整长图.png",
+      "height": 2721,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n社区内容管理\n\n按状态、作者和关键词分批查阅帖子与评论。\n\n帖子与评论\n\n16 条符合条件的内容\n\n待审核\n已展示\n已下架\n已删除\n全部\n帖子与评论\n帖子\n评论\n评论 · 验收学生甲\n评论"
+    },
+    {
+      "num": "058",
+      "role": "admin",
+      "name": "店铺与点评管理",
+      "route": "/v2/admin/shops",
+      "file": "admin/058-店铺与点评管理.png",
+      "full": null,
+      "height": 876,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n店铺与点评管理\n新增店铺\n\n校内外的小店与美食，听听同学们怎么说。\n\n全部\n校内\n校外\n全部类别\n美食\n校内 · 美食\n本地验收示例店（非真实店铺）\n\n校内测试地点，仅用于功能验收\n\n1 "
+    },
+    {
+      "num": "059",
+      "role": "admin",
+      "name": "社区屏蔽词",
+      "route": "/v2/admin/keywords",
+      "file": "admin/059-社区屏蔽词.png",
+      "full": null,
+      "height": 876,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n社区屏蔽词\n\n帖子标题、正文与评论共用这套词库。命中启用词汇时，服务端会拒绝发布并提示作者修改。\n\n新增词汇\n\n保存后立即用于后续发布\n\n词汇\n保存词汇\n词库\n\n0 个启用 · 0 个总计"
+    },
+    {
+      "num": "060",
+      "role": "admin",
+      "name": "管理员设置",
+      "route": "/v2/admin/settings",
+      "file": "admin/060-管理员设置.png",
+      "full": "admin/060-管理员设置-完整长图.png",
+      "height": 1062,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n设置\n验\n验收管理员\n个人资料与校园身份\n通用\n语言\n中文 / English\n外观与显示\n主题、文字大小\n应用与数据\n账号与安全\n账号信息、密码与登录\n字体与许可\n使用说明\n隐私政策\n了"
+    },
+    {
+      "num": "061",
+      "role": "student",
+      "name": "教师介绍与预约时段",
+      "route": "/v2/coffee",
+      "file": "student/061-教师介绍与预约时段.png",
+      "full": "student/061-教师介绍与预约时段-完整长图.png",
+      "height": 1525,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\nCoffee Chat\n\n和老师聊聊，每一种可能。\n\n返回老师列表\nCOFFEE CHAT · 其他\n陈老师\n·\n\n模拟教师资料，欢迎预约交流学习与项目中的问题。\n\n学业规划"
+    },
+    {
+      "num": "062",
+      "role": "student",
+      "name": "教师预约记录详情",
+      "route": "/v2/coffee?view=bookings",
+      "file": "student/062-教师预约记录详情.png",
+      "full": "student/062-教师预约记录详情-完整长图.png",
+      "height": 1410,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n4\n6\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\nCoffee Chat\n\n和老师聊聊，每一种可能。\n\n返回老师列表\nCOFFEE CHAT · 其他\n陈老师\n·\n\n模拟教师资料，欢迎预约交流学习与项目中的问题。\n\n学业规划"
+    },
+    {
+      "num": "063",
+      "role": "student",
+      "name": "课表周视图",
+      "route": "/v2/me?tab=timetable",
+      "file": "student/063-课表周视图.png",
+      "full": "student/063-课表周视图-完整长图.png",
+      "height": 1322,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的课表\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n已收录 21 项课程安排\n\n重新导入\n2026 / 10 月\n第 7 周\n10.19 — 10.25\n今天\n本周 18 项课程\n周课表\n日列表\n时间\n周一\n19\n"
+    },
+    {
+      "num": "064",
+      "role": "student",
+      "name": "课表日列表",
+      "route": "/v2/me?tab=timetable",
+      "file": "student/064-课表日列表.png",
+      "full": "student/064-课表日列表-完整长图.png",
+      "height": 1165,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的课表\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n已收录 21 项课程安排\n\n重新导入\n2026 / 10 月\n第 7 周\n10.19 — 10.25\n今天\n本周 18 项课程\n周课表\n日列表\n一\n19\n二\n20"
+    },
+    {
+      "num": "065",
+      "role": "student",
+      "name": "隐私与可见性",
+      "route": "/v2/settings?section=privacy",
+      "file": "student/065-隐私与可见性.png",
+      "full": "student/065-隐私与可见性-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "066",
+      "role": "student",
+      "name": "消息与提醒",
+      "route": "/v2/settings?section=notifications",
+      "file": "student/066-消息与提醒.png",
+      "full": "student/066-消息与提醒-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "067",
+      "role": "student",
+      "name": "资料展示内容",
+      "route": "/v2/settings?section=preview",
+      "file": "student/067-资料展示内容.png",
+      "full": "student/067-资料展示内容-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "068",
+      "role": "student",
+      "name": "语言",
+      "route": "/v2/settings?section=language",
+      "file": "student/068-语言.png",
+      "full": "student/068-语言-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "069",
+      "role": "student",
+      "name": "外观与显示",
+      "route": "/v2/settings?section=appearance",
+      "file": "student/069-外观与显示.png",
+      "full": "student/069-外观与显示-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "070",
+      "role": "student",
+      "name": "校园使用偏好",
+      "route": "/v2/settings?section=campus",
+      "file": "student/070-校园使用偏好.png",
+      "full": "student/070-校园使用偏好-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "071",
+      "role": "student",
+      "name": "设置隐私政策",
+      "route": "/v2/settings?section=policy",
+      "file": "student/071-设置隐私政策.png",
+      "full": "student/071-设置隐私政策-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "072",
+      "role": "student",
+      "name": "关于会同里",
+      "route": "/v2/settings?section=about",
+      "file": "student/072-关于会同里.png",
+      "full": "student/072-关于会同里-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "073",
+      "role": "student",
+      "name": "账号与安全",
+      "route": "/v2/settings?section=account",
+      "file": "student/073-账号与安全.png",
+      "full": "student/073-账号与安全-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "074",
+      "role": "student",
+      "name": "使用指南",
+      "route": "/v2/settings?section=help",
+      "file": "student/074-使用指南.png",
+      "full": "student/074-使用指南-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "075",
+      "role": "student",
+      "name": "演示数据",
+      "route": "/v2/settings?section=data",
+      "file": "student/075-演示数据.png",
+      "full": "student/075-演示数据-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "076",
+      "role": "student",
+      "name": "课程校历弹窗",
+      "route": "/v2/me?tab=timetable",
+      "file": "student/076-课程校历弹窗.png",
+      "full": "student/076-课程校历弹窗-完整长图.png",
+      "height": 1165,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的课表\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n已收录 21 项课程安排\n\n重新导入\n2026 / 10 月\n第 7 周\n10.19 — 10.25\n今天\n本周 18 项课程\n周课表\n日列表\n一\n19\n二\n20"
+    },
+    {
+      "num": "077",
+      "role": "admin",
+      "name": "新增店铺表单",
+      "route": "/v2/admin/shops",
+      "file": "admin/077-新增店铺表单.png",
+      "full": null,
+      "height": 876,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n会同里\nBNBU CAMPUS\n管理\n运营总览\n邮件转活动\n认证审核\n社区内容\n店铺与点评\n社区屏蔽词\n设置\n校园生活，随时相伴\nBNBU / 管理\n验\n店铺与点评管理\n新增店铺\n\n校内外的小店与美食，听听同学们怎么说。\n\n全部\n校内\n校外\n全部类别\n美食\n校内 · 美食\n本地验收示例店（非真实店铺）\n\n校内测试地点，仅用于功能验收\n\n1 "
+    },
+    {
+      "num": "078",
+      "role": "student",
+      "name": "活动筛选",
+      "route": "/v2/activities",
+      "file": "student/078-活动筛选.png",
+      "full": "student/078-活动筛选-完整长图.png",
+      "height": 1524,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n发现\n4\n6\n校园社区\n活动\n社团组织\n校友交流\n全部\n学校活动\n筛选\n时间\n全部时间\n地点\n全部地点\n排序\n时间最近\n校园成员活动\n英语口语工作坊\n\n10/21周三 19:00\n\n校园广场\n\n摄\n摄影社\n1\n校园成员活动\n校园音乐分享会\n\n10/23周五 19:00\n\n东区操场\n\n跑\n跑步社\n0\n学校活动\n羽毛球交流赛\n\n10/20周二 "
+    },
+    {
+      "num": "079",
+      "role": "student",
+      "name": "课程详情",
+      "route": "/v2/me?tab=timetable",
+      "file": "student/079-课程详情.png",
+      "full": "student/079-课程详情-完整长图.png",
+      "height": 1165,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的课表\n推荐看看\n校园里正在发生\n秋日校园摄影展\n活动 · 校园广场\n计算机前沿技术分享会\n活动 · 教学楼 A101\n校园夜跑计划\n活动 · 东区操场\n浏览全部活动\n4\n6\n\n已收录 21 项课程安排\n\n重新导入\n2026 / 10 月\n第 7 周\n10.19 — 10.25\n今天\n本周 18 项课程\n周课表\n日列表\n一\n19\n二\n20"
+    },
+    {
+      "num": "080",
+      "role": "student",
+      "name": "通知详情",
+      "route": "/v2/messages?view=notifications",
+      "file": "student/080-通知详情.png",
+      "full": "student/080-通知详情-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    },
+    {
+      "num": "081",
+      "role": "student",
+      "name": "队伍会话详情",
+      "route": "/v2/messages",
+      "file": "student/081-队伍会话详情.png",
+      "full": "student/081-队伍会话详情-完整长图.png",
+      "height": 1263,
+      "text": "本地模拟数据 · 课程、活动、预约与体育进度用于界面体验\n我的\n4\n6\n会同里 · CAMPUS LIFE\n更换封面\n王\n王同学\n会同里校园社区\n\n热爱校园生活，喜欢摄影、运动和技术交流。\n\n0\n关注\n0\n粉丝\n7\n获赞与收藏\n编辑资料\n我的校园足迹\n4\n参与活动\n3\n关注组织\n5\n参与队伍\n6\n我的收藏\n1\nCoffee Chat\n我的日历\n一\n19\n二\n20\n三\n21\n四\n22\n五\n23\n六\n"
+    }
+  ],
+  "skipped": []
+}

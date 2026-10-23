@@ -1,0 +1,300 @@
+{
+  "activitiesBefore": [
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-event-5",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    },
+    {
+      "entranceId": "preview-event-4",
+      "entranceState": "pending"
+    },
+    {
+      "entranceId": "preview-event-3",
+      "entranceState": "pending"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-event-6",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-event-7",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    },
+    {
+      "entranceId": "preview-event-2",
+      "entranceState": "pending"
+    }
+  ],
+  "activitiesDown": [
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-event-5",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-event-4",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-event-3",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-event-1",
+      "entranceRuns": "1",
+      "entranceState": "playing"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-event-6",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-event-7",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-event-2",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceId": "preview-event-0",
+      "entranceState": "pending"
+    }
+  ],
+  "activitiesReturn": [
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-event-5",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-event-4",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-event-3",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-event-1",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-event-6",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-event-7",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-event-2",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceId": "preview-event-0",
+      "entranceState": "pending"
+    }
+  ],
+  "communityInitial": [
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-post-0",
+      "entranceRuns": "1",
+      "entranceState": "playing"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-post-1",
+      "entranceRuns": "1",
+      "entranceState": "playing"
+    },
+    {
+      "entranceId": "preview-post-5",
+      "entranceState": "pending"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-post-3",
+      "entranceRuns": "1",
+      "entranceState": "playing"
+    },
+    {
+      "entranceDelay": "108",
+      "entranceId": "preview-post-4",
+      "entranceRuns": "1",
+      "entranceState": "playing"
+    },
+    {
+      "entranceId": "preview-post-2",
+      "entranceState": "pending"
+    }
+  ],
+  "communityDown": [
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-post-0",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-post-1",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-post-5",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-post-3",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "108",
+      "entranceId": "preview-post-4",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-post-2",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-alumni-post",
+      "entranceRuns": "1",
+      "entranceState": "playing"
+    }
+  ],
+  "communityRepeat": [
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-post-0",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-post-1",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-post-5",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-post-3",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "108",
+      "entranceId": "preview-post-4",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-post-2",
+      "entranceRuns": "1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-alumni-post",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    }
+  ],
+  "organizationsInitial": [
+    {
+      "entranceDelay": "0",
+      "entranceId": "preview-org-0",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    },
+    {
+      "entranceId": "preview-org-3",
+      "entranceState": "pending"
+    },
+    {
+      "entranceDelay": "36",
+      "entranceId": "preview-org-1",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    },
+    {
+      "entranceDelay": "72",
+      "entranceId": "preview-org-2",
+      "entranceRuns": "1",
+      "entranceState": "shown"
+    }
+  ],
+  "organizationsFiltered": [
+    {
+      "entranceId": "preview-org-0",
+      "entranceState": "seen"
+    }
+  ],
+  "organizationsReturn": [
+    {
+      "entranceId": "preview-org-0",
+      "entranceState": "seen"
+    },
+    {
+      "entranceId": "preview-org-3",
+      "entranceState": "pending"
+    },
+    {
+      "entranceId": "preview-org-1",
+      "entranceState": "seen"
+    },
+    {
+      "entranceId": "preview-org-2",
+      "entranceState": "seen"
+    }
+  ]
+}

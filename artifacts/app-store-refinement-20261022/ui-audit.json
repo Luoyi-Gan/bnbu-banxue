@@ -1,0 +1,250 @@
+{
+  "records": [
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 378,
+      "headerShadow": null,
+      "motion": "normal",
+      "pressTime": "140ms",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community",
+      "label": "feed-before"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 393,
+      "engine": "view-transition",
+      "headerShadow": "rgba(0, 0, 0, 0) 0px 3px 9px 0px",
+      "motion": "normal",
+      "pressTime": "140ms",
+      "readingScrolled": null,
+      "result": "complete",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "detail-top"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 393,
+      "engine": "view-transition",
+      "headerShadow": "rgba(0, 0, 0, 0) 0px 3px 9px 0px",
+      "motion": "normal",
+      "pressTime": "140ms",
+      "readingScrolled": null,
+      "result": "complete",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "detail-scrolled"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 393,
+      "engine": "view-transition",
+      "headerShadow": "rgba(0, 0, 0, 0.19) 0px 3px 9px 0px",
+      "motion": "normal",
+      "pressTime": "140ms",
+      "readingScrolled": "true",
+      "result": "complete",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "detail-scrolled-700"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 393,
+      "engine": "view-transition",
+      "headerShadow": "rgba(0, 0, 0, 0) 0px 3px 9px 0px",
+      "motion": "normal",
+      "pressTime": "140ms",
+      "readingScrolled": null,
+      "result": "complete",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "detail-scroll-reset"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 378,
+      "engine": "view-transition",
+      "headerShadow": null,
+      "motion": "normal",
+      "pressTime": "140ms",
+      "result": "complete",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community",
+      "label": "feed-return"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 393,
+      "engine": "view-transition",
+      "headerShadow": "rgba(0, 0, 0, 0) 0px 3px 9px 0px",
+      "motion": "normal",
+      "pressTime": "140ms",
+      "readingScrolled": null,
+      "result": "complete",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "light",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "reading-light-700"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 393,
+      "engine": "view-transition",
+      "headerShadow": "rgba(23, 60, 37, 0.08) 0px 3px 9px 0px",
+      "motion": "normal",
+      "pressTime": "140ms",
+      "readingScrolled": "true",
+      "result": "complete",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "light",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "reading-light-scrolled-final"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "1",
+        "transition": "none"
+      },
+      "clientWidth": 393,
+      "engine": "reduced",
+      "headerShadow": "rgba(0, 0, 0, 0) 0px 3px 9px 0px",
+      "motion": "reduce",
+      "pressTime": "140ms",
+      "readingScrolled": null,
+      "result": "direct",
+      "source": {
+        "width": 167.28981018066406,
+        "x": 15.997023582458496
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "reduced-detail"
+    },
+    {
+      "active": null,
+      "card": {
+        "scale": "none",
+        "transition": "scale 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.21s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.21s ease-out"
+      },
+      "clientWidth": 1200,
+      "engine": "view-transition",
+      "headerShadow": "rgba(0, 0, 0, 0.19) 0px 3px 9px 0px",
+      "motion": "normal",
+      "pressTime": "140ms",
+      "readingScrolled": "true",
+      "result": "complete",
+      "source": {
+        "width": 214.92745971679688,
+        "x": 243.99180603027344
+      },
+      "theme": "dark",
+      "url": "/v2/activities?section=community&item=preview-post-0",
+      "label": "desktop-reading-scrolled"
+    },
+    {
+      "active": null,
+      "card": null,
+      "clientWidth": 378,
+      "headerShadow": null,
+      "motion": "normal",
+      "pressTime": "140ms",
+      "source": null,
+      "theme": "dark",
+      "url": "/v2/me",
+      "label": "me-final"
+    }
+  ],
+  "calendar": {
+    "background": "color(srgb 0.556863 0.858824 0.752941 / 0.12)",
+    "color": "rgb(142, 219, 192)",
+    "parentBackgrounds": [
+      "rgba(0, 0, 0, 0)",
+      "rgb(37, 49, 43)",
+      "rgb(20, 28, 27)"
+    ]
+  },
+  "verification": "本地浏览器与计算样式，非真机性能或触屏按压轨迹",
+  "preferencesRestored": {
+    "theme": "dark",
+    "motion": "normal"
+  },
+  "viewports": [
+    {
+      "width": 393,
+      "height": 852
+    },
+    {
+      "width": 393,
+      "height": 700
+    },
+    {
+      "width": 1200,
+      "height": 600
+    }
+  ]
+}

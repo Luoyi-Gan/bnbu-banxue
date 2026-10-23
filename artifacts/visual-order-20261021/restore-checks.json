@@ -1,0 +1,15 @@
+[
+  {
+    "name": "home-restored",
+    "width": 393,
+    "url": "http://127.0.0.1:4174/v2",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "5px 25px 5px 5px"
+    ],
+    "underline": []
+  }
+]

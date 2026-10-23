@@ -1,0 +1,104 @@
+[
+  {
+    "client": 345,
+    "fabTop": 712.154052734375,
+    "navTop": 776.618408203125,
+    "padding": "160px",
+    "route": "/v2/activities?section=community",
+    "scroll": 345,
+    "width": 360
+  },
+  {
+    "client": 345,
+    "fabTop": 712.154052734375,
+    "navTop": 776.5435791015625,
+    "padding": "160px",
+    "route": "/v2/partners",
+    "scroll": 345,
+    "width": 360
+  },
+  {
+    "client": 345,
+    "navTop": 777.3301391601562,
+    "padding": "96px",
+    "route": "/v2/coffee",
+    "scroll": 345,
+    "width": 360
+  },
+  {
+    "client": 345,
+    "navTop": 776.4945678710938,
+    "padding": "96px",
+    "route": "/v2/shops",
+    "scroll": 345,
+    "width": 360
+  },
+  {
+    "client": 378,
+    "fabTop": 712.154052734375,
+    "navTop": 776.7451782226562,
+    "padding": "160px",
+    "route": "/v2/activities?section=community",
+    "scroll": 378,
+    "width": 393
+  },
+  {
+    "client": 378,
+    "fabTop": 712.154052734375,
+    "navTop": 776.5568237304688,
+    "padding": "160px",
+    "route": "/v2/partners",
+    "scroll": 378,
+    "width": 393
+  },
+  {
+    "client": 378,
+    "navTop": 777.3287963867188,
+    "padding": "96px",
+    "route": "/v2/coffee",
+    "scroll": 378,
+    "width": 393
+  },
+  {
+    "client": 378,
+    "navTop": 776.5032958984375,
+    "padding": "96px",
+    "route": "/v2/shops",
+    "scroll": 378,
+    "width": 393
+  },
+  {
+    "client": 415,
+    "fabTop": 792.154052734375,
+    "navTop": 856.618408203125,
+    "padding": "160px",
+    "route": "/v2/activities?section=community",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "client": 415,
+    "fabTop": 792.154052734375,
+    "navTop": 856.6068725585938,
+    "padding": "160px",
+    "route": "/v2/partners",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "client": 415,
+    "navTop": 857.3189086914062,
+    "padding": "96px",
+    "route": "/v2/coffee",
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "client": 415,
+    "navTop": 856.4567260742188,
+    "padding": "96px",
+    "route": "/v2/shops",
+    "scroll": 415,
+    "width": 430
+  }
+]

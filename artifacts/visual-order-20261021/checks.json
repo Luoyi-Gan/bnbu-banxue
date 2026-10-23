@@ -1,0 +1,145 @@
+[
+  {
+    "name": "home",
+    "width": 1440,
+    "url": "http://127.0.0.1:4174/v2",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px"
+    ],
+    "underline": []
+  },
+  {
+    "name": "home",
+    "width": 390,
+    "url": "http://127.0.0.1:4174/v2",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px"
+    ],
+    "underline": []
+  },
+  {
+    "name": "discover",
+    "width": 1440,
+    "url": "http://127.0.0.1:4174/v2/activities",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [],
+    "underline": [
+      "none"
+    ]
+  },
+  {
+    "name": "discover",
+    "width": 390,
+    "url": "http://127.0.0.1:4174/v2/activities",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [
+      "",
+      "",
+      {},
+      {},
+      "discovery-choice-options",
+      ""
+    ],
+    "radii": [],
+    "underline": [
+      "none"
+    ]
+  },
+  {
+    "name": "timetable",
+    "width": 1440,
+    "url": "http://127.0.0.1:4174/v2/me?tab=timetable",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px"
+    ],
+    "underline": []
+  },
+  {
+    "name": "timetable",
+    "width": 390,
+    "url": "http://127.0.0.1:4174/v2/me?tab=timetable",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px"
+    ],
+    "underline": []
+  },
+  {
+    "name": "settings",
+    "width": 1440,
+    "url": "http://127.0.0.1:4174/v2/settings",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px",
+      "24px",
+      "24px",
+      "24px"
+    ],
+    "underline": []
+  },
+  {
+    "name": "settings",
+    "width": 390,
+    "url": "http://127.0.0.1:4174/v2/settings",
+    "overflow": false,
+    "classes": "v2-app v2-app-student",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px",
+      "24px",
+      "24px",
+      "24px"
+    ],
+    "underline": []
+  },
+  {
+    "name": "teacher",
+    "width": 1440,
+    "url": "http://127.0.0.1:4174/v2/teacher/coffee",
+    "overflow": false,
+    "classes": "v2-app v2-app-staff v2-app-teacher",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px"
+    ],
+    "underline": []
+  },
+  {
+    "name": "teacher",
+    "width": 390,
+    "url": "http://127.0.0.1:4174/v2/teacher/coffee",
+    "overflow": false,
+    "classes": "v2-app v2-app-staff v2-app-teacher",
+    "token": "24px",
+    "outside": [],
+    "radii": [
+      "24px"
+    ],
+    "underline": []
+  }
+]

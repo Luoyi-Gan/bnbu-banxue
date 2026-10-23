@@ -40,4 +40,40 @@ html[data-ui-theme=dark] .social-note-identity .community-outline{color:#a0d1c9;
 
 .community-shortcuts{flex-wrap:wrap;justify-content:flex-start;column-gap:20px;row-gap:4px}
 
-.community-inline-hot{margin:2px 0 16px;padding:12px 14px;background:#b94a3e06;border:1px solid #b94a3e14;border-radius:10px}.community-inline-hot h2{display:flex;align-items:center;gap:7px;font:inherit;font-size:12px;font-weight:650;letter-spacing:.04em;color:#ad4b40;margin:0 0 6px}.community-inline-hot h2:before{content:'';width:3px;height:11px;border-radius:2px;background:#c65b4e}.community-inline-hot>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 24px}.community-inline-hot button{display:flex;align-items:center;gap:8px;text-align:left;min-width:0;min-height:28px;border:0;border-radius:4px;background:none;padding:3px 0;font-size:12px;line-height:1.5;color:var(--v2-ink)}.community-inline-hot button:hover{background:#b94a3e08}.community-inline-hot strong{display:grid;place-items:center;flex:none;width:16px;height:18px;color:#a97b73;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}.community-inline-hot button:nth-child(-n+3) strong{color:#bb4f42;background:#bb4f420d;border-radius:4px}.community-inline-hot span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.86}.community-inline-hot p{font-size:12px;color:var(--v2-muted);margin:0}html[data-ui-theme=dark] .community-inline-hot{background:#e98a7b08;border-color:#e98a7b24}html[data-ui-theme=dark] .community-inline-hot :is(h2,strong){color:#e7a095}html[data-ui-theme=dark] .community-inline-hot button:nth-child(-n+3) strong{color:#f0a195;background:#e98a7b16}
+/* Editorial ranking surface: quiet paper, legible titles and a warm ranking accent. */
+.community-inline-hot{--hot-accent:#b94a42;--hot-accent-soft:#b94a420c;margin:2px 0 20px;padding:16px;background:var(--page-paper,var(--v2-surface));border:1px solid color-mix(in srgb,var(--v2-line) 65%,transparent);border-radius:20px;box-shadow:0 1px 2px #173c2503,0 6px 20px #173c2505}
+.community-inline-hot>header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.community-inline-hot h2{display:flex;align-items:center;gap:8px;font:inherit;font-size:17px;line-height:1.4;font-weight:650;letter-spacing:-.2px;color:var(--hot-accent);margin:0}
+.community-inline-hot h2:before{content:'';width:3px;height:14px;border-radius:3px;background:var(--hot-accent)}
+.community-inline-hot>header>small{font-size:11px;line-height:1.5;color:var(--v2-muted)}
+.community-inline-hot>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px}
+.community-hub .community-inline-hot button{display:flex;align-items:center;gap:9px;text-align:left;min-width:0;min-height:46px;border:0;border-radius:0;background:none;padding:5px 0;font-size:13px;line-height:1.45;color:var(--v2-ink);touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:scale var(--motion-press,110ms) var(--motion-feedback-ease,ease-out),background-color var(--motion-release,200ms) ease-out}
+.community-inline-hot button:nth-child(n+3){border-top:1px solid color-mix(in srgb,var(--v2-line) 55%,transparent)}
+.community-inline-hot strong{display:block;flex:none;width:18px;text-align:center;color:var(--v2-muted);font-size:15px;line-height:1;font-weight:550;font-variant-numeric:tabular-nums}
+.community-inline-hot button:nth-child(-n+3) strong{color:var(--hot-accent);font-weight:700;background:var(--hot-accent-soft);border-radius:6px;padding:5px 0}
+.community-inline-hot button>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere;white-space:normal;font-weight:500}
+.community-inline-hot button:active{scale:.985;background:var(--student-glass-active)}
+.community-inline-hot button:focus-visible{outline:2px solid var(--student-glass-accent);outline-offset:2px;border-radius:8px}
+.community-inline-hot p{grid-column:1/-1;font-size:12px;color:var(--v2-muted);margin:8px 0}
+@media(hover:hover){.community-inline-hot button:hover{background:var(--student-glass-active)}}
+@media(max-width:420px){.community-inline-hot{padding:14px}.community-inline-hot>div{column-gap:14px}.community-hub .community-inline-hot button{gap:7px;font-size:12px}.community-inline-hot strong{width:16px}}
+html[data-ui-theme=dark] .community-inline-hot{--hot-accent:#eea197;--hot-accent-soft:#eea19712;box-shadow:0 1px 2px #00000012,0 6px 20px #00000010}
+html[data-ui-theme=dark] .v2-app .community-inline-hot h2{color:var(--hot-accent)!important}
+html[data-ui-motion=reduce] .community-hub .community-inline-hot button{transition:none}
+html[data-ui-motion=reduce] .community-inline-hot button:active{scale:1}
+@media(prefers-reduced-motion:reduce){.community-hub .community-inline-hot button{transition:none}.community-inline-hot button:active{scale:1}}
+
+/* Content navigation shares the feed's left edge; tools occupy the right edge. */
+.campus-discovery-panel:has(>.community-hub.is-embedded){padding-top:24px}
+.community-hub .community-topbar{min-height:48px;gap:16px}
+.community-topbar nav.community-feed-tabs{position:relative;display:flex;flex:none;justify-content:flex-start;gap:24px;min-height:48px;touch-action:pan-y;user-select:none}
+.community-topbar nav.community-feed-tabs button{display:block;flex:none;box-sizing:border-box;width:44px;min-width:44px;min-height:44px;text-align:left;padding:5px 0 9px;font-size:17px;line-height:30px;font-weight:500;color:var(--v2-muted);-webkit-tap-highlight-color:transparent}
+.community-topbar nav.community-feed-tabs button[aria-pressed=true]{font-size:18px;font-weight:600;color:var(--student-glass-accent)}
+.community-topbar nav.community-feed-tabs button:after{content:none}
+.community-feed-indicator{position:absolute;left:0;bottom:3px;width:24px;height:3px;border-radius:3px;background:var(--student-glass-accent);pointer-events:none}
+.community-topbar>button[aria-label]{margin-left:auto;width:44px;min-width:44px;height:44px;min-height:44px;color:var(--v2-muted);border-radius:50%}
+.community-topbar nav.community-feed-tabs button:focus-visible,.community-topbar>button:focus-visible{outline:2px solid var(--student-glass-accent);outline-offset:2px;border-radius:8px}
+html[lang=en] .community-topbar nav.community-feed-tabs{--community-tab-step:136px}
+html[lang=en] .community-topbar nav.community-feed-tabs button{width:112px;min-width:112px;font-size:15px}
+html[lang=en] .community-topbar nav.community-feed-tabs button[aria-pressed=true]{font-size:16px}
+@media(max-width:360px){html[lang=en] .community-topbar nav.community-feed-tabs{--community-tab-step:124px}html[lang=en] .community-topbar nav.community-feed-tabs button{width:100px;min-width:100px}}

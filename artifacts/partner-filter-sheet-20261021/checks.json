@@ -1,0 +1,23 @@
+[
+  {
+    "width": 393,
+    "feedLayoutStable": true,
+    "retainsFilters": true,
+    "escapeAndBackdropClose": true,
+    "focusRestored": true
+  },
+  {
+    "width": 320,
+    "feedLayoutStable": true,
+    "retainsFilters": true,
+    "escapeAndBackdropClose": true,
+    "focusRestored": true
+  },
+  {
+    "width": 1440,
+    "feedLayoutStable": true,
+    "retainsFilters": true,
+    "escapeAndBackdropClose": true,
+    "focusRestored": true
+  }
+]

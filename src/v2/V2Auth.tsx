@@ -14,9 +14,11 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 const brandIcon = "/huitongli-app-icon.png";
 import { authApi, AuthServiceError } from "./authApi";
+import {StudentLoginMethods} from './StudentLoginMethods';
 import { roleLoginPath } from "./authReturnPath";
 import "./auth.css";
 import "./editorialAuth.css";
+import "./welcomeAuth.css";
 
 type AuthMode = "login" | "register";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,6 +27,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
+  const [legacy,setLegacy]=useState(false);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -126,7 +129,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
   };
 
   return (
-    <div className="v2-auth-page">
+    <div className={`v2-auth-page${mode==='login'?' v2-auth-welcome':''}`}>
       <header className="v2-auth-header">
         <Link className="v2-auth-brand" to="/v2">
           <img src={brandIcon} alt="" />
@@ -162,7 +165,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
               {mode === "login"?uiText("登录会同里"):uiText("注册会同里")}
             </h2>
             <p>
-              {mode === "login"?uiText("输入账号和密码，继续你的校园生活。"):step === 1?uiText("填写邮箱与验证码，再设置登录密码。"):uiText("提交后由账号服务核验验证码并建立账号。")}
+              {mode === "login"?uiText("选择适合你的登录方式。"):step === 1?uiText("填写邮箱与验证码，再设置登录密码。"):uiText("提交后由账号服务核验验证码并建立账号。")}
             </p>
           </div>
           {mode === "register" && (
@@ -175,7 +178,7 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
             </div>
           )}
           {location.state?.roleMismatch && <p role="status">{uiText("当前账号没有此页面的身份权限，请切换到对应的学生、教师或管理员账号。")}</p>}
-          <form className="v2-auth-form" onSubmit={onSubmit} noValidate>
+          {mode==='login'&&!legacy?<StudentLoginMethods onLegacy={()=>setLegacy(true)}/>:<form className="v2-auth-form" onSubmit={onSubmit} noValidate>
 
             {(mode === "login" || step === 1) && (
               <label>
@@ -302,8 +305,9 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
               {busy?uiText("请稍候…"):mode === "login"?uiText("登录"):step === 1?uiText("下一步"):uiText("完成注册")}
               {!busy && <ArrowRight size={18} />}
             </button>
-          </form>
-          {mode === 'login' && <p className="v2-auth-switch"><Link to="/v2/forgot-password">{uiText("忘记密码？")}</Link></p>}
+          </form>}
+          {mode==='login'&&legacy&&<button type="button" className="v2-auth-text-action" onClick={()=>{setLegacy(false);setPassword('');setError('')}}>{uiText('使用邮箱验证码或学校账号')}</button>}
+          {mode === 'login' && legacy && <p className="v2-auth-switch"><Link to="/v2/forgot-password">{uiText("忘记密码？")}</Link></p>}
           <p className="v2-auth-switch">
             {mode === "login"?uiText("还没有账号？"):uiText("已有账号？")}{" "}
             <Link to={mode === "login"?"/v2/register":"/v2/login"}>
@@ -311,10 +315,10 @@ export function V2Auth({ mode }: { mode: AuthMode }) { useUiLanguage();
               <ArrowRight size={14} />
             </Link>
           </p>
-          <div className="v2-auth-demo">
+          {mode!=='login'&&<div className="v2-auth-demo">
             <span>
               {uiText("请使用本人邮箱注册或找回密码。校园身份需完成相应认证。")}</span>
-          </div>
+          </div>}
         </section>
       </main>
       <footer className="v2-auth-footer"><Link to="/v2/privacy">{uiText("隐私政策")}</Link>

@@ -1,0 +1,87 @@
+/* App Store web evidence: short press feedback, quieter release, light surface separation.
+   Keep Huitongli's geometry, palette and layout. Values below are local design choices. */
+body:has(.v2-app.v2-app-student){
+  --student-press-time:var(--motion-press);
+  --student-release-time:var(--motion-release);
+  --student-feedback-ease:var(--motion-feedback-ease);
+  --student-cover-shadow:var(--material-shadow-cover);
+  --student-reading-edge:0 3px 9px #173c2514;
+}
+/* Opening a reading surface must not widen the underlying feed when its scrollbar is locked. */
+html:has(.v2-app.v2-app-student){scrollbar-gutter:stable}
+html[data-ui-theme=dark] body:has(.v2-app.v2-app-student){
+  --student-cover-shadow:var(--material-shadow-cover);
+  --student-reading-edge:0 3px 9px #00000030;
+}
+html[data-ui-theme=dark] .v2-app.v2-app-student .own-profile .ref-week button[aria-pressed=true]{background:color-mix(in srgb,var(--student-glass-accent) 12%,transparent)}
+html[data-ui-theme=dark] .v2-app.v2-app-student .own-profile .ref-week button[aria-pressed=true] :is(strong,small){color:var(--student-glass-accent)}
+
+/* Scale the card once, including its cover; nested actions never compress the whole card. */
+.v2-app.v2-app-student :is(.discovery-card,.shop-card,.partner-feed-card,.v2-teacher-card){
+  transition:scale var(--student-release-time) var(--student-feedback-ease),transform var(--student-release-time) var(--student-feedback-ease),box-shadow var(--student-release-time) ease-out;
+  transform-origin:center;
+}
+.v2-app.v2-app-student :is(
+  .discovery-card:has(a[data-shared-trigger]:active,.community-discovery-open:active,.organization-detail-trigger:active),
+  .shop-card:has(.shop-card-link:active),
+  .partner-feed-card:has(.partner-card-open:active,.partner-card-details:active),
+  button.v2-teacher-card:active
+){scale:.985;transition-duration:var(--student-press-time)}
+.v2-app.v2-app-student .partner-feed-card:has(.partner-card-open:active){transform:none}
+.v2-app.v2-app-student :is(.discovery-cover,.shop-cover){box-shadow:var(--student-cover-shadow)}
+
+body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary){
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  transition:scale var(--student-release-time) var(--student-feedback-ease),transform var(--student-release-time) var(--student-feedback-ease),background-color var(--student-release-time) ease-out,color var(--student-release-time) ease-out;
+}
+body:has(.v2-app.v2-app-student) :is(.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary):active:not(:disabled):not([aria-disabled=true]){
+  scale:.98;transition-duration:var(--student-press-time);
+}
+.v2-app.v2-app-student :is(.shop-card-link,.community-discovery-open,.partner-card-open,.partner-card-details,.v2-teacher-card,.organization-detail-trigger){
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.v2-app.v2-app-student :is(.shop-card-link,.community-discovery-open,.partner-card-open,.partner-card-details,.v2-teacher-card,.organization-detail-trigger):focus-visible{
+  outline:2px solid var(--v2-action,var(--v2-blue));outline-offset:3px;
+}
+
+/* A fixed reading header gains a boundary only after content moves behind it. */
+body:has(.v2-app.v2-app-student) .note-detail-header{
+  position:relative;z-index:1;
+  box-shadow:0 3px 9px transparent;
+  transition:box-shadow var(--student-release-time) ease-out;
+}
+body:has(.v2-app.v2-app-student) .note-detail[data-reading-scrolled=true] .note-detail-header{box-shadow:var(--student-reading-edge)}
+body:has(.v2-app.v2-app-student) .note-detail :is(.note-detail-title,.note-detail-prose){overflow-wrap:anywhere}
+
+/* Touch devices keep feedback under the finger, without a hover lift remaining after release. */
+@media(hover:none){
+  .v2-app.v2-app-student :is(.v2-button,.v2-icon-button,.shop-card):hover{transform:none}
+  body:has(.v2-app.v2-app-student) .v2-modal>header>.v2-icon-button:hover{transform:none}
+}
+html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) :is(.discovery-card,.shop-card,.partner-feed-card,.v2-teacher-card,.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary){scale:1!important;transition:none!important}
+html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) .note-detail-header{transition:none}
+@media(prefers-reduced-motion:reduce){
+  body:has(.v2-app.v2-app-student) :is(.discovery-card,.shop-card,.partner-feed-card,.v2-teacher-card,.v2-button,.shop-primary,.community-outline,.note-detail-close,.v2-coffee-back,.student-utilities>a,.v2-student-search-trigger,.v2-student-search-close,.v2-modal>header>.v2-icon-button,.v2-partner-type-picker>button,.partner-filter-group>summary){scale:1!important;transition:none!important}
+  body:has(.v2-app.v2-app-student) .note-detail-header{transition:none}
+}
+
+/* Keep native momentum within the surface; reaching an edge must not scroll the page behind it. */
+body:has(.v2-app.v2-app-student) :is(.v2-modal,.v2-drawer-body,.student-utility-content,.note-detail-scroll,.note-detail-body,.v2-student-search-panel){overscroll-behavior-y:contain;scroll-padding-block:12px;-webkit-overflow-scrolling:touch}
+
+/* Settings rows use a quiet color response rather than compressing a whole list. */
+body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background-color var(--student-release-time) ease-out}
+body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account):active{background:var(--student-glass-active)!important;transition-duration:var(--student-press-time)}
+html[data-ui-motion=reduce] body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){transition:none}
+@media(prefers-reduced-motion:reduce){body:has(.v2-app.v2-app-student) :is(.settings-entry,.settings-account){transition:none}}
+/* Clip the sampled glass and its paint to the floating control's rounded shape.
+   Overflow alone does not provide a reliable backdrop boundary during compositing. */
+body:has(.v2-app.v2-app-student) :is(.student-fluid-nav.v2-mobile-nav,.student-timetable-launcher){
+ clip-path:inset(0 round 24px);
+ overflow:hidden;
+ isolation:isolate;
+}
+body:has(.v2-app.v2-app-student) :is(.student-timetable-launcher,.student-fluid-nav>a):focus-visible{
+ outline:2px solid currentColor;
+ outline-offset:-4px;
+}

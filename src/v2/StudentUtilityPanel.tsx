@@ -1,8 +1,9 @@
 import {useEffect, useRef, type ReactNode} from 'react'
 import {Modal} from './ui'
 
-export function StudentUtilityPanel({title,onClose,children}:{title:string;onClose:()=>void;children:ReactNode}){
+export function StudentUtilityPanel({title,onClose,children,navigation}:{title:string;onClose:()=>void;children:ReactNode;navigation?:ReactNode}){
   const initialTitle=useRef(title)
+  const previousTitle=useRef(title)
   useEffect(()=>{
     const restoreLabel=initialTitle.current
     const trigger=document.activeElement as HTMLElement|null
@@ -10,10 +11,10 @@ export function StudentUtilityPanel({title,onClose,children}:{title:string;onClo
     const overflow=document.body.style.overflow
     app?.setAttribute('inert','')
     document.body.style.overflow='hidden'
-    const focusables=()=>Array.from(document.querySelectorAll<HTMLElement>('.v2-modal')).at(-1)?.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),[tabindex="0"]')
+    const focusables=()=>Array.from(document.querySelectorAll<HTMLElement>('.v2-modal')).at(-1)?.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),summary,input:not(:disabled),textarea:not(:disabled),select:not(:disabled),[tabindex="0"]')
     const frame=requestAnimationFrame(()=>focusables()?.[0]?.focus())
     const trap=(event:KeyboardEvent)=>{
-      if(event.key!=='Tab')return
+      if(event.key!=='Tab'||document.querySelector('.v2-map-picker-layer'))return
       const nodes=Array.from(focusables()??[]).filter(el=>el.getClientRects().length)
       const first=nodes[0],last=nodes.at(-1)
       if(!document.activeElement?.closest('.v2-modal')){event.preventDefault();(event.shiftKey?last:first)?.focus()}
@@ -23,5 +24,6 @@ export function StudentUtilityPanel({title,onClose,children}:{title:string;onClo
     document.addEventListener('keydown',trap)
     return()=>{cancelAnimationFrame(frame);document.removeEventListener('keydown',trap);app?.removeAttribute('inert');document.body.style.overflow=overflow;const restore=trigger?.matches('a,button')?trigger:app?.querySelector<HTMLElement>(`.student-utilities a[aria-label="${restoreLabel}"]`);restore?.focus()}
   },[])
-  return <Modal title={title} onClose={()=>{if(document.querySelectorAll('.v2-modal').length===1)onClose()}}><div className="student-utility-content">{children}</div></Modal>
+  useEffect(()=>{if(previousTitle.current!==title){document.querySelector<HTMLElement>('.v2-modal:has(.student-utility-content)>header h2')?.focus({preventScroll:true});previousTitle.current=title}},[title])
+  return <Modal title={title} navigation={navigation} gesture onClose={()=>{if(document.querySelectorAll('.v2-modal').length===1)onClose()}}><div className="student-utility-content">{children}</div></Modal>
 }

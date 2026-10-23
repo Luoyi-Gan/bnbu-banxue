@@ -30,7 +30,7 @@ describe('个人下一项安排',()=>{
     expect(lessonRunsInWeek('第1-8周、10-16周',9)).toBe(false)
     expect(lessonRunsInWeek('双周',8)).toBe(true)
     expect(lessonRunsInWeek('待确认',7)).toBeNull()
-    expect(schedulePreferences({homeScheduleCount:999,semesterStartDate:'bad'})).toEqual({homeScheduleCount:3,semesterStartDate:'',academicCalendar:'bnbu-2026-s1'})
+    expect(schedulePreferences({homeScheduleCount:999,semesterStartDate:'bad'})).toEqual({homeScheduleCount:3,semesterStartDate:'',academicCalendar:'bnbu-2026-s1',hiddenDailyCourses:[]})
   })
   it('只有本人的有效课表和已设置起始周才能生成课程，结束后移除',()=>{
     const data=fixture(),items=liveStudentSchedule(data,now)
@@ -44,7 +44,7 @@ describe('个人下一项安排',()=>{
   })
   it('参与活动、课程、已确认预约按时间混排；无时间组队最后展示',()=>{
     const data=fixture()
-    data.entities.push(entity('event','activity',{status:'published',title:'参与活动',startAt:'2026-10-21T13:00:00+08:00',endAt:'2026-10-21T14:00:00+08:00'}),entity('unmarked','activity',{status:'published',startAt:'2026-10-21T11:00:00+08:00',endAt:'2026-10-21T12:00:00+08:00'}),entity('team','room',{isMember:true,status:'open',visibility:'visible',title:'组队',time:'本周末15:00'}),entity('slot','coffeeSlot',{startAt:'2026-10-21T16:00:00+08:00',endAt:'2026-10-21T17:00:00+08:00'}),entity('booking','coffeeBooking',{status:'confirmed',slotId:'slot'}))
+    data.entities.push(entity('event','activity',{status:'published',title:'参与活动',startAt:'2026-10-21T13:00:00+08:00',endAt:'2026-10-21T14:00:00+08:00'},'other'),entity('unmarked','activity',{status:'published',startAt:'2026-10-21T11:00:00+08:00',endAt:'2026-10-21T12:00:00+08:00'},'other'),entity('team','room',{isMember:true,status:'open',visibility:'visible',title:'组队',time:'本周末15:00'}),entity('slot','coffeeSlot',{startAt:'2026-10-21T16:00:00+08:00',endAt:'2026-10-21T17:00:00+08:00'}),entity('booking','coffeeBooking',{status:'confirmed',slotId:'slot'}))
     data.relations.push({entityId:'event',kind:'participate',createdAt:''})
     const items=liveStudentSchedule(data,now)
     expect(items.slice(0,3).map(i=>i.kind)).toEqual(['activity','course','coffee'])
