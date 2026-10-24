@@ -1637,11 +1637,13 @@ export function ConnectedApp() {
                     <>
                       {title(entity, "举报")}
                       <p>{read(entity, "reason")}</p>
+                      {entity.data.privateMessage === true && <blockquote style={{whiteSpace: "pre-wrap"}}>{String((entity.data.snapshot as Record<string, unknown>)?.body ?? "")}</blockquote>}
                       <div className="live-actions">
                         {[true, false].map((upheld) => (
                           <button
                             className="v2-button v2-button-secondary"
                             key={String(upheld)}
+                            disabled={entity.data.status !== "pending"}
                             onClick={() =>
                               open("处理举报", "report.decide", [reason], {
                                 id: entity.id,

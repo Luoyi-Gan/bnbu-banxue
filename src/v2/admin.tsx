@@ -1,3 +1,4 @@
+import {AdminChatReports} from './AdminChatReports'
 import { uiText, uiTemplate, useUiLanguage } from './uiLanguage'
 import { AdminAlumniReview } from './alumniWorkflow'
 import { AdminStudentIdentityQueue } from './AdminStudentIdentityQueue'
@@ -79,7 +80,7 @@ export function AdminModeration() { useUiLanguage();
     if(!confirmDelete){setConfirmDelete(true);return}
     if(await live.mutate('post.delete',{id:item.id,reason:reason.trim()})){close();await load()}
   }
-  return <div className="v2-page"><PageHeading eyebrow="CONTENT REVIEW" title={uiText("社区内容管理")} description={uiText("按状态、作者和关键词分批查阅帖子与评论。")}/>
+  return <div className="v2-page"><PageHeading eyebrow="CONTENT REVIEW" title={uiText("社区内容管理")} description={uiText("按状态、作者和关键词分批查阅帖子与评论。")}/><AdminChatReports/>
     <section className="v2-panel v2-list-panel"><SectionHeading title={uiText("帖子与评论")} detail={uiTemplate([""," 条符合条件的内容"],data?.total??0)}/>
       <div className="v2-toolbar"><div className="v2-filter-pills">{([['pending','待审核'],['visible','已展示'],['hidden','已下架'],['deleted','已删除'],['all','全部']] as const).map(([key,label])=><button type="button" className={status===key?'is-active':''} key={key} onClick={()=>{setStatus(key);setPage(1)}}>{uiText(label)}</button>)}</div><select value={kind} onChange={event=>{setKind(event.target.value as typeof kind);setPage(1)}} aria-label={uiText("内容类型")}><option value="all">{uiText("帖子与评论")}</option><option value="post">{uiText("帖子")}</option><option value="comment">{uiText("评论")}</option></select></div>
       <div className="v2-toolbar"><input aria-label={uiText("搜索内容关键词")} placeholder={uiText("搜索标题或正文")} value={query} onChange={event=>{setQuery(event.target.value);setPage(1)}}/><input aria-label={uiText("搜索作者")} placeholder={uiText("搜索作者")} value={author} onChange={event=>{setAuthor(event.target.value);setPage(1)}}/></div>

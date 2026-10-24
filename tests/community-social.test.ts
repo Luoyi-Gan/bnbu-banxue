@@ -36,7 +36,7 @@ it('个人私信持久化、幂等并只向原参与者提供，屏蔽后停止�
   expect(()=>command(a,'direct.send',{targetId:b.account.id,body:' '})).toThrow()
   command(b,'social.block',{targetId:a.account.id,enabled:true})
   expect(()=>command(a,'direct.send',input)).toThrow('互动')
-  expect(chat(b.token,a.account.id).messages).toHaveLength(1)
+  expect(chat(b.token,a.account.id).messages).toHaveLength(0)
 })
 
 it('私信拒绝陌生目录账号和失效身份，发送频率受控',()=>{

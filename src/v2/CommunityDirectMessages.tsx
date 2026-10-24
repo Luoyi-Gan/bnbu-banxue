@@ -1,3 +1,4 @@
+import {ChatMessageActions} from './ChatMessageActions'
 import {useEffect,useRef,useState,type FormEvent} from 'react'
 import {ArrowLeft,ArrowUp,MessageCircle} from 'lucide-react'
 import {Link} from 'react-router-dom'
@@ -20,8 +21,9 @@ export function CommunityDirectMessages({person}:{person:string}){
     <header><Link to={`/v2/community?person=${encodeURIComponent(person)}`} aria-label={uiText('返回个人主页')}><ArrowLeft size={22}/></Link>{profile&&<Link className="community-direct-person" to={`/v2/community?person=${encodeURIComponent(person)}`}><DisplayAvatar name={profile.name} avatar={profile.avatar} className="community-list-avatar"/><strong>{profile.name}</strong></Link>}<span>{uiText('私信')}</span></header>
     <div className="community-direct-history" ref={history} role="log" aria-live="polite" aria-label={uiText('私信记录')}>
       {!social.data&&!social.error&&<p role="status">{uiText('正在读取私信…')}</p>}
-      {social.data&&!social.data.messages?.length&&<div className="community-empty"><MessageCircle size={32}/><strong>{uiText('打个招呼，开始交流')}</strong><p>{uiText('聊聊校园生活，也请尊重彼此的边界。')}</p></div>}
-      {social.data?.messages?.map(message=><article className={message.mine?'is-mine':''} key={message.id}><time>{new Date(message.createdAt).toLocaleString(uiLocale(),{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</time><p>{message.body}</p></article>)}
+      {profile?.blocked&&<p role="status">{uiText('当前无法与该用户互动。')}</p>}
+      {social.data&&!profile?.blocked&&!social.data.messages?.length&&<div className="community-empty"><MessageCircle size={32}/><strong>{uiText('打个招呼，开始交流')}</strong><p>{uiText('聊聊校园生活，也请尊重彼此的边界。')}</p></div>}
+      {social.data?.messages?.map(message=><article className={message.mine?'is-mine':''} key={message.id}><time>{new Date(message.createdAt).toLocaleString(uiLocale(),{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</time><p>{message.body}</p>{!message.mine&&<ChatMessageActions id={message.id} author={person} onChanged={()=>{setError('');social.refresh()}}/>}</article>)}
       {social.data?.messagesHasMore&&<button onClick={()=>setPage(value=>value+1)}>{uiText('加载更早的消息')}</button>}
     </div>
     {(error||social.error)&&<p className="community-direct-error" role="alert">{uiText(error||social.error)}<button onClick={social.refresh}>{uiText('重试')}</button></p>}

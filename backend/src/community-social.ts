@@ -6,7 +6,8 @@ import {projectDisplayPeople} from './display-people';
 import type {AlumniData} from '../../shared/v2/alumniModel';
 import {rankHotSummaries,type CommunityCandidate,type CommunityMetrics} from './community-ranking';
 
-export const socialBlocked=(edges:Entity[],a:string,b:string|null)=>edges.some(e=>e.data.kind==='block'&&e.data.enabled===true&&(e.ownerId===a&&e.data.targetId===b||e.ownerId===b&&e.data.targetId===a));
+export {socialBlocked} from './chat-visibility';
+import {socialBlocked} from './chat-visibility';
 export function* requireSocialAccess(repo:BusinessRepository,actor:Account,ownerId:string|null):Generator<unknown,void,unknown>{
   demand(!socialBlocked(yield* effect(repo.all('socialEdge')),actor.id,ownerId),'当前无法与该用户互动。',403);
 }
@@ -29,7 +30,9 @@ export function* communitySocialPolicy(repo:BusinessRepository,actor:Account,act
     yield* communitySocialRead(repo,actor,new URLSearchParams({person:targetId}));
     const messages=yield* effect(repo.all('directMessage'));
     demand(messages.filter(m=>m.ownerId===actor.id&&Date.parse(m.createdAt)>Date.now()-60000).length<20,'发送过于频繁，请稍后再试。',429);
-    const message=yield* effect(repo.create('directMessage',actor.id,{targetId,body:textField(input,'body',500)}));
+    const body = textField(input, 'body', 500);
+    yield* checkCommunityKeywords(repo, body);
+    const message=yield* effect(repo.create('directMessage',actor.id,{targetId,body}));
     yield* effect(repo.notify([targetId],message.id,'community.direct','你收到了一条校园私信。'));
     return message;
   }
@@ -145,12 +148,13 @@ export function* communitySocialRead(repo:BusinessRepository,actor:Account,param
     const display=projection(target);
     people.push({id:personId,name:display?.nickname||display?.name||target.name,avatar:display?.avatar??'',self:personId===actor.id,isFollowing:active.some(e=>e.ownerId===actor.id&&e.data.targetId===personId)});
   }
-  const messages=tab==='chat'&&!self?privateMessages.filter(m=>m.ownerId===id||m.data.targetId===id).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id)):[];
+  const messages=tab==='chat'&&!self&&!blocked?privateMessages.filter(m=>m.data.status!=='hidden'&&(m.ownerId===id||m.data.targetId===id)).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id)):[];
   const conversations=[];
   if(self&&tab==='inbox')for(const targetId of [...new Set(privateMessages.map(m=>m.ownerId===actor.id?String(m.data.targetId):m.ownerId!))]){
     const target=yield* effect(repo.person(targetId));
     if(target.status==='banned'||socialBlocked(edges,actor.id,targetId))continue;
-    const display=projection(target),last=privateMessages.filter(m=>m.ownerId===targetId||m.data.targetId===targetId).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||b.id.localeCompare(a.id))[0];
+    const display=projection(target),last=privateMessages.filter(m=>m.data.status!=='hidden'&&(m.ownerId===targetId||m.data.targetId===targetId)).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||b.id.localeCompare(a.id))[0];
+    if (!last) continue;
     conversations.push({id:targetId,name:display?.nickname||display?.name||target.name,avatar:display?.avatar??'',body:String(last.data.body),createdAt:last.createdAt});
   }
   const drafts=self?(yield* effect(repo.all('postDraft'))).filter(d=>d.ownerId===actor.id&&d.data.status==='draft').map(d=>({id:d.id,title:d.data.title,updatedAt:d.updatedAt})):[];

@@ -1,3 +1,5 @@
+import {chatModerationPolicy} from './chat-moderation';
+import {chatMessageVisible} from './chat-visibility';
 import { effect, runSync, type BusinessRepository } from "./storage/effects";
 import {communitySocialPolicy,requireSocialAccess,validPostImages} from './community-social';
 import { demand, type Account } from "./auth";
@@ -83,6 +85,10 @@ export function* communityPolicy(
   action: string,
   input: Fields,
 ): Generator<unknown, Entity | undefined, unknown> {
+  if (action === 'report.create' || action === 'report.decide') {
+    const report = yield* chatModerationPolicy(repo, actor, action, input);
+    if (report) return report;
+  }
   const social=yield* communitySocialPolicy(repo,actor,action,input);
   if(social)return social;
   if (action.startsWith('keyword.')) return yield* communityKeywordPolicy(repo, actor, action, input);
@@ -320,7 +326,11 @@ export function* communityPolicy(
     demand(room.data.status === "open" && room.data.visibility === "visible" && strings(room.data.members).includes(actor.id), "当前没有此队伍的聊天权限。", 403);
     demand(Array.isArray(input.ids) && input.ids.length > 0 && input.ids.every(id => typeof id === "string"), "请选择已读取的消息。");
     const ids = [...new Set(input.ids as string[])];
-    for (const id of ids) demand((yield* effect(repo.get(id, "message"))).data.roomId === room.id, "消息不属于当前会话。", 403);
+    const edges = yield* effect(repo.all('socialEdge'));
+    for (const id of ids) {
+      const message = yield* effect(repo.get(id, "message"));
+      demand(message.data.roomId === room.id && chatMessageVisible(message, actor.id, edges), "消息不属于当前可见会话。", 403);
+    }
     for (const id of ids) (yield* effect(repo.relation(actor.id, id, "message.read", true)));
     return room;
   }
@@ -335,9 +345,11 @@ export function* communityPolicy(
       "当前没有此队伍的聊天权限。",
       403,
     );
+    const body = textField(input, "body", 500);
+    yield* checkCommunityKeywords(repo, body);
     return (yield* effect(repo.create("message", actor.id, {
       roomId: room.id,
-      body: textField(input, "body", 500),
+      body,
     })));
   }
   if (action === "report.create") {
