@@ -50,6 +50,7 @@ export class PostgresRepository {
 
   async create(kind: string, ownerId: string | null, data: Fields): Promise<Entity> {
     const now = timestamp();
+    await this.client.query('SELECT pg_advisory_xact_lock(18422,42)');
     const stored=await storeImages(data);
     const {rows} = await this.client.query<EntityRow>('INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$5) RETURNING *', [randomUUID(),kind,ownerId,JSON.stringify(stored),now]);
     if(kind==='message') {
@@ -60,6 +61,7 @@ export class PostgresRepository {
   }
 
   async save(entity: Entity, patch: Fields): Promise<Entity> {
+    await this.client.query('SELECT pg_advisory_xact_lock(18422,42)');
     const stored=await storeImages({...entity.data,...patch});
     const {rows} = await this.client.query<EntityRow>('UPDATE entities SET data=$1,version=version+1,updated_at=$2 WHERE id=$3 AND version=$4 RETURNING *', [JSON.stringify(stored),timestamp(),entity.id,entity.version]);
     demand(rows[0], '内容已更新，请刷新后重试。', 409);

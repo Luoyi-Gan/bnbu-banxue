@@ -1,3 +1,4 @@
+import {deletionMigration} from '../privacy/schema';
 import {pushMigration} from '../push/storage';
 export const companionIdentityMigrationSql = `
 UPDATE entities SET kind='companionIdentity'
@@ -96,4 +97,4 @@ CREATE INDEX security_rate_window ON security_rate_events(category,occurred_at,s
 `},{version:12,sql:`
 CREATE UNIQUE INDEX verified_student_number_unique ON entities ((data::jsonb->>'studentNumber'))
 WHERE kind='companionIdentity' AND data::jsonb->>'role'='student' AND data::jsonb->>'status'='verified' AND data::jsonb->>'studentNumber' IS NOT NULL;
-`},pushMigration];
+`},pushMigration,deletionMigration];

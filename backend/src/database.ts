@@ -1,3 +1,4 @@
+import {deletionSchema} from './privacy/schema';
 import { migrateCompanionIdentity } from "./companion-identity-migration";
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
@@ -102,6 +103,8 @@ export function openDatabase(filename: string) {
   migrateCompanionIdentity(db);
   db.exec("CREATE UNIQUE INDEX IF NOT EXISTS verified_student_number_unique ON entities(json_extract(data,'$.studentNumber')) WHERE kind='companionIdentity' AND json_extract(data,'$.role')='student' AND json_extract(data,'$.status')='verified' AND json_extract(data,'$.studentNumber') IS NOT NULL");
   db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(10,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
+  db.exec(deletionSchema);
+  db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(11,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
   return db;
 }
 

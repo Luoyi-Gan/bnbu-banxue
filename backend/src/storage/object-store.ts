@@ -5,6 +5,7 @@ import { resolve, join } from 'node:path';
 export interface ObjectStore {
   put(bytes:Buffer,contentType:string):Promise<string>;
   get(key:string):Promise<Buffer>;
+  delete(key:string):Promise<void>;
 }
 export const objectKey=(bytes:Buffer)=>createHash('sha256').update(bytes).digest('hex');
 export function validateObjectKey(key:string) {
@@ -31,6 +32,9 @@ export class LocalObjectStore implements ObjectStore {
     }
     finally { await unlink(temporary).catch(error=>{if(error.code!=='ENOENT') throw error;}); }
     return key;
+  }
+  async delete(key:string) {
+    await unlink(join(this.root,validateObjectKey(key))).catch(error=>{if(error.code!=='ENOENT')throw error;});
   }
   async get(key:string) {
     const bytes=await readFile(join(this.root,validateObjectKey(key)));

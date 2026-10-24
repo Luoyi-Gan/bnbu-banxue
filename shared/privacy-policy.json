@@ -1,0 +1,50 @@
+[
+  [
+    "适用范围与联系方式",
+    "Scope and contact",
+    "本政策适用于会同里 iOS、配套 Apple Watch 和校园网页服务。运营者为珠海澄序智能科技有限公司。隐私、数据访问、更正、删除或投诉请联系 siltotchen@gmail.com。版本日期：2026年10月24日。学校和体育平台的独立账号另受其自身政策约束。",
+    "This policy applies to Huitongli for iOS, its companion Apple Watch app and campus web service. The operator is 珠海澄序智能科技有限公司 (Zhuhai Chengxu Intelligent Technology Co., Ltd.). Contact siltotchen@gmail.com for privacy questions, access, corrections, deletion or complaints. Version: 24 October 2026. Independent school and sports accounts are governed by their own policies."
+  ],
+  [
+    "处理的信息与用途",
+    "Information and purposes",
+    "我们为账号登录和身份核验处理邮箱、密码的加盐摘要、会话凭证、姓名、学号、学校身份及你填写的资料；为校园功能处理头像与上传图片、活动参与及收藏、组队与私信、帖子评论、预约、课表、学习资料、个人安排及问答。相关内容按访问权限向参与者、教师或负责审核的人员展示。网络地址的摘要和操作记录用于限流、防滥用及处理故障。不出售个人信息，不使用广告追踪或跨应用画像。",
+    "We process your email, salted password hash, session credentials, name, student number, campus identity and profile for sign-in and verification. Campus features process avatars and uploaded images, activity participation and bookmarks, teams and messages, posts and comments, appointments, timetables, learning materials, personal plans and questions. Content is shown according to permissions to participants, teachers or authorized reviewers. Hashed network addresses and operation records support rate limiting, abuse prevention and troubleshooting. We do not sell personal information or use advertising tracking or cross-app profiling."
+  ],
+  [
+    "学校连接与体育资料",
+    "School connections and sports data",
+    "学校密码仅用于本次向学校验证，不写入平台数据库。学校令牌按会话保存在服务内存中，最长12小时；断开、退出、注销或服务重启会使当前服务中的连接失效。根据本人授权读取课程、资料、评分和日历，必要的同步副本保存在平台。体育页面读取本人已授权的运动记录、时长、学时与课程进度；平台账号注销不会注销学校或体育平台账号，也不会删除校方原始资料。",
+    "Your school password is used for the current school authentication and is not written to our database. School tokens remain in service memory per session for up to 12 hours; disconnecting, signing out, deleting the account or restarting the service invalidates connections in that service. Authorized courses, materials, grades and calendars may have necessary synchronized copies on the platform. Sports screens read your authorized exercise records, duration, credited hours and course progress. Deleting a Huitongli account does not delete independent school or sports accounts or their source records."
+  ],
+  [
+    "设备权限、通知与 Apple Watch",
+    "Device permissions, notifications and Apple Watch",
+    "相机、照片和定位权限仅在使用对应功能时请求，你可在系统设置撤回；不授予可选权限仍可使用其他功能。地图在使用时可能通过高德 SDK 处理定位、设备及网络信息，详见高德隐私政策。登录凭证保存在 iOS 系统安全存储，语言与显示偏好保存在设备。Apple 推送服务使用设备推送标识发送通知或实时活动。配对手表接收课表、通知、待办和预约的必要副本。注销后当前手机清除账号缓存与提醒，配对手表下次连接时清除；离线手表、其他设备或已送达的通知可能暂时保留副本，请联网同步或移除应用。",
+    "Camera, photo and location access is requested when you use the relevant feature and can be revoked in system settings. Other features remain usable without optional permissions. When used, the AMap SDK may process location, device and network information under its privacy policy. Sign-in credentials use iOS secure storage; language and display preferences stay on the device. Apple push services use device push identifiers for notifications and Live Activities. A paired Watch receives necessary timetable, notification, to-do and appointment copies. After deletion, the current phone clears account caches and reminders and the paired Watch clears them at its next connection. Offline Watches, other devices or previously delivered notifications may temporarily retain copies; reconnect or remove the app."
+  ],
+  [
+    "服务商与数据共享",
+    "Service providers and sharing",
+    "部署的主服务位于香港。邮件验证码通过已配置的邮件服务（当前代码支持 AoKSend）发送，服务商处理收件邮箱及验证码邮件。启用腾讯云 COS 时，上传文件存放于运营配置的对象存储区域；具体区域需在上线部署时核实。主动使用校园 AI 并同意分享后，问题、相关历史问答及本次有权访问的校园资料片段会发送给 DeepSeek 生成回答。拒绝分享可继续使用其他校园功能。高德、Apple、学校、体育及 AI 服务有各自的处理规则；我们只为相应功能提供必要数据。",
+    "The deployed primary service is in Hong Kong. Configured email services (the current implementation supports AoKSend) process your recipient address and verification email. If Tencent Cloud COS is enabled, uploaded files are stored in the region configured by the operator; that region must be verified for deployment. When you use campus AI and agree to sharing, your question, relevant previous exchanges and authorized campus excerpts are sent to DeepSeek to generate an answer. Declining sharing leaves other campus features available. AMap, Apple, school, sports and AI services have their own processing rules; we provide data needed for the relevant feature."
+  ],
+  [
+    "保存、注销与备份",
+    "Retention, deletion and backups",
+    "账号资料及校园记录在提供相应服务所需期间保留，或在你删除内容、注销账号时清除。个人账号可在“设置 → 账号与安全 → 永久注销账号”发起，未取得学生身份也可进入此入口。使用平台密码或专用邮箱验证码确认后，在线账号、登录会话、个人内容及关联记录会删除；本人创建的队伍、帖子及其依附消息、评论会一并删除，其他用户无关内容保留。无其他引用的上传文件进入持久清理队列并重试至成功，共享文件继续供仍有权使用的人访问。注销回执仅保存会话摘要和请求摘要，24小时后到期清理。为防止备份恢复已注销账号，保留账号标识的单向摘要及注销时间至相关历史备份不再可恢复。历史备份最长保存周期目前尚未核实；此项需由运营确认并更新，不能将在线删除理解为已同步清除所有历史备份。备份不得用于日常查询，恢复前须执行注销清单过滤。",
+    "Account and campus records remain while needed for their features, or until you delete content or your account. Personal accounts can initiate deletion at Settings → Account & security → Permanently delete account, including accounts without student verification. Confirm with a platform password or dedicated email code. The online account, sessions, personal content and dependent records are deleted. Teams and posts you created, with their dependent messages and comments, are deleted; unrelated content from others is retained. Unreferenced uploads enter a durable cleanup queue and retry until successful; shared files remain for other authorized users. Retry receipts contain only session and request digests and expire after 24 hours. A one-way account-ID digest and deletion time are retained until related historical backups can no longer be restored, to prevent resurrection during restoration. The maximum historical backup retention period has not yet been verified and must be confirmed by the operator and updated here. Online deletion does not mean that every historical backup has already been erased. Backups must not be used for routine access and must be filtered against the erasure log before restoration."
+  ],
+  [
+    "你的选择与权利",
+    "Your choices and rights",
+    "你可以修改资料、限制资料预览和学号搜索、关闭提醒、断开学校连接、删除支持单独删除的内容，以及注销账号。已发送内容可能已被接收人查看或在平台外保存；注销不能收回他人在平台外的副本或他人独立发表的文字。需要访问、更正、导出或处理其他个人信息时，可通过上述邮箱联系并接受必要的身份核验。联系支持不是使用应用内注销的前置条件。",
+    "You can edit your profile, restrict profile previews and student-number search, turn off reminders, disconnect school services, delete content where supported and delete your account. Recipients may already have viewed or saved sent content outside the platform. Account deletion cannot recall external copies or independently authored text from others. Contact the address above for access, correction, export or other personal-data requests, subject to necessary identity verification. Contacting support is not a prerequisite for in-app deletion."
+  ],
+  [
+    "政策更新",
+    "Policy updates",
+    "政策变更将在此页标明日期。新增用途、第三方共享或系统权限需要同意时，我们会在相关功能使用前说明并请求选择。若发现本政策与实际部署不一致，请通过联系邮箱反馈。",
+    "Updates will be dated on this page. When new purposes, third-party sharing or system permissions require consent, we explain them before use and request your choice. Please contact us if you find a discrepancy between this policy and the deployed service."
+  ]
+]

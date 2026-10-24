@@ -1,3 +1,6 @@
+import {servePrivacy} from './privacy/policy';
+import {AccountDeletion} from './privacy/service';
+import {forgetMovementAccount} from './movement-native';
 import {movementNative} from './movement-native';
 import {movementRequest} from './movement';
 import {LearningAuth} from './learning-auth';
@@ -94,10 +97,12 @@ export function createApiServer(
   options: { localOutbox?: boolean; screenshotRecognizer?: ScreenshotRecognizer } = {},
 ) {
   const learningAuth=new LearningAuth(sqliteLearningStore(db)),learning=new LearningService(learningAuth),ai=new CampusAI(sqliteLearningStore(db));
-  return createServer(async (request, response) => {
+  const deletion=new AccountDeletion(db);
+  const server=createServer(async (request, response) => {
     try {
       const requestUrl = new URL(request.url ?? "/", "http://127.0.0.1");
       const pathname = requestUrl.pathname;
+      if(servePrivacy(request,response,requestUrl))return;
       if(request.method==='GET'&&pathname==='/api/learning'){
         const token=cookieToken(request)??'',actor=authenticate(db,token);accountSecurityGate(new Repository(db),actor);
         return send(response,200,await learning.overview(actor,token));
@@ -170,6 +175,17 @@ export function createApiServer(
           return send(response, 200, { data: execute(db, token, 'screenshot.import', {image: image.image, recognizedText: image.text, ocrRequestId: image.requestId}, randomUUID()) });
         }
         const input = await body(request);
+        if(pathname==='/api/account/deletion/request'){
+          demand(Object.keys(input).length===0,'注销验证码只能发送至本人绑定邮箱。');
+          return send(response,200,await deletion.request(cookieToken(request)??'',request.socket.remoteAddress??'unknown',options.localOutbox===true));
+        }
+        if(pathname==='/api/account/deletion/confirm'){
+          const result=await deletion.confirm(cookieToken(request)??'',input,request.socket.remoteAddress??'unknown');
+          if(result.erasedAccountID){learningAuth.forgetAccount(result.erasedAccountID);forgetMovementAccount(result.erasedAccountID);}
+          response.setHeader('Set-Cookie','bnbu_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');
+          return send(response,200,{deleted:result.deleted,requestId:result.requestId,completedAt:result.completedAt});
+        }
+
         if(pathname==='/api/auth/email-login/request')return send(response,200,await learningAuth.requestCode(input.email,request.socket.remoteAddress??'unknown',options.localOutbox===true));
         if(pathname==='/api/auth/email-login'||pathname==='/api/auth/school-login'){
           const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown');
@@ -390,6 +406,7 @@ export function createApiServer(
       });
     }
   });
+  return server;
 }
 export async function startBackend() {
   const host = process.env.BNBU_API_HOST ?? "127.0.0.1";

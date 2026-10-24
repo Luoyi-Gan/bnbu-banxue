@@ -2,11 +2,14 @@ import COS from 'cos-nodejs-sdk-v5';
 import { LocalObjectStore, objectKey, validateObjectKey, type ObjectStore } from './object-store';
 
 export class CosObjectStore implements ObjectStore {
-  constructor(private readonly client:Pick<COS,'putObject'|'getObject'>,private readonly bucket:string,private readonly region:string) {}
+  constructor(private readonly client:Pick<COS,'putObject'|'getObject'|'deleteObject'>,private readonly bucket:string,private readonly region:string) {}
   async put(bytes:Buffer,contentType:string) {
     const key=objectKey(bytes);
     await this.client.putObject({Bucket:this.bucket,Region:this.region,Key:`bnbu/${key}`,Body:bytes,ContentType:contentType,ACL:'private'});
     return key;
+  }
+  async delete(key:string) {
+    await this.client.deleteObject({Bucket:this.bucket,Region:this.region,Key:`bnbu/${validateObjectKey(key)}`});
   }
   async get(key:string) {
     const response=await this.client.getObject({Bucket:this.bucket,Region:this.region,Key:`bnbu/${validateObjectKey(key)}`});

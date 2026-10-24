@@ -9,11 +9,13 @@ export class PostgresDatabase {
     this.pool.on('error', () => console.error('PostgreSQL idle connection failed'));
   }
 
-  async transaction<T>(operation: (client: PoolClient) => Promise<T>): Promise<T> {
+  async transaction<T>(operation: (client: PoolClient) => Promise<T>, privacyExclusive = false): Promise<T> {
     const client = await this.pool.connect();
     let broken = false;
     try {
       await client.query('BEGIN');
+      // An erasure commits between other transactions, never halfway through their writes.
+      await client.query(privacyExclusive ? 'SELECT pg_advisory_xact_lock(18422,43)' : 'SELECT pg_advisory_xact_lock_shared(18422,43)');
       const result = await operation(client);
       await client.query('COMMIT');
       return result;
