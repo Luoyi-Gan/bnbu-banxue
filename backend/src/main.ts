@@ -82,7 +82,7 @@ import { accountSecurityGate } from "./accounts/account-gate";
 
 
 
-import { recognize } from "./timetable";
+import { recognize, reserveTimetableRecognition, type TimetableRecognizer } from "./timetable";
 import { student } from "./community";
 import {ownStudentIdentity,requestStudentIdentity,listStudentIdentityRequests,reviewStudentIdentity} from './student-identity-workflow';
 import {requestPasswordReset,completePasswordReset} from './password-reset';
@@ -94,7 +94,7 @@ import { recognizeActivityScreenshot, type ScreenshotRecognizer } from './activi
 import { startActivityMailbox } from './activity-mailbox';
 export function createApiServer(
   db: Database,
-  options: { localOutbox?: boolean; screenshotRecognizer?: ScreenshotRecognizer } = {},
+  options: { localOutbox?: boolean; screenshotRecognizer?: ScreenshotRecognizer; timetableRecognizer?: TimetableRecognizer } = {},
 ) {
   const learningAuth=new LearningAuth(sqliteLearningStore(db)),learning=new LearningService(learningAuth),ai=new CampusAI(sqliteLearningStore(db));
   const deletion=new AccountDeletion(db);
@@ -164,7 +164,16 @@ export function createApiServer(
           accountSecurityGate(new Repository(db), actor);
           student(actor);
           demand(actor.status !== "banned", "账号已封禁。", 403);
-          return send(response, 200, await recognize(request));
+          const controller = new AbortController();
+          const closed = () => { if (!response.writableEnded) controller.abort(); };
+          response.once('close', closed);
+          try {
+            const result = await recognize(request, {
+              recognizer: options.timetableRecognizer, signal: controller.signal,
+              reserve: () => reserveTimetableRecognition(sqliteLearningStore(db), actor.id, request.socket.remoteAddress || 'unknown'),
+            });
+            return send(response, 200, result);
+          } finally { response.off('close', closed); }
         }
         if (pathname === '/api/activity/screenshot/import') {
           const token = cookieToken(request) ?? '';

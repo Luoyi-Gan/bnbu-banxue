@@ -4,7 +4,7 @@ import { CalendarDays, Check, Clock3, ImagePlus, LoaderCircle, MapPin, Upload } 
 import type {Workspace} from '../live/api'
 import { useWorkspaceBackend } from './useWorkspaceBackend'
 import { Drawer, Modal, type CardOrigin } from './ui'
-import { weekDays, type StudentTimetable as Timetable, type TimetableLesson } from '../../shared/v2/timetableModel'
+import { parseTimetableResponse, weekDays, type StudentTimetable as Timetable, type TimetableLesson } from '../../shared/v2/timetableModel'
 import { demonstrateRecognition, recognizeTimetable, validateTimetablePhoto, type RecognitionStage } from './timetableAdapter'
 import {CampusLocationLink} from './CampusLocationLink'
 import {TimetableBoard} from './TimetableBoard'
@@ -23,6 +23,7 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
   const [importOpen, setImportOpen] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState('')
+  const [recognized, setRecognized] = useState<{lessons: TimetableLesson[]; fileName: string; owner: string; expectedTableId: string; expectedVersion: number} | null>(null)
   const [stage, setStage] = useState<RecognitionStage | null>(null)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -41,24 +42,32 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
     return () => URL.revokeObjectURL(url)
   }, [file])
   useEffect(() => () => { controller.current?.abort(); photoVersion.current++ }, [])
+  useEffect(() => {
+    controller.current?.abort(); controller.current = null; photoVersion.current++
+    setFile(null); setRecognized(null); setStage(null); setReadingPhoto(false)
+    setImportOpen(false); setSample(null); setSelected(null); setMessage(''); setError('')
+  }, [live.data?.account.id])
   const closeImport = () => {
     if (live.busy) return
     controller.current?.abort(); controller.current = null; photoVersion.current++; setReadingPhoto(false)
-    setStage(null); setImportOpen(false); setFile(null); setSampleLoading(false); setError('')
+    setStage(null); setImportOpen(false); setFile(null); setRecognized(null); setSampleLoading(false); setError('')
   }
   const selectFile = async (photo?: File) => {
     if (!photo) return
     const version = ++photoVersion.current
-    setError(''); setFile(null); setReadingPhoto(true)
+    setError(''); setFile(null); setRecognized(null); setReadingPhoto(true)
     try {
       validateTimetablePhoto(photo)
       const bitmap = await createImageBitmap(photo)
-      bitmap.close(); if (photoVersion.current === version) setFile(photo)
+      const tooLarge = bitmap.width * bitmap.height > 40_000_000
+      bitmap.close(); if (tooLarge) throw new Error('照片无法读取或分辨率过大，请换一张清晰的课表图片。')
+      if (photoVersion.current === version) setFile(photo)
     } catch (failure) { if (photoVersion.current === version) setError(failure instanceof Error ? failure.message : '照片无法读取，请重新选择。') }
     finally { if (photoVersion.current === version) setReadingPhoto(false) }
   }
   const start = async (demo: boolean) => {
     if (controller.current || (!demo && !file)) return
+    const base = {owner: live.data?.account.id || '', expectedTableId: record?.id || '', expectedVersion: record?.version || 0}
     const request = new AbortController(); controller.current = request
     photoVersion.current++; setReadingPhoto(false)
     setStage('preparing'); setSampleLoading(demo); setError(''); setMessage('')
@@ -68,8 +77,8 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
       if (request.signal.aborted || controller.current !== request) return
       if (demo) { setSample(result); setMessage('正在查看示例课表，未读取照片，也未写入你的个人课表。') }
       else {
-        if (!await live.mutate('timetable.save', {lessons: result, fileName: file!.name})) return
-        setSample(null); setMessage('识别完成，课表已自动显示。请核对课程及周次，必要时点击课程修正。')
+        setRecognized({lessons: result, fileName: file!.name, ...base})
+        return
       }
       setSelected(null); setFile(null); setImportOpen(false)
     } catch (failure) {
@@ -79,6 +88,18 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
       clearTimeout(timeout)
       if (controller.current === request) { controller.current = null; setStage(null); setSampleLoading(false) }
     }
+  }
+  const saveRecognition = async () => {
+    if (!recognized || live.busy) return
+    try {
+      if (live.data?.account.id !== recognized.owner) throw new Error('登录状态已变更，请重新识别。')
+      const checked = parseTimetableResponse({lessons: recognized.lessons.map(item => ({...item, needsReview: !item.startTime || !item.endTime}))})
+      if (!await live.mutate('timetable.save', {lessons: checked, fileName: recognized.fileName, source: 'photo', expectedTableId: recognized.expectedTableId, expectedVersion: recognized.expectedVersion})) return
+      setRecognized(null); setFile(null); setImportOpen(false); setSelected(null); setSample(null); setMessage('课表已保存。')
+    } catch (failure) { setError(failure instanceof Error ? failure.message : '保存失败') }
+  }
+  const updateRecognized = (id: string, key: keyof TimetableLesson, value: string | number) => {
+    setRecognized(old => old && ({...old, lessons: old.lessons.map(item => item.id === id ? {...item, [key]: value} : item)}))
   }
   const edit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -92,22 +113,38 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
   }
   return <section className="v2-timetable" aria-label={uiText("我的课表")}>
     {!detailOnly&&<><div className="v2-timetable-heading"><div className="v2-timetable-heading-icon"><CalendarDays size={25}/></div><div>{!embedded&&<h2>{uiText("我的课表")}</h2>}<p>{table?uiTemplate(["已收录 "," 项课程安排"],table.lessons.length):recognitionPath?uiText('上传一张课表照片，查看一周的课程安排。'):uiText('图片识别服务尚未接入，可先体验示例课表。')}</p></div><button className="v2-button v2-button-primary" onClick={() => { setImportOpen(true); setError(''); setMessage('') }}><Upload size={16}/>{recognitionPath?table?uiText('重新导入'):uiText('导入课表'):uiText('体验示例课表')}</button></div>
-    {message && <p className="v2-timetable-message" role="status">{message}</p>}
+    {message && <p className="v2-timetable-message" role="status">{uiText(message)}</p>}
     {live.error && <p role="alert" className="v2-info-box">{uiText(live.error)}</p>}
     {sample && <div className="v2-info-box">{uiText("示例模式 · 以下课程为虚构内容。")}<button className="v2-text-button" onClick={() => { setSample(null); setMessage(''); setSelected(null) }}>{uiText("退出示例")}</button></div>}
     <TimetableBoard lessons={lessons} preferences={live.data?.entities.find(e=>e.kind==='preferences'&&e.ownerId===live.data?.account.id)?.data} idPrefix={idPrefix} onSelect={(id,rect)=>{setCardOrigin(rect);setSelected(id);setError('')}}/>
     <div className="v2-timetable-footnote"><span>{table && !sample?uiTemplate(["","更新于 ",""],table.fileName?`${table.fileName} · `:'',new Date(table.updatedAt).toLocaleString(uiLocale(), { timeZone: 'Asia/Shanghai' })):recognitionPath?uiText('识别后自动按星期归类；未识别清楚的内容保留待核对。'):uiText('示例课程仅供体验，不会保存。')}</span><small>{uiText("课程以学校最新安排为准。")}</small></div>
     </>}
     {importOpen && <Modal title={uiText(recognitionPath?'导入我的课表':'体验示例课表')} onClose={closeImport}>
-      {stage?<div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading?uiText('正在演示识别过程'):uiText('正在识别课表')}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{uiText(label)}</li>)}</ol><p>{uiText("识别完成后自动显示课表，原有课表在识别成功前保留。")}</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy?uiText('正在保存'):uiText('取消识别')}</button></div>:<div className="v2-timetable-import">
+      {stage?<div className="v2-recognition" aria-busy="true"><LoaderCircle className="v2-recognition-spinner" size={40}/><h3>{sampleLoading?uiText('正在演示识别过程'):uiText('正在识别课表')}</h3><p role="status">{stages[stage]}…</p><ol>{(Object.entries(stages) as [RecognitionStage, string][]).map(([key, label], index) => <li key={key} className={Object.keys(stages).indexOf(stage) >= index ? 'is-active' : ''}>{Object.keys(stages).indexOf(stage) > index ? <Check size={15}/> : <span>{index + 1}</span>}{uiText(label)}</li>)}</ol><p>{uiText("识别后先核对课程，确认保存前保留原课表。")}</p><button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{live.busy?uiText('正在保存'):uiText('取消识别')}</button></div> :recognized?<div className="v2-timetable-import">
+        <p>{uiText('请逐项核对课程；未知时间和周次请留空。确认保存前原课表保持不变。')}</p>
+        {preview && <img src={preview} alt={uiText('待识别的课表照片')} style={{maxWidth:'100%',maxHeight:220,objectFit:'contain'}}/>}
+        {recognized.lessons.map(item => <fieldset className="v2-form" key={item.id} disabled={live.busy}>
+          <legend>{uiText('核对课程')}</legend>
+          <label>{uiText('课程名称')}<input value={item.name} maxLength={100} onChange={e=>updateRecognized(item.id,'name',e.target.value)}/></label>
+          <label>{uiText('上课星期')}<select value={item.weekday} onChange={e=>updateRecognized(item.id,'weekday',Number(e.target.value))}>{weekDays.map((day,i)=><option key={day} value={i+1}>{uiText(day)}</option>)}</select></label>
+          <div className="v2-form-two"><label>{uiText('开始时间')}<input type="time" value={item.startTime} onChange={e=>updateRecognized(item.id,'startTime',e.target.value)}/></label><label>{uiText('结束时间')}<input type="time" value={item.endTime} onChange={e=>updateRecognized(item.id,'endTime',e.target.value)}/></label></div>
+          {([['period','节次'],['location','上课地点'],['teacher','任课老师'],['weeks','上课周次'],['note','备注']] as const).map(([key,label])=><label key={key}>{uiText(label)}<input value={item[key]} onChange={e=>updateRecognized(item.id,key,e.target.value)}/></label>)}
+          <button className="v2-button v2-button-secondary" onClick={()=>setRecognized(old=>old&&({...old,lessons:old.lessons.filter(row=>row.id!==item.id)}))}>{uiText('移除课程')}</button>
+        </fieldset>)}
+        {(error || live.error) && <p role="alert">{uiText(error || live.error)}</p>}
+        <button className="v2-button v2-button-secondary" disabled={live.busy || recognized.lessons.length>=100} onClick={()=>setRecognized(old=>old&&({...old,lessons:[...old.lessons,{id:crypto.randomUUID(),name:'',weekday:1,startTime:'',endTime:'',period:'',location:'',teacher:'',weeks:'',note:'',needsReview:true}]}))}>{uiText('补充课程')}</button>
+        <button className="v2-button v2-button-primary" disabled={live.busy || !recognized.lessons.length} onClick={()=>void saveRecognition()}>{uiText('已核对，替换并保存课表')}</button>
+        <button className="v2-button v2-button-secondary" disabled={live.busy} onClick={closeImport}>{uiText('放弃本次识别')}</button>
+      </div>:<div className="v2-timetable-import">
         {recognitionPath&&<><p>{uiText("请选择包含星期、课程名和时间的完整课表照片。支持 JPG、PNG、WebP，最大 10 MB。")}</p>
         <label className="v2-timetable-upload"><input type="file" accept="image/jpeg,image/png,image/webp" aria-label={uiText("选择课表照片")} onChange={event => { void selectFile(event.target.files?.[0]); event.target.value = '' }}/>{preview ? <img src={preview} alt={uiText("待识别的课表照片")}/> : <><ImagePlus size={32}/><strong>{uiText("选择课表照片")}</strong><span>{uiText("上传照片或课表截图")}</span></>}</label></>}
         {readingPhoto && <p role="status">{uiText("正在读取图片…")}</p>}
         {file && <p className="v2-timetable-filename">{file.name} · {(file.size / 1024 / 1024).toFixed(1)} MB</p>}
-        {table && recognitionPath && <p>{uiText("识别成功后将替换当前课表；失败或取消保留原有记录。")}</p>}
+        {table && recognitionPath && <p>{uiText("确认保存后将替换当前课表；失败或取消保留原有记录。")}</p>}
         {!recognitionPath && <div className="v2-info-box">{uiText("图片识别服务尚未接入。示例课表仅供体验，不会上传照片或覆盖已有课程。")}</div>}
-        {(error || live.error) && <p role="alert">{error || live.error}</p>}
-        {recognitionPath&&<button className="v2-button v2-button-primary" disabled={!file || readingPhoto} onClick={() => void start(false)}><Upload size={16}/>{uiText("开始识别")}</button>}
+        {(error || live.error) && <p role="alert">{uiText(error || live.error)}</p>}
+        {recognitionPath&&<p>{uiText(live.data?.capabilities?.timetableRecognitionProvider==='tencent'?'点击开始即同意将这张课表照片发送至腾讯云文字识别服务。本平台不保存原图；确认导入后只保存课程信息。':'点击开始即同意将这张课表照片发送至运营配置的图片识别服务。本平台不保存原图；确认导入后只保存课程信息。')}</p>}
+        {recognitionPath&&<button className="v2-button v2-button-primary" disabled={!file || readingPhoto} onClick={() => void start(false)}><Upload size={16}/>{uiText("同意并开始识别")}</button>}
         <button className={`v2-button ${recognitionPath?'v2-button-secondary':'v2-button-primary'}`} onClick={() => void start(true)}>{uiText("体验示例识别流程")}</button>
       </div>}
     </Modal>}
@@ -119,7 +156,7 @@ export function StudentTimetable({ idPrefix = 'timetable', embedded=false, initi
         <label>{uiText("上课星期")}<select name="weekday" defaultValue={current.weekday}>{weekDays.map((name, index) => <option value={index + 1} key={name}>{name}</option>)}</select></label>
         <div className="v2-form-two"><label>{uiText("开始时间")}<input type="time" name="startTime" defaultValue={current.startTime}/></label><label>{uiText("结束时间")}<input type="time" name="endTime" defaultValue={current.endTime}/></label></div>
         <label>{uiText("节次")}<input name="period" maxLength={60} defaultValue={current.period}/></label><label>{uiText("上课地点")}<input name="location" maxLength={100} defaultValue={current.location}/></label><label>{uiText("任课老师")}<input name="teacher" maxLength={80} defaultValue={current.teacher}/></label><label>{uiText("上课周次")}<input name="weeks" maxLength={100} defaultValue={current.weeks} placeholder={uiText("例如：1–16 周 / 单周")}/></label><label>{uiText("备注")}<textarea name="note" maxLength={300} defaultValue={current.note}/></label>
-        {(error || live.error) && <p role="alert">{error || live.error}</p>}<button disabled={live.busy} className="v2-button v2-button-primary">{uiText("保存修正")}</button>
+        {(error || live.error) && <p role="alert">{uiText(error || live.error)}</p>}<button disabled={live.busy} className="v2-button v2-button-primary">{uiText("保存修正")}</button>
       </form>}
     </Drawer>}
   </section>

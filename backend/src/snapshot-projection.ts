@@ -1,3 +1,4 @@
+import { timetableProvider } from './timetable-config';
 import type { Account } from './auth';
 import type { Repository, Entity, Fields } from './repository';
 import { strings } from './repository';
@@ -243,7 +244,8 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
         : process.env.BNBU_LOCAL_OUTBOX === "1"
           ? "local-outbox"
           : "unconfigured",
-      timetableRecognition: process.env.BNBU_TIMETABLE_UPSTREAM
+      timetableRecognitionProvider: timetableProvider() || 'unconfigured',
+      timetableRecognition: timetableProvider()
         ? "configured"
         : "external-service-required",
     },

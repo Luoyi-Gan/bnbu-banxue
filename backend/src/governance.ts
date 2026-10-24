@@ -314,8 +314,12 @@ export function* governancePolicy(
   if (action === "timetable.save") {
     student(actor);
     const table = (yield* effect(repo.all("timetable"))).find((t) => t.ownerId === actor.id);
+    if (input.source === 'photo' || input.expectedTableId !== undefined || input.expectedVersion !== undefined) {
+      demand(typeof input.expectedTableId === 'string' && typeof input.expectedVersion === 'number' && Number.isInteger(input.expectedVersion), '请重新打开课表后导入。');
+      demand(input.expectedTableId === (table?.id ?? '') && input.expectedVersion === (table?.version ?? 0), '课表已被更新，请重新识别并核对后再导入。', 409);
+    }
     const lessons = parseTimetableResponse({ lessons: input.lessons });
-    const data = { lessons, fileName: textField(input, "fileName", 255, true), importedAt: timestamp(), source: "manual" };
+    const data = { lessons, fileName: textField(input, "fileName", 255, true), importedAt: timestamp(), source: input.source === 'photo' ? 'photo' : 'manual' };
     return table
       ? (yield* effect(repo.save(table, data)))
       : (yield* effect(repo.create("timetable", actor.id, data)));
