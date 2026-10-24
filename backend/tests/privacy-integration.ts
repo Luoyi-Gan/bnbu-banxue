@@ -29,6 +29,28 @@ const sql=async(text:string,args:unknown[]=[])=>{
 let server:ReturnType<typeof createApiServer>|undefined;
 try{
  if(db instanceof PostgresDatabase){await db.pool.query(`CREATE SCHEMA "${schema}"`);await db.migrate(postgresMigrations);await db.migrate(postgresMigrations);}
+ if(db instanceof PostgresDatabase){
+  const snapshot=await db.transaction(async c=>{
+   await c.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+   return (await c.query("SELECT current_setting('transaction_isolation') AS isolation,pg_backend_pid() AS pid")).rows[0];
+  });
+  check(snapshot.isolation==='repeatable read','snapshot readers can set isolation before their first query');
+  let failedPID=0;
+  await assert.rejects(db.transaction(async c=>{failedPID=(await c.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;throw Error('rollback barrier test');}));
+  const locks=await db.pool.query("SELECT 1 FROM pg_locks WHERE pid=ANY($1::int[]) AND locktype='advisory' AND classid=18422 AND objid=43",[[snapshot.pid,failedPID]]);
+  check(locks.rows.length===0,'privacy barrier is released after commit and rollback');
+  await db.pool.query('CREATE TABLE privacy_snapshot_probe(value INTEGER)');
+  let release!:()=>void,entered!:()=>void,readerEntered=false;
+  const started=new Promise<void>(r=>entered=r),hold=new Promise<void>(r=>release=r);
+  const writer=db.transaction(async c=>{await c.query('INSERT INTO privacy_snapshot_probe VALUES(1)');entered();await hold;},true);
+  await started;
+  const reader=db.transaction(async c=>{readerEntered=true;await c.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');return (await c.query('SELECT * FROM privacy_snapshot_probe')).rows.length;});
+  await new Promise(r=>setTimeout(r,30));const waited=!readerEntered;
+  release();await writer;
+  check(waited,'snapshot reader waits outside BEGIN for exclusive erasure');
+  check(await reader===1,'waiting snapshot sees data committed before the erasure barrier was released');
+ }
+
  const now=new Date().toISOString(),password='Delete-test-password-9';
  const addAccount=async(id:string,kind='PERSONAL')=>{
   await sql('INSERT INTO accounts(id,email,password_hash,name,roles,created_at,login_kind,login_name) VALUES(?,?,?,?,?,?,?,?)',[id,id+'@example.invalid',encodePassword(password),'Synthetic '+id,'[]',now,kind,kind==='ADMIN'?id:null]);

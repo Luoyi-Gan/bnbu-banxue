@@ -12,10 +12,14 @@ export class PostgresDatabase {
   async transaction<T>(operation: (client: PoolClient) => Promise<T>, privacyExclusive = false): Promise<T> {
     const client = await this.pool.connect();
     let broken = false;
+    let privacyLocked = false;
     try {
+      // Acquire the connection-level barrier BEFORE BEGIN. A query inside BEGIN
+      // prevents readers from setting their isolation level and can establish a
+      // repeatable-read snapshot before an in-progress erasure has committed.
+      await client.query(privacyExclusive ? 'SELECT pg_advisory_lock(18422,43)' : 'SELECT pg_advisory_lock_shared(18422,43)');
+      privacyLocked = true;
       await client.query('BEGIN');
-      // An erasure commits between other transactions, never halfway through their writes.
-      await client.query(privacyExclusive ? 'SELECT pg_advisory_xact_lock(18422,43)' : 'SELECT pg_advisory_xact_lock_shared(18422,43)');
       const result = await operation(client);
       await client.query('COMMIT');
       return result;
@@ -23,6 +27,12 @@ export class PostgresDatabase {
       try { await client.query('ROLLBACK'); } catch { broken = true; }
       throw error;
     } finally {
+      // Session locks survive COMMIT/ROLLBACK, so release on this same connection.
+      // Destroy it if unlocking fails; never return a locked client to the pool.
+      if (privacyLocked) {
+        try { await client.query(privacyExclusive ? 'SELECT pg_advisory_unlock(18422,43)' : 'SELECT pg_advisory_unlock_shared(18422,43)'); }
+        catch { broken = true; }
+      }
       client.release(broken);
     }
   }

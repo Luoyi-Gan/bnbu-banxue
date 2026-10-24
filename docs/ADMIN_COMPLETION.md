@@ -3255,3 +3255,8 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 - 本轮 4 个 Vitest 文件 44 项通过；PostgreSQL 隔离 schema 的 31 项检查通过，包括事务回滚、并发领取、重试、过期、停用、聊天隐私、分页、全量已读、HTTP 会话门禁与设备越权。transport 为测试替身，不代表 Apple 接受或真机收到。
 - iOS 增加原生通知中心/设备设置与 Live Activity 扩展；已完成模拟器通知点击及卡片布局验证。Watch mapper 868、handler 63、store 27 项断言与 native Web parity 通过。
 - 用户要求付费 Team ID/开发者权限稍后交接；目前未提供 APNs Key ID/Team ID/.p8，worker 明确 disabled。真实 Sandbox 投递、后台远程生命周期、真机/Watch 端到端仍待验收。配置与迁移说明见 docs/APNS_SETUP.md；iOS 对应 docs/NOTIFICATIONS_HANDOFF.md。
+
+
+## 2026-10-24 PR #1 合并复核
+
+发现并修复新增注销事务锁导致 PostgreSQL 工作区/社区读取无法设置隔离级别的阻塞问题。隐私屏障调整至 BEGIN 前，finally 释放，解锁失败销毁连接。新增四项真实 PostgreSQL 断言；SQLite 48、PostgreSQL 注销 63、类型检查通过。原跳过 PostgreSQL 文件实际执行 33 通过、7 失败，七项均在 e133966 基线复现，详见 PRIVACY_ACCOUNT_DELETION.md。本轮仅合并代码，不部署生产；本机正式预览容器仍是 schema 13。

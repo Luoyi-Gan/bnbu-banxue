@@ -15,7 +15,7 @@
 
 `privacy/plan.ts` 计算实体及依附记录，去掉其他队伍中的本人关系，单独处理全局 alumniState 的个人记录和依赖。外键挑战、入会能力、通知、审计/命令快照、个人问答、会话和推送均一并清理。派生 RAG 索引失效重建。不同用户独立创作的文本、平台外副本、独立学校与体育账户不被任意改写。
 
-PostgreSQL 所有 `PostgresDatabase.transaction` 取得共享隐私锁，注销取得独占锁，避免其他业务事务在扫描与删除之间插入遗漏数据。业务锁与图片锁沿用固定顺序。新增写入必须继续通过该事务封装；剩余 pool 直写仅更新邮件投递/推送任务状态或退出会话，不能创建账号数据。
+PostgreSQL 所有 `PostgresDatabase.transaction` 在 BEGIN 前取得连接级共享隐私锁，注销取得独占锁，避免其他业务事务在扫描与删除之间插入遗漏数据。COMMIT/ROLLBACK 后在同一连接解锁；解锁失败销毁连接，不放回连接池。这样保留读取接口在首条事务查询前设置隔离级别的能力，等待注销的 repeatable-read 也不会提前取得旧快照。业务锁与图片锁沿用固定顺序。新增写入必须继续通过该事务封装；剩余 pool 直写仅更新邮件投递/推送任务状态或退出会话，不能创建账号数据。
 
 图片仍被实体、审计或命令回执引用时保留。未引用对象进入 `privacy_object_gc`；API 进程启动及每 30 秒重试，失败增加 attempts，不打印对象内容或凭据。对象上传和 GC 共享锁，防止刚上传、尚未写引用的对象被误删。需监控队列数量、最老 queued_at 和 attempts；COS 版本历史/复制/外部备份不等同于当前对象删除，须按实际存储策略处理。SQLite 正常业务图片内联数据库，随记录删除。
 
@@ -43,3 +43,14 @@ Node 24：`node scripts/test-privacy.mjs`；真实 PostgreSQL 隔离随机 schem
 推送回归：`DATABASE_URL=本地测试库 node scripts/test-push-postgres.mjs`。对象与 HTTP 回归：`npx vitest run tests/object-store.test.ts tests/backend-http.test.ts`。前后端类型检查和 Web 构建须通过。
 
 全量 Vitest 本次观察到 503 通过、5 失败、39 跳过；在未修改的 e133966 临时副本独立复现相同 5 失败：`tests/sports-companion.test.tsx` 的 4 个语言/文案断言，`src/v2/sharedElementMotion.test.ts` 的 1 个滚动位置断言。本 PR 不将这些基线失败标为通过，也不改动无关体育页或动画行为。
+
+
+## 2026-10-24 合并前复核
+
+原 PR 的事务封装在 BEGIN 后先查询注销锁，破坏了 workspace、社区等读取接口的 `SET TRANSACTION ISOLATION LEVEL`；真实 PostgreSQL 读接口会报错，已作为阻塞合并问题修复。锁改为 BEGIN 前取得，提交/回滚后释放，失败连接销毁。新增隔离级别、提交/回滚解锁、读事务等待与新快照四项断言，注销 PostgreSQL 检查由 59 增至 63 项。
+
+启用原来因缺少 `BNBU_TEST_POSTGRES_URL` 而跳过的三个测试文件：修复后 33 通过、7 失败、0 跳过。七个失败在未改动的 e133966 副本、同一个隔离 PostgreSQL 实例独立复现；涉及旧身份迁移期待、图片测试账号身份、登录限流期待、验证码格式期待、社区 HTTP 测试数据、预约时段数量、学号检索身份。不能再把“39 跳过”概括为没有额外问题；这七项仍须在对外发布前核对业务/夹具并闭环。
+
+本轮 iOS 回执 7 项、评分规则 17 项、评分 HTTP 25 项、AppModel/Watch 73 项通过；iPhone/Watch/实时活动扩展 Release 无签名构建通过。无真实账号删除、无生产部署、无真实 APNs 投递。
+
+本机最终以 `vitest run --maxWorkers=4` 执行全量回归：503 通过、5 失败、39 跳过，五个失败与 e133966 对照一致。首次默认并发运行曾额外出现 5 个资源校验失败；这五个文件单独运行 12/12 通过，限制并发的全量运行亦通过，不能据首次结果认定资产丢失。真实 PostgreSQL 三个文件另外执行覆盖了原 39 个跳过项（加同文件一个普通单元测试），结果为上述 33/7。推送 PostgreSQL 31 项与后端构建通过。
