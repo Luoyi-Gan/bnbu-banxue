@@ -12,6 +12,6 @@ await build({
     emptyOutDir: true,
     minify: false,
     lib: { entry: { main: fileURLToPath(new URL('./main.ts', import.meta.url)), postgres: fileURLToPath(new URL('./postgres-main.ts', import.meta.url)), 'import-sqlite': fileURLToPath(new URL('./import-sqlite.ts', import.meta.url)) }, formats: ['es'], fileName: (_format, name) => `${name}.mjs` },
-    rollupOptions: { external: [/^node:/, 'pg', 'cos-nodejs-sdk-v5', 'imapflow', 'mailparser', 'sm-crypto', 'tencentcloud-sdk-nodejs-ocr'] },
+    rollupOptions: { external: [/^node:/, 'pg', 'cos-nodejs-sdk-v5', 'imapflow', 'mailparser', 'sm-crypto', 'tencentcloud-sdk-nodejs-ocr', 'sharp'] },
   },
 });

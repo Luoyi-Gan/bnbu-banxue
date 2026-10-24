@@ -28,7 +28,7 @@ import { postgresWorkspace } from './storage/postgres-workspace';
 import { postgresStudentSearch } from './storage/postgres-student-search';
 import { postgresPersonHover } from './storage/postgres-person-hover';
 import { checkSchoolIdentity } from './identity';
-import { recognize } from './timetable';
+import { recognize, reserveTimetableRecognition, type TimetableRecognizer } from './timetable';
 import { student } from './community';
 import {postgresOwnStudentIdentity,postgresRequestStudentIdentity,postgresListStudentIdentityRequests,postgresReviewStudentIdentity} from './storage/postgres-student-identity';
 import {postgresRequestPasswordReset,postgresCompletePasswordReset} from './storage/postgres-password-reset';
@@ -41,7 +41,7 @@ import { postgresAccountDirectory } from './storage/postgres-account-directory';
 import { postgresAdminEmailStatus, postgresAdminEmailRequest, postgresAdminEmailConfirm } from './storage/postgres-admin-email';
 import { recognizeActivityScreenshot, type ScreenshotRecognizer } from './activity-screenshot-ocr';
 
-export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'; screenshotRecognizer?:ScreenshotRecognizer} = {}) {
+export function createPostgresApiServer(db: PostgresDatabase, options: {localOutbox?:boolean; origins?:string[]; secureCookies?:boolean; surface?:'companion'|'sports'; screenshotRecognizer?:ScreenshotRecognizer; timetableRecognizer?:TimetableRecognizer} = {}) {
   demand(options.surface!=='sports','伴学不提供独立体育服务。',404);
   const auth = new PostgresAuth(db), mail = new PostgresEmail(db);
   const learningAuth=new LearningAuth(postgresLearningStore(db)),learning=new LearningService(learningAuth),ai=new CampusAI(postgresLearningStore(db));
@@ -121,7 +121,16 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           demand(actor.status!=='banned','账号已封禁。',403);
           const mustChange=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
           if(mustChange) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');
-          return send(response,200,await recognize(request));
+          const controller = new AbortController();
+          const closed = () => { if (!response.writableEnded) controller.abort(); };
+          response.once('close', closed);
+          try {
+            const result = await recognize(request, {
+              recognizer: options.timetableRecognizer, signal: controller.signal,
+              reserve: () => reserveTimetableRecognition(postgresLearningStore(db), actor.id, request.socket.remoteAddress || 'unknown'),
+            });
+            return send(response, 200, result);
+          } finally { response.off('close', closed); }
         }
         if(pathname==='/api/activity/screenshot/import') {
           const token=cookieToken(request) ?? '';

@@ -41,6 +41,11 @@ async function executeWithActor(db: PostgresDatabase, actorProvider: (client: Po
     await client.query('SELECT pg_advisory_xact_lock(18422,2)');
     const actor = await actorProvider(client);
     demand(actor.status!=='banned','账号已封禁，不能进行业务写入。',403);
+    // MIS persists under the LearningStore per-account lock. Take the same lock
+    // before reading a timetable, including the no-row case on first import.
+    if (action === 'timetable.save' || action === 'timetable.correct') {
+      await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [`learning:${actor.id}`]);
+    }
     const repo = new PostgresRepository(client);
     if(action==='post.view') return recordPostgresPostView(repo,actor,input);
     if(action!=='accounts.password.change' && passwordChangeRequired(await repo.all('companionIdentity'),actor)) throw new ServiceError(403,'PASSWORD_CHANGE_REQUIRED','请先修改本人初始密码，再继续操作。');

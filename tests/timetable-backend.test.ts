@@ -1,3 +1,4 @@
+import sharp from 'sharp';
 import { afterEach, expect, it, vi } from "vitest";
 import { createServer, type Server } from "node:http";
 import { createApiServer } from "../backend/src/main";
@@ -29,8 +30,9 @@ it("真实课表代理隔离外部错误，识别本身不覆盖原表且未授�
   vi.stubEnv("BNBU_TIMETABLE_UPSTREAM", upstream);
   vi.stubEnv("BNBU_TIMETABLE_TOKEN", "test-provider-key");
   const base = await listen(createApiServer(db));
+  const image = await sharp({create:{width:32,height:32,channels:3,background:"white"}}).png().toBuffer();
   const upload = (token?: string) => {
-    const body = new FormData(); body.append("image", new Blob([new Uint8Array([1,2,3])], {type: "image/png"}), "table.png");
+    const body = new FormData(); body.append("image", new Blob([Uint8Array.from(image)], {type: "image/png"}), "table.png");
     return fetch(base + "/api/timetable/recognize", {method: "POST", body, headers: token ? {Cookie: `bnbu_session=${token}`} : {}});
   };
   expect((await upload()).status).toBe(401); expect(calls).toBe(0);

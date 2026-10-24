@@ -16,7 +16,7 @@ export async function recognizeTimetable(file: File, signal: AbortSignal, onStag
   const body = new FormData(); body.append('image', file)
   onStage('recognizing')
   const response = await fetch(path, { method: 'POST', body, credentials: 'same-origin', signal })
-  if (!response.ok) throw new Error(response.status === 413 ? '图片过大，请缩小后重新上传。' : response.status === 401 || response.status === 403 ? '登录状态已失效，请重新登录后识别。' : '课表识别服务暂时不可用，请稍后重试。')
+  if (!response.ok) throw new Error(response.status === 422 ? '未能完整确定课程与星期，请上传清晰、完整的周课表或课程列表，原课表已保留。' : response.status === 429 ? '课表识别次数较多，请稍后再试。' : response.status === 413 ? '图片过大，请缩小后重新上传。' : response.status === 401 || response.status === 403 ? '登录状态已失效，请重新登录后识别。' : '课表识别服务暂时不可用，请稍后重试。')
   if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('课表识别接口尚未正确接入。')
   onStage('organizing')
   return parseTimetableResponse(await response.json())

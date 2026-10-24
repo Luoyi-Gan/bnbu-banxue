@@ -16,6 +16,7 @@ const keys=[
  'BNBU_STUDY_DEEPSEEK_KEY','DEEPSEEK_API_KEY','BNBU_STUDY_AI_PROVIDER',
  'BNBU_STUDY_AI_URL','BNBU_STUDY_AI_TOKEN','BNBU_SPORTS_BRIDGE_ORIGIN',
  'BNBU_SPORTS_BRIDGE_SECRET','BNBU_SPORTS_WEB_ORIGIN','BNBU_SPORTS_MODE',
+ 'BNBU_TIMETABLE_PROVIDER','BNBU_TIMETABLE_OCR_SECRET_ID','BNBU_TIMETABLE_OCR_SECRET_KEY','BNBU_TIMETABLE_OCR_REGION',
  'BNBU_TIMETABLE_UPSTREAM','BNBU_TIMETABLE_TOKEN',
  'BNBU_IDENTITY_VERIFICATION_URL','BNBU_IDENTITY_VERIFICATION_TOKEN',
 ];
@@ -33,7 +34,7 @@ try {
   for(const key of keys){assert.ok(!frontend.includes(configured[key]),'server configuration leaked into frontend');checks++;}
   const defaults=parse(base).services[service].environment;
   assert.equal(defaults.BNBU_SPORTS_MODE,'real');checks++;
-  for(const key of keys.filter(key=>key!=='BNBU_SPORTS_MODE')){assert.equal(defaults[key],'');checks++;}
+  for(const key of keys.filter(key=>key!=='BNBU_SPORTS_MODE')){assert.equal(defaults[key],key==='BNBU_TIMETABLE_OCR_REGION'?'ap-guangzhou':'');checks++;}
  }
  console.log(`Compose configuration: ${checks} checks passed; no containers started.`);
 } finally {await rm(directory,{recursive:true,force:true});}

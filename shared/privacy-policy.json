@@ -30,6 +30,12 @@
     "The deployed primary service is in Hong Kong. Configured email services (the current implementation supports AoKSend) process your recipient address and verification email. If Tencent Cloud COS is enabled, uploaded files are stored in the region configured by the operator; that region must be verified for deployment. When you use campus AI and agree to sharing, your question, relevant previous exchanges and authorized campus excerpts are sent to DeepSeek to generate an answer. Declining sharing leaves other campus features available. AMap, Apple, school, sports and AI services have their own processing rules; we provide data needed for the relevant feature."
   ],
   [
+    "课表照片识别",
+    "Timetable photo recognition",
+    "选择照片只在设备上预览。点击“同意并开始识别”后，所选课表照片经本平台服务器去除图片元数据、调整方向和尺寸，再发送至腾讯云 OCR 或部署时明确配置的识别服务，用于提取课程、星期、时间、地点、教师和周次；不会附带平台密码、会话凭证或账号资料。请避免上传无关个人信息。本平台不保存课表照片或完整识别原文，确认导入后仅保存课程字段及来源文件名。取消不会撤回已发给服务商的请求，但不会自动替换课表。服务商区域和处理规则应按实际部署核实，腾讯云识别默认配置区域为广州；拒绝分享可手工添加课程，学校 MIS 同步是另一独立功能。",
+    "Selecting a photo previews it on your device. After you agree to recognition, our server removes image metadata and adjusts orientation and size, then sends the selected timetable photo to Tencent Cloud OCR or the explicitly configured recognition service to extract courses, weekdays, times, locations, teachers and weeks. Platform passwords, session credentials and account details are not included. Avoid unrelated personal information. Our platform does not store timetable photos or the full raw OCR response. Only course fields and the source filename are saved after confirmation. Cancellation cannot recall a request already sent to the provider, but does not automatically replace your timetable. Provider regions and processing terms must be checked against deployment; the default Tencent OCR region is Guangzhou. You can enter courses manually without sharing a photo. School MIS synchronization is a separate feature."
+  ],
+  [
     "保存、注销与备份",
     "Retention, deletion and backups",
     "账号资料及校园记录在提供相应服务所需期间保留，或在你删除内容、注销账号时清除。iOS 个人账号可在“设置 → 账号与安全 → 永久注销账号”发起，未取得学生身份也可进入此入口。使用平台密码或专用邮箱验证码确认后，在线账号、登录会话、个人内容及关联记录会删除；本人创建的队伍、帖子及其依附消息、评论会一并删除，其他用户无关内容保留。无其他引用的上传文件进入持久清理队列并重试至成功，共享文件继续供仍有权使用的人访问。注销回执仅保存会话摘要和请求摘要，24小时后到期清理。为防止备份恢复已注销账号，保留账号标识的单向摘要及注销时间至相关历史备份不再可恢复。历史备份最长保存周期目前尚未核实；此项需由运营确认并更新，不能将在线删除理解为已同步清除所有历史备份。备份不得用于日常查询，恢复前须执行注销清单过滤。",
