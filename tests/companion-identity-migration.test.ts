@@ -32,7 +32,7 @@ it.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('upgrades a real PostgreSQL legac
  await admin.pool.query('CREATE SCHEMA '+schema);
  const db=new PostgresDatabase({connectionString:process.env.BNBU_TEST_POSTGRES_URL,options:'-c search_path='+schema});
  try {
-  await db.migrate(postgresMigrations.slice(0,-1));
+  await db.migrate(postgresMigrations.filter(migration=>migration.version<9));
   await db.pool.query(`INSERT INTO accounts(id,email,password_hash,name,roles,created_at) VALUES('person','migration@example.test','unchanged','学生','["student"]','now')`);
   await db.pool.query(`INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES
    ('allowed','sportsIdentity','person','{"role":"student","status":"verified","studentNumber":"20260001"}','now','now'),

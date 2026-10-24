@@ -133,14 +133,16 @@ describe('shared element navigation',()=>{
   expect(f.media.style.viewTransitionName).toBe('')
   expect(f.target.style.viewTransitionName).toBe('')
  })
- it('keeps the card at its original viewport position when content above changes height',async()=>{
+ it.each([['post:one',213],['shop:one',253],['organization:one',253]])('restores the correct return position for %s after content above changes height',async(key,expected)=>{
   const f=fixture(),{sharedElementTransition}=await import('./sharedElementMotion')
-  sharedElementTransition('post:one',()=>f.mount('detail'),{source:f.media as unknown as HTMLElement})
+  sharedElementTransition(key,()=>f.mount('detail'),{source:f.media as unknown as HTMLElement})
   await f.settle()
   f.media.getBoundingClientRect=()=>({width:100,height:100,top:60,bottom:160})
-  sharedElementTransition('post:one',()=>f.mount('list'),{reverse:true})
+  sharedElementTransition(key,()=>f.mount('list'),{reverse:true})
   await f.settle()
-  expect(f.scroll()).toBe(253)
+  // Posts close onto their existing feed at the saved offset. Routed shop and
+  // organization cards compensate for preceding layout changes instead.
+  expect(f.scroll()).toBe(expected)
   expect(f.root.dataset.sharedMotionResult).toBe('complete')
  })
  it('uses direct navigation and resets detail scroll for reduced motion',async()=>{

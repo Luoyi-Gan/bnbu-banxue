@@ -10,7 +10,7 @@
 | 封面与搭子互评 | 已完成（代码与本地验证） | iOS 评分规则 17、HTTP 25、Release 构建通过；真机相册/iCloud/弱网及多账号真实 PostgreSQL 流程待验 |
 | 课表照片识别 | 还需开发 / 提供现成服务 | `backend/src/timetable.ts` 仅转发 multipart image 至 `BNBU_TIMETABLE_UPSTREAM`，要求返回可被 `parseTimetableResponse` 解析的结构化课程。仓库未找到图片→课程结构的识别服务实现，当前运行容器未配置。若另有现成服务，需交接 URL/协议并用真实课表验通；否则补识别与结构化适配。腾讯云通用 OCR 开通不等于此项完成 |
 | MIS 课表、iSpace 学校连接 | 待配置部署 / 验收 | 已有学校登录与同步实现，是独立于照片 OCR 的路径；当前目标服务器真实账号闭环未取得证据，不应重写接口或宣布已验收 |
-| Docker 参数与邮件加载器 | 还需开发 | `compose.postgres.yaml` 缺少 AoKSend provider/key/模板/变量、DeepSeek、体育 bridge 参数透传；`scripts/configure-email.mjs` 缺 `BNBU_AOKSEND_DELETION_TEMPLATE_ID`。只在 `.env` 写值不会自动进入容器。独立覆盖配置可替代，但当前本机未发现这些服务已注入。旧 SQLite compose 也不是完整部署配置 |
+| Docker 参数与邮件加载器 | 已完成代码；待配置部署 | 2026-10-24 后续修复已补齐两套 Compose 的 AoKSend、DeepSeek、体育 bridge 等参数，以及邮件加载器的注销模板字段。128 项静态断言通过；实际连接值仍由部署者配置，当前运行容器未更新 |
 | migration 14、公开政策、注销专用模板 | 待配置部署 | 后端先发布，再发布客户端；确认 `/api/health` schema 14、公开政策地址、模板用途。Nginx 当前未单独代理 `/privacy`，可使用已有 `/v2/privacy`，或显式转发后验证 HTML |
 | 真实邮件 | 待配置部署 / 验收 | `docs/EMAIL_LOGIN.md` 记录 10 月 23 日另一套本地预览曾真实送达并登录。当前 Mac 容器未接入；注销模板新增且不能借用登录模板。对外环境必须关闭本地收件箱，分别验证注册/验证、登录、找回及注销用途 |
 | DeepSeek AI | 待配置部署 / 验收 | 实现完整；`docs/AI_KNOWLEDGE.md` 记录 4186 预览 2 次真实模型调用。当前容器 `BNBU_STUDY_DEEPSEEK_KEY` / `DEEPSEEK_API_KEY` 均未配置，不表示香港服务器同样没有配置 |
@@ -43,10 +43,14 @@
 5. 客户端连接目标 HTTPS，真机相册/iCloud/弱网、Watch 清理、真实 APNs/实时活动联调后再推进 TestFlight。
 
 
-## 本轮测试结论
+## PR 合并时测试结论（历史记录）
 
 - 后端最终全量：503 通过 / 5 既有失败 / 39 条件跳过（限制为 4 个 worker）。五项失败已在原 e133966 基线复现。
 - 将 PostgreSQL 条件补齐后，原跳过项所在三个文件：33 通过 / 7 失败 / 0 跳过；七项同样在原基线复现，不能算“全部通过”。其中未修改数据或用跳过隐藏失败。
 - 新增注销回归：SQLite 48，PostgreSQL 63；推送 PostgreSQL 31；后端类型检查与构建通过。
 - iOS：回执 7、评分规则 17、评分真实本地 HTTP 25、AppModel/Watch 73；iPhone/Watch/实时活动扩展 Release 无签名构建通过。
 - 本轮没有重复执行作者所有 UI 截图用例，也未做真实云端/设备验收；这些原 PR 证据与本次复测分别看待。
+
+## 后续修复完成（2026-10-24）
+
+Docker 透传和邮件加载器已补齐；上文 PR 合并时的 5 个 Web / 7 个 PostgreSQL 失败已逐项修复并复测。最新全量结果为 101 个文件、552 项通过，0 失败、0 跳过，替代旧基线失败结论。PostgreSQL 预约历史遗漏双方操作为实际代码缺陷，其他项按已有业务规则修正测试前置条件和旧预期。详见 [逐项修复与配置说明](DEPLOYMENT_REGRESSION_2026-10-24.md)。本次仍未部署生产或更新本机正式预览服务；实际服务器连接、照片识别服务、备份和真实设备验收保持待办。

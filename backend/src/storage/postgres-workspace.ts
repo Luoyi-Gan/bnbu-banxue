@@ -36,6 +36,12 @@ export async function postgresWorkspace(db: PostgresDatabase, token: string) {
       people:()=>people,
     };
     const audit=(await client.query<Fields>("SELECT id,actor_id,role,action,entity_id,reason,data,created_at FROM audit WHERE actor_id=$1 OR action IN ('room.create','room.decide','room.finish','room.moderate') OR ($2 AND action='notification.send') ORDER BY created_at DESC,sequence DESC LIMIT 2000",[actor.id,actor.roles.includes('superadmin')])).rows;
+    // Each party needs the complete booking timeline, including changes by the
+    // other party. Match the shared projection's operator/teacher/owner scope,
+    // keeping this separate from the actor-scoped general audit feed.
+    const operate=actor.roles.includes('operator') || actor.roles.includes('superadmin');
+    const coffeeIDs=entities.filter(entity=>entity.kind==='coffeeBooking' && (entity.ownerId===actor.id || (entity.data.teacherId===actor.id && actor.roles.includes('teacher')) || operate)).map(entity=>entity.id);
+    const coffeeAudit=coffeeIDs.length?(await client.query<Fields>("SELECT id,action,entity_id,reason,data,created_at FROM audit WHERE entity_id=ANY($1::text[]) AND action IN ('coffee.book','coffee.move','coffee.answer','coffee.cancel') ORDER BY created_at,sequence",[coffeeIDs])).rows:[];
     const allNotifications=(await client.query<Fields>('SELECT id,recipient_id,entity_id AS "entityId",event,body,target,created_at AS "createdAt",read_at AS "readAt" FROM notifications WHERE recipient_id=$1 ORDER BY created_at DESC LIMIT 100',[actor.id])).rows;
     const notifications=allNotifications.map(row=>({id:row.id,entityId:row.entityId,event:row.event,body:row.body,target:row.target,createdAt:row.createdAt,readAt:row.readAt}));
     const batchIds=audit.filter(row=>row.action==='notification.send').map(row=>String(row.entity_id));
@@ -47,7 +53,7 @@ export async function postgresWorkspace(db: PostgresDatabase, token: string) {
       repo,firstLoginOnly:passwordChangeRequired(repo.all('companionIdentity'),actor),studentNumber:number,
       sports:null,notifications,relations,
       audit:audit.slice(0,200),
-      coffeeHistory:id=>audit.filter(row=>row.entity_id===id && ['coffee.book','coffee.move','coffee.answer','coffee.cancel'].includes(String(row.action))).map(row=>{
+      coffeeHistory:id=>coffeeAudit.filter(row=>row.entity_id===id && ['coffee.book','coffee.move','coffee.answer','coffee.cancel'].includes(String(row.action))).map(row=>{
         const data=JSON.parse(String(row.data)) as {accepted?:boolean};
         return {id:row.id,action:row.action,reason:row.reason,at:row.created_at,...(row.action==='coffee.answer' && typeof data.accepted==='boolean' ? {accepted:data.accepted} : {})};
       }),

@@ -6,7 +6,7 @@
 
 - 复用现有 AoKSend 服务端适配，固定官方 v2 HTTPS 接口、表单提交及业务响应 `code=200` 校验。接口依据：[AoKSend 官方文档](https://www.aoksend.com/api.html)。浏览器只调用会同里的 `/api/auth/email-login/request` 与 `/api/auth/email-login`。
 - 当前过渡使用 AoKSend 官方“验证码邮件-3”的已启用副本；验证码变量为 `code`，补充的用户名/预留信息仅为固定平台说明，不发送额外本人身份信息。该模板没有与平台冲突的固定有效期文案。
-- `BNBU_AOKSEND_LOGIN_TEMPLATE_ID` 只选择登录模板，其他用途继续使用原 `BNBU_AOKSEND_TEMPLATE_ID`。不修改原体育和官网业务模板。
+- `BNBU_AOKSEND_LOGIN_TEMPLATE_ID` 只选择登录模板，注销使用独立的 `BNBU_AOKSEND_DELETION_TEMPLATE_ID`；注册、验证及找回密码继续使用原 `BNBU_AOKSEND_TEMPLATE_ID`。不修改原体育和官网业务模板。
 - 本机用户目录 `LocalAppData/BNBU-Companion/Email/connection.json` 保存私有配置，目录和文件 ACL 限当前用户读取。配置值不进入 Git、前端或证据报告。`BNBU_EMAIL_CONNECTION_FILE` 可指定另一受保护文件，明确环境变量优先。
 - `scripts/configure-email.mjs` 校验配置并关闭 `BNBU_LOCAL_OUTBOX`；真实体育预览启动器通过原 preview.mjs 自动调用。无配置仍为明确标识的本地开发收件箱，配置损坏时启动失败，避免静默退回。不得把开发收件箱成功描述为真实投递。
 
@@ -28,3 +28,10 @@
 - `.runtime/login-refresh/verification.json` 与手机393/320、桌面1440截图覆盖响应式、错误恢复、按邮箱冷却、数字输入、焦点、学校/管理入口和减少动态。此轮浏览器表单失败场景使用拦截响应，不外发邮件。
 - `.runtime/login-refresh/real-verification.json` 记录另一次真实验证：1封邮件发送已确认，用户收到后提交验证码，浏览器进入本人首页；数据库仅核对本人会话有效、挑战已消费和正文已清理。不保存验证码、完整邮箱或会话凭据到证据。
 - 独立视觉评审未发现阻塞问题；320宽照片标题对比不足已补充局部遮罩。邮件网页渲染检查不等同于所有实际邮件客户端排版验收。
+
+## 2026-10-24 注销模板与 Docker 配置补齐
+
+- `configure-email.mjs` 已载入注销专用模板字段，支持受保护 `connection.json` 和环境变量。环境变量优先，包括显式空值：清空模板不能再次从文件补回；清空必填 key 则校验失败。旧配置不强制增加注销模板，原登录功能可继续工作；没有注销模板时注销发信明确失败，不能回退到登录或通用模板。
+- 注销模板需在供应商后台创建并启用，正文明确“永久注销/永久删除”，有效期 10 分钟；验证码变量使用 `BNBU_AOKSEND_CODE_VARIABLE`。现有适配另提供 `minutes`、`username`、`userinfo` 等固定说明，不能只依赖模板 ID 判断用户已得到正确告知。本轮没有创建或验证真实供应商模板。
+- 两套 Compose 已显式透传邮件、AI 和体育连接参数。Docker 不会自动读取宿主机的 `connection.json`；当前容器直接从环境取值，必须提供部署环境文件或覆盖配置，并明确设置 `BNBU_LOCAL_OUTBOX=0`。
+- 参数列表、隔离验证命令及十二项失败修复说明见 [部署参数与回归修复](DEPLOYMENT_REGRESSION_2026-10-24.md)。本轮邮件发送测试使用替身，没有发送真实邮件、启动新服务版本或部署生产。

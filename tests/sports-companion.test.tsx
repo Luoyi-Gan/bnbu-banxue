@@ -1,6 +1,6 @@
 import { SportsPortal } from '../src/live/SportsPortal';
 import type { Workspace } from '../src/live/api';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { openDatabase } from '../backend/src/database';
@@ -12,7 +12,13 @@ import { V2Sports } from '../src/v2/V2Sports';
 import { TeacherSports } from '../src/v2/TeacherPortal';
 import * as workspaceBackend from '../src/v2/useWorkspaceBackend';
 
-afterEach(() => vi.restoreAllMocks());
+import {saveDevicePreferences} from '../src/v2/devicePreferences';
+
+beforeEach(() => {
+  vi.stubGlobal('localStorage', {getItem: () => null, setItem: vi.fn()});
+  saveDevicePreferences({language: 'zh'});
+});
+afterEach(() => { saveDevicePreferences({language: 'system'}); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 it('未配置真实体育源时不会展示伴学库残留的测试身份和运动数据', () => {
   const db=openDatabase(':memory:');

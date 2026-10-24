@@ -54,3 +54,23 @@ it('登录可使用独立模板，找回密码继续使用原模板', async () =
   expect(new URLSearchParams(send.mock.calls[0][1].body).get('template_id')).toBe('login-template')
   expect(new URLSearchParams(send.mock.calls[1][1].body).get('template_id')).toBe('test-template')
 })
+
+
+it('注销必须使用专用模板，不能回退到登录或通用模板', async () => {
+  provider()
+  vi.stubEnv('BNBU_AOKSEND_LOGIN_TEMPLATE_ID', 'login-template')
+  vi.stubEnv('BNBU_AOKSEND_DELETION_TEMPLATE_ID', '')
+  const send=vi.fn().mockImplementation(async()=>Response.json({code:200}))
+  vi.stubGlobal('fetch',send)
+  const deletion={...message,subject:'会同里账号注销验证码'}
+  await expect(deliverMessage(deletion,endpoint)).rejects.toThrow('永久注销')
+  expect(send).not.toHaveBeenCalled()
+  vi.stubEnv('BNBU_AOKSEND_DELETION_TEMPLATE_ID','deletion-template')
+  await deliverMessage(deletion,endpoint)
+  await deliverMessage({...message,subject:'会同里登录验证码'},endpoint)
+  await deliverMessage(message,endpoint)
+  expect(send.mock.calls.map(call=>new URLSearchParams(call[1].body).get('template_id'))).toEqual(['deletion-template','login-template','test-template'])
+  const data=JSON.parse(new URLSearchParams(send.mock.calls[0][1].body).get('data')!)
+  expect(data).toMatchObject({code:'123456',minutes:'10'})
+  expect(data.userinfo).toContain('永久删除')
+})

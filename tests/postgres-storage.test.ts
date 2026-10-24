@@ -42,8 +42,11 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   const schema = `test_${randomUUID().replaceAll('-', '')}`;
   let admin: Pool;
   let db: PostgresDatabase;
+  let objectRoot: string;
   beforeAll(async () => {
     vi.stubEnv('BNBU_EMAIL_DELIVERY_URL', '');
+    objectRoot=mkdtempSync(join(tmpdir(),'bnbu-pg-objects-'));
+    vi.stubEnv('BNBU_OBJECT_DIRECTORY', objectRoot);
     admin = new Pool({ connectionString: process.env.BNBU_TEST_POSTGRES_URL });
     await admin.query(`CREATE SCHEMA ${schema}`);
     db = new PostgresDatabase({ connectionString: process.env.BNBU_TEST_POSTGRES_URL, options: `-c search_path=${schema}` });
@@ -51,6 +54,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   });
   afterAll(async () => {
     vi.unstubAllEnvs();
+    if(objectRoot) rmSync(objectRoot,{recursive:true,force:true});
     await db?.close();
     if (admin) {
       try { await admin.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`); }
@@ -325,29 +329,30 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     } finally { await db.pool.query("UPDATE accounts SET roles='[]' WHERE id='password-admin'"); }
   });
   it('stores image bytes outside PostgreSQL and rolls the entity back on object write failure', async () => {
-    const root=mkdtempSync(join(tmpdir(),'bnbu-pg-objects-'));
-    const previous=process.env.BNBU_OBJECT_DIRECTORY;
-    process.env.BNBU_OBJECT_DIRECTORY=root;
+    const root=objectRoot;
     try {
+      for (const id of ['image-owner','image-viewer']) {
+        await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES($1,$2,$3,$1,$4,$5)',[id,id+'@example.test',hashPassword('Image-fixture-123'),new Date().toISOString(),'["student"]']);
+        await db.transaction(client=>new PostgresRepository(client).create('companionIdentity',id,{role:'student',status:'verified',source:'local-test-fixture'}));
+      }
       const image='data:image/png;base64,'+Buffer.from([137,80,78,71,1,2,3]).toString('base64');
-      const post=await db.transaction(client=>new PostgresRepository(client).create('post','state-person',{title:'私有待审图片',body:'test',board:'test',images:[image],status:'pending'}));
+      const post=await db.transaction(client=>new PostgresRepository(client).create('post','image-owner',{title:'私有待审图片',body:'test',board:'test',images:[image],status:'pending'}));
       const raw=(await db.pool.query('SELECT data FROM entities WHERE id=$1',[post.id])).rows[0].data;
       expect(raw).not.toContain('data:image');
       expect(raw).toContain('$bnbuStoredImage');
       expect((await db.transaction(client=>new PostgresRepository(client).get(post.id))).data.images).toEqual([image]);
-      const auth=new PostgresAuth(db),own=(await auth.login('state@example.test','State-test-123')).token;
-      const other=(await auth.login('password-manager','Changed-test-123')).token;
+      const auth=new PostgresAuth(db),own=(await auth.login('image-owner@example.test','Image-fixture-123')).token;
+      const other=(await auth.login('image-viewer@example.test','Image-fixture-123')).token;
       expect(JSON.stringify(await postgresCommunityView(db,other))).not.toContain(image);
       expect(JSON.stringify(await postgresCommunityView(db,own))).toContain(image);
-      await expect(db.transaction(client=>new PostgresRepository(client).create('post','state-person',{images:[{$bnbuStoredImage:'f'.repeat(64),contentType:'image/png'}]}))).rejects.toThrow('内部存储标识');
+      await expect(db.transaction(client=>new PostgresRepository(client).create('post','image-owner',{images:[{$bnbuStoredImage:'f'.repeat(64),contentType:'image/png'}]}))).rejects.toThrow('内部存储标识');
       const before=Number((await db.pool.query('SELECT count(*) FROM entities')).rows[0].count);
       process.env.BNBU_OBJECT_DIRECTORY=join(root,JSON.parse(raw).images[0].$bnbuStoredImage);
-      await expect(db.transaction(client=>new PostgresRepository(client).create('post','state-person',{images:[image]}))).rejects.toThrow();
+      await expect(db.transaction(client=>new PostgresRepository(client).create('post','image-owner',{images:[image]}))).rejects.toThrow();
       expect(Number((await db.pool.query('SELECT count(*) FROM entities')).rows[0].count)).toBe(before);
       await db.pool.query('DELETE FROM entities WHERE id=$1',[post.id]);
     } finally {
-      if(previous===undefined) delete process.env.BNBU_OBJECT_DIRECTORY; else process.env.BNBU_OBJECT_DIRECTORY=previous;
-      rmSync(root,{recursive:true,force:true});
+      process.env.BNBU_OBJECT_DIRECTORY=objectRoot;
     }
   });
   it('projects the student account directory without leaking login credentials', async () => {
@@ -555,11 +560,16 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.pool.query('UPDATE sessions SET expires_at=0 WHERE token_hash=$1',[digest(expired.token)]);
     await expect(auth.authenticate(expired.token)).rejects.toMatchObject({status:401});
   });
-  it('persists failed attempts across auth instances and never creates a session on failure', async () => {
-    const auth = new PostgresAuth(db);
-    for (let i=0;i<10;i++) await expect(auth.login('missing@example.test','wrong-password')).rejects.toMatchObject({status:401});
-    await expect(new PostgresAuth(db).login('missing@example.test','wrong-password')).rejects.toMatchObject({status:429});
-    expect((await db.pool.query('SELECT failures FROM login_attempts WHERE identifier=$1',['missing@example.test'])).rows[0].failures).toBe(10);
+  it('persists source login limits across auth instances without locking out other origins', async () => {
+    const identifier='login@example.test',origin='fixture-login-attacker';
+    const before=Number((await db.pool.query('SELECT count(*) FROM sessions')).rows[0].count);
+    for (let i=0;i<12;i++) await expect(new PostgresAuth(db).login(identifier,'wrong-password','PERSONAL',undefined,origin)).rejects.toMatchObject({status:401});
+    await expect(new PostgresAuth(db).login(identifier,'wrong-password','PERSONAL',undefined,origin)).rejects.toMatchObject({status:429});
+    expect(Number((await db.pool.query('SELECT count(*) FROM sessions')).rows[0].count)).toBe(before);
+    expect(Number((await db.pool.query("SELECT count(*) FROM security_rate_events WHERE category='login' AND subject=$1 AND origin=$2",[digest(identifier),digest(origin)])).rows[0].count)).toBe(12);
+    expect((await new PostgresAuth(db).login(identifier,'Postgres-test-123','PERSONAL',undefined,'fixture-legitimate-owner')).account.id).toBe('login-student');
+    await db.pool.query("UPDATE security_rate_events SET occurred_at=$1 WHERE category='login' AND origin=$2",[Date.now()-61_000,digest(origin)]);
+    await expect(new PostgresAuth(db).login(identifier,'wrong-password','PERSONAL',undefined,origin)).rejects.toMatchObject({status:401});
   });
   it('serializes email sending and registration, consumes a code once and never grants school roles', async () => {
     const mail = new PostgresEmail(db);
@@ -582,7 +592,10 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const email = 'wrong-code@example.test';
     await mail.sendVerification(email,true);
     const code = /\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1',[email])).rows[0].body)![0];
-    for(let i=0;i<5;i++) await expect(mail.register({email,code:'invalid',password:'Register-test-123'})).rejects.toThrow('验证码错误');
+    await expect(mail.register({email,code:'invalid',password:'Register-test-123'})).rejects.toThrow('六位验证码');
+    expect((await db.pool.query('SELECT attempts FROM email_challenges WHERE email=$1',[email])).rows[0].attempts).toBe(0);
+    const wrongCode=code==='000000'?'000001':'000000';
+    for(let i=0;i<5;i++) await expect(mail.register({email,code:wrongCode,password:'Register-test-123'})).rejects.toThrow('验证码错误');
     await expect(mail.register({email,code,password:'Register-test-123'})).rejects.toThrow('验证码已失效');
     expect((await db.pool.query('SELECT attempts FROM email_challenges WHERE email=$1',[email])).rows[0].attempts).toBe(5);
     const actor = await db.transaction(client=>new PostgresRepository(client).person('login-student'));
@@ -629,6 +642,12 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const command=(token:string,action:string,input:unknown,requestId=randomUUID())=>fetch(base+'/api/commands',{method:'POST',headers:{'Content-Type':'application/json',Cookie:`bnbu_session=${token}`},body:JSON.stringify({action,input,requestId})});
     const community=(token:string)=>fetch(base+'/api/community',{headers:{Cookie:`bnbu_session=${token}`}}).then(r=>r.json());
     try {
+      expect((await fetch(base+'/api/community',{headers:{Cookie:`bnbu_session=${viewer.token}`}})).status).toBe(403);
+      // Registration alone does not grant campus access; explicitly prepare a verified test student.
+      await db.transaction(async client=>{
+        await client.query('UPDATE accounts SET roles=$1 WHERE id=$2',['["student"]',viewer.account.id]);
+        await new PostgresRepository(client).create('companionIdentity',viewer.account.id,{role:'student',status:'verified',source:'local-test-fixture'});
+      });
       const requestId=randomUUID();
       const attempts=await Promise.all([command(student.token,'post.create',{title:'PG 帖子',body:'正文',board:'校园'},requestId),command(student.token,'post.create',{title:'PG 帖子',body:'正文',board:'校园'},requestId)]);
       expect(attempts.map(r=>r.status)).toEqual([200,200]);
@@ -682,7 +701,7 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
   it('preserves coffee capacity under concurrent booking, reserves both times until acceptance and releases cancellation', async () => {
     const auth = new PostgresAuth(db);
     const tokens: Record<string,string> = {};
-    for(const [id,role] of [['coffee-teacher','teacher'],['coffee-a','student'],['coffee-b','student']]) {
+    for(const [id,role] of [['coffee-teacher','teacher'],['coffee-a','student'],['coffee-b','student'],['coffee-operator','operator']]) {
       await db.pool.query('INSERT INTO accounts(id,email,password_hash,name,created_at,roles) VALUES($1,$2,$3,$1,$4,$5)',[id,`${id}@example.test`,hashPassword('Coffee-test-123'),new Date().toISOString(),JSON.stringify([role])]);
       tokens[id]=(await auth.login(`${id}@example.test`,'Coffee-test-123')).token;
     }
@@ -717,7 +736,13 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     const studentView=await postgresWorkspace(db,tokens[winner]);
     const unrelatedView=await postgresWorkspace(db,(await auth.login('review-pg@example.test','Review-postgres-123')).token);
     expect(teacherView.entities.find(e=>e.id===bookingId)?.data.status).toBe('cancelled');
-    expect(studentView.entities.find(e=>e.id===bookingId)?.data.history).toHaveLength(4);
+    const operatorView=await postgresWorkspace(db,tokens['coffee-operator']);
+    for (const view of [studentView,teacherView,operatorView]) {
+      const history=view.entities.find(e=>e.id===bookingId)?.data.history as Array<{action:string;accepted?:boolean;reason:string}>;
+      expect(history.map(row=>row.action)).toEqual(['coffee.book','coffee.move','coffee.answer','coffee.cancel']);
+      expect(history.find(row=>row.action==='coffee.move')?.reason).toBe('老师改期');
+      expect(history.find(row=>row.action==='coffee.answer')?.accepted).toBe(true);
+    }
     expect(unrelatedView.entities.some(e=>e.id===bookingId)).toBe(false);
     expect(unrelatedView.notifications.some(n=>n.entityId===bookingId)).toBe(false);
   });
@@ -846,6 +871,8 @@ describe.skipIf(!process.env.BNBU_TEST_POSTGRES_URL)('PostgreSQL persistence on 
     await db.pool.query("INSERT INTO accounts(id,email,password_hash,name,organization,created_at,roles) VALUES('search-person',$1,$2,'搜索学生','学院','now','[\"student\"]')",[email,hashPassword('Search-test-123')]);
     const target=await auth.login(email,'Search-test-123');
     const requester=(await auth.login('coffee-b@example.test','Coffee-test-123')).token;
+    await expect(postgresStudentSearch(db,requester,'20260001')).rejects.toMatchObject({status:403});
+    await db.transaction(client=>new PostgresRepository(client).create('companionIdentity','coffee-b',{role:'student',status:'verified',studentNumber:'20269999',source:'local-test-fixture'}));
     expect(await postgresStudentSearch(db,requester,'20260001')).toEqual({students:[]});
     await mail.sendVerification(email,true);
     const code=/\d{6}/.exec((await db.pool.query('SELECT body FROM mail_outbox WHERE recipient=$1',[email])).rows[0].body)![0];
