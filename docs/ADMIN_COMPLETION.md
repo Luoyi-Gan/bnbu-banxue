@@ -3277,3 +3277,11 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 验证证据：全量 Vitest 104 文件、590 项通过，0 失败/0 跳过（含独立 PostgreSQL 随机 schema）；新课表解析/SDK契约/HTTP/取消/并发覆盖/账号隔离/元数据测试；前后端类型检查、变更 lint、Web/后端构建；152 项 Compose 静态检查；Linux 生产镜像实际运行 sharp 的 WebP→JPEG 和 API 模块加载。iOS 模拟器系统选图→取消→重选→编辑→确认→重新进入课表通过，服务器独立回读保存字段；Web 浏览器也验证了草稿不覆盖和确认保存后刷新持久化。
 
 实现与部署参数：`docs/TIMETABLE_RECOGNITION.md`。本轮云 OCR 使用替身，无真实 Tencent 密钥调用、生产部署或真机验收；需配置启用表格识别的专用密钥、核实区域及额度，再用获得授权的真实课表验收准确率。学校 MIS 同步不能替代该项验收。没有新增数据库迁移，沿用最新 schema 14。
+
+## 2026-10-24 课表照片识别 PR #2 / iOS PR #8 合并复核
+
+- 对原后端 PR 复跑全量 590 项通过；新增边界测试复现首次照片确认/MIS 同时建表与 AM/PM、中文时段被误读为凌晨的问题，再修复并回归。
+- PostgreSQL 课表保存及修正获取与 MIS 相同的本人写入锁，覆盖首份课表不存在时的竞态。未支持的时段写法留空并保留备注，不以错误的 24 小时制生成课程提醒。新增 7 项回归，含真实 PostgreSQL 受控交错、课程列表及周课表时段处理。
+- 最终后端全量 104 文件、597 项通过，0 失败、0 跳过；Compose 152 项、前后端类型检查、变更 lint、Web/后端构建通过。一次与 Xcode 编译并行的全量运行出现 3 项旧用例 5 秒超时，编译结束后按原配置重跑通过，未放宽超时或跳过断言。
+- iOS 原 PR head f787da1 复核：业务 smoke、AppModel/Watch handler 76 项断言、iPhone/配套 Watch/实时活动 Release 无签名构建通过；独立 iOS 26.5 模拟器 TimetableImportUITests 1 项通过、0 失败、0 跳过，覆盖系统选图、取消、重复选择、编辑、保存和重进页面持久化，已查看核对与确认页面截图。
+- 本机证据：/tmp/review-ocr-final-rerun.json、/tmp/review-pr8-ui.xcresult、/tmp/review-pr8-ui-images。照片、账号和云 OCR 均为合成/替身，未调用真实腾讯云，未部署生产或更新既有预览。真实照片准确率、真机 HEIC/iCloud、弱网、Watch 配对同步与云服务配置仍待验收。

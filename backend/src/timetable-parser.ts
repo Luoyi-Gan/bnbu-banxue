@@ -16,9 +16,15 @@ export function timetableWeekday(text: string): number | undefined {
   const day = english.findIndex(name => new RegExp(`^${name}\\.?(?:\\(?\\d{1,2}[/.-]\\d{1,2}\\)?)?$`, 'i').test(value));
   return day < 0 ? undefined : day + 1;
 }
+function hasMeridiem(raw: string) {
+  return /(?:(?<![a-z])[ap]\.?m\.?(?![a-z])|凌晨|早上|早晨|上午|中午|下午|傍晚|晚上|夜间)/i.test(clean(raw));
+}
 function timeRange(raw: string): [string, string] | undefined {
+  // Only unqualified 24-hour clocks are supported. Do not drop AM/PM or a
+  // Chinese daypart and turn an afternoon class into a morning reminder.
   const value = clean(raw), matches = [...value.matchAll(/(?<!\d)(\d{1,2}):([0-5]\d)\s*(?:-|–|—|~|至|到)\s*(\d{1,2}):([0-5]\d)(?!\d)/g)];
   if (matches.length > 1) throw fail();
+  if (hasMeridiem(raw)) return;
   if (matches.length !== 1) return;
   const m = matches[0], start = `${m[1].padStart(2, '0')}:${m[2]}`, end = `${m[3].padStart(2, '0')}:${m[4]}`;
   if (+m[1] > 23 || +m[3] > 23 || end <= start) throw fail();
@@ -42,9 +48,10 @@ function details(raw: string) {
       else if (/教师|老师|teacher|instructor/.test(key)) result.teacher = value;
       else if (/周次|week/.test(key)) result.weeks = value;
       else if (/节次|period/.test(key)) result.period = value;
-      else if (/时间|time/.test(key)) { const time = timeRange(value); if (time) [result.startTime, result.endTime] = time; else rest.push(line); }
+      else if (/时间|time/.test(key)) { const time = timeRange(value); if (time) [result.startTime, result.endTime] = time; else result.note = [result.note, line].filter(Boolean).join('\n'); }
       else result.note = value;
-    } else if (timeRange(line) && /^\d/.test(line)) [result.startTime, result.endTime] = timeRange(line)!;
+    } else if (hasMeridiem(line) && /\d{1,2}:\d{2}/.test(line)) result.note = [result.note, line].filter(Boolean).join('\n');
+    else if (timeRange(line) && /^\d/.test(line)) [result.startTime, result.endTime] = timeRange(line)!;
     else if (/^(?:第?\s*\d+(?:\s*[-–—~,、]\s*\d+)*\s*周(?:\s*[（(]?[单双]周?[）)]?)?|[单双]周|weeks?\s+\d.*)$/i.test(line)) result.weeks = line;
     else if (period(line) === line) result.period = line;
     else if (/^[A-Za-z]{1,5}\d?[-－]\d{2,4}[A-Za-z]?$/.test(line)) result.location = line;
@@ -106,6 +113,10 @@ function gridLessons(cells: TimetableCell[]): Record<string, unknown>[] {
       const first = labels.filter(c => c.RowTl === cell.RowTl).map(c => timeRange(c.Text)).filter(Boolean);
       const last = labels.filter(c => c.RowBr === cell.RowBr).map(c => timeRange(c.Text)).filter(Boolean);
       if (first.length === 1 && last.length === 1) [value.startTime, value.endTime] = [first[0]![0], last[0]![1]];
+    }
+    if (!value.startTime && !value.endTime) {
+      const unresolved = labels.filter(c => hasMeridiem(c.Text) && /\d{1,2}:\d{2}/.test(c.Text)).map(c => clean(c.Text));
+      value.note = [value.note, ...new Set(unresolved)].filter(Boolean).join('\n');
     }
     if (!value.period) value.period = labels.map(c => period(c.Text)).filter(Boolean).join('、');
     lessons.push({ ...value, weekday: timetableWeekday(columns[0].Text) });

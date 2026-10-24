@@ -61,6 +61,21 @@ describe('OCR table geometry to timetable', () => {
   it('rejects a list row without a weekday instead of silently dropping it', () => {
     expect(() => parse([cell(0, 0, 'Course'), cell(0, 1, 'Day'), cell(1, 0, 'Math')])).toThrow();
   });
+  it.each(['2:00-3:00 PM','2:00-3:00PM','2:00-3:00p.m.','下午2:00-3:00'])('does not silently turn meridiem time %s into a morning class', time => {
+    const rows = [['Course','Day','Time'],['English','Monday',time]];
+    const lessons = parse(rows.flatMap((row,r)=>row.map((text,c)=>cell(r,c,text))));
+    expect(lessons[0]).toMatchObject({startTime:'',endTime:'',note:time,needsReview:true});
+  });
+  it('keeps unresolved daypart labels in weekly-grid notes and still rejects multiple time blocks', () => {
+    const cells=grid(); cells[4].Text='下午2:00-3:00'; cells[5].Text='下午3:00-4:00';
+    expect(parse(cells)[0]).toMatchObject({startTime:'',endTime:'',note:'下午2:00-3:00\n下午3:00-4:00'});
+    cells[6].Text='English\n09:00-10:00\n2:00-3:00 PM';
+    expect(()=>parse(cells)).toThrow();
+  });
+  it('does not mistake an unresolved time line for the course name', () => {
+    const cells=grid(); cells[6].Text='Time: 2:00-3:00 PM\nEnglish';
+    expect(parse(cells)[0]).toMatchObject({name:'English',note:'Time: 2:00-3:00 PM'});
+  });
   it('rejects malformed geometry and oversized responses', () => {
     expect(() => parse([{ ...grid()[0], RowBr: 0 }])).toThrow();
     expect(() => parse(Array.from({ length: 2501 }, () => grid()[0]))).toThrow();

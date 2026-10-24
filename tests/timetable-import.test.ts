@@ -13,6 +13,8 @@ import { execute } from '../backend/src/commands';
 import { executePostgres } from '../backend/src/storage/postgres-commands';
 import { type TimetableTable } from '../backend/src/timetable-parser';
 import { reserveTimetableRecognition } from '../backend/src/timetable';
+import { LearningAuth } from '../backend/src/learning-auth';
+import { persistMisTable } from '../backend/src/school-sync';
 import { sqliteLearningStore, postgresLearningStore, type LearningStore } from '../backend/src/learning-store';
 const cells = [['Course', 'Day', 'Time', 'Weeks'], ['Algorithms', 'Monday', '08:00-09:40', '1-16']].flatMap((row, r) => row.map((Text, c) => ({ RowTl: r, RowBr: r+1, ColTl: c, ColBr: c+1, Text })));
 for (const storage of ['sqlite', 'postgres']) describe.skipIf(storage === 'postgres' && !process.env.BNBU_TEST_POSTGRES_URL)(`${storage} timetable photo contract`, () => {
@@ -87,6 +89,30 @@ for (const storage of ['sqlite', 'postgres']) describe.skipIf(storage === 'postg
     await command(other,'timetable.save',{lessons:[{name:'Newly edited',weekday:2}]});
     await expect(command(other,'timetable.save',{...input,expectedTableId:'',expectedVersion:0})).rejects.toMatchObject({status:409});
     expect((await table(other)).data.lessons[0].name).toBe('Newly edited');
+  });
+  if (storage === 'postgres') it('serializes first photo confirmation with MIS creating the first timetable', async () => {
+    let release!: () => void, reached!: () => void;
+    const gate = new Promise<void>(resolve => { release = resolve; });
+    const selected = new Promise<void>(resolve => { reached = resolve; });
+    const paused: LearningStore = { transaction: (key, fn) => store.transaction(key, sql => fn({ ...sql,
+      rows: async <T,>(query: string, params?: unknown[]) => {
+        const rows = await sql.rows<T>(query, params);
+        if (query.includes("kind='timetable'")) { reached(); await gate; }
+        return rows;
+      },
+    })) };
+    const account = (await workspace(other)).account;
+    const lesson = {id:'mis-review',name:'MIS course',weekday:2,startTime:'10:00',endTime:'11:00',period:'',location:'',teacher:'',weeks:'',note:'',needsReview:false};
+    const syncing = persistMisTable(new LearningAuth(paused), account, {semester:'Test',lessons:[lesson],courseCount:1},new Date().toISOString());
+    await selected;
+    const saving = command(other,'timetable.save',{lessons:[{name:'Photo',weekday:1}],source:'photo',expectedTableId:'',expectedVersion:0});
+    // Observe the result immediately to avoid an unhandled rejection after releasing MIS.
+    const outcome = saving.then(value => ({value,status:200}),error => ({status:error.status}));
+    await new Promise(resolve=>setTimeout(resolve,50));
+    release(); await syncing;
+    expect(await outcome).toMatchObject({status:409});
+    const tables = (await workspace(other)).entities.filter((e:{kind:string})=>e.kind==='timetable');
+    expect(tables).toHaveLength(1); expect(tables[0].data.source).toBe('mis');
   });
   it('blocks unauthenticated, nonstudent and cross-site uploads before invoking OCR', async () => {
     expect((await upload(undefined,'image/png','invalid')).status).toBe(401);
