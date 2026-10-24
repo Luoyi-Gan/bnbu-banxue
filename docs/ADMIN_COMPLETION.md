@@ -1904,7 +1904,7 @@ alumniCommand 提取为两数据库共用 alumniPolicy，复用原校友状态�
 已等候原构建完成，再次构建纳入原子硬链接及 COS 启动预检修复。三容器健康启动，增强 docker-postgres-smoke.mjs 实测通过：头像提交成功、实体 JSON 仅存内部引用、重启 PostgreSQL 和 API 后工作台完整读回原头像；同时注册、登录、设置与退出链路通过。使用本地私有对象卷，非真实 COS 云联通。继续排查未迁移体育工作台/账号目录等页面调用；不将容器启动和此组冒烟测试当作三端全部功能完成。
 
 ### PostgreSQL 学生教师只读账号目录
-提取 projectAccountDirectory 共用字段投影、学期成员状态推导、筛选和分页；PostgreSQL 接通 /api/sports/accounts/students 与 teachers，保留 ACCOUNTS 权限、首改及维护门禁。原账号目录 4 项与 PostgreSQL 30 项回归通过；补充实际 PostgreSQL 权限拒绝、未入班 PENDING、未核验邮箱隐藏及非法状态筛选场景后 PostgreSQL 31 项通过。服务端类型检查与接口 lint 通过，UI 未改。
+提取 projectAccountDirectory 共用字段投影、学期成员状态推导、筛选和分页；PostgreSQL 接通 /api/sports/accounts/students 与 teachers，保留 ACCOUNTS 权限、首改及维护门禁。原账号目录 4 项与 PostgreSQL 31 项回归通过；补充实际 PostgreSQL 权限拒绝、未入班 PENDING、未核验邮箱隐藏及非法状态筛选场景后 PostgreSQL 31 项通过。服务端类型检查与接口 lint 通过，UI 未改。
 
 ### 实际路由核对与邮件拆分原子性
 核对 App/V2App/ConnectedApp 后确认：旧 LiveSports 和 SportsPortalClassic 无实际导入，但当前 SportsPortal 使用 SportsDashboard，学生 V2Sports 仍嵌入 /student/index.html，其协议为 /api/v1。这与文档顶部最新仅快捷跳转决定及本轮不改 UI 要求存在冲突，已向用户以大白话询问；相关页面暂不自行更改。独立推进邮件拆分 PostgreSQL 验证：第二条活动无效时首条活动和子邮件全部回滚，修正后生成两条活动。32 项 PostgreSQL 测试通过。
@@ -3244,6 +3244,6 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 - PostgreSQL 增量迁移 13 增加通知目标、设备绑定、实时活动绑定与事务 outbox；已在本机原数据卷应用，健康检查 schemaVersion=13。未部署生产。
 - 通知分页/正文/全量已读接口保持本人会话边界；私信补齐目标。队伍聊天独立事件只推摘要，不产生额外站内通知。旧 SQLite 业务回归保持通过。
 - 30 秒调度复用 Web 课表和校历，生成已核对课程、本人公开活动及已确认预约；提醒默认 15/30 分钟、实时活动提前 15 分钟单项选择。失效、已读、取消、过期、权限和偏好在投递前复核。
-- 本轮 4 个 Vitest 文件 44 项通过；PostgreSQL 隔离 schema 的 30 项检查通过，包括事务回滚、并发领取、重试、过期、停用、聊天隐私、分页、全量已读、HTTP 会话门禁与设备越权。transport 为测试替身，不代表 Apple 接受或真机收到。
+- 本轮 4 个 Vitest 文件 44 项通过；PostgreSQL 隔离 schema 的 31 项检查通过，包括事务回滚、并发领取、重试、过期、停用、聊天隐私、分页、全量已读、HTTP 会话门禁与设备越权。transport 为测试替身，不代表 Apple 接受或真机收到。
 - iOS 增加原生通知中心/设备设置与 Live Activity 扩展；已完成模拟器通知点击及卡片布局验证。Watch mapper 868、handler 63、store 27 项断言与 native Web parity 通过。
 - 用户要求付费 Team ID/开发者权限稍后交接；目前未提供 APNs Key ID/Team ID/.p8，worker 明确 disabled。真实 Sandbox 投递、后台远程生命周期、真机/Watch 端到端仍待验收。配置与迁移说明见 docs/APNS_SETUP.md；iOS 对应 docs/NOTIFICATIONS_HANDOFF.md。

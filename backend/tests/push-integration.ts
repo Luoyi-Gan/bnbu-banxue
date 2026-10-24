@@ -74,6 +74,9 @@ try{
  const liveSent=sent.length;
  await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','unbind',device));
  await deliverPush(db,transport);check(sent.length===liveSent,'unbind cancels remaining delivery');
+ await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',{...liveDevice,token:''}));
+ await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',{...liveDevice,token:'',installationID:randomUUID(),installationSecret:randomUUID()}));
+ check((await db.pool.query("SELECT count(*) FROM push_devices WHERE enabled AND push_start_token=$1",[liveDevice.pushStartToken])).rows[0].count==='1','reinstallation rebinds remote start token without alert permission');
  const server=createPostgresApiServer(db);
  await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
  try {

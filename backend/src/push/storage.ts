@@ -56,11 +56,15 @@ export async function pushDeviceRequest(client:PoolClient,actor:Account,session:
   demand(['notDetermined','denied','authorized','provisional','ephemeral'].includes(String(input.authorization)),'通知权限无效。');
   let settings:PushSettings;try{settings=validateSettings((input.settings??defaultPushSettings) as Fields);}catch{demand(false,'提醒设置无效。');}
   settings.pushInputToken=input.supportsPushInputToken===true;
-  const pushToken=token(input.token);
+  const pushToken=token(input.token),startToken=token(input.pushStartToken);
+  if(startToken){
+   await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',['push-start:'+input.environment+':'+startToken]);
+   await client.query('UPDATE push_devices SET enabled=false,token=NULL,push_start_token=NULL WHERE push_start_token=$1 AND environment=$2 AND id<>$3',[startToken,input.environment,id]);
+  }
   if(old&&(old.account_id!==actor.id||old.session_hash!==digest(session))){await client.query("UPDATE push_outbox SET status='cancelled' WHERE device_id=$1 AND status IN ('pending','sending')",[id]);await client.query('DELETE FROM push_live_bindings WHERE device_id=$1',[id]);}
   // A reinstall can produce a new installation ID for the same APNs token.
   if(pushToken)await client.query('UPDATE push_devices SET enabled=false,token=NULL WHERE token=$1 AND environment=$2 AND id<>$3',[pushToken,input.environment,id]);
-  await client.query(`INSERT INTO push_devices(id,secret_hash,account_id,session_hash,token,environment,language,authorization_status,settings,push_start_token) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(id) DO UPDATE SET account_id=EXCLUDED.account_id,session_hash=EXCLUDED.session_hash,token=EXCLUDED.token,environment=EXCLUDED.environment,language=EXCLUDED.language,authorization_status=EXCLUDED.authorization_status,settings=EXCLUDED.settings,push_start_token=EXCLUDED.push_start_token,enabled=true,updated_at=now()`,[id,digest(secret),actor.id,digest(session),pushToken,input.environment,input.language==='en'?'en':'zh',input.authorization,JSON.stringify(settings),token(input.pushStartToken)]);
+  await client.query(`INSERT INTO push_devices(id,secret_hash,account_id,session_hash,token,environment,language,authorization_status,settings,push_start_token) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(id) DO UPDATE SET account_id=EXCLUDED.account_id,session_hash=EXCLUDED.session_hash,token=EXCLUDED.token,environment=EXCLUDED.environment,language=EXCLUDED.language,authorization_status=EXCLUDED.authorization_status,settings=EXCLUDED.settings,push_start_token=EXCLUDED.push_start_token,enabled=true,updated_at=now()`,[id,digest(secret),actor.id,digest(session),pushToken,input.environment,input.language==='en'?'en':'zh',input.authorization,JSON.stringify(settings),startToken]);
   // Persist user/system removals across session renewal and offline callbacks.
   const suppressed=Array.isArray(input.suppressedOccurrences)?input.suppressedOccurrences.filter((v):v is string=>typeof v==='string'&&v.length<=200).slice(-200):[];
   if(suppressed.length)for(const item of await loadAgenda(client,actor.id)){
