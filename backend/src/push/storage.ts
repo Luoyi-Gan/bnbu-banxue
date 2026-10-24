@@ -61,7 +61,7 @@ export async function pushDeviceRequest(client:PoolClient,actor:Account,session:
    await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',['push-start:'+input.environment+':'+startToken]);
    await client.query('UPDATE push_devices SET enabled=false,token=NULL,push_start_token=NULL WHERE push_start_token=$1 AND environment=$2 AND id<>$3',[startToken,input.environment,id]);
   }
-  if(old&&(old.account_id!==actor.id||old.session_hash!==digest(session))){await client.query("UPDATE push_outbox SET status='cancelled' WHERE device_id=$1 AND status IN ('pending','sending')",[id]);await client.query('DELETE FROM push_live_bindings WHERE device_id=$1',[id]);}
+  if(old&&(old.account_id!==actor.id||old.session_hash!==digest(session)||old.environment!==input.environment)){await client.query("UPDATE push_outbox SET status='cancelled' WHERE device_id=$1 AND status IN ('pending','sending')",[id]);await client.query('DELETE FROM push_live_bindings WHERE device_id=$1',[id]);}
   // A reinstall can produce a new installation ID for the same APNs token.
   if(pushToken)await client.query('UPDATE push_devices SET enabled=false,token=NULL WHERE token=$1 AND environment=$2 AND id<>$3',[pushToken,input.environment,id]);
   await client.query(`INSERT INTO push_devices(id,secret_hash,account_id,session_hash,token,environment,language,authorization_status,settings,push_start_token) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(id) DO UPDATE SET account_id=EXCLUDED.account_id,session_hash=EXCLUDED.session_hash,token=EXCLUDED.token,environment=EXCLUDED.environment,language=EXCLUDED.language,authorization_status=EXCLUDED.authorization_status,settings=EXCLUDED.settings,push_start_token=EXCLUDED.push_start_token,enabled=true,updated_at=now()`,[id,digest(secret),actor.id,digest(session),pushToken,input.environment,input.language==='en'?'en':'zh',input.authorization,JSON.stringify(settings),startToken]);
@@ -87,7 +87,7 @@ export async function pushDeviceRequest(client:PoolClient,actor:Account,session:
    await client.query(`INSERT INTO push_live_bindings(device_id,occurrence_id,activity_id,token,version,state,content,started_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(device_id,occurrence_id) DO UPDATE SET activity_id=EXCLUDED.activity_id,token=EXCLUDED.token,state=CASE WHEN push_live_bindings.state IN ('dismissed','ended','ending') THEN push_live_bindings.state ELSE EXCLUDED.state END,updated_at=now()`,[id,occurrenceID,String(input.activityID??'').slice(0,200),token(input.token),occurrence?.version??binding.version,state,JSON.stringify(occurrence??binding.content),Math.floor(Date.now()/1000)]);
   }else demand(false,'接口不存在。',404);
  }
- return {configured:apnsConfigured(),agenda:action==='unbind'?[]:await loadAgenda(client,actor.id)};
+ return {configured:apnsConfigured((action==='register'?input.environment:old.environment) as PushDevice['environment']),agenda:action==='unbind'?[]:await loadAgenda(client,actor.id)};
 }
 export async function readNotices(client:PoolClient,actor:Account,query:URLSearchParams){
  const category=query.get('category')??'全部',unread=query.get('unread')==='1',cursor=query.get('cursor');let after=['9999',''];

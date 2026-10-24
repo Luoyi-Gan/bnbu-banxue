@@ -1,0 +1,20 @@
+# Optional dual-environment overlay for compose.postgres.yaml.
+# Set KEY_FILE to protected host paths and KEY_ID/TEAM_ID in a private env file.
+services:
+  api:
+    environment:
+      APNS_SANDBOX_KEY_PATH: /run/secrets/apns-sandbox.p8
+      APNS_PRODUCTION_KEY_PATH: /run/secrets/apns-production.p8
+    volumes:
+      - type: bind
+        source: ${APNS_SANDBOX_KEY_FILE:?Set APNS_SANDBOX_KEY_FILE to an absolute private key path}
+        target: /run/secrets/apns-sandbox.p8
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${APNS_PRODUCTION_KEY_FILE:?Set APNS_PRODUCTION_KEY_FILE to an absolute private key path}
+        target: /run/secrets/apns-production.p8
+        read_only: true
+        bind:
+          create_host_path: false
