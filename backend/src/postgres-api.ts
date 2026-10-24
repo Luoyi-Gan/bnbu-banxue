@@ -1,3 +1,7 @@
+import {servePrivacy} from './privacy/policy';
+import {startPrivacyGC} from './privacy/object-gc';
+import {AccountDeletion} from './privacy/service';
+import {forgetMovementAccount} from './movement-native';
 import {pushDeviceRequest,readNotices} from './push/storage';
 import {movementNative} from './movement-native';
 import {movementRequest} from './movement';
@@ -45,10 +49,13 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
   const cookieName='bnbu_session';
   const cookieToken=(request:Parameters<typeof readCookieToken>[0])=>readCookieToken(request,cookieName);
   const cookie = (token: string, age: number) => `${cookieName}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${age}${options.secureCookies ? '; Secure' : ''}`;
-  return createServer(async (request,response) => {
+  const deletion=new AccountDeletion(db);
+  const stopGC=startPrivacyGC(db);
+  const server=createServer(async (request,response) => {
     try {
       const requestUrl = new URL(request.url ?? '/', 'http://localhost');
       const pathname = requestUrl.pathname;
+      if(servePrivacy(request,response,requestUrl))return;
       const noticeDetail=request.method==='GET' && /^\/api\/notifications\/([^/]+)$/.exec(pathname);
       if(noticeDetail)return send(response,200,await db.transaction(async client=>{const actor=await auth.authenticate(cookieToken(request),client);demand(actor.status!=='banned'&&!passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor),'当前账号不可读取通知。',403);const rows=(await client.query('SELECT id,entity_id AS "entityId",event,body,created_at AS "createdAt",read_at AS "readAt",target FROM notifications WHERE id=$1 AND recipient_id=$2',[decodeURIComponent(noticeDetail[1]),actor.id])).rows;demand(rows.length,'通知不存在。',404);return {notifications:rows};}));
       if(request.method==='GET'&&pathname==='/api/notifications')return send(response,200,await db.transaction(async client=>{const actor=await auth.authenticate(cookieToken(request),client);demand(actor.status!=='banned'&&!passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor),'当前账号不可读取通知。',403);return readNotices(client,actor,requestUrl.searchParams);}));
@@ -126,6 +133,17 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,token,'screenshot.import',{image:image.image,recognizedText:image.text,ocrRequestId:image.requestId},randomUUID())});
         }
         const input = await body(request);
+        if(pathname==='/api/account/deletion/request'){
+          demand(Object.keys(input).length===0,'注销验证码只能发送至本人绑定邮箱。');
+          return send(response,200,await deletion.request(cookieToken(request)??'',request.socket.remoteAddress??'unknown',options.localOutbox===true));
+        }
+        if(pathname==='/api/account/deletion/confirm'){
+          const result=await deletion.confirm(cookieToken(request)??'',input,request.socket.remoteAddress??'unknown');
+          if(result.erasedAccountID){learningAuth.forgetAccount(result.erasedAccountID);forgetMovementAccount(result.erasedAccountID);}
+          response.setHeader('Set-Cookie',cookie('',0));
+          return send(response,200,{deleted:result.deleted,requestId:result.requestId,completedAt:result.completedAt});
+        }
+
         if(pathname.startsWith('/api/push/'))return send(response,200,await db.transaction(async client=>{
           const actor=await auth.authenticate(cookieToken(request),client);
           demand(!passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor),'请先修改本人初始密码。',403);
@@ -206,4 +224,6 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
       return send(response,500,{code:'INTERNAL_ERROR',message:'操作失败，请重试。'});
     }
   });
+  server.on('close',stopGC);
+  return server;
 }

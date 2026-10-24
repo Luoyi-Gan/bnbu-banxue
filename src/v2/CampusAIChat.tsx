@@ -45,6 +45,7 @@ export function CampusAIChat({embedded=false,initialQuestion='',initialConversat
  const jumpLatest=()=>{const node=scroll.current;if(!node)return;nearBottom.current=true;node.scrollTo({top:node.scrollHeight,behavior:device.reducedMotion?'instant':'smooth'});setNewBelow(false)}
  const ask=async(question:string)=>{
   if(!question.trim()||question.length>500||questionLock.current||!live.data)return
+  if(!window.confirm(uiText('本次问题、相关历史问答及你有权访问的课程、预约、通知、体育或校园资料片段会发送给 DeepSeek 生成回答。是否同意分享并发送？')))return
   questionLock.current=true;setAsking(true);setCopyError('')
   const parent=followup?.id??answers.at(-1)?.id
   if(pendingQuestion.current?.question!==question||pendingQuestion.current?.previousAnswerId!==parent)pendingQuestion.current={question,conversationId,requestId:crypto.randomUUID(),...(parent?{previousAnswerId:parent}:{})}

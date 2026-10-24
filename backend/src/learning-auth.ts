@@ -13,6 +13,7 @@ export class LearningAuth {
   constructor(readonly store:LearningStore,readonly school=new ISpace()){}
   private cleanup(){const now=Date.now();for(const[key,value]of this.sessions)if(value.expiresAt<=now)this.sessions.delete(key);}
   current(token:string,ownerId:string){this.cleanup();const session=this.sessions.get(digest(token));return session?.ownerId===ownerId?session:undefined;}
+  forgetAccount(ownerId:string){for(const [key,value]of this.sessions)if(value.ownerId===ownerId)this.sessions.delete(key);}
   forget(token:string){this.sessions.delete(digest(token));}
   async limit(sql:LearningSql,subject:string,origin:string,category:string,max:number,window=60000){
     const now=Date.now(),key=digest(origin);

@@ -8,6 +8,7 @@ const seconds=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)&&
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
 type Session={token:string;userId:string;expires:number;origin:string}
 const sessions=new Map<string,Promise<Session>>()
+export function forgetMovementAccount(accountID:string){for(const key of sessions.keys())if(JSON.parse(key)[0]===accountID)sessions.delete(key);}
 const keyFor=(actor:Account)=>JSON.stringify([actor.id,actor.email])
 async function session(actor:Account,verified:boolean){
  demand(verified&&actor.roles.includes('student')&&actor.status!=='banned','需要本人已验证的有效学生账号。',403)
