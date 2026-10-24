@@ -77,6 +77,50 @@ try{
  await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',{...liveDevice,token:''}));
  await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',{...liveDevice,token:'',installationID:randomUUID(),installationSecret:randomUUID()}));
  check((await db.pool.query("SELECT count(*) FROM push_devices WHERE enabled AND push_start_token=$1",[liveDevice.pushStartToken])).rows[0].count==='1','reinstallation rebinds remote start token without alert permission');
+ // Configuration status and delivery environment follow each stored device.
+ const apnsEnvironment=Object.fromEntries(Object.entries(process.env).filter(([name])=>name.startsWith('APNS_')));
+ try {
+  for(const name of Object.keys(apnsEnvironment))delete process.env[name];
+  process.env.APNS_TEAM_ID='TESTTEAM01';
+  process.env.APNS_SANDBOX_KEY_ID='SANDBOX001';process.env.APNS_SANDBOX_KEY_PATH='/test-only/sandbox.p8';
+  const sandboxDevice={...device,installationID:randomUUID(),installationSecret:randomUUID(),token:'e'.repeat(64)};
+  const productionDevice={...device,installationID:randomUUID(),installationSecret:randomUUID(),environment:'production',token:'f'.repeat(64)};
+  const sandboxResult=await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',sandboxDevice));
+  const unavailableResult=await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',productionDevice));
+  check(sandboxResult.configured&&!unavailableResult.configured,'registration reports configuration per device environment');
+  process.env.APNS_PRODUCTION_KEY_ID='PRODKEY001';process.env.APNS_PRODUCTION_KEY_PATH='/test-only/production.p8';
+  check((await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',productionDevice))).configured,'production registration becomes configured when its pair is present');
+  await db.transaction(c=>new PostgresRepository(c).notify(['a'],null,'broadcast','mixed environments'));
+  const mixed:APNsMessage[]=[];
+  await deliverPush(db,async m=>{mixed.push(m);return {status:200,reason:''};});
+  check(mixed.some(m=>m.token===sandboxDevice.token&&m.environment==='sandbox'),'sandbox device keeps sandbox endpoint selection');
+  check(mixed.some(m=>m.token===productionDevice.token&&m.environment==='production'),'TestFlight device keeps production endpoint selection');
+  await db.transaction(c=>new PostgresRepository(c).notify(['a'],null,'broadcast','partial environment outage'));
+  await deliverPush(db,async m=>{if(m.environment==='production')throw Error('APNS_NOT_CONFIGURED');return {status:200,reason:''};});
+  check((await db.pool.query("SELECT count(*) FROM push_outbox WHERE device_id=$1 AND status='sent'",[sandboxDevice.installationID])).rows[0].count==='2','one environment outage does not block the other environment');
+  check((await db.pool.query("SELECT count(*) FROM push_outbox WHERE device_id=$1 AND status='pending' AND last_error='TransportUnavailable'",[productionDevice.installationID])).rows[0].count==='1','missing environment credentials remain retryable');
+  check((await db.pool.query('SELECT token FROM push_devices WHERE id=$1',[productionDevice.installationID])).rows[0].token===productionDevice.token,'configuration failure does not invalidate a device token');
+  await db.pool.query("UPDATE push_outbox SET available_at=now() WHERE device_id=$1 AND status='pending'",[productionDevice.installationID]);
+  await deliverPush(db,transport);
+  check((await db.pool.query("SELECT count(*) FROM push_outbox WHERE device_id=$1 AND status='pending'",[productionDevice.installationID])).rows[0].count==='0','production jobs recover without re-registering the device');
+  await db.transaction(c=>new PostgresRepository(c).notify(['a'],null,'broadcast','environment switch'));
+  await db.pool.query("INSERT INTO push_live_bindings(device_id,occurrence_id,token,version,state,content,started_at) VALUES($1,'environment-switch',$2,'1','active','{}',0)",[sandboxDevice.installationID,'1'.repeat(64)]);
+  const switched={...sandboxDevice,environment:'production',token:'2'.repeat(64)};
+  await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','register',switched));
+  check((await db.pool.query("SELECT count(*) FROM push_outbox WHERE device_id=$1 AND status IN ('pending','sending')",[sandboxDevice.installationID])).rows[0].count==='0','environment switch cancels old pending tokens');
+  check((await db.pool.query('SELECT count(*) FROM push_live_bindings WHERE device_id=$1',[sandboxDevice.installationID])).rows[0].count==='0','environment switch clears old Live Activity tokens');
+  const afterSwitch:APNsMessage[]=[];
+  await deliverPush(db,async m=>{afterSwitch.push(m);return {status:200,reason:''};});
+  check(!afterSwitch.some(m=>m.token===sandboxDevice.token||m.token===switched.token||m.token==='1'.repeat(64)),'old jobs never cross the environment boundary');
+  await db.transaction(c=>new PostgresRepository(c).notify(['a'],null,'broadcast','new production token'));
+  await deliverPush(db,async m=>{afterSwitch.push(m);return {status:200,reason:''};});
+  check(afterSwitch.some(m=>m.token===switched.token&&m.environment==='production'),'new jobs use the new environment and token');
+  await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','unbind',switched));
+  await db.transaction(c=>pushDeviceRequest(c,actor,'test-session','unbind',productionDevice));
+ } finally {
+  for(const name of Object.keys(process.env).filter(name=>name.startsWith('APNS_')))delete process.env[name];
+  Object.assign(process.env,apnsEnvironment);
+ }
  const server=createPostgresApiServer(db);
  await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
  try {
