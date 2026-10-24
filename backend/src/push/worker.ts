@@ -65,11 +65,13 @@ export async function deliverPush(db:PostgresDatabase,transport:(m:APNsMessage)=
     if(target?.kind==='room'){
      if(!d.settings.teams)return;
      const room=(await c.query("SELECT data::jsonb AS data FROM entities WHERE id=$1 AND kind='room'",[target.id])).rows[0];
-     if(!room||!room.data.members?.includes(d.account_id)||room.data.visibility!=='visible')return;
+     if(!room||!room.data.members?.includes(d.account_id)||room.data.visibility!=='visible'||(!payload.notificationID&&room.data.status!=='open'))return;
     }else if(!d.settings.messages)return;
-    if(target?.kind==='directChat'){
-     const blocked=(await c.query("SELECT 1 FROM entities WHERE kind='socialEdge' AND data::jsonb->>'kind'='block' AND data::jsonb->>'enabled'='true' AND ((owner_id=$1 AND data::jsonb->>'targetId'=$2) OR (owner_id=$2 AND data::jsonb->>'targetId'=$1))",[d.account_id,target.id])).rowCount;
-     if(blocked)return;
+    // Group jobs use the message ID; direct jobs use a notification referring to it.
+    if ((target?.kind === 'room' && !payload.notificationID) || target?.kind === 'directChat') {
+     const message = (await c.query("SELECT owner_id,kind,data::jsonb AS data FROM entities WHERE id=CASE WHEN $2::boolean THEN (SELECT entity_id FROM notifications WHERE id=$1 AND recipient_id=$3) ELSE $1 END", [job.source_id, target.kind === 'directChat', d.account_id])).rows[0];
+     if (!message || message.data.status === 'hidden' || (target.kind === 'room' ? message.kind !== 'message' || message.data.roomId !== target.id : message.kind !== 'directMessage' || message.data.targetId !== d.account_id)) return;
+     if ((await c.query("SELECT 1 FROM entities WHERE kind='socialEdge' AND data::jsonb->>'kind'='block' AND data::jsonb->>'enabled'='true' AND ((owner_id=$1 AND data::jsonb->>'targetId'=$2) OR (owner_id=$2 AND data::jsonb->>'targetId'=$1))", [d.account_id, message.owner_id])).rowCount) return;
     }
     if(payload.notificationID){const n=(await c.query('SELECT read_at FROM notifications WHERE id=$1 AND recipient_id=$2',[payload.notificationID,d.account_id])).rows[0];if(!n||n.read_at)return;}
    }

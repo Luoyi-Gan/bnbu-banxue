@@ -55,7 +55,7 @@ export class PostgresRepository {
     const {rows} = await this.client.query<EntityRow>('INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$5) RETURNING *', [randomUUID(),kind,ownerId,JSON.stringify(stored),now]);
     if(kind==='message') {
       const room=await this.get(data.roomId,'room');
-      for(const member of (Array.isArray(room.data.members)?room.data.members:[]))if(typeof member==='string'&&member!==ownerId)await enqueueNotice(this.client,member,rows[0].id,'room.message','你收到了一条队伍消息。',{kind:'room',id:room.id});
+      for(const member of (Array.isArray(room.data.members)?room.data.members:[]))if(typeof member==='string'&&member!==ownerId&&!(await this.client.query("SELECT 1 FROM entities WHERE kind='socialEdge' AND data::jsonb->>'kind'='block' AND data::jsonb->>'enabled'='true' AND ((owner_id=$1 AND data::jsonb->>'targetId'=$2) OR (owner_id=$2 AND data::jsonb->>'targetId'=$1))",[member,ownerId])).rowCount)await enqueueNotice(this.client,member,rows[0].id,'room.message','你收到了一条队伍消息。',{kind:'room',id:room.id});
     }
     return decodePostgresEntity(rows[0]);
   }

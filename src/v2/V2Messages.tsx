@@ -1,3 +1,5 @@
+import {command} from '../live/api'
+import {ChatMessageActions} from './ChatMessageActions'
 import './stateContinuity.css'
 import { uiText, uiTemplate, useUiLanguage, uiLocale } from './uiLanguage'
 import { ArrowLeft, ArrowUp, Bell, CalendarDays, ChevronRight, Coffee, MessageCircle, UsersRound } from 'lucide-react'
@@ -12,9 +14,9 @@ import { DisplayAvatar } from './DisplayAvatar'
 import './messages.css'
 import {CommunityDirectMessages,CommunityDirectInbox} from './CommunityDirectMessages'
 
-function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened }: {
+function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened, onChanged, sending }: {
   conversation: LiveConversation; draft: string; onDraft: (value: string) => void
-  onSend: (event: FormEvent<HTMLFormElement>) => void; onBack: () => void; opened: boolean
+  onSend: (event: FormEvent<HTMLFormElement>) => void; onBack: () => void; opened: boolean; onChanged: () => unknown; sending: boolean
 }) { useUiLanguage();
   const messages = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLTextAreaElement>(null)
@@ -47,7 +49,7 @@ function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened
       <span className="inbox-history-caption">{uiText("会话记录")}</span>
       {conversation.messages.map(message => <div className={`inbox-message${message.mine ? ' is-mine' : ''}`} key={message.id}>
         {!message.mine && <DisplayAvatar className="inbox-person-avatar" name={message.from} avatar={message.avatar} personId={message.personId}/>}
-        <div className="inbox-message-content"><div className="inbox-message-meta"><span>{message.mine?uiText('我'):message.from}</span><time>{message.time}</time></div><p>{message.body}</p></div>
+        <div className="inbox-message-content"><div className="inbox-message-meta"><span>{message.mine?uiText('我'):message.from}</span><time>{message.time}</time></div><p>{message.body}</p>{!message.mine&&message.personId&&<ChatMessageActions id={message.id} author={message.personId} onChanged={onChanged}/>}</div>
       </div>)}
       {!conversation.messages.length && <Empty icon={MessageCircle} title={uiText("开始一段新对话")} description={uiText("向一起参与的同学打个招呼吧。")}/>}
     </div>
@@ -57,7 +59,7 @@ function ConversationPane({ conversation, draft, onDraft, onSend, onBack, opened
           event.preventDefault()
           if (draft.trim()) event.currentTarget.form?.requestSubmit()
         }
-      }}/><button type="submit" aria-label={uiText("发送消息")} disabled={!draft.trim()}><ArrowUp size={21}/></button></div>
+      }}/><button type="submit" aria-label={uiText("发送消息")} disabled={sending||!draft.trim()}><ArrowUp size={21}/></button></div>
       <small className="inbox-composer-hint">{uiText("Enter 发送 · Shift + Enter 换行")}</small>
     </form>
   </>
@@ -71,6 +73,8 @@ export function V2Messages() { useUiLanguage();
   const view = params.get('view') === 'notifications' ? 'notifications' : 'conversations'
   const selected = params.get('conversation')
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [sendErrors,setSendErrors]=useState<Record<string,string>>({}),[sending,setSending]=useState(false)
+  const sendLock=useRef(false)
   const category = noticeCategories.find(item => item === params.get('category')) ?? '全部'
   const setCategory = (value: string) => setParams({view:'notifications',category:value})
   const notice = live.data?.notifications.find(item => item.id === params.get('notice'))
@@ -100,8 +104,14 @@ export function V2Messages() { useUiLanguage();
     event.preventDefault()
     if (!active) return
     const id = active.id, body = (drafts[id] ?? '').trim()
-    if (!body) return
-    if (await live.mutate('message.send', {roomId: id, body})) setDrafts(value => value[id]?.trim() === body ? {...value, [id]: ''} : value)
+    if (!body||sendLock.current) return
+    sendLock.current=true;setSending(true);setSendErrors(value=>({...value,[id]:''}))
+    try {
+      await command('message.send',{roomId:id,body})
+      setDrafts(value=>value[id]?.trim()===body?{...value,[id]:''}:value)
+      await live.refresh()
+    } catch(cause){setSendErrors(value=>({...value,[id]:cause instanceof Error?cause.message:'发送失败，请重试。'}))}
+    finally{sendLock.current=false;setSending(false)}
   }
   if(params.get('person'))return <div className="v2-page"><CommunityDirectMessages key={params.get('person')} person={params.get('person')!}/></div>
   return <div className={`v2-page v2-messages-page${opened ? ' is-chat-open' : ''}`}>
@@ -131,7 +141,8 @@ export function V2Messages() { useUiLanguage();
         {conversations.length > 0 && <p className="inbox-list-note">{uiText("与一起参与的同学，保持联系。")}</p>}
       </aside>
       <section className="inbox-chat" aria-label={uiText("聊天区域")}>
-        {active ? <ConversationPane conversation={active} draft={drafts[active.id] ?? ''} onDraft={value => setDrafts(previous => ({ ...previous, [active.id]: value }))} onSend={send} onBack={() => setParams({})} opened={opened}/> : <Empty icon={MessageCircle} title={uiText("选择一个会话")} description={uiText("在这里延续校园里的交流。")}/>}
+        {active ? <ConversationPane conversation={active} draft={drafts[active.id] ?? ''} onDraft={value => setDrafts(previous => ({ ...previous, [active.id]: value }))} onSend={send} onBack={() => setParams({})} opened={opened} onChanged={live.refresh} sending={sending}/> : <Empty icon={MessageCircle} title={uiText("选择一个会话")} description={uiText("在这里延续校园里的交流。")}/>}
+        {active&&sendErrors[active.id]&&<p className="inbox-save-error" role="alert">{uiText(sendErrors[active.id])}</p>}
         {live.error && <p className="inbox-save-error" role="alert">{uiText(live.error)}</p>}
       </section>
     </div>}

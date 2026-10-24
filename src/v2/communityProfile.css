@@ -57,3 +57,5 @@ html[data-ui-theme=dark] .community-profile-card .community-outline{border-color
 html[data-ui-theme=dark] .community-profile-identity .community-profile-avatar{border-color:#1c2726}
 html[lang=en] .community-profile-statline span{max-width:110px}
 @media(prefers-reduced-motion:reduce){.community-profile-actions :is(button,a){transition:none;transform:none}}
+
+.chat-safety-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12px}.chat-safety-actions>button{background:none;border:0;color:var(--v2-muted,#666);padding:6px;cursor:pointer}.chat-safety-actions textarea{display:block;width:100%;min-height:100px;margin:12px 0}

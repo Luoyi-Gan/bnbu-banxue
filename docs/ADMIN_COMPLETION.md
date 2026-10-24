@@ -3285,3 +3285,9 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 - 最终后端全量 104 文件、597 项通过，0 失败、0 跳过；Compose 152 项、前后端类型检查、变更 lint、Web/后端构建通过。一次与 Xcode 编译并行的全量运行出现 3 项旧用例 5 秒超时，编译结束后按原配置重跑通过，未放宽超时或跳过断言。
 - iOS 原 PR head f787da1 复核：业务 smoke、AppModel/Watch handler 76 项断言、iPhone/配套 Watch/实时活动 Release 无签名构建通过；独立 iOS 26.5 模拟器 TimetableImportUITests 1 项通过、0 失败、0 跳过，覆盖系统选图、取消、重复选择、编辑、保存和重进页面持久化，已查看核对与确认页面截图。
 - 本机证据：/tmp/review-ocr-final-rerun.json、/tmp/review-pr8-ui.xcresult、/tmp/review-pr8-ui-images。照片、账号和云 OCR 均为合成/替身，未调用真实腾讯云，未部署生产或更新既有预览。真实照片准确率、真机 HEIC/iCloud、弱网、Watch 配对同步与云服务配置仍待验收。
+
+## 2026-10-24 聊天举报、过滤与群聊屏蔽
+
+新增单条私信/群消息举报、最小证据审核队列、下架联动、统一关键词检查和双向群聊屏蔽。推送在入队及投递前检查，保留队伍结束等业务通知。SQLite/PostgreSQL 全量 608 项通过；独立推送 31 项、注销 63 项通过。配置与权限、浏览器操作证据及上线待办见 [聊天安全交接](CHAT_SAFETY_RELEASE_2026-10-24.md)。未部署生产，未作真实 APNs/真机验收。
+
+本轮同步修复独立注销回归仍固定断言 8 节政策的问题（OCR 合并后为 9 节），并先 drain 数据库连接池再清理测试 schema，避免后台 GC 与测试 DDL 清理死锁。最终 PostgreSQL 63 项、SQLite 48 项通过。

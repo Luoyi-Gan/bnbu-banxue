@@ -1,4 +1,5 @@
 import { timetableProvider } from './timetable-config';
+import {chatMessageVisible} from './chat-visibility';
 import type { Account } from './auth';
 import type { Repository, Entity, Fields } from './repository';
 import { strings } from './repository';
@@ -159,7 +160,7 @@ export function projectWorkspace(source: SnapshotSource, actor: Account) {
       .filter((r) => rooms.some((room) => room.id === r.data.roomId)),
     ...repo
       .all("message")
-      .filter((m) => memberRooms.some((r) => r.id === m.data.roomId)),
+      .filter((m) => memberRooms.some((r) => r.id === m.data.roomId) && chatMessageVisible(m, actor.id, socialEdges)),
     ...repo.all("certification").filter((c) => own(c.ownerId) || review),
     ...repo.all("report").filter((c) => own(c.ownerId) || review).map((report) => {
       if (review) return report;

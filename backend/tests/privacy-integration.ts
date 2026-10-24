@@ -90,7 +90,7 @@ try{
  const policy=await fetch(base+'/privacy');
  check(policy.status===200&&(await policy.text()).includes('珠海澄序智能科技有限公司'),'policy public without authentication');
  const policyJSON=await (await fetch(base+'/api/privacy-policy')).json();
- check(policyJSON.version==='2026-10-24'&&policyJSON.sections.length===8,'versioned bilingual policy available');
+ check(policyJSON.version==='2026-10-24'&&policyJSON.sections.length===9&&policyJSON.sections.some((section:string[])=>section[0]==='课表照片识别'&&section.length===4),'versioned bilingual policy available');
  const confirm='/api/account/deletion/confirm',request='/api/account/deletion/request';
  const payload=(credential:unknown={password})=>({requestId:randomUUID(),confirmed:true,...credential as object});
  check((await post('none',confirm,payload())).status===401,'unauthenticated rejected');
@@ -175,6 +175,12 @@ try{
  console.log(`Privacy ${mode}: ${checks} assertions passed`);
 }finally{
  if(server)await new Promise<void>(resolve=>server!.close(()=>resolve()));
- if(db instanceof PostgresDatabase){await db.pool.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);await db.close();}else db.close();
+ if(db instanceof PostgresDatabase){
+  // Drain in-flight GC before dropping tables; cleanup must not mask an assertion
+  // with a DDL deadlock against a still-running background transaction.
+  await db.close();
+  const cleanup=new PostgresDatabase({connectionString:process.env.DATABASE_URL});
+  try{await cleanup.pool.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);}finally{await cleanup.close();}
+ }else db.close();
  await rm(directory,{recursive:true,force:true});
 }
