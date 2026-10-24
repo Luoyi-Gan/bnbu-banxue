@@ -30,7 +30,7 @@ export function* communitySocialPolicy(repo:BusinessRepository,actor:Account,act
     const messages=yield* effect(repo.all('directMessage'));
     demand(messages.filter(m=>m.ownerId===actor.id&&Date.parse(m.createdAt)>Date.now()-60000).length<20,'发送过于频繁，请稍后再试。',429);
     const message=yield* effect(repo.create('directMessage',actor.id,{targetId,body:textField(input,'body',500)}));
-    yield* effect(repo.notify([targetId],null,'community.direct','你收到了一条校园私信。'));
+    yield* effect(repo.notify([targetId],message.id,'community.direct','你收到了一条校园私信。'));
     return message;
   }
   if(!['social.follow','social.block','social.dismiss','draft.save','draft.delete','post.update','comment.delete','comment.like'].includes(action))return;

@@ -21,6 +21,10 @@ services:
     command: ["node", "backend/dist/postgres.mjs"]
     environment:
       DATABASE_URL: postgresql://bnbu:${BNBU_POSTGRES_PASSWORD:?Set BNBU_POSTGRES_PASSWORD}@postgres:5432/bnbu
+      APNS_KEY_PATH: ${APNS_KEY_PATH:-}
+      APNS_KEY_ID: ${APNS_KEY_ID:-}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:-}
+      APNS_BUNDLE_ID: edu.bnbu.banxue.student
       BNBU_APP_SURFACE: companion
       BNBU_POSTGRES_SCHEMA: public
       BNBU_API_HOST: 0.0.0.0

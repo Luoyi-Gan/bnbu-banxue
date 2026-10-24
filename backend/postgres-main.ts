@@ -1,3 +1,4 @@
+import {startPushWorker} from './src/push/worker';
 import { PostgresDatabase } from './src/storage/postgres';
 import { postgresMigrations } from './src/storage/postgres-schema';
 import { createPostgresApiServer } from './src/postgres-api';
@@ -30,5 +31,6 @@ try {
   });
 } catch(error) { await db.close(); throw error; }
 console.log(`BNBU PostgreSQL API listening on port ${port}; business route migration in progress`);
+const push=startPushWorker(db);
 const mailbox=startActivityMailbox((actorId,input,requestId)=>executePostgresMailboxImport(db,actorId,input,requestId));
-for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>{mailbox?.stop();server.close(()=>void db.close());});
+for(const signal of ['SIGINT','SIGTERM'] as const) process.once(signal,()=>{push.stop();mailbox?.stop();server.close(()=>void db.close());});

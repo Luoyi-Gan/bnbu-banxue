@@ -3238,3 +3238,12 @@ SQLite 与 PostgreSQL 共用域名与身份资料口径，注册验证码成功�
 - CampusHeroGallery只显示当前/前一层图片，下一张低优先预取并解码后淡入；不再一次挂载全部图片。静态偏好/减少动态初次只请求当前顶部图；离屏与后台暂停，下一张失败跳过且保留当前已解码图。设置中移除已不存在的“手动切换”说明。
 - 本地430×932/1440×1000浏览器通过：删除区域不存在、11张素材HTTP200/图片类型、真实轮播切换与最多两层、离屏暂停、关闭轮播与系统减少动态仅请求当前图、下一张断网失败跳过且不空白。无页面异常或桌面溢出。证据.runtime/home-gallery/verification.json、photo-dimensions.json及截图。
 - 前端类型检查、变更文件lint通过。未改业务数据，未调用DeepSeek，未部署生产。
+
+### 2026-10-24 iOS 通知中心与 APNs / ActivityKit
+
+- PostgreSQL 增量迁移 13 增加通知目标、设备绑定、实时活动绑定与事务 outbox；已在本机原数据卷应用，健康检查 schemaVersion=13。未部署生产。
+- 通知分页/正文/全量已读接口保持本人会话边界；私信补齐目标。队伍聊天独立事件只推摘要，不产生额外站内通知。旧 SQLite 业务回归保持通过。
+- 30 秒调度复用 Web 课表和校历，生成已核对课程、本人公开活动及已确认预约；提醒默认 15/30 分钟、实时活动提前 15 分钟单项选择。失效、已读、取消、过期、权限和偏好在投递前复核。
+- 本轮 4 个 Vitest 文件 44 项通过；PostgreSQL 隔离 schema 的 30 项检查通过，包括事务回滚、并发领取、重试、过期、停用、聊天隐私、分页、全量已读、HTTP 会话门禁与设备越权。transport 为测试替身，不代表 Apple 接受或真机收到。
+- iOS 增加原生通知中心/设备设置与 Live Activity 扩展；已完成模拟器通知点击及卡片布局验证。Watch mapper 868、handler 63、store 27 项断言与 native Web parity 通过。
+- 用户要求付费 Team ID/开发者权限稍后交接；目前未提供 APNs Key ID/Team ID/.p8，worker 明确 disabled。真实 Sandbox 投递、后台远程生命周期、真机/Watch 端到端仍待验收。配置与迁移说明见 docs/APNS_SETUP.md；iOS 对应 docs/NOTIFICATIONS_HANDOFF.md。

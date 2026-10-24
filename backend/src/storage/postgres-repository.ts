@@ -1,3 +1,4 @@
+import {enqueueNotice,notificationTarget} from '../push/storage';
 import { randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { demand, timestamp, type Account } from '../auth';
@@ -51,6 +52,10 @@ export class PostgresRepository {
     const now = timestamp();
     const stored=await storeImages(data);
     const {rows} = await this.client.query<EntityRow>('INSERT INTO entities(id,kind,owner_id,data,created_at,updated_at) VALUES($1,$2,$3,$4,$5,$5) RETURNING *', [randomUUID(),kind,ownerId,JSON.stringify(stored),now]);
+    if(kind==='message') {
+      const room=await this.get(data.roomId,'room');
+      for(const member of (Array.isArray(room.data.members)?room.data.members:[]))if(typeof member==='string'&&member!==ownerId)await enqueueNotice(this.client,member,rows[0].id,'room.message','你收到了一条队伍消息。',{kind:'room',id:room.id});
+    }
     return decodePostgresEntity(rows[0]);
   }
 
@@ -74,7 +79,9 @@ export class PostgresRepository {
 
   async notify(recipients: string[], entityId: string | null, event: string, body: string) {
     for (const recipient of new Set(recipients)) {
-      await this.client.query('INSERT INTO notifications(id,recipient_id,entity_id,event,body,created_at) VALUES($1,$2,$3,$4,$5,$6)', [randomUUID(),recipient,entityId,event,body,timestamp()]);
+      const id=randomUUID(),target=await notificationTarget(this.client,recipient,entityId,event);
+      await this.client.query('INSERT INTO notifications(id,recipient_id,entity_id,event,body,created_at,target) VALUES($1,$2,$3,$4,$5,$6,$7)', [id,recipient,entityId,event,body,timestamp(),target?JSON.stringify(target):null]);
+      await enqueueNotice(this.client,recipient,id,event,body,target);
     }
   }
 

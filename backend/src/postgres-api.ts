@@ -1,3 +1,4 @@
+import {pushDeviceRequest,readNotices} from './push/storage';
 import {movementNative} from './movement-native';
 import {movementRequest} from './movement';
 import {LearningAuth} from './learning-auth';
@@ -48,6 +49,9 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
     try {
       const requestUrl = new URL(request.url ?? '/', 'http://localhost');
       const pathname = requestUrl.pathname;
+      const noticeDetail=request.method==='GET' && /^\/api\/notifications\/([^/]+)$/.exec(pathname);
+      if(noticeDetail)return send(response,200,await db.transaction(async client=>{const actor=await auth.authenticate(cookieToken(request),client);demand(actor.status!=='banned'&&!passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor),'当前账号不可读取通知。',403);const rows=(await client.query('SELECT id,entity_id AS "entityId",event,body,created_at AS "createdAt",read_at AS "readAt",target FROM notifications WHERE id=$1 AND recipient_id=$2',[decodeURIComponent(noticeDetail[1]),actor.id])).rows;demand(rows.length,'通知不存在。',404);return {notifications:rows};}));
+      if(request.method==='GET'&&pathname==='/api/notifications')return send(response,200,await db.transaction(async client=>{const actor=await auth.authenticate(cookieToken(request),client);demand(actor.status!=='banned'&&!passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor),'当前账号不可读取通知。',403);return readNotices(client,actor,requestUrl.searchParams);}));
       if(request.method==='GET'&&pathname==='/api/learning'){
         const token=cookieToken(request)??'',actor=await auth.authenticate(token);
         const blocked=await db.transaction(async client=>passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor));
@@ -122,6 +126,12 @@ export function createPostgresApiServer(db: PostgresDatabase, options: {localOut
           return send(response,200,{data:await executePostgres(db,token,'screenshot.import',{image:image.image,recognizedText:image.text,ocrRequestId:image.requestId},randomUUID())});
         }
         const input = await body(request);
+        if(pathname.startsWith('/api/push/'))return send(response,200,await db.transaction(async client=>{
+          const actor=await auth.authenticate(cookieToken(request),client);
+          demand(!passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor),'请先修改本人初始密码。',403);
+          return pushDeviceRequest(client,actor,cookieToken(request)??'',pathname.slice('/api/push/'.length),input);
+        }));
+        if(pathname==='/api/notifications/read-all')return send(response,200,await db.transaction(async client=>{const actor=await auth.authenticate(cookieToken(request),client);demand(actor.status!=='banned'&&!passwordChangeRequired(await new PostgresRepository(client).all('companionIdentity'),actor),'当前账号不可更新通知。',403);await client.query('UPDATE notifications SET read_at=$1 WHERE recipient_id=$2 AND read_at IS NULL',[new Date().toISOString(),actor.id]);return {ok:true};}));
         if(pathname==='/api/auth/email-login/request')return send(response,200,await learningAuth.requestCode(input.email,request.socket.remoteAddress??'unknown',options.localOutbox===true));
         if(pathname==='/api/auth/email-login'||pathname==='/api/auth/school-login'){
           const result=pathname.endsWith('/school-login')?await learningAuth.schoolLogin(input.identifier,input.password,request.socket.remoteAddress??'unknown'):await learningAuth.emailLogin(input.email,input.code,request.socket.remoteAddress??'unknown');
