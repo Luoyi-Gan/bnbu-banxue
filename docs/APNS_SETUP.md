@@ -2,39 +2,50 @@
 
 ## 配置状态
 
-代码已接入当前 PostgreSQL API。未提供付费 Apple Team、Key ID 与 `.p8`，本机日志明确显示 APNs disabled，不会伪装成功投递。用户要求开发者账号配置交由后续接手人完成。当前 iOS 本地 Personal Team 不支持 Push Notifications。
+同一个 PostgreSQL API 现在可按设备注册时的 `sandbox` / `production` 环境选择各自的 APNs 私钥和 Key ID。普通通知、提醒和实时活动均走同一环境路由。iOS Debug 使用 Sandbox；TestFlight / App Store Release 使用 Production。
 
-## 凭据与环境
+会同里付费团队为 `2X7N2NAF7P`；主 App 已注册 `com.runjizhou.huitongli`，实时活动扩展为 `com.runjizhou.huitongli.live`，Watch 为 `com.runjizhou.huitongli.watchkitapp`。账户侧已创建独立的 Sandbox / Production APNs 密钥与发布证书，实际私钥不在仓库。本文是部署配置交接，未部署生产，未验证真实 APNs 送达。
 
-需要付费 Team 的 APNs Auth Key；主 App Bundle ID `edu.bnbu.banxue.student`，实时活动扩展 `edu.bnbu.banxue.student.live`。主 App 开启 Push Notifications，扩展同 Team 签名。私钥放仓库外，权限仅部署账号可读。
+## 同一后端的双环境配置（推荐）
 
-本地 `.env.local`（已有 Git 忽略）增加以下占位项，实际值由接手人填写：
+在仓库外的受保护环境文件中填写：
 
 ```dotenv
-APNS_TEAM_ID=YOUR_PAID_TEAM_ID
-APNS_KEY_ID=YOUR_KEY_ID
-APNS_KEY_PATH=/run/secrets/apns.p8
-APNS_BUNDLE_ID=edu.bnbu.banxue.student
+APNS_TEAM_ID=2X7N2NAF7P
+APNS_BUNDLE_ID=com.runjizhou.huitongli
+APNS_SANDBOX_KEY_ID=YOUR_SANDBOX_KEY_ID
+APNS_PRODUCTION_KEY_ID=YOUR_PRODUCTION_KEY_ID
+# 这两个是宿主机上的绝对路径；不要把 .p8 复制到源码或镜像。
+APNS_SANDBOX_KEY_FILE=/absolute/private/path/AuthKey_Sandbox.p8
+APNS_PRODUCTION_KEY_FILE=/absolute/private/path/AuthKey_Production.p8
 ```
 
-本地 `.runtime/compose.apns.local.yaml`（Git 忽略）示例：
-
-```yaml
-services:
-  api:
-    volumes:
-      - /absolute/private/path/AuthKey.p8:/run/secrets/apns.p8:ro
-```
+使用提交的可选 `compose.apns.yaml`，将两把钥匙分别只读挂载到容器，缺少文件时禁止自动创建空目录：
 
 ```sh
-docker compose --env-file .env.local -f compose.postgres.yaml \
-  -f .runtime/compose.iphone.local.yaml -f .runtime/compose.apns.local.yaml \
-  up -d --no-deps --build api
+docker compose --env-file /absolute/private/server.env \
+  --env-file /absolute/private/apns.env \
+  -f compose.postgres.yaml -f compose.apns.yaml config --quiet
+# 经过部署授权并完成数据库/图片备份后再执行：
+docker compose --env-file /absolute/private/server.env \
+  --env-file /absolute/private/apns.env \
+  -f compose.postgres.yaml -f compose.apns.yaml up -d --no-deps --build api
 ```
 
-路径要换成本机真实私钥路径，不把文件复制到源码/镜像。API 容器需出站访问 Apple HTTP/2 443。App 的 Debug token 对应 `api.sandbox.push.apple.com`，Release 对应 `api.push.apple.com`；推送使用主 App topic，实时活动使用主 App topic 加 `.push-type.liveactivity`，不是扩展 bundle ID。
+容器内 `APNS_SANDBOX_KEY_PATH=/run/secrets/apns-sandbox.p8`、`APNS_PRODUCTION_KEY_PATH=/run/secrets/apns-production.p8` 由覆盖文件设置。直接启动 Node 时，使用这两个 KEY_PATH 变量指定进程实际可读路径，KEY_FILE 仅供 Compose 挂载使用。私钥文件权限设为仅运行账号可读，确保容器运行用户可读；不要在工单或日志中粘贴私钥、JWT 或设备 token。
 
-配置只判断环境是否齐备，不等于 Apple 接受凭据。首次实际投递须查看脱敏结果，修正 `InvalidProviderToken / TopicDisallowed / BadDeviceToken` 等原因后再验收。
+`compose.postgres.yaml` 的 `APNS_BUNDLE_ID` 默认已改为 `com.runjizhou.huitongli`，并支持环境变量覆盖。SQLite Compose 不运行 APNs worker，不因透传变量而宣称支持推送。API 需出站访问 Apple HTTP/2 443。
+
+## 选择规则、缓存与兼容
+
+- 任意一个 `APNS_SANDBOX_KEY_ID/KEY_PATH` 或 `APNS_PRODUCTION_KEY_ID/KEY_PATH` 非空时，整个进程进入分环境模式。每个环境必须同时有自己的 Key ID、Key Path 和共享 Team ID；缺失时明确不可用，不借用旧通用密钥或另一环境的密钥。Compose 默认透传的空值不算启用分环境模式。
+- 只有全部分环境设置为空时，保留旧 `APNS_KEY_ID` + `APNS_KEY_PATH` + `APNS_TEAM_ID` 单密钥模式。只有确实兼容两环境的旧密钥才能同时用于两类设备；现在创建的环境专属密钥应使用新配置，不能靠兼容模式扩展 Apple 授予的权限。
+- JWT 缓存按环境隔离，45 分钟刷新；Team ID、Key ID、路径或文件身份/修改时间变化会使对应缓存失效。修改 Docker 环境变量需重建 API 容器；替换只读挂载文件建议重建容器，确保 bind mount 指向新文件。
+- 注册/实时活动接口返回的 `configured` 只反映该设备环境的配置字段是否齐备，不表示文件可读或 Apple 接受凭据。只配置一侧时该侧仍能工作；另一侧待发任务按既有退避重试，直到恢复或过期，不因缺配置删除设备 token。
+- 同一安装切换 APNs 环境时，取消旧待发任务并清理旧实时活动绑定，避免旧环境 token 被新环境复用；新设备注册和新任务继续走原账号/会话权限检查。
+- 普通通知使用主 App Topic `com.runjizhou.huitongli`；实时活动使用 `com.runjizhou.huitongli.push-type.liveactivity`，不是 `.live` 扩展标识。
+
+首次实际投递需核对脱敏错误与设备结果，区分 `InvalidProviderToken`、`BadEnvironmentKeyIdInToken`、`TopicDisallowed`、`BadDeviceToken` 等原因。配置和自动化测试通过不等于真实推送成功。
 
 ## 数据与接口
 
@@ -78,7 +89,8 @@ Node 24；安装仓库锁定依赖后：
 
 ```sh
 npm run typecheck:server
-npx vitest run backend/src/push/agenda.test.ts tests/notification-preferences.test.ts tests/backend.test.ts tests/backend-http.test.ts
+npx vitest run backend/src/push/apns.test.ts backend/src/push/agenda.test.ts tests/notification-preferences.test.ts tests/backend.test.ts tests/backend-http.test.ts
+node scripts/test-deployment-config.mjs
 # 使用本地测试数据库；仅创建/删除随机 push_test_* schema
 DATABASE_URL='postgresql://...' node scripts/test-push-postgres.mjs
 ```
@@ -92,6 +104,8 @@ docker exec bnbu-postgres-local-api-1 node /app/backend/dist/push-integration.mj
 ```
 
 集成测试仅对随机 schema 操作，finally 删除自身 schema；不会对 public schema 创建测试账号。测试传输为替身，不发送真实 APNs。
+
+本轮结果：全量 Vitest 106 个文件、626 项通过（含 18 项 APNs 单测），零失败、零跳过；真实隔离 PostgreSQL 推送专项 43 项、Compose 静态配置 183 项通过。JWT 单测使用临时 EC 密钥校验 ES256 签名、交错环境路由、缓存隔离/过期/轮换和配置缺失，HTTP/2 为替身，不调用 Apple。
 
 ## 后续真机验收
 
